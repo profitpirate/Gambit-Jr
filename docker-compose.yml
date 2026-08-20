@@ -1,0 +1,15 @@
+services:
+  bot:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - bot-data:/app/data
+      - bot-evidence:/app/evidence
+    ports:
+      - "127.0.0.1:8080:8080"
+
+volumes:
+  bot-data:
+  bot-evidence:
+
