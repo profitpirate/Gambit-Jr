@@ -24,7 +24,7 @@ class SolanaRpcProvider:
         return data.get("result")
 
     async def safety(self, token_address: str) -> SafetyAssessment:
-        assessment = SafetyAssessment(checked_at=iso(), source=self.name)
+        assessment = SafetyAssessment(checked_at=iso(), source=self.name, chain="solana")
         account = await self._rpc("getAccountInfo", [
             token_address, {"encoding": "jsonParsed", "commitment": "confirmed"}
         ])

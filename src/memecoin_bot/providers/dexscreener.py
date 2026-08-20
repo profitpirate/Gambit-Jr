@@ -38,7 +38,7 @@ class DexScreenerProvider:
         self.client = client
 
     async def discover(self) -> list[DiscoveryEvent]:
-        """Discover latest Solana profile/boost/catalyst activations from documented endpoints."""
+        """Discover latest Solana/BSC profile, boost and takeover activations."""
         endpoints = {
             "dexscreener_profile": "/token-profiles/latest/v1",
             "dexscreener_boost": "/token-boosts/latest/v1",
@@ -53,13 +53,16 @@ class DexScreenerProvider:
                 # suppress boost/takeover discovery (or crash the scanner).
                 continue
             for item in _items(data):
-                if str(item.get("chainId", "")).lower() != "solana":
+                raw_chain = str(item.get("chainId", "")).lower()
+                chain = {"solana": "solana", "bsc": "bsc"}.get(raw_chain)
+                if chain is None:
                     continue
                 address = item.get("tokenAddress")
                 if not isinstance(address, str) or not address:
                     continue
                 events.setdefault(address, DiscoveryEvent(
                     token_address=address,
+                    chain=chain,
                     source=source,
                     metadata={
                         "description": item.get("description"),
@@ -72,9 +75,9 @@ class DexScreenerProvider:
                 ))
         return list(events.values())
 
-    async def market_snapshot(self, token_address: str) -> MarketSnapshot | None:
+    async def market_snapshot(self, token_address: str, chain: str = "solana") -> MarketSnapshot | None:
         data = await self.client.request(
-            f"{self.base_url}/token-pairs/v1/solana/{token_address}"
+            f"{self.base_url}/token-pairs/v1/{chain}/{token_address}"
         )
         pairs = _items(data)
         if not pairs:
@@ -103,6 +106,7 @@ class DexScreenerProvider:
             token_address=token_address,
             captured_at=iso(),
             source=self.name,
+            chain=chain,
             pair_address=pair.get("pairAddress"),
             symbol=base.get("symbol"),
             name=base.get("name"),

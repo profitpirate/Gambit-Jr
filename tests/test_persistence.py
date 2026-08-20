@@ -7,6 +7,21 @@ from tests.helpers import create_signal, store, temp_db_path
 
 
 class PersistenceTests(unittest.TestCase):
+    def test_additive_migration_is_restart_safe_after_columns_exist(self) -> None:
+        with temp_db_path() as path:
+            db = store(path)
+            with db.conn:
+                db.conn.execute("DELETE FROM schema_migrations WHERE version='003_radar_multichain.sql'")
+            db.close()
+            recovered = store(path)
+            self.assertIsNotNone(recovered.conn.execute(
+                "SELECT radar_score FROM candidates LIMIT 1"
+            ).description)
+            self.assertIn("003_radar_multichain.sql", {
+                row[0] for row in recovered.conn.execute("SELECT version FROM schema_migrations")
+            })
+            recovered.close()
+
     def test_initial_signal_snapshot_is_immutable(self) -> None:
         with temp_db_path() as path:
             db = store(path)

@@ -4,7 +4,7 @@ import asyncio
 import json
 import logging
 from dataclasses import asdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from memecoin_bot.config import Settings
@@ -18,12 +18,31 @@ from memecoin_bot.observability.logging import event as log_event
 from memecoin_bot.onchain import OnchainEngine
 from memecoin_bot.providers.base import ProviderError
 from memecoin_bot.providers.dexscreener import DexScreenerProvider
-from memecoin_bot.providers.solana_rpc import SolanaRpcProvider
+from memecoin_bot.radar import RadarEngine
 from memecoin_bot.safety import SafetyGates
 from memecoin_bot.scoring import ScoringEngine
-from memecoin_bot.signals import format_event, signal_payload
+from memecoin_bot.signals import format_discord_event, radar_payload, signal_payload
 from memecoin_bot.social import SocialEngine
 from memecoin_bot.tracking import SignalTracker
+
+
+def fair_chain_sample(discoveries: list[DiscoveryEvent], limit: int) -> list[DiscoveryEvent]:
+    """Bound a discovery cycle without allowing the first provider/chain to starve others."""
+    if limit <= 0:
+        return []
+    chains: dict[str, list[DiscoveryEvent]] = {}
+    for discovery in discoveries:
+        chains.setdefault(discovery.chain, []).append(discovery)
+    selected: list[DiscoveryEvent] = []
+    while len(selected) < limit:
+        progressed = False
+        for queue in chains.values():
+            if queue and len(selected) < limit:
+                selected.append(queue.pop(0))
+                progressed = True
+        if not progressed:
+            break
+    return selected
 
 
 class IntelligenceService:
@@ -33,14 +52,14 @@ class IntelligenceService:
         store: Store,
         discovery: DiscoveryPoller,
         market: DexScreenerProvider,
-        solana: SolanaRpcProvider,
+        safety_provider: Any,
         notifier: Any,
     ):
         self.settings = settings
         self.store = store
         self.discovery = discovery
         self.market = market
-        self.solana = solana
+        self.safety_provider = safety_provider
         self.notifier = notifier
         self.safety_gates = SafetyGates(settings)
         self.scoring = ScoringEngine(settings)
@@ -49,6 +68,7 @@ class IntelligenceService:
         self.social = SocialEngine()
         self.onchain = OnchainEngine()
         self.momentum = MomentumEngine()
+        self.radar = RadarEngine(settings)
         self.tracker = SignalTracker(store, market, settings)
         self.started_at = iso()
         self.log = logging.getLogger("memecoin_bot.service")
@@ -71,13 +91,14 @@ class IntelligenceService:
         token_id = int(candidate["token_id"])
         candidate_id = int(candidate["id"])
         address = candidate["token_address"] if "token_address" in candidate.keys() else discovery.token_address
+        chain = candidate["chain"] if "chain" in candidate.keys() else discovery.chain
         last_seen = candidate["last_monitored_at"]
         if last_seen and (datetime.now(timezone.utc) - datetime.fromisoformat(last_seen)).total_seconds() / 60 > self.settings.candidate_inactivity_timeout_minutes:
             self.store.update_candidate(candidate_id, CandidateState.EXPIRED,
                                         "CANDIDATE_INACTIVITY_TIMEOUT", waiting_reasons=["CANDIDATE_INACTIVITY_TIMEOUT"], expired=True)
             return str(CandidateState.EXPIRED)
         try:
-            market = await self.market.market_snapshot(address)
+            market = await self.market.market_snapshot(address, chain)
         except ProviderError as exc:
             self.store.update_candidate(candidate_id, CandidateState.FAILED_PROVIDER,
                                         "MARKET_PROVIDER_UNAVAILABLE", waiting_reasons=["MARKET_PROVIDER_UNAVAILABLE"])
@@ -89,27 +110,34 @@ class IntelligenceService:
                                         "PAIR_NOT_AVAILABLE", waiting_reasons=["PAIR_NOT_AVAILABLE"])
             return str(CandidateState.PENDING_EVIDENCE)
         if discovery is None:
-            discovery = DiscoveryEvent(token_address=address, symbol=candidate["symbol"],
+            discovery = DiscoveryEvent(token_address=address, chain=chain, symbol=candidate["symbol"],
                                        name=candidate["name"], pair_address=candidate["pair_address"],
-                                       discovered_at=candidate["first_discovered_at"], source="candidate_monitor")
+                                       discovered_at=candidate["first_discovered_at"], source="candidate_monitor",
+                                       metadata=json.loads(candidate["metadata_json"] or "{}"))
         discovery.symbol, discovery.name, discovery.pair_address = market.symbol, market.name, market.pair_address
         self.store.upsert_discovery(discovery)
         previous_rows = list(reversed(self.store.recent_snapshots(token_id, self.settings.snapshot_history_limit)))
         previous = [json.loads(row["payload_json"]) for row in previous_rows]
         try:
-            safety = await self.solana.safety(address)
+            safety = await self.safety_provider.safety(chain, address)
             safety_unavailable = False
         except ProviderError as exc:
             safety = SafetyAssessment(
-                checked_at=iso(), source=self.solana.name,
+                checked_at=iso(), source=getattr(self.safety_provider, "name", f"{chain}_safety"), chain=chain,
                 warnings=[f"SAFETY_PROVIDER_UNAVAILABLE:{exc}"],
             )
             safety_unavailable = True
         self.store.save_snapshot(token_id, market, safety.holder_count)
         hard_rejections = self.safety_gates.evaluate(market, safety)
         if hard_rejections:
+            rejected_score = self.scoring.score({name: None for name in self.settings.weights}, hard_rejections)
+            self.store.save_evaluation(token_id, rejected_score, {
+                "market": market.to_dict(), "safety": asdict(safety),
+                "unknown_fields": list(self.settings.weights), "terminal_safety_rejection": True,
+            })
             self.store.update_candidate(candidate_id, CandidateState.REJECTED_UNSAFE,
-                                        hard_rejections[0], market, hard_rejections=hard_rejections)
+                                        hard_rejections[0], market, rejected_score,
+                                        hard_rejections=hard_rejections)
             log_event(self.log, logging.WARNING, "candidate_rejected", token=address,
                       candidate_id=candidate_id, state=CandidateState.REJECTED_UNSAFE,
                       reason=hard_rejections)
@@ -121,6 +149,19 @@ class IntelligenceService:
             log_event(self.log, logging.INFO, "candidate_expired", token=address,
                       candidate_id=candidate_id, reason=expiry)
             return str(CandidateState.EXPIRED)
+        radar = self.radar.evaluate(
+            market, previous, candidate["first_discovered_at"], basic_safety_passed=not safety_unavailable
+        )
+        radar_now = False
+        if radar.triggered:
+            radar_now = self.store.trigger_radar(
+                candidate_id, radar.score, radar.reasons, market,
+                radar_payload(discovery, market, radar, len(previous) + 1),
+            )
+            if radar_now:
+                log_event(self.log, logging.INFO, "early_radar_triggered", token=address, chain=chain,
+                          candidate_id=candidate_id, score=radar.score, reasons=radar.reasons,
+                          market_cap=market.market_cap_usd, liquidity=market.liquidity_usd)
 
         developer = self.developers.assess(discovery.deployer)
         narrative = self.narratives.assess(discovery, market)
@@ -128,7 +169,7 @@ class IntelligenceService:
         onchain = self.onchain.assess(safety)
         momentum = self.momentum.assess_history(market, previous, self.settings.min_snapshots_for_momentum)
         safety_score = None if safety_unavailable else (
-            5.0 if not safety.mint_authority and not safety.freeze_authority else 0.0
+            5.0 if chain == "bsc" or (not safety.mint_authority and not safety.freeze_authority) else 0.0
         )
         components = {
             "narrative": narrative.get("score"),
@@ -178,7 +219,8 @@ class IntelligenceService:
             if signal_grade and not waiting:
                 update = self.store.update_signal_intelligence(
                     int(existing_signal_id), str(score.classification), score, intelligence["thesis"],
-                    {"symbol": market.symbol, "token_address": address,
+                    {"symbol": market.symbol, "token_address": address, "chain": chain,
+                     "pair_address": market.pair_address,
                      "normalized_score": score.normalized_score, "confidence": score.confidence,
                      "shadow": self.settings.shadow_mode},
                 )
@@ -187,7 +229,8 @@ class IntelligenceService:
                 deterioration = waiting or ["NORMALIZED_SCORE_BELOW_WATCH"]
                 self.store.update_signal_intelligence(
                     int(existing_signal_id), "BELOW_WATCH", score, deterioration,
-                    {"symbol": market.symbol, "token_address": address,
+                    {"symbol": market.symbol, "token_address": address, "chain": chain,
+                     "pair_address": market.pair_address,
                      "normalized_score": score.normalized_score, "confidence": score.confidence,
                      "shadow": self.settings.shadow_mode},
                 )
@@ -197,7 +240,10 @@ class IntelligenceService:
                                         unknown_fields=evidence["unknown_fields"], signal_id=int(existing_signal_id))
             return str(CandidateState.SIGNALLED)
         if waiting or not signal_grade:
-            state = CandidateState.PENDING_EVIDENCE if waiting else CandidateState.CANDIDATE
+            has_radar = radar_now or candidate["radar_triggered_at"] is not None
+            state = CandidateState.EARLY_RADAR if has_radar else (
+                CandidateState.PENDING_EVIDENCE if waiting else CandidateState.CANDIDATE
+            )
             reason = waiting[0] if waiting else "SCORE_BELOW_WATCH"
             self.store.update_candidate(candidate_id, state, reason, market, score,
                                         waiting_reasons=sorted(set(waiting)),
@@ -235,7 +281,9 @@ class IntelligenceService:
 
     async def monitor_candidates_once(self) -> dict[str, int]:
         results: dict[str, int] = {}
-        for candidate in self.store.active_candidates(self.settings.max_active_candidates):
+        for candidate in self.store.active_candidates(
+            self.settings.max_active_candidates, self.settings.max_active_candidates_per_chain
+        ):
             try:
                 result = await self._monitor_candidate(candidate)
             except Exception:
@@ -244,6 +292,19 @@ class IntelligenceService:
             results[result] = results.get(result, 0) + 1
         return results
 
+    async def monitor_outcomes_once(self) -> int:
+        since = (datetime.now(timezone.utc) - timedelta(hours=self.settings.outcome_max_age_hours)).isoformat()
+        monitored = 0
+        for token in self.store.outcome_watchlist(since, self.settings.max_outcome_watchlist):
+            try:
+                snapshot = await self.market.market_snapshot(token["token_address"], token["chain"])
+            except ProviderError:
+                continue
+            if snapshot and snapshot.market_cap_usd is not None and snapshot.market_cap_usd > 0:
+                self.store.save_snapshot(int(token["token_id"]), snapshot)
+                monitored += 1
+        return monitored
+
     async def scan_once(self) -> dict[str, int]:
         results: dict[str, int] = {}
         try:
@@ -251,7 +312,7 @@ class IntelligenceService:
         except ProviderError as exc:
             log_event(self.log, logging.ERROR, "discovery_failure", error=str(exc))
             return {"DISCOVERY_FAILURE": 1}
-        for discovered in discoveries[:self.settings.max_discoveries_per_cycle]:
+        for discovered in fair_chain_sample(discoveries, self.settings.max_discoveries_per_cycle):
             try:
                 result = await self.evaluate(discovered)
             except Exception:
@@ -265,12 +326,19 @@ class IntelligenceService:
         for row in self.store.pending_outbox():
             try:
                 payload = json.loads(row["payload_json"])
-                content = format_event(row["event_type"], payload)
+                content = format_discord_event(row["event_type"], payload)
                 remote_id = await self.notifier.send(content)
                 self.store.mark_outbox_sent(int(row["id"]), remote_id)
+                self.store.set_provider_health("discord", True, 0, None)
                 sent += 1
             except Exception as exc:
                 self.store.mark_outbox_error(int(row["id"]), str(exc))
+                previous = self.store.conn.execute(
+                    "SELECT consecutive_failures FROM provider_health WHERE provider='discord'"
+                ).fetchone()
+                self.store.set_provider_health(
+                    "discord", False, int(previous[0]) + 1 if previous else 1, str(exc)
+                )
                 log_event(self.log, logging.ERROR, "discord_failure", outbox_id=row["id"], error=str(exc))
                 break
         return sent
@@ -308,7 +376,15 @@ class IntelligenceService:
                 except asyncio.TimeoutError:
                     pass
 
-        await asyncio.gather(scanner(), candidate_monitor(), tracker())
+        async def outcome_monitor() -> None:
+            while not self.stop_event.is_set():
+                await self.monitor_outcomes_once()
+                try:
+                    await asyncio.wait_for(self.stop_event.wait(), self.settings.outcome_monitor_interval_seconds)
+                except asyncio.TimeoutError:
+                    pass
+
+        await asyncio.gather(scanner(), candidate_monitor(), outcome_monitor(), tracker())
 
     def stop(self) -> None:
         self.stop_event.set()

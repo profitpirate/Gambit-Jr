@@ -1,30 +1,31 @@
-# Gambit Jr — V1.1 Candidate Intelligence
+# Gambit Jr — V1.2 Early Radar and Multichain Intelligence
 
-A read-only, autonomous intelligence service for Solana memecoins. It discovers newly
+A read-only, autonomous intelligence service for Solana and BNB Chain memecoins. It discovers newly
 active tokens, collects real market and mint data, applies fail-closed safety gates,
 scores only supported evidence, persists every decision, and monitors qualifying
 signals. It never connects to a wallet and contains no trading code.
 
 ## Completion status
 
-This repository is a production-oriented **P0 implementation**, not a claim that the
-brief's live acceptance test is complete. A real shadow cycle on 2026-08-20 naturally
-discovered and evaluated three Solana tokens. All were rejected; no threshold was
-weakened. There were no Discord credentials or cloud target, so a real Discord signal,
-active-signal restart, natural lifecycle, and independent 24/7 deployment are not yet
-proven. See `outputs/DELIVERY_REPORT.md` and `outputs/live-shadow-evidence.json`.
+The V1.2 code path is implemented and covered by deterministic unit and replay tests.
+This is not a claim that the brief's live operational acceptance test is complete:
+Discord credentials, a cloud target, and a naturally qualifying real token are external
+requirements. Thresholds must not be weakened to manufacture that evidence.
 
 Implemented:
 
-- documented DEX Screener profile/boost/community-takeover discovery;
-- documented DEX Screener pair market snapshots;
+- DEX Screener profile/boost/community-takeover discovery and pair market snapshots;
+- GeckoTerminal new-pool discovery for Solana and BNB Chain, with isolated provider failures;
+- chain-aware identity, fair bounded discovery, and per-chain candidate caps;
 - Solana JSON-RPC mint authority, freeze authority, supply, and top-account checks;
+- BSC JSON-RPC contract-bytecode and standard `owner()` checks with explicit unknowns;
 - `None`/unknown semantics for unavailable holder, bundler, insider, social velocity,
   developer-history, and distribution data;
 - configurable hard gates and versioned deterministic scoring;
 - SQLite migrations, indexes, WAL, immutable initial signal trigger, and durable outbox;
 - one-shot milestones, failure persistence, active-signal recovery, and performance stats;
-- one configured Discord channel, safe message formatting, `/status`, and `/performance`;
+- mobile-first Discord embeds/buttons and all five operational slash commands;
+- durable early-radar, outcome, missed-runner, and pre-move opportunity-coverage records;
 - structured JSON logs, provider retry/backoff/circuit state, health HTTP endpoint;
 - Docker/Compose deployment, replay simulation, and critical tests.
 
@@ -34,8 +35,7 @@ Deliberately degraded or unavailable without legitimate providers:
 - developer/funding-wallet/related-wallet history;
 - reliable bundler, insider, sniper, holder-count, and smart-money labels;
 - external breaking-news/catalyst velocity and multilingual source feeds;
-- live upgrade/downgrade intelligence is not yet wired into the tracker;
-- PostgreSQL adapter and chain adapters beyond Solana.
+- PostgreSQL adapter and chain adapters beyond Solana and BNB Chain.
 
 None of those values are synthesized as zero.
 
@@ -43,10 +43,10 @@ None of those values are synthesized as zero.
 
 The production path is:
 
-`discovery → durable candidate → independent 30s monitor → real snapshots → safety/readiness split → normalized scoring → immutable signal + Discord outbox → tracker → milestones/failure → analytics`
+`multisource discovery → durable candidate → real snapshots → EARLY_RADAR → normalized qualified signal → tracking → missed-runner analytics`
 
 Candidate states are `DISCOVERED`, `SCREENING`, `CANDIDATE`, `PENDING_EVIDENCE`,
-`FAILED_PROVIDER`, `REJECTED_UNSAFE`, `EXPIRED`, and `SIGNALLED`. Signal classes remain
+`FAILED_PROVIDER`, `EARLY_RADAR`, `REJECTED_UNSAFE`, `EXPIRED`, and `SIGNALLED`. Signal classes remain
 `WATCH`, `STRONG`, and `HIGH_CONVICTION`. Mint/freeze authority and verified excessive
 holder concentration are terminal safety failures. Low liquidity, low market cap,
 missing momentum history, insufficient coverage, and provider outages remain retryable.
@@ -68,6 +68,65 @@ normalized score of 70.77 (WATCH). A high normalized score with confidence below
 `MIN_CONFIDENCE_FOR_SIGNAL` must not produce a signal. Unknown evidence is not
 equivalent to negative evidence and is never converted into fabricated evidence.
 
+## V1.2 discovery and chain adapters
+
+One shared lifecycle handles canonical `(chain, token_address)` identities for `solana`
+and `bsc`. The same literal address on both chains remains two distinct tokens.
+
+Active discovery adapters are:
+
+- GeckoTerminal keyless new-pool feeds for Solana and BNB Chain;
+- DexScreener latest profiles;
+- DexScreener latest boosts;
+- DexScreener community takeovers.
+
+Each adapter fails independently. Cross-source discoveries merge into one token and one
+candidate while `discovery_sources` preserves every observed source and the first source
+on `tokens` remains immutable. Candidate limits are bounded globally and per chain.
+
+DexScreener supplies canonical market snapshots for both chains. Solana safety retains
+mint/freeze and top-account checks. BNB safety verifies contract bytecode and probes the
+standard `owner()` selector through BSC JSON-RPC. Owner/admin state, holder distribution,
+and transfer mechanics stay explicitly unknown when they cannot be proven. BNB owner
+renouncement is useful evidence, not proof that a token is safe.
+
+## EARLY_RADAR
+
+EARLY_RADAR is a lower-confidence attention alert, never a qualified signal. It requires
+basic chain validation, at least `RADAR_MIN_SNAPSHOTS`, liquidity and market-cap limits,
+an age inside `RADAR_MAX_AGE_MINUTES`, at least `RADAR_MIN_CONDITIONS` abnormal conditions,
+and `RADAR_SCORE_THRESHOLD`. Conditions include market-cap velocity, volume acceleration,
+liquidity growth, buy pressure, buy-pressure acceleration, and volume/market-cap activity.
+
+Late vertical price moves, a market cap above the radar range, collapsing liquidity,
+dominant sell pressure, and observations outside the early window apply hard penalties
+and suppress alerts. Radar events are unique by candidate and escalation level, so a
+restart or repeated monitoring cycle cannot resend the same event. Radar and signal
+timestamps/market caps are stored separately, including radar-to-signal latency and
+multiple.
+
+## Unicode metadata
+
+Names, symbols, and descriptions remain original Unicode in SQLite and Discord. Narrative
+tokenization uses Unicode word characters and lightweight multilingual concept terms;
+Chinese, Japanese, Korean, Arabic, Cyrillic, accented Latin, and emoji metadata cannot
+cause rejection. Uninterpreted narrative evidence is `UNKNOWN`, never negative. Optional
+translation fields exist separately and are not required for monitoring or signals.
+
+## Discord and opportunity coverage
+
+Automatic radar, signal, upgrade, milestone, deterioration, and failure messages use
+mobile-first Discord embeds. Every card shows the full copyable contract address and an
+explicit SOLANA or BNB CHAIN label. Valid DexScreener plus Solscan/BscScan link buttons
+are constructed without credentials.
+
+Commands are `/status`, `/candidates`, `/rejections`, `/missed`, and `/performance`.
+`/missed` reports tokens that crossed `MISSED_RUNNER_MULTIPLE` without a qualified signal,
+including discovery market cap, peak, multiple, radar status, and the last non-signal
+reason. Signal hit rates and opportunity coverage remain separate metric families.
+Coverage uses explicit counts for major runners discovered, radar-flagged, signalled,
+and completely missed, plus discovery-to-signal and radar-to-signal latency.
+
 Provider code is under `src/memecoin_bot/providers`; business rules do not depend on
 provider response shapes. SQLite writes a signal and its outbound Discord event in the
 same transaction. A unique `(signal_id, multiple)` constraint and outbox event key make
@@ -77,13 +136,18 @@ milestones restart-safe.
 
 | Provider | Status | Use |
 |---|---|---|
+| GeckoTerminal public API | Free but rate-limited | recent new-pool discovery on Solana and BNB Chain |
 | DEX Screener public API | Free but rate-limited | activation discovery, pairs, price/MC/liquidity/volume/transactions/social links |
 | Solana JSON-RPC | Free public endpoint but heavily rate-limited | mint configuration, supply, largest token accounts |
+| BSC JSON-RPC | Free public endpoint but rate-limited | bytecode existence and standard owner probe |
 | Dedicated Solana RPC | Optional paid/free-tier upgrade | better reliability for top-account distribution |
 | Social/news/developer providers | Not configured | interfaces return unknown; no fabricated evidence |
 
 The implementation follows the documented [DEX Screener API](https://docs.dexscreener.com/api/reference),
-[Solana RPC](https://solana.com/docs/rpc), and [Discord rate-limit guidance](https://docs.discord.com/developers/topics/rate-limits).
+[GeckoTerminal API](https://docs.coingecko.com/reference/latest-pools-list),
+[Solana RPC](https://solana.com/docs/rpc),
+[BNB Smart Chain JSON-RPC](https://docs.bnbchain.org/bnb-smart-chain/developers/json_rpc/json-rpc-endpoint/),
+and [Discord rate-limit guidance](https://docs.discord.com/developers/topics/rate-limits).
 
 ## Local setup
 
@@ -97,7 +161,7 @@ cp .env.example .env                 # Windows: Copy-Item .env.example .env
 ```
 
 Set `DISCORD_TOKEN` and `DISCORD_CHANNEL_ID` for `/status`, `/candidates`, `/rejections`,
-`/performance`, and alerts. A webhook
+`/missed`, `/performance`, and alerts. A webhook
 can send one-way alerts, but slash commands require a bot token. Invite the bot with
 `bot` and `applications.commands` scopes and permission to view/send in exactly the
 configured channel.
@@ -109,7 +173,7 @@ memecoin-bot once --output evidence/live-shadow.json
 memecoin-bot run
 ```
 
-V1.1 remains `SHADOW_MODE=true` and `SHADOW_SEND_ALERTS=true`. Qualifying messages are
+V1.2 remains `SHADOW_MODE=true` and `SHADOW_SEND_ALERTS=true`. Qualifying messages are
 explicitly labelled read-only shadow signals. There is no wallet, private key,
 transaction signing, swap, purchase, or sale path.
 
@@ -118,7 +182,7 @@ transaction signing, swap, purchase, or sale path.
 ```bash
 python -m unittest discover -s tests -v
 memecoin-bot replay \
-  --fixture fixtures/replay_lifecycle.json \
+  --fixture fixtures/replay_v12_multichain.json \
   --database data/replay-$(date +%s).db \
   --output evidence/replay.json
 ```
@@ -159,25 +223,36 @@ exchange credential, or swap endpoint.
 
 Before migration, stop the bot or use SQLite's online backup command and copy
 `/app/data/memecoin.db` (plus `-wal`/`-shm` when copying a live database) to dated,
-off-host storage. Migration `002_candidate_lifecycle.sql` is additive and preserves
+off-host storage. Migrations `002_candidate_lifecycle.sql` and `003_radar_multichain.sql`
+are additive and preserve
 tokens, evaluations, signals, milestones, provider health, and the durable outbox.
 
-Deploy `codex/gambit-jr-v1.1-candidate-lifecycle` only after unit, replay, Compose,
+Deploy `codex/gambit-jr-v1.2-radar-multichain` only after unit, replay, Compose,
 restart, health, and Discord shadow checks. Verify `docker compose ps`, then
-`curl http://127.0.0.1:8080/health`, and exercise all four Discord commands. To roll
-back, stop the V1.1 container, restore the pre-migration database backup, check out
-`codex/gambit-jr-v1-production`, and run `docker compose up -d --build`. The production
-branch is not modified by V1.1 development.
+`curl http://127.0.0.1:8080/health`, and exercise all five Discord commands. To roll
+back, stop the V1.2 container, restore the pre-migration database backup, check out
+`codex/gambit-jr-v1.1-candidate-lifecycle`, and run `docker compose up -d --build`. The V1.1
+branch is not modified by V1.2 development.
 
 ## Known limitations
 
 Social velocity, developer reputation, bundler/insider/sniper intelligence,
 smart-money labels, funding-wallet history, and breaking-news velocity remain UNKNOWN
-until legitimate providers are integrated.
+until legitimate providers are integrated. BNB transfer restrictions and holder
+concentration are also unknown without a dedicated security/indexing provider.
+
+## Resource profile
+
+The service runs one discovery loop, one bounded candidate loop, one low-cadence outcome
+loop, and one signal tracker.
+New-pool feeds are polled once per discovery cycle; candidate history is bounded by
+`SNAPSHOT_HISTORY_LIMIT`, candidates by global and per-chain limits, and SQLite remains
+single-instance. Run one Compose replica only. Adaptive per-candidate cadence remains a
+future optimization; the bounded shared cadence is intentionally simpler and predictable.
 
 ## Operational acceptance checklist
 
-Before claiming V1 complete, retain evidence for a naturally qualifying real token,
+Before claiming V1.2 live acceptance complete, retain evidence for a naturally qualifying real token,
 Discord message ID, immutable DB snapshot, subsequent market updates, service restart,
 non-duplicated milestones, Discord reconnect, and an independently running cloud
 container. Do not lower thresholds to manufacture that evidence.

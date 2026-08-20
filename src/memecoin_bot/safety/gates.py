@@ -13,9 +13,9 @@ class SafetyGates:
     def evaluate(self, market: MarketSnapshot, chain: SafetyAssessment) -> list[str]:
         """Return only terminal, verified safety failures."""
         reasons = list(chain.rejection_reasons)
-        if self.settings.reject_mint_authority and chain.mint_authority:
+        if chain.chain == "solana" and self.settings.reject_mint_authority and chain.mint_authority:
             reasons.append("MINT_AUTHORITY_ACTIVE")
-        if self.settings.reject_freeze_authority and chain.freeze_authority:
+        if chain.chain == "solana" and self.settings.reject_freeze_authority and chain.freeze_authority:
             reasons.append("FREEZE_AUTHORITY_ACTIVE")
         if chain.top10_percent is not None and chain.top10_percent > self.settings.max_top10_percent:
             reasons.append("TOP_HOLDER_CONCENTRATION_HIGH")

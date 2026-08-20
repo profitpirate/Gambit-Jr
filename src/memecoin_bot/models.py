@@ -41,6 +41,7 @@ class CandidateState(StrEnum):
     REJECTED_UNSAFE = "REJECTED_UNSAFE"
     EXPIRED = "EXPIRED"
     SIGNALLED = "SIGNALLED"
+    EARLY_RADAR = "EARLY_RADAR"
 
 
 class DeveloperClass(StrEnum):
@@ -79,6 +80,7 @@ class MarketSnapshot:
     token_address: str
     captured_at: str
     source: str
+    chain: str = "solana"
     pair_address: str | None = None
     symbol: str | None = None
     name: str | None = None
@@ -105,6 +107,7 @@ class MarketSnapshot:
 class SafetyAssessment:
     checked_at: str
     source: str
+    chain: str = "solana"
     mint_authority: str | None = None
     freeze_authority: str | None = None
     supply_raw: int | None = None
@@ -115,6 +118,15 @@ class SafetyAssessment:
     bundled_percent: float | None = None
     rejection_reasons: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+
+
+@dataclass(slots=True)
+class RadarResult:
+    triggered: bool
+    score: float
+    reasons: list[str]
+    penalties: list[str]
+    level: str = "EARLY_RADAR"
 
 
 @dataclass(slots=True)

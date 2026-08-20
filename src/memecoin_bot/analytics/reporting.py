@@ -9,6 +9,10 @@ def format_status(stats: dict[str, Any]) -> str:
     uptime = datetime.now(timezone.utc) - started
     hours, remainder = divmod(int(uptime.total_seconds()), 3600)
     minutes = remainder // 60
+    providers = "\n".join(
+        f"{row['provider']}: {'OK' if row['healthy'] else 'DEGRADED'}"
+        for row in stats.get("provider_status", [])
+    ) or f"Providers healthy: {stats['providers_healthy']}/{stats['providers_total']}"
     return (
         "Gambit Jr — ONLINE\n"
         f"Uptime: {hours}h {minutes}m\n"
@@ -17,11 +21,13 @@ def format_status(stats: dict[str, Any]) -> str:
         f"Hard rejected: {stats['hard_rejected']:,}\n"
         f"Pending evidence: {stats['pending_evidence']:,}\n"
         f"Candidates watching: {stats['candidates_watching']:,}\n"
+        f"Early radar flagged: {stats['early_radar']:,}\n"
         f"Expired: {stats['expired']:,}\n"
         f"Signals: {stats['signals']:,} (WATCH {stats['watch']}, STRONG {stats['strong']}, HIGH {stats['high_conviction']})\n"
+        f"Discovered outcomes tracked: {stats['outcomes_tracked']:,}\n"
         f"Active signals: {stats['active_signals']:,}\n"
         f"Signals today: {stats['signals_today']:,}\n"
-        f"Providers healthy: {stats['providers_healthy']}/{stats['providers_total']}\n"
+        f"{providers}\n"
         f"Database: {stats['database']}"
     )
 
@@ -36,7 +42,7 @@ def format_candidates(rows: list[Any]) -> str:
         score = "UNKNOWN" if row["normalized_score"] is None else f"{row['normalized_score']:.1f}"
         confidence = "UNKNOWN" if row["confidence"] is None else f"{row['confidence']:.0%}"
         blocks.append(
-            f"${row['symbol'] or 'UNKNOWN'} | MC ${float(row['current_market_cap_usd'] or 0):,.0f} | "
+            f"${row['symbol'] or 'UNKNOWN'} [{str(row['chain']).upper()}] | MC ${float(row['current_market_cap_usd'] or 0):,.0f} | "
             f"Liq ${float(row['current_liquidity_usd'] or 0):,.0f}\n"
             f"Age {age}m | Snapshots {row['snapshot_count']} | Score {score} | Confidence {confidence}\n"
             f"State {row['state']} — {row['reason'] or 'collecting evidence'}"
@@ -52,8 +58,33 @@ def format_rejections(report: dict[str, Any]) -> str:
     return "\n".join(lines)[:1990]
 
 
+def format_missed(rows: list[Any], hours: int = 24) -> str:
+    if not rows:
+        return f"Gambit Jr — Missed Runners, {hours}h\nNo runners met the configured threshold."
+    blocks = [f"Gambit Jr — Missed Runners, {hours}h"]
+    for row in rows:
+        radar = "YES" if row["radar_before_hit"] else "NO"
+        blocks.append(
+            f"${row['symbol'] or 'UNKNOWN'} | {str(row['chain']).upper()}\n"
+            f"Discovery MC: ${float(row['discovery_market_cap_usd'] or 0):,.0f}\n"
+            f"Peak: ${float(row['peak_market_cap_usd'] or 0):,.0f} | "
+            f"Multiple: {float(row['max_multiple_from_discovery'] or 0):.1f}x\n"
+            f"Radar before move: {radar} | Qualified signal before move: NO\n"
+            f"Why missed: {row['non_signal_reason'] or row['reason'] or 'unknown'}"
+        )
+    return "\n\n---\n\n".join(blocks)[:1990]
+
+
 def format_performance(p: dict[str, Any]) -> str:
     rate = lambda key: "N/A" if p[key] is None else f"{p[key]:.1f}%"
+    coverage = p.get("coverage") or {}
+    coverage_text = (
+        f"\nOpportunity coverage ({coverage.get('major_runner_multiple', 10):g}X runners): "
+        f"{coverage.get('major_runners_discovered', 0)} discovered | "
+        f"{coverage.get('major_runners_radar', 0)} radar | "
+        f"{coverage.get('major_runners_signalled', 0)} signalled | "
+        f"{coverage.get('major_runners_completely_missed', 0)} completely missed"
+    )
     return (
         f"Performance — scoring {p['scoring_version']}\n"
         f"Signals: {p['total_signals']} "
@@ -64,4 +95,5 @@ def format_performance(p: dict[str, Any]) -> str:
         f"Failed: {p['failed']}\n"
         f"Median max multiple: {p['median_max_multiple'] or 'N/A'}\n"
         f"Median drawdown: {p['median_drawdown'] if p['median_drawdown'] is not None else 'N/A'}"
+        f"{coverage_text}"
     )

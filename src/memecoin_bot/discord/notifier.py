@@ -8,7 +8,7 @@ from typing import Any
 
 
 class NullNotifier:
-    async def send(self, content: str) -> str | None:
+    async def send(self, content: str | dict[str, Any]) -> str | None:
         return "shadow-not-sent"
 
 
@@ -27,8 +27,11 @@ class DiscordNotifier:
         else:
             raise ValueError("Discord requires webhook URL or both bot token and channel ID")
 
-    async def send(self, content: str) -> str | None:
-        payload = json.dumps({"content": content, "allowed_mentions": {"parse": []}}).encode()
+    async def send(self, content: str | dict[str, Any]) -> str | None:
+        message = content if isinstance(content, dict) else {
+            "content": content, "allowed_mentions": {"parse": []}
+        }
+        payload = json.dumps(message).encode()
         for attempt in range(4):
             def perform() -> tuple[int, bytes, dict[str, str]]:
                 headers = {"Content-Type": "application/json", "User-Agent": "DiscordBot (memecoin-intelligence, 1.0)"}

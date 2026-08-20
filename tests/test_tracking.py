@@ -11,7 +11,7 @@ class StaticMarket:
     def __init__(self, market_cap: float):
         self.market_cap = market_cap
 
-    async def market_snapshot(self, token: str) -> MarketSnapshot:
+    async def market_snapshot(self, token: str, chain: str = "solana") -> MarketSnapshot:
         return MarketSnapshot(
             token_address=token, captured_at=iso(), source="test", symbol="TST",
             market_cap_usd=self.market_cap, price_usd=0.1,

@@ -18,7 +18,7 @@ class SignalTracker:
     async def monitor_once(self) -> dict[str, int]:
         stats = {"monitored": 0, "milestones": 0, "failed": 0}
         for signal in self.store.active_signals():
-            snapshot = await self.market.market_snapshot(signal["token_address"])
+            snapshot = await self.market.market_snapshot(signal["token_address"], signal["chain"])
             if not snapshot or snapshot.market_cap_usd is None or snapshot.market_cap_usd <= 0:
                 continue
             stats["monitored"] += 1
@@ -40,6 +40,7 @@ class SignalTracker:
             ]
             payload = {
                 "token_address": signal["token_address"], "symbol": signal["symbol"],
+                "chain": signal["chain"], "pair_address": signal["pair_address"],
                 "signal_market_cap_usd": signal_mc, "max_multiple": max_multiple,
             }
             hit = self.store.record_milestones(int(signal["id"]), candidates, payload)

@@ -18,7 +18,7 @@ class SequenceMarket:
         self.snapshots = snapshots
         self.index = 0
 
-    async def market_snapshot(self, address):
+    async def market_snapshot(self, address, chain="solana"):
         value = self.snapshots[min(self.index, len(self.snapshots) - 1)]
         self.index += 1
         return value
@@ -27,7 +27,7 @@ class SequenceMarket:
 class SafeRpc:
     name = "safe_rpc"
 
-    async def safety(self, address):
+    async def safety(self, chain, address):
         return SafetyAssessment(checked_at=iso(), source=self.name, top10_percent=20, holder_count=50)
 
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sqlite3
 import threading
 import statistics
@@ -46,7 +47,16 @@ class Store:
             for file in sorted(self.migrations_dir.glob("*.sql")):
                 if file.name in applied:
                     continue
-                self.conn.executescript(file.read_text(encoding="utf-8"))
+                script = file.read_text(encoding="utf-8")
+                def skip_existing_column(match: re.Match[str]) -> str:
+                    table, column = match.group(1), match.group(2)
+                    existing = {str(row[1]) for row in self.conn.execute(f"PRAGMA table_info({table})")}
+                    return "" if column in existing else match.group(0)
+                script = re.sub(
+                    r"ALTER\s+TABLE\s+(\w+)\s+ADD\s+COLUMN\s+(\w+)\s+[^;]+;",
+                    skip_existing_column, script, flags=re.IGNORECASE | re.MULTILINE,
+                )
+                self.conn.executescript(script)
                 self.conn.execute(
                     "INSERT INTO schema_migrations(version, applied_at) VALUES (?, ?)",
                     (file.name, iso()),
@@ -85,10 +95,30 @@ class Store:
                     "pair_address=COALESCE(pair_address,?) WHERE id=?",
                     (event.symbol, event.name, event.pair_address, row["id"]),
                 )
+            description = event.metadata.get("description")
+            if description is not None:
+                self.conn.execute(
+                    "UPDATE tokens SET original_description=COALESCE(original_description,?) WHERE id=?",
+                    (str(description), row["id"]),
+                )
+            self.conn.execute(
+                "INSERT INTO discovery_sources(token_id,source,first_seen_at,last_seen_at,metadata_json) "
+                "VALUES(?,?,?,?,?) ON CONFLICT(token_id,source) DO UPDATE SET "
+                "last_seen_at=excluded.last_seen_at,metadata_json=excluded.metadata_json",
+                (row["id"], event.source, event.discovered_at, event.discovered_at, _json(event.metadata)),
+            )
+            for extra_source in event.metadata.get("additional_sources") or []:
+                self.conn.execute(
+                    "INSERT INTO discovery_sources(token_id,source,first_seen_at,last_seen_at,metadata_json) "
+                    "VALUES(?,?,?,?,?) ON CONFLICT(token_id,source) DO UPDATE SET last_seen_at=excluded.last_seen_at",
+                    (row["id"], str(extra_source), event.discovered_at, event.discovered_at, "{}"),
+                )
             return int(row["id"]), created
 
-    def token_id(self, address: str) -> int | None:
-        row = self.conn.execute("SELECT id FROM tokens WHERE token_address=?", (address,)).fetchone()
+    def token_id(self, address: str, chain: str = "solana") -> int | None:
+        row = self.conn.execute(
+            "SELECT id FROM tokens WHERE chain=? AND token_address=?", (chain, address)
+        ).fetchone()
         return int(row[0]) if row else None
 
     def has_evaluation(self, token_id: int) -> bool:
@@ -105,6 +135,30 @@ class Store:
                  snapshot.price_usd, snapshot.liquidity_usd, snapshot.volume_5m_usd,
                  holder_count, _json(snapshot.to_dict())),
             )
+            if snapshot.market_cap_usd is not None and snapshot.market_cap_usd > 0:
+                now = snapshot.captured_at
+                self.conn.execute(
+                    "INSERT INTO token_outcomes(token_id,discovery_market_cap_usd,peak_market_cap_usd,"
+                    "max_multiple_from_discovery,first_market_at,last_observed_at,updated_at) "
+                    "VALUES(?,?,?,?,?,?,?) ON CONFLICT(token_id) DO UPDATE SET "
+                    "peak_market_cap_usd=MAX(COALESCE(token_outcomes.peak_market_cap_usd,0),excluded.peak_market_cap_usd),"
+                    "max_multiple_from_discovery=MAX(COALESCE(token_outcomes.max_multiple_from_discovery,1),"
+                    "excluded.peak_market_cap_usd/token_outcomes.discovery_market_cap_usd),"
+                    "last_observed_at=excluded.last_observed_at,updated_at=excluded.updated_at",
+                    (token_id, snapshot.market_cap_usd, snapshot.market_cap_usd, 1.0, now, now, now),
+                )
+                outcome = self.conn.execute(
+                    "SELECT discovery_market_cap_usd,max_multiple_from_discovery,radar_occurred,signal_id "
+                    "FROM token_outcomes WHERE token_id=?", (token_id,),
+                ).fetchone()
+                for multiple in (2, 3, 5, 10, 20, 50, 100):
+                    if float(outcome["max_multiple_from_discovery"] or 0) >= multiple:
+                        self.conn.execute(
+                            "INSERT OR IGNORE INTO outcome_milestones(token_id,multiple,hit_at,market_cap_usd,"
+                            "radar_before_hit,signal_before_hit) VALUES(?,?,?,?,?,?)",
+                            (token_id, multiple, now, snapshot.market_cap_usd,
+                             int(bool(outcome["radar_occurred"])), int(outcome["signal_id"] is not None)),
+                        )
             return int(cur.lastrowid)
 
     def recent_snapshots(self, token_id: int, limit: int = 3) -> list[sqlite3.Row]:
@@ -135,14 +189,48 @@ class Store:
     def candidate_for_token(self, token_id: int) -> sqlite3.Row | None:
         return self.conn.execute("SELECT * FROM candidates WHERE token_id=?", (token_id,)).fetchone()
 
-    def active_candidates(self, limit: int = 250) -> list[sqlite3.Row]:
+    def active_candidates(self, limit: int = 250, per_chain: int | None = None) -> list[sqlite3.Row]:
         terminal = (CandidateState.REJECTED_UNSAFE, CandidateState.EXPIRED)
+        chain_limit = per_chain or limit
         return list(self.conn.execute(
-            "SELECT c.*,t.token_address,t.symbol,t.name,t.pair_address FROM candidates c "
-            "JOIN tokens t ON t.id=c.token_id WHERE c.state NOT IN (?,?) "
-            "ORDER BY COALESCE(c.last_monitored_at,c.first_discovered_at),c.id LIMIT ?",
-            (*terminal, limit),
+            "WITH ranked AS (SELECT c.*,t.token_address,t.symbol,t.name,t.pair_address,t.chain,t.metadata_json,"
+            "t.first_discovered_at token_discovered_at,ROW_NUMBER() OVER (PARTITION BY t.chain "
+            "ORDER BY COALESCE(c.last_monitored_at,c.first_discovered_at),c.id) chain_rank "
+            "FROM candidates c JOIN tokens t ON t.id=c.token_id WHERE c.state NOT IN (?,?)) "
+            "SELECT * FROM ranked WHERE chain_rank<=? "
+            "ORDER BY COALESCE(last_monitored_at,first_discovered_at),id LIMIT ?",
+            (*terminal, chain_limit, limit),
         ))
+
+    def trigger_radar(self, candidate_id: int, score: float, reasons: list[str],
+                      snapshot: MarketSnapshot, payload: dict[str, Any], level: str = "EARLY_RADAR") -> bool:
+        now = snapshot.captured_at
+        with self._lock, self.conn:
+            cur = self.conn.execute(
+                "INSERT OR IGNORE INTO radar_events(candidate_id,event_level,triggered_at,radar_score,"
+                "reason_json,market_cap_usd,price_usd,liquidity_usd,snapshot_count) "
+                "VALUES(?,?,?,?,?,?,?,?,(SELECT COUNT(*) FROM token_snapshots WHERE token_id="
+                "(SELECT token_id FROM candidates WHERE id=?)))",
+                (candidate_id, level, now, score, _json(reasons), snapshot.market_cap_usd,
+                 snapshot.price_usd, snapshot.liquidity_usd, candidate_id),
+            )
+            if cur.rowcount != 1:
+                return False
+            self.conn.execute(
+                "UPDATE candidates SET state='EARLY_RADAR',radar_score=?,radar_reason=?,radar_triggered_at=?,"
+                "radar_market_cap_usd=?,radar_price_usd=?,radar_liquidity_usd=?,updated_at=? WHERE id=?",
+                (score, ";".join(reasons), now, snapshot.market_cap_usd, snapshot.price_usd,
+                 snapshot.liquidity_usd, now, candidate_id),
+            )
+            token_id = self.conn.execute("SELECT token_id FROM candidates WHERE id=?", (candidate_id,)).fetchone()[0]
+            self.conn.execute(
+                "UPDATE token_outcomes SET radar_occurred=1,updated_at=? WHERE token_id=?", (now, token_id)
+            )
+            self.conn.execute(
+                "INSERT INTO outbox(event_key,event_type,payload_json,created_at) VALUES(?,?,?,?)",
+                (f"radar:{candidate_id}:{level}", "EARLY_RADAR", _json(payload), now),
+            )
+            return True
 
     def update_candidate(
         self, candidate_id: int, state: CandidateState | str, reason: str,
@@ -207,6 +295,15 @@ class Store:
                 ]
             values["id"] = candidate_id
             self.conn.execute(f"UPDATE candidates SET {','.join(assignments)} WHERE id=:id", values)
+            token_id = self.conn.execute(
+                "SELECT token_id FROM candidates WHERE id=?", (candidate_id,)
+            ).fetchone()[0]
+            self.conn.execute(
+                "UPDATE token_outcomes SET final_lifecycle_state=?,"
+                "non_signal_reason=CASE WHEN token_outcomes.signal_id IS NULL THEN ? ELSE NULL END,"
+                "signal_id=COALESCE(signal_id,?),updated_at=? WHERE token_id=?",
+                (str(state), reason, signal_id, now, token_id),
+            )
             if str(old[0]) != str(state):
                 self.conn.execute(
                     "INSERT INTO candidate_transitions(candidate_id,from_state,to_state,reason,score,confidence,created_at) "
@@ -217,7 +314,7 @@ class Store:
 
     def candidates_report(self, limit: int = 10) -> list[sqlite3.Row]:
         return list(self.conn.execute(
-            "SELECT c.*,t.symbol,t.name,t.token_address FROM candidates c JOIN tokens t ON t.id=c.token_id "
+            "SELECT c.*,t.symbol,t.name,t.token_address,t.chain FROM candidates c JOIN tokens t ON t.id=c.token_id "
             "WHERE c.state NOT IN ('REJECTED_UNSAFE','EXPIRED','SIGNALLED') "
             "ORDER BY COALESCE(c.normalized_score,-1) DESC,c.updated_at DESC LIMIT ?", (limit,)
         ))
@@ -266,13 +363,35 @@ class Store:
             ).fetchone()
             if existing:
                 return None
+            candidate = self.conn.execute(
+                "SELECT first_discovered_at,radar_triggered_at,radar_market_cap_usd "
+                "FROM candidates WHERE token_id=?", (token_id,),
+            ).fetchone()
+            radar_at = candidate["radar_triggered_at"] if candidate else None
+            radar_mc = candidate["radar_market_cap_usd"] if candidate else None
+            signalled_at = datetime.fromisoformat(now.replace("Z", "+00:00"))
+            discovery_seconds = None
+            radar_seconds = None
+            radar_multiple = None
+            if candidate:
+                discovery_seconds = (signalled_at - datetime.fromisoformat(
+                    candidate["first_discovered_at"].replace("Z", "+00:00")
+                )).total_seconds()
+            if radar_at:
+                radar_seconds = (signalled_at - datetime.fromisoformat(
+                    radar_at.replace("Z", "+00:00")
+                )).total_seconds()
+                if radar_mc and float(radar_mc) > 0:
+                    radar_multiple = snapshot.market_cap_usd / float(radar_mc)
             cur = self.conn.execute(
                 "INSERT INTO signals(token_id,signal_timestamp,signal_price_usd,signal_market_cap_usd,"
                 "signal_liquidity_usd,signal_holder_count,signal_volume_5m_usd,signal_score,signal_class,"
                 "component_scores_json,developer_state_json,narrative_state_json,social_state_json,"
                 "onchain_state_json,risk_flags_json,scoring_version,current_market_cap_usd,current_score,"
                 "ath_market_cap_usd,atl_market_cap_usd,last_monitored_at,created_at,normalized_score,confidence,"
-                "candidate_history_json,current_signal_class) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                "candidate_history_json,current_signal_class,radar_timestamp,radar_market_cap_usd,"
+                "radar_to_signal_seconds,radar_to_signal_multiple,discovery_to_signal_seconds) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (token_id, now, snapshot.price_usd, snapshot.market_cap_usd, snapshot.liquidity_usd,
                  holder_count, snapshot.volume_5m_usd, score.total, score.classification,
                  _json(score.component_scores), _json(states.get("developer", {})),
@@ -280,7 +399,8 @@ class Store:
                  _json(states.get("onchain", {})), _json(risk_flags), score.scoring_version,
                  snapshot.market_cap_usd, score.normalized_score, snapshot.market_cap_usd,
                  snapshot.market_cap_usd, now, now, score.normalized_score, score.confidence,
-                 _json(states.get("candidate_history", {})), str(score.classification)),
+                 _json(states.get("candidate_history", {})), str(score.classification), radar_at, radar_mc,
+                 radar_seconds, radar_multiple, discovery_seconds),
             )
             signal_id = int(cur.lastrowid)
             payload = dict(message_payload, signal_id=signal_id)
@@ -288,11 +408,15 @@ class Store:
                 "INSERT INTO outbox(event_key,event_type,payload_json,created_at) VALUES(?,?,?,?)",
                 (f"signal:{signal_id}", "SIGNAL", _json(payload), now),
             )
+            self.conn.execute(
+                "UPDATE token_outcomes SET signal_id=?,final_lifecycle_state='SIGNALLED',"
+                "non_signal_reason=NULL,updated_at=? WHERE token_id=?", (signal_id, now, token_id),
+            )
             return signal_id
 
     def active_signals(self) -> list[sqlite3.Row]:
         return list(self.conn.execute(
-            "SELECT s.*,t.token_address,t.symbol,t.name FROM signals s "
+            "SELECT s.*,t.token_address,t.symbol,t.name,t.chain,t.pair_address FROM signals s "
             "JOIN tokens t ON t.id=s.token_id WHERE s.active=1 ORDER BY s.id"
         ))
 
@@ -430,8 +554,10 @@ class Store:
             "hard_rejected": one("SELECT COUNT(*) FROM candidates WHERE state='REJECTED_UNSAFE'"),
             "pending_evidence": one("SELECT COUNT(*) FROM candidates WHERE state IN ('PENDING_EVIDENCE','FAILED_PROVIDER','DISCOVERED','SCREENING')"),
             "candidates_watching": one("SELECT COUNT(*) FROM candidates WHERE state='CANDIDATE'"),
+            "early_radar": one("SELECT COUNT(*) FROM candidates WHERE radar_triggered_at IS NOT NULL"),
             "expired": one("SELECT COUNT(*) FROM candidates WHERE state='EXPIRED'"),
             "signals": one("SELECT COUNT(*) FROM signals"),
+            "outcomes_tracked": one("SELECT COUNT(*) FROM token_outcomes"),
             "watch": one("SELECT COUNT(*) FROM signals WHERE signal_class='WATCH'"),
             "strong": one("SELECT COUNT(*) FROM signals WHERE signal_class='STRONG'"),
             "high_conviction": one("SELECT COUNT(*) FROM signals WHERE signal_class='HIGH_CONVICTION'"),
@@ -439,10 +565,76 @@ class Store:
             "signals_today": one("SELECT COUNT(*) FROM signals WHERE signal_timestamp LIKE ?", (today + "%",)),
             "providers_healthy": int(providers[1]),
             "providers_total": int(providers[0]),
+            "provider_status": [dict(r) for r in self.conn.execute(
+                "SELECT provider,healthy,consecutive_failures,last_error,updated_at FROM provider_health ORDER BY provider"
+            )],
             "database": "OK",
         }
 
-    def performance(self, version: str, since: str | None = None) -> dict[str, Any]:
+    def missed_report(self, since: str | None, threshold: float, limit: int = 10) -> list[sqlite3.Row]:
+        where = "WHERE m.signal_before_hit=0"
+        args: list[Any] = [threshold]
+        if since:
+            where += " AND m.hit_at>=?"
+            args.append(since)
+        args.append(limit)
+        return list(self.conn.execute(
+            "SELECT o.*,m.radar_before_hit,m.signal_before_hit,m.hit_at threshold_hit_at,"
+            "t.chain,t.token_address,t.symbol,t.name,c.reason,c.confidence,c.state "
+            "FROM token_outcomes o JOIN tokens t ON t.id=o.token_id "
+            "JOIN outcome_milestones m ON m.token_id=o.token_id AND m.multiple=? "
+            "LEFT JOIN candidates c ON c.token_id=t.id " + where +
+            " ORDER BY o.max_multiple_from_discovery DESC LIMIT ?", args,
+        ))
+
+    def outcome_watchlist(self, since: str, limit: int) -> list[sqlite3.Row]:
+        return list(self.conn.execute(
+            "SELECT o.*,t.chain,t.token_address FROM token_outcomes o "
+            "JOIN tokens t ON t.id=o.token_id JOIN candidates c ON c.token_id=t.id "
+            "WHERE o.signal_id IS NULL AND c.state IN ('EXPIRED','REJECTED_UNSAFE') "
+            "AND t.first_discovered_at>=? ORDER BY o.last_observed_at LIMIT ?", (since, limit),
+        ))
+
+    def coverage(self, since: str | None, major_multiple: float) -> dict[str, Any]:
+        where = "WHERE m.multiple=?"
+        args: list[Any] = [major_multiple]
+        if since:
+            where += " AND m.hit_at>=?"
+            args.append(since)
+        rows = list(self.conn.execute(
+            "SELECT o.*,m.radar_before_hit,m.signal_before_hit,m.hit_at threshold_hit_at "
+            "FROM token_outcomes o JOIN outcome_milestones m ON m.token_id=o.token_id " + where,
+            args,
+        ))
+        major = len(rows)
+        radar = sum(bool(r["radar_before_hit"]) for r in rows)
+        signalled = sum(bool(r["signal_before_hit"]) for r in rows)
+        complete_miss = sum(not r["radar_before_hit"] and not r["signal_before_hit"] for r in rows)
+        latency = list(self.conn.execute(
+            "SELECT discovery_to_signal_seconds,radar_to_signal_seconds,radar_to_signal_multiple "
+            "FROM signals WHERE discovery_to_signal_seconds IS NOT NULL" +
+            (" AND signal_timestamp>=?" if since else ""), ([since] if since else []),
+        ))
+        return {
+            "major_runner_multiple": major_multiple, "major_runners_discovered": major,
+            "major_runners_radar": radar, "major_runners_signalled": signalled,
+            "major_runners_completely_missed": complete_miss,
+            "radar_recall": radar / major * 100 if major else None,
+            "signal_recall": signalled / major * 100 if major else None,
+            "complete_miss_rate": complete_miss / major * 100 if major else None,
+            "median_discovery_to_signal_seconds": statistics.median(
+                [float(r[0]) for r in latency if r[0] is not None]
+            ) if latency else None,
+            "median_radar_to_signal_seconds": statistics.median(
+                [float(r[1]) for r in latency if r[1] is not None]
+            ) if any(r[1] is not None for r in latency) else None,
+            "median_radar_to_signal_multiple": statistics.median(
+                [float(r[2]) for r in latency if r[2] is not None]
+            ) if any(r[2] is not None for r in latency) else None,
+        }
+
+    def performance(self, version: str, since: str | None = None,
+                    major_multiple: float = 10) -> dict[str, Any]:
         where = "WHERE scoring_version=?"
         args: list[Any] = [version]
         if since:
@@ -480,4 +672,5 @@ class Store:
                 [version, target] + ([since] if since else []),
             )]
             result[f"median_seconds_to_{target}x"] = statistics.median(durations) if durations else None
+        result["coverage"] = self.coverage(since, major_multiple)
         return result

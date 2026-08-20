@@ -16,6 +16,8 @@ from memecoin_bot.observability.logging import configure_logging
 from memecoin_bot.providers.base import ResilientJsonClient
 from memecoin_bot.providers.dexscreener import DexScreenerProvider
 from memecoin_bot.providers.solana_rpc import SolanaRpcProvider
+from memecoin_bot.providers.bsc_rpc import BscRpcProvider, ChainSafetyRouter
+from memecoin_bot.providers.geckoterminal import GeckoTerminalDiscoveryProvider
 from memecoin_bot.replay import ReplayRunner
 from memecoin_bot.service import IntelligenceService
 
@@ -38,8 +40,27 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
         "solana_rpc", settings.provider_timeout_seconds, settings.provider_max_retries,
         settings.provider_circuit_failures, settings.provider_circuit_cooldown_seconds, callback,
     )
+    bsc_client = ResilientJsonClient(
+        "bsc_rpc", settings.provider_timeout_seconds, settings.provider_max_retries,
+        settings.provider_circuit_failures, settings.provider_circuit_cooldown_seconds, callback,
+    )
+    gecko_solana_client = ResilientJsonClient(
+        "geckoterminal_solana_new_pools", settings.provider_timeout_seconds, settings.provider_max_retries,
+        settings.provider_circuit_failures, settings.provider_circuit_cooldown_seconds, callback,
+    )
+    gecko_bsc_client = ResilientJsonClient(
+        "geckoterminal_bsc_new_pools", settings.provider_timeout_seconds, settings.provider_max_retries,
+        settings.provider_circuit_failures, settings.provider_circuit_cooldown_seconds, callback,
+    )
     market = DexScreenerProvider(settings.dexscreener_base_url, dex_client)
     solana = SolanaRpcProvider(settings.solana_rpc_url, rpc_client)
+    bsc = BscRpcProvider(settings.bsc_rpc_url, bsc_client)
+    safety = ChainSafetyRouter({"solana": solana, "bsc": bsc})
+    discovery = DiscoveryPoller([
+        GeckoTerminalDiscoveryProvider(settings.geckoterminal_base_url, gecko_solana_client, "solana"),
+        GeckoTerminalDiscoveryProvider(settings.geckoterminal_base_url, gecko_bsc_client, "bsc"),
+        market,
+    ])
     if settings.shadow_mode and not settings.shadow_send_alerts:
         notifier = NullNotifier()
     elif settings.discord_webhook_url or (settings.discord_token and settings.discord_channel_id):
@@ -50,7 +71,7 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
     else:
         raise ValueError("Discord credentials required when alerts are enabled")
     service = IntelligenceService(
-        settings, store, DiscoveryPoller(market), market, solana, notifier,
+        settings, store, discovery, market, safety, notifier,
     )
     return store, service
 
@@ -104,7 +125,9 @@ async def async_main(args: argparse.Namespace) -> int:
             print(format_status(store.status_stats(service.started_at)))
             return 0
         if args.command == "performance":
-            print(format_performance(store.performance(settings.scoring_version)))
+            print(format_performance(store.performance(
+                settings.scoring_version, major_multiple=settings.major_missed_runner_multiple
+            )))
             return 0
         server = start_health_server(settings.health_port, lambda: store.status_stats(service.started_at))
         loop = asyncio.get_running_loop()

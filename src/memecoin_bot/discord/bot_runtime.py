@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 from datetime import datetime, timedelta, timezone
 
-from memecoin_bot.analytics import format_candidates, format_performance, format_rejections, format_status
+from memecoin_bot.analytics import format_candidates, format_missed, format_performance, format_rejections, format_status
 
 
 async def run_discord_bot(service: object, store: object, settings: object) -> None:
@@ -35,7 +35,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             return
         days = {"7d": 7, "30d": 30}.get(period.lower())
         since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat() if days else None
-        report = store.performance(settings.scoring_version, since)
+        report = store.performance(settings.scoring_version, since, settings.major_missed_runner_multiple)
         await interaction.response.send_message(format_performance(report))
 
     @tree.command(name="candidates", description="Show strongest active pre-signal candidates")
@@ -52,6 +52,17 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             return
         since = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
         await interaction.response.send_message(format_rejections(store.rejection_report(since)))
+
+    @tree.command(name="missed", description="Show recently observed runners without a qualified signal")
+    @app_commands.describe(period="24h, 7d, or 30d")
+    async def missed_command(interaction: discord.Interaction, period: str = "24h") -> None:
+        if not allowed(interaction):
+            await interaction.response.send_message("This bot uses one configured channel.", ephemeral=True)
+            return
+        hours = {"24h": 24, "7d": 168, "30d": 720}.get(period.lower(), 24)
+        since = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
+        rows = store.missed_report(since, settings.missed_runner_multiple, 8)
+        await interaction.response.send_message(format_missed(rows, hours))
 
     @client.event
     async def on_ready() -> None:
