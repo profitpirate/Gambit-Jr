@@ -44,6 +44,13 @@ class Settings:
     discovery_interval_seconds: float = 30
     max_discoveries_per_cycle: int = 20
     monitor_interval_seconds: float = 30
+    candidate_monitor_interval_seconds: float = 30
+    candidate_max_age_minutes: float = 180
+    candidate_inactivity_timeout_minutes: float = 30
+    candidate_max_market_cap_usd: float = 300_000
+    min_snapshots_for_momentum: int = 3
+    max_active_candidates: int = 250
+    snapshot_history_limit: int = 12
     provider_timeout_seconds: float = 10
     provider_max_retries: int = 2
     provider_circuit_failures: int = 4
@@ -64,7 +71,7 @@ class Settings:
         "narrative": 25, "social": 20, "onchain": 20,
         "developer": 15, "momentum": 15, "safety": 5,
     })
-    scoring_version: str = "v1"
+    scoring_version: str = "v1.1-normalized"
     milestones: tuple[float, ...] = (1.5, 2, 3, 5, 10, 25, 50, 100)
     failure_multiple: float = 0.30
     inactivity_timeout_hours: float = 24
@@ -91,6 +98,13 @@ class Settings:
             discovery_interval_seconds=_float("DISCOVERY_INTERVAL_SECONDS", 30),
             max_discoveries_per_cycle=_int("MAX_DISCOVERIES_PER_CYCLE", 20),
             monitor_interval_seconds=_float("MONITOR_INTERVAL_SECONDS", 30),
+            candidate_monitor_interval_seconds=_float("CANDIDATE_MONITOR_INTERVAL_SECONDS", 30),
+            candidate_max_age_minutes=_float("CANDIDATE_MAX_AGE_MINUTES", 180),
+            candidate_inactivity_timeout_minutes=_float("CANDIDATE_INACTIVITY_TIMEOUT_MINUTES", 30),
+            candidate_max_market_cap_usd=_float("CANDIDATE_MAX_MARKET_CAP_USD", 300_000),
+            min_snapshots_for_momentum=_int("MIN_SNAPSHOTS_FOR_MOMENTUM", 3),
+            max_active_candidates=_int("MAX_ACTIVE_CANDIDATES", 250),
+            snapshot_history_limit=_int("SNAPSHOT_HISTORY_LIMIT", 12),
             provider_timeout_seconds=_float("PROVIDER_TIMEOUT_SECONDS", 10),
             provider_max_retries=_int("PROVIDER_MAX_RETRIES", 2),
             provider_circuit_failures=_int("PROVIDER_CIRCUIT_FAILURES", 4),
@@ -115,7 +129,7 @@ class Settings:
                 "momentum": _float("WEIGHT_MOMENTUM", 15),
                 "safety": _float("WEIGHT_SAFETY", 5),
             },
-            scoring_version=os.getenv("SCORING_VERSION", "v1"),
+            scoring_version=os.getenv("SCORING_VERSION", "v1.1-normalized"),
             milestones=milestones,
             failure_multiple=_float("FAILURE_MULTIPLE", 0.30),
             inactivity_timeout_hours=_float("INACTIVITY_TIMEOUT_HOURS", 24),
@@ -132,3 +146,7 @@ class Settings:
             raise ValueError("MIN_CONFIDENCE_FOR_SIGNAL must be between 0 and 1")
         if not self.milestones or any(x <= 1 for x in self.milestones):
             raise ValueError("All milestones must be greater than 1")
+        if min(self.candidate_monitor_interval_seconds, self.candidate_max_age_minutes,
+               self.candidate_inactivity_timeout_minutes, self.max_active_candidates,
+               self.min_snapshots_for_momentum, self.snapshot_history_limit) <= 0:
+            raise ValueError("Candidate monitoring settings must be positive")

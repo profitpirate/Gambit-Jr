@@ -1,4 +1,4 @@
-# Solana Memecoin Intelligence & Signal Bot — V1
+# Gambit Jr — V1.1 Candidate Intelligence
 
 A read-only, autonomous intelligence service for Solana memecoins. It discovers newly
 active tokens, collects real market and mint data, applies fail-closed safety gates,
@@ -43,7 +43,30 @@ None of those values are synthesized as zero.
 
 The production path is:
 
-`discovery → market → Solana safety → developer/narrative/social/on-chain/momentum → hard gates → scoring → immutable signal + Discord outbox → tracker → milestones/failure → analytics`
+`discovery → durable candidate → independent 30s monitor → real snapshots → safety/readiness split → normalized scoring → immutable signal + Discord outbox → tracker → milestones/failure → analytics`
+
+Candidate states are `DISCOVERED`, `SCREENING`, `CANDIDATE`, `PENDING_EVIDENCE`,
+`FAILED_PROVIDER`, `REJECTED_UNSAFE`, `EXPIRED`, and `SIGNALLED`. Signal classes remain
+`WATCH`, `STRONG`, and `HIGH_CONVICTION`. Mint/freeze authority and verified excessive
+holder concentration are terminal safety failures. Low liquidity, low market cap,
+missing momentum history, insufficient coverage, and provider outages remain retryable.
+Duplicate discovery updates the known token; it does not own or disable monitoring.
+
+## Normalized scoring
+
+The database retains raw component points, normalized score, confidence, and source
+availability. Let `available_weight` be the sum of weights whose evidence is genuinely
+available and `earned_points` the points from those components:
+
+```text
+confidence = available_weight / total_configured_weight
+normalized_score = earned_points / available_weight * 100
+```
+
+For example, 46 earned points from 65 available weight gives confidence 65% and a
+normalized score of 70.77 (WATCH). A high normalized score with confidence below
+`MIN_CONFIDENCE_FOR_SIGNAL` must not produce a signal. Unknown evidence is not
+equivalent to negative evidence and is never converted into fabricated evidence.
 
 Provider code is under `src/memecoin_bot/providers`; business rules do not depend on
 provider response shapes. SQLite writes a signal and its outbound Discord event in the
@@ -73,7 +96,8 @@ python -m pip install -e '.[dev]'
 cp .env.example .env                 # Windows: Copy-Item .env.example .env
 ```
 
-Set `DISCORD_TOKEN` and `DISCORD_CHANNEL_ID` for slash commands and alerts. A webhook
+Set `DISCORD_TOKEN` and `DISCORD_CHANNEL_ID` for `/status`, `/candidates`, `/rejections`,
+`/performance`, and alerts. A webhook
 can send one-way alerts, but slash commands require a bot token. Invite the bot with
 `bot` and `applications.commands` scopes and permission to view/send in exactly the
 configured channel.
@@ -85,10 +109,9 @@ memecoin-bot once --output evidence/live-shadow.json
 memecoin-bot run
 ```
 
-With `SHADOW_MODE=true` and `SHADOW_SEND_ALERTS=false`, decisions persist but Discord is
-suppressed. With both set to true, qualifying messages are clearly labelled shadow
-tests. Production signalling requires `SHADOW_MODE=false`; this changes labelling only,
-not thresholds.
+V1.1 remains `SHADOW_MODE=true` and `SHADOW_SEND_ALERTS=true`. Qualifying messages are
+explicitly labelled read-only shadow signals. There is no wallet, private key,
+transaction signing, swap, purchase, or sale path.
 
 ## Tests and replay
 
@@ -114,9 +137,9 @@ proof.
 5. Run `docker compose up -d --build`.
 6. Verify `docker compose ps`, `docker compose logs -f bot`, and
    `curl http://127.0.0.1:8080/health`.
-7. Restart with `docker compose restart bot`; confirm the same database volume, active
-   signals, immutable signal MC, milestone rows, and pending outbox state remain.
-8. Only after reviewing sustained shadow evidence set `SHADOW_MODE=false` and redeploy.
+7. Restart with `docker compose restart bot`; confirm the same candidates, snapshot
+   histories, signals, immutable signal MC, milestone rows, and pending outbox state remain.
+8. Keep V1.1 in shadow mode while reviewing sustained evidence.
 
 The Compose policy is `restart: unless-stopped`; named volumes keep SQLite and evidence
 independent of the development computer. Back up the `bot-data` volume. Run only one
@@ -131,6 +154,26 @@ timeouts, failure rules, alert behavior, and health port are configurable there.
 
 Never commit `.env`. The service does not accept a seed phrase, private key, wallet,
 exchange credential, or swap endpoint.
+
+## Backup, deployment, and rollback
+
+Before migration, stop the bot or use SQLite's online backup command and copy
+`/app/data/memecoin.db` (plus `-wal`/`-shm` when copying a live database) to dated,
+off-host storage. Migration `002_candidate_lifecycle.sql` is additive and preserves
+tokens, evaluations, signals, milestones, provider health, and the durable outbox.
+
+Deploy `codex/gambit-jr-v1.1-candidate-lifecycle` only after unit, replay, Compose,
+restart, health, and Discord shadow checks. Verify `docker compose ps`, then
+`curl http://127.0.0.1:8080/health`, and exercise all four Discord commands. To roll
+back, stop the V1.1 container, restore the pre-migration database backup, check out
+`codex/gambit-jr-v1-production`, and run `docker compose up -d --build`. The production
+branch is not modified by V1.1 development.
+
+## Known limitations
+
+Social velocity, developer reputation, bundler/insider/sniper intelligence,
+smart-money labels, funding-wallet history, and breaking-news velocity remain UNKNOWN
+until legitimate providers are integrated.
 
 ## Operational acceptance checklist
 

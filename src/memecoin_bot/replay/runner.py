@@ -8,7 +8,7 @@ from typing import Any
 from memecoin_bot.config import Settings
 from memecoin_bot.database import Store
 from memecoin_bot.models import (
-    DeveloperClass, DiscoveryEvent, MarketSnapshot, SafetyAssessment, SignalClass,
+    CandidateState, DeveloperClass, DiscoveryEvent, MarketSnapshot, SafetyAssessment, SignalClass,
 )
 from memecoin_bot.safety import SafetyGates
 from memecoin_bot.scoring import ScoringEngine
@@ -58,6 +58,9 @@ class ReplayRunner:
         for token in fixture["tokens"]:
             discovery = DiscoveryEvent(**token["discovery"])
             token_id, _ = self.store.upsert_discovery(discovery)
+            candidate_id, _ = self.store.ensure_candidate(
+                token_id, discovery.discovered_at, self.settings.scoring_version
+            )
             snapshot = sequences[discovery.token_address][0]
             safety = safeties[discovery.token_address]
             self.store.save_snapshot(token_id, snapshot, safety.holder_count)
@@ -66,6 +69,9 @@ class ReplayRunner:
             evidence = {"simulation": True, "fixture": str(fixture_path),
                         "market": snapshot.to_dict(), "safety": asdict(safety)}
             self.store.save_evaluation(token_id, result, evidence)
+            if hard:
+                self.store.update_candidate(candidate_id, CandidateState.REJECTED_UNSAFE,
+                                            hard[0], snapshot, result, hard_rejections=hard)
             decisions.append({"token_address": discovery.token_address,
                               "classification": str(result.classification),
                               "score": result.total, "rejections": result.hard_rejections})
@@ -87,6 +93,13 @@ class ReplayRunner:
                 )
                 if signal_id:
                     created.append(signal_id)
+                    self.store.update_candidate(candidate_id, CandidateState.SIGNALLED,
+                                                f"PROMOTED_{result.classification}", snapshot, result,
+                                                signal_id=signal_id)
+            elif not hard:
+                self.store.update_candidate(candidate_id, CandidateState.PENDING_EVIDENCE,
+                                            "REPLAY_SCORE_BELOW_THRESHOLD", snapshot, result,
+                                            waiting_reasons=["REPLAY_SCORE_BELOW_THRESHOLD"])
 
         tracker = SignalTracker(self.store, market, self.settings)
         cycle_results = []
@@ -103,6 +116,9 @@ class ReplayRunner:
             "cycles": cycle_results,
             "milestones": [dict(x) for x in self.store.conn.execute("SELECT * FROM milestones ORDER BY id")],
             "active_after_replay": len(self.store.active_signals()),
+            "candidate_transitions": [dict(x) for x in self.store.conn.execute(
+                "SELECT * FROM candidate_transitions ORDER BY id"
+            )],
             "performance": self.store.performance(self.settings.scoring_version),
         }
 

@@ -37,6 +37,8 @@ def signal_payload(
     return {
         "classification": str(score.classification),
         "score": score.total,
+        "normalized_score": score.normalized_score,
+        "available_weight": score.available_weight,
         "confidence": score.confidence,
         "symbol": market.symbol or discovery.symbol,
         "name": market.name or discovery.name,
@@ -70,20 +72,23 @@ def format_event(event_type: str, p: dict[str, Any]) -> str:
         developer = p.get("developer") or {}
         narrative = p.get("narrative") or {}
         momentum = p.get("momentum") or {}
+        social_display = "UNKNOWN" if (p.get("social") or {}).get("score") is None else f"{scores['social']:.1f}/{maxima['social']:.0f}"
+        developer_display = "UNKNOWN" if developer.get("score") is None else f"{scores['developer']:.1f}/{maxima['developer']:.0f}"
         thesis = "; ".join(_safe(x) for x in p.get("thesis") or []) or "Evidence met configured deterministic thresholds."
         risks = "; ".join(_safe(x) for x in p.get("risks") or []) or "Very young, highly volatile asset; limited history."
         return (
-            f"{shadow}🚨 {_safe(p['classification']).replace('_', ' ')} — {p['score']:.1f}/100\n\n"
+            f"{shadow}🚨 GAMBIT JR SHADOW — {_safe(p['classification']).replace('_', ' ')}\n\n"
             f"{_safe(p.get('name'))} (${_safe(p.get('symbol'))})\n"
             f"CA: `{_safe(p['token_address'], 80)}`\n\n"
             f"Signal MC: {_money(p.get('signal_market_cap_usd'))}\n"
             f"Liquidity: {_money(p.get('liquidity_usd'))}\n"
             f"Holders: {_number(p.get('holders'))}\n"
-            f"5m Volume: {_money(p.get('volume_5m_usd'))}\n\n"
+            f"5m Volume: {_money(p.get('volume_5m_usd'))}\n"
+            f"Score: {p.get('normalized_score', 0):.1f} | Confidence: {p.get('confidence', 0):.0%}\n\n"
             f"Narrative: {scores['narrative']:.1f}/{maxima['narrative']:.0f} ({_safe(narrative.get('label'))})\n"
-            f"Social Velocity: {scores['social']:.1f}/{maxima['social']:.0f}\n"
+            f"Social Velocity: {social_display}\n"
             f"On-chain: {scores['onchain']:.1f}/{maxima['onchain']:.0f}\n"
-            f"Developer: {scores['developer']:.1f}/{maxima['developer']:.0f}\n"
+            f"Developer: {developer_display}\n"
             f"Momentum: {scores['momentum']:.1f}/{maxima['momentum']:.0f}\n"
             f"Safety evidence: {scores['safety']:.1f}/{maxima['safety']:.0f}\n\n"
             f"Dev: {_safe(developer.get('classification'))}\n"
@@ -92,7 +97,7 @@ def format_event(event_type: str, p: dict[str, Any]) -> str:
             f"Buy/Sell: {_number(momentum.get('buy_sell_ratio'))}\n\n"
             f"THESIS: {_safe(thesis, 450)}\n\nRISKS: {_safe(risks, 350)}\n\n"
             f"Signal timestamp: {_safe(p.get('signal_timestamp'))} UTC\n"
-            f"Scoring: {_safe(p.get('scoring_version'))} | Confidence: {p.get('confidence', 0):.0%}"
+            f"Scoring: {_safe(p.get('scoring_version'))}\nREAD-ONLY SHADOW SIGNAL — NO TRADE EXECUTED"
         )[:1990]
     if event_type == "MILESTONE":
         multiple = p["milestone"]
@@ -114,6 +119,21 @@ def format_event(event_type: str, p: dict[str, Any]) -> str:
             f"Current: {float(p.get('current_multiple', 0)):.2f}X\n"
             f"Max Drawdown: {float(p.get('max_drawdown', 0)):.1%}\n"
             "Observation: configured failure drawdown reached before 2X."
+        )
+    if event_type == "UPGRADE":
+        return (
+            f"🟢 GAMBIT JR SHADOW — SIGNAL UPGRADE\n"
+            f"${_safe(p.get('symbol'))}: {_safe(p.get('previous_class'))} → {_safe(p.get('new_class'))}\n"
+            f"Score: {_number(p.get('normalized_score'))} | "
+            f"Confidence: {_number(float(p.get('confidence', 0)) * 100, '%')}\n"
+            "READ-ONLY SHADOW UPDATE — NO TRADE EXECUTED"
+        )
+    if event_type == "DETERIORATION":
+        return (
+            f"🟠 GAMBIT JR SHADOW — DETERIORATION\n${_safe(p.get('symbol'))}\n"
+            f"Score: {_number(p.get('normalized_score'))} | "
+            f"Reasons: {_safe('; '.join(p.get('reasons') or []), 500)}\n"
+            "Original signal baseline remains unchanged."
         )
     return _safe(p, 1900)
 

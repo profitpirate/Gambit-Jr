@@ -10,6 +10,20 @@ def _ratio(a: float | None, b: float | None) -> float | None:
 
 
 class MomentumEngine:
+    def assess_history(self, current: MarketSnapshot, previous: list[dict], minimum: int = 3) -> dict:
+        if len(previous) + 1 < minimum:
+            result = self.assess(current, previous[-1] if previous else None)
+            result["score"] = None
+            result["reason"] = "INSUFFICIENT_ROLLING_HISTORY"
+            result["snapshots_required"] = minimum
+            return result
+        latest = self.assess(current, previous[-1])
+        if latest.get("score") is None or len(previous) < 2:
+            return latest
+        prior = self.assess(previous[-1]["_snapshot"], previous[-2]) if "_snapshot" in previous[-1] else None
+        latest["acceleration"] = None if not prior or prior.get("score") is None else round(latest["score"] - prior["score"], 2)
+        return latest
+
     def assess(self, current: MarketSnapshot, previous: dict | None) -> dict:
         buy_sell = _ratio(
             float(current.buys_5m) if current.buys_5m is not None else None,

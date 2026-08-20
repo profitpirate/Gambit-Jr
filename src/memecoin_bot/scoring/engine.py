@@ -23,15 +23,16 @@ class ScoringEngine:
             scores[name] = round(max(0.0, min(float(value), maximum)), 2)
         total = round(sum(scores.values()), 2)
         confidence = round(known_weight / sum(maxima.values()), 4)
+        normalized = round(total / known_weight * 100, 2) if known_weight > 0 else None
         if hard_rejections:
             classification = SignalClass.REJECT
         elif confidence < self.settings.min_confidence_for_signal:
             classification = SignalClass.IGNORE
-        elif total >= self.settings.high_conviction_threshold:
+        elif normalized is not None and normalized >= self.settings.high_conviction_threshold:
             classification = SignalClass.HIGH_CONVICTION
-        elif total >= self.settings.strong_threshold:
+        elif normalized is not None and normalized >= self.settings.strong_threshold:
             classification = SignalClass.STRONG
-        elif total >= self.settings.watch_threshold:
+        elif normalized is not None and normalized >= self.settings.watch_threshold:
             classification = SignalClass.WATCH
         else:
             classification = SignalClass.IGNORE
@@ -43,5 +44,7 @@ class ScoringEngine:
             confidence=confidence,
             scoring_version=self.settings.scoring_version,
             hard_rejections=hard_rejections,
+            normalized_score=normalized,
+            available_weight=known_weight,
         )
 

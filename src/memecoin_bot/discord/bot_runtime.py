@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 from datetime import datetime, timedelta, timezone
 
-from memecoin_bot.analytics import format_performance, format_status
+from memecoin_bot.analytics import format_candidates, format_performance, format_rejections, format_status
 
 
 async def run_discord_bot(service: object, store: object, settings: object) -> None:
@@ -37,6 +37,21 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat() if days else None
         report = store.performance(settings.scoring_version, since)
         await interaction.response.send_message(format_performance(report))
+
+    @tree.command(name="candidates", description="Show strongest active pre-signal candidates")
+    async def candidates_command(interaction: discord.Interaction) -> None:
+        if not allowed(interaction):
+            await interaction.response.send_message("This bot uses one configured channel.", ephemeral=True)
+            return
+        await interaction.response.send_message(format_candidates(store.candidates_report(10)))
+
+    @tree.command(name="rejections", description="Show hard and temporary rejection reasons")
+    async def rejections_command(interaction: discord.Interaction) -> None:
+        if not allowed(interaction):
+            await interaction.response.send_message("This bot uses one configured channel.", ephemeral=True)
+            return
+        since = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+        await interaction.response.send_message(format_rejections(store.rejection_report(since)))
 
     @client.event
     async def on_ready() -> None:

@@ -29,6 +29,20 @@ class SignalClass(StrEnum):
     REJECT = "REJECT"
 
 
+class CandidateState(StrEnum):
+    DISCOVERED = "DISCOVERED"
+    SCREENING = "SCREENING"
+    CANDIDATE = "CANDIDATE"
+    PENDING_EVIDENCE = "PENDING_EVIDENCE"
+    FAILED_PROVIDER = "FAILED_PROVIDER"
+    WATCH = "WATCH"
+    STRONG = "STRONG"
+    HIGH_CONVICTION = "HIGH_CONVICTION"
+    REJECTED_UNSAFE = "REJECTED_UNSAFE"
+    EXPIRED = "EXPIRED"
+    SIGNALLED = "SIGNALLED"
+
+
 class DeveloperClass(StrEnum):
     KNOWN_GOOD = "KNOWN_GOOD"
     KNOWN_OF = "KNOWN_OF"
@@ -126,4 +140,6 @@ class ScoreResult:
     confidence: float
     scoring_version: str
     hard_rejections: list[str] = field(default_factory=list)
+    normalized_score: float | None = None
+    available_weight: float = 0.0
 
