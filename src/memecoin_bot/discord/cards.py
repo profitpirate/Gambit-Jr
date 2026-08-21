@@ -5,13 +5,23 @@ from datetime import UTC, datetime
 from typing import Any
 from urllib.parse import quote
 
+BRAND = {
+    "near_black": 0x0B0B0C,
+    "charcoal": 0x1B1B1E,
+    "burnt_orange": 0xD96B1D,
+    "off_white": 0xF4F0E8,
+    "muted_grey": 0x77777E,
+    "risk": 0xA63D2F,
+    "positive": 0xB45F16,
+}
 COLORS = {
-    "blue": 0x5865F2,
-    "green": 0x22C55E,
-    "amber": 0xF59E0B,
-    "red": 0xDC2626,
-    "grey": 0x64748B,
-    "purple": 0x8B5CF6,
+    "orange": BRAND["burnt_orange"],
+    "blue": BRAND["burnt_orange"],
+    "green": BRAND["positive"],
+    "amber": BRAND["burnt_orange"],
+    "red": BRAND["risk"],
+    "grey": BRAND["muted_grey"],
+    "purple": BRAND["burnt_orange"],
 }
 
 
@@ -39,9 +49,9 @@ def _field(name: str, value: Any, inline: bool = True) -> dict[str, Any]:
 def card(
     title: str,
     description: str = "",
-    color: str = "blue",
+    color: str = "orange",
     fields: Iterable[dict[str, Any]] = (),
-    footer: str = "READ-ONLY INTELLIGENCE • NO TRADE EXECUTED",
+    footer: str = "GAMBIT JR • READ-ONLY INTELLIGENCE • NO EXECUTION",
     links: Iterable[tuple[str, str]] = (),
 ) -> dict[str, Any]:
     return {
@@ -67,6 +77,8 @@ def status_card(stats: dict[str, Any]) -> dict[str, Any]:
         or "No provider observations yet"
     )
     reconciliation = stats.get("state_reconciliation", {})
+    v14 = stats.get("v14") or {}
+    queue = stats.get("event_queue") or {}
     live = (
         f"Watching: **{stats.get('candidates_watching', 0)}**\n"
         f"Pending: **{stats.get('pending_evidence', 0)}**\n"
@@ -106,7 +118,150 @@ def status_card(stats: dict[str, Any]) -> dict[str, Any]:
                 else f"DIFFERENCE {reconciliation.get('difference')}",
                 False,
             ),
+            _field(
+                "ALPHA ENGINE",
+                f"Event queue: **{queue.get('size', 0)} / {queue.get('maxsize', 0)}**\n"
+                f"Persisted events: **{v14.get('event_queue_persisted', 0)}**\n"
+                f"Wallet clusters: **{v14.get('wallet_clusters', 0)}**",
+                False,
+            ),
         ],
+    )
+
+
+def menu_card() -> dict[str, Any]:
+    return card(
+        "GAMBIT JR • COMMAND CENTER",
+        "Ultra-early, read-only intelligence from launch through measured outcome.",
+        fields=[
+            _field(
+                "START HERE",
+                "`/scan` any supported CA • `/compare` two tokens • `/watch` a token",
+                False,
+            ),
+            _field(
+                "LIVE INTELLIGENCE",
+                "`/radar` `/runners` `/failed` `/token` `/smartmoney`",
+                False,
+            ),
+            _field(
+                "GRAPHS & CONTEXT",
+                "`/wallet` `/clusters` `/creator` `/narrative`",
+                False,
+            ),
+            _field(
+                "OPERATIONS",
+                "`/status` `/performance` `/watchlist` `/server-settings`",
+                False,
+            ),
+            _field(
+                "HOW JR THINKS",
+                "ATTENTION → LAUNCH → T0 → GRAPH → SURVIVAL → ASYMMETRY → GENESIS → QUALIFIED",
+                False,
+            ),
+        ],
+    )
+
+
+def scan_card(data: dict[str, Any]) -> dict[str, Any]:
+    market = data.get("market") or {}
+    survival = data.get("survival") or {}
+    payoff = data.get("payoff") or {}
+    providers = "\n".join(
+        f"{name.upper()} — {value.get('state', 'UNKNOWN')}"
+        for name, value in (data.get("providers") or {}).items()
+    )
+    return card(
+        f"SCAN • {_value(market.get('symbol') or data.get('token_address'))}",
+        f"`{_value(data.get('token_address'))}`\nManual intelligence only; this scan creates no Radar or signal.",
+        fields=[
+            _field("Chain", str(data.get("chain", "UNKNOWN")).upper()),
+            _field("Market state", data.get("state")),
+            _field("Entry", data.get("entry_state")),
+            _field("Market cap", _money(market.get("market_cap_usd"))),
+            _field("Liquidity", _money(market.get("liquidity_usd"))),
+            _field("5m volume", _money(market.get("volume_5m_usd"))),
+            _field("Survival", survival.get("grade")),
+            _field("Payoff", payoff.get("grade")),
+            _field("Latency", f"{float(data.get('latency_ms') or 0):.0f} ms"),
+            _field("Providers", providers or "No provider evidence", False),
+            _field("Unknowns", ", ".join(data.get("unknowns") or []) or "None", False),
+        ],
+        links=token_links(data | {"pair_address": market.get("pair_address")}),
+    )
+
+
+def compare_card(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
+    def line(value: dict[str, Any]) -> str:
+        market = value.get("market") or {}
+        return (
+            f"`{value.get('token_address')}`\n"
+            f"MC {_money(market.get('market_cap_usd'))} • Liq {_money(market.get('liquidity_usd'))}\n"
+            f"Entry {value.get('entry_state')} • Survival {(value.get('survival') or {}).get('grade')} • "
+            f"Payoff {(value.get('payoff') or {}).get('grade')}"
+        )
+
+    return card(
+        "COMPARE • READ-ONLY SETUPS",
+        fields=[_field("TOKEN A", line(left), False), _field("TOKEN B", line(right), False)],
+    )
+
+
+def watchlist_card(rows: Iterable[dict[str, Any]]) -> dict[str, Any]:
+    return rows_card(
+        "MY WATCHLIST",
+        rows,
+        "Your watchlist is empty. Use `/watch` to add a token.",
+        lambda row: f"**{row['chain'].upper()}** • `{row['token_address']}`",
+    )
+
+
+def wallet_card(data: dict[str, Any]) -> dict[str, Any]:
+    return card(
+        "WALLET GRAPH",
+        f"`{_value(data.get('wallet'))}`\nRelationships are informational, never an automatic verdict.",
+        fields=[
+            _field("Known chains", len(data.get("nodes") or [])),
+            _field("Relationships", len(data.get("edges") or [])),
+            _field("Clusters", len(data.get("clusters") or [])),
+            _field(
+                "Relationship types",
+                ", ".join(
+                    sorted({row.get("relationship", "UNKNOWN") for row in data.get("edges") or []})
+                )
+                or "UNKNOWN",
+                False,
+            ),
+        ],
+    )
+
+
+def creator_card(data: dict[str, Any] | None, creator: str) -> dict[str, Any]:
+    if not data:
+        return card("CREATOR INTELLIGENCE", f"`{creator}`\nCreator history is UNKNOWN.", "grey")
+    return card(
+        "CREATOR INTELLIGENCE",
+        f"`{creator}`",
+        fields=[
+            _field("Quality", data.get("quality")),
+            _field("Launches", data.get("launches")),
+            _field("Survived", data.get("survived")),
+            _field("Runners", data.get("runners")),
+            _field("Rugs / failures", data.get("rugs")),
+            _field("Last observed", data.get("last_seen_at"), False),
+        ],
+    )
+
+
+def narrative_card(rows: Iterable[dict[str, Any]], query: str | None = None) -> dict[str, Any]:
+    return rows_card(
+        f"NARRATIVES{f' • {query}' if query else ''}",
+        rows,
+        "No narrative evidence is available.",
+        lambda row: (
+            f"**{row.get('label')}** • {row.get('freshness')} • {row.get('saturation')} • "
+            f"leader {row.get('leader_symbol') or row.get('leader_address') or 'UNKNOWN'}"
+        ),
     )
 
 
@@ -183,9 +338,11 @@ def rows_card(
 
 
 def performance_card(report: dict[str, Any]) -> dict[str, Any]:
+    sample = int(report.get("total_signals") or 0)
+    warning = "\n\n**SMALL SAMPLE • NOT YET RELIABLE**" if report.get("small_sample") else ""
     return card(
         "PERFORMANCE • MEASURED OUTCOMES",
-        "Historical shadow results, never promises.",
+        f"Historical shadow results, never promises.{warning}",
         "green",
         [
             _field("Signals", report.get("total_signals")),
@@ -194,6 +351,11 @@ def performance_card(report: dict[str, Any]) -> dict[str, Any]:
             _field("2x rate", f"{float(report.get('2x_rate') or 0):.1f}%"),
             _field("5x rate", f"{float(report.get('5x_rate') or 0):.1f}%"),
             _field("10x rate", f"{float(report.get('10x_rate') or 0):.1f}%"),
+            _field("Mature sample", sample),
+            _field(
+                "Qualified 2x precision",
+                _value((report.get("right_tail") or {}).get("qualified_2x_precision")),
+            ),
         ],
     )
 
@@ -218,6 +380,11 @@ def settings_card(settings: dict[str, Any] | None) -> dict[str, Any]:
                 else "NOT SET",
             ),
             _field("Alert tier", settings.get("alert_tier")),
+            _field(
+                "Daily report",
+                "ENABLED" if settings.get("daily_report_enabled") else "DISABLED",
+            ),
+            _field("Chains", ", ".join(settings.get("enabled_chains") or []) or "NONE"),
             _field("Updated", settings.get("updated_at"), False),
         ],
     )
@@ -225,7 +392,7 @@ def settings_card(settings: dict[str, Any] | None) -> dict[str, Any]:
 
 def test_alert_card() -> dict[str, Any]:
     return card(
-        "🧪 GAMBIT JR • TEST ALERT",
+        "GAMBIT JR • TEST ALERT",
         "TEST / NON-LIVE — Discord delivery and rich-card rendering succeeded.",
         "amber",
         [

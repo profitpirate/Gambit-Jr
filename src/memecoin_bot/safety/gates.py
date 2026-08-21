@@ -15,9 +15,16 @@ class SafetyGates:
         reasons = list(chain.rejection_reasons)
         if chain.chain == "solana" and self.settings.reject_mint_authority and chain.mint_authority:
             reasons.append("MINT_AUTHORITY_ACTIVE")
-        if chain.chain == "solana" and self.settings.reject_freeze_authority and chain.freeze_authority:
+        if (
+            chain.chain == "solana"
+            and self.settings.reject_freeze_authority
+            and chain.freeze_authority
+        ):
             reasons.append("FREEZE_AUTHORITY_ACTIVE")
-        if chain.top10_percent is not None and chain.top10_percent > self.settings.max_top10_percent:
+        if (
+            chain.top10_percent is not None
+            and chain.top10_percent > self.settings.max_top10_percent
+        ):
             reasons.append("TOP_HOLDER_CONCENTRATION_HIGH")
         return sorted(set(reasons))
 
@@ -40,11 +47,13 @@ class SafetyGates:
         discovered = datetime.fromisoformat(first_discovered_at.replace("Z", "+00:00"))
         if (now - discovered).total_seconds() / 60 > self.settings.candidate_max_age_minutes:
             return "CANDIDATE_MAX_AGE_EXCEEDED"
-        if market.market_cap_usd is not None and market.market_cap_usd > self.settings.candidate_max_market_cap_usd:
+        if (
+            market.market_cap_usd is not None
+            and market.market_cap_usd > self.settings.candidate_max_market_cap_usd
+        ):
             return "MARKET_CAP_ABOVE_CANDIDATE_RANGE"
         if market.pair_created_at:
             created = datetime.fromisoformat(market.pair_created_at.replace("Z", "+00:00"))
             if (now - created).total_seconds() / 60 > self.settings.max_pair_age_minutes:
                 return "PAIR_TOO_OLD"
         return None
-

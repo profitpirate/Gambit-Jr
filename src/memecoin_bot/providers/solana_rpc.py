@@ -16,23 +16,30 @@ class SolanaRpcProvider:
 
     async def _rpc(self, method: str, params: list[Any]) -> Any:
         self._request_id += 1
-        data = await self.client.request(self.rpc_url, "POST", {
-            "jsonrpc": "2.0", "id": self._request_id, "method": method, "params": params,
-        })
+        data = await self.client.request(
+            self.rpc_url,
+            "POST",
+            {
+                "jsonrpc": "2.0",
+                "id": self._request_id,
+                "method": method,
+                "params": params,
+            },
+        )
         if data.get("error"):
             raise ProviderError(f"Solana {method}: {data['error']}")
         return data.get("result")
 
     async def safety(self, token_address: str) -> SafetyAssessment:
         assessment = SafetyAssessment(checked_at=iso(), source=self.name, chain="solana")
-        account = await self._rpc("getAccountInfo", [
-            token_address, {"encoding": "jsonParsed", "commitment": "confirmed"}
-        ])
+        account = await self._rpc(
+            "getAccountInfo", [token_address, {"encoding": "jsonParsed", "commitment": "confirmed"}]
+        )
         value = (account or {}).get("value")
         if not value:
             assessment.rejection_reasons.append("MINT_ACCOUNT_NOT_FOUND")
             return assessment
-        parsed = (((value.get("data") or {}).get("parsed") or {}).get("info") or {})
+        parsed = ((value.get("data") or {}).get("parsed") or {}).get("info") or {}
         assessment.mint_authority = parsed.get("mintAuthority")
         assessment.freeze_authority = parsed.get("freezeAuthority")
         supply_text = parsed.get("supply")
@@ -40,7 +47,9 @@ class SolanaRpcProvider:
         assessment.decimals = parsed.get("decimals")
 
         try:
-            supply_result = await self._rpc("getTokenSupply", [token_address, {"commitment": "confirmed"}])
+            supply_result = await self._rpc(
+                "getTokenSupply", [token_address, {"commitment": "confirmed"}]
+            )
             raw = ((supply_result or {}).get("value") or {}).get("amount")
             if raw is not None:
                 assessment.supply_raw = int(raw)
@@ -55,4 +64,3 @@ class SolanaRpcProvider:
             # Mint authorities remain real data; distribution is explicitly unknown.
             assessment.warnings.append(f"DISTRIBUTION_UNAVAILABLE:{exc}")
         return assessment
-

@@ -10,7 +10,9 @@ class ScoringEngine:
     def __init__(self, settings: Settings):
         self.settings = settings
 
-    def score(self, component_inputs: dict[str, float | None], hard_rejections: list[str]) -> ScoreResult:
+    def score(
+        self, component_inputs: dict[str, float | None], hard_rejections: list[str]
+    ) -> ScoreResult:
         maxima = self.settings.weights.copy()
         scores: dict[str, float] = {}
         known_weight = 0.0
@@ -47,4 +49,3 @@ class ScoringEngine:
             normalized_score=normalized,
             available_weight=known_weight,
         )
-

@@ -1,19 +1,35 @@
-# Gambit Jr — V1.3.1 Signal Quality and Discord-First Intelligence
+# Gambit Jr — V1.4 Ultra-Early Discord Intelligence
 
-A read-only, autonomous intelligence service for Solana and BNB Chain memecoins. It discovers newly
-active tokens, collects real market and mint data, applies fail-closed safety gates,
-scores only supported evidence, persists every decision, and monitors qualifying
-signals. It never connects to a wallet and contains no trading code.
+A read-only, autonomous intelligence service for Solana and BNB Chain memecoins. Gambit Jr now starts
+at the launch event, performs a low-latency T0 decision, enriches evidence in parallel, builds wallet,
+creator, and narrative context, estimates survival and convexity, and follows every promoted setup
+through measured outcomes. Discord is the complete supported product surface. Jr never connects to a
+wallet and contains no transaction, signing, order, swap, purchase, or sale path.
 
-## Completion status
+## V1.4 completion and operational boundary
 
-The V1.3.1 code path is implemented and covered by deterministic unit, migration,
-backlog-stress, delivery-idempotency, and replay tests.
-This is not a claim that the brief's live operational acceptance test is complete:
-Discord credentials, a cloud target, and a naturally qualifying real token are external
-requirements. Thresholds must not be weakened to manufacture that evidence.
+The V1.4 code path is covered by deterministic migration, lifecycle, promotion, replay, provider,
+graph, anti-lookahead, delivery-idempotency, two-restart, 1,000-candidate, and 10,000-event tests.
+Live provider acceptance can prove public Solana/BNB discovery and market plumbing. Actual Discord
+delivery, a naturally qualifying live token, and operator-verified BNB launch-factory deployments
+remain credential/external-event dependent; no threshold is weakened to manufacture that evidence.
 
 Implemented:
+
+- bounded, deduplicating launch-event ingestion with source/receive/candidate/T0 latency evidence;
+- Solana `logsSubscribe` Pump.fun program adapter and a reconnecting read-only path;
+- configurable BNB factory-log polling fallback for operator-verified Four.meme/Flap deployments;
+- authoritative `DISCOVERED → GENESIS_RADAR → HOT_RADAR → PRIORITY_RADAR → QUALIFIED_SIGNAL`
+  promotion with separate entry timing and evidence confidence;
+- explicit Genesis cards labelled extremely early, high uncertainty, and not qualified signals;
+- T0 plus staged/parallel enrichment, immutable call snapshots, and versioned feature/provenance data;
+- first-buyer cohort schema, connected-wallet graph, cluster memory, and false-positive avoidance;
+- creator history/quality, narrative leader election, clone/saturation penalties, and capital rotation;
+- survival/rug-warning and payoff/convexity engines whose `UNKNOWN` state is never coerced to bad;
+- right-tail recall, missed-runner, comparable benchmark schema, qualified 2x precision, and small-sample warnings;
+- `/menu`, `/help`, `/scan` with Refresh/Watch, `/compare`, `/watch`, `/unwatch`, `/watchlist`,
+  `/wallet`, `/clusters`, `/creator`, and `/narrative` in the burnt-orange Gambit visual system;
+- `GENESIS_ALL`, `HOT_PLUS`, `PRIORITY_PLUS`, and `QUALIFIED_ONLY` guild alert policies, with legacy aliases;
 
 - DEX Screener profile/boost/community-takeover discovery and pair market snapshots;
 - GeckoTerminal new-pool discovery for Solana and BNB Chain, with isolated provider failures;
@@ -42,13 +58,32 @@ None of those values are synthesized as zero.
 
 ## Architecture
 
-The production path is:
+The V1.4 production path is:
 
-`multisource discovery → durable candidate → real snapshots → EARLY_RADAR → normalized qualified signal → tracking → missed-runner analytics`
+`attention → launch event → T0 → parallel intelligence → wallet/creator/narrative graph → survival → payoff → Genesis → Hot → Priority → Qualified → outcome attribution`
 
-Candidate states are `DISCOVERED`, `SCREENING`, `CANDIDATE`, `PENDING_EVIDENCE`,
-`FAILED_PROVIDER`, `EARLY_RADAR`, `REJECTED_UNSAFE`, `EXPIRED`, and `SIGNALLED`. Signal classes remain
-`WATCH`, `STRONG`, and `HIGH_CONVICTION`. Mint/freeze authority and verified excessive
+Launch events are stored before candidate creation with `source_event_timestamp`, `source_received_at`,
+and `candidate_created_at`. The event queue is bounded and deduplicated. Solana uses official RPC
+PubSub semantics; BSC's public endpoints may disable `eth_getLogs`, so the BNB direct adapter stays
+disabled until an operator supplies a WebSocket/log-capable RPC plus verified factory addresses and
+event topics. DexScreener and GeckoTerminal remain independent polling fallbacks.
+
+T0 permits incomplete evidence only for Genesis. `UNKNOWN` remains unknown. Terminal contract safety
+evidence still rejects; connected wallets are warnings and context, not automatic rejection. Entry
+state is independent from confidence, and `CHASING` or `LATE` can never qualify regardless of score.
+Thresholds are versioned and never self-modify in V1.4.
+
+### Discord-first workflow
+
+Run `/menu` to discover the product. `/scan` evaluates any supported contract in parallel without
+creating a candidate, Radar event, signal, or performance record; Refresh repeats that isolated scan,
+and Watch adds only a user/guild watchlist row. Automatic alerts go to one configured channel per
+guild, while commands work in any permitted guild text channel. `/test-alert` remains a delivery-only
+audit and never creates intelligence.
+
+Candidate states retain the V1.3 lifecycle values and add the authoritative V1.4 promotion states
+`GENESIS_RADAR`, `HOT_RADAR`, `PRIORITY_RADAR`, and `QUALIFIED_SIGNAL`. Legacy signal classes
+`WATCH`, `STRONG`, and `HIGH_CONVICTION` remain compatible. Mint/freeze authority and verified excessive
 holder concentration are terminal safety failures. Low liquidity, low market cap,
 missing momentum history, insufficient coverage, and provider outages remain retryable.
 Duplicate discovery updates the known token; it does not own or disable monitoring.
@@ -121,8 +156,10 @@ mobile-first Discord embeds. Every card shows the full copyable contract address
 explicit SOLANA or BNB CHAIN label. Valid DexScreener plus Solscan/BscScan link buttons
 are constructed without credentials.
 
-Commands are `/status`, `/performance`, `/candidates`, `/rejections`, `/missed`, `/radar`,
-`/runners`, `/failed`, `/token`, `/smartmoney`, `/setup`, `/server-settings`, and `/test-alert`.
+Commands include `/menu`, `/help`, `/scan`, `/compare`, `/watch`, `/unwatch`, `/watchlist`,
+`/wallet`, `/clusters`, `/creator`, `/narrative`, `/status`, `/performance`, `/candidates`,
+`/rejections`, `/missed`, `/radar`, `/runners`, `/failed`, `/token`, `/smartmoney`, `/setup`,
+`/server-settings`, and `/test-alert`.
 `/missed` reports tokens that crossed `MISSED_RUNNER_MULTIPLE` without a qualified signal,
 including discovery market cap, peak, multiple, radar status, and the last non-signal
 reason. Signal hit rates and opportunity coverage remain separate metric families.
@@ -140,8 +177,8 @@ milestones restart-safe.
 |---|---|---|
 | GeckoTerminal public API | Free but rate-limited | recent new-pool discovery on Solana and BNB Chain |
 | DEX Screener public API | Free but rate-limited | activation discovery, pairs, price/MC/liquidity/volume/transactions/social links |
-| Solana JSON-RPC | Free public endpoint but heavily rate-limited | mint configuration, supply, largest token accounts |
-| BSC JSON-RPC | Free public endpoint but rate-limited | bytecode existence and standard owner probe |
+| Solana JSON-RPC/PubSub | Free public endpoint but heavily rate-limited | direct launch logs, mint configuration, supply, largest token accounts |
+| BSC JSON-RPC | Free public endpoint but rate-limited | verified factory logs, bytecode existence, and standard owner probe |
 | Dedicated Solana RPC | Optional paid/free-tier upgrade | better reliability for top-account distribution |
 | Social/news/developer providers | Not configured | interfaces return unknown; no fabricated evidence |
 
@@ -175,7 +212,7 @@ memecoin-bot once --output evidence/live-shadow.json
 memecoin-bot run
 ```
 
-V1.3.1 remains `SHADOW_MODE=true` and `SHADOW_SEND_ALERTS=true`. Qualifying messages are
+V1.4 defaults remain `SHADOW_MODE=true` and `SHADOW_SEND_ALERTS=true`. Qualifying messages are
 explicitly labelled read-only shadow signals. There is no wallet, private key,
 transaction signing, swap, purchase, or sale path.
 
@@ -254,16 +291,17 @@ bounded concurrency, exponential retry/backoff, 429 handling through the resilie
 circuit breaker. Static enrichment defaults to a 120-second TTL. Operators should lower concurrency
 or increase TTL if their issued key has stricter limits.
 
-### V1.3 deployment and rollback
+### V1.4 deployment and rollback
 
-Before deploying, stop the V1.2 process and back up the SQLite database plus WAL/SHM files. Check out
-`codex/gambit-jr-v1.3-intelligence-gmgn`, configure `.env`, keep `SHADOW_MODE=true`, and run
+Before deploying, stop the prior process and back up the SQLite database plus WAL/SHM files. Check out
+`codex/gambit-jr-v1.4-alpha-engine-discord`, configure `.env`, keep `SHADOW_MODE=true`, and run
 `docker compose up -d --build`. Verify ports 8080 and 8081, provider health, state reconciliation,
-Discord commands, and restart recovery. GMGN may remain disabled; the scanner continues normally.
+Discord commands, and restart recovery. GMGN may remain disabled; direct BNB launch ingestion must
+remain disabled until verified factory addresses/topics and a log-capable RPC are configured.
 
-Rollback is application-first: stop V1.3, check out the V1.2 branch, and start the old container
-against a pre-upgrade database backup. Migration 004 is additive, but restoring the backup is the
-supported rollback because older application code does not own V1.3 tables.
+Rollback is application-first: stop V1.4, check out the prior release, and start the old container
+against a pre-upgrade database backup. Migration 006 is additive, but restoring the backup is the
+supported rollback because older application code does not own V1.4 tables.
 
 ## Tests and replay
 

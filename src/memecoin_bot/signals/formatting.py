@@ -145,24 +145,30 @@ def _buttons(p: dict[str, Any]) -> list[dict[str, Any]]:
 def format_discord_event(event_type: str, p: dict[str, Any]) -> dict[str, Any]:
     text = format_event(event_type, p)
     colors = {
-        "EARLY_RADAR": 0x5865F2,
-        "RADAR_MILESTONE": 0x22C55E,
-        "RADAR_RISK": 0xDC2626,
-        "SIGNAL": 0xF59E0B,
-        "MILESTONE": 0xEF4444,
-        "UPGRADE": 0xF97316,
-        "DETERIORATION": 0xEAB308,
-        "FAILED": 0xDC2626,
+        "GENESIS_RADAR": 0xD96B1D,
+        "EARLY_RADAR": 0xD96B1D,
+        "HOT_RADAR": 0xD96B1D,
+        "PRIORITY_RADAR": 0xD96B1D,
+        "RADAR_MILESTONE": 0xB45F16,
+        "RADAR_RISK": 0xA63D2F,
+        "SIGNAL": 0xD96B1D,
+        "MILESTONE": 0xD96B1D,
+        "UPGRADE": 0xD96B1D,
+        "DETERIORATION": 0xD96B1D,
+        "FAILED": 0xA63D2F,
     }
     title = {
-        "EARLY_RADAR": "🛰️ GAMBIT JR — EARLY RADAR",
-        "RADAR_MILESTONE": "🔥 GAMBIT JR — RADAR OUTCOME",
-        "RADAR_RISK": "⚠️ GAMBIT JR — RADAR RISK",
+        "GENESIS_RADAR": "GAMBIT JR — GENESIS RADAR",
+        "EARLY_RADAR": "GAMBIT JR — STANDARD RADAR",
+        "HOT_RADAR": "GAMBIT JR — HOT RADAR",
+        "PRIORITY_RADAR": "GAMBIT JR — PRIORITY RADAR",
+        "RADAR_MILESTONE": "GAMBIT JR — RADAR OUTCOME",
+        "RADAR_RISK": "GAMBIT JR — RADAR RISK",
         "SIGNAL": f"GAMBIT JR — {str(p.get('classification', 'SIGNAL')).replace('_', ' ')}",
-        "MILESTONE": "🔥 GAMBIT JR — MILESTONE",
+        "MILESTONE": "GAMBIT JR — MILESTONE",
         "UPGRADE": "GAMBIT JR — SIGNAL UPGRADE",
-        "DETERIORATION": "⚠️ GAMBIT JR — DETERIORATION",
-        "FAILED": "🔴 GAMBIT JR — FAILED",
+        "DETERIORATION": "GAMBIT JR — DETERIORATION",
+        "FAILED": "GAMBIT JR — FAILED",
     }.get(event_type, f"GAMBIT JR — {event_type}")
     address = str(p.get("token_address") or "UNKNOWN")
     fields = [
@@ -178,11 +184,15 @@ def format_discord_event(event_type: str, p: dict[str, Any]) -> dict[str, Any]:
             },
             {"name": "Liquidity", "value": _money(p.get("liquidity_usd")), "inline": True},
         ]
-    if event_type == "EARLY_RADAR":
+    if event_type in {"GENESIS_RADAR", "EARLY_RADAR"}:
         fields.append(
             {
                 "name": "Status",
-                "value": "LOWER CONFIDENCE — NOT A QUALIFIED SIGNAL",
+                "value": (
+                    "EXTREMELY EARLY • HIGH UNCERTAINTY • NOT A QUALIFIED SIGNAL"
+                    if event_type == "GENESIS_RADAR"
+                    else "LOWER CONFIDENCE • NOT A QUALIFIED SIGNAL"
+                ),
                 "inline": False,
             }
         )
@@ -217,6 +227,7 @@ def format_discord_event(event_type: str, p: dict[str, Any]) -> dict[str, Any]:
                 "description": text[:3500],
                 "color": colors.get(event_type, 0x64748B),
                 "fields": fields,
+                "footer": {"text": "GAMBIT JR • READ-ONLY INTELLIGENCE • NO EXECUTION"},
             }
         ],
         "components": _buttons(p),
@@ -225,6 +236,17 @@ def format_discord_event(event_type: str, p: dict[str, Any]) -> dict[str, Any]:
 
 
 def format_event(event_type: str, p: dict[str, Any]) -> str:
+    if event_type == "GENESIS_RADAR":
+        reasons = "; ".join(_safe(x) for x in p.get("reasons") or []) or "verified launch event"
+        unknowns = ", ".join(_safe(x) for x in p.get("unknowns") or []) or "none recorded"
+        return (
+            "GENESIS RADAR — EXTREMELY EARLY / HIGH UNCERTAINTY / NOT A QUALIFIED SIGNAL\n"
+            f"{_chain_label(p.get('chain'))} • {_safe(p.get('launchpad'))}\n"
+            f"CA: `{_safe(p.get('token_address'), 80)}`\n"
+            f"Entry: {_safe(p.get('entry_state'))} • Confidence: {float(p.get('confidence') or 0):.0%}\n"
+            f"Why now: {_safe(reasons, 700)}\nUnknown: {_safe(unknowns, 500)}\n"
+            "READ-ONLY SHADOW INTELLIGENCE — NO EXECUTION"
+        )[:1990]
     if event_type == "EARLY_RADAR":
         ratio = None
         if p.get("sells_5m") not in (None, 0) and p.get("buys_5m") is not None:

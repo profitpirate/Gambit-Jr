@@ -13,4 +13,3 @@ class SocialEngine:
             "source": current.source,
             "reason": "VELOCITY_PROVIDER_UNAVAILABLE",
         }
-

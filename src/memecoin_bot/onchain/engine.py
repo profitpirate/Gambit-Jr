@@ -7,12 +7,30 @@ class OnchainEngine:
     def assess(self, safety: SafetyAssessment) -> dict:
         if safety.chain == "bsc":
             if "BSC_OWNER_RENOUNCED" in safety.warnings:
-                return {"score": 18.0, "owner_state": "RENOUNCED", "source": safety.source,
-                        "limitations": ["HOLDER_CONCENTRATION_UNKNOWN", "TRANSFER_RESTRICTIONS_UNKNOWN"]}
+                return {
+                    "score": 18.0,
+                    "owner_state": "RENOUNCED",
+                    "source": safety.source,
+                    "limitations": [
+                        "HOLDER_CONCENTRATION_UNKNOWN",
+                        "TRANSFER_RESTRICTIONS_UNKNOWN",
+                    ],
+                }
             if "BSC_OWNER_ACTIVE" in safety.warnings:
-                return {"score": 6.0, "owner_state": "ACTIVE", "source": safety.source,
-                        "limitations": ["HOLDER_CONCENTRATION_UNKNOWN", "TRANSFER_RESTRICTIONS_UNKNOWN"]}
-            return {"score": None, "owner_state": "UNKNOWN", "reason": "BSC_ADMIN_EVIDENCE_UNAVAILABLE"}
+                return {
+                    "score": 6.0,
+                    "owner_state": "ACTIVE",
+                    "source": safety.source,
+                    "limitations": [
+                        "HOLDER_CONCENTRATION_UNKNOWN",
+                        "TRANSFER_RESTRICTIONS_UNKNOWN",
+                    ],
+                }
+            return {
+                "score": None,
+                "owner_state": "UNKNOWN",
+                "reason": "BSC_ADMIN_EVIDENCE_UNAVAILABLE",
+            }
         if safety.top10_percent is None:
             return {
                 "score": None,
@@ -30,4 +48,3 @@ class OnchainEngine:
             "holder_count": safety.holder_count,
             "source": safety.source,
         }
-

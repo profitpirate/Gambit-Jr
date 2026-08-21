@@ -42,6 +42,15 @@ class Settings:
     dexscreener_base_url: str = "https://api.dexscreener.com"
     geckoterminal_base_url: str = "https://api.geckoterminal.com/api/v2"
     bsc_rpc_url: str = "https://bsc-dataseed.bnbchain.org"
+    direct_launch_discovery_enabled: bool = False
+    pumpfun_discovery_enabled: bool = False
+    bnb_launch_discovery_enabled: bool = False
+    pumpfun_program_ids: tuple[str, ...] = ("6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",)
+    bnb_launch_factory_addresses: tuple[str, ...] = ()
+    bnb_launch_event_topics: tuple[str, ...] = ()
+    bnb_launch_token_topic_index: int = 1
+    event_queue_max: int = 2_048
+    launch_source_reconnect_seconds: float = 2
     gmgn_enabled: bool = False
     gmgn_api_key: str | None = None
     gmgn_base_url: str = "https://openapi.gmgn.ai"
@@ -72,6 +81,8 @@ class Settings:
     scheduler_fresh_reserved_slots: int = 50
     scheduler_radar_reserved_slots: int = 50
     scheduler_near_signal_reserved_slots: int = 50
+    scheduler_genesis_reserved_slots: int = 50
+    scheduler_priority_reserved_slots: int = 50
     radar_max_age_minutes: float = 15
     radar_min_liquidity_usd: float = 8_000
     radar_min_snapshots: int = 2
@@ -110,17 +121,22 @@ class Settings:
             "safety": 5,
         }
     )
-    scoring_version: str = "v1.3.1-signal-quality"
-    milestones: tuple[float, ...] = (1.5, 2, 3, 5, 10, 25, 50, 100)
+    milestones: tuple[float, ...] = (1.5, 2, 3, 5, 10, 15, 20, 25, 50, 100)
     failure_multiple: float = 0.30
     inactivity_timeout_hours: float = 24
     alert_cooldown_seconds: float = 900
     health_port: int = 8080
     radar_board_enabled: bool = False
     radar_board_port: int = 8081
-    discord_default_alert_tier: str = "HOT"
-    software_version: str = "1.3.1"
-    radar_version: str = "v1.3.1-radar"
+    discord_default_alert_tier: str = "HOT_PLUS"
+    watchlist_alerts_enabled: bool = False
+    daily_report_enabled: bool = False
+    min_sample_for_edge_metrics: int = 30
+    software_version: str = "1.4.0"
+    scoring_version: str = "v1.4-right-tail"
+    feature_version: str = "v1.4-t0"
+    model_version: str = "deterministic-v1.4"
+    radar_version: str = "v1.4-alpha-radar"
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -133,7 +149,7 @@ class Settings:
             channels = (int(channel), *channels)
         milestones = tuple(
             float(x)
-            for x in os.getenv("MILESTONES", "1.5,2,3,5,10,25,50,100").split(",")
+            for x in os.getenv("MILESTONES", "1.5,2,3,5,10,15,20,25,50,100").split(",")
             if x.strip()
         )
         return cls(
@@ -147,6 +163,30 @@ class Settings:
                 "GECKOTERMINAL_BASE_URL", "https://api.geckoterminal.com/api/v2"
             ),
             bsc_rpc_url=os.getenv("BSC_RPC_URL", "https://bsc-dataseed.bnbchain.org"),
+            direct_launch_discovery_enabled=_bool("DIRECT_LAUNCH_DISCOVERY_ENABLED", False),
+            pumpfun_discovery_enabled=_bool("PUMPFUN_DISCOVERY_ENABLED", False),
+            bnb_launch_discovery_enabled=_bool("BNB_LAUNCH_DISCOVERY_ENABLED", False),
+            pumpfun_program_ids=tuple(
+                value.strip()
+                for value in os.getenv(
+                    "PUMPFUN_PROGRAM_IDS",
+                    "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+                ).split(",")
+                if value.strip()
+            ),
+            bnb_launch_factory_addresses=tuple(
+                value.strip()
+                for value in os.getenv("BNB_LAUNCH_FACTORY_ADDRESSES", "").split(",")
+                if value.strip()
+            ),
+            bnb_launch_event_topics=tuple(
+                value.strip()
+                for value in os.getenv("BNB_LAUNCH_EVENT_TOPICS", "").split(",")
+                if value.strip()
+            ),
+            bnb_launch_token_topic_index=_int("BNB_LAUNCH_TOKEN_TOPIC_INDEX", 1),
+            event_queue_max=_int("EVENT_QUEUE_MAX", 2_048),
+            launch_source_reconnect_seconds=_float("LAUNCH_SOURCE_RECONNECT_SECONDS", 2),
             gmgn_enabled=_bool("GMGN_ENABLED", False),
             gmgn_api_key=os.getenv("GMGN_API_KEY") or None,
             gmgn_base_url=os.getenv("GMGN_BASE_URL", "https://openapi.gmgn.ai").rstrip("/"),
@@ -174,9 +214,13 @@ class Settings:
             candidate_retry_initial_seconds=_float("CANDIDATE_RETRY_INITIAL_SECONDS", 30),
             candidate_retry_max_seconds=_float("CANDIDATE_RETRY_MAX_SECONDS", 900),
             candidate_retry_backoff=_float("CANDIDATE_RETRY_BACKOFF", 2),
-            scheduler_fresh_reserved_slots=_int("SCHEDULER_FRESH_RESERVED_SLOTS", 50),
+            scheduler_fresh_reserved_slots=_int(
+                "FRESH_RESERVED_SLOTS", _int("SCHEDULER_FRESH_RESERVED_SLOTS", 50)
+            ),
             scheduler_radar_reserved_slots=_int("SCHEDULER_RADAR_RESERVED_SLOTS", 50),
             scheduler_near_signal_reserved_slots=_int("SCHEDULER_NEAR_SIGNAL_RESERVED_SLOTS", 50),
+            scheduler_genesis_reserved_slots=_int("GENESIS_RESERVED_SLOTS", 50),
+            scheduler_priority_reserved_slots=_int("PRIORITY_RESERVED_SLOTS", 50),
             radar_max_age_minutes=_float("RADAR_MAX_AGE_MINUTES", 15),
             radar_min_liquidity_usd=_float("RADAR_MIN_LIQUIDITY_USD", 8_000),
             radar_min_snapshots=_int("RADAR_MIN_SNAPSHOTS", 2),
@@ -215,7 +259,7 @@ class Settings:
                 "momentum": _float("WEIGHT_MOMENTUM", 15),
                 "safety": _float("WEIGHT_SAFETY", 5),
             },
-            scoring_version=os.getenv("SCORING_VERSION", "v1.3.1-signal-quality"),
+            scoring_version=os.getenv("SCORING_VERSION", "v1.4-right-tail"),
             milestones=milestones,
             failure_multiple=_float("FAILURE_MULTIPLE", 0.30),
             inactivity_timeout_hours=_float("INACTIVITY_TIMEOUT_HOURS", 24),
@@ -223,9 +267,14 @@ class Settings:
             health_port=_int("HEALTH_PORT", 8080),
             radar_board_enabled=_bool("RADAR_BOARD_ENABLED", False),
             radar_board_port=_int("RADAR_BOARD_PORT", 8081),
-            discord_default_alert_tier=os.getenv("DISCORD_DEFAULT_ALERT_TIER", "HOT").upper(),
-            software_version=os.getenv("SOFTWARE_VERSION", "1.3.1"),
-            radar_version=os.getenv("RADAR_VERSION", "v1.3.1-radar"),
+            discord_default_alert_tier=os.getenv("DISCORD_DEFAULT_ALERT_TIER", "HOT_PLUS").upper(),
+            watchlist_alerts_enabled=_bool("WATCHLIST_ALERTS_ENABLED", False),
+            daily_report_enabled=_bool("DAILY_REPORT_ENABLED", False),
+            min_sample_for_edge_metrics=_int("MIN_SAMPLE_FOR_EDGE_METRICS", 30),
+            software_version=os.getenv("SOFTWARE_VERSION", "1.4.0"),
+            feature_version=os.getenv("FEATURE_VERSION", "v1.4-t0"),
+            model_version=os.getenv("MODEL_VERSION", "deterministic-v1.4"),
+            radar_version=os.getenv("RADAR_VERSION", "v1.4-alpha-radar"),
         )
 
     def validate(self) -> None:
@@ -277,8 +326,19 @@ class Settings:
             raise ValueError("Candidate retry settings must be positive")
         if self.candidate_retry_initial_seconds > self.candidate_retry_max_seconds:
             raise ValueError("Candidate retry initial delay cannot exceed maximum delay")
-        if self.discord_default_alert_tier not in {"ALL", "HOT", "PRIORITY", "QUALIFIED"}:
-            raise ValueError("DISCORD_DEFAULT_ALERT_TIER must be ALL, HOT, PRIORITY, or QUALIFIED")
+        if self.discord_default_alert_tier not in {
+            "ALL",
+            "HOT",
+            "PRIORITY",
+            "QUALIFIED",
+            "GENESIS_ALL",
+            "HOT_PLUS",
+            "PRIORITY_PLUS",
+            "QUALIFIED_ONLY",
+        }:
+            raise ValueError("Unsupported DISCORD_DEFAULT_ALERT_TIER")
+        if min(self.event_queue_max, self.min_sample_for_edge_metrics) <= 0:
+            raise ValueError("Event queue and edge sample settings must be positive")
 
     def config_fingerprint(self) -> str:
         """Stable fingerprint of decision settings; credentials are deliberately excluded."""
@@ -286,6 +346,8 @@ class Settings:
             "software_version": self.software_version,
             "scoring_version": self.scoring_version,
             "radar_version": self.radar_version,
+            "feature_version": self.feature_version,
+            "model_version": self.model_version,
             "weights": self.weights,
             "thresholds": [
                 self.watch_threshold,

@@ -18,6 +18,7 @@ from memecoin_bot.providers.bsc_rpc import BscRpcProvider, ChainSafetyRouter
 from memecoin_bot.providers.dexscreener import DexScreenerProvider
 from memecoin_bot.providers.geckoterminal import GeckoTerminalDiscoveryProvider
 from memecoin_bot.providers.gmgn import GmgnProvider
+from memecoin_bot.providers.launch_events import EvmFactoryLaunchSource, SolanaProgramLaunchSource
 from memecoin_bot.providers.solana_rpc import SolanaRpcProvider
 from memecoin_bot.radar_board import start_radar_board
 from memecoin_bot.replay import ReplayRunner
@@ -29,6 +30,7 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
     store = Store(settings.database_path)
     store.migrate()
     store.reconcile_stale_candidates(settings.candidate_max_age_minutes)
+    store.reconcile_v14_state()
     store.register_scoring_version(
         settings.scoring_version,
         settings.weights,
@@ -129,6 +131,51 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
         )
     else:
         store.set_provider_health("gmgn", False, 0, "GMGN_DISABLED", "DISABLED")
+    launch_sources = []
+    if settings.direct_launch_discovery_enabled and settings.pumpfun_discovery_enabled:
+        pump_client = ResilientJsonClient(
+            "solana_direct_launch",
+            settings.provider_timeout_seconds,
+            settings.provider_max_retries,
+            settings.provider_circuit_failures,
+            settings.provider_circuit_cooldown_seconds,
+            callback,
+        )
+        launch_sources.append(
+            SolanaProgramLaunchSource(
+                settings.solana_rpc_url,
+                settings.pumpfun_program_ids,
+                pump_client,
+                reconnect_seconds=settings.launch_source_reconnect_seconds,
+            )
+        )
+    else:
+        store.set_provider_health(
+            "solana_direct_launch", False, 0, "DIRECT_LAUNCH_DISABLED", "DISABLED"
+        )
+    if settings.direct_launch_discovery_enabled and settings.bnb_launch_discovery_enabled:
+        bnb_launch_client = ResilientJsonClient(
+            "bsc_direct_launch",
+            settings.provider_timeout_seconds,
+            settings.provider_max_retries,
+            settings.provider_circuit_failures,
+            settings.provider_circuit_cooldown_seconds,
+            callback,
+        )
+        launch_sources.append(
+            EvmFactoryLaunchSource(
+                settings.bsc_rpc_url,
+                settings.bnb_launch_factory_addresses,
+                settings.bnb_launch_event_topics,
+                bnb_launch_client,
+                token_topic_index=settings.bnb_launch_token_topic_index,
+                poll_seconds=settings.launch_source_reconnect_seconds,
+            )
+        )
+    else:
+        store.set_provider_health(
+            "bsc_direct_launch", False, 0, "DIRECT_LAUNCH_DISABLED", "DISABLED"
+        )
     if settings.shadow_mode and not settings.shadow_send_alerts:
         notifier = NullNotifier()
     elif settings.discord_webhook_url or settings.discord_token:
@@ -148,6 +195,7 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
         safety,
         notifier,
         gmgn,
+        launch_sources,
     )
     return store, service
 
@@ -174,6 +222,10 @@ async def async_main(args: argparse.Namespace) -> int:
 
     store, service = build(settings)
     try:
+        if args.command == "scan":
+            result = await service.manual_scan(args.address, args.chain)
+            print(json.dumps(result, indent=2, default=str))
+            return 0
         if args.command == "once":
             results = await service.scan_once()
             sent = await service.flush_outbox()
@@ -243,7 +295,9 @@ async def async_main(args: argparse.Namespace) -> int:
 
 
 def parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(description="Read-only Solana memecoin intelligence service")
+    p = argparse.ArgumentParser(
+        description="Read-only Solana and BNB memecoin intelligence service"
+    )
     sub = p.add_subparsers(dest="command", required=True)
     sub.add_parser("run", help="Run the 24/7 scanner and tracker")
     once = sub.add_parser("once", help="Perform one real shadow discovery/evaluation cycle")
@@ -252,13 +306,20 @@ def parser() -> argparse.ArgumentParser:
     replay.add_argument("--fixture", default="fixtures/replay_lifecycle.json")
     replay.add_argument("--database", default="data/replay.db")
     replay.add_argument("--output", default="evidence/replay.json")
+    manual_scan = sub.add_parser("scan", help="Run one isolated read-only manual token scan")
+    manual_scan.add_argument("address")
+    manual_scan.add_argument("--chain", choices=("solana", "bsc"), default="solana")
     sub.add_parser("status")
     sub.add_parser("performance")
     return p
 
 
 def main() -> None:
-    raise SystemExit(asyncio.run(async_main(parser().parse_args())))
+    try:
+        code = asyncio.run(async_main(parser().parse_args()))
+    except KeyboardInterrupt:
+        code = 0
+    raise SystemExit(code)
 
 
 if __name__ == "__main__":

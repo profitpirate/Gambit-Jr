@@ -7,6 +7,7 @@ import statistics
 import threading
 from collections.abc import Iterable
 from datetime import UTC, datetime, timedelta
+from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
@@ -373,6 +374,8 @@ class Store:
         radar_reserved: int = 0,
         near_signal_reserved: int = 0,
         now: str | None = None,
+        genesis_reserved: int = 0,
+        priority_reserved: int = 0,
     ) -> list[sqlite3.Row]:
         """Return due candidates using lane quotas and round-robin chain fairness.
 
@@ -395,6 +398,13 @@ class Store:
         rows = [row for row in rows if row["state"] != str(CandidateState.SIGNALLED)]
 
         def lane(row: sqlite3.Row) -> str:
+            authoritative = row["authoritative_state"]
+            if authoritative == "PRIORITY_RADAR":
+                return "PRIORITY"
+            if authoritative == "HOT_RADAR":
+                return "HOT"
+            if authoritative == "GENESIS_RADAR":
+                return "GENESIS"
             if row["radar_triggered_at"] is not None:
                 return "RADAR"
             if int(row["attempt_count"] or 0) == 0:
@@ -411,6 +421,9 @@ class Store:
             name: []
             for name in (
                 "FRESH",
+                "GENESIS",
+                "HOT",
+                "PRIORITY",
                 "RADAR",
                 "NEAR_SIGNAL",
                 "ACTIVE",
@@ -468,10 +481,22 @@ class Store:
                     break
 
         take(("FRESH",), min(fresh_reserved, limit))
+        take(("GENESIS",), min(genesis_reserved, limit - len(selected)))
+        take(("PRIORITY",), min(priority_reserved, limit - len(selected)))
         take(("RADAR",), min(radar_reserved, limit - len(selected)))
         take(("NEAR_SIGNAL",), min(near_signal_reserved, limit - len(selected)))
         take(
-            ("FRESH", "RADAR", "NEAR_SIGNAL", "ACTIVE", "PENDING_RETRY", "LOW_PRIORITY_RETRY"),
+            (
+                "FRESH",
+                "GENESIS",
+                "HOT",
+                "PRIORITY",
+                "RADAR",
+                "NEAR_SIGNAL",
+                "ACTIVE",
+                "PENDING_RETRY",
+                "LOW_PRIORITY_RETRY",
+            ),
             limit - len(selected),
         )
         return selected
@@ -520,14 +545,17 @@ class Store:
             next_retry = (now_dt + timedelta(seconds=delay)).isoformat()
             self.conn.execute(
                 "UPDATE candidates SET previous_reason=reason,reason=?,lifecycle_reason=?,retry_class=?,"
-                "next_retry_at=?,consecutive_missing_pair_count=?,"
-                "consecutive_provider_failure_count=?,scheduling_lane=?,updated_at=? WHERE id=?",
+                "next_retry_at=?,consecutive_missing_pair_count=?,consecutive_pair_missing=?,"
+                "consecutive_provider_failure_count=?,consecutive_provider_failures=?,retry_count=retry_count+1,"
+                "scheduling_lane=?,updated_at=? WHERE id=?",
                 (
                     reason,
                     reason,
                     retry_class,
                     next_retry,
                     missing,
+                    missing,
+                    provider,
                     provider,
                     "LOW_PRIORITY_RETRY" if count >= 5 else "PENDING_RETRY",
                     now_dt.isoformat(),
@@ -540,7 +568,8 @@ class Store:
         with self._lock, self.conn:
             self.conn.execute(
                 "UPDATE candidates SET last_successful_snapshot_at=?,next_retry_at=NULL,retry_class=NULL,"
-                "consecutive_missing_pair_count=0,consecutive_provider_failure_count=0,pending_since=NULL "
+                "consecutive_missing_pair_count=0,consecutive_pair_missing=0,"
+                "consecutive_provider_failure_count=0,consecutive_provider_failures=0,pending_since=NULL "
                 "WHERE id=?",
                 (captured_at, candidate_id),
             )
@@ -621,7 +650,8 @@ class Store:
             )
             for row in stale:
                 self.conn.execute(
-                    "UPDATE candidates SET previous_reason=reason,state=?,reason=?,lifecycle_reason=?,"
+                    "UPDATE candidates SET previous_reason=reason,state=?,authoritative_state='EXPIRED',"
+                    "reason=?,lifecycle_reason=?,"
                     "next_retry_at=NULL,expired_at=?,updated_at=? WHERE id=?",
                     (
                         str(CandidateState.EXPIRED),
@@ -814,6 +844,24 @@ class Store:
                 ]
             values["id"] = candidate_id
             self.conn.execute(f"UPDATE candidates SET {','.join(assignments)} WHERE id=:id", values)
+            authoritative = {
+                str(CandidateState.REJECTED_UNSAFE): "REJECTED_UNSAFE",
+                str(CandidateState.EXPIRED): "EXPIRED",
+                str(CandidateState.SIGNALLED): "QUALIFIED_SIGNAL",
+                str(CandidateState.EARLY_RADAR): "STANDARD_RADAR",
+            }.get(str(state))
+            if authoritative:
+                if authoritative == "STANDARD_RADAR":
+                    self.conn.execute(
+                        "UPDATE candidates SET authoritative_state='STANDARD_RADAR' WHERE id=? "
+                        "AND authoritative_state IN ('DISCOVERED','SCREENING','GENESIS_RADAR')",
+                        (candidate_id,),
+                    )
+                else:
+                    self.conn.execute(
+                        "UPDATE candidates SET authoritative_state=? WHERE id=?",
+                        (authoritative, candidate_id),
+                    )
             if str(state) in {str(CandidateState.REJECTED_UNSAFE), str(CandidateState.EXPIRED)}:
                 self.conn.execute(
                     "UPDATE candidates SET next_retry_at=NULL,lifecycle_reason=? WHERE id=?",
@@ -1249,27 +1297,50 @@ class Store:
         guild_id: int | str,
         channel_id: int | str | None,
         alerts_enabled: bool,
-        alert_tier: str = "HOT",
+        alert_tier: str = "HOT_PLUS",
         updated_by: int | str | None = None,
+        daily_report_enabled: bool = False,
+        enabled_chains: Iterable[str] = ("solana", "bsc"),
     ) -> None:
         tier = alert_tier.upper()
-        if tier not in {"ALL", "HOT", "PRIORITY", "QUALIFIED"}:
+        if tier not in {
+            "ALL",
+            "HOT",
+            "PRIORITY",
+            "QUALIFIED",
+            "GENESIS_ALL",
+            "HOT_PLUS",
+            "PRIORITY_PLUS",
+            "QUALIFIED_ONLY",
+        }:
             raise ValueError("Invalid alert tier")
+        legacy_tier = {
+            "GENESIS_ALL": "ALL",
+            "HOT_PLUS": "HOT",
+            "PRIORITY_PLUS": "PRIORITY",
+            "QUALIFIED_ONLY": "QUALIFIED",
+        }.get(tier, tier)
         now = iso()
         with self._lock, self.conn:
             self.conn.execute(
-                "INSERT INTO guild_settings(guild_id,alert_channel_id,alerts_enabled,alert_tier,created_at,updated_by,updated_at) "
-                "VALUES(?,?,?,?,?,?,?) ON CONFLICT(guild_id) DO UPDATE SET "
+                "INSERT INTO guild_settings(guild_id,alert_channel_id,alerts_enabled,alert_tier,created_at,updated_by,"
+                "updated_at,alert_tier_v14,daily_report_enabled,enabled_chains_json) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?) ON CONFLICT(guild_id) DO UPDATE SET "
                 "alert_channel_id=excluded.alert_channel_id,alerts_enabled=excluded.alerts_enabled,"
-                "alert_tier=excluded.alert_tier,updated_by=excluded.updated_by,updated_at=excluded.updated_at",
+                "alert_tier=excluded.alert_tier,alert_tier_v14=excluded.alert_tier_v14,"
+                "daily_report_enabled=excluded.daily_report_enabled,enabled_chains_json=excluded.enabled_chains_json,"
+                "updated_by=excluded.updated_by,updated_at=excluded.updated_at",
                 (
                     str(guild_id),
                     str(channel_id) if channel_id is not None else None,
                     int(alerts_enabled),
-                    tier,
+                    legacy_tier,
                     now,
                     str(updated_by) if updated_by is not None else None,
                     now,
+                    tier,
+                    int(daily_report_enabled),
+                    _json(sorted(set(enabled_chains))),
                 ),
             )
 
@@ -1277,11 +1348,16 @@ class Store:
         row = self.conn.execute(
             "SELECT * FROM guild_settings WHERE guild_id=?", (str(guild_id),)
         ).fetchone()
-        return dict(row) if row else None
+        if not row:
+            return None
+        value = dict(row)
+        value["alert_tier"] = value.get("alert_tier_v14") or value["alert_tier"]
+        value["enabled_chains"] = json.loads(value.get("enabled_chains_json") or "[]")
+        return value
 
     def alert_destinations(self) -> list[dict[str, Any]]:
         return [
-            dict(row)
+            dict(row) | {"alert_tier": row["alert_tier_v14"] or row["alert_tier"]}
             for row in self.conn.execute(
                 "SELECT * FROM guild_settings WHERE alerts_enabled=1 AND alert_channel_id IS NOT NULL ORDER BY guild_id"
             )
@@ -1290,6 +1366,12 @@ class Store:
     @staticmethod
     def alert_allowed(tier: str, event_type: str, payload: dict[str, Any]) -> bool:
         tier = tier.upper()
+        tier = {
+            "ALL": "GENESIS_ALL",
+            "HOT": "HOT_PLUS",
+            "PRIORITY": "PRIORITY_PLUS",
+            "QUALIFIED": "QUALIFIED_ONLY",
+        }.get(tier, tier)
         if event_type in {
             "MILESTONE",
             "RADAR_MILESTONE",
@@ -1303,16 +1385,23 @@ class Store:
             return True
         classification = str(payload.get("classification") or "").upper()
         priority_value = str(payload.get("priority") or "STANDARD").upper()
-        if tier == "ALL":
+        if tier == "GENESIS_ALL":
             return True
-        if tier == "QUALIFIED":
+        if tier == "QUALIFIED_ONLY":
             return event_type == "SIGNAL" or classification in {
                 "WATCH",
                 "STRONG",
                 "HIGH_CONVICTION",
             }
-        rank = {"STANDARD": 0, "HOT": 1, "PRIORITY": 2}
-        return rank.get(priority_value, 0) >= rank[tier]
+        event_rank = {
+            "GENESIS_RADAR": 0,
+            "EARLY_RADAR": 1,
+            "HOT_RADAR": 2,
+            "PRIORITY_RADAR": 3,
+            "SIGNAL": 4,
+        }.get(event_type, {"STANDARD": 1, "HOT": 2, "PRIORITY": 3}.get(priority_value, 1))
+        required = {"HOT_PLUS": 2, "PRIORITY_PLUS": 3}.get(tier, 4)
+        return event_rank >= required
 
     def ensure_guild_alert_delivery(
         self, outbox_id: int, guild_id: int | str, channel_id: int | str
@@ -1713,3 +1802,570 @@ class Store:
             )
         result["coverage"] = self.coverage(since, major_multiple)
         return result
+
+    # V1.4 ultra-early, graph, watchlist, and attribution persistence.
+    def record_launch_event(self, event: Any) -> tuple[int, bool]:
+        received = datetime.fromisoformat(str(event.source_received_at))
+        observed = datetime.fromisoformat(str(event.source_event_timestamp))
+        if received.tzinfo is None:
+            received = received.replace(tzinfo=UTC)
+        if observed.tzinfo is None:
+            observed = observed.replace(tzinfo=UTC)
+        latency_ms = max(0.0, (received - observed).total_seconds() * 1000)
+        with self._lock, self.conn:
+            cur = self.conn.execute(
+                "INSERT OR IGNORE INTO launch_events(event_key,source,chain,launchpad,token_address,"
+                "creator_address,phase,source_event_timestamp,source_received_at,source_to_candidate_ms,"
+                "slot_or_block,transaction_id,payload_json,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                (
+                    event.event_key,
+                    event.source,
+                    event.chain,
+                    event.launchpad,
+                    event.token_address,
+                    event.creator_address,
+                    event.phase,
+                    event.source_event_timestamp,
+                    event.source_received_at,
+                    latency_ms,
+                    event.slot_or_block,
+                    event.transaction_id,
+                    _json(event.metadata),
+                    iso(),
+                ),
+            )
+            row = self.conn.execute(
+                "SELECT id FROM launch_events WHERE event_key=?", (event.event_key,)
+            ).fetchone()
+            assert row
+            if cur.rowcount == 1:
+                self.conn.execute(
+                    "INSERT INTO latency_observations_v14(metric,observed_at,milliseconds,source,event_key) "
+                    "VALUES('SOURCE_TO_RECEIVED',?,?,?,?)",
+                    (event.source_received_at, latency_ms, event.source, event.event_key),
+                )
+            return int(row[0]), cur.rowcount == 1
+
+    def record_launch_events(self, events: Iterable[Any]) -> dict[str, int]:
+        """Bulk discovery ingestion keeps the 10k-event path transactional and bounded."""
+        inserted = duplicates = 0
+        now = iso()
+        with self._lock, self.conn:
+            for event in events:
+                cur = self.conn.execute(
+                    "INSERT OR IGNORE INTO launch_events(event_key,source,chain,launchpad,token_address,"
+                    "creator_address,phase,source_event_timestamp,source_received_at,slot_or_block,"
+                    "transaction_id,payload_json,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    (
+                        event.event_key,
+                        event.source,
+                        event.chain,
+                        event.launchpad,
+                        event.token_address,
+                        event.creator_address,
+                        event.phase,
+                        event.source_event_timestamp,
+                        event.source_received_at,
+                        event.slot_or_block,
+                        event.transaction_id,
+                        _json(event.metadata),
+                        now,
+                    ),
+                )
+                inserted += int(cur.rowcount == 1)
+                duplicates += int(cur.rowcount != 1)
+        return {"inserted": inserted, "duplicates": duplicates}
+
+    def link_launch_candidate(
+        self, launch_event_id: int, candidate_id: int, created_at: str
+    ) -> None:
+        row = self.conn.execute(
+            "SELECT source_event_timestamp,source_received_at FROM launch_events WHERE id=?",
+            (launch_event_id,),
+        ).fetchone()
+        if not row:
+            raise KeyError(launch_event_id)
+        source = datetime.fromisoformat(str(row[0]))
+        created = datetime.fromisoformat(created_at)
+        if source.tzinfo is None:
+            source = source.replace(tzinfo=UTC)
+        if created.tzinfo is None:
+            created = created.replace(tzinfo=UTC)
+        latency_ms = max(0.0, (created - source).total_seconds() * 1000)
+        with self._lock, self.conn:
+            self.conn.execute(
+                "UPDATE launch_events SET candidate_created_at=?,source_to_candidate_ms=?,"
+                "processing_status='CANDIDATE_CREATED' WHERE id=?",
+                (created_at, latency_ms, launch_event_id),
+            )
+            self.conn.execute(
+                "UPDATE candidates SET source_event_timestamp=?,source_received_at=?,"
+                "candidate_created_at=?,authoritative_state='DISCOVERED' WHERE id=?",
+                (row[0], row[1], created_at, candidate_id),
+            )
+            self.conn.execute(
+                "INSERT INTO latency_observations_v14(metric,observed_at,milliseconds,event_key) "
+                "SELECT 'SOURCE_TO_CANDIDATE',?,?,event_key FROM launch_events WHERE id=?",
+                (created_at, latency_ms, launch_event_id),
+            )
+
+    def record_v14_decision(
+        self,
+        candidate_id: int,
+        launch_event_id: int | None,
+        decision: Any,
+        settings: Any,
+        observed_at: str | None = None,
+        decided_at: str | None = None,
+        providers: dict[str, Any] | None = None,
+    ) -> bool:
+        observed_at = observed_at or iso()
+        decided_at = decided_at or iso()
+        start = datetime.fromisoformat(observed_at)
+        end = datetime.fromisoformat(decided_at)
+        latency_ms = max(0.0, (end - start).total_seconds() * 1000)
+        state = str(decision.state)
+        with self._lock, self.conn:
+            previous = self.conn.execute(
+                "SELECT authoritative_state FROM candidates WHERE id=?", (candidate_id,)
+            ).fetchone()
+            if not previous:
+                raise KeyError(candidate_id)
+            cur = self.conn.execute(
+                "INSERT OR IGNORE INTO evaluation_stages_v14(candidate_id,launch_event_id,stage,"
+                "observed_at,decided_at,decision,authoritative_state,entry_state,confidence,"
+                "feature_vector_json,provider_evidence_json,unknowns_json,reasons_json,latency_ms,"
+                "software_version,scoring_version,feature_version,model_version,config_fingerprint) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                (
+                    candidate_id,
+                    launch_event_id,
+                    decision.stage,
+                    observed_at,
+                    decided_at,
+                    state,
+                    state,
+                    str(decision.entry_state),
+                    decision.confidence,
+                    _json(decision.feature_vector),
+                    _json(providers or {}),
+                    _json(decision.unknowns),
+                    _json(decision.reasons),
+                    latency_ms,
+                    settings.software_version,
+                    settings.scoring_version,
+                    settings.feature_version,
+                    settings.model_version,
+                    settings.config_fingerprint(),
+                ),
+            )
+            self.conn.execute(
+                "UPDATE candidates SET authoritative_state=?,evaluation_stage=?,entry_state=?,"
+                "survival_grade=?,payoff_grade=?,updated_at=? WHERE id=?",
+                (
+                    state,
+                    decision.stage,
+                    str(decision.entry_state),
+                    str(decision.survival),
+                    str(decision.payoff),
+                    decided_at,
+                    candidate_id,
+                ),
+            )
+            self.conn.execute(
+                "INSERT OR IGNORE INTO lifecycle_transitions_v14(candidate_id,from_state,to_state,reason,"
+                "created_at,evidence_json) VALUES(?,?,?,?,?,?)",
+                (
+                    candidate_id,
+                    previous[0],
+                    state,
+                    decision.reasons[0] if decision.reasons else "V14_DECISION",
+                    decided_at,
+                    _json({"stage": decision.stage, "unknowns": decision.unknowns}),
+                ),
+            )
+            metric = "T0_DECISION" if decision.stage == "T0" else "STAGED_DECISION"
+            self.conn.execute(
+                "INSERT INTO latency_observations_v14(metric,observed_at,milliseconds,event_key) "
+                "VALUES(?,?,?,?)",
+                (metric, decided_at, latency_ms, str(launch_event_id or "")),
+            )
+            if launch_event_id and decision.stage == "T0":
+                self.conn.execute(
+                    "UPDATE launch_events SET processing_status='T0_EVALUATED' WHERE id=?",
+                    (launch_event_id,),
+                )
+            return cur.rowcount == 1
+
+    def record_immutable_call(
+        self,
+        candidate_id: int,
+        tier: str,
+        snapshot: dict[str, Any],
+        settings: Any,
+        signal_id: int | None = None,
+    ) -> bool:
+        with self._lock, self.conn:
+            cur = self.conn.execute(
+                "INSERT OR IGNORE INTO immutable_call_snapshots(candidate_id,signal_id,tier,call_timestamp,"
+                "call_market_cap_usd,call_price_usd,call_liquidity_usd,call_score,confidence,entry_state,"
+                "feature_vector_json,provider_evidence_json,software_version,scoring_version,feature_version,"
+                "model_version,config_fingerprint,radar_version) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                (
+                    candidate_id,
+                    signal_id,
+                    tier,
+                    snapshot.get("call_timestamp") or iso(),
+                    snapshot.get("market_cap_usd"),
+                    snapshot.get("price_usd"),
+                    snapshot.get("liquidity_usd"),
+                    snapshot.get("score"),
+                    snapshot.get("confidence"),
+                    snapshot.get("entry_state", "UNKNOWN"),
+                    _json(snapshot.get("features") or {}),
+                    _json(snapshot.get("providers") or {}),
+                    settings.software_version,
+                    settings.scoring_version,
+                    settings.feature_version,
+                    settings.model_version,
+                    settings.config_fingerprint(),
+                    settings.radar_version,
+                ),
+            )
+            return cur.rowcount == 1
+
+    def record_latency(
+        self, metric: str, milliseconds: float, source: str | None = None, metadata: Any = None
+    ) -> None:
+        with self._lock, self.conn:
+            self.conn.execute(
+                "INSERT INTO latency_observations_v14(metric,observed_at,milliseconds,source,metadata_json) "
+                "VALUES(?,?,?,?,?)",
+                (metric, iso(), milliseconds, source, _json(metadata or {})),
+            )
+
+    def enqueue_v14_event(self, event_key: str, event_type: str, payload: dict[str, Any]) -> bool:
+        with self._lock, self.conn:
+            cur = self.conn.execute(
+                "INSERT OR IGNORE INTO outbox(event_key,event_type,payload_json,created_at) VALUES(?,?,?,?)",
+                (event_key, event_type, _json(payload), iso()),
+            )
+            return cur.rowcount == 1
+
+    def latency_report(self) -> dict[str, dict[str, Any]]:
+        from memecoin_bot.alpha_engine import latency_summary
+
+        metrics = [
+            str(row[0])
+            for row in self.conn.execute("SELECT DISTINCT metric FROM latency_observations_v14")
+        ]
+        return {
+            metric: latency_summary(
+                float(row[0])
+                for row in self.conn.execute(
+                    "SELECT milliseconds FROM latency_observations_v14 WHERE metric=?", (metric,)
+                )
+            )
+            for metric in metrics
+        }
+
+    def save_wallet_graph(self, chain: str, token_address: str, result: Any) -> list[int]:
+        now = iso()
+        cluster_ids: list[int] = []
+        with self._lock, self.conn:
+            for cluster in result.clusters:
+                cluster_key = f"{chain}:" + ":".join(sorted(cluster))
+                self.conn.execute(
+                    "INSERT INTO wallet_clusters(chain,cluster_key,first_seen_at,last_seen_at,risk_state,evidence_json) "
+                    "VALUES(?,?,?,?,?,?) ON CONFLICT(chain,cluster_key) DO UPDATE SET last_seen_at=excluded.last_seen_at,"
+                    "risk_state=excluded.risk_state,evidence_json=excluded.evidence_json",
+                    (
+                        chain,
+                        cluster_key,
+                        now,
+                        now,
+                        "COORDINATED" if result.coordinated else "CONNECTED",
+                        _json(result.evidence),
+                    ),
+                )
+                row = self.conn.execute(
+                    "SELECT id FROM wallet_clusters WHERE chain=? AND cluster_key=?",
+                    (chain, cluster_key),
+                ).fetchone()
+                assert row
+                cluster_id = int(row[0])
+                cluster_ids.append(cluster_id)
+                for wallet in cluster:
+                    self.conn.execute(
+                        "INSERT INTO wallet_nodes(chain,wallet_address,first_seen_at,last_seen_at) VALUES(?,?,?,?) "
+                        "ON CONFLICT(chain,wallet_address) DO UPDATE SET last_seen_at=excluded.last_seen_at",
+                        (chain, wallet, now, now),
+                    )
+                    self.conn.execute(
+                        "INSERT OR IGNORE INTO wallet_cluster_members(cluster_id,wallet_address,first_seen_at) "
+                        "VALUES(?,?,?)",
+                        (cluster_id, wallet, now),
+                    )
+                for left, right in pairwise(cluster):
+                    self.conn.execute(
+                        "INSERT INTO wallet_edges(chain,from_wallet,to_wallet,relationship,token_address,"
+                        "observed_at,confidence,evidence_json) VALUES(?,?,?,?,?,?,?,?) "
+                        "ON CONFLICT(chain,from_wallet,to_wallet,relationship,token_address) DO UPDATE SET "
+                        "observed_at=excluded.observed_at,evidence_json=excluded.evidence_json",
+                        (
+                            chain,
+                            left,
+                            right,
+                            "SHARED_FUNDER",
+                            token_address,
+                            now,
+                            0.8,
+                            _json(result.evidence),
+                        ),
+                    )
+        return cluster_ids
+
+    def save_creator_profile(
+        self, chain: str, creator: str, token_id: int, quality: dict[str, Any]
+    ) -> None:
+        now = iso()
+        with self._lock, self.conn:
+            self.conn.execute(
+                "INSERT INTO creator_profiles_v14(chain,creator_address,quality,launches,survived,rugs,runners,"
+                "first_seen_at,last_seen_at,evidence_json) VALUES(?,?,?,?,?,?,?,?,?,?) "
+                "ON CONFLICT(chain,creator_address) DO UPDATE SET quality=excluded.quality,launches=excluded.launches,"
+                "survived=excluded.survived,rugs=excluded.rugs,runners=excluded.runners,last_seen_at=excluded.last_seen_at,"
+                "evidence_json=excluded.evidence_json",
+                (
+                    chain,
+                    creator,
+                    str(quality.get("quality", "UNKNOWN")),
+                    quality.get("sample", 0),
+                    quality.get("survived", 0),
+                    quality.get("rugs", 0),
+                    quality.get("runners", 0),
+                    now,
+                    now,
+                    _json(quality),
+                ),
+            )
+            self.conn.execute(
+                "INSERT OR IGNORE INTO creator_launches_v14(creator_address,token_id,launched_at) VALUES(?,?,?)",
+                (creator, token_id, now),
+            )
+
+    def save_narrative_election(
+        self, narrative_key: str, label: str, token_ids: dict[str, int], election: dict[str, Any]
+    ) -> int:
+        now = iso()
+        leader_id = token_ids.get(str(election.get("leader")))
+        with self._lock, self.conn:
+            self.conn.execute(
+                "INSERT INTO narratives_v14(narrative_key,label,first_seen_at,last_seen_at,freshness,saturation,"
+                "leader_token_id,evidence_json) VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(narrative_key) DO UPDATE SET "
+                "last_seen_at=excluded.last_seen_at,freshness=excluded.freshness,saturation=excluded.saturation,"
+                "leader_token_id=excluded.leader_token_id,evidence_json=excluded.evidence_json",
+                (
+                    narrative_key,
+                    label,
+                    now,
+                    now,
+                    "FRESH",
+                    election["saturation"],
+                    leader_id,
+                    _json(election),
+                ),
+            )
+            row = self.conn.execute(
+                "SELECT id FROM narratives_v14 WHERE narrative_key=?", (narrative_key,)
+            ).fetchone()
+            assert row
+            narrative_id = int(row[0])
+            for member in election.get("members", []):
+                token_id = token_ids.get(str(member["token_address"]))
+                if token_id:
+                    self.conn.execute(
+                        "INSERT INTO narrative_members_v14(narrative_id,token_id,role,joined_at,clone_penalty,"
+                        "evidence_json) VALUES(?,?,?,?,?,?) ON CONFLICT(narrative_id,token_id) DO UPDATE SET "
+                        "role=excluded.role,clone_penalty=excluded.clone_penalty,evidence_json=excluded.evidence_json",
+                        (
+                            narrative_id,
+                            token_id,
+                            member["role"],
+                            member["detected_at"],
+                            member["clone_penalty"],
+                            _json(member),
+                        ),
+                    )
+            return narrative_id
+
+    def add_watch(self, guild_id: Any, user_id: Any, chain: str, token_address: str) -> bool:
+        with self._lock, self.conn:
+            cur = self.conn.execute(
+                "INSERT OR IGNORE INTO watchlists(guild_id,user_id,chain,token_address,created_at) VALUES(?,?,?,?,?)",
+                (str(guild_id), str(user_id), chain, token_address, iso()),
+            )
+            return cur.rowcount == 1
+
+    def remove_watch(self, guild_id: Any, user_id: Any, chain: str, token_address: str) -> bool:
+        with self._lock, self.conn:
+            cur = self.conn.execute(
+                "DELETE FROM watchlists WHERE guild_id=? AND user_id=? AND chain=? AND token_address=?",
+                (str(guild_id), str(user_id), chain, token_address),
+            )
+            return cur.rowcount == 1
+
+    def user_watchlist(self, guild_id: Any, user_id: Any, limit: int = 50) -> list[dict[str, Any]]:
+        return [
+            dict(row)
+            for row in self.conn.execute(
+                "SELECT * FROM watchlists WHERE guild_id=? AND user_id=? ORDER BY created_at DESC LIMIT ?",
+                (str(guild_id), str(user_id), limit),
+            )
+        ]
+
+    def record_manual_scan(
+        self,
+        chain: str,
+        token_address: str,
+        requested_at: str,
+        payload: dict[str, Any],
+        latency_ms: float,
+        guild_id: Any = None,
+        user_id: Any = None,
+    ) -> int:
+        with self._lock, self.conn:
+            cur = self.conn.execute(
+                "INSERT INTO manual_scans(guild_id,user_id,chain,token_address,requested_at,completed_at,"
+                "result_state,payload_json,latency_ms) VALUES(?,?,?,?,?,?,?,?,?)",
+                (
+                    str(guild_id) if guild_id is not None else None,
+                    str(user_id) if user_id is not None else None,
+                    chain,
+                    token_address,
+                    requested_at,
+                    iso(),
+                    str(payload.get("state", "UNKNOWN")),
+                    _json(payload),
+                    latency_ms,
+                ),
+            )
+            return int(cur.lastrowid)
+
+    def wallet_report(self, wallet: str) -> dict[str, Any]:
+        nodes = [
+            dict(row)
+            for row in self.conn.execute(
+                "SELECT * FROM wallet_nodes WHERE wallet_address=?", (wallet,)
+            )
+        ]
+        edges = [
+            dict(row)
+            for row in self.conn.execute(
+                "SELECT * FROM wallet_edges WHERE from_wallet=? OR to_wallet=? ORDER BY observed_at DESC LIMIT 20",
+                (wallet, wallet),
+            )
+        ]
+        clusters = [
+            dict(row)
+            for row in self.conn.execute(
+                "SELECT wc.* FROM wallet_clusters wc JOIN wallet_cluster_members wm ON wm.cluster_id=wc.id "
+                "WHERE wm.wallet_address=? ORDER BY wc.last_seen_at DESC",
+                (wallet,),
+            )
+        ]
+        return {"wallet": wallet, "nodes": nodes, "edges": edges, "clusters": clusters}
+
+    def cluster_report(self, limit: int = 10) -> list[dict[str, Any]]:
+        return [
+            dict(row)
+            for row in self.conn.execute(
+                "SELECT wc.*,COUNT(wm.wallet_address) member_count FROM wallet_clusters wc "
+                "LEFT JOIN wallet_cluster_members wm ON wm.cluster_id=wc.id GROUP BY wc.id "
+                "ORDER BY wc.last_seen_at DESC LIMIT ?",
+                (limit,),
+            )
+        ]
+
+    def creator_report(self, creator: str) -> dict[str, Any] | None:
+        row = self.conn.execute(
+            "SELECT * FROM creator_profiles_v14 WHERE creator_address=? ORDER BY last_seen_at DESC LIMIT 1",
+            (creator,),
+        ).fetchone()
+        if not row:
+            return None
+        value = dict(row)
+        value["launch_history"] = [
+            dict(item)
+            for item in self.conn.execute(
+                "SELECT cl.*,t.token_address,t.symbol FROM creator_launches_v14 cl JOIN tokens t ON t.id=cl.token_id "
+                "WHERE cl.creator_address=? ORDER BY cl.launched_at DESC LIMIT 10",
+                (creator,),
+            )
+        ]
+        return value
+
+    def narrative_report(self, query: str | None = None, limit: int = 10) -> list[dict[str, Any]]:
+        sql = (
+            "SELECT n.*,t.token_address leader_address,t.symbol leader_symbol FROM narratives_v14 n "
+            "LEFT JOIN tokens t ON t.id=n.leader_token_id"
+        )
+        args: list[Any] = []
+        if query:
+            sql += " WHERE n.narrative_key LIKE ? OR n.label LIKE ?"
+            args.extend((f"%{query}%", f"%{query}%"))
+        sql += " ORDER BY n.last_seen_at DESC LIMIT ?"
+        args.append(limit)
+        return [dict(row) for row in self.conn.execute(sql, args)]
+
+    def reconcile_v14_state(self) -> dict[str, int]:
+        with self._lock, self.conn:
+            self.conn.execute(
+                "UPDATE candidates SET retry_count=attempt_count,"
+                "consecutive_provider_failures=consecutive_provider_failure_count,"
+                "consecutive_pair_missing=consecutive_missing_pair_count"
+            )
+            self.conn.execute(
+                "UPDATE candidates SET authoritative_state=CASE WHEN state='EARLY_RADAR' THEN 'STANDARD_RADAR' "
+                "WHEN state='SIGNALLED' THEN 'QUALIFIED_SIGNAL' ELSE state END "
+                "WHERE authoritative_state IS NULL OR authoritative_state='DISCOVERED'"
+            )
+        row = self.conn.execute(
+            "SELECT COUNT(*) total,SUM(CASE WHEN authoritative_state IS NULL OR authoritative_state='' THEN 1 ELSE 0 END) missing "
+            "FROM candidates"
+        ).fetchone()
+        return {"total": int(row[0] or 0), "difference": int(row[1] or 0)}
+
+    def v14_health(self) -> dict[str, Any]:
+        oldest = self.conn.execute(
+            "SELECT MIN(first_discovered_at) FROM candidates WHERE state NOT IN ('EXPIRED','REJECTED_UNSAFE','SIGNALLED')"
+        ).fetchone()[0]
+        return {
+            "event_queue_persisted": int(
+                self.conn.execute("SELECT COUNT(*) FROM launch_events").fetchone()[0]
+            ),
+            "oldest_pending_at": oldest,
+            "watchlist_entries": int(
+                self.conn.execute("SELECT COUNT(*) FROM watchlists").fetchone()[0]
+            ),
+            "wallet_clusters": int(
+                self.conn.execute("SELECT COUNT(*) FROM wallet_clusters").fetchone()[0]
+            ),
+            "outbox_pending": len(self.pending_outbox()),
+            "latency": self.latency_report(),
+            "state_reconciliation": self.reconcile_v14_state(),
+        }
+
+    def right_tail_performance(self, min_sample: int = 30) -> dict[str, Any]:
+        from memecoin_bot.alpha_engine import right_tail_metrics
+
+        rows = [
+            dict(row)
+            for row in self.conn.execute(
+                "SELECT t.token_address,COALESCE(o.max_multiple_from_discovery,1) peak_multiple,"
+                "CASE WHEN s.id IS NOT NULL THEN 'QUALIFIED_SIGNAL' ELSE c.authoritative_state END highest_tier "
+                "FROM tokens t LEFT JOIN candidates c ON c.token_id=t.id "
+                "LEFT JOIN token_outcomes o ON o.token_id=t.id LEFT JOIN signals s ON s.token_id=t.id"
+            )
+        ]
+        return right_tail_metrics(rows, min_sample)

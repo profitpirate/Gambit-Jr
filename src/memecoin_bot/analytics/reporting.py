@@ -9,10 +9,13 @@ def format_status(stats: dict[str, Any]) -> str:
     uptime = datetime.now(timezone.utc) - started
     hours, remainder = divmod(int(uptime.total_seconds()), 3600)
     minutes = remainder // 60
-    providers = "\n".join(
-        f"{row['provider']}: {'OK' if row['healthy'] else 'DEGRADED'}"
-        for row in stats.get("provider_status", [])
-    ) or f"Providers healthy: {stats['providers_healthy']}/{stats['providers_total']}"
+    providers = (
+        "\n".join(
+            f"{row['provider']}: {'OK' if row['healthy'] else 'DEGRADED'}"
+            for row in stats.get("provider_status", [])
+        )
+        or f"Providers healthy: {stats['providers_healthy']}/{stats['providers_total']}"
+    )
     return (
         "Gambit Jr — ONLINE\n"
         f"Uptime: {hours}h {minutes}m\n"
@@ -38,7 +41,9 @@ def format_candidates(rows: list[Any]) -> str:
     now = datetime.now(timezone.utc)
     blocks = ["Strongest active candidates"]
     for row in rows:
-        age = max(0, int((now - datetime.fromisoformat(row["first_discovered_at"])).total_seconds() / 60))
+        age = max(
+            0, int((now - datetime.fromisoformat(row["first_discovered_at"])).total_seconds() / 60)
+        )
         score = "UNKNOWN" if row["normalized_score"] is None else f"{row['normalized_score']:.1f}"
         confidence = "UNKNOWN" if row["confidence"] is None else f"{row['confidence']:.0%}"
         blocks.append(

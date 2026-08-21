@@ -31,27 +31,41 @@ class SignalTracker:
             max_multiple = max(float(signal["max_multiple"]), ath / signal_mc)
             max_drawdown = min(float(signal["max_drawdown"]), (atl - signal_mc) / signal_mc)
             now = snapshot.captured_at
-            self.store.update_tracking(int(signal["id"]), current_mc, now, max_multiple, max_drawdown, ath, atl)
+            self.store.update_tracking(
+                int(signal["id"]), current_mc, now, max_multiple, max_drawdown, ath, atl
+            )
             started = datetime.fromisoformat(signal["signal_timestamp"])
             seconds = (datetime.fromisoformat(now) - started).total_seconds()
             candidates = [
                 (target, current_mc, seconds)
-                for target in self.settings.milestones if multiple >= target
+                for target in self.settings.milestones
+                if multiple >= target
             ]
             payload = {
-                "token_address": signal["token_address"], "symbol": signal["symbol"],
-                "chain": signal["chain"], "pair_address": signal["pair_address"],
-                "signal_market_cap_usd": signal_mc, "max_multiple": max_multiple,
+                "token_address": signal["token_address"],
+                "symbol": signal["symbol"],
+                "chain": signal["chain"],
+                "pair_address": signal["pair_address"],
+                "signal_market_cap_usd": signal_mc,
+                "max_multiple": max_multiple,
             }
             hit = self.store.record_milestones(int(signal["id"]), candidates, payload)
             stats["milestones"] += len(hit)
-            reached_2x = self.store.conn.execute(
-                "SELECT 1 FROM milestones WHERE signal_id=? AND multiple>=2 LIMIT 1",
-                (signal["id"],),
-            ).fetchone() is not None
+            reached_2x = (
+                self.store.conn.execute(
+                    "SELECT 1 FROM milestones WHERE signal_id=? AND multiple>=2 LIMIT 1",
+                    (signal["id"],),
+                ).fetchone()
+                is not None
+            )
             if multiple <= self.settings.failure_multiple and not reached_2x:
-                if self.store.fail_signal(int(signal["id"]), dict(
-                    payload, current_multiple=multiple, max_drawdown=max_drawdown,
-                )):
+                if self.store.fail_signal(
+                    int(signal["id"]),
+                    dict(
+                        payload,
+                        current_multiple=multiple,
+                        max_drawdown=max_drawdown,
+                    ),
+                ):
                     stats["failed"] += 1
         return stats

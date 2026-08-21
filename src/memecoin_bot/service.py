@@ -7,6 +7,23 @@ from dataclasses import asdict
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+from memecoin_bot.alpha_engine import (
+    AlphaDecision,
+    AlphaState,
+    BoundedLaunchQueue,
+    EntryState,
+    LaunchEvent,
+    PayoffGrade,
+    SurvivalGrade,
+    parallel_enrichment,
+    payoff_engine,
+    promotion_decision,
+    survival_engine,
+    t0_decision,
+)
+from memecoin_bot.alpha_engine import (
+    entry_state as alpha_entry_state,
+)
 from memecoin_bot.config import Settings
 from memecoin_bot.database import Store
 from memecoin_bot.developers import DeveloperEngine
@@ -71,6 +88,7 @@ class IntelligenceService:
         safety_provider: Any,
         notifier: Any,
         gmgn: Any | None = None,
+        launch_sources: list[Any] | None = None,
     ):
         self.settings = settings
         self.store = store
@@ -79,6 +97,8 @@ class IntelligenceService:
         self.safety_provider = safety_provider
         self.notifier = notifier
         self.gmgn = gmgn
+        self.launch_sources = launch_sources or []
+        self.launch_queue = BoundedLaunchQueue(settings.event_queue_max)
         self.safety_gates = SafetyGates(settings)
         self.scoring = ScoringEngine(settings)
         self.developers = DeveloperEngine()
@@ -91,6 +111,157 @@ class IntelligenceService:
         self.started_at = iso()
         self.log = logging.getLogger("memecoin_bot.service")
         self.stop_event = asyncio.Event()
+
+    async def offer_launch_event(self, event: LaunchEvent) -> None:
+        result = self.launch_queue.offer(event)
+        if result != "QUEUED":
+            log_event(
+                self.log,
+                logging.WARNING if result == "BACKPRESSURE" else logging.DEBUG,
+                "launch_event_queue",
+                event_key=event.event_key,
+                result=result,
+                queue=self.launch_queue.stats(),
+            )
+
+    async def handle_launch_event(self, event: LaunchEvent) -> str:
+        launch_event_id, created = self.store.record_launch_event(event)
+        if not created:
+            return "DUPLICATE"
+        discovery = DiscoveryEvent(
+            token_address=event.token_address,
+            chain=event.chain,
+            source=event.source,
+            discovered_at=event.source_received_at,
+            estimated_creation_timestamp=event.source_event_timestamp,
+            deployer=event.creator_address,
+            metadata={
+                **event.metadata,
+                "launchpad": event.launchpad,
+                "launch_event_key": event.event_key,
+                "launch_phase": event.phase,
+            },
+        )
+        token_id, _ = self.store.upsert_discovery(discovery)
+        candidate_id, _ = self.store.ensure_candidate(
+            token_id, event.source_received_at, self.settings.scoring_version
+        )
+        created_at = iso()
+        self.store.link_launch_candidate(launch_event_id, candidate_id, created_at)
+        received = datetime.fromisoformat(event.source_received_at)
+        source_time = datetime.fromisoformat(event.source_event_timestamp)
+        if received.tzinfo is None:
+            received = received.replace(tzinfo=UTC)
+        if source_time.tzinfo is None:
+            source_time = source_time.replace(tzinfo=UTC)
+        features = {
+            **event.metadata,
+            "launch_event_verified": True,
+            "launchpad": event.launchpad,
+            "creator_address": event.creator_address,
+            "age_seconds": max(0, (received - source_time).total_seconds()),
+        }
+        decision = t0_decision(features)
+        self.store.record_v14_decision(
+            candidate_id,
+            launch_event_id,
+            decision,
+            self.settings,
+            observed_at=event.source_received_at,
+            decided_at=iso(),
+            providers={event.source: {"state": "HEALTHY", "observed_at": event.source_received_at}},
+        )
+        if decision.state == AlphaState.GENESIS_RADAR:
+            call = {
+                "call_timestamp": iso(),
+                "entry_state": str(decision.entry_state),
+                "confidence": decision.confidence,
+                "features": decision.feature_vector,
+                "providers": {event.source: {"state": "HEALTHY"}},
+            }
+            self.store.record_immutable_call(candidate_id, "GENESIS_RADAR", call, self.settings)
+            self.store.enqueue_v14_event(
+                f"v14:{candidate_id}:GENESIS_RADAR",
+                "GENESIS_RADAR",
+                {
+                    "tier": "GENESIS_RADAR",
+                    "chain": event.chain,
+                    "token_address": event.token_address,
+                    "launchpad": event.launchpad,
+                    "confidence": decision.confidence,
+                    "entry_state": str(decision.entry_state),
+                    "reasons": decision.reasons,
+                    "unknowns": decision.unknowns,
+                    "shadow": self.settings.shadow_mode,
+                },
+            )
+            log_event(
+                self.log,
+                logging.INFO,
+                "genesis_triggered",
+                token=event.token_address,
+                candidate_id=candidate_id,
+                confidence=decision.confidence,
+            )
+        return str(decision.state)
+
+    async def manual_scan(
+        self,
+        address: str,
+        chain: str = "solana",
+        guild_id: Any = None,
+        user_id: Any = None,
+    ) -> dict[str, Any]:
+        """Parallel, read-only scan that never creates a candidate, Radar call, or signal."""
+        requested_at = iso()
+        started = datetime.now(UTC)
+        providers: dict[str, Any] = {
+            "market": lambda: self.market.market_snapshot(address, chain),
+            "safety": lambda: self.safety_provider.safety(chain, address),
+        }
+        if self.gmgn is not None:
+            providers["gmgn"] = lambda: self.gmgn.enrich(chain, address)
+        results = await parallel_enrichment(providers, self.settings.provider_timeout_seconds)
+        market = results["market"].get("value")
+        safety = results["safety"].get("value")
+        features = {
+            "age_seconds": None,
+            "price_change_from_launch_percent": getattr(market, "price_change_5m", None),
+            "market_cap_usd": getattr(market, "market_cap_usd", None),
+            "liquidity_usd": getattr(market, "liquidity_usd", None),
+            "terminal_safety_failure": bool(getattr(safety, "rejection_reasons", [])),
+            "mint_authority_active": getattr(safety, "mint_authority", None) is not None
+            if safety is not None
+            else None,
+            "freeze_authority_active": getattr(safety, "freeze_authority", None) is not None
+            if safety is not None
+            else None,
+        }
+        survival = survival_engine(features)
+        payoff = payoff_engine(features, survival["grade"])
+        unknowns = [key for key, value in features.items() if value is None]
+        payload = {
+            "state": "FOUND" if market is not None else "NO_MARKET_PAIR",
+            "chain": chain,
+            "token_address": address,
+            "entry_state": str(alpha_entry_state(features)),
+            "market": market.to_dict() if market is not None else None,
+            "safety": asdict(safety) if safety is not None else None,
+            "survival": survival,
+            "payoff": payoff,
+            "providers": {
+                name: {key: value for key, value in result.items() if key != "value"}
+                for name, result in results.items()
+            },
+            "unknowns": unknowns,
+            "read_only": True,
+        }
+        elapsed = (datetime.now(UTC) - started).total_seconds() * 1000
+        payload["latency_ms"] = elapsed
+        self.store.record_manual_scan(
+            chain, address, requested_at, payload, elapsed, guild_id=guild_id, user_id=user_id
+        )
+        return payload
 
     async def evaluate(self, discovery: DiscoveryEvent) -> str:
         token_id, _created = self.store.upsert_discovery(discovery)
@@ -229,31 +400,39 @@ class IntelligenceService:
             "activity_quality": "UNKNOWN",
             "counts": {},
         }
-        if self.gmgn is not None:
-            try:
-                gmgn_snapshot = await self.gmgn.enrich(chain, address)
-                gmgn_wallet = wallet_intelligence(
-                    gmgn_snapshot.holders, gmgn_snapshot.traders, gmgn_snapshot.info
-                )
-                self.store.save_gmgn_intelligence(token_id, gmgn_snapshot.to_dict(), gmgn_wallet)
-            except (ProviderError, ValueError) as exc:
-                self.store.set_provider_health("gmgn", False, 1, str(exc))
-                log_event(self.log, logging.WARNING, "gmgn_degraded", token=address, error=str(exc))
         previous_rows = list(
             reversed(self.store.recent_snapshots(token_id, self.settings.snapshot_history_limit))
         )
         previous = [json.loads(row["payload_json"]) for row in previous_rows]
-        try:
-            safety = await self.safety_provider.safety(chain, address)
-            safety_unavailable = False
-        except ProviderError as exc:
+        enrichment_calls: dict[str, Any] = {
+            "safety": lambda: self.safety_provider.safety(chain, address)
+        }
+        if self.gmgn is not None:
+            enrichment_calls["gmgn"] = lambda: self.gmgn.enrich(chain, address)
+        enrichment = await parallel_enrichment(
+            enrichment_calls, self.settings.provider_timeout_seconds
+        )
+        safety = enrichment["safety"].get("value")
+        safety_unavailable = safety is None
+        if safety_unavailable:
+            error = enrichment["safety"].get("error", "UNKNOWN")
             safety = SafetyAssessment(
                 checked_at=iso(),
                 source=getattr(self.safety_provider, "name", f"{chain}_safety"),
                 chain=chain,
-                warnings=[f"SAFETY_PROVIDER_UNAVAILABLE:{exc}"],
+                warnings=[f"SAFETY_PROVIDER_UNAVAILABLE:{error}"],
             )
-            safety_unavailable = True
+        if "gmgn" in enrichment:
+            gmgn_snapshot = enrichment["gmgn"].get("value")
+            if gmgn_snapshot is not None:
+                gmgn_wallet = wallet_intelligence(
+                    gmgn_snapshot.holders, gmgn_snapshot.traders, gmgn_snapshot.info
+                )
+                self.store.save_gmgn_intelligence(token_id, gmgn_snapshot.to_dict(), gmgn_wallet)
+            elif enrichment["gmgn"].get("error"):
+                error = str(enrichment["gmgn"]["error"])
+                self.store.set_provider_health("gmgn", False, 1, error)
+                log_event(self.log, logging.WARNING, "gmgn_degraded", token=address, error=error)
         self.store.save_snapshot(token_id, market, safety.holder_count)
         self.store.record_candidate_snapshot_success(candidate_id, market.captured_at)
         hard_rejections = self.safety_gates.evaluate(market, safety)
@@ -399,6 +578,8 @@ class IntelligenceService:
         entry_state = entry_quality(
             candidate["radar_market_cap_usd"] or market.market_cap_usd, market.market_cap_usd
         )
+        if entry_state in {"CHASING", "LATE"}:
+            waiting.append("LATE_ENTRY_NOT_QUALIFIED")
         narrative_state = narrative_context(
             narrative.get("label"), candidate["first_discovered_at"]
         )
@@ -458,6 +639,95 @@ class IntelligenceService:
         }
         convergence = signal_convergence(pillars)
         setup = setup_quality(pillars, entry_state)
+        survival_result = survival_engine(
+            {
+                "liquidity_usd": market.liquidity_usd,
+                "connected_wallet_percent": gmgn_wallet.get("connected_wallet_percent"),
+                "creator_quality": developer.get("classification"),
+                "sell_pressure": (
+                    market.sells_5m / (market.buys_5m + market.sells_5m)
+                    if market.buys_5m is not None
+                    and market.sells_5m is not None
+                    and market.buys_5m + market.sells_5m > 0
+                    else None
+                ),
+            }
+        )
+        payoff_result = payoff_engine(
+            {
+                "market_cap_usd": market.market_cap_usd,
+                "liquidity_usd": market.liquidity_usd,
+                "price_change_from_launch_percent": market.price_change_5m,
+            },
+            survival_result["grade"],
+        )
+        independent_pillars = sum(
+            pillar.get("score") is not None and float(pillar.get("confidence") or 0) >= 0.45
+            for pillar in pillars.values()
+        )
+        current_alpha = candidate["authoritative_state"] or AlphaState.DISCOVERED
+        try:
+            current_alpha = AlphaState(current_alpha)
+        except ValueError:
+            current_alpha = (
+                AlphaState.STANDARD_RADAR
+                if candidate["radar_triggered_at"]
+                else AlphaState.DISCOVERED
+            )
+        promoted_alpha = promotion_decision(
+            current_alpha,
+            score=float(score.normalized_score or 0),
+            confidence=score.confidence,
+            entry=EntryState(entry_state),
+            survival=survival_result["grade"],
+            payoff=payoff_result["grade"],
+            independent_pillars=independent_pillars,
+        )
+        alpha_decision = AlphaDecision(
+            promoted_alpha,
+            EntryState(entry_state),
+            score.confidence,
+            [f"MARKET_STAGE_{promoted_alpha}"],
+            [],
+            {
+                "market_cap_usd": market.market_cap_usd,
+                "liquidity_usd": market.liquidity_usd,
+                "normalized_score": score.normalized_score,
+                "independent_pillars": independent_pillars,
+            },
+            stage="T+MARKET",
+            survival=SurvivalGrade(survival_result["grade"]),
+            payoff=PayoffGrade(payoff_result["grade"]),
+        )
+        self.store.record_v14_decision(
+            candidate_id,
+            None,
+            alpha_decision,
+            self.settings,
+            observed_at=market.captured_at,
+            providers=enrichment,
+        )
+        if promoted_alpha in {
+            AlphaState.HOT_RADAR,
+            AlphaState.PRIORITY_RADAR,
+            AlphaState.QUALIFIED_SIGNAL,
+        }:
+            self.store.record_immutable_call(
+                candidate_id,
+                str(promoted_alpha),
+                {
+                    "call_timestamp": market.captured_at,
+                    "market_cap_usd": market.market_cap_usd,
+                    "price_usd": market.price_usd,
+                    "liquidity_usd": market.liquidity_usd,
+                    "score": score.normalized_score,
+                    "confidence": score.confidence,
+                    "entry_state": entry_state,
+                    "features": alpha_decision.feature_vector,
+                    "providers": enrichment,
+                },
+                self.settings,
+            )
         self.store.record_narrative_event(
             token_id,
             f"narrative:{token_id}:{narrative_state['identity']}:{narrative_state['freshness']}",
@@ -672,6 +942,8 @@ class IntelligenceService:
             self.settings.scheduler_fresh_reserved_slots,
             self.settings.scheduler_radar_reserved_slots,
             self.settings.scheduler_near_signal_reserved_slots,
+            genesis_reserved=self.settings.scheduler_genesis_reserved_slots,
+            priority_reserved=self.settings.scheduler_priority_reserved_slots,
         ):
             try:
                 result = await self._monitor_candidate(candidate)
@@ -721,6 +993,7 @@ class IntelligenceService:
         sent = 0
         for row in self.store.pending_outbox():
             try:
+                delivery_started = datetime.now(UTC)
                 payload = json.loads(row["payload_json"])
                 content = format_discord_event(row["event_type"], payload)
                 has_guild_settings = bool(
@@ -787,6 +1060,12 @@ class IntelligenceService:
                 elif not destinations:
                     remote_id = await self.notifier.send(content)
                 self.store.mark_outbox_sent(int(row["id"]), remote_id)
+                self.store.record_latency(
+                    "DISCORD_DELIVERY",
+                    (datetime.now(UTC) - delivery_started).total_seconds() * 1000,
+                    "discord",
+                    {"outbox_id": row["id"], "event_type": row["event_type"]},
+                )
                 self.store.set_provider_health("discord", True, 0, None)
                 sent += 1
             except Exception as exc:  # noqa: BLE001 - outbox must persist any delivery failure
@@ -858,7 +1137,30 @@ class IntelligenceService:
                 except TimeoutError:
                     pass
 
-        await asyncio.gather(scanner(), candidate_monitor(), outcome_monitor(), tracker())
+        async def launch_worker() -> None:
+            while not self.stop_event.is_set():
+                try:
+                    event = await asyncio.wait_for(self.launch_queue.queue.get(), timeout=0.5)
+                except TimeoutError:
+                    continue
+                try:
+                    await self.handle_launch_event(event)
+                except Exception:
+                    self.log.exception(
+                        "launch event processing failed",
+                        extra={"fields": {"event_key": event.event_key}},
+                    )
+                finally:
+                    self.launch_queue.task_done(event)
+
+        tasks = [scanner(), candidate_monitor(), outcome_monitor(), tracker()]
+        if self.launch_sources:
+            tasks.append(launch_worker())
+            tasks.extend(
+                source.run(self.offer_launch_event, self.stop_event)
+                for source in self.launch_sources
+            )
+        await asyncio.gather(*tasks)
 
     def stop(self) -> None:
         self.stop_event.set()

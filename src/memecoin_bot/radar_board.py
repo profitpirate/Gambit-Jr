@@ -21,19 +21,33 @@ def start_radar_board(port: int, store: object, started_at: str) -> ThreadingHTT
             if path.path in {"/", "/index.html", "/token.html"}:
                 body, content_type = HTML.encode(), "text/html; charset=utf-8"
             elif path.path == "/api/status":
-                body, content_type = json.dumps(store.status_stats(started_at), default=str).encode(), "application/json"
+                body, content_type = (
+                    json.dumps(store.status_stats(started_at), default=str).encode(),
+                    "application/json",
+                )
             elif path.path == "/api/radar":
-                body, content_type = json.dumps(store.radar_board(), default=str).encode(), "application/json"
+                body, content_type = (
+                    json.dumps(store.radar_board(), default=str).encode(),
+                    "application/json",
+                )
             elif path.path == "/api/token":
                 address = parse_qs(path.query).get("address", [""])[0]
                 data = store.token_intelligence(address)
                 body, content_type = json.dumps(data, default=str).encode(), "application/json"
             else:
-                self.send_response(404); self.end_headers(); return
-            self.send_response(200); self.send_header("Content-Type", content_type)
-            self.send_header("Cache-Control", "no-store"); self.send_header("Content-Length", str(len(body)))
-            self.end_headers(); self.wfile.write(body)
-        def log_message(self, format: str, *args: object) -> None: return
+                self.send_response(404)
+                self.end_headers()
+                return
+            self.send_response(200)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, format: str, *args: object) -> None:
+            return
+
     server = ThreadingHTTPServer(("0.0.0.0", port), Handler)
     threading.Thread(target=server.serve_forever, name="radar-board", daemon=True).start()
     return server

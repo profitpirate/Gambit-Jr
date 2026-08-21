@@ -16,9 +16,16 @@ class BscRpcProvider:
 
     async def _rpc(self, method: str, params: list[Any]) -> Any:
         self._request_id += 1
-        data = await self.client.request(self.rpc_url, "POST", {
-            "jsonrpc": "2.0", "id": self._request_id, "method": method, "params": params,
-        })
+        data = await self.client.request(
+            self.rpc_url,
+            "POST",
+            {
+                "jsonrpc": "2.0",
+                "id": self._request_id,
+                "method": method,
+                "params": params,
+            },
+        )
         if data.get("error"):
             raise ProviderError(f"BSC {method}: {data['error']}")
         return data.get("result")
@@ -33,7 +40,9 @@ class BscRpcProvider:
             result.rejection_reasons.append("BSC_TOKEN_CONTRACT_NOT_FOUND")
             return result
         try:
-            owner_raw = await self._rpc("eth_call", [{"to": token_address, "data": "0x8da5cb5b"}, "latest"])
+            owner_raw = await self._rpc(
+                "eth_call", [{"to": token_address, "data": "0x8da5cb5b"}, "latest"]
+            )
             if isinstance(owner_raw, str) and len(owner_raw) >= 42:
                 owner = "0x" + owner_raw[-40:]
                 if int(owner[2:], 16) == 0:
@@ -45,7 +54,9 @@ class BscRpcProvider:
                 result.warnings.append("BSC_OWNER_ADMIN_STATE_UNKNOWN")
         except (ProviderError, ValueError):
             result.warnings.append("BSC_OWNER_ADMIN_STATE_UNKNOWN")
-        result.warnings.extend(["BSC_TRANSFER_RESTRICTIONS_UNKNOWN", "BSC_HOLDER_CONCENTRATION_UNKNOWN"])
+        result.warnings.extend(
+            ["BSC_TRANSFER_RESTRICTIONS_UNKNOWN", "BSC_HOLDER_CONCENTRATION_UNKNOWN"]
+        )
         return result
 
 

@@ -60,31 +60,33 @@ class DexScreenerProvider:
                 address = item.get("tokenAddress")
                 if not isinstance(address, str) or not address:
                     continue
-                events.setdefault(address, DiscoveryEvent(
-                    token_address=address,
-                    chain=chain,
-                    source=source,
-                    metadata={
-                        "description": item.get("description"),
-                        "links": item.get("links") or [],
-                        "profile_url": item.get("url"),
-                        "boost_amount": item.get("amount"),
-                        "boost_total": item.get("totalAmount"),
-                        "claim_date": item.get("claimDate"),
-                    },
-                ))
+                events.setdefault(
+                    address,
+                    DiscoveryEvent(
+                        token_address=address,
+                        chain=chain,
+                        source=source,
+                        metadata={
+                            "description": item.get("description"),
+                            "links": item.get("links") or [],
+                            "profile_url": item.get("url"),
+                            "boost_amount": item.get("amount"),
+                            "boost_total": item.get("totalAmount"),
+                            "claim_date": item.get("claimDate"),
+                        },
+                    ),
+                )
         return list(events.values())
 
-    async def market_snapshot(self, token_address: str, chain: str = "solana") -> MarketSnapshot | None:
-        data = await self.client.request(
-            f"{self.base_url}/token-pairs/v1/{chain}/{token_address}"
-        )
+    async def market_snapshot(
+        self, token_address: str, chain: str = "solana"
+    ) -> MarketSnapshot | None:
+        data = await self.client.request(f"{self.base_url}/token-pairs/v1/{chain}/{token_address}")
         pairs = _items(data)
         if not pairs:
             return None
         matching = [
-            p for p in pairs
-            if (p.get("baseToken") or {}).get("address") == token_address
+            p for p in pairs if (p.get("baseToken") or {}).get("address") == token_address
         ] or pairs
         pair = max(matching, key=lambda p: _number((p.get("liquidity") or {}).get("usd")) or -1)
         base = pair.get("baseToken") or {}
@@ -100,7 +102,8 @@ class DexScreenerProvider:
         launchpad = next((x for x in labels if "pump" in x or "moon" in x), None)
         socials = [
             {str(k): str(v) for k, v in social.items() if v is not None}
-            for social in info.get("socials") or [] if isinstance(social, dict)
+            for social in info.get("socials") or []
+            if isinstance(social, dict)
         ]
         return MarketSnapshot(
             token_address=token_address,

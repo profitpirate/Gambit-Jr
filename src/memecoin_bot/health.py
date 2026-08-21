@@ -32,4 +32,3 @@ def start_health_server(port: int, status: Callable[[], dict]) -> ThreadingHTTPS
     server = ThreadingHTTPServer(("0.0.0.0", port), Handler)
     threading.Thread(target=server.serve_forever, name="health-server", daemon=True).start()
     return server
-

@@ -42,6 +42,12 @@ class CandidateState(StrEnum):
     EXPIRED = "EXPIRED"
     SIGNALLED = "SIGNALLED"
     EARLY_RADAR = "EARLY_RADAR"
+    GENESIS_RADAR = "GENESIS_RADAR"
+    STANDARD_RADAR = "STANDARD_RADAR"
+    HOT_RADAR = "HOT_RADAR"
+    PRIORITY_RADAR = "PRIORITY_RADAR"
+    QUALIFIED_SIGNAL = "QUALIFIED_SIGNAL"
+    FAILED_OUTCOME = "FAILED_OUTCOME"
 
 
 class DeveloperClass(StrEnum):
@@ -154,4 +160,3 @@ class ScoreResult:
     hard_rejections: list[str] = field(default_factory=list)
     normalized_score: float | None = None
     available_weight: float = 0.0
-

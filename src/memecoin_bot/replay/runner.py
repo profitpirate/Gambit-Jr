@@ -19,7 +19,9 @@ def _key(chain: str, address: str) -> str:
 class ReplayMarket:
     name = "replay_market"
 
-    def __init__(self, sequences: dict[str, list[MarketSnapshot]], errors: dict[str, set[int]] | None = None):
+    def __init__(
+        self, sequences: dict[str, list[MarketSnapshot]], errors: dict[str, set[int]] | None = None
+    ):
         self.sequences = sequences
         self.index = {token: 0 for token in sequences}
         self.errors = errors or {}
@@ -33,6 +35,7 @@ class ReplayMarket:
         values = self.sequences.get(key)
         if self.index.get(key, 0) in self.errors.get(key, set()):
             from memecoin_bot.providers.base import ProviderError
+
             raise ProviderError("replay provider outage")
         return values[self.index[key]] if values else None
 
@@ -102,16 +105,24 @@ class ReplayRunner:
                 data["pair_created_at"] = self._shift_time(data.get("pair_created_at"), offset)
                 snapshots.append(MarketSnapshot(**data))
             sequences[_key(discovery.chain, discovery.token_address)] = snapshots
-            market_errors[_key(discovery.chain, discovery.token_address)] = set(token.get("market_errors_at") or [])
+            market_errors[_key(discovery.chain, discovery.token_address)] = set(
+                token.get("market_errors_at") or []
+            )
             safety_data = dict(token["safety"])
             safety_data.setdefault("chain", discovery.chain)
             safety_data["checked_at"] = self._shift_time(safety_data["checked_at"], offset)
-            safeties[_key(discovery.chain, discovery.token_address)] = SafetyAssessment(**safety_data)
+            safeties[_key(discovery.chain, discovery.token_address)] = SafetyAssessment(
+                **safety_data
+            )
 
         market = ReplayMarket(sequences, market_errors)
         service = IntelligenceService(
-            self.settings, self.store, DiscoveryPoller(ReplayDiscovery(discoveries)),
-            market, ReplaySafety(safeties), ReplayNotifier(),
+            self.settings,
+            self.store,
+            DiscoveryPoller(ReplayDiscovery(discoveries)),
+            market,
+            ReplaySafety(safeties),
+            ReplayNotifier(),
         )
         initial = await service.scan_once()
         cycles: list[dict[str, Any]] = []
@@ -122,23 +133,40 @@ class ReplayRunner:
             await service.flush_outbox()
             cycles.append({"candidates": candidates, "tracking": tracking})
 
-        decisions = [dict(row) for row in self.store.conn.execute(
-            "SELECT e.*,t.chain,t.token_address FROM evaluations e JOIN tokens t ON t.id=e.token_id "
-            "ORDER BY e.id"
-        )]
-        signals = [int(row[0]) for row in self.store.conn.execute("SELECT id FROM signals ORDER BY id")]
+        decisions = [
+            dict(row)
+            for row in self.store.conn.execute(
+                "SELECT e.*,t.chain,t.token_address FROM evaluations e JOIN tokens t ON t.id=e.token_id "
+                "ORDER BY e.id"
+            )
+        ]
+        signals = [
+            int(row[0]) for row in self.store.conn.execute("SELECT id FROM signals ORDER BY id")
+        ]
         return {
             "evidence_type": "SIMULATION_ONLY_NOT_LIVE_E2E",
-            "fixture": str(fixture_path), "initial": initial, "decisions": decisions,
-            "signals_created": signals, "cycles": cycles,
-            "radar_events": [dict(x) for x in self.store.conn.execute("SELECT * FROM radar_events ORDER BY id")],
-            "candidate_transitions": [dict(x) for x in self.store.conn.execute(
-                "SELECT * FROM candidate_transitions ORDER BY id"
-            )],
-            "milestones": [dict(x) for x in self.store.conn.execute("SELECT * FROM milestones ORDER BY id")],
-            "outcomes": [dict(x) for x in self.store.conn.execute("SELECT * FROM token_outcomes ORDER BY token_id")],
+            "fixture": str(fixture_path),
+            "initial": initial,
+            "decisions": decisions,
+            "signals_created": signals,
+            "cycles": cycles,
+            "radar_events": [
+                dict(x) for x in self.store.conn.execute("SELECT * FROM radar_events ORDER BY id")
+            ],
+            "candidate_transitions": [
+                dict(x)
+                for x in self.store.conn.execute("SELECT * FROM candidate_transitions ORDER BY id")
+            ],
+            "milestones": [
+                dict(x) for x in self.store.conn.execute("SELECT * FROM milestones ORDER BY id")
+            ],
+            "outcomes": [
+                dict(x)
+                for x in self.store.conn.execute("SELECT * FROM token_outcomes ORDER BY token_id")
+            ],
             "active_after_replay": len(self.store.active_signals()),
             "performance": self.store.performance(
-                self.settings.scoring_version, major_multiple=self.settings.major_missed_runner_multiple
+                self.settings.scoring_version,
+                major_multiple=self.settings.major_missed_runner_multiple,
             ),
         }
