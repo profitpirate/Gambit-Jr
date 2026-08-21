@@ -1,113 +1,269 @@
 from __future__ import annotations
 
 import asyncio
-import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
-from memecoin_bot.analytics import format_candidates, format_missed, format_performance, format_rejections, format_status
+try:
+    import discord
+    from discord import app_commands
+except ImportError:  # pragma: no cover - deployment dependency guard
+    discord = None
+    app_commands = None
+
+from memecoin_bot.discord.cards import (
+    performance_card,
+    rows_card,
+    settings_card,
+    smartmoney_card,
+    status_card,
+    test_alert_card,
+    token_card,
+)
 
 
 async def run_discord_bot(service: object, store: object, settings: object) -> None:
-    try:
-        import discord
-        from discord import app_commands
-    except ImportError as exc:
-        raise RuntimeError("discord.py is required for slash commands") from exc
+    if discord is None or app_commands is None:
+        raise RuntimeError("discord.py is required for slash commands")
 
     intents = discord.Intents.none()
     client = discord.Client(intents=intents)
     tree = app_commands.CommandTree(client)
 
-    def allowed(interaction: discord.Interaction) -> bool:
-        configured = set(settings.discord_channel_ids or (() if settings.discord_channel_id is None else (settings.discord_channel_id,)))
-        return interaction.channel_id in configured
+    def command_allowed(interaction: discord.Interaction) -> bool:
+        """Commands are guild-wide; automatic-alert destination is a separate policy."""
+        return interaction.guild_id is not None and interaction.channel_id is not None
 
-    @tree.command(name="status", description="Show scanner health")
+    async def send_card(
+        interaction: discord.Interaction, payload: dict, ephemeral: bool = False
+    ) -> None:
+        embed = discord.Embed.from_dict(payload["embed"])
+        view = None
+        if payload.get("links"):
+            view = discord.ui.View(timeout=None)
+            for label, url in payload["links"]:
+                view.add_item(discord.ui.Button(label=label, url=url))
+        await interaction.response.send_message(embed=embed, view=view, ephemeral=ephemeral)
+
+    async def require_guild(interaction: discord.Interaction) -> bool:
+        if command_allowed(interaction):
+            return True
+        await interaction.response.send_message(
+            "This command is available in Discord server text channels.", ephemeral=True
+        )
+        return False
+
+    @tree.command(
+        name="status",
+        description="Show truthful live scanner, pipeline, provider, and lifetime state",
+    )
     async def status_command(interaction: discord.Interaction) -> None:
-        if not allowed(interaction):
-            await interaction.response.send_message("This bot uses one configured channel.", ephemeral=True)
-            return
-        await interaction.response.send_message(format_status(store.status_stats(service.started_at)))
+        if await require_guild(interaction):
+            await send_card(interaction, status_card(store.status_stats(service.started_at)))
 
-    @tree.command(name="performance", description="Show measured signal performance")
+    @tree.command(name="performance", description="Show measured historical shadow performance")
     @app_commands.describe(period="7d, 30d, or all")
     async def performance_command(interaction: discord.Interaction, period: str = "all") -> None:
-        if not allowed(interaction):
-            await interaction.response.send_message("This bot uses one configured channel.", ephemeral=True)
+        if not await require_guild(interaction):
             return
         days = {"7d": 7, "30d": 30}.get(period.lower())
-        since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat() if days else None
-        report = store.performance(settings.scoring_version, since, settings.major_missed_runner_multiple)
-        await interaction.response.send_message(format_performance(report))
+        since = (datetime.now(UTC) - timedelta(days=days)).isoformat() if days else None
+        await send_card(
+            interaction,
+            performance_card(
+                store.performance(
+                    settings.scoring_version, since, settings.major_missed_runner_multiple
+                )
+            ),
+        )
 
     @tree.command(name="candidates", description="Show strongest active pre-signal candidates")
     async def candidates_command(interaction: discord.Interaction) -> None:
-        if not allowed(interaction):
-            await interaction.response.send_message("This bot uses one configured channel.", ephemeral=True)
+        if not await require_guild(interaction):
             return
-        await interaction.response.send_message(format_candidates(store.candidates_report(10)))
+        await send_card(
+            interaction,
+            rows_card(
+                "ACTIVE CANDIDATES",
+                store.candidates_report(10),
+                "No active candidates.",
+                lambda r: (
+                    f"**{r.get('name') or r.get('symbol')}** • {r.get('chain')} • {r.get('state')} • score {float(r.get('normalized_score') or 0):.1f}"
+                ),
+            ),
+        )
 
     @tree.command(name="rejections", description="Show hard and temporary rejection reasons")
     async def rejections_command(interaction: discord.Interaction) -> None:
-        if not allowed(interaction):
-            await interaction.response.send_message("This bot uses one configured channel.", ephemeral=True)
+        if not await require_guild(interaction):
             return
-        since = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
-        await interaction.response.send_message(format_rejections(store.rejection_report(since)))
+        report = store.rejection_report((datetime.now(UTC) - timedelta(hours=24)).isoformat())
+        rows = [
+            {"kind": kind, "reason": reason, "count": count}
+            for kind, values in report.items()
+            for reason, count in values
+        ]
+        await send_card(
+            interaction,
+            rows_card(
+                "REJECTIONS / BLOCKERS • 24H",
+                rows,
+                "No rejection evidence.",
+                lambda r: f"**{r['count']}×** {r['reason']} ({r['kind']})",
+                "amber",
+            ),
+        )
 
-    @tree.command(name="missed", description="Show recently observed runners without a qualified signal")
+    @tree.command(name="missed", description="Show observed runners without a qualified signal")
     @app_commands.describe(period="24h, 7d, or 30d")
     async def missed_command(interaction: discord.Interaction, period: str = "24h") -> None:
-        if not allowed(interaction):
-            await interaction.response.send_message("This bot uses one configured channel.", ephemeral=True)
+        if not await require_guild(interaction):
             return
         hours = {"24h": 24, "7d": 168, "30d": 720}.get(period.lower(), 24)
-        since = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
-        rows = store.missed_report(since, settings.missed_runner_multiple, 8)
-        await interaction.response.send_message(format_missed(rows, hours))
+        rows = store.missed_report(
+            (datetime.now(UTC) - timedelta(hours=hours)).isoformat(),
+            settings.missed_runner_multiple,
+            8,
+        )
+        await send_card(
+            interaction,
+            rows_card(
+                f"MISSED RUNNERS • {period.upper()}",
+                rows,
+                "No missed runners.",
+                lambda r: (
+                    f"**{r.get('name') or r.get('symbol')}** • {float(r.get('max_multiple_from_discovery') or 0):.2f}x • {r.get('non_signal_reason') or r.get('reason') or 'UNKNOWN'}"
+                ),
+                "amber",
+            ),
+        )
 
-    async def token_reply(interaction: discord.Interaction, address: str, smart_only: bool = False) -> None:
-        if not allowed(interaction):
-            await interaction.response.send_message("This channel is not authorized.", ephemeral=True)
+    async def token_reply(
+        interaction: discord.Interaction, address: str, smart_only: bool = False
+    ) -> None:
+        if not await require_guild(interaction):
             return
         data = store.token_intelligence(address)
         if not data:
             await interaction.response.send_message("Token is not tracked.", ephemeral=True)
             return
-        selected = data.get("wallet_intelligence") if smart_only else {
-            key: data.get(key) for key in ("name", "symbol", "chain", "token_address", "state",
-                "radar_score", "normalized_score", "confidence", "radar_market_cap_usd",
-                "current_market_cap_usd", "current_liquidity_usd", "max_multiple",
-                "signal_status", "wallet_intelligence")
-        }
-        body = json.dumps(selected, indent=2, default=str)
-        await interaction.response.send_message(f"```json\n{body[:1850]}\n```", ephemeral=True)
+        await send_card(
+            interaction, smartmoney_card(data) if smart_only else token_card(data), True
+        )
 
-    @tree.command(name="radar", description="Show active Radar calls")
+    @tree.command(name="radar", description="Show active Radar calls and ongoing outcomes")
     async def radar_command(interaction: discord.Interaction) -> None:
-        if not allowed(interaction):
-            await interaction.response.send_message("This channel is not authorized.", ephemeral=True); return
-        rows = store.radar_board(10)
-        text = "\n".join(f"{r['name'] or r['symbol']} · {r['chain']} · {r['state']} · {r['radar_score'] or 0:.1f}" for r in rows)
-        await interaction.response.send_message(text or "No Radar calls.")
+        if not await require_guild(interaction):
+            return
+        await send_card(
+            interaction,
+            rows_card(
+                "RADAR • ACTIVE INTELLIGENCE",
+                store.radar_board(10),
+                "No Radar calls.",
+                lambda r: (
+                    f"**{r.get('name') or r.get('symbol')}** • {r.get('chain')} • {r.get('state')} • Radar {float(r.get('radar_score') or 0):.1f} • {float(r.get('max_multiple') or 0):.2f}x"
+                ),
+            ),
+        )
 
-    @tree.command(name="runners", description="Show active runners")
+    @tree.command(name="runners", description="Show Radar or signal entities at 2x or greater")
     async def runners_command(interaction: discord.Interaction) -> None:
+        if not await require_guild(interaction):
+            return
         rows = [r for r in store.radar_board(100) if (r.get("max_multiple") or 0) >= 2]
-        await interaction.response.send_message("\n".join(f"{r['name'] or r['symbol']} · {r['max_multiple']:.2f}x" for r in rows[:10]) or "No runners.")
+        await send_card(
+            interaction,
+            rows_card(
+                "RUNNERS • 2X+",
+                rows,
+                "No runners.",
+                lambda r: (
+                    f"🔥 **{r.get('name') or r.get('symbol')}** • {float(r.get('max_multiple') or 0):.2f}x • {r.get('state')}"
+                ),
+                "green",
+            ),
+        )
 
-    @tree.command(name="failed", description="Show failed calls")
+    @tree.command(name="failed", description="Show failed calls with observed outcomes")
     async def failed_command(interaction: discord.Interaction) -> None:
+        if not await require_guild(interaction):
+            return
         rows = [r for r in store.radar_board(100) if r.get("signal_status") == "FAILED"]
-        await interaction.response.send_message("\n".join(str(r['name'] or r['symbol']) for r in rows[:10]) or "No failures.")
+        await send_card(
+            interaction,
+            rows_card(
+                "FAILED CALLS",
+                rows,
+                "No failures.",
+                lambda r: (
+                    f"🔴 **{r.get('name') or r.get('symbol')}** • peak {float(r.get('max_multiple') or 0):.2f}x"
+                ),
+                "red",
+            ),
+        )
 
     @tree.command(name="token", description="Show current token intelligence")
     async def token_command(interaction: discord.Interaction, address: str) -> None:
         await token_reply(interaction, address)
 
-    @tree.command(name="smartmoney", description="Show wallet intelligence for a token")
+    @tree.command(name="smartmoney", description="Show labelled wallet evidence for a token")
     async def smartmoney_command(interaction: discord.Interaction, address: str) -> None:
         await token_reply(interaction, address, True)
+
+    @tree.command(name="setup", description="Admin: designate a channel for automatic alerts")
+    @app_commands.default_permissions(manage_guild=True)
+    async def setup_command(
+        interaction: discord.Interaction,
+        channel: discord.TextChannel | None = None,
+        alert_tier: str = "HOT",
+    ) -> None:
+        if not await require_guild(interaction):
+            return
+        permissions = getattr(interaction.user, "guild_permissions", None)
+        if not permissions or not permissions.manage_guild:
+            await interaction.response.send_message(
+                "Manage Server permission is required.", ephemeral=True
+            )
+            return
+        destination = channel or interaction.channel
+        try:
+            store.set_guild_settings(
+                interaction.guild_id, destination.id, True, alert_tier, interaction.user.id
+            )
+        except ValueError as exc:
+            await interaction.response.send_message(str(exc), ephemeral=True)
+            return
+        await send_card(
+            interaction, settings_card(store.guild_settings(interaction.guild_id)), True
+        )
+
+    @tree.command(
+        name="server-settings", description="Show this server's alert destination and noise tier"
+    )
+    async def server_settings_command(interaction: discord.Interaction) -> None:
+        if await require_guild(interaction):
+            await send_card(
+                interaction, settings_card(store.guild_settings(interaction.guild_id)), True
+            )
+
+    @tree.command(
+        name="test-alert", description="Admin: send a non-live card without creating intelligence"
+    )
+    @app_commands.default_permissions(manage_guild=True)
+    async def test_alert_command(interaction: discord.Interaction) -> None:
+        if not await require_guild(interaction):
+            return
+        permissions = getattr(interaction.user, "guild_permissions", None)
+        if not permissions or not permissions.manage_guild:
+            await interaction.response.send_message(
+                "Manage Server permission is required.", ephemeral=True
+            )
+            return
+        await send_card(interaction, test_alert_card())
+        message = await interaction.original_response()
+        store.record_test_alert(
+            interaction.guild_id, interaction.channel_id, interaction.user.id, str(message.id)
+        )
 
     @client.event
     async def on_ready() -> None:
@@ -119,4 +275,3 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
     finally:
         service.stop()
         await service_task
-

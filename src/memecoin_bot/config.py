@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import os
 import hashlib
 import json
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -54,7 +54,7 @@ class Settings:
     database_path: Path = Path("data/memecoin.db")
     log_level: str = "INFO"
     shadow_mode: bool = True
-    shadow_send_alerts: bool = False
+    shadow_send_alerts: bool = True
     discovery_interval_seconds: float = 30
     max_discoveries_per_cycle: int = 20
     monitor_interval_seconds: float = 30
@@ -66,6 +66,12 @@ class Settings:
     max_active_candidates: int = 250
     snapshot_history_limit: int = 12
     max_active_candidates_per_chain: int = 125
+    candidate_retry_initial_seconds: float = 30
+    candidate_retry_max_seconds: float = 900
+    candidate_retry_backoff: float = 2
+    scheduler_fresh_reserved_slots: int = 50
+    scheduler_radar_reserved_slots: int = 50
+    scheduler_near_signal_reserved_slots: int = 50
     radar_max_age_minutes: float = 15
     radar_min_liquidity_usd: float = 8_000
     radar_min_snapshots: int = 2
@@ -94,31 +100,42 @@ class Settings:
     strong_threshold: float = 75
     high_conviction_threshold: float = 85
     min_confidence_for_signal: float = 0.60
-    weights: dict[str, float] = field(default_factory=lambda: {
-        "narrative": 25, "social": 20, "onchain": 20,
-        "developer": 15, "momentum": 15, "safety": 5,
-    })
-    scoring_version: str = "v1.3-intelligence-gmgn"
+    weights: dict[str, float] = field(
+        default_factory=lambda: {
+            "narrative": 25,
+            "social": 20,
+            "onchain": 20,
+            "developer": 15,
+            "momentum": 15,
+            "safety": 5,
+        }
+    )
+    scoring_version: str = "v1.3.1-signal-quality"
     milestones: tuple[float, ...] = (1.5, 2, 3, 5, 10, 25, 50, 100)
     failure_multiple: float = 0.30
     inactivity_timeout_hours: float = 24
     alert_cooldown_seconds: float = 900
     health_port: int = 8080
-    radar_board_enabled: bool = True
+    radar_board_enabled: bool = False
     radar_board_port: int = 8081
-    software_version: str = "1.3.0"
-    radar_version: str = "v1.3-radar"
+    discord_default_alert_tier: str = "HOT"
+    software_version: str = "1.3.1"
+    radar_version: str = "v1.3.1-radar"
 
     @classmethod
-    def from_env(cls) -> "Settings":
+    def from_env(cls) -> Settings:
         load_dotenv()
         channel = os.getenv("DISCORD_CHANNEL_ID")
-        channels = tuple(int(x.strip()) for x in os.getenv("DISCORD_CHANNEL_IDS", "").split(",") if x.strip())
+        channels = tuple(
+            int(x.strip()) for x in os.getenv("DISCORD_CHANNEL_IDS", "").split(",") if x.strip()
+        )
         if channel and int(channel) not in channels:
             channels = (int(channel), *channels)
-        milestones = tuple(float(x) for x in os.getenv(
-            "MILESTONES", "1.5,2,3,5,10,25,50,100"
-        ).split(",") if x.strip())
+        milestones = tuple(
+            float(x)
+            for x in os.getenv("MILESTONES", "1.5,2,3,5,10,25,50,100").split(",")
+            if x.strip()
+        )
         return cls(
             discord_token=os.getenv("DISCORD_TOKEN") or None,
             discord_channel_id=int(channel) if channel else None,
@@ -126,7 +143,9 @@ class Settings:
             discord_webhook_url=os.getenv("DISCORD_WEBHOOK_URL") or None,
             solana_rpc_url=os.getenv("SOLANA_RPC_URL", "https://api.mainnet-beta.solana.com"),
             dexscreener_base_url=os.getenv("DEXSCREENER_BASE_URL", "https://api.dexscreener.com"),
-            geckoterminal_base_url=os.getenv("GECKOTERMINAL_BASE_URL", "https://api.geckoterminal.com/api/v2"),
+            geckoterminal_base_url=os.getenv(
+                "GECKOTERMINAL_BASE_URL", "https://api.geckoterminal.com/api/v2"
+            ),
             bsc_rpc_url=os.getenv("BSC_RPC_URL", "https://bsc-dataseed.bnbchain.org"),
             gmgn_enabled=_bool("GMGN_ENABLED", False),
             gmgn_api_key=os.getenv("GMGN_API_KEY") or None,
@@ -140,7 +159,7 @@ class Settings:
             database_path=Path(os.getenv("DATABASE_PATH", "data/memecoin.db")),
             log_level=os.getenv("LOG_LEVEL", "INFO"),
             shadow_mode=_bool("SHADOW_MODE", True),
-            shadow_send_alerts=_bool("SHADOW_SEND_ALERTS", False),
+            shadow_send_alerts=_bool("SHADOW_SEND_ALERTS", True),
             discovery_interval_seconds=_float("DISCOVERY_INTERVAL_SECONDS", 30),
             max_discoveries_per_cycle=_int("MAX_DISCOVERIES_PER_CYCLE", 20),
             monitor_interval_seconds=_float("MONITOR_INTERVAL_SECONDS", 30),
@@ -152,13 +171,21 @@ class Settings:
             max_active_candidates=_int("MAX_ACTIVE_CANDIDATES", 250),
             snapshot_history_limit=_int("SNAPSHOT_HISTORY_LIMIT", 12),
             max_active_candidates_per_chain=_int("MAX_ACTIVE_CANDIDATES_PER_CHAIN", 125),
+            candidate_retry_initial_seconds=_float("CANDIDATE_RETRY_INITIAL_SECONDS", 30),
+            candidate_retry_max_seconds=_float("CANDIDATE_RETRY_MAX_SECONDS", 900),
+            candidate_retry_backoff=_float("CANDIDATE_RETRY_BACKOFF", 2),
+            scheduler_fresh_reserved_slots=_int("SCHEDULER_FRESH_RESERVED_SLOTS", 50),
+            scheduler_radar_reserved_slots=_int("SCHEDULER_RADAR_RESERVED_SLOTS", 50),
+            scheduler_near_signal_reserved_slots=_int("SCHEDULER_NEAR_SIGNAL_RESERVED_SLOTS", 50),
             radar_max_age_minutes=_float("RADAR_MAX_AGE_MINUTES", 15),
             radar_min_liquidity_usd=_float("RADAR_MIN_LIQUIDITY_USD", 8_000),
             radar_min_snapshots=_int("RADAR_MIN_SNAPSHOTS", 2),
             radar_min_conditions=_int("RADAR_MIN_CONDITIONS", 3),
             radar_score_threshold=_float("RADAR_SCORE_THRESHOLD", 60),
             radar_max_market_cap_usd=_float("RADAR_MAX_MARKET_CAP_USD", 150_000),
-            radar_late_pump_price_change_percent=_float("RADAR_LATE_PUMP_PRICE_CHANGE_PERCENT", 300),
+            radar_late_pump_price_change_percent=_float(
+                "RADAR_LATE_PUMP_PRICE_CHANGE_PERCENT", 300
+            ),
             missed_runner_multiple=_float("MISSED_RUNNER_MULTIPLE", 5),
             major_missed_runner_multiple=_float("MAJOR_MISSED_RUNNER_MULTIPLE", 10),
             outcome_monitor_interval_seconds=_float("OUTCOME_MONITOR_INTERVAL_SECONDS", 300),
@@ -188,16 +215,17 @@ class Settings:
                 "momentum": _float("WEIGHT_MOMENTUM", 15),
                 "safety": _float("WEIGHT_SAFETY", 5),
             },
-            scoring_version=os.getenv("SCORING_VERSION", "v1.3-intelligence-gmgn"),
+            scoring_version=os.getenv("SCORING_VERSION", "v1.3.1-signal-quality"),
             milestones=milestones,
             failure_multiple=_float("FAILURE_MULTIPLE", 0.30),
             inactivity_timeout_hours=_float("INACTIVITY_TIMEOUT_HOURS", 24),
             alert_cooldown_seconds=_float("ALERT_COOLDOWN_SECONDS", 900),
             health_port=_int("HEALTH_PORT", 8080),
-            radar_board_enabled=_bool("RADAR_BOARD_ENABLED", True),
+            radar_board_enabled=_bool("RADAR_BOARD_ENABLED", False),
             radar_board_port=_int("RADAR_BOARD_PORT", 8081),
-            software_version=os.getenv("SOFTWARE_VERSION", "1.3.0"),
-            radar_version=os.getenv("RADAR_VERSION", "v1.3-radar"),
+            discord_default_alert_tier=os.getenv("DISCORD_DEFAULT_ALERT_TIER", "HOT").upper(),
+            software_version=os.getenv("SOFTWARE_VERSION", "1.3.1"),
+            radar_version=os.getenv("RADAR_VERSION", "v1.3.1-radar"),
         )
 
     def validate(self) -> None:
@@ -209,31 +237,73 @@ class Settings:
             raise ValueError("MIN_CONFIDENCE_FOR_SIGNAL must be between 0 and 1")
         if not self.milestones or any(x <= 1 for x in self.milestones):
             raise ValueError("All milestones must be greater than 1")
-        if min(self.candidate_monitor_interval_seconds, self.candidate_max_age_minutes,
-               self.candidate_inactivity_timeout_minutes, self.max_active_candidates,
-               self.min_snapshots_for_momentum, self.snapshot_history_limit,
-               self.outcome_monitor_interval_seconds, self.outcome_max_age_hours,
-               self.max_outcome_watchlist) <= 0:
+        if (
+            min(
+                self.candidate_monitor_interval_seconds,
+                self.candidate_max_age_minutes,
+                self.candidate_inactivity_timeout_minutes,
+                self.max_active_candidates,
+                self.min_snapshots_for_momentum,
+                self.snapshot_history_limit,
+                self.outcome_monitor_interval_seconds,
+                self.outcome_max_age_hours,
+                self.max_outcome_watchlist,
+            )
+            <= 0
+        ):
             raise ValueError("Candidate monitoring settings must be positive")
         if self.missed_runner_multiple > self.major_missed_runner_multiple:
             raise ValueError("MISSED_RUNNER_MULTIPLE cannot exceed MAJOR_MISSED_RUNNER_MULTIPLE")
         if self.gmgn_enabled and not self.gmgn_api_key:
             raise ValueError("GMGN_ENABLED requires a read-only GMGN_API_KEY")
-        if min(self.gmgn_timeout_seconds, self.gmgn_cache_ttl_seconds,
-               self.gmgn_concurrency, self.radar_board_port) <= 0:
+        if (
+            min(
+                self.gmgn_timeout_seconds,
+                self.gmgn_cache_ttl_seconds,
+                self.gmgn_concurrency,
+                self.radar_board_port,
+            )
+            <= 0
+        ):
             raise ValueError("GMGN and Radar Board settings must be positive")
+        if (
+            min(
+                self.candidate_retry_initial_seconds,
+                self.candidate_retry_max_seconds,
+                self.candidate_retry_backoff,
+            )
+            <= 0
+        ):
+            raise ValueError("Candidate retry settings must be positive")
+        if self.candidate_retry_initial_seconds > self.candidate_retry_max_seconds:
+            raise ValueError("Candidate retry initial delay cannot exceed maximum delay")
+        if self.discord_default_alert_tier not in {"ALL", "HOT", "PRIORITY", "QUALIFIED"}:
+            raise ValueError("DISCORD_DEFAULT_ALERT_TIER must be ALL, HOT, PRIORITY, or QUALIFIED")
 
     def config_fingerprint(self) -> str:
         """Stable fingerprint of decision settings; credentials are deliberately excluded."""
         payload = {
-            "software_version": self.software_version, "scoring_version": self.scoring_version,
-            "radar_version": self.radar_version, "weights": self.weights,
-            "thresholds": [self.watch_threshold, self.strong_threshold,
-                           self.high_conviction_threshold, self.min_confidence_for_signal],
-            "radar": [self.radar_score_threshold, self.radar_min_conditions,
-                      self.radar_min_liquidity_usd, self.radar_max_market_cap_usd],
-            "safety": [self.reject_mint_authority, self.reject_freeze_authority,
-                       self.max_top10_percent],
+            "software_version": self.software_version,
+            "scoring_version": self.scoring_version,
+            "radar_version": self.radar_version,
+            "weights": self.weights,
+            "thresholds": [
+                self.watch_threshold,
+                self.strong_threshold,
+                self.high_conviction_threshold,
+                self.min_confidence_for_signal,
+            ],
+            "radar": [
+                self.radar_score_threshold,
+                self.radar_min_conditions,
+                self.radar_min_liquidity_usd,
+                self.radar_max_market_cap_usd,
+            ],
+            "safety": [
+                self.reject_mint_authority,
+                self.reject_freeze_authority,
+                self.max_top10_percent,
+            ],
         }
         raw = json.dumps(payload, sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(raw.encode()).hexdigest()

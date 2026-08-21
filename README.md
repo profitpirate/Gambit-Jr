@@ -1,4 +1,4 @@
-# Gambit Jr — V1.3 Radar Intelligence and GMGN Enrichment
+# Gambit Jr — V1.3.1 Signal Quality and Discord-First Intelligence
 
 A read-only, autonomous intelligence service for Solana and BNB Chain memecoins. It discovers newly
 active tokens, collects real market and mint data, applies fail-closed safety gates,
@@ -7,7 +7,8 @@ signals. It never connects to a wallet and contains no trading code.
 
 ## Completion status
 
-The V1.2 code path is implemented and covered by deterministic unit and replay tests.
+The V1.3.1 code path is implemented and covered by deterministic unit, migration,
+backlog-stress, delivery-idempotency, and replay tests.
 This is not a claim that the brief's live operational acceptance test is complete:
 Discord credentials, a cloud target, and a naturally qualifying real token are external
 requirements. Thresholds must not be weakened to manufacture that evidence.
@@ -24,7 +25,7 @@ Implemented:
 - configurable hard gates and versioned deterministic scoring;
 - SQLite migrations, indexes, WAL, immutable initial signal trigger, and durable outbox;
 - one-shot milestones, failure persistence, active-signal recovery, and performance stats;
-- mobile-first Discord embeds/buttons and all five operational slash commands;
+- mobile-first Discord embeds/buttons and all operational slash commands;
 - durable early-radar, outcome, missed-runner, and pre-move opportunity-coverage records;
 - structured JSON logs, provider retry/backoff/circuit state, health HTTP endpoint;
 - Docker/Compose deployment, replay simulation, and critical tests.
@@ -120,7 +121,8 @@ mobile-first Discord embeds. Every card shows the full copyable contract address
 explicit SOLANA or BNB CHAIN label. Valid DexScreener plus Solscan/BscScan link buttons
 are constructed without credentials.
 
-Commands are `/status`, `/candidates`, `/rejections`, `/missed`, and `/performance`.
+Commands are `/status`, `/performance`, `/candidates`, `/rejections`, `/missed`, `/radar`,
+`/runners`, `/failed`, `/token`, `/smartmoney`, `/setup`, `/server-settings`, and `/test-alert`.
 `/missed` reports tokens that crossed `MISSED_RUNNER_MULTIPLE` without a qualified signal,
 including discovery market cap, peak, multiple, radar status, and the last non-signal
 reason. Signal hit rates and opportunity coverage remain separate metric families.
@@ -160,11 +162,11 @@ python -m pip install -e '.[dev]'
 cp .env.example .env                 # Windows: Copy-Item .env.example .env
 ```
 
-Set `DISCORD_TOKEN` and `DISCORD_CHANNEL_ID` for `/status`, `/candidates`, `/rejections`,
-`/missed`, `/performance`, and alerts. A webhook
+Set `DISCORD_TOKEN` for slash commands. Run `/setup` with Manage Server permission in each guild to
+designate its one automatic-alert channel and alert tier. A webhook
 can send one-way alerts, but slash commands require a bot token. Invite the bot with
-`bot` and `applications.commands` scopes and permission to view/send in exactly the
-configured channel.
+`bot` and `applications.commands` scopes. Commands work in permitted guild text channels;
+automatic alerts go only to the guild's configured alert channel.
 
 Start in shadow mode first:
 
@@ -173,7 +175,7 @@ memecoin-bot once --output evidence/live-shadow.json
 memecoin-bot run
 ```
 
-V1.2 remains `SHADOW_MODE=true` and `SHADOW_SEND_ALERTS=true`. Qualifying messages are
+V1.3.1 remains `SHADOW_MODE=true` and `SHADOW_SEND_ALERTS=true`. Qualifying messages are
 explicitly labelled read-only shadow signals. There is no wallet, private key,
 transaction signing, swap, purchase, or sale path.
 
@@ -192,15 +194,57 @@ intelligence events, per-channel alert delivery, paper simulations, latency metr
 version/config fingerprints. The `/status` state reconciliation reports a zero difference only when
 every tracked token belongs to exactly one visible lifecycle state.
 
-The database-backed, read-only Radar Board runs on `RADAR_BOARD_PORT` (default `8081`) and serves
+The optional database-backed, read-only Radar Board runs on `RADAR_BOARD_PORT` when enabled and serves
 `/api/status`, `/api/radar`, and `/api/token?address=<CA>`. Discord adds `/radar`, `/runners`,
 `/failed`, `/token`, and `/smartmoney`; alert cards include chain-aware GMGN links. Configure
-multiple bot channels with `DISCORD_CHANNEL_IDS=id1,id2`; delivery success and retry state are
-persisted independently per channel.
+guild alert channels with `/setup`; delivery success and retry state are persisted independently
+per guild/channel. Legacy `DISCORD_CHANNEL_IDS` remains a fallback only until guild settings exist.
 
 These V1.2 qualification defaults are unchanged: WATCH 65, STRONG 75, HIGH_CONVICTION 85, and
 minimum confidence 0.60. Social presence or a single labelled wallet cannot independently create
 Priority, and terminal safety evidence cannot be overridden by smart-money evidence.
+
+## V1.3.1 lifecycle, signal quality, and Discord
+
+Migration `005_v131_signal_quality_discord.sql` adds explicit candidate attempts, bounded
+exponential retry state, scheduling lanes, auditable startup reconciliation, explicit provider
+states, confidence history, narrative/news/catalyst evidence, ongoing Radar outcomes, guild
+settings, and guild-scoped delivery identities. Existing V1.3 tokens, candidates, Radar events,
+signals, outcomes, provider evidence, and outbox history are retained.
+
+`last_attempted_at` is written before provider I/O. Candidate max age is checked before missing-pair
+or provider-error returns. Missing pairs and provider failures persist `next_retry_at` with 30s,
+60s, 120s, and bounded later delays. Startup reconciliation transitions old pre-signal rows to
+`EXPIRED` with `STALE_PENDING_RECONCILIATION`, retains the prior reason, and cannot duplicate the
+transition. Qualified `SIGNALLED` entities are tracked separately and are not expired as stale
+pre-signal candidates.
+
+The scheduler reserves capacity for fresh launches, active Radar entities, and near-signal setups,
+then fills remaining capacity across active and retry lanes with chain round-robin selection and
+per-chain caps. A retry backlog therefore cannot starve fresh Solana or BNB launches.
+
+Every intelligence pillar has score, confidence, evidence, unknowns, risks, and freshness. Overall
+convergence requires independent pillar diversity. Setup grades (`C` through `A+`) persist their
+component explanation and apply explicit entry-timing penalties for EXTENDED, CHASING, and LATE.
+Narrative context separately records identity, cluster, freshness, velocity, saturation, decay,
+first-mover/copycat state, peers, and provenance. News/catalyst tables accept only
+provenance-backed read-only evidence; the service does not synthesize headlines or sentiment.
+
+Discord is the primary frontend. Every command renders an embed, `/token` and `/smartmoney` expose
+structured evidence without raw JSON, and `/status` separates live pipeline, pending ages,
+providers, Discord delivery, lifetime counts, and state reconciliation. Provider states are
+`HEALTHY`, `DEGRADED`, `DOWN`, `DISABLED`, `UNKNOWN`, `RATE_LIMITED`, or `CIRCUIT_OPEN`; configured-off
+GMGN is `DISABLED` and excluded from the configured-health denominator.
+
+One global scanner serves all guilds. New guilds receive commands but no automatic alerts until an
+administrator runs `/setup`. Delivery identity is `(outbox event, guild, channel)`, successful guilds
+are never retried, and one guild failure does not block another. Tiers are `ALL`, `HOT`, `PRIORITY`,
+and `QUALIFIED`. `/test-alert` writes only a test-delivery audit row and cannot create a token, Radar
+event, signal, or market outbox event.
+
+The HTTP Radar Board is disabled by default in V1.3.1 because Discord contains the supported
+operational UI. Qualification defaults remain exactly WATCH 65, STRONG 75, HIGH_CONVICTION 85, and
+minimum confidence 0.60.
 
 ### GMGN rate-limit assumptions
 
@@ -256,7 +300,7 @@ replica with SQLite. Move to PostgreSQL before horizontal scaling.
 ## Environment variables
 
 Every supported variable and safe default appears in `.env.example`. Required for full
-Discord operation: `DISCORD_TOKEN`, `DISCORD_CHANNEL_ID`. Required runtime configuration:
+Discord operation: `DISCORD_TOKEN`, followed by `/setup` in each guild. Required runtime configuration:
 `SOLANA_RPC_URL`, `DATABASE_PATH`. All other thresholds, weights, intervals, milestones,
 timeouts, failure rules, alert behavior, and health port are configurable there.
 

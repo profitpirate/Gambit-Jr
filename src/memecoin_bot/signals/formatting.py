@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 import re
-from urllib.parse import quote
-from datetime import datetime, timezone
 from typing import Any
+from urllib.parse import quote
 
-from memecoin_bot.models import DiscoveryEvent, MarketSnapshot, RadarResult, SafetyAssessment, ScoreResult
+from memecoin_bot.models import (
+    DiscoveryEvent,
+    MarketSnapshot,
+    RadarResult,
+    SafetyAssessment,
+    ScoreResult,
+)
 
 
 def _safe(value: Any, max_length: int = 200) -> str:
@@ -23,8 +28,14 @@ def _money(value: float | None) -> str:
     return f"${value:,.2f}"
 
 
-def _number(value: float | int | None, suffix: str = "") -> str:
-    return "UNKNOWN" if value is None else f"{value:.2f}{suffix}" if isinstance(value, float) else f"{value}{suffix}"
+def _number(value: float | None, suffix: str = "") -> str:
+    return (
+        "UNKNOWN"
+        if value is None
+        else f"{value:.2f}{suffix}"
+        if isinstance(value, float)
+        else f"{value}{suffix}"
+    )
 
 
 def signal_payload(
@@ -60,6 +71,11 @@ def signal_payload(
         "momentum": intelligence["momentum"],
         "risks": intelligence.get("risks", []),
         "thesis": intelligence.get("thesis", []),
+        "pillars": intelligence.get("pillars", {}),
+        "convergence": intelligence.get("convergence", {}),
+        "setup_quality": intelligence.get("setup_quality", {}),
+        "entry_quality": intelligence.get("entry_quality", "UNKNOWN"),
+        "narrative_context": intelligence.get("narrative_context", {}),
         "signal_timestamp": market.captured_at,
         "pair_address": market.pair_address,
         "shadow": shadow,
@@ -67,18 +83,29 @@ def signal_payload(
     }
 
 
-def radar_payload(discovery: DiscoveryEvent, market: MarketSnapshot,
-                  radar: RadarResult, snapshot_count: int) -> dict[str, Any]:
+def radar_payload(
+    discovery: DiscoveryEvent, market: MarketSnapshot, radar: RadarResult, snapshot_count: int
+) -> dict[str, Any]:
     return {
-        "classification": "EARLY_RADAR", "chain": discovery.chain,
-        "symbol": market.symbol or discovery.symbol, "name": market.name or discovery.name,
-        "token_address": discovery.token_address, "pair_address": market.pair_address,
-        "market_cap_usd": market.market_cap_usd, "price_usd": market.price_usd,
-        "liquidity_usd": market.liquidity_usd, "volume_5m_usd": market.volume_5m_usd,
-        "buys_5m": market.buys_5m, "sells_5m": market.sells_5m,
-        "pair_created_at": market.pair_created_at, "radar_score": radar.score,
-        "reasons": radar.reasons, "penalties": radar.penalties,
-        "snapshot_count": snapshot_count, "triggered_at": market.captured_at, "shadow": True,
+        "classification": "EARLY_RADAR",
+        "chain": discovery.chain,
+        "symbol": market.symbol or discovery.symbol,
+        "name": market.name or discovery.name,
+        "token_address": discovery.token_address,
+        "pair_address": market.pair_address,
+        "market_cap_usd": market.market_cap_usd,
+        "price_usd": market.price_usd,
+        "liquidity_usd": market.liquidity_usd,
+        "volume_5m_usd": market.volume_5m_usd,
+        "buys_5m": market.buys_5m,
+        "sells_5m": market.sells_5m,
+        "pair_created_at": market.pair_created_at,
+        "radar_score": radar.score,
+        "reasons": radar.reasons,
+        "penalties": radar.penalties,
+        "snapshot_count": snapshot_count,
+        "triggered_at": market.captured_at,
+        "shadow": True,
     }
 
 
@@ -94,25 +121,48 @@ def _buttons(p: dict[str, Any]) -> list[dict[str, Any]]:
         return []
     links = [
         ("DexScreener", f"https://dexscreener.com/{quote(chain)}/{quote(pair)}"),
-        ("Open GMGN", f"https://gmgn.ai/{'sol' if chain == 'solana' else 'bsc'}/token/{quote(address)}"),
-        (("BscScan" if chain == "bsc" else "Solscan"),
-         f"https://bscscan.com/token/{quote(address)}" if chain == "bsc" else
-         f"https://solscan.io/token/{quote(address)}"),
+        (
+            "Open GMGN",
+            f"https://gmgn.ai/{'sol' if chain == 'solana' else 'bsc'}/token/{quote(address)}",
+        ),
+        (
+            ("BscScan" if chain == "bsc" else "Solscan"),
+            f"https://bscscan.com/token/{quote(address)}"
+            if chain == "bsc"
+            else f"https://solscan.io/token/{quote(address)}",
+        ),
     ]
-    return [{"type": 1, "components": [
-        {"type": 2, "style": 5, "label": label, "url": url} for label, url in links
-    ]}]
+    return [
+        {
+            "type": 1,
+            "components": [
+                {"type": 2, "style": 5, "label": label, "url": url} for label, url in links
+            ],
+        }
+    ]
 
 
 def format_discord_event(event_type: str, p: dict[str, Any]) -> dict[str, Any]:
     text = format_event(event_type, p)
-    colors = {"EARLY_RADAR": 0x5865F2, "SIGNAL": 0xF59E0B, "MILESTONE": 0xEF4444,
-              "UPGRADE": 0xF97316, "DETERIORATION": 0xEAB308, "FAILED": 0xDC2626}
+    colors = {
+        "EARLY_RADAR": 0x5865F2,
+        "RADAR_MILESTONE": 0x22C55E,
+        "RADAR_RISK": 0xDC2626,
+        "SIGNAL": 0xF59E0B,
+        "MILESTONE": 0xEF4444,
+        "UPGRADE": 0xF97316,
+        "DETERIORATION": 0xEAB308,
+        "FAILED": 0xDC2626,
+    }
     title = {
         "EARLY_RADAR": "🛰️ GAMBIT JR — EARLY RADAR",
+        "RADAR_MILESTONE": "🔥 GAMBIT JR — RADAR OUTCOME",
+        "RADAR_RISK": "⚠️ GAMBIT JR — RADAR RISK",
         "SIGNAL": f"GAMBIT JR — {str(p.get('classification', 'SIGNAL')).replace('_', ' ')}",
-        "MILESTONE": "🔥 GAMBIT JR — MILESTONE", "UPGRADE": "GAMBIT JR — SIGNAL UPGRADE",
-        "DETERIORATION": "⚠️ GAMBIT JR — DETERIORATION", "FAILED": "🔴 GAMBIT JR — FAILED",
+        "MILESTONE": "🔥 GAMBIT JR — MILESTONE",
+        "UPGRADE": "GAMBIT JR — SIGNAL UPGRADE",
+        "DETERIORATION": "⚠️ GAMBIT JR — DETERIORATION",
+        "FAILED": "🔴 GAMBIT JR — FAILED",
     }.get(event_type, f"GAMBIT JR — {event_type}")
     address = str(p.get("token_address") or "UNKNOWN")
     fields = [
@@ -121,17 +171,56 @@ def format_discord_event(event_type: str, p: dict[str, Any]) -> dict[str, Any]:
     ]
     if p.get("market_cap_usd") is not None or p.get("signal_market_cap_usd") is not None:
         fields += [
-            {"name": "Market cap", "value": _money(p.get("market_cap_usd", p.get("signal_market_cap_usd"))), "inline": True},
+            {
+                "name": "Market cap",
+                "value": _money(p.get("market_cap_usd", p.get("signal_market_cap_usd"))),
+                "inline": True,
+            },
             {"name": "Liquidity", "value": _money(p.get("liquidity_usd")), "inline": True},
         ]
     if event_type == "EARLY_RADAR":
-        fields.append({"name": "Status", "value": "LOWER CONFIDENCE — NOT A QUALIFIED SIGNAL", "inline": False})
-        fields.append({"name": "Qualification", "value": "Evidence and safety gates still apply; Radar is not a buy instruction.", "inline": False})
+        fields.append(
+            {
+                "name": "Status",
+                "value": "LOWER CONFIDENCE — NOT A QUALIFIED SIGNAL",
+                "inline": False,
+            }
+        )
+        fields.append(
+            {
+                "name": "Qualification",
+                "value": "Evidence and safety gates still apply; Radar is not a buy instruction.",
+                "inline": False,
+            }
+        )
+    if event_type == "RADAR_MILESTONE":
+        fields.append(
+            {
+                "name": "Observed outcome",
+                "value": f"{float(p.get('milestone', 0)):g}x from Radar",
+                "inline": False,
+            }
+        )
+    if event_type == "RADAR_RISK":
+        fields.append(
+            {
+                "name": "Observed risk",
+                "value": str(p.get("risk") or "LIQUIDITY COLLAPSE"),
+                "inline": False,
+            }
+        )
     return {
         "content": f"{title}\n`{address}`",
-        "embeds": [{"title": title, "description": text[:3500], "color": colors.get(event_type, 0x64748B),
-                    "fields": fields}],
-        "components": _buttons(p), "allowed_mentions": {"parse": []},
+        "embeds": [
+            {
+                "title": title,
+                "description": text[:3500],
+                "color": colors.get(event_type, 0x64748B),
+                "fields": fields,
+            }
+        ],
+        "components": _buttons(p),
+        "allowed_mentions": {"parse": []},
     }
 
 
@@ -157,10 +246,24 @@ def format_event(event_type: str, p: dict[str, Any]) -> str:
         developer = p.get("developer") or {}
         narrative = p.get("narrative") or {}
         momentum = p.get("momentum") or {}
-        social_display = "UNKNOWN" if (p.get("social") or {}).get("score") is None else f"{scores['social']:.1f}/{maxima['social']:.0f}"
-        developer_display = "UNKNOWN" if developer.get("score") is None else f"{scores['developer']:.1f}/{maxima['developer']:.0f}"
-        thesis = "; ".join(_safe(x) for x in p.get("thesis") or []) or "Evidence met configured deterministic thresholds."
-        risks = "; ".join(_safe(x) for x in p.get("risks") or []) or "Very young, highly volatile asset; limited history."
+        social_display = (
+            "UNKNOWN"
+            if (p.get("social") or {}).get("score") is None
+            else f"{scores['social']:.1f}/{maxima['social']:.0f}"
+        )
+        developer_display = (
+            "UNKNOWN"
+            if developer.get("score") is None
+            else f"{scores['developer']:.1f}/{maxima['developer']:.0f}"
+        )
+        thesis = (
+            "; ".join(_safe(x) for x in p.get("thesis") or [])
+            or "Evidence met configured deterministic thresholds."
+        )
+        risks = (
+            "; ".join(_safe(x) for x in p.get("risks") or [])
+            or "Very young, highly volatile asset; limited history."
+        )
         return (
             f"{shadow}🚨 GAMBIT JR SHADOW — {_safe(p['classification']).replace('_', ' ')}\n\n"
             f"{_safe(p.get('name'))} (${_safe(p.get('symbol'))})\n"
@@ -221,4 +324,3 @@ def format_event(event_type: str, p: dict[str, Any]) -> str:
             "Original signal baseline remains unchanged."
         )
     return _safe(p, 1900)
-

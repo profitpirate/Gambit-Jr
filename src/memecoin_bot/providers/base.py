@@ -6,8 +6,9 @@ import random
 import time
 import urllib.error
 import urllib.request
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 
 class ProviderError(RuntimeError):
@@ -49,10 +50,20 @@ class ResilientJsonClient:
         if time.monotonic() - self.health.opened_at >= self.circuit_cooldown:
             self.health.opened_at = None
             return
+        if self.health_callback:
+            self.health_callback(
+                self.name,
+                False,
+                self.health.consecutive_failures,
+                f"{self.name} circuit is open",
+            )
         raise CircuitOpen(f"{self.name} circuit is open")
 
     async def request(
-        self, url: str, method: str = "GET", payload: dict[str, Any] | None = None,
+        self,
+        url: str,
+        method: str = "GET",
+        payload: dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
     ) -> Any:
         self._check_circuit()
@@ -67,8 +78,12 @@ class ResilientJsonClient:
                 }
                 request_headers.update(headers or {})
 
-                def perform() -> Any:
-                    request = urllib.request.Request(url, data=data, headers=request_headers, method=method)
+                def perform(
+                    data: bytes | None = data, request_headers: dict[str, str] = request_headers
+                ) -> Any:
+                    request = urllib.request.Request(
+                        url, data=data, headers=request_headers, method=method
+                    )
                     with urllib.request.urlopen(request, timeout=self.timeout) as response:
                         return json.loads(response.read().decode("utf-8"))
 
@@ -77,7 +92,7 @@ class ResilientJsonClient:
                 if self.health_callback:
                     self.health_callback(self.name, True, 0, None)
                 return result
-            except (OSError, TimeoutError, asyncio.TimeoutError, ValueError, urllib.error.URLError) as exc:
+            except (OSError, TimeoutError, ValueError, urllib.error.URLError) as exc:
                 last = exc
                 self.health.consecutive_failures += 1
                 self.health.last_error = str(exc)
@@ -90,4 +105,3 @@ class ResilientJsonClient:
                 if attempt < self.retries:
                     await asyncio.sleep(min(0.5 * (2**attempt) + random.random() * 0.2, 5))
         raise ProviderError(f"{self.name} request failed: {last}") from last
-
