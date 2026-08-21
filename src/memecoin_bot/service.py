@@ -12,6 +12,7 @@ from memecoin_bot.database import Store
 from memecoin_bot.developers import DeveloperEngine
 from memecoin_bot.discovery import DiscoveryPoller
 from memecoin_bot.models import CandidateState, DiscoveryEvent, MarketSnapshot, SafetyAssessment, SignalClass, iso
+from memecoin_bot.intelligence import entry_quality, priority, social_presence, wallet_intelligence
 from memecoin_bot.momentum import MomentumEngine
 from memecoin_bot.narratives import NarrativeEngine
 from memecoin_bot.observability.logging import event as log_event
@@ -54,6 +55,7 @@ class IntelligenceService:
         market: DexScreenerProvider,
         safety_provider: Any,
         notifier: Any,
+        gmgn: Any | None = None,
     ):
         self.settings = settings
         self.store = store
@@ -61,6 +63,7 @@ class IntelligenceService:
         self.market = market
         self.safety_provider = safety_provider
         self.notifier = notifier
+        self.gmgn = gmgn
         self.safety_gates = SafetyGates(settings)
         self.scoring = ScoringEngine(settings)
         self.developers = DeveloperEngine()
@@ -116,6 +119,18 @@ class IntelligenceService:
                                        metadata=json.loads(candidate["metadata_json"] or "{}"))
         discovery.symbol, discovery.name, discovery.pair_address = market.symbol, market.name, market.pair_address
         self.store.upsert_discovery(discovery)
+        gmgn_snapshot = None
+        gmgn_wallet = {"smart_money": "SMART_MONEY_UNKNOWN", "buyer_diversity": "UNKNOWN",
+                       "activity_quality": "UNKNOWN", "counts": {}}
+        if self.gmgn is not None:
+            try:
+                gmgn_snapshot = await self.gmgn.enrich(chain, address)
+                gmgn_wallet = wallet_intelligence(gmgn_snapshot.holders, gmgn_snapshot.traders,
+                                                  gmgn_snapshot.info)
+                self.store.save_gmgn_intelligence(token_id, gmgn_snapshot.to_dict(), gmgn_wallet)
+            except (ProviderError, ValueError) as exc:
+                self.store.set_provider_health("gmgn", False, 1, str(exc))
+                log_event(self.log, logging.WARNING, "gmgn_degraded", token=address, error=str(exc))
         previous_rows = list(reversed(self.store.recent_snapshots(token_id, self.settings.snapshot_history_limit)))
         previous = [json.loads(row["payload_json"]) for row in previous_rows]
         try:
@@ -154,9 +169,20 @@ class IntelligenceService:
         )
         radar_now = False
         if radar.triggered:
+            current_priority = priority(radar.score, float(candidate["confidence"] or 0), False,
+                                        int(gmgn_wallet.get("counts", {}).get("smart", 0)),
+                                        gmgn_wallet.get("activity_quality") == "ORGANIC_LIKELY")
+            rp = radar_payload(discovery, market, radar, len(previous) + 1)
+            rp.update({"priority": current_priority, "entry_quality": entry_quality(
+                candidate["radar_market_cap_usd"] or market.market_cap_usd, market.market_cap_usd),
+                "gmgn": gmgn_snapshot.to_dict() if gmgn_snapshot else None,
+                "wallet_intelligence": gmgn_wallet,
+                "social_presence": social_presence(gmgn_snapshot.info if gmgn_snapshot else {},
+                                                   candidate["first_discovered_at"]),
+                "confidence": candidate["confidence"]})
             radar_now = self.store.trigger_radar(
                 candidate_id, radar.score, radar.reasons, market,
-                radar_payload(discovery, market, radar, len(previous) + 1),
+                rp,
             )
             if radar_now:
                 log_event(self.log, logging.INFO, "early_radar_triggered", token=address, chain=chain,
@@ -202,6 +228,8 @@ class IntelligenceService:
         evidence = {
             "market": market.to_dict(), "safety": asdict(safety),
             "intelligence": intelligence,
+            "gmgn": gmgn_snapshot.to_dict() if gmgn_snapshot else None,
+            "wallet_intelligence": gmgn_wallet,
             "unknown_fields": [
                 name for name, value in {
                     "holder_count": safety.holder_count,
@@ -327,7 +355,24 @@ class IntelligenceService:
             try:
                 payload = json.loads(row["payload_json"])
                 content = format_discord_event(row["event_type"], payload)
-                remote_id = await self.notifier.send(content)
+                channels = self.settings.discord_channel_ids
+                if channels and hasattr(self.notifier, "send_to"):
+                    self.store.ensure_alert_deliveries(int(row["id"]), channels)
+                    failures = []
+                    remote_ids = []
+                    for delivery in self.store.pending_alert_deliveries(int(row["id"])):
+                        try:
+                            remote = await self.notifier.send_to(int(delivery["channel_id"]), content)
+                            self.store.mark_alert_delivery(int(delivery["id"]), True, remote)
+                            remote_ids.append(str(remote or ""))
+                        except Exception as exc:
+                            self.store.mark_alert_delivery(int(delivery["id"]), False, error=str(exc))
+                            failures.append(exc)
+                    if failures:
+                        raise failures[0]
+                    remote_id = ",".join(remote_ids)
+                else:
+                    remote_id = await self.notifier.send(content)
                 self.store.mark_outbox_sent(int(row["id"]), remote_id)
                 self.store.set_provider_health("discord", True, 0, None)
                 sent += 1

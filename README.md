@@ -1,4 +1,4 @@
-# Gambit Jr — V1.2 Early Radar and Multichain Intelligence
+# Gambit Jr — V1.3 Radar Intelligence and GMGN Enrichment
 
 A read-only, autonomous intelligence service for Solana and BNB Chain memecoins. It discovers newly
 active tokens, collects real market and mint data, applies fail-closed safety gates,
@@ -176,6 +176,50 @@ memecoin-bot run
 V1.2 remains `SHADOW_MODE=true` and `SHADOW_SEND_ALERTS=true`. Qualifying messages are
 explicitly labelled read-only shadow signals. There is no wallet, private key,
 transaction signing, swap, purchase, or sale path.
+
+## V1.3 intelligence upgrade
+
+V1.3 preserves the V1.2 discovery, chain safety, Radar, scoring, signal and outcome paths. It adds an
+optional fail-open GMGN Agent/OpenAPI provider using only API-key authenticated `GET` routes:
+`/v1/token/info`, `/v1/token/security`, `/v1/token/pool_info`,
+`/v1/market/token_top_holders`, and `/v1/market/token_top_traders`. The provider contains no signed
+routes, swap/order calls, wallet, seed or private-key configuration. GMGN downtime leaves existing
+providers and qualification logic running and records unavailable fields as unknown.
+
+The additive `004_v13_intelligence.sql` migration persists immutable Radar payloads, GMGN raw
+snapshots, field provenance, separate wallet-label evidence, priority transitions, social history,
+intelligence events, per-channel alert delivery, paper simulations, latency metrics, outcomes and
+version/config fingerprints. The `/status` state reconciliation reports a zero difference only when
+every tracked token belongs to exactly one visible lifecycle state.
+
+The database-backed, read-only Radar Board runs on `RADAR_BOARD_PORT` (default `8081`) and serves
+`/api/status`, `/api/radar`, and `/api/token?address=<CA>`. Discord adds `/radar`, `/runners`,
+`/failed`, `/token`, and `/smartmoney`; alert cards include chain-aware GMGN links. Configure
+multiple bot channels with `DISCORD_CHANNEL_IDS=id1,id2`; delivery success and retry state are
+persisted independently per channel.
+
+These V1.2 qualification defaults are unchanged: WATCH 65, STRONG 75, HIGH_CONVICTION 85, and
+minimum confidence 0.60. Social presence or a single labelled wallet cannot independently create
+Priority, and terminal safety evidence cannot be overridden by smart-money evidence.
+
+### GMGN rate-limit assumptions
+
+GMGN's official token skill documents a leaky bucket with rate/capacity 20 and route weights of 1
+for info/security/pool and 5 for holders/traders. Jr applies caching, per-token in-flight dedupe,
+bounded concurrency, exponential retry/backoff, 429 handling through the resilient client, and a
+circuit breaker. Static enrichment defaults to a 120-second TTL. Operators should lower concurrency
+or increase TTL if their issued key has stricter limits.
+
+### V1.3 deployment and rollback
+
+Before deploying, stop the V1.2 process and back up the SQLite database plus WAL/SHM files. Check out
+`codex/gambit-jr-v1.3-intelligence-gmgn`, configure `.env`, keep `SHADOW_MODE=true`, and run
+`docker compose up -d --build`. Verify ports 8080 and 8081, provider health, state reconciliation,
+Discord commands, and restart recovery. GMGN may remain disabled; the scanner continues normally.
+
+Rollback is application-first: stop V1.3, check out the V1.2 branch, and start the old container
+against a pre-upgrade database backup. Migration 004 is additive, but restoring the backup is the
+supported rollback because older application code does not own V1.3 tables.
 
 ## Tests and replay
 

@@ -72,6 +72,15 @@ class Store:
                 (version, _json(weights), _json(thresholds), iso()),
             )
 
+    def register_config_fingerprint(self, fingerprint: str, software_version: str,
+                                    scoring_version: str, radar_version: str,
+                                    config: dict[str, Any]) -> None:
+        with self._lock, self.conn:
+            self.conn.execute(
+                "INSERT OR IGNORE INTO config_fingerprints VALUES(?,?,?,?,?,?)",
+                (fingerprint, software_version, scoring_version, radar_version, _json(config), iso()),
+            )
+
     def upsert_discovery(self, event: DiscoveryEvent) -> tuple[int, bool]:
         """Return token id and whether it was newly inserted."""
         with self._lock, self.conn:
@@ -208,11 +217,11 @@ class Store:
         with self._lock, self.conn:
             cur = self.conn.execute(
                 "INSERT OR IGNORE INTO radar_events(candidate_id,event_level,triggered_at,radar_score,"
-                "reason_json,market_cap_usd,price_usd,liquidity_usd,snapshot_count) "
+                "reason_json,market_cap_usd,price_usd,liquidity_usd,snapshot_count,immutable_payload_json) "
                 "VALUES(?,?,?,?,?,?,?,?,(SELECT COUNT(*) FROM token_snapshots WHERE token_id="
-                "(SELECT token_id FROM candidates WHERE id=?)))",
+                "(SELECT token_id FROM candidates WHERE id=?)),?)",
                 (candidate_id, level, now, score, _json(reasons), snapshot.market_cap_usd,
-                 snapshot.price_usd, snapshot.liquidity_usd, candidate_id),
+                 snapshot.price_usd, snapshot.liquidity_usd, candidate_id, _json(payload)),
             )
             if cur.rowcount != 1:
                 return False
@@ -526,6 +535,29 @@ class Store:
                 (error[:1000], outbox_id),
             )
 
+    def ensure_alert_deliveries(self, outbox_id: int, channel_ids: Iterable[int]) -> None:
+        with self._lock, self.conn:
+            for channel_id in channel_ids:
+                self.conn.execute(
+                    "INSERT OR IGNORE INTO alert_deliveries(outbox_id,channel_id) VALUES(?,?)",
+                    (outbox_id, str(channel_id)),
+                )
+
+    def pending_alert_deliveries(self, outbox_id: int) -> list[sqlite3.Row]:
+        return list(self.conn.execute(
+            "SELECT * FROM alert_deliveries WHERE outbox_id=? AND status!='SENT' ORDER BY id", (outbox_id,)
+        ))
+
+    def mark_alert_delivery(self, delivery_id: int, success: bool, remote_id: str | None = None,
+                            error: str | None = None) -> None:
+        with self._lock, self.conn:
+            self.conn.execute(
+                "UPDATE alert_deliveries SET status=?,attempts=attempts+1,remote_message_id=?,"
+                "delivered_at=?,last_error=? WHERE id=?",
+                ("SENT" if success else "FAILED", remote_id, iso() if success else None,
+                 None if success else str(error or "")[:1000], delivery_id),
+            )
+
     def set_provider_health(self, provider: str, healthy: bool, failures: int, error: str | None) -> None:
         now = iso()
         with self._lock, self.conn:
@@ -541,13 +573,103 @@ class Store:
                  None if healthy else now, error, now),
             )
 
+    def save_gmgn_intelligence(self, token_id: int, snapshot: dict[str, Any],
+                               wallet: dict[str, Any]) -> int:
+        """Persist raw GMGN evidence and derived wallet evidence without flattening labels."""
+        captured = str(snapshot.get("retrieved_at") or iso())
+        with self._lock, self.conn:
+            cur = self.conn.execute(
+                "INSERT OR IGNORE INTO gmgn_snapshots(token_id,captured_at,payload_json,unavailable_json) "
+                "VALUES(?,?,?,?)", (token_id, captured, _json(snapshot), _json(snapshot.get("unavailable", []))),
+            )
+            self.conn.execute(
+                "INSERT INTO wallet_intelligence(token_id,captured_at,smart_money_state,buyer_diversity,"
+                "activity_quality,payload_json) VALUES(?,?,?,?,?,?)",
+                (token_id, captured, wallet.get("smart_money", "SMART_MONEY_UNKNOWN"),
+                 wallet.get("buyer_diversity", "UNKNOWN"), wallet.get("activity_quality", "UNKNOWN"),
+                 _json(wallet)),
+            )
+            for field in ("info", "security", "pool", "holders", "traders"):
+                value = snapshot.get(field)
+                self.conn.execute(
+                    "INSERT OR IGNORE INTO provider_evidence(token_id,field_name,value_json,provider,"
+                    "retrieved_at,confidence,raw_json) VALUES(?,?,?,?,?,?,?)",
+                    (token_id, field, _json(value), "gmgn", captured,
+                     "KNOWN" if value is not None else "UNKNOWN", _json(value)),
+                )
+            return int(cur.lastrowid or 0)
+
+    def record_intelligence_event(self, token_id: int, event_key: str, event_type: str,
+                                  evidence: dict[str, Any]) -> bool:
+        with self._lock, self.conn:
+            cur = self.conn.execute(
+                "INSERT OR IGNORE INTO intelligence_events(token_id,event_key,event_type,detected_at,evidence_json) "
+                "VALUES(?,?,?,?,?)", (token_id, event_key, event_type, iso(), _json(evidence)),
+            )
+            return cur.rowcount == 1
+
+    def state_reconciliation(self) -> dict[str, Any]:
+        total = int(self.conn.execute("SELECT COUNT(*) FROM tokens").fetchone()[0])
+        states = {str(r[0]): int(r[1]) for r in self.conn.execute(
+            "SELECT COALESCE(c.state,'DISCOVERED'),COUNT(*) FROM tokens t LEFT JOIN candidates c "
+            "ON c.token_id=t.id GROUP BY COALESCE(c.state,'DISCOVERED')"
+        )}
+        accounted = sum(states.values())
+        return {"total_tracked": total, "states": states, "accounted": accounted,
+                "difference": total - accounted, "reconciled": total == accounted}
+
+    def token_intelligence(self, address: str, chain: str | None = None) -> dict[str, Any] | None:
+        args: list[Any] = [address]
+        chain_sql = ""
+        if chain:
+            chain_sql, args = " AND t.chain=?", [address, chain]
+        row = self.conn.execute(
+            "SELECT t.*,c.state,c.radar_score,c.radar_triggered_at,c.radar_market_cap_usd,"
+            "c.current_market_cap_usd,c.current_liquidity_usd,c.normalized_score,c.confidence,"
+            "s.max_multiple,s.ath_market_cap_usd,s.atl_market_cap_usd,s.status signal_status "
+            "FROM tokens t LEFT JOIN candidates c ON c.token_id=t.id LEFT JOIN signals s ON s.token_id=t.id "
+            "WHERE t.token_address=?" + chain_sql + " ORDER BY t.id DESC LIMIT 1", args,
+        ).fetchone()
+        if not row: return None
+        result = dict(row)
+        gmgn = self.conn.execute(
+            "SELECT payload_json FROM gmgn_snapshots WHERE token_id=? ORDER BY captured_at DESC LIMIT 1", (row["id"],)
+        ).fetchone()
+        wallet = self.conn.execute(
+            "SELECT payload_json FROM wallet_intelligence WHERE token_id=? ORDER BY captured_at DESC LIMIT 1", (row["id"],)
+        ).fetchone()
+        result["gmgn"] = json.loads(gmgn[0]) if gmgn else None
+        result["wallet_intelligence"] = json.loads(wallet[0]) if wallet else None
+        result["timeline"] = [dict(x) for x in self.conn.execute(
+            "SELECT event_type,detected_at,evidence_json FROM intelligence_events WHERE token_id=? ORDER BY detected_at", (row["id"],)
+        )]
+        result["snapshots"] = [dict(x) for x in self.conn.execute(
+            "SELECT captured_at,market_cap_usd,liquidity_usd FROM token_snapshots WHERE token_id=? ORDER BY captured_at", (row["id"],)
+        )]
+        return result
+
+    def radar_board(self, limit: int = 250) -> list[dict[str, Any]]:
+        return [dict(r) for r in self.conn.execute(
+            "SELECT t.name,t.symbol,t.chain,t.token_address,c.state,c.radar_score,c.normalized_score,"
+            "c.confidence,c.radar_market_cap_usd,c.current_market_cap_usd,c.current_liquidity_usd,"
+            "c.radar_triggered_at,c.updated_at,s.max_multiple,s.ath_market_cap_usd,s.status signal_status "
+            "FROM candidates c JOIN tokens t ON t.id=c.token_id LEFT JOIN signals s ON s.id=c.signal_id "
+            "ORDER BY COALESCE(c.radar_score,0) DESC,c.updated_at DESC LIMIT ?", (limit,)
+        )]
+
     def status_stats(self, started_at: str) -> dict[str, Any]:
         today = datetime.now(timezone.utc).date().isoformat()
         one = lambda sql, args=(): self.conn.execute(sql, args).fetchone()[0]
         providers = self.conn.execute(
             "SELECT COUNT(*),COALESCE(SUM(healthy),0) FROM provider_health"
         ).fetchone()
-        return {
+        provider_rows = [dict(r) for r in self.conn.execute(
+            "SELECT provider,healthy,consecutive_failures,last_success_at,last_error,updated_at FROM provider_health ORDER BY provider"
+        )]
+        for provider in provider_rows:
+            provider["state"] = ("OK" if provider["healthy"] else
+                "PARTIAL" if provider.get("last_success_at") else "OFFLINE")
+        result = {
             "started_at": started_at,
             "tokens_discovered": one("SELECT COUNT(*) FROM tokens"),
             "tokens_evaluated": one("SELECT COUNT(DISTINCT token_id) FROM evaluations"),
@@ -565,11 +687,11 @@ class Store:
             "signals_today": one("SELECT COUNT(*) FROM signals WHERE signal_timestamp LIKE ?", (today + "%",)),
             "providers_healthy": int(providers[1]),
             "providers_total": int(providers[0]),
-            "provider_status": [dict(r) for r in self.conn.execute(
-                "SELECT provider,healthy,consecutive_failures,last_error,updated_at FROM provider_health ORDER BY provider"
-            )],
+            "provider_status": provider_rows,
             "database": "OK",
         }
+        result["state_reconciliation"] = self.state_reconciliation()
+        return result
 
     def missed_report(self, since: str | None, threshold: float, limit: int = 10) -> list[sqlite3.Row]:
         where = "WHERE m.signal_before_hit=0"

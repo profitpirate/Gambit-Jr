@@ -94,6 +94,7 @@ def _buttons(p: dict[str, Any]) -> list[dict[str, Any]]:
         return []
     links = [
         ("DexScreener", f"https://dexscreener.com/{quote(chain)}/{quote(pair)}"),
+        ("Open GMGN", f"https://gmgn.ai/{'sol' if chain == 'solana' else 'bsc'}/token/{quote(address)}"),
         (("BscScan" if chain == "bsc" else "Solscan"),
          f"https://bscscan.com/token/{quote(address)}" if chain == "bsc" else
          f"https://solscan.io/token/{quote(address)}"),
@@ -125,6 +126,7 @@ def format_discord_event(event_type: str, p: dict[str, Any]) -> dict[str, Any]:
         ]
     if event_type == "EARLY_RADAR":
         fields.append({"name": "Status", "value": "LOWER CONFIDENCE — NOT A QUALIFIED SIGNAL", "inline": False})
+        fields.append({"name": "Qualification", "value": "Evidence and safety gates still apply; Radar is not a buy instruction.", "inline": False})
     return {
         "content": f"{title}\n`{address}`",
         "embeds": [{"title": title, "description": text[:3500], "color": colors.get(event_type, 0x64748B),

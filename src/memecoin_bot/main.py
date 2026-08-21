@@ -18,6 +18,8 @@ from memecoin_bot.providers.dexscreener import DexScreenerProvider
 from memecoin_bot.providers.solana_rpc import SolanaRpcProvider
 from memecoin_bot.providers.bsc_rpc import BscRpcProvider, ChainSafetyRouter
 from memecoin_bot.providers.geckoterminal import GeckoTerminalDiscoveryProvider
+from memecoin_bot.providers.gmgn import GmgnProvider
+from memecoin_bot.radar_board import start_radar_board
 from memecoin_bot.replay import ReplayRunner
 from memecoin_bot.service import IntelligenceService
 
@@ -31,6 +33,10 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
         "high_conviction": settings.high_conviction_threshold,
         "min_confidence": settings.min_confidence_for_signal,
     })
+    store.register_config_fingerprint(settings.config_fingerprint(), settings.software_version,
+        settings.scoring_version, settings.radar_version, {"weights": settings.weights,
+        "thresholds": {"watch": settings.watch_threshold, "strong": settings.strong_threshold,
+        "high": settings.high_conviction_threshold, "confidence": settings.min_confidence_for_signal}})
     callback = store.set_provider_health
     dex_client = ResilientJsonClient(
         "dexscreener", settings.provider_timeout_seconds, settings.provider_max_retries,
@@ -61,17 +67,27 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
         GeckoTerminalDiscoveryProvider(settings.geckoterminal_base_url, gecko_bsc_client, "bsc"),
         market,
     ])
+    gmgn = None
+    if settings.gmgn_enabled:
+        gmgn_client = ResilientJsonClient(
+            "gmgn", settings.gmgn_timeout_seconds, settings.gmgn_max_retries,
+            settings.gmgn_circuit_failures, settings.gmgn_circuit_cooldown_seconds, callback,
+        )
+        gmgn = GmgnProvider(settings.gmgn_base_url, settings.gmgn_api_key or "", gmgn_client,
+                            settings.gmgn_cache_ttl_seconds, settings.gmgn_concurrency)
+    else:
+        store.set_provider_health("gmgn", False, 0, "DISABLED")
     if settings.shadow_mode and not settings.shadow_send_alerts:
         notifier = NullNotifier()
-    elif settings.discord_webhook_url or (settings.discord_token and settings.discord_channel_id):
+    elif settings.discord_webhook_url or (settings.discord_token and (settings.discord_channel_id or settings.discord_channel_ids)):
         notifier = DiscordNotifier(
-            settings.discord_token, settings.discord_channel_id,
+            settings.discord_token, settings.discord_channel_id or settings.discord_channel_ids[0],
             settings.discord_webhook_url, settings.provider_timeout_seconds,
         )
     else:
         raise ValueError("Discord credentials required when alerts are enabled")
     service = IntelligenceService(
-        settings, store, discovery, market, safety, notifier,
+        settings, store, discovery, market, safety, notifier, gmgn,
     )
     return store, service
 
@@ -130,18 +146,21 @@ async def async_main(args: argparse.Namespace) -> int:
             )))
             return 0
         server = start_health_server(settings.health_port, lambda: store.status_stats(service.started_at))
+        board = start_radar_board(settings.radar_board_port, store, service.started_at) if settings.radar_board_enabled else None
         loop = asyncio.get_running_loop()
         for sig in (signal.SIGINT, signal.SIGTERM):
             try:
                 loop.add_signal_handler(sig, service.stop)
             except (NotImplementedError, RuntimeError):
                 pass
-        if settings.discord_token and settings.discord_channel_id:
+        if settings.discord_token and (settings.discord_channel_id or settings.discord_channel_ids):
             from memecoin_bot.discord.bot_runtime import run_discord_bot
             await run_discord_bot(service, store, settings)
         else:
             await service.run()
         server.shutdown()
+        if board:
+            board.shutdown()
         return 0
     finally:
         store.close()

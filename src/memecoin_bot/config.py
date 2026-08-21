@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+import hashlib
+import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -34,11 +36,21 @@ def load_dotenv(path: str | Path = ".env") -> None:
 class Settings:
     discord_token: str | None = None
     discord_channel_id: int | None = None
+    discord_channel_ids: tuple[int, ...] = ()
     discord_webhook_url: str | None = None
     solana_rpc_url: str = "https://api.mainnet-beta.solana.com"
     dexscreener_base_url: str = "https://api.dexscreener.com"
     geckoterminal_base_url: str = "https://api.geckoterminal.com/api/v2"
     bsc_rpc_url: str = "https://bsc-dataseed.bnbchain.org"
+    gmgn_enabled: bool = False
+    gmgn_api_key: str | None = None
+    gmgn_base_url: str = "https://openapi.gmgn.ai"
+    gmgn_timeout_seconds: float = 10
+    gmgn_cache_ttl_seconds: float = 120
+    gmgn_max_retries: int = 2
+    gmgn_circuit_failures: int = 4
+    gmgn_circuit_cooldown_seconds: float = 60
+    gmgn_concurrency: int = 4
     database_path: Path = Path("data/memecoin.db")
     log_level: str = "INFO"
     shadow_mode: bool = True
@@ -86,28 +98,45 @@ class Settings:
         "narrative": 25, "social": 20, "onchain": 20,
         "developer": 15, "momentum": 15, "safety": 5,
     })
-    scoring_version: str = "v1.2-radar-multichain"
+    scoring_version: str = "v1.3-intelligence-gmgn"
     milestones: tuple[float, ...] = (1.5, 2, 3, 5, 10, 25, 50, 100)
     failure_multiple: float = 0.30
     inactivity_timeout_hours: float = 24
     alert_cooldown_seconds: float = 900
     health_port: int = 8080
+    radar_board_enabled: bool = True
+    radar_board_port: int = 8081
+    software_version: str = "1.3.0"
+    radar_version: str = "v1.3-radar"
 
     @classmethod
     def from_env(cls) -> "Settings":
         load_dotenv()
         channel = os.getenv("DISCORD_CHANNEL_ID")
+        channels = tuple(int(x.strip()) for x in os.getenv("DISCORD_CHANNEL_IDS", "").split(",") if x.strip())
+        if channel and int(channel) not in channels:
+            channels = (int(channel), *channels)
         milestones = tuple(float(x) for x in os.getenv(
             "MILESTONES", "1.5,2,3,5,10,25,50,100"
         ).split(",") if x.strip())
         return cls(
             discord_token=os.getenv("DISCORD_TOKEN") or None,
             discord_channel_id=int(channel) if channel else None,
+            discord_channel_ids=channels,
             discord_webhook_url=os.getenv("DISCORD_WEBHOOK_URL") or None,
             solana_rpc_url=os.getenv("SOLANA_RPC_URL", "https://api.mainnet-beta.solana.com"),
             dexscreener_base_url=os.getenv("DEXSCREENER_BASE_URL", "https://api.dexscreener.com"),
             geckoterminal_base_url=os.getenv("GECKOTERMINAL_BASE_URL", "https://api.geckoterminal.com/api/v2"),
             bsc_rpc_url=os.getenv("BSC_RPC_URL", "https://bsc-dataseed.bnbchain.org"),
+            gmgn_enabled=_bool("GMGN_ENABLED", False),
+            gmgn_api_key=os.getenv("GMGN_API_KEY") or None,
+            gmgn_base_url=os.getenv("GMGN_BASE_URL", "https://openapi.gmgn.ai").rstrip("/"),
+            gmgn_timeout_seconds=_float("GMGN_TIMEOUT_SECONDS", 10),
+            gmgn_cache_ttl_seconds=_float("GMGN_CACHE_TTL_SECONDS", 120),
+            gmgn_max_retries=_int("GMGN_MAX_RETRIES", 2),
+            gmgn_circuit_failures=_int("GMGN_CIRCUIT_FAILURES", 4),
+            gmgn_circuit_cooldown_seconds=_float("GMGN_CIRCUIT_COOLDOWN_SECONDS", 60),
+            gmgn_concurrency=_int("GMGN_CONCURRENCY", 4),
             database_path=Path(os.getenv("DATABASE_PATH", "data/memecoin.db")),
             log_level=os.getenv("LOG_LEVEL", "INFO"),
             shadow_mode=_bool("SHADOW_MODE", True),
@@ -159,12 +188,16 @@ class Settings:
                 "momentum": _float("WEIGHT_MOMENTUM", 15),
                 "safety": _float("WEIGHT_SAFETY", 5),
             },
-            scoring_version=os.getenv("SCORING_VERSION", "v1.2-radar-multichain"),
+            scoring_version=os.getenv("SCORING_VERSION", "v1.3-intelligence-gmgn"),
             milestones=milestones,
             failure_multiple=_float("FAILURE_MULTIPLE", 0.30),
             inactivity_timeout_hours=_float("INACTIVITY_TIMEOUT_HOURS", 24),
             alert_cooldown_seconds=_float("ALERT_COOLDOWN_SECONDS", 900),
             health_port=_int("HEALTH_PORT", 8080),
+            radar_board_enabled=_bool("RADAR_BOARD_ENABLED", True),
+            radar_board_port=_int("RADAR_BOARD_PORT", 8081),
+            software_version=os.getenv("SOFTWARE_VERSION", "1.3.0"),
+            radar_version=os.getenv("RADAR_VERSION", "v1.3-radar"),
         )
 
     def validate(self) -> None:
@@ -184,3 +217,23 @@ class Settings:
             raise ValueError("Candidate monitoring settings must be positive")
         if self.missed_runner_multiple > self.major_missed_runner_multiple:
             raise ValueError("MISSED_RUNNER_MULTIPLE cannot exceed MAJOR_MISSED_RUNNER_MULTIPLE")
+        if self.gmgn_enabled and not self.gmgn_api_key:
+            raise ValueError("GMGN_ENABLED requires a read-only GMGN_API_KEY")
+        if min(self.gmgn_timeout_seconds, self.gmgn_cache_ttl_seconds,
+               self.gmgn_concurrency, self.radar_board_port) <= 0:
+            raise ValueError("GMGN and Radar Board settings must be positive")
+
+    def config_fingerprint(self) -> str:
+        """Stable fingerprint of decision settings; credentials are deliberately excluded."""
+        payload = {
+            "software_version": self.software_version, "scoring_version": self.scoring_version,
+            "radar_version": self.radar_version, "weights": self.weights,
+            "thresholds": [self.watch_threshold, self.strong_threshold,
+                           self.high_conviction_threshold, self.min_confidence_for_signal],
+            "radar": [self.radar_score_threshold, self.radar_min_conditions,
+                      self.radar_min_liquidity_usd, self.radar_max_market_cap_usd],
+            "safety": [self.reject_mint_authority, self.reject_freeze_authority,
+                       self.max_top10_percent],
+        }
+        raw = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+        return hashlib.sha256(raw.encode()).hexdigest()

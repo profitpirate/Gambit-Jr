@@ -52,21 +52,23 @@ class ResilientJsonClient:
         raise CircuitOpen(f"{self.name} circuit is open")
 
     async def request(
-        self, url: str, method: str = "GET", payload: dict[str, Any] | None = None
+        self, url: str, method: str = "GET", payload: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
     ) -> Any:
         self._check_circuit()
         last: Exception | None = None
         for attempt in range(self.retries + 1):
             try:
                 data = None if payload is None else json.dumps(payload).encode()
-                headers = {
+                request_headers = {
                     "Accept": "application/json",
                     "Content-Type": "application/json",
                     "User-Agent": "solana-memecoin-intelligence/1.0",
                 }
+                request_headers.update(headers or {})
 
                 def perform() -> Any:
-                    request = urllib.request.Request(url, data=data, headers=headers, method=method)
+                    request = urllib.request.Request(url, data=data, headers=request_headers, method=method)
                     with urllib.request.urlopen(request, timeout=self.timeout) as response:
                         return json.loads(response.read().decode("utf-8"))
 

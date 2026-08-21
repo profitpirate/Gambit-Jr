@@ -27,6 +27,16 @@ class DiscordNotifier:
         else:
             raise ValueError("Discord requires webhook URL or both bot token and channel ID")
 
+    async def send_to(self, channel_id: int, content: str | dict[str, Any]) -> str | None:
+        if not self.token:
+            return await self.send(content)
+        original = self.url
+        try:
+            self.url = f"https://discord.com/api/v10/channels/{channel_id}/messages"
+            return await self.send(content)
+        finally:
+            self.url = original
+
     async def send(self, content: str | dict[str, Any]) -> str | None:
         message = content if isinstance(content, dict) else {
             "content": content, "allowed_mentions": {"parse": []}
