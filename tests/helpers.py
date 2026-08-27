@@ -1,13 +1,17 @@
 from __future__ import annotations
 
-from pathlib import Path
 from contextlib import contextmanager
+from pathlib import Path
 from uuid import uuid4
 
 from memecoin_bot.config import Settings
 from memecoin_bot.database import Store
 from memecoin_bot.models import (
-    DiscoveryEvent, MarketSnapshot, ScoreResult, SignalClass, iso,
+    DiscoveryEvent,
+    MarketSnapshot,
+    ScoreResult,
+    SignalClass,
+    iso,
 )
 
 

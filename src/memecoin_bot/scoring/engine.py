@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from memecoin_bot.config import Settings
 from memecoin_bot.models import ScoreResult, SignalClass
 

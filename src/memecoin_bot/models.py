@@ -1,17 +1,17 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
 
 def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def iso(value: datetime | None = None) -> str:
-    return (value or utcnow()).astimezone(timezone.utc).isoformat()
+    return (value or utcnow()).astimezone(UTC).isoformat()
 
 
 class Availability(StrEnum):

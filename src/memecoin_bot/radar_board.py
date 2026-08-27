@@ -5,7 +5,6 @@ import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-
 HTML = """<!doctype html><html><head><meta charset=utf-8><meta name=viewport content='width=device-width'>
 <title>Gambit Jr Live Intelligence</title><style>
 :root{color-scheme:dark;background:#07111f;color:#e5edf8;font:14px system-ui}body{margin:0;padding:24px}h1{letter-spacing:.16em}.sub{color:#69d5ff}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}.card,table{background:#0d1b2d;border:1px solid #213650;border-radius:10px}.card{padding:14px}table{width:100%;border-collapse:collapse;margin-top:20px;overflow:hidden}th,td{padding:10px;border-bottom:1px solid #1c3049;text-align:left}th{color:#85a5c8}.hot{color:#ffb84d}.risk{color:#ff6b7a}a{color:#69d5ff}@media(max-width:700px){body{padding:12px}.wide{overflow:auto}}
@@ -16,7 +15,7 @@ async function load(){const address=new URLSearchParams(location.search).get('ad
 
 def start_radar_board(port: int, store: object, started_at: str) -> ThreadingHTTPServer:
     class Handler(BaseHTTPRequestHandler):
-        def do_GET(self) -> None:  # noqa: N802
+        def do_GET(self) -> None:
             path = urlparse(self.path)
             if path.path in {"/", "/index.html", "/token.html"}:
                 body, content_type = HTML.encode(), "text/html; charset=utf-8"

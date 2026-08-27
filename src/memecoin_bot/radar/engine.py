@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
 
 from memecoin_bot.config import Settings
 from memecoin_bot.models import MarketSnapshot, RadarResult
 
 
-def _ratio(current: float | int | None, previous: float | int | None) -> float | None:
+def _ratio(current: float | None, previous: float | None) -> float | None:
     if current is None or previous is None or float(previous) <= 0:
         return None
     return float(current) / float(previous)
@@ -27,9 +27,9 @@ class RadarEngine:
     ) -> RadarResult:
         if not basic_safety_passed or len(previous) + 1 < self.settings.radar_min_snapshots:
             return RadarResult(False, 0, [], ["BASIC_SAFETY_OR_HISTORY_INCOMPLETE"])
-        now = datetime.fromisoformat(current.captured_at.replace("Z", "+00:00"))
+        now = datetime.fromisoformat(current.captured_at)
         origin_text = current.pair_created_at or first_discovered_at
-        origin = datetime.fromisoformat(origin_text.replace("Z", "+00:00"))
+        origin = datetime.fromisoformat(origin_text)
         age_minutes = max(0, (now - origin).total_seconds() / 60)
         prior = previous[-1]
         mc_velocity = _ratio(current.market_cap_usd, prior.get("market_cap_usd"))

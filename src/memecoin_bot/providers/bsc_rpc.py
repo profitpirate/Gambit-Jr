@@ -45,7 +45,7 @@ class BscRpcProvider:
             )
             if isinstance(owner_raw, str) and len(owner_raw) >= 42:
                 owner = "0x" + owner_raw[-40:]
-                if int(owner[2:], 16) == 0:
+                if int(owner, 0) == 0:
                     result.warnings.append("BSC_OWNER_RENOUNCED")
                 else:
                     result.mint_authority = owner

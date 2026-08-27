@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from memecoin_bot.models import DiscoveryEvent, MarketSnapshot, iso
-from memecoin_bot.providers.base import ResilientJsonClient
-from memecoin_bot.providers.base import ProviderError
+from memecoin_bot.providers.base import ProviderError, ResilientJsonClient
 
 
 def _number(value: Any) -> float | None:
@@ -97,7 +96,7 @@ class DexScreenerProvider:
         created_ms = _number(pair.get("pairCreatedAt"))
         created_at = None
         if created_ms is not None:
-            created_at = datetime.fromtimestamp(created_ms / 1000, tz=timezone.utc).isoformat()
+            created_at = datetime.fromtimestamp(created_ms / 1000, tz=UTC).isoformat()
         labels = [str(x).lower() for x in pair.get("labels") or []]
         launchpad = next((x for x in labels if "pump" in x or "moon" in x), None)
         socials = [

@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 
 def format_status(stats: dict[str, Any]) -> str:
     started = datetime.fromisoformat(stats["started_at"])
-    uptime = datetime.now(timezone.utc) - started
+    uptime = datetime.now(UTC) - started
     hours, remainder = divmod(int(uptime.total_seconds()), 3600)
     minutes = remainder // 60
     providers = (
@@ -38,7 +38,7 @@ def format_status(stats: dict[str, Any]) -> str:
 def format_candidates(rows: list[Any]) -> str:
     if not rows:
         return "No active pre-signal candidates."
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     blocks = ["Strongest active candidates"]
     for row in rows:
         age = max(

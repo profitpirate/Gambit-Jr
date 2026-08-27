@@ -4,18 +4,24 @@ import asyncio
 import json
 import os
 import sqlite3
-from pathlib import Path
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from memecoin_bot.config import Settings
 from memecoin_bot.intelligence import (
-    constant_product_impact, entry_quality, priority, probable_rug, reconcile_field,
-    social_presence, stale_alert, wallet_intelligence,
+    constant_product_impact,
+    entry_quality,
+    priority,
+    probable_rug,
+    reconcile_field,
+    social_presence,
+    stale_alert,
+    wallet_intelligence,
 )
 from memecoin_bot.models import DiscoveryEvent, MarketSnapshot, RadarResult, iso
 from memecoin_bot.providers.base import ProviderError
-from memecoin_bot.providers.gmgn import GmgnProvider, READ_ONLY_ROUTES
+from memecoin_bot.providers.gmgn import READ_ONLY_ROUTES, GmgnProvider
 from memecoin_bot.signals import format_discord_event, radar_payload
 from tests.helpers import store, temp_db_path
 

@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import json
 from datetime import datetime
 
 from memecoin_bot.config import Settings
 from memecoin_bot.database import Store
-from memecoin_bot.models import iso
 from memecoin_bot.providers.dexscreener import DexScreenerProvider
 
 
@@ -60,8 +58,7 @@ class SignalTracker:
                 ).fetchone()
                 is not None
             )
-            if multiple <= self.settings.failure_multiple:
-                if self.store.fail_signal(
+            if multiple <= self.settings.failure_multiple and self.store.fail_signal(
                     int(signal["id"]),
                     dict(
                         payload,
@@ -72,5 +69,5 @@ class SignalTracker:
                         ),
                     ),
                 ):
-                    stats["failed"] += 1
+                stats["failed"] += 1
         return stats

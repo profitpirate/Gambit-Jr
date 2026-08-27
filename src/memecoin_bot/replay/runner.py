@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -79,15 +79,15 @@ class ReplayRunner:
     def _shift_time(value: str | None, offset: timedelta) -> str | None:
         if value is None:
             return None
-        return (datetime.fromisoformat(value.replace("Z", "+00:00")) + offset).isoformat()
+        return (datetime.fromisoformat(value) + offset).isoformat()
 
     async def run(self, fixture_path: str | Path) -> dict[str, Any]:
         fixture = self.load(fixture_path)
         source_times = [
-            datetime.fromisoformat(t["discovery"]["discovered_at"].replace("Z", "+00:00"))
+            datetime.fromisoformat(t["discovery"]["discovered_at"])
             for t in fixture["tokens"]
         ]
-        offset = datetime.now(timezone.utc) - timedelta(minutes=2) - min(source_times)
+        offset = datetime.now(UTC) - timedelta(minutes=2) - min(source_times)
         sequences: dict[str, list[MarketSnapshot]] = {}
         safeties: dict[str, SafetyAssessment] = {}
         discoveries: list[DiscoveryEvent] = []

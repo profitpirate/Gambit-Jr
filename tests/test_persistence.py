@@ -26,11 +26,10 @@ class PersistenceTests(unittest.TestCase):
         with temp_db_path() as path:
             db = store(path)
             signal_id = create_signal(db)
-            with self.assertRaises(sqlite3.IntegrityError):
-                with db.conn:
-                    db.conn.execute(
-                        "UPDATE signals SET signal_market_cap_usd=999 WHERE id=?", (signal_id,)
-                    )
+            with self.assertRaises(sqlite3.IntegrityError), db.conn:
+                db.conn.execute(
+                    "UPDATE signals SET signal_market_cap_usd=999 WHERE id=?", (signal_id,)
+                )
             self.assertEqual(db.signal(signal_id)["signal_market_cap_usd"], 30_000)
             db.close()
 

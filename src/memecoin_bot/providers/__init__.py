@@ -1,12 +1,12 @@
-from .dexscreener import DexScreenerProvider
-from .solana_rpc import SolanaRpcProvider
 from .bsc_rpc import BscRpcProvider, ChainSafetyRouter
+from .dexscreener import DexScreenerProvider
 from .geckoterminal import GeckoTerminalDiscoveryProvider
+from .solana_rpc import SolanaRpcProvider
 
 __all__ = [
-    "DexScreenerProvider",
-    "SolanaRpcProvider",
     "BscRpcProvider",
     "ChainSafetyRouter",
+    "DexScreenerProvider",
     "GeckoTerminalDiscoveryProvider",
+    "SolanaRpcProvider",
 ]

@@ -1,10 +1,17 @@
 from __future__ import annotations
 
 import unittest
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
-from memecoin_bot.models import CandidateState, DiscoveryEvent, MarketSnapshot, SafetyAssessment, SignalClass, iso
 from memecoin_bot.config import Settings
+from memecoin_bot.models import (
+    CandidateState,
+    DiscoveryEvent,
+    MarketSnapshot,
+    SafetyAssessment,
+    SignalClass,
+    iso,
+)
 from memecoin_bot.momentum import MomentumEngine
 from memecoin_bot.scoring import ScoringEngine
 from memecoin_bot.service import IntelligenceService
@@ -44,7 +51,7 @@ class NullNotifier:
 def snapshot(address: str, mc: float, liquidity: float, volume: float, buys: int, sells: int) -> MarketSnapshot:
     return MarketSnapshot(
         token_address=address, captured_at=iso(), source="fixture", symbol="LIFE", name="Lifecycle",
-        pair_created_at=(datetime.now(timezone.utc) - timedelta(minutes=2)).isoformat(),
+        pair_created_at=(datetime.now(UTC) - timedelta(minutes=2)).isoformat(),
         market_cap_usd=mc, price_usd=mc / 1_000_000_000, liquidity_usd=liquidity,
         volume_5m_usd=volume, buys_5m=buys, sells_5m=sells, price_change_5m=10,
     )

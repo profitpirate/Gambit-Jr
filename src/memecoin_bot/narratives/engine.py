@@ -5,7 +5,6 @@ from typing import Any
 
 from memecoin_bot.models import DiscoveryEvent, MarketSnapshot
 
-
 CATEGORIES: dict[str, set[str]] = {
     "AI": {"ai", "agent", "robot", "gpt", "neural", "人工智能", "未来ai", "에이아이"},
     "SOLANA": {"solana", "sol", "pump", "bonk"},

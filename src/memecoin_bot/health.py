@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 import threading
+from collections.abc import Callable
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Callable
 
 
 def start_health_server(port: int, status: Callable[[], dict]) -> ThreadingHTTPServer:
     class Handler(BaseHTTPRequestHandler):
-        def do_GET(self) -> None:  # noqa: N802
+        def do_GET(self) -> None:
             if self.path not in {"/health", "/status"}:
                 self.send_response(404)
                 self.end_headers()
@@ -16,7 +17,15 @@ def start_health_server(port: int, status: Callable[[], dict]) -> ThreadingHTTPS
             try:
                 payload = status()
                 code = 200
-            except Exception as exc:  # health endpoint must stay independently observable
+            except (
+                AttributeError,
+                KeyError,
+                OSError,
+                RuntimeError,
+                sqlite3.Error,
+                TypeError,
+                ValueError,
+            ) as exc:
                 payload = {"status": "error", "error": str(exc)}
                 code = 503
             body = json.dumps(payload, default=str).encode()

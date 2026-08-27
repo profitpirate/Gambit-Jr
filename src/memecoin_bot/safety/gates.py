@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from memecoin_bot.config import Settings
 from memecoin_bot.models import MarketSnapshot, SafetyAssessment
@@ -43,8 +43,8 @@ class SafetyGates:
         return reasons
 
     def expiry(self, market: MarketSnapshot, first_discovered_at: str) -> str | None:
-        now = datetime.now(timezone.utc)
-        discovered = datetime.fromisoformat(first_discovered_at.replace("Z", "+00:00"))
+        now = datetime.now(UTC)
+        discovered = datetime.fromisoformat(first_discovered_at)
         if (now - discovered).total_seconds() / 60 > self.settings.candidate_max_age_minutes:
             return "CANDIDATE_MAX_AGE_EXCEEDED"
         if (
@@ -53,7 +53,7 @@ class SafetyGates:
         ):
             return "MARKET_CAP_ABOVE_CANDIDATE_RANGE"
         if market.pair_created_at:
-            created = datetime.fromisoformat(market.pair_created_at.replace("Z", "+00:00"))
+            created = datetime.fromisoformat(market.pair_created_at)
             if (now - created).total_seconds() / 60 > self.settings.max_pair_age_minutes:
                 return "PAIR_TOO_OLD"
         return None

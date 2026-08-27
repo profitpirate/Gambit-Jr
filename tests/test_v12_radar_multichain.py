@@ -1,13 +1,19 @@
 from __future__ import annotations
 
 import unittest
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from memecoin_bot.config import Settings
 from memecoin_bot.discovery import DiscoveryPoller
 from memecoin_bot.models import (
-    CandidateState, DiscoveryEvent, MarketSnapshot, RadarResult, SafetyAssessment,
-    ScoreResult, SignalClass, iso,
+    CandidateState,
+    DiscoveryEvent,
+    MarketSnapshot,
+    RadarResult,
+    SafetyAssessment,
+    ScoreResult,
+    SignalClass,
+    iso,
 )
 from memecoin_bot.narratives import NarrativeEngine
 from memecoin_bot.providers.base import ProviderError
@@ -23,7 +29,7 @@ def market(address: str, chain: str, mc: float, liq: float, vol: float,
     return MarketSnapshot(
         token_address=address, chain=chain, captured_at=iso(), source="test", symbol="猫AI",
         name="🚀猫AI", pair_address="pair123", pair_created_at=(
-            datetime.now(timezone.utc) - timedelta(minutes=2)
+            datetime.now(UTC) - timedelta(minutes=2)
         ).isoformat(), price_usd=mc / 1_000_000_000, market_cap_usd=mc,
         liquidity_usd=liq, volume_5m_usd=vol, buys_5m=buys, sells_5m=sells,
         price_change_5m=change,
@@ -35,7 +41,7 @@ class RadarTests(unittest.TestCase):
         self.config = Settings()
         self.engine = RadarEngine(self.config)
         self.address = "0x1111111111111111111111111111111111111111"
-        self.first_seen = (datetime.now(timezone.utc) - timedelta(minutes=2)).isoformat()
+        self.first_seen = (datetime.now(UTC) - timedelta(minutes=2)).isoformat()
 
     def test_young_accelerating_token_triggers(self):
         first = market(self.address, "bsc", 10_000, 9_000, 2_000, 10, 10)
@@ -268,7 +274,7 @@ class MissedRunnerTests(unittest.TestCase):
             db = store(path)
             address = "late-signal"
             token_id, _ = db.upsert_discovery(DiscoveryEvent(token_address=address, source="test"))
-            candidate_id, _ = db.ensure_candidate(token_id, iso(), "v1.2")
+            _candidate_id, _ = db.ensure_candidate(token_id, iso(), "v1.2")
             first = market(address, "solana", 10_000, 10_000, 1_000, 10, 10)
             peak = market(address, "solana", 100_000, 20_000, 20_000, 100, 20)
             db.save_snapshot(token_id, first)

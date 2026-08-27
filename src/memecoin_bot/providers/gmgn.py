@@ -10,7 +10,6 @@ from urllib.parse import urlencode
 from memecoin_bot.models import iso
 from memecoin_bot.providers.base import ProviderError, ResilientJsonClient
 
-
 READ_ONLY_ROUTES = {
     "info": "/v1/token/info",
     "security": "/v1/token/security",

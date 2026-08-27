@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from memecoin_bot.models import DiscoveryEvent, iso
 from memecoin_bot.providers.base import ResilientJsonClient
 
