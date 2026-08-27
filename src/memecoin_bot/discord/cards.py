@@ -42,6 +42,14 @@ def _value(value: Any, fallback: str = "UNKNOWN") -> str:
     return fallback if value is None or value == "" else str(value)
 
 
+def _multiple(value: Any) -> str:
+    return "UNKNOWN" if value is None else f"{float(value):.2f}x"
+
+
+def _percent(value: Any) -> str:
+    return "UNKNOWN" if value is None else f"{float(value):.1f}%"
+
+
 def _field(name: str, value: Any, inline: bool = True) -> dict[str, Any]:
     return {"name": name, "value": _value(value)[:1024], "inline": inline}
 
@@ -68,32 +76,34 @@ def card(
 
 
 def status_card(stats: dict[str, Any]) -> dict[str, Any]:
-    providers = (
+    provider_rows = stats.get("provider_status")
+    providers = "UNKNOWN" if provider_rows is None else (
         "\n".join(
             f"{'🟢' if p['state'] == 'HEALTHY' else '⚪' if p['state'] == 'DISABLED' else '🟠' if p['state'] in {'DEGRADED', 'RATE_LIMITED', 'CIRCUIT_OPEN'} else '🔴'} "
             f"{str(p['provider']).upper()} — {str(p['state']).replace('_', ' ')}"
-            for p in stats.get("provider_status", [])
+            for p in provider_rows
         )
         or "No provider observations yet"
     )
-    reconciliation = stats.get("state_reconciliation", {})
+    reconciliation = stats.get("state_reconciliation")
     v14 = stats.get("v14") or {}
     queue = stats.get("event_queue") or {}
     live = (
-        f"Watching: **{stats.get('candidates_watching', 0)}**\n"
-        f"Pending: **{stats.get('pending_evidence', 0)}**\n"
-        f"Radar: **{stats.get('early_radar', 0)}**\n"
-        f"Active signals: **{stats.get('active_signals', 0)}**"
+        f"Watching: **{_value(stats.get('candidates_watching'))}**\n"
+        f"Pending: **{_value(stats.get('pending_evidence'))}**\n"
+        f"Radar: **{_value(stats.get('early_radar'))}**\n"
+        f"Active signals: **{_value(stats.get('active_signals'))}**"
     )
     pipeline = (
-        f"Pending >1h: **{stats.get('pending_over_1h', 0)}**\n"
-        f"Pending >3h: **{stats.get('pending_over_3h', 0)}**\n"
-        f"Stale beyond TTL: **{stats.get('stale_beyond_ttl', 0)}**"
+        f"Pending >1h: **{_value(stats.get('pending_over_1h'))}**\n"
+        f"Pending >3h: **{_value(stats.get('pending_over_3h'))}**\n"
+        f"Stale beyond TTL: **{_value(stats.get('stale_beyond_ttl'))}**"
     )
     lifetime = (
-        f"Discovered: **{stats.get('tokens_discovered', 0)}**\n"
-        f"Evaluated: **{stats.get('tokens_evaluated', 0)}**\n"
-        f"Signals: **{stats.get('signals', 0)}**\nExpired: **{stats.get('expired', 0)}**"
+        f"Discovered: **{_value(stats.get('tokens_discovered'))}**\n"
+        f"Evaluated: **{_value(stats.get('tokens_evaluated'))}**\n"
+        f"Signals: **{_value(stats.get('signals'))}**\n"
+        f"Expired: **{_value(stats.get('expired'))}**"
     )
     return card(
         "GAMBIT JR • SYSTEM STATUS",
@@ -106,23 +116,26 @@ def status_card(stats: dict[str, Any]) -> dict[str, Any]:
             _field("LIFETIME", lifetime, False),
             _field(
                 "DISCORD DELIVERY",
-                f"Outbox pending: **{stats.get('outbox_pending', 0)}**\n"
-                f"Delivery pending/failed: **{stats.get('discord_deliveries_pending', 0)} / {stats.get('discord_deliveries_failed', 0)}**\n"
-                f"Last error: {_value(stats.get('last_alert_error'), 'NONE')}",
+                f"Outbox pending: **{_value(stats.get('outbox_pending'))}**\n"
+                f"Delivery pending/failed: **{_value(stats.get('discord_deliveries_pending'))} / {_value(stats.get('discord_deliveries_failed'))}**\n"
+                f"Last error: "
+                f"{'UNKNOWN' if 'last_alert_error' not in stats else _value(stats.get('last_alert_error'), 'NONE')}",
                 False,
             ),
             _field(
                 "STATE RECONCILIATION",
-                "OK"
+                "UNKNOWN"
+                if reconciliation is None
+                else "OK"
                 if reconciliation.get("difference") == 0
-                else f"DIFFERENCE {reconciliation.get('difference')}",
+                else f"DIFFERENCE {_value(reconciliation.get('difference'))}",
                 False,
             ),
             _field(
                 "ALPHA ENGINE",
-                f"Event queue: **{queue.get('size', 0)} / {queue.get('maxsize', 0)}**\n"
-                f"Persisted events: **{v14.get('event_queue_persisted', 0)}**\n"
-                f"Wallet clusters: **{v14.get('wallet_clusters', 0)}**",
+                f"Event queue: **{_value(queue.get('size'))} / {_value(queue.get('maxsize'))}**\n"
+                f"Persisted events: **{_value(v14.get('event_queue_persisted'))}**\n"
+                f"Wallet clusters: **{_value(v14.get('wallet_clusters'))}**",
                 False,
             ),
         ],
@@ -338,7 +351,8 @@ def rows_card(
 
 
 def performance_card(report: dict[str, Any]) -> dict[str, Any]:
-    sample = int(report.get("total_signals") or 0)
+    raw_sample = report.get("total_signals")
+    sample = int(raw_sample) if raw_sample is not None else None
     warning = "\n\n**SMALL SAMPLE • NOT YET RELIABLE**" if report.get("small_sample") else ""
     return card(
         "PERFORMANCE • MEASURED OUTCOMES",
@@ -347,10 +361,10 @@ def performance_card(report: dict[str, Any]) -> dict[str, Any]:
         [
             _field("Signals", report.get("total_signals")),
             _field("Failed", report.get("failed")),
-            _field("Median peak", f"{float(report.get('median_max_multiple') or 0):.2f}x"),
-            _field("2x rate", f"{float(report.get('2x_rate') or 0):.1f}%"),
-            _field("5x rate", f"{float(report.get('5x_rate') or 0):.1f}%"),
-            _field("10x rate", f"{float(report.get('10x_rate') or 0):.1f}%"),
+            _field("Median peak", _multiple(report.get("median_max_multiple"))),
+            _field("2x rate", _percent(report.get("2x_rate"))),
+            _field("5x rate", _percent(report.get("5x_rate"))),
+            _field("10x rate", _percent(report.get("10x_rate"))),
             _field("Mature sample", sample),
             _field(
                 "Qualified 2x precision",

@@ -1,7 +1,12 @@
 from __future__ import annotations
 
 import asyncio
+import functools
+import logging
+import time
+from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime, timedelta
+from typing import Any, TypeVar
 
 try:
     import discord
@@ -26,16 +31,60 @@ from memecoin_bot.discord.cards import (
     wallet_card,
     watchlist_card,
 )
+from memecoin_bot.discord.command_center import (
+    CommandCenterData,
+    MenuView,
+    _safe_failure_log,
+    run_component_callback,
+    safe_interaction_error,
+)
+from memecoin_bot.observability.logging import event
+
+CommandCallback = TypeVar("CommandCallback", bound=Callable[..., Awaitable[None]])
 
 if discord is not None:
 
     class ScanView(discord.ui.View):
-        def __init__(self, service: object, store: object, address: str, chain: str):
+        def __init__(
+            self,
+            service: object,
+            store: object,
+            address: str,
+            chain: str,
+            logger: logging.Logger | None = None,
+        ):
             super().__init__(timeout=300)
             self.service = service
             self.store = store
             self.address = address
             self.chain = chain
+            self.log = logger or logging.getLogger("memecoin_bot.discord")
+            self.message: discord.InteractionMessage | None = None
+
+        async def on_timeout(self) -> None:
+            for item in self.children:
+                if hasattr(item, "disabled"):
+                    item.disabled = True
+            if self.message is not None:
+                try:
+                    await self.message.edit(view=self)
+                except discord.HTTPException:
+                    pass
+
+        async def on_error(
+            self,
+            interaction: discord.Interaction,
+            error: Exception,
+            item: discord.ui.Item[Any],
+        ) -> None:
+            _safe_failure_log(
+                self.log,
+                "component_callback_failed",
+                error,
+                custom_id=getattr(item, "custom_id", "UNKNOWN"),
+                result="failure",
+            )
+            await safe_interaction_error(interaction)
 
         @discord.ui.button(
             label="Refresh", style=discord.ButtonStyle.primary, custom_id="gambit:scan:refresh"
@@ -43,29 +92,41 @@ if discord is not None:
         async def refresh(
             self, interaction: discord.Interaction, _button: discord.ui.Button
         ) -> None:
-            await interaction.response.defer()
-            result = await self.service.manual_scan(
-                self.address, self.chain, interaction.guild_id, interaction.user.id
-            )
-            await interaction.edit_original_response(
-                embed=discord.Embed.from_dict(scan_card(result)["embed"]), view=self
+            async def refresh_scan() -> None:
+                result = await self.service.manual_scan(
+                    self.address, self.chain, interaction.guild_id, interaction.user.id
+                )
+                await interaction.edit_original_response(
+                    embed=discord.Embed.from_dict(scan_card(result)["embed"]), view=self
+                )
+
+            await run_component_callback(
+                interaction, "gambit:scan:refresh", self.log, refresh_scan
             )
 
         @discord.ui.button(
             label="Watch", style=discord.ButtonStyle.secondary, custom_id="gambit:scan:watch"
         )
         async def watch(self, interaction: discord.Interaction, _button: discord.ui.Button) -> None:
-            await interaction.response.defer(ephemeral=True)
-            created = await asyncio.to_thread(
-                self.store.add_watch,
-                interaction.guild_id,
-                interaction.user.id,
-                self.chain,
-                self.address,
-            )
-            await interaction.followup.send(
-                "Added to your watchlist." if created else "Already on your watchlist.",
-                ephemeral=True,
+            async def add_watch() -> None:
+                created = await asyncio.to_thread(
+                    self.store.add_watch,
+                    interaction.guild_id,
+                    interaction.user.id,
+                    self.chain,
+                    self.address,
+                )
+                await interaction.followup.send(
+                    "Added to your watchlist." if created else "Already on your watchlist.",
+                    ephemeral=True,
+                )
+
+            await run_component_callback(
+                interaction,
+                "gambit:scan:watch",
+                self.log,
+                add_watch,
+                ephemeral_defer=True,
             )
 
 else:  # pragma: no cover - deployment dependency guard
@@ -79,6 +140,46 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
     intents = discord.Intents.none()
     client = discord.Client(intents=intents)
     tree = app_commands.CommandTree(client)
+    log = logging.getLogger("memecoin_bot.discord")
+    menu_view = MenuView(CommandCenterData(service, store, settings), log)
+    client.add_view(menu_view)
+
+    def track_command(callback: CommandCallback) -> CommandCallback:
+        @functools.wraps(callback)
+        async def tracked(interaction: discord.Interaction, *args: Any, **kwargs: Any) -> None:
+            started = time.monotonic()
+            name = callback.__name__.removesuffix("_command").replace("_", "-")
+            event(
+                log,
+                logging.INFO,
+                "command_received",
+                command_name=name,
+                guild_id=interaction.guild_id,
+                channel_id=interaction.channel_id,
+                user_id=getattr(interaction.user, "id", None),
+            )
+            try:
+                await callback(interaction, *args, **kwargs)
+            except Exception as error:
+                _safe_failure_log(
+                    log,
+                    "command_completed",
+                    error,
+                    command_name=name,
+                    duration_ms=round((time.monotonic() - started) * 1000, 1),
+                    result="failure",
+                )
+                raise
+            event(
+                log,
+                logging.INFO,
+                "command_completed",
+                command_name=name,
+                duration_ms=round((time.monotonic() - started) * 1000, 1),
+                result="success",
+            )
+
+        return tracked  # type: ignore[return-value]
 
     def command_allowed(interaction: discord.Interaction) -> bool:
         """Commands are guild-wide; automatic-alert destination is a separate policy."""
@@ -89,16 +190,22 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         payload: dict,
         ephemeral: bool = False,
         view: discord.ui.View | None = None,
-    ) -> None:
+    ) -> discord.InteractionMessage | None:
         embed = discord.Embed.from_dict(payload["embed"])
         if payload.get("links"):
             view = view or discord.ui.View(timeout=None)
             for label, url in payload["links"]:
                 view.add_item(discord.ui.Button(label=label, url=url))
         if interaction.response.is_done():
-            await interaction.followup.send(embed=embed, view=view, ephemeral=ephemeral)
+            message = await interaction.followup.send(
+                embed=embed, view=view, ephemeral=ephemeral, wait=True
+            )
         else:
             await interaction.response.send_message(embed=embed, view=view, ephemeral=ephemeral)
+            message = await interaction.original_response()
+        if isinstance(view, ScanView):
+            view.message = message
+        return message
 
     async def send_text(
         interaction: discord.Interaction, message: str, ephemeral: bool = True
@@ -125,6 +232,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         name="status",
         description="Show truthful live scanner, pipeline, provider, and lifetime state",
     )
+    @track_command
     async def status_command(interaction: discord.Interaction) -> None:
         if await require_guild(interaction):
             stats = store.status_stats(service.started_at)
@@ -134,17 +242,21 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             await send_card(interaction, status_card(stats))
 
     @tree.command(name="menu", description="Open the complete Gambit Jr command center")
+    @track_command
     async def menu_command(interaction: discord.Interaction) -> None:
         if await require_guild(interaction):
-            await send_card(interaction, menu_card(), True)
+            payload = await menu_view.data.render("home", interaction)
+            await send_card(interaction, payload, True, menu_view)
 
     @tree.command(name="help", description="Explain Gambit Jr commands and intelligence flow")
+    @track_command
     async def help_command(interaction: discord.Interaction) -> None:
         if await require_guild(interaction):
             await send_card(interaction, menu_card(), True)
 
     @tree.command(name="performance", description="Show measured historical shadow performance")
     @app_commands.describe(period="7d, 30d, or all")
+    @track_command
     async def performance_command(interaction: discord.Interaction, period: str = "all") -> None:
         if not await require_guild(interaction):
             return
@@ -162,6 +274,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
 
     @tree.command(name="scan", description="Run a parallel read-only scan for any supported CA")
     @app_commands.describe(address="Token contract address", chain="solana or bsc")
+    @track_command
     async def scan_command(
         interaction: discord.Interaction, address: str, chain: str = "solana"
     ) -> None:
@@ -178,10 +291,11 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             interaction,
             scan_card(result),
             True,
-            ScanView(service, store, address.strip(), chain),
+            ScanView(service, store, address.strip(), chain, log),
         )
 
     @tree.command(name="compare", description="Compare two token setups side by side")
+    @track_command
     async def compare_command(
         interaction: discord.Interaction,
         address_a: str,
@@ -201,6 +315,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         await send_card(interaction, compare_card(left, right), True)
 
     @tree.command(name="watch", description="Add a token to your private server watchlist")
+    @track_command
     async def watch_command(
         interaction: discord.Interaction, address: str, chain: str = "solana"
     ) -> None:
@@ -215,6 +330,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         )
 
     @tree.command(name="unwatch", description="Remove a token from your watchlist")
+    @track_command
     async def unwatch_command(
         interaction: discord.Interaction, address: str, chain: str = "solana"
     ) -> None:
@@ -230,6 +346,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         )
 
     @tree.command(name="watchlist", description="Show your watched tokens")
+    @track_command
     async def watchlist_command(interaction: discord.Interaction) -> None:
         if await require_guild(interaction):
             await send_card(
@@ -239,6 +356,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             )
 
     @tree.command(name="candidates", description="Show strongest active pre-signal candidates")
+    @track_command
     async def candidates_command(interaction: discord.Interaction) -> None:
         if not await require_guild(interaction):
             return
@@ -255,6 +373,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         )
 
     @tree.command(name="rejections", description="Show hard and temporary rejection reasons")
+    @track_command
     async def rejections_command(interaction: discord.Interaction) -> None:
         if not await require_guild(interaction):
             return
@@ -277,6 +396,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
 
     @tree.command(name="missed", description="Show observed runners without a qualified signal")
     @app_commands.describe(period="24h, 7d, or 30d")
+    @track_command
     async def missed_command(interaction: discord.Interaction, period: str = "24h") -> None:
         if not await require_guild(interaction):
             return
@@ -313,6 +433,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         )
 
     @tree.command(name="radar", description="Show active Radar calls and ongoing outcomes")
+    @track_command
     async def radar_command(interaction: discord.Interaction) -> None:
         if not await require_guild(interaction):
             return
@@ -329,6 +450,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         )
 
     @tree.command(name="runners", description="Show Radar or signal entities at 2x or greater")
+    @track_command
     async def runners_command(interaction: discord.Interaction) -> None:
         if not await require_guild(interaction):
             return
@@ -347,6 +469,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         )
 
     @tree.command(name="failed", description="Show failed calls with observed outcomes")
+    @track_command
     async def failed_command(interaction: discord.Interaction) -> None:
         if not await require_guild(interaction):
             return
@@ -365,19 +488,23 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         )
 
     @tree.command(name="token", description="Show current token intelligence")
+    @track_command
     async def token_command(interaction: discord.Interaction, address: str) -> None:
         await token_reply(interaction, address)
 
     @tree.command(name="smartmoney", description="Show labelled wallet evidence for a token")
+    @track_command
     async def smartmoney_command(interaction: discord.Interaction, address: str) -> None:
         await token_reply(interaction, address, True)
 
     @tree.command(name="wallet", description="Inspect read-only wallet relationships and clusters")
+    @track_command
     async def wallet_command(interaction: discord.Interaction, address: str) -> None:
         if await require_guild(interaction):
             await send_card(interaction, wallet_card(store.wallet_report(address.strip())), True)
 
     @tree.command(name="clusters", description="Show recently observed connected-wallet clusters")
+    @track_command
     async def clusters_command(interaction: discord.Interaction) -> None:
         if await require_guild(interaction):
             await send_card(
@@ -394,6 +521,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             )
 
     @tree.command(name="creator", description="Inspect creator/deployer launch history")
+    @track_command
     async def creator_command(interaction: discord.Interaction, address: str) -> None:
         if await require_guild(interaction):
             await send_card(
@@ -405,6 +533,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
     @tree.command(
         name="narrative", description="Inspect narrative leaders, challengers, and saturation"
     )
+    @track_command
     async def narrative_command(interaction: discord.Interaction, query: str = "") -> None:
         if await require_guild(interaction):
             await send_card(
@@ -415,6 +544,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
 
     @tree.command(name="setup", description="Admin: designate a channel for automatic alerts")
     @app_commands.default_permissions(manage_guild=True)
+    @track_command
     async def setup_command(
         interaction: discord.Interaction,
         channel: discord.TextChannel | None = None,
@@ -449,6 +579,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
     @tree.command(
         name="server-settings", description="Show this server's alert destination and noise tier"
     )
+    @track_command
     async def server_settings_command(interaction: discord.Interaction) -> None:
         if await require_guild(interaction):
             await send_card(
@@ -459,6 +590,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         name="test-alert", description="Admin: send a non-live card without creating intelligence"
     )
     @app_commands.default_permissions(manage_guild=True)
+    @track_command
     async def test_alert_command(interaction: discord.Interaction) -> None:
         if not await require_guild(interaction):
             return
@@ -472,12 +604,75 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             interaction.guild_id, interaction.channel_id, interaction.user.id, str(message.id)
         )
 
+    @tree.error
+    async def on_tree_error(
+        interaction: discord.Interaction, error: app_commands.AppCommandError
+    ) -> None:
+        underlying = getattr(error, "original", error)
+        _safe_failure_log(
+            log,
+            "command_error",
+            underlying,
+            command_name=getattr(getattr(interaction, "command", None), "name", "UNKNOWN"),
+            guild_id=interaction.guild_id,
+            channel_id=interaction.channel_id,
+            user_id=getattr(interaction.user, "id", None),
+            result="failure",
+        )
+        await safe_interaction_error(interaction)
+
+    sync_lock = asyncio.Lock()
+    sync_complete = False
+
     @client.event
     async def on_ready() -> None:
-        await tree.sync()
+        nonlocal sync_complete
+        user = client.user
+        event(
+            log,
+            logging.INFO,
+            "discord_ready",
+            bot_username=str(user) if user else "UNKNOWN",
+            bot_user_id=getattr(user, "id", None),
+            application_id=client.application_id,
+            guild_count=len(client.guilds),
+        )
+        async with sync_lock:
+            if sync_complete:
+                event(log, logging.INFO, "command_sync_skipped", reason="already_synced")
+                return
+            names = sorted(command.name for command in tree.get_commands())
+            event(log, logging.INFO, "command_sync_start", command_names=names)
+            try:
+                synced = await tree.sync()
+            except Exception as error:  # noqa: BLE001 - sync is a runtime isolation boundary
+                _safe_failure_log(
+                    log,
+                    "command_sync_failure",
+                    error,
+                    command_names=names,
+                    result="failure",
+                )
+                return
+            sync_complete = True
+            event(
+                log,
+                logging.INFO,
+                "command_sync_success",
+                synced_command_count=len(synced),
+                command_names=sorted(command.name for command in synced),
+                result="success",
+            )
 
     service_task = asyncio.create_task(service.run(), name="intelligence-service")
     try:
+        event(
+            log,
+            logging.INFO,
+            "discord_connect_start",
+            persistent_view_count=1,
+            command_count=len(tree.get_commands()),
+        )
         await client.start(settings.discord_token)
     finally:
         service.stop()
