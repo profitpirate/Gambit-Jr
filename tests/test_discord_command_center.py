@@ -127,17 +127,46 @@ class FakeStore:
         self.calls.append("candidates_report")
         return [{"name": "Candidate", "state": "CANDIDATE"}]
 
+    def rejection_report(self, _since):
+        self.calls.append("rejection_report")
+        return {"hard": [("UNSAFE", 1)], "temporary": []}
+
+    def missed_report(self, *_args):
+        self.calls.append("missed_report")
+        return []
+
     def cluster_report(self, _limit):
         self.calls.append("cluster_report")
         return [{"chain": "solana", "risk_state": "LOW", "member_count": 2}]
 
-    def narrative_report(self, _query, _limit):
+    def narrative_report(self, _query, _limit=10):
         self.calls.append("narrative_report")
         return [{"label": "AI", "freshness": "FRESH"}]
 
     def user_watchlist(self, _guild_id, _user_id):
         self.calls.append("user_watchlist")
         return [{"chain": "solana", "token_address": "So111"}]
+
+    def token_intelligence(self, address):
+        self.calls.append("token_intelligence")
+        return {
+            "token_address": address,
+            "chain": "solana",
+            "symbol": "TEST",
+            "name": "Test Token",
+            "state": "SIGNALLED",
+            "signal_status": "ACTIVE",
+            "confidence": 0.8,
+            "wallet_intelligence": {},
+        }
+
+    def wallet_report(self, address):
+        self.calls.append("wallet_report")
+        return {"wallet": address, "nodes": [], "edges": [], "clusters": []}
+
+    def creator_report(self, address):
+        self.calls.append("creator_report")
+        return {"creator": address, "quality": "UNKNOWN", "launches": 0}
 
     def right_tail_performance(self, _minimum):
         self.calls.append("right_tail_performance")
@@ -168,6 +197,13 @@ class FakeStore:
     def add_watch(self, *_args):
         self.calls.append("add_watch")
         return True
+
+    def remove_watch(self, *_args):
+        self.calls.append("remove_watch")
+        return True
+
+    def record_test_alert(self, *_args):
+        self.calls.append("record_test_alert")
 
 
 class FakeService:
@@ -218,8 +254,9 @@ def item(view: discord.ui.View, custom_id: str):
 
 def test_menu_is_persistent_mobile_component_tree_with_stable_ids(command_center):
     view, _, _, _ = command_center
-    assert view.timeout is None
-    assert view.is_persistent()
+    assert view.timeout == 900
+    assert not view.is_persistent()
+    assert MenuView(view.data, timeout=None).is_persistent()
     assert len(view.children) == 4
     assert [child.custom_id for child in view.children] == [
         "gambit:menu:home",
@@ -352,6 +389,7 @@ async def capture_runtime(*, start_hook=None):
     settings = SimpleNamespace(
         discord_token="credential-must-not-be-logged",
         scoring_version="v1.5-runner-failure",
+        missed_runner_multiple=3,
         major_missed_runner_multiple=10,
         min_sample_for_edge_metrics=30,
     )
@@ -382,10 +420,11 @@ async def test_menu_command_sends_actual_ephemeral_view_and_all_commands_remain_
     tree, _client, _store = await capture_runtime()
     interaction = FakeInteraction()
     await tree.get_command("menu").callback(interaction)
-    sent = interaction.followup.messages[0]
-    assert sent["ephemeral"] is True
+    sent = interaction.edits[0]
     assert isinstance(sent["view"], MenuView)
+    assert sent["view"].timeout == 900
     assert sent["embed"].title == PAGE_TITLES["home"]
+    assert interaction.followup.messages == []
     assert len(tree.get_commands()) == 24
 
 
@@ -394,7 +433,7 @@ async def test_registered_menu_e2e_sequence_has_no_duplicate_responses():
     tree, _client, _store = await capture_runtime()
     opened = FakeInteraction()
     await tree.get_command("menu").callback(opened)
-    view = opened.followup.messages[0]["view"]
+    view = opened.edits[0]["view"]
 
     title = PAGE_TITLES["home"]
     for page in ("overview", "radar", "performance", "system", "home"):
@@ -412,7 +451,7 @@ async def test_registered_scan_e2e_refresh_then_watch():
     tree, _client, store = await capture_runtime()
     opened = FakeInteraction()
     await tree.get_command("scan").callback(opened, "So111", "solana")
-    scan_view = opened.followup.messages[0]["view"]
+    scan_view = opened.edits[0]["view"]
     assert isinstance(scan_view, bot_runtime.ScanView)
 
     refresh = FakeInteraction()
@@ -426,11 +465,74 @@ async def test_registered_scan_e2e_refresh_then_watch():
 
 
 @pytest.mark.asyncio
+async def test_scan_persistent_router_recovers_target_after_simulated_restart():
+    tree, client, store = await capture_runtime()
+    opened = FakeInteraction()
+    await tree.get_command("scan").callback(opened, "So111", "solana")
+    scan_embed = opened.edits[0]["embed"]
+    router = next(
+        view
+        for view in client.persistent_views
+        if isinstance(view, bot_runtime.ScanView)
+    )
+
+    refresh = FakeInteraction()
+    refresh.message.embeds = [scan_embed]
+    await item(router, "gambit:scan:refresh").callback(refresh)
+    assert refresh.edits[0]["embed"].title.startswith("SCAN")
+
+    watch = FakeInteraction()
+    watch.message.embeds = [scan_embed]
+    await item(router, "gambit:scan:watch").callback(watch)
+    assert watch.followup.messages[0]["content"] == "Added to your watchlist."
+    assert "add_watch" in store.calls
+
+
+@pytest.mark.asyncio
+async def test_all_24_registered_commands_complete_one_primary_response():
+    tree, _client, _store = await capture_runtime()
+    calls = {
+        "status": (),
+        "menu": (),
+        "help": (),
+        "performance": ("all",),
+        "scan": ("So111", "solana"),
+        "compare": ("So111", "So222", "solana"),
+        "watch": ("So111", "solana"),
+        "unwatch": ("So111", "solana"),
+        "watchlist": (),
+        "candidates": (),
+        "rejections": (),
+        "missed": ("24h",),
+        "radar": (),
+        "runners": (),
+        "failed": (),
+        "token": ("So111",),
+        "smartmoney": ("So111",),
+        "wallet": ("Wallet111",),
+        "clusters": (),
+        "creator": ("Creator111",),
+        "narrative": ("AI",),
+        "setup": (),
+        "server-settings": (),
+        "test-alert": (),
+    }
+    assert set(calls) == bot_runtime.EXPECTED_COMMAND_NAMES
+    for name, arguments in calls.items():
+        interaction = FakeInteraction(admin=True)
+        await tree.get_command(name).callback(interaction, *arguments)
+        assert len(interaction.edits) == 1, name
+        assert interaction.followup.messages == [], name
+
+
+@pytest.mark.asyncio
 async def test_persistent_view_is_registered_again_after_restart():
     _tree1, client1, _store1 = await capture_runtime()
     _tree2, client2, _store2 = await capture_runtime()
     assert sum(isinstance(view, MenuView) for view in client1.persistent_views) == 1
     assert sum(isinstance(view, MenuView) for view in client2.persistent_views) == 1
+    assert sum(isinstance(view, bot_runtime.ScanView) for view in client1.persistent_views) == 1
+    assert sum(isinstance(view, bot_runtime.ScanView) for view in client2.persistent_views) == 1
 
 
 @pytest.mark.asyncio
@@ -440,13 +542,13 @@ async def test_clean_database_restart_keeps_command_center_operational(tmp_path)
 
     first = Store(database_path)
     first.migrate()
-    first_view = MenuView(CommandCenterData(FakeService(), first, settings))
+    first_view = MenuView(CommandCenterData(FakeService(), first, settings), timeout=None)
     assert first_view.is_persistent()
     first.close()
 
     restarted = Store(database_path)
     restarted.migrate()
-    second_view = MenuView(CommandCenterData(FakeService(), restarted, settings))
+    second_view = MenuView(CommandCenterData(FakeService(), restarted, settings), timeout=None)
     interaction = FakeInteraction()
     await second_view.navigate(interaction, "system", "gambit:menu:system")
     assert interaction.edits[0]["embed"].title == PAGE_TITLES["system"]
@@ -461,7 +563,8 @@ async def test_unauthorized_setup_is_rejected_before_store_mutation():
     interaction = FakeInteraction(admin=False)
     await tree.get_command("setup").callback(interaction)
     assert store.setup_called is False
-    assert interaction.followup.messages[0]["content"] == "Manage Server permission is required."
+    assert interaction.edits[0]["content"] == "Manage Server permission is required."
+    assert interaction.followup.messages == []
 
 
 @pytest.mark.asyncio
@@ -472,8 +575,9 @@ async def test_global_tree_error_uses_safe_followup_after_defer(caplog):
     error = bot_runtime.app_commands.AppCommandError("DISCORD_TOKEN=not-visible")
     with caplog.at_level(logging.INFO, logger="memecoin_bot.discord"):
         await tree.on_error(interaction, error)
-    assert interaction.followup.messages[0]["content"] == SAFE_ERROR
-    assert interaction.followup.messages[0]["ephemeral"] is True
+    assert interaction.edits[0]["content"] == SAFE_ERROR
+    assert interaction.edits[0]["embed"] is None
+    assert interaction.followup.messages == []
     assert "not-visible" not in caplog.text
 
 

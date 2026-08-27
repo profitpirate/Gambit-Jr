@@ -36,11 +36,64 @@ from memecoin_bot.discord.command_center import (
     MenuView,
     _safe_failure_log,
     run_component_callback,
-    safe_interaction_error,
 )
+from memecoin_bot.discord.responses import (
+    SAFE_INTERNAL_ERROR,
+    InteractionResponder,
+    ResponseVisibility,
+    respond_command_error,
+    respond_component_error,
+)
+from memecoin_bot.discord.validation import validate_message
 from memecoin_bot.observability.logging import event
 
 CommandCallback = TypeVar("CommandCallback", bound=Callable[..., Awaitable[None]])
+EXPECTED_COMMAND_NAMES = frozenset(
+    {
+        "candidates",
+        "clusters",
+        "compare",
+        "creator",
+        "failed",
+        "help",
+        "menu",
+        "missed",
+        "narrative",
+        "performance",
+        "radar",
+        "rejections",
+        "runners",
+        "scan",
+        "server-settings",
+        "setup",
+        "smartmoney",
+        "status",
+        "test-alert",
+        "token",
+        "unwatch",
+        "wallet",
+        "watch",
+        "watchlist",
+    }
+)
+PRIVATE_COMMANDS = frozenset(
+    {
+        "compare",
+        "creator",
+        "help",
+        "menu",
+        "scan",
+        "narrative",
+        "server-settings",
+        "setup",
+        "smartmoney",
+        "token",
+        "unwatch",
+        "wallet",
+        "watch",
+        "watchlist",
+    }
+)
 
 if discord is not None:
 
@@ -49,11 +102,13 @@ if discord is not None:
             self,
             service: object,
             store: object,
-            address: str,
-            chain: str,
+            address: str | None,
+            chain: str | None,
             logger: logging.Logger | None = None,
+            *,
+            timeout: float | None = 900,
         ):
-            super().__init__(timeout=300)
+            super().__init__(timeout=timeout)
             self.service = service
             self.store = store
             self.address = address
@@ -84,7 +139,25 @@ if discord is not None:
                 custom_id=getattr(item, "custom_id", "UNKNOWN"),
                 result="failure",
             )
-            await safe_interaction_error(interaction)
+            await respond_component_error(interaction, SAFE_INTERNAL_ERROR)
+
+        def target(self, interaction: discord.Interaction) -> tuple[str, str]:
+            if self.address and self.chain:
+                return self.address, self.chain
+            message = getattr(interaction, "message", None)
+            embeds = getattr(message, "embeds", []) if message else []
+            if not embeds:
+                raise ValueError("Scan session metadata is unavailable; run /scan again.")
+            embed = embeds[0]
+            description = str(getattr(embed, "description", "") or "")
+            address = description.split("`", 2)[1] if "`" in description else ""
+            chain_field = next(
+                (field for field in getattr(embed, "fields", []) if field.name == "Chain"), None
+            )
+            chain = str(chain_field.value).lower() if chain_field else ""
+            if not address or chain not in {"solana", "bsc"}:
+                raise ValueError("Scan session metadata is invalid; run /scan again.")
+            return address, chain
 
         @discord.ui.button(
             label="Refresh", style=discord.ButtonStyle.primary, custom_id="gambit:scan:refresh"
@@ -93,11 +166,13 @@ if discord is not None:
             self, interaction: discord.Interaction, _button: discord.ui.Button
         ) -> None:
             async def refresh_scan() -> None:
+                address, chain = self.target(interaction)
                 result = await self.service.manual_scan(
-                    self.address, self.chain, interaction.guild_id, interaction.user.id
+                    address, chain, interaction.guild_id, interaction.user.id
                 )
+                embed = validate_message(card_payload=scan_card(result), view=self)
                 await interaction.edit_original_response(
-                    embed=discord.Embed.from_dict(scan_card(result)["embed"]), view=self
+                    embed=embed, view=self
                 )
 
             await run_component_callback(
@@ -109,12 +184,13 @@ if discord is not None:
         )
         async def watch(self, interaction: discord.Interaction, _button: discord.ui.Button) -> None:
             async def add_watch() -> None:
+                address, chain = self.target(interaction)
                 created = await asyncio.to_thread(
                     self.store.add_watch,
                     interaction.guild_id,
                     interaction.user.id,
-                    self.chain,
-                    self.address,
+                    chain,
+                    address,
                 )
                 await interaction.followup.send(
                     "Added to your watchlist." if created else "Already on your watchlist.",
@@ -141,14 +217,18 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
     client = discord.Client(intents=intents)
     tree = app_commands.CommandTree(client)
     log = logging.getLogger("memecoin_bot.discord")
-    menu_view = MenuView(CommandCenterData(service, store, settings), log)
-    client.add_view(menu_view)
+    menu_data = CommandCenterData(service, store, settings)
+    client.add_view(MenuView(menu_data, log, timeout=None))
+    client.add_view(ScanView(service, store, None, None, log, timeout=None))
+    response_sessions: dict[int, InteractionResponder] = {}
+    active_command_names: dict[int, str] = {}
 
     def track_command(callback: CommandCallback) -> CommandCallback:
         @functools.wraps(callback)
         async def tracked(interaction: discord.Interaction, *args: Any, **kwargs: Any) -> None:
             started = time.monotonic()
             name = callback.__name__.removesuffix("_command").replace("_", "-")
+            active_command_names[id(interaction)] = name
             event(
                 log,
                 logging.INFO,
@@ -170,6 +250,9 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
                     result="failure",
                 )
                 raise
+            finally:
+                response_sessions.pop(id(interaction), None)
+                active_command_names.pop(id(interaction), None)
             event(
                 log,
                 logging.INFO,
@@ -191,18 +274,15 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         ephemeral: bool = False,
         view: discord.ui.View | None = None,
     ) -> discord.InteractionMessage | None:
-        embed = discord.Embed.from_dict(payload["embed"])
-        if payload.get("links"):
-            view = view or discord.ui.View(timeout=None)
-            for label, url in payload["links"]:
-                view.add_item(discord.ui.Button(label=label, url=url))
-        if interaction.response.is_done():
-            message = await interaction.followup.send(
-                embed=embed, view=view, ephemeral=ephemeral, wait=True
+        session = response_sessions.get(id(interaction))
+        if session is None:
+            raise RuntimeError("Discord primary response has no active command session")
+        if ephemeral != session.visibility.ephemeral:
+            raise RuntimeError(
+                f"response visibility mismatch for {session.command_name}: "
+                f"deferred={session.visibility.value}, requested={'private' if ephemeral else 'public'}"
             )
-        else:
-            await interaction.response.send_message(embed=embed, view=view, ephemeral=ephemeral)
-            message = await interaction.original_response()
+        message = await session.primary_card(payload, view)
         if isinstance(view, ScanView):
             view.message = message
         return message
@@ -210,18 +290,29 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
     async def send_text(
         interaction: discord.Interaction, message: str, ephemeral: bool = True
     ) -> None:
-        if interaction.response.is_done():
-            await interaction.followup.send(message, ephemeral=ephemeral)
-        else:
-            await interaction.response.send_message(message, ephemeral=ephemeral)
+        session = response_sessions.get(id(interaction))
+        if session is None:
+            raise RuntimeError("Discord primary response has no active command session")
+        if ephemeral != session.visibility.ephemeral:
+            raise RuntimeError(
+                f"response visibility mismatch for {session.command_name}: "
+                f"deferred={session.visibility.value}, requested={'private' if ephemeral else 'public'}"
+            )
+        await session.primary_text(message)
 
     async def require_guild(interaction: discord.Interaction) -> bool:
         if command_allowed(interaction):
-            # Discord requires an acknowledgement within three seconds.  Every
-            # command enters this guard before database or provider work, so
-            # defer centrally instead of relying on each handler to remember.
-            if not interaction.response.is_done():
-                await interaction.response.defer(ephemeral=True)
+            command = active_command_names.get(id(interaction)) or getattr(
+                getattr(interaction, "command", None), "name", "unknown"
+            )
+            visibility = (
+                ResponseVisibility.PRIVATE
+                if command in PRIVATE_COMMANDS
+                else ResponseVisibility.PUBLIC
+            )
+            session = InteractionResponder(interaction, command, visibility, log)
+            response_sessions[id(interaction)] = session
+            await session.defer()
             return True
         await interaction.response.send_message(
             "This command is available in Discord server text channels.", ephemeral=True
@@ -245,8 +336,8 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
     @track_command
     async def menu_command(interaction: discord.Interaction) -> None:
         if await require_guild(interaction):
-            payload = await menu_view.data.render("home", interaction)
-            await send_card(interaction, payload, True, menu_view)
+            payload = await menu_data.render("home", interaction)
+            await send_card(interaction, payload, True, MenuView(menu_data, log, timeout=900))
 
     @tree.command(name="help", description="Explain Gambit Jr commands and intelligence flow")
     @track_command
@@ -291,7 +382,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             interaction,
             scan_card(result),
             True,
-            ScanView(service, store, address.strip(), chain, log),
+            ScanView(service, store, address.strip(), chain, log, timeout=900),
         )
 
     @tree.command(name="compare", description="Compare two token setups side by side")
@@ -598,8 +689,9 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         if not permissions or not permissions.manage_guild:
             await send_text(interaction, "Manage Server permission is required.")
             return
-        await send_card(interaction, test_alert_card())
-        message = await interaction.original_response()
+        message = await send_card(interaction, test_alert_card())
+        if message is None:
+            message = await interaction.original_response()
         store.record_test_alert(
             interaction.guild_id, interaction.channel_id, interaction.user.id, str(message.id)
         )
@@ -619,10 +711,15 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             user_id=getattr(interaction.user, "id", None),
             result="failure",
         )
-        await safe_interaction_error(interaction)
+        await respond_command_error(interaction, SAFE_INTERNAL_ERROR)
 
     sync_lock = asyncio.Lock()
     sync_complete = False
+    registered_names = {command.name for command in tree.get_commands()}
+    if registered_names != EXPECTED_COMMAND_NAMES:
+        missing = sorted(EXPECTED_COMMAND_NAMES - registered_names)
+        extra = sorted(registered_names - EXPECTED_COMMAND_NAMES)
+        raise RuntimeError(f"Discord command contract mismatch; missing={missing}, extra={extra}")
 
     @client.event
     async def on_ready() -> None:
@@ -670,7 +767,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             log,
             logging.INFO,
             "discord_connect_start",
-            persistent_view_count=1,
+            persistent_view_count=2,
             command_count=len(tree.get_commands()),
         )
         await client.start(settings.discord_token)

@@ -57,7 +57,14 @@ from memecoin_bot.scoring import ScoringEngine
 from memecoin_bot.signals import format_discord_event, radar_payload, signal_payload
 from memecoin_bot.social import SocialEngine
 from memecoin_bot.tracking import SignalTracker
-from memecoin_bot.v15_engine import SignalTier, Stage, evaluate_v15, tradeability
+from memecoin_bot.v15_engine import (
+    SignalTier,
+    Stage,
+    buyer_trajectory,
+    economic_concentration,
+    evaluate_v15,
+    tradeability,
+)
 
 
 def fair_chain_sample(discoveries: list[DiscoveryEvent], limit: int) -> list[DiscoveryEvent]:
@@ -77,6 +84,52 @@ def fair_chain_sample(discoveries: list[DiscoveryEvent], limit: int) -> list[Dis
         if not progressed:
             break
     return selected
+
+
+def _evidence_age_seconds(retrieved_at: str | None, observed_at: str) -> float | None:
+    if not retrieved_at:
+        return None
+    retrieved = datetime.fromisoformat(retrieved_at)
+    observed = datetime.fromisoformat(observed_at)
+    if retrieved.tzinfo is None:
+        retrieved = retrieved.replace(tzinfo=UTC)
+    if observed.tzinfo is None:
+        observed = observed.replace(tzinfo=UTC)
+    return max(0.0, (observed - retrieved).total_seconds())
+
+
+def _v15_stage(discovery: DiscoveryEvent, market: Any) -> Stage:
+    phase = str(discovery.metadata.get("launch_phase") or "").upper()
+    if "REVIVAL" in phase:
+        return Stage.REVIVAL
+    if "BOND" in phase or "CURVE" in phase:
+        return Stage.BONDING
+    return Stage.MIGRATED if market.pair_address else Stage.NEW
+
+
+def _economic_holder_rows(holders: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
+    rows = []
+    for holder in holders or []:
+        labels = holder.get("labels") or holder.get("tags") or holder.get("tag") or []
+        if isinstance(labels, str):
+            labels = [labels]
+        label_text = " ".join(str(value).lower() for value in labels)
+        rows.append(
+            {
+                "wallet": holder.get("wallet_address") or holder.get("address"),
+                "percent": holder.get("percent")
+                or holder.get("percentage")
+                or holder.get("amount_percentage"),
+                "cluster_id": holder.get("cluster_id")
+                or holder.get("funder")
+                or holder.get("funding_source"),
+                "deployer_related": "dev" in label_text or "creator" in label_text,
+                "excluded_non_economic": any(
+                    marker in label_text for marker in ("lp", "liquidity", "burn", "locker")
+                ),
+            }
+        )
+    return rows
 
 
 class IntelligenceService:
@@ -721,6 +774,7 @@ class IntelligenceService:
             providers=enrichment,
         )
         trade = tradeability(market.liquidity_usd)
+        self.store.record_v15_tradeability(candidate_id, market.captured_at, trade)
         age_minutes = max(
             0.0,
             (
@@ -729,7 +783,7 @@ class IntelligenceService:
             ).total_seconds()
             / 60,
         )
-        v15_stage = Stage.MIGRATED if market.pair_address else Stage.NEW
+        v15_stage = _v15_stage(discovery, market)
         liquidity_quality = (
             None
             if market.liquidity_usd is None
@@ -745,25 +799,125 @@ class IntelligenceService:
             if gmgn_snapshot
             else None
         )
+        concentration = economic_concentration(
+            _economic_holder_rows(gmgn_snapshot.holders if gmgn_snapshot else None)
+        )
+        actor_independence = (
+            max(0.0, 100.0 - float(concentration["effective_actor_concentration"]) * 2)
+            if gmgn_snapshot and gmgn_snapshot.holders is not None
+            else None
+        )
+        buyer_cohorts = (
+            list((gmgn_snapshot.info or {}).get("buyer_cohorts") or [])
+            if gmgn_snapshot
+            else []
+        )
+        buyer_replacement = buyer_trajectory(buyer_cohorts)
+        freshness_limit = max(60.0, self.settings.gmgn_cache_ttl_seconds * 2)
+        provenance = [
+            {
+                "field_name": "market",
+                "value": {
+                    "market_cap_usd": market.market_cap_usd,
+                    "liquidity_usd": market.liquidity_usd,
+                },
+                "provider": market.source,
+                "retrieved_at": market.captured_at,
+                "age_seconds": 0,
+                "confidence": 1,
+                "conflict_state": "KNOWN",
+            },
+            {
+                "field_name": "safety",
+                "value": {
+                    "top10_percent": safety.top10_percent,
+                    "holder_count": safety.holder_count,
+                },
+                "provider": safety.source,
+                "retrieved_at": safety.checked_at,
+                "age_seconds": _evidence_age_seconds(safety.checked_at, market.captured_at) or 0,
+                "confidence": 0 if safety_unavailable else 1,
+                "conflict_state": "UNKNOWN" if safety_unavailable else "KNOWN",
+            },
+        ]
+        if gmgn_snapshot:
+            gmgn_age = _evidence_age_seconds(gmgn_snapshot.retrieved_at, market.captured_at) or 0
+            provenance.append(
+                {
+                    "field_name": "wallet_quality",
+                    "value": {
+                        "buyer_diversity": gmgn_wallet.get("buyer_diversity"),
+                        "activity_quality": gmgn_wallet.get("activity_quality"),
+                    },
+                    "provider": "gmgn",
+                    "retrieved_at": gmgn_snapshot.retrieved_at,
+                    "age_seconds": gmgn_age,
+                    "confidence": 0.7,
+                    "conflict_state": "STALE" if gmgn_age > freshness_limit else "KNOWN",
+                }
+            )
+        self.store.record_v15_provider_evidence(candidate_id, provenance)
+        stale_evidence = [
+            row["field_name"]
+            for row in provenance
+            if float(row["age_seconds"]) > freshness_limit
+        ]
+        provider_conflicts = [
+            warning for warning in safety.warnings if "CONFLICT" in warning
+        ]
+        survival_quality = survival_result.get("score")
+        payoff_quality = payoff_result.get("score")
         if v15_stage == Stage.MIGRATED:
             v15_features = {
                 "amm_liquidity": liquidity_quality,
                 "tradeability": {"GOOD": 90, "LIMITED": 55, "POOR": 20}.get(trade["grade"]),
                 "migration_continuity": None,
                 "buyer_quality": wallet_quality,
+                "buyer_replacement": buyer_replacement.get("score"),
+                "actor_independence": actor_independence,
                 "post_migration_momentum": momentum_quality,
+                "survival_quality": survival_quality,
+                "payoff_quality": payoff_quality,
+            }
+        elif v15_stage == Stage.BONDING:
+            v15_features = {
+                "curve_progress": discovery.metadata.get("bonding_curve_progress_percent"),
+                "momentum_acceleration": momentum_quality,
+                "buyer_retention": (gmgn_snapshot.info or {}).get("buyer_retention_score")
+                if gmgn_snapshot
+                else None,
+                "buyer_replacement": buyer_replacement.get("score"),
+                "concentration_trend": (gmgn_snapshot.info or {}).get(
+                    "concentration_trend_score"
+                )
+                if gmgn_snapshot
+                else None,
+                "survival_quality": survival_quality,
+                "payoff_quality": payoff_quality,
+            }
+        elif v15_stage == Stage.REVIVAL:
+            v15_features = {
+                "abnormal_volume": momentum_quality,
+                "new_wallet_cohort": buyer_replacement.get("score"),
+                "fresh_catalyst": discovery.metadata.get("fresh_catalyst_score"),
+                "renewed_liquidity": liquidity_quality,
+                "narrative_relevance": narrative.get("score"),
+                "survival_quality": survival_quality,
+                "payoff_quality": payoff_quality,
             }
         else:
             v15_features = {
                 "launch_verified": 100 if candidate["source_event_timestamp"] else None,
                 "early_demand": momentum_quality,
-                "buyer_independence": wallet_quality,
+                "buyer_independence": actor_independence,
                 "creator_quality": (
                     None
                     if developer.get("score") is None
                     else min(100.0, float(developer["score"]) / 15 * 100)
                 ),
                 "early_liquidity": liquidity_quality,
+                "survival_quality": survival_quality,
+                "payoff_quality": payoff_quality,
             }
         v15_features.update(
             {
@@ -773,13 +927,18 @@ class IntelligenceService:
                 "vertical_acceleration": momentum.get("acceleration"),
                 "sell_restriction_unknown": "BSC_TRANSFER_RESTRICTIONS_UNKNOWN"
                 in safety.warnings,
-                "concentration_unknown": safety.top10_percent is None,
+                "concentration_unknown": (
+                    safety.top10_percent is None and actor_independence is None
+                ),
                 "toxic_creator": str(developer.get("classification")) in {"TOXIC", "KNOWN_BAD"},
                 "poor_tradeability": trade["grade"] == "POOR",
+                "connected_concentration": (
+                    actor_independence is not None and actor_independence < 40
+                ),
+                "buyer_collapse": buyer_replacement.get("state") == "BUYER_COLLAPSE",
                 "terminal_safety_failure": bool(safety.rejection_reasons),
-                "provider_conflicts": [
-                    warning for warning in safety.warnings if "CONFLICT" in warning
-                ],
+                "provider_conflicts": provider_conflicts,
+                "stale_evidence": stale_evidence,
                 "critical_unknowns": [],
                 "why_now": [
                     reason
@@ -990,7 +1149,14 @@ class IntelligenceService:
                 "setup_conviction": v15_decision.setup_conviction,
                 "evidence_coverage": v15_decision.evidence_coverage,
                 "entry_status": str(v15_decision.entry_status),
+                "survival_grade": v15_decision.survival_grade,
+                "v15_stage": str(v15_decision.stage),
+                "provider_conflicts": v15_decision.provider_conflicts,
                 "critical_unknowns": v15_decision.critical_unknowns,
+                "why_now": v15_decision.why_now,
+                "tradeability": trade,
+                "actor_concentration": concentration,
+                "buyer_replacement": buyer_replacement,
             }
         )
         signal_id = self.store.create_signal(

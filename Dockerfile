@@ -6,6 +6,7 @@ WORKDIR /app
 COPY pyproject.toml README.md ./
 COPY src ./src
 COPY migrations ./migrations
+COPY scripts ./scripts
 RUN pip install --no-cache-dir .
 
 RUN useradd --create-home --uid 10001 bot && mkdir -p /app/data /app/evidence \

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import unittest
 from datetime import UTC, datetime, timedelta
 
@@ -58,6 +59,40 @@ def snapshot(address: str, mc: float, liquidity: float, volume: float, buys: int
 
 
 class CandidateLifecycleTests(unittest.IsolatedAsyncioTestCase):
+    async def test_production_candidate_path_persists_consumed_v15_evidence(self):
+        with temp_db_path() as path:
+            config = settings(path)
+            address = "V15Production111111111111111111111111111111"
+            db = store(path)
+            service = IntelligenceService(
+                config,
+                db,
+                EmptyDiscovery(),
+                SequenceMarket([snapshot(address, 20_000, 25_000, 4_000, 30, 10)]),
+                SafeRpc(),
+                NullNotifier(),
+            )
+            await service.evaluate(DiscoveryEvent(token_address=address, source="test"))
+
+            decision = db.conn.execute("SELECT * FROM v15_decisions").fetchone()
+            assert decision is not None
+            features = json.loads(decision["feature_vector_json"])
+            assert features["survival_quality"] is not None
+            assert features["payoff_quality"] is not None
+            assert "provider_conflicts" in features and "stale_evidence" in features
+            assert db.conn.execute("SELECT COUNT(*) FROM tradeability_v15").fetchone()[0] == 5
+            evidence = {
+                row[0]
+                for row in db.conn.execute(
+                    "SELECT field_name FROM provider_evidence_v15 ORDER BY field_name"
+                )
+            }
+            assert evidence == {"market", "safety"}
+            candidate = db.candidate_for_token(db.token_id(address))
+            assert candidate["runner_score"] == decision["runner_score"]
+            assert candidate["failure_score"] == decision["failure_score"]
+            db.close()
+
     async def test_low_liquidity_remains_candidate_and_duplicate_does_not_disable_monitor(self):
         with temp_db_path() as path:
             config = settings(path)

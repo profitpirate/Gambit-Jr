@@ -184,6 +184,37 @@ def format_discord_event(event_type: str, p: dict[str, Any]) -> dict[str, Any]:
             },
             {"name": "Liquidity", "value": _money(p.get("liquidity_usd")), "inline": True},
         ]
+    if event_type == "SIGNAL":
+        fields.extend(
+            [
+                {
+                    "name": "V1.5 tier",
+                    "value": _safe(p.get("v15_signal_tier")),
+                    "inline": True,
+                },
+                {
+                    "name": "Runner / failure",
+                    "value": (
+                        f"{_number(p.get('runner_score'))} / "
+                        f"{_number(p.get('failure_score'))}"
+                    ),
+                    "inline": True,
+                },
+                {
+                    "name": "Coverage / entry",
+                    "value": (
+                        f"{_number(p.get('evidence_coverage'), '%')} / "
+                        f"{_safe(p.get('entry_status'))}"
+                    ),
+                    "inline": True,
+                },
+                {
+                    "name": "Survival",
+                    "value": _safe(p.get("survival_grade")),
+                    "inline": True,
+                },
+            ]
+        )
     if event_type in {"GENESIS_RADAR", "EARLY_RADAR"}:
         fields.append(
             {
@@ -295,6 +326,10 @@ def format_event(event_type: str, p: dict[str, Any]) -> str:
             f"Holders: {_number(p.get('holders'))}\n"
             f"5m Volume: {_money(p.get('volume_5m_usd'))}\n"
             f"Score: {p.get('normalized_score', 0):.1f} | Confidence: {p.get('confidence', 0):.0%}\n\n"
+            f"V1.5 Tier: {_safe(p.get('v15_signal_tier'))} | "
+            f"Runner: {_number(p.get('runner_score'))} | Failure: {_number(p.get('failure_score'))}\n"
+            f"Coverage: {_number(p.get('evidence_coverage'), '%')} | "
+            f"Entry: {_safe(p.get('entry_status'))} | Survival: {_safe(p.get('survival_grade'))}\n\n"
             f"Narrative: {scores['narrative']:.1f}/{maxima['narrative']:.0f} ({_safe(narrative.get('label'))})\n"
             f"Social Velocity: {social_display}\n"
             f"On-chain: {scores['onchain']:.1f}/{maxima['onchain']:.0f}\n"

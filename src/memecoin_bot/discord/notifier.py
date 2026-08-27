@@ -6,6 +6,8 @@ import urllib.error
 import urllib.request
 from typing import Any
 
+from memecoin_bot.discord.validation import validate_webhook_payload
+
 
 class NullNotifier:
     async def send(self, content: str | dict[str, Any]) -> str | None:
@@ -53,6 +55,7 @@ class DiscordNotifier:
             if isinstance(content, dict)
             else {"content": content, "allowed_mentions": {"parse": []}}
         )
+        validate_webhook_payload(message)
         payload = json.dumps(message).encode()
         for attempt in range(4):
 

@@ -80,6 +80,8 @@ STAGE_FEATURES = {
         "buyer_independence",
         "creator_quality",
         "early_liquidity",
+        "survival_quality",
+        "payoff_quality",
     ),
     Stage.BONDING: (
         "curve_progress",
@@ -87,13 +89,19 @@ STAGE_FEATURES = {
         "buyer_retention",
         "buyer_replacement",
         "concentration_trend",
+        "survival_quality",
+        "payoff_quality",
     ),
     Stage.MIGRATED: (
         "amm_liquidity",
         "tradeability",
         "migration_continuity",
         "buyer_quality",
+        "buyer_replacement",
+        "actor_independence",
         "post_migration_momentum",
+        "survival_quality",
+        "payoff_quality",
     ),
     Stage.REVIVAL: (
         "abnormal_volume",
@@ -101,6 +109,8 @@ STAGE_FEATURES = {
         "fresh_catalyst",
         "renewed_liquidity",
         "narrative_relevance",
+        "survival_quality",
+        "payoff_quality",
     ),
 }
 
@@ -289,7 +299,7 @@ def evaluate_v15(stage: Stage | str, features: dict[str, Any]) -> V15Decision:
         tier = SignalTier.SILENT_WATCH
 
     if tier == SignalTier.PREMIUM and (
-        coverage < 70 or critical or conflicts or stale or entry != EntryStatus.OPEN
+        coverage < 75 or critical or conflicts or stale or entry != EntryStatus.OPEN
     ):
         tier = SignalTier.STRONG if runner >= 60 and entry != EntryStatus.CHASING else SignalTier.SILENT_WATCH
     if entry in {EntryStatus.CHASING, EntryStatus.CLOSED, EntryStatus.UNKNOWN} and tier in {

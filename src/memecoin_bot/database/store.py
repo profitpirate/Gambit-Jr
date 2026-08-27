@@ -2191,6 +2191,56 @@ class Store:
                 )
             return cur.rowcount == 1
 
+    def record_v15_provider_evidence(
+        self, candidate_id: int, rows: Iterable[dict[str, Any]]
+    ) -> int:
+        """Persist sanitized provenance/freshness inputs consumed by a V1.5 decision."""
+        inserted = 0
+        with self._lock, self.conn:
+            for row in rows:
+                cur = self.conn.execute(
+                    "INSERT OR IGNORE INTO provider_evidence_v15(candidate_id,field_name,value_json,"
+                    "provider,retrieved_at,age_seconds,confidence,conflict_state) "
+                    "VALUES(?,?,?,?,?,?,?,?)",
+                    (
+                        candidate_id,
+                        row["field_name"],
+                        _json(row.get("value")),
+                        row["provider"],
+                        row["retrieved_at"],
+                        max(0.0, float(row.get("age_seconds") or 0)),
+                        max(0.0, min(1.0, float(row.get("confidence", 1)))),
+                        row.get("conflict_state", "KNOWN"),
+                    ),
+                )
+                inserted += cur.rowcount
+        return inserted
+
+    def record_v15_tradeability(
+        self, candidate_id: int, observed_at: str, result: dict[str, Any]
+    ) -> int:
+        """Persist each notional impact estimate used by the production decision."""
+        inserted = 0
+        with self._lock, self.conn:
+            for notional, estimate in (result.get("estimates") or {}).items():
+                cur = self.conn.execute(
+                    "INSERT OR IGNORE INTO tradeability_v15(candidate_id,observed_at,notional_usd,"
+                    "buy_impact_percent,sell_impact_percent,exitability_grade,source_type,evidence_json) "
+                    "VALUES(?,?,?,?,?,?,?,?)",
+                    (
+                        candidate_id,
+                        observed_at,
+                        float(notional),
+                        estimate.get("buy_impact_percent"),
+                        estimate.get("sell_impact_percent"),
+                        result.get("grade", "UNKNOWN"),
+                        estimate.get("source", "ESTIMATE"),
+                        _json(estimate),
+                    ),
+                )
+                inserted += cur.rowcount
+        return inserted
+
     def record_latency(
         self, metric: str, milliseconds: float, source: str | None = None, metadata: Any = None
     ) -> None:

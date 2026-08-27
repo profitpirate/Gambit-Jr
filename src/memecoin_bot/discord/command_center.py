@@ -16,9 +16,15 @@ from memecoin_bot.discord.cards import (
     status_card,
     watchlist_card,
 )
+from memecoin_bot.discord.responses import (
+    SAFE_INTERNAL_ERROR,
+    log_discord_http_failure,
+    respond_component_error,
+)
+from memecoin_bot.discord.validation import component_count, validate_message
 from memecoin_bot.observability.logging import event
 
-SAFE_ERROR = "Gambit Jr couldn't complete that request. The error has been logged."
+SAFE_ERROR = SAFE_INTERNAL_ERROR
 MENU_PAGES = (
     "overview",
     "scanner",
@@ -67,18 +73,6 @@ def _safe_failure_log(
         traceback=[f"{frame.name}:{frame.lineno}" for frame in frames[-8:]],
         **fields,
     )
-
-
-async def safe_interaction_error(interaction: discord.Interaction) -> None:
-    try:
-        if interaction.response.is_done():
-            await interaction.followup.send(SAFE_ERROR, ephemeral=True)
-        else:
-            await interaction.response.send_message(SAFE_ERROR, ephemeral=True)
-    except (discord.HTTPException, discord.InteractionResponded):
-        # The original failure has already been recorded. A vanished interaction
-        # cannot safely receive a second response.
-        return
 
 
 class CommandCenterData:
@@ -292,8 +286,14 @@ class MenuSelect(discord.ui.Select):
 class MenuView(discord.ui.View):
     """Stateless persistent navigation; current page is read from the message embed."""
 
-    def __init__(self, data: CommandCenterData, logger: logging.Logger | None = None):
-        super().__init__(timeout=None)
+    def __init__(
+        self,
+        data: CommandCenterData,
+        logger: logging.Logger | None = None,
+        *,
+        timeout: float | None = 900,
+    ):
+        super().__init__(timeout=timeout)
         self.data = data
         self.log = logger or logging.getLogger("memecoin_bot.discord")
         self.add_item(MenuSelect(self))
@@ -321,9 +321,27 @@ class MenuView(discord.ui.View):
             if not interaction.response.is_done():
                 await interaction.response.defer()
             payload = await self.data.render(page, interaction)
+            embed = validate_message(card_payload=payload, view=self)
             await interaction.edit_original_response(
-                embed=discord.Embed.from_dict(payload["embed"]), view=self
+                embed=embed, view=self
             )
+        except discord.HTTPException as error:
+            log_discord_http_failure(
+                self.log,
+                error,
+                command_name="menu",
+                interaction=interaction,
+                response_state="deferred_component_update",
+                defer_occurred=True,
+                ephemeral=True,
+                payload_kind="embed_view",
+                has_content=False,
+                embed_count=1,
+                components=component_count(self),
+                started=started,
+            )
+            await respond_component_error(interaction, SAFE_ERROR)
+            return
         except Exception as error:  # noqa: BLE001 - component boundary must contain callbacks
             _safe_failure_log(
                 self.log,
@@ -333,7 +351,7 @@ class MenuView(discord.ui.View):
                 duration_ms=round((time.monotonic() - started) * 1000, 1),
                 result="failure",
             )
-            await safe_interaction_error(interaction)
+            await respond_component_error(interaction, SAFE_ERROR)
             return
         event(
             self.log,
@@ -385,7 +403,7 @@ class MenuView(discord.ui.View):
             custom_id=getattr(item, "custom_id", "UNKNOWN"),
             result="failure",
         )
-        await safe_interaction_error(interaction)
+        await respond_component_error(interaction, SAFE_ERROR)
 
 
 async def run_component_callback(
@@ -410,6 +428,23 @@ async def run_component_callback(
         if not interaction.response.is_done():
             await interaction.response.defer(ephemeral=ephemeral_defer)
         await callback()
+    except discord.HTTPException as error:
+        log_discord_http_failure(
+            logger,
+            error,
+            command_name="scan",
+            interaction=interaction,
+            response_state="deferred_component_update",
+            defer_occurred=True,
+            ephemeral=ephemeral_defer,
+            payload_kind="component_action",
+            has_content=False,
+            embed_count=0,
+            components=0,
+            started=started,
+        )
+        await respond_component_error(interaction, SAFE_ERROR)
+        return
     except Exception as error:  # noqa: BLE001 - component boundary must contain callbacks
         _safe_failure_log(
             logger,
@@ -419,7 +454,7 @@ async def run_component_callback(
             duration_ms=round((time.monotonic() - started) * 1000, 1),
             result="failure",
         )
-        await safe_interaction_error(interaction)
+        await respond_component_error(interaction, SAFE_ERROR)
         return
     event(
         logger,
