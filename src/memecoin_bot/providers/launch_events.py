@@ -194,6 +194,23 @@ def topic_address(value: str) -> str | None:
     return "0x" + raw[-40:].lower() if len(raw) >= 40 else None
 
 
+def abi_word_address(data: str, word_index: int) -> str | None:
+    """Extract an ABI-encoded address from a non-indexed event-data word."""
+    raw = str(data or "").removeprefix("0x")
+    start = word_index * 64
+    word = raw[start : start + 64]
+    if word_index < 0 or len(word) != 64:
+        return None
+    padding, address = word[:24], word[24:]
+    try:
+        numeric = int(address, 16)
+    except ValueError:
+        return None
+    if padding != "0" * 24 or numeric == 0:
+        return None
+    return "0x" + address.lower()
+
+
 class EvmFactoryLaunchSource:
     """Read-only BSC factory-log polling fallback; WebSocket-capable RPCs can replace it later."""
 
@@ -207,6 +224,8 @@ class EvmFactoryLaunchSource:
         client: ResilientJsonClient,
         launchpad: str = "fourmeme",
         token_topic_index: int = 1,
+        token_data_word_index: int | None = None,
+        creator_data_word_index: int | None = None,
         poll_seconds: float = 2,
     ):
         self.rpc_url = rpc_url
@@ -215,6 +234,8 @@ class EvmFactoryLaunchSource:
         self.client = client
         self.launchpad = launchpad
         self.token_topic_index = token_topic_index
+        self.token_data_word_index = token_data_word_index
+        self.creator_data_word_index = creator_data_word_index
         self.poll_seconds = poll_seconds
         self.next_block: int | None = None
         self.log = logging.getLogger("memecoin_bot.launch.bsc")
@@ -266,13 +287,25 @@ class EvmFactoryLaunchSource:
         events = []
         for row in logs or []:
             topics = row.get("topics") or []
-            if len(topics) <= self.token_topic_index:
-                continue
-            token = topic_address(str(topics[self.token_topic_index]))
+            token = (
+                abi_word_address(str(row.get("data") or ""), self.token_data_word_index)
+                if self.token_data_word_index is not None
+                else (
+                    topic_address(str(topics[self.token_topic_index]))
+                    if len(topics) > self.token_topic_index
+                    else None
+                )
+            )
             if not token:
                 continue
+            creator = (
+                abi_word_address(str(row.get("data") or ""), self.creator_data_word_index)
+                if self.creator_data_word_index is not None
+                else None
+            )
             block = str(row.get("blockNumber") or "")
             transaction = str(row.get("transactionHash") or "")
+            log_index = str(row.get("logIndex") or "")
             source_timestamp = block_timestamps.get(block, received)
             events.append(
                 LaunchEvent.deterministic(
@@ -282,11 +315,18 @@ class EvmFactoryLaunchSource:
                     source_timestamp,
                     source_received_at=received,
                     launchpad=self.launchpad,
+                    creator_address=creator,
                     slot_or_block=block,
-                    transaction_id=transaction,
+                    transaction_id=f"{transaction}:{log_index}" if log_index else transaction,
                     metadata={
                         "factory": row.get("address"),
                         "topic": topics[0],
+                        "log_index": log_index or None,
+                        "address_encoding": (
+                            "abi_event_data"
+                            if self.token_data_word_index is not None
+                            else "indexed_topic"
+                        ),
                         "timestamp_source": (
                             "block_timestamp" if block in block_timestamps else "received_at"
                         ),

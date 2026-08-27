@@ -400,6 +400,47 @@ async def test_bnb_factory_polling_fixture_and_source_ordering():
 
 
 @pytest.mark.asyncio
+async def test_fourmeme_tokencreate_abi_derived_fixture_and_log_dedupe():
+    """Synthetic ABI-derived fixture; this is not represented as a mainnet receipt."""
+    creator = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    token = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    word = lambda address: "0" * 24 + address
+
+    class Client:
+        async def request(self, _url, _method, payload):
+            if payload["method"] == "eth_blockNumber":
+                return {"result": "0x20"}
+            if payload["method"] == "eth_getBlockByNumber":
+                return {"result": {"timestamp": "0x65000000"}}
+            return {
+                "result": [
+                    {
+                        "address": "0xfactory",
+                        "blockNumber": "0x20",
+                        "transactionHash": "0xtx",
+                        "logIndex": "0x3",
+                        "topics": ["0xtokencreate"],
+                        "data": "0x" + word(creator) + word(token),
+                    }
+                ]
+            }
+
+    source = EvmFactoryLaunchSource(
+        "https://bsc.example",
+        ["0xfactory"],
+        ["0xtokencreate"],
+        Client(),
+        token_data_word_index=1,
+        creator_data_word_index=0,
+    )
+    event = (await source.poll_once())[0]
+    assert event.token_address == "0x" + token
+    assert event.creator_address == "0x" + creator
+    assert event.transaction_id == "0xtx:0x3"
+    assert event.metadata["address_encoding"] == "abi_event_data"
+
+
+@pytest.mark.asyncio
 async def test_event_to_genesis_exactly_one_alert_and_two_restarts():
     class Null:
         async def send(self, _content):

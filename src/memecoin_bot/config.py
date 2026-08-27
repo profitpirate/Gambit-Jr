@@ -49,6 +49,8 @@ class Settings:
     bnb_launch_factory_addresses: tuple[str, ...] = ()
     bnb_launch_event_topics: tuple[str, ...] = ()
     bnb_launch_token_topic_index: int = 1
+    bnb_launch_token_data_word_index: int | None = None
+    bnb_launch_creator_data_word_index: int | None = None
     event_queue_max: int = 2_048
     launch_source_reconnect_seconds: float = 2
     gmgn_enabled: bool = False
@@ -185,6 +187,16 @@ class Settings:
                 if value.strip()
             ),
             bnb_launch_token_topic_index=_int("BNB_LAUNCH_TOKEN_TOPIC_INDEX", 1),
+            bnb_launch_token_data_word_index=(
+                _int("BNB_LAUNCH_TOKEN_DATA_WORD_INDEX", -1)
+                if os.getenv("BNB_LAUNCH_TOKEN_DATA_WORD_INDEX") not in (None, "")
+                else None
+            ),
+            bnb_launch_creator_data_word_index=(
+                _int("BNB_LAUNCH_CREATOR_DATA_WORD_INDEX", -1)
+                if os.getenv("BNB_LAUNCH_CREATOR_DATA_WORD_INDEX") not in (None, "")
+                else None
+            ),
             event_queue_max=_int("EVENT_QUEUE_MAX", 2_048),
             launch_source_reconnect_seconds=_float("LAUNCH_SOURCE_RECONNECT_SECONDS", 2),
             gmgn_enabled=_bool("GMGN_ENABLED", False),

@@ -28,7 +28,9 @@ class ReplayTests(unittest.IsolatedAsyncioTestCase):
             report = await ReplayRunner(config, db).run(fixture)
             self.assertEqual(len(report["outcomes"]), 9)
             self.assertGreaterEqual(len(report["radar_events"]), 4)
-            self.assertGreaterEqual(len(report["signals_created"]), 3)
+            # Unknown BNB concentration/transfer controls no longer receive
+            # full safety credit merely to satisfy the replay fixture.
+            self.assertGreaterEqual(len(report["signals_created"]), 2)
             chains = {row["chain"] for row in report["decisions"]}
             self.assertEqual(chains, {"solana", "bsc"})
             self.assertTrue(any("FAILED_PROVIDER" in cycle["candidates"] for cycle in report["cycles"]))

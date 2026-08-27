@@ -543,7 +543,10 @@ class IntelligenceService:
                     liquidity=market.liquidity_usd,
                 )
 
-        developer = self.developers.assess(discovery.deployer)
+        creator_history = (
+            self.store.creator_report(discovery.deployer) if discovery.deployer else None
+        )
+        developer = self.developers.assess(discovery.deployer, creator_history)
         narrative = self.narratives.assess(discovery, market)
         social = self.social.assess(market, previous[-1] if previous else None)
         onchain = self.onchain.assess(safety)
@@ -554,9 +557,18 @@ class IntelligenceService:
             None
             if safety_unavailable
             else (
-                5.0
-                if chain == "bsc" or (not safety.mint_authority and not safety.freeze_authority)
-                else 0.0
+                2.5
+                if chain == "bsc"
+                and {
+                    "BSC_TRANSFER_RESTRICTIONS_UNKNOWN",
+                    "BSC_HOLDER_CONCENTRATION_UNKNOWN",
+                }.intersection(safety.warnings)
+                else (
+                    5.0
+                    if chain == "bsc"
+                    or (not safety.mint_authority and not safety.freeze_authority)
+                    else 0.0
+                )
             )
         )
         components = {
@@ -991,7 +1003,8 @@ class IntelligenceService:
 
     async def flush_outbox(self) -> int:
         sent = 0
-        for row in self.store.pending_outbox():
+        for row in self.store.claim_outbox():
+            claim_token = row["claim_token"]
             try:
                 delivery_started = datetime.now(UTC)
                 payload = json.loads(row["payload_json"])
@@ -1031,11 +1044,15 @@ class IntelligenceService:
                     if not channels and self.settings.discord_channel_id:
                         channels = (self.settings.discord_channel_id,)
                     if has_guild_settings:
-                        self.store.mark_outbox_sent(int(row["id"]), "policy-suppressed")
+                        self.store.mark_outbox_sent(
+                            int(row["id"]), "policy-suppressed", claim_token
+                        )
                         sent += 1
                         continue
                     if not channels and hasattr(self.notifier, "send_to"):
-                        self.store.mark_outbox_sent(int(row["id"]), "no-configured-destination")
+                        self.store.mark_outbox_sent(
+                            int(row["id"]), "no-configured-destination", claim_token
+                        )
                         sent += 1
                         continue
                 if not destinations and channels and hasattr(self.notifier, "send_to"):
@@ -1059,7 +1076,7 @@ class IntelligenceService:
                     remote_id = ",".join(remote_ids)
                 elif not destinations:
                     remote_id = await self.notifier.send(content)
-                self.store.mark_outbox_sent(int(row["id"]), remote_id)
+                self.store.mark_outbox_sent(int(row["id"]), remote_id, claim_token)
                 self.store.record_latency(
                     "DISCORD_DELIVERY",
                     (datetime.now(UTC) - delivery_started).total_seconds() * 1000,
@@ -1069,7 +1086,7 @@ class IntelligenceService:
                 self.store.set_provider_health("discord", True, 0, None)
                 sent += 1
             except Exception as exc:  # noqa: BLE001 - outbox must persist any delivery failure
-                self.store.mark_outbox_error(int(row["id"]), str(exc))
+                self.store.mark_outbox_error(int(row["id"]), str(exc), claim_token)
                 previous = self.store.conn.execute(
                     "SELECT consecutive_failures FROM provider_health WHERE provider='discord'"
                 ).fetchone()

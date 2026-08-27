@@ -169,6 +169,8 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
                 settings.bnb_launch_event_topics,
                 bnb_launch_client,
                 token_topic_index=settings.bnb_launch_token_topic_index,
+                token_data_word_index=settings.bnb_launch_token_data_word_index,
+                creator_data_word_index=settings.bnb_launch_creator_data_word_index,
                 poll_seconds=settings.launch_source_reconnect_seconds,
             )
         )

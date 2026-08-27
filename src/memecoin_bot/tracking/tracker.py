@@ -29,7 +29,9 @@ class SignalTracker:
             ath = max(float(signal["ath_market_cap_usd"] or signal_mc), current_mc)
             atl = min(float(signal["atl_market_cap_usd"] or signal_mc), current_mc)
             max_multiple = max(float(signal["max_multiple"]), ath / signal_mc)
-            max_drawdown = min(float(signal["max_drawdown"]), (atl - signal_mc) / signal_mc)
+            # Peak-to-current drawdown, not merely adverse excursion from entry.
+            # This correctly records a runner that gives back gains after its ATH.
+            max_drawdown = min(float(signal["max_drawdown"]), (current_mc - ath) / ath)
             now = snapshot.captured_at
             self.store.update_tracking(
                 int(signal["id"]), current_mc, now, max_multiple, max_drawdown, ath, atl
@@ -58,13 +60,16 @@ class SignalTracker:
                 ).fetchone()
                 is not None
             )
-            if multiple <= self.settings.failure_multiple and not reached_2x:
+            if multiple <= self.settings.failure_multiple:
                 if self.store.fail_signal(
                     int(signal["id"]),
                     dict(
                         payload,
                         current_multiple=multiple,
                         max_drawdown=max_drawdown,
+                        outcome_class=(
+                            "FAILED_AFTER_RUNNER" if reached_2x else "FAILED_BEFORE_2X"
+                        ),
                     ),
                 ):
                     stats["failed"] += 1

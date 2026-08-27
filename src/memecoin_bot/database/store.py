@@ -5,6 +5,7 @@ import re
 import sqlite3
 import statistics
 import threading
+import uuid
 from collections.abc import Iterable
 from datetime import UTC, datetime, timedelta
 from itertools import pairwise
@@ -1045,6 +1046,11 @@ class Store:
                 "non_signal_reason=NULL,updated_at=? WHERE token_id=?",
                 (signal_id, now, token_id),
             )
+            self.conn.execute(
+                "UPDATE candidates SET state='QUALIFIED_SIGNAL',"
+                "authoritative_state='QUALIFIED_SIGNAL',updated_at=? WHERE token_id=?",
+                (now, token_id),
+            )
             return signal_id
 
     def active_signals(self) -> list[sqlite3.Row]:
@@ -1194,19 +1200,64 @@ class Store:
             )
         )
 
-    def mark_outbox_sent(self, outbox_id: int, remote_id: str | None) -> None:
-        with self._lock, self.conn:
+    def claim_outbox(self, limit: int = 20, lease_seconds: int = 120) -> list[sqlite3.Row]:
+        """Atomically lease rows so concurrent flushers cannot deliver the same event."""
+        token = uuid.uuid4().hex
+        expired = (datetime.now(UTC) - timedelta(seconds=lease_seconds)).isoformat()
+        with self._lock:
+            self.conn.execute("BEGIN IMMEDIATE")
+            try:
+                ids = [
+                    int(row[0])
+                    for row in self.conn.execute(
+                        "SELECT id FROM outbox WHERE sent_at IS NULL "
+                        "AND (claim_token IS NULL OR claimed_at<?) ORDER BY id LIMIT ?",
+                        (expired, limit),
+                    )
+                ]
+                if ids:
+                    placeholders = ",".join("?" for _ in ids)
+                    self.conn.execute(
+                        f"UPDATE outbox SET claim_token=?,claimed_at=? WHERE id IN ({placeholders})",
+                        (token, iso(), *ids),
+                    )
+                self.conn.commit()
+            except Exception:
+                self.conn.rollback()
+                raise
+        return list(
             self.conn.execute(
-                "UPDATE outbox SET sent_at=?,remote_message_id=?,attempts=attempts+1,last_error=NULL WHERE id=?",
-                (iso(), remote_id, outbox_id),
+                "SELECT * FROM outbox WHERE claim_token=? AND sent_at IS NULL ORDER BY id", (token,)
             )
+        )
 
-    def mark_outbox_error(self, outbox_id: int, error: str) -> None:
+    def mark_outbox_sent(
+        self, outbox_id: int, remote_id: str | None, claim_token: str | None = None
+    ) -> None:
         with self._lock, self.conn:
-            self.conn.execute(
-                "UPDATE outbox SET attempts=attempts+1,last_error=? WHERE id=?",
-                (error[:1000], outbox_id),
+            sql = (
+                "UPDATE outbox SET sent_at=?,remote_message_id=?,attempts=attempts+1,last_error=NULL,"
+                "claim_token=NULL,claimed_at=NULL WHERE id=?"
             )
+            args: tuple[Any, ...] = (iso(), remote_id, outbox_id)
+            if claim_token is not None:
+                sql += " AND claim_token=?"
+                args += (claim_token,)
+            self.conn.execute(sql, args)
+
+    def mark_outbox_error(
+        self, outbox_id: int, error: str, claim_token: str | None = None
+    ) -> None:
+        with self._lock, self.conn:
+            sql = (
+                "UPDATE outbox SET attempts=attempts+1,last_error=?,claim_token=NULL,claimed_at=NULL "
+                "WHERE id=?"
+            )
+            args = (error[:1000], outbox_id)
+            if claim_token is not None:
+                sql += " AND claim_token=?"
+                args += (claim_token,)
+            self.conn.execute(sql, args)
 
     def ensure_alert_deliveries(self, outbox_id: int, channel_ids: Iterable[int]) -> None:
         with self._lock, self.conn:
@@ -1931,6 +1982,17 @@ class Store:
             ).fetchone()
             if not previous:
                 raise KeyError(candidate_id)
+            lifecycle_rank = {
+                "DISCOVERED": 0,
+                "SCREENING": 1,
+                "GENESIS_RADAR": 2,
+                "STANDARD_RADAR": 3,
+                "HOT_RADAR": 4,
+                "PRIORITY_RADAR": 5,
+                "QUALIFIED_SIGNAL": 6,
+            }
+            if lifecycle_rank.get(str(previous[0]), -1) > lifecycle_rank.get(state, -1):
+                state = str(previous[0])
             cur = self.conn.execute(
                 "INSERT OR IGNORE INTO evaluation_stages_v14(candidate_id,launch_event_id,stage,"
                 "observed_at,decided_at,decision,authoritative_state,entry_state,confidence,"
@@ -1960,9 +2022,10 @@ class Store:
                 ),
             )
             self.conn.execute(
-                "UPDATE candidates SET authoritative_state=?,evaluation_stage=?,entry_state=?,"
+                "UPDATE candidates SET authoritative_state=?,state=?,evaluation_stage=?,entry_state=?,"
                 "survival_grade=?,payoff_grade=?,updated_at=? WHERE id=?",
                 (
+                    state,
                     state,
                     decision.stage,
                     str(decision.entry_state),
@@ -2330,8 +2393,16 @@ class Store:
                 "WHEN state='SIGNALLED' THEN 'QUALIFIED_SIGNAL' ELSE state END "
                 "WHERE authoritative_state IS NULL OR authoritative_state='DISCOVERED'"
             )
+            # authoritative_state is the single lifecycle truth. `state` remains
+            # a restart-compatible mirror for older queries and deployments.
+            self.conn.execute(
+                "UPDATE candidates SET state=authoritative_state "
+                "WHERE authoritative_state IS NOT NULL AND authoritative_state!='' "
+                "AND state!=authoritative_state"
+            )
         row = self.conn.execute(
-            "SELECT COUNT(*) total,SUM(CASE WHEN authoritative_state IS NULL OR authoritative_state='' THEN 1 ELSE 0 END) missing "
+            "SELECT COUNT(*) total,SUM(CASE WHEN authoritative_state IS NULL OR authoritative_state='' "
+            "OR state!=authoritative_state THEN 1 ELSE 0 END) missing "
             "FROM candidates"
         ).fetchone()
         return {"total": int(row[0] or 0), "difference": int(row[1] or 0)}

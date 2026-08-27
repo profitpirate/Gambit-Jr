@@ -24,4 +24,23 @@ class DeveloperEngine:
                 "score": None,
                 "reason": "NO_TRACKED_HISTORY",
             }
-        return stored_profile
+        # Persistence uses the V1.4 creator vocabulary while the legacy scorer
+        # expects DeveloperClass plus a 0..15 component score.  Normalize the
+        # stored history here so it is consumed by the production evaluation.
+        quality = str(stored_profile.get("quality") or "UNKNOWN").upper()
+        score_by_quality = {
+            "PROVEN": 15.0,
+            "POSITIVE": 12.0,
+            "NEUTRAL": 7.5,
+            "SUSPICIOUS": 2.0,
+            "TOXIC": 0.0,
+        }
+        return {
+            "wallet": deployer,
+            "classification": quality,
+            "score": score_by_quality.get(quality),
+            "reason": "TRACKED_CREATOR_HISTORY",
+            "launches": int(stored_profile.get("launches") or 0),
+            "rugs": int(stored_profile.get("rugs") or 0),
+            "runners": int(stored_profile.get("runners") or 0),
+        }

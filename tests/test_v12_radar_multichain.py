@@ -104,7 +104,7 @@ class BscLifecycleTests(unittest.IsolatedAsyncioTestCase):
         invalid = await provider.safety("not-a-contract")
         self.assertIn("INVALID_BSC_CONTRACT_ADDRESS", invalid.rejection_reasons)
 
-    async def test_bsc_candidate_to_radar_to_qualified_signal(self):
+    async def test_bsc_unknown_concentration_reaches_radar_but_not_qualified_signal(self):
         with temp_db_path() as path:
             config = settings(path)
             config.radar_min_conditions = 3
@@ -127,11 +127,10 @@ class BscLifecycleTests(unittest.IsolatedAsyncioTestCase):
             await service.monitor_candidates_once()
             token_id = db.token_id(address, "bsc")
             candidate = db.candidate_for_token(token_id)
-            self.assertEqual(candidate["state"], CandidateState.SIGNALLED)
+            self.assertEqual(candidate["state"], CandidateState.EARLY_RADAR)
             self.assertIsNotNone(candidate["radar_triggered_at"])
             signal = db.conn.execute("SELECT * FROM signals WHERE token_id=?", (token_id,)).fetchone()
-            self.assertIsNotNone(signal)
-            self.assertIsNotNone(signal["radar_to_signal_seconds"])
+            self.assertIsNone(signal)
             self.assertEqual(db.conn.execute("SELECT COUNT(*) FROM radar_events").fetchone()[0], 1)
             db.close()
 

@@ -43,10 +43,11 @@ if discord is not None:
         async def refresh(
             self, interaction: discord.Interaction, _button: discord.ui.Button
         ) -> None:
+            await interaction.response.defer()
             result = await self.service.manual_scan(
                 self.address, self.chain, interaction.guild_id, interaction.user.id
             )
-            await interaction.response.edit_message(
+            await interaction.edit_original_response(
                 embed=discord.Embed.from_dict(scan_card(result)["embed"]), view=self
             )
 
@@ -54,10 +55,15 @@ if discord is not None:
             label="Watch", style=discord.ButtonStyle.secondary, custom_id="gambit:scan:watch"
         )
         async def watch(self, interaction: discord.Interaction, _button: discord.ui.Button) -> None:
-            created = self.store.add_watch(
-                interaction.guild_id, interaction.user.id, self.chain, self.address
+            await interaction.response.defer(ephemeral=True)
+            created = await asyncio.to_thread(
+                self.store.add_watch,
+                interaction.guild_id,
+                interaction.user.id,
+                self.chain,
+                self.address,
             )
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 "Added to your watchlist." if created else "Already on your watchlist.",
                 ephemeral=True,
             )
@@ -89,10 +95,26 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             view = view or discord.ui.View(timeout=None)
             for label, url in payload["links"]:
                 view.add_item(discord.ui.Button(label=label, url=url))
-        await interaction.response.send_message(embed=embed, view=view, ephemeral=ephemeral)
+        if interaction.response.is_done():
+            await interaction.followup.send(embed=embed, view=view, ephemeral=ephemeral)
+        else:
+            await interaction.response.send_message(embed=embed, view=view, ephemeral=ephemeral)
+
+    async def send_text(
+        interaction: discord.Interaction, message: str, ephemeral: bool = True
+    ) -> None:
+        if interaction.response.is_done():
+            await interaction.followup.send(message, ephemeral=ephemeral)
+        else:
+            await interaction.response.send_message(message, ephemeral=ephemeral)
 
     async def require_guild(interaction: discord.Interaction) -> bool:
         if command_allowed(interaction):
+            # Discord requires an acknowledgement within three seconds.  Every
+            # command enters this guard before database or provider work, so
+            # defer centrally instead of relying on each handler to remember.
+            if not interaction.response.is_done():
+                await interaction.response.defer(ephemeral=True)
             return True
         await interaction.response.send_message(
             "This command is available in Discord server text channels.", ephemeral=True
@@ -146,7 +168,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             return
         chain = chain.lower()
         if chain not in {"solana", "bsc"}:
-            await interaction.response.send_message("Chain must be solana or bsc.", ephemeral=True)
+            await send_text(interaction, "Chain must be solana or bsc.")
             return
         result = await service.manual_scan(
             address.strip(), chain, interaction.guild_id, interaction.user.id
@@ -186,7 +208,8 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         created = store.add_watch(
             interaction.guild_id, interaction.user.id, chain.lower(), address.strip()
         )
-        await interaction.response.send_message(
+        await send_text(
+            interaction,
             "Added to your watchlist." if created else "Already on your watchlist.", ephemeral=True
         )
 
@@ -199,7 +222,8 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         removed = store.remove_watch(
             interaction.guild_id, interaction.user.id, chain.lower(), address.strip()
         )
-        await interaction.response.send_message(
+        await send_text(
+            interaction,
             "Removed from your watchlist." if removed else "Token was not on your watchlist.",
             ephemeral=True,
         )
@@ -281,7 +305,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             return
         data = store.token_intelligence(address)
         if not data:
-            await interaction.response.send_message("Token is not tracked.", ephemeral=True)
+            await send_text(interaction, "Token is not tracked.")
             return
         await send_card(
             interaction, smartmoney_card(data) if smart_only else token_card(data), True
@@ -401,9 +425,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             return
         permissions = getattr(interaction.user, "guild_permissions", None)
         if not permissions or not permissions.manage_guild:
-            await interaction.response.send_message(
-                "Manage Server permission is required.", ephemeral=True
-            )
+            await send_text(interaction, "Manage Server permission is required.")
             return
         destination = channel or interaction.channel
         try:
@@ -417,7 +439,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
                 [value.strip().lower() for value in chains.split(",") if value.strip()],
             )
         except ValueError as exc:
-            await interaction.response.send_message(str(exc), ephemeral=True)
+            await send_text(interaction, str(exc))
             return
         await send_card(
             interaction, settings_card(store.guild_settings(interaction.guild_id)), True
@@ -441,9 +463,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             return
         permissions = getattr(interaction.user, "guild_permissions", None)
         if not permissions or not permissions.manage_guild:
-            await interaction.response.send_message(
-                "Manage Server permission is required.", ephemeral=True
-            )
+            await send_text(interaction, "Manage Server permission is required.")
             return
         await send_card(interaction, test_alert_card())
         message = await interaction.original_response()
