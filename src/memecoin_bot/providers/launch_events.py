@@ -226,6 +226,8 @@ class EvmFactoryLaunchSource:
         token_topic_index: int = 1,
         token_data_word_index: int | None = None,
         creator_data_word_index: int | None = None,
+        load_cursor: Callable[[str], str | None] | None = None,
+        save_cursor: Callable[[str, str, dict[str, Any]], None] | None = None,
         poll_seconds: float = 2,
     ):
         self.rpc_url = rpc_url
@@ -236,6 +238,8 @@ class EvmFactoryLaunchSource:
         self.token_topic_index = token_topic_index
         self.token_data_word_index = token_data_word_index
         self.creator_data_word_index = creator_data_word_index
+        self.load_cursor = load_cursor
+        self.save_cursor = save_cursor
         self.poll_seconds = poll_seconds
         self.next_block: int | None = None
         self.log = logging.getLogger("memecoin_bot.launch.bsc")
@@ -254,6 +258,9 @@ class EvmFactoryLaunchSource:
         if not self.factories or not self.event_topics:
             raise ProviderError("No BNB launch factory addresses/event topics configured")
         latest = int(await self._rpc("eth_blockNumber", []), 16)
+        if self.next_block is None and self.load_cursor:
+            persisted = self.load_cursor(self.name)
+            self.next_block = int(persisted) if persisted is not None else None
         start = self.next_block if self.next_block is not None else latest
         end = min(latest, start + 250)
         logs = await self._rpc(
@@ -268,6 +275,12 @@ class EvmFactoryLaunchSource:
             ],
         )
         self.next_block = end + 1
+        if self.save_cursor:
+            self.save_cursor(
+                self.name,
+                str(self.next_block),
+                {"last_completed_block": end, "backfill_window": end - start + 1},
+            )
         received = iso()
         block_timestamps: dict[str, str] = {}
         for block_number in {

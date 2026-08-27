@@ -154,6 +154,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             settings.scoring_version, since, settings.major_missed_runner_multiple
         )
         report["right_tail"] = store.right_tail_performance(settings.min_sample_for_edge_metrics)
+        report["v15"] = store.v15_performance(settings.min_sample_for_edge_metrics)
         report["small_sample"] = (
             int(report.get("total_signals") or 0) < settings.min_sample_for_edge_metrics
         )

@@ -283,7 +283,9 @@ class ProviderAndGuildTests(unittest.TestCase):
             db.ensure_guild_alert_delivery(1, 1, 11)
             db.ensure_guild_alert_delivery(1, 2, 22)
             self.assertEqual(len(db.pending_guild_alert_deliveries(1)), 2)
-            self.assertTrue(db.alert_allowed("QUALIFIED", "SIGNAL", {}))
+            self.assertTrue(
+                db.alert_allowed("QUALIFIED", "SIGNAL", {"v15_signal_tier": "PREMIUM"})
+            )
             self.assertFalse(db.alert_allowed("PRIORITY", "EARLY_RADAR", {"priority": "HOT"}))
             db.close()
 

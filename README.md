@@ -1,4 +1,13 @@
-# Gambit Jr — V1.4 Ultra-Early Discord Intelligence
+# Gambit Jr — V1.5 Runner/Survival Intelligence
+
+V1.5 adds a production-consumed decision core with independent runner and failure
+scores, setup conviction separate from evidence coverage, stage-specific evaluation,
+provider conflict/freshness states, notional tradeability estimates, effective actor
+concentration, buyer replacement, immutable V1.5 T0 calls, and signal-only Discord
+routing. Public automatic tiers are `PREMIUM`, `STRONG`, `HIGH_RISK_MOMENTUM`, and
+`CATALYST_REVIVAL`; Genesis and Radar remain internal/queryable. The read-only boundary
+is unchanged: there is no transaction signing, swap, approval, private-key, seed, or
+fund-transfer path.
 
 A read-only, autonomous intelligence service for Solana and BNB Chain memecoins. Gambit Jr now starts
 at the launch event, performs a low-latency T0 decision, enriches evidence in parallel, builds wallet,

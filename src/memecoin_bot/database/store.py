@@ -850,6 +850,12 @@ class Store:
                 str(CandidateState.EXPIRED): "EXPIRED",
                 str(CandidateState.SIGNALLED): "QUALIFIED_SIGNAL",
                 str(CandidateState.EARLY_RADAR): "STANDARD_RADAR",
+                str(CandidateState.GENESIS_RADAR): "GENESIS_RADAR",
+                str(CandidateState.STANDARD_RADAR): "STANDARD_RADAR",
+                str(CandidateState.HOT_RADAR): "HOT_RADAR",
+                str(CandidateState.PRIORITY_RADAR): "PRIORITY_RADAR",
+                str(CandidateState.QUALIFIED_SIGNAL): "QUALIFIED_SIGNAL",
+                str(CandidateState.FAILED_OUTCOME): "FAILED_OUTCOME",
             }.get(str(state))
             if authoritative:
                 if authoritative == "STANDARD_RADAR":
@@ -860,8 +866,8 @@ class Store:
                     )
                 else:
                     self.conn.execute(
-                        "UPDATE candidates SET authoritative_state=? WHERE id=?",
-                        (authoritative, candidate_id),
+                        "UPDATE candidates SET authoritative_state=?,state=? WHERE id=?",
+                        (authoritative, authoritative, candidate_id),
                     )
             if str(state) in {str(CandidateState.REJECTED_UNSAFE), str(CandidateState.EXPIRED)}:
                 self.conn.execute(
@@ -1416,13 +1422,8 @@ class Store:
 
     @staticmethod
     def alert_allowed(tier: str, event_type: str, payload: dict[str, Any]) -> bool:
-        tier = tier.upper()
-        tier = {
-            "ALL": "GENESIS_ALL",
-            "HOT": "HOT_PLUS",
-            "PRIORITY": "PRIORITY_PLUS",
-            "QUALIFIED": "QUALIFIED_ONLY",
-        }.get(tier, tier)
+        # V1.5 externally routes only public signal classes and post-call
+        # intelligence. Genesis/Radar remain queryable internal states.
         if event_type in {
             "MILESTONE",
             "RADAR_MILESTONE",
@@ -1432,27 +1433,14 @@ class Store:
             "UPGRADE",
         }:
             return True
-        if event_type == "SIGNAL":
-            return True
-        classification = str(payload.get("classification") or "").upper()
-        priority_value = str(payload.get("priority") or "STANDARD").upper()
-        if tier == "GENESIS_ALL":
-            return True
-        if tier == "QUALIFIED_ONLY":
-            return event_type == "SIGNAL" or classification in {
-                "WATCH",
-                "STRONG",
-                "HIGH_CONVICTION",
-            }
-        event_rank = {
-            "GENESIS_RADAR": 0,
-            "EARLY_RADAR": 1,
-            "HOT_RADAR": 2,
-            "PRIORITY_RADAR": 3,
-            "SIGNAL": 4,
-        }.get(event_type, {"STANDARD": 1, "HOT": 2, "PRIORITY": 3}.get(priority_value, 1))
-        required = {"HOT_PLUS": 2, "PRIORITY_PLUS": 3}.get(tier, 4)
-        return event_rank >= required
+        if event_type != "SIGNAL":
+            return False
+        return str(payload.get("v15_signal_tier") or payload.get("signal_tier") or "").upper() in {
+            "PREMIUM",
+            "STRONG",
+            "HIGH_RISK_MOMENTUM",
+            "CATALYST_REVIVAL",
+        }
 
     def ensure_guild_alert_delivery(
         self, outbox_id: int, guild_id: int | str, channel_id: int | str
@@ -1897,6 +1885,23 @@ class Store:
                 )
             return int(row[0]), cur.rowcount == 1
 
+    def launch_cursor(self, source: str) -> str | None:
+        row = self.conn.execute(
+            "SELECT cursor FROM launch_source_cursors WHERE source=?", (source,)
+        ).fetchone()
+        return str(row[0]) if row else None
+
+    def save_launch_cursor(
+        self, source: str, cursor: str, metadata: dict[str, Any] | None = None
+    ) -> None:
+        with self._lock, self.conn:
+            self.conn.execute(
+                "INSERT INTO launch_source_cursors(source,cursor,updated_at,metadata_json) VALUES(?,?,?,?) "
+                "ON CONFLICT(source) DO UPDATE SET cursor=excluded.cursor,updated_at=excluded.updated_at,"
+                "metadata_json=excluded.metadata_json",
+                (source, cursor, iso(), _json(metadata or {})),
+            )
+
     def record_launch_events(self, events: Iterable[Any]) -> dict[str, int]:
         """Bulk discovery ingestion keeps the 10k-event path transactional and bounded."""
         inserted = duplicates = 0
@@ -2095,6 +2100,95 @@ class Store:
                     settings.radar_version,
                 ),
             )
+            return cur.rowcount == 1
+
+    def record_v15_decision(
+        self,
+        candidate_id: int,
+        decision: Any,
+        settings: Any,
+        token_address: str,
+        chain: str,
+        market: Any,
+    ) -> bool:
+        """Persist a production V1.5 decision and an immutable first public-call truth."""
+        now = market.captured_at
+        payload = decision.to_dict()
+        with self._lock, self.conn:
+            cur = self.conn.execute(
+                "INSERT OR IGNORE INTO v15_decisions(candidate_id,observed_at,stage,runner_score,"
+                "runner_grade,failure_score,failure_grade,survival_grade,setup_conviction,"
+                "evidence_coverage,entry_status,signal_tier,critical_unknowns_json,failure_reasons_json,"
+                "provider_conflicts_json,feature_vector_json,software_version,model_version,"
+                "config_fingerprint) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                (
+                    candidate_id,
+                    now,
+                    str(decision.stage),
+                    decision.runner_score,
+                    decision.runner_grade,
+                    decision.failure_score,
+                    decision.failure_grade,
+                    decision.survival_grade,
+                    decision.setup_conviction,
+                    decision.evidence_coverage,
+                    str(decision.entry_status),
+                    str(decision.signal_tier),
+                    _json(decision.critical_unknowns),
+                    _json(decision.failure_reasons),
+                    _json(decision.provider_conflicts),
+                    _json(decision.feature_vector),
+                    settings.software_version,
+                    settings.model_version,
+                    settings.config_fingerprint(),
+                ),
+            )
+            self.conn.execute(
+                "UPDATE candidates SET runner_score=?,runner_grade=?,failure_score=?,failure_grade=?,"
+                "survival_grade=?,setup_conviction=?,evidence_coverage=?,entry_state=?,"
+                "critical_unknowns_json=?,failure_reasons_json=?,v15_signal_tier=?,updated_at=? WHERE id=?",
+                (
+                    decision.runner_score,
+                    decision.runner_grade,
+                    decision.failure_score,
+                    decision.failure_grade,
+                    decision.survival_grade,
+                    decision.setup_conviction,
+                    decision.evidence_coverage,
+                    str(decision.entry_status),
+                    _json(decision.critical_unknowns),
+                    _json(decision.failure_reasons),
+                    str(decision.signal_tier),
+                    now,
+                    candidate_id,
+                ),
+            )
+            if str(decision.signal_tier) not in {"SILENT_WATCH", "REJECT"}:
+                self.conn.execute(
+                    "INSERT OR IGNORE INTO v15_t0_calls(candidate_id,call_timestamp,token_address,chain,"
+                    "stage,market_cap_usd,price_usd,liquidity_usd,runner_score,failure_score,"
+                    "setup_conviction,evidence_coverage,entry_status,fingerprint_json,software_version,"
+                    "model_version,config_fingerprint) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    (
+                        candidate_id,
+                        now,
+                        token_address,
+                        chain,
+                        str(decision.stage),
+                        market.market_cap_usd,
+                        market.price_usd,
+                        market.liquidity_usd,
+                        decision.runner_score,
+                        decision.failure_score,
+                        decision.setup_conviction,
+                        decision.evidence_coverage,
+                        str(decision.entry_status),
+                        _json(payload),
+                        settings.software_version,
+                        settings.model_version,
+                        settings.config_fingerprint(),
+                    ),
+                )
             return cur.rowcount == 1
 
     def record_latency(
@@ -2440,3 +2534,36 @@ class Store:
             )
         ]
         return right_tail_metrics(rows, min_sample)
+
+    def v15_performance(self, min_sample: int = 30) -> dict[str, Any]:
+        """Observed cohort discrimination; never labels small samples as edge."""
+        rows = [
+            dict(row)
+            for row in self.conn.execute(
+                "WITH latest AS (SELECT candidate_id,MAX(id) id FROM v15_decisions GROUP BY candidate_id) "
+                "SELECT d.signal_tier,d.stage,t.chain,COUNT(*) sample,"
+                "SUM(CASE WHEN o.max_multiple_from_discovery>=2 THEN 1 ELSE 0 END) runners_2x,"
+                "SUM(CASE WHEN o.max_multiple_from_discovery>=5 THEN 1 ELSE 0 END) runners_5x,"
+                "SUM(CASE WHEN o.max_multiple_from_discovery>=10 THEN 1 ELSE 0 END) runners_10x,"
+                "SUM(CASE WHEN o.final_lifecycle_state LIKE 'FAILED%' "
+                "AND COALESCE(o.max_multiple_from_discovery,0)<2 "
+                "THEN 1 ELSE 0 END) failed_before_2x "
+                "FROM latest l JOIN v15_decisions d ON d.id=l.id "
+                "JOIN candidates c ON c.id=d.candidate_id "
+                "JOIN tokens t ON t.id=c.token_id LEFT JOIN token_outcomes o ON o.token_id=t.id "
+                "GROUP BY d.signal_tier,d.stage,t.chain ORDER BY d.signal_tier,d.stage,t.chain"
+            )
+        ]
+        for row in rows:
+            sample = int(row["sample"] or 0)
+            row["runner_2x_rate"] = (row["runners_2x"] or 0) / sample if sample else None
+            row["failure_rate"] = (row["failed_before_2x"] or 0) / sample if sample else None
+            row["mature_enough_for_edge_claim"] = sample >= min_sample
+        return {
+            "cohorts": rows,
+            "warning": (
+                None
+                if rows and all(row["mature_enough_for_edge_claim"] for row in rows)
+                else "SMALL_OR_IMMATURE_SAMPLE_NO_EDGE_CLAIM"
+            ),
+        }

@@ -171,6 +171,8 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
                 token_topic_index=settings.bnb_launch_token_topic_index,
                 token_data_word_index=settings.bnb_launch_token_data_word_index,
                 creator_data_word_index=settings.bnb_launch_creator_data_word_index,
+                load_cursor=store.launch_cursor,
+                save_cursor=store.save_launch_cursor,
                 poll_seconds=settings.launch_source_reconnect_seconds,
             )
         )

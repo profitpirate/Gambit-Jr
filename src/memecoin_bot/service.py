@@ -57,6 +57,7 @@ from memecoin_bot.scoring import ScoringEngine
 from memecoin_bot.signals import format_discord_event, radar_payload, signal_payload
 from memecoin_bot.social import SocialEngine
 from memecoin_bot.tracking import SignalTracker
+from memecoin_bot.v15_engine import SignalTier, Stage, evaluate_v15, tradeability
 
 
 def fair_chain_sample(discoveries: list[DiscoveryEvent], limit: int) -> list[DiscoveryEvent]:
@@ -719,6 +720,81 @@ class IntelligenceService:
             observed_at=market.captured_at,
             providers=enrichment,
         )
+        trade = tradeability(market.liquidity_usd)
+        age_minutes = max(
+            0.0,
+            (
+                datetime.fromisoformat(market.captured_at)
+                - datetime.fromisoformat(candidate["first_discovered_at"])
+            ).total_seconds()
+            / 60,
+        )
+        v15_stage = Stage.MIGRATED if market.pair_address else Stage.NEW
+        liquidity_quality = (
+            None
+            if market.liquidity_usd is None
+            else min(100.0, market.liquidity_usd / 250)
+        )
+        momentum_quality = (
+            None
+            if momentum.get("score") is None
+            else min(100.0, float(momentum["score"]) / 15 * 100)
+        )
+        wallet_quality = (
+            min(100.0, float(gmgn_wallet.get("counts", {}).get("smart", 0)) * 25)
+            if gmgn_snapshot
+            else None
+        )
+        if v15_stage == Stage.MIGRATED:
+            v15_features = {
+                "amm_liquidity": liquidity_quality,
+                "tradeability": {"GOOD": 90, "LIMITED": 55, "POOR": 20}.get(trade["grade"]),
+                "migration_continuity": None,
+                "buyer_quality": wallet_quality,
+                "post_migration_momentum": momentum_quality,
+            }
+        else:
+            v15_features = {
+                "launch_verified": 100 if candidate["source_event_timestamp"] else None,
+                "early_demand": momentum_quality,
+                "buyer_independence": wallet_quality,
+                "creator_quality": (
+                    None
+                    if developer.get("score") is None
+                    else min(100.0, float(developer["score"]) / 15 * 100)
+                ),
+                "early_liquidity": liquidity_quality,
+            }
+        v15_features.update(
+            {
+                "call_market_cap": candidate["radar_market_cap_usd"] or market.market_cap_usd,
+                "current_market_cap": market.market_cap_usd,
+                "age_minutes": age_minutes,
+                "vertical_acceleration": momentum.get("acceleration"),
+                "sell_restriction_unknown": "BSC_TRANSFER_RESTRICTIONS_UNKNOWN"
+                in safety.warnings,
+                "concentration_unknown": safety.top10_percent is None,
+                "toxic_creator": str(developer.get("classification")) in {"TOXIC", "KNOWN_BAD"},
+                "poor_tradeability": trade["grade"] == "POOR",
+                "terminal_safety_failure": bool(safety.rejection_reasons),
+                "provider_conflicts": [
+                    warning for warning in safety.warnings if "CONFLICT" in warning
+                ],
+                "critical_unknowns": [],
+                "why_now": [
+                    reason
+                    for reason in (
+                        "momentum acceleration" if momentum_quality and momentum_quality >= 70 else None,
+                        "tradeable liquidity" if trade["grade"] == "GOOD" else None,
+                    )
+                    if reason
+                ],
+            }
+        )
+        v15_decision = evaluate_v15(v15_stage, v15_features)
+        self.store.record_v15_decision(
+            candidate_id, v15_decision, self.settings, address, chain, market
+        )
         if promoted_alpha in {
             AlphaState.HOT_RADAR,
             AlphaState.PRIORITY_RADAR,
@@ -802,6 +878,11 @@ class IntelligenceService:
             SignalClass.WATCH,
             SignalClass.STRONG,
             SignalClass.HIGH_CONVICTION,
+        } and v15_decision.signal_tier in {
+            SignalTier.PREMIUM,
+            SignalTier.STRONG,
+            SignalTier.HIGH_RISK_MOMENTUM,
+            SignalTier.CATALYST_REVIVAL,
         }
         existing_signal_id = candidate["signal_id"]
         if existing_signal_id:
@@ -901,6 +982,17 @@ class IntelligenceService:
             score,
             self.settings.shadow_mode,
         )
+        payload.update(
+            {
+                "v15_signal_tier": str(v15_decision.signal_tier),
+                "runner_score": v15_decision.runner_score,
+                "failure_score": v15_decision.failure_score,
+                "setup_conviction": v15_decision.setup_conviction,
+                "evidence_coverage": v15_decision.evidence_coverage,
+                "entry_status": str(v15_decision.entry_status),
+                "critical_unknowns": v15_decision.critical_unknowns,
+            }
+        )
         signal_id = self.store.create_signal(
             token_id,
             market,
@@ -923,7 +1015,7 @@ class IntelligenceService:
         if signal_id:
             self.store.update_candidate(
                 candidate_id,
-                CandidateState.SIGNALLED,
+                CandidateState.QUALIFIED_SIGNAL,
                 f"PROMOTED_{score.classification}",
                 market,
                 score,
@@ -1016,6 +1108,8 @@ class IntelligenceService:
                     d
                     for d in self.store.alert_destinations()
                     if self.store.alert_allowed(d["alert_tier"], row["event_type"], payload)
+                    and str(payload.get("chain") or "").lower()
+                    in json.loads(d.get("enabled_chains_json") or "[]")
                 ]
                 if destinations and hasattr(self.notifier, "send_to"):
                     for destination in destinations:

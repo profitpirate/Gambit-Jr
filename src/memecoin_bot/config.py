@@ -134,11 +134,11 @@ class Settings:
     watchlist_alerts_enabled: bool = False
     daily_report_enabled: bool = False
     min_sample_for_edge_metrics: int = 30
-    software_version: str = "1.4.0"
-    scoring_version: str = "v1.4-right-tail"
-    feature_version: str = "v1.4-t0"
-    model_version: str = "deterministic-v1.4"
-    radar_version: str = "v1.4-alpha-radar"
+    software_version: str = "1.5.0"
+    scoring_version: str = "v1.5-runner-failure"
+    feature_version: str = "v1.5-stage-truth"
+    model_version: str = "deterministic-v1.5"
+    radar_version: str = "v1.5-signal-policy"
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -271,7 +271,7 @@ class Settings:
                 "momentum": _float("WEIGHT_MOMENTUM", 15),
                 "safety": _float("WEIGHT_SAFETY", 5),
             },
-            scoring_version=os.getenv("SCORING_VERSION", "v1.4-right-tail"),
+            scoring_version=os.getenv("SCORING_VERSION", "v1.5-runner-failure"),
             milestones=milestones,
             failure_multiple=_float("FAILURE_MULTIPLE", 0.30),
             inactivity_timeout_hours=_float("INACTIVITY_TIMEOUT_HOURS", 24),
@@ -283,10 +283,10 @@ class Settings:
             watchlist_alerts_enabled=_bool("WATCHLIST_ALERTS_ENABLED", False),
             daily_report_enabled=_bool("DAILY_REPORT_ENABLED", False),
             min_sample_for_edge_metrics=_int("MIN_SAMPLE_FOR_EDGE_METRICS", 30),
-            software_version=os.getenv("SOFTWARE_VERSION", "1.4.0"),
-            feature_version=os.getenv("FEATURE_VERSION", "v1.4-t0"),
-            model_version=os.getenv("MODEL_VERSION", "deterministic-v1.4"),
-            radar_version=os.getenv("RADAR_VERSION", "v1.4-alpha-radar"),
+            software_version=os.getenv("SOFTWARE_VERSION", "1.5.0"),
+            feature_version=os.getenv("FEATURE_VERSION", "v1.5-stage-truth"),
+            model_version=os.getenv("MODEL_VERSION", "deterministic-v1.5"),
+            radar_version=os.getenv("RADAR_VERSION", "v1.5-signal-policy"),
         )
 
     def validate(self) -> None:

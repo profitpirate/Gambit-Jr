@@ -61,6 +61,7 @@ def create_signal(db: Store, scoring_version: str = "v1") -> int:
         [], {
             "classification": "HIGH_CONVICTION", "score": 88, "confidence": 1,
             "symbol": "TST", "name": "Test", "token_address": market.token_address,
+            "chain": "solana",
             "signal_market_cap_usd": 30_000, "liquidity_usd": 20_000,
             "volume_5m_usd": 25_000, "holders": None, "top10_percent": None,
             "bundled_percent": None, "component_scores": score.component_scores,
@@ -68,6 +69,7 @@ def create_signal(db: Store, scoring_version: str = "v1") -> int:
             "developer": {"classification": "UNKNOWN"}, "narrative": {},
             "social": {}, "onchain": {}, "momentum": {}, "risks": [], "thesis": [],
             "signal_timestamp": market.captured_at, "shadow": True,
+            "v15_signal_tier": "STRONG",
             "scoring_version": scoring_version,
         }, holder_count=None,
     )
