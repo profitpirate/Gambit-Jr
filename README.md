@@ -387,12 +387,34 @@ concentration are also unknown without a dedicated security/indexing provider.
 
 ## Resource profile
 
-The service runs one discovery loop, one bounded candidate loop, one low-cadence outcome
-loop, and one signal tracker.
-New-pool feeds are polled once per discovery cycle; candidate history is bounded by
-`SNAPSHOT_HISTORY_LIMIT`, candidates by global and per-chain limits, and SQLite remains
-single-instance. Run one Compose replica only. Adaptive per-candidate cadence remains a
-future optimization; the bounded shared cadence is intentionally simpler and predictable.
+The service runs a durable canonical realtime worker, native chain sources, one broad
+discovery loop, an adaptive candidate loop, one low-cadence outcome loop, and one signal
+tracker. Native Pump program logs and curve accounts drive early Solana state. Optional
+PumpPortal new-token/migration events reconcile into the same event identity. Selective
+Helius monitoring uses standard `logsSubscribe` plus `getTransaction`; paid enhanced
+`transactionSubscribe` is not required. Configured BNB factories use `eth_subscribe` with
+the existing persisted `eth_getLogs` cursor as gap recovery.
+
+Candidate history is bounded by `SNAPSHOT_HISTORY_LIMIT`, candidates by global and
+per-chain limits, and SQLite remains single-instance. GENESIS/HOT/WARM/COLD/DEAD state
+sets each candidate's next due time, while DexScreener requests are grouped in batches of
+at most 30. Run one Compose replica only.
+
+Offline event replay and the human-gated challenger lab are explicit commands:
+
+```bash
+python scripts/v15_realtime_replay.py --database RESEARCH.duckdb \
+  --corpus Pumpfun_Memecoin_Corpus --output replay-manifest.json
+python scripts/v15_realtime_research.py --database RESEARCH.duckdb \
+  --output realtime-trajectory-results.json
+memecoin-bot realtime-research --output outputs/operational-realtime-challenger.json
+python scripts/v15_realtime_probe.py --seconds 60 --database probe.db \
+  --output probe.json
+```
+
+All challengers persist with `public_route=false`; neither command promotes a production
+feature. Transaction-only replay is labelled `HISTORICAL_PROXY` and never substitutes
+market cap or virtual reserve values for native real-SOL account state.
 
 ## Operational acceptance checklist
 

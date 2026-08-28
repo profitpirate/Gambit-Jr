@@ -389,6 +389,11 @@ def token_links(data: dict[str, Any]) -> list[tuple[str, str]]:
 
 def token_card(data: dict[str, Any]) -> dict[str, Any]:
     wallet = data.get("wallet_intelligence") or {}
+    realtime = data.get("realtime_intelligence") or {}
+    capital = realtime.get("capital_trajectory") or {}
+    buyers = realtime.get("buyer_arrival") or {}
+    first_sell = realtime.get("first_sell") or {}
+    monitoring = realtime.get("monitoring") or {}
     return card(
         f"TOKEN • {_value(data.get('name') or data.get('symbol'))}",
         f"`{_value(data.get('token_address'))}`",
@@ -403,6 +408,26 @@ def token_card(data: dict[str, Any]) -> dict[str, Any]:
             _field("Market cap", _money(data.get("current_market_cap_usd"))),
             _field("Liquidity", _money(data.get("current_liquidity_usd"))),
             _field("Peak", f"{float(data.get('max_multiple') or 0):.2f}x"),
+            _field("Realtime", realtime.get("evidence_mode")),
+            _field("Temperature", monitoring.get("state")),
+            _field(
+                "Real SOL / curve",
+                (
+                    f"{_value(capital.get('real_sol_reserve'))} SOL • "
+                    f"{_percent(float(capital['curve_progress']) * 100) if capital.get('curve_progress') is not None else 'UNKNOWN'}"
+                ),
+            ),
+            _field(
+                "Buyer trajectory",
+                (
+                    f"{_value(buyers.get('raw_buyers'))} raw • "
+                    f"{_value(buyers.get('adjusted_independent_buyers'))} independent"
+                ),
+            ),
+            _field(
+                "First meaningful sell",
+                _value(first_sell.get("time_to_first_meaningful_sell_seconds"), "NOT OBSERVED"),
+            ),
             _field("Smart money", wallet.get("smart_money"), False),
             _field(
                 "Evidence gaps",

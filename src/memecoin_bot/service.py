@@ -57,6 +57,10 @@ from memecoin_bot.onchain import OnchainEngine
 from memecoin_bot.providers.base import ProviderError
 from memecoin_bot.providers.dexscreener import DexScreenerProvider
 from memecoin_bot.radar import RadarEngine
+from memecoin_bot.realtime import CanonicalEvent, CanonicalEventFabric, CanonicalEventType
+from memecoin_bot.realtime.actors import ActorIntelligence
+from memecoin_bot.realtime.features import RealtimeFeatureProjector
+from memecoin_bot.realtime.learning import AdaptiveLearningLab
 from memecoin_bot.safety import SafetyGates
 from memecoin_bot.scoring import ScoringEngine
 from memecoin_bot.signals import format_discord_event, radar_payload, signal_payload
@@ -70,6 +74,8 @@ from memecoin_bot.v15_engine import (
     evaluate_v15,
     tradeability,
 )
+
+_MARKET_UNSET = object()
 
 
 def fair_chain_sample(discoveries: list[DiscoveryEvent], limit: int) -> list[DiscoveryEvent]:
@@ -149,6 +155,7 @@ class IntelligenceService:
         gmgn: Any | None = None,
         launch_sources: list[Any] | None = None,
         historical_context: Any | None = None,
+        realtime_sources: list[Any] | None = None,
     ):
         self.settings = settings
         self.store = store
@@ -159,7 +166,13 @@ class IntelligenceService:
         self.gmgn = gmgn
         self.launch_sources = launch_sources or []
         self.historical_context = historical_context
+        self.realtime_sources = realtime_sources or []
         self.launch_queue = BoundedLaunchQueue(settings.event_queue_max)
+        self.realtime_fabric = CanonicalEventFabric(store)
+        self.realtime_features = RealtimeFeatureProjector(store)
+        self.actor_intelligence = ActorIntelligence(store)
+        self.learning_lab = AdaptiveLearningLab(store)
+        self.realtime_wake = asyncio.Event()
         self.safety_gates = SafetyGates(settings)
         self.scoring = ScoringEngine(settings)
         self.developers = DeveloperEngine()
@@ -189,6 +202,109 @@ class IntelligenceService:
                 result=result,
                 queue=self.launch_queue.stats(),
             )
+
+    async def offer_realtime_event(self, event: CanonicalEvent) -> None:
+        result = self.realtime_fabric.publish(event)
+        if result.is_new:
+            self.realtime_wake.set()
+        elif result.conflict:
+            log_event(
+                self.log,
+                logging.WARNING,
+                "canonical_event_conflict",
+                event_id=result.event_id,
+                source=event.source,
+                event_type=str(event.event_type),
+            )
+
+    async def handle_realtime_event(self, event: CanonicalEvent) -> str:
+        feature_ready = model_start = model_finish = decision_at = None
+        token_id, _ = self.realtime_fabric.project(event)
+        if token_id is not None:
+            model_start = iso()
+        if event.event_type == CanonicalEventType.TOKEN_CREATED:
+            launch = LaunchEvent(
+                event_key=event.event_id,
+                source=event.source,
+                chain=event.chain,
+                token_address=event.canonical_token,
+                source_event_timestamp=event.source_timestamp,
+                source_received_at=event.received_timestamp,
+                launchpad=event.platform,
+                creator_address=event.payload.get("creator"),
+                phase="CREATED",
+                slot_or_block=event.slot_or_block,
+                transaction_id=event.transaction_signature,
+                metadata={
+                    **event.payload,
+                    "canonical_event_id": event.event_id,
+                    "confirmation_sources": self.store.conn.execute(
+                        "SELECT confirmation_sources_json FROM canonical_events WHERE event_id=?",
+                        (event.event_id,),
+                    ).fetchone()[0],
+                },
+            )
+            await self.handle_launch_event(launch)
+        if token_id is not None:
+            feature_ready = iso()
+            # Every event updates a bounded PIT trajectory snapshot. This is
+            # research/shadow evidence and cannot route a public alert itself.
+            feature = self.realtime_features.compute(token_id, event.available_timestamp)
+            age = float(feature.get("token_age_seconds") or 0)
+            actor_stage = (
+                "BONDING_SNIPER"
+                if age <= 30
+                else "EARLY_CURVE"
+                if age <= 120
+                else "MID_CURVE"
+                if age <= 600
+                else "POST_MIGRATION_PULLBACK"
+                if feature.get("migration_state") == "MIGRATED"
+                else "UNKNOWN"
+            )
+            actor_evidence = {
+                "funder": self.actor_intelligence.funder_graph(
+                    token_id, event.available_timestamp
+                ),
+                "wallet_consensus": self.actor_intelligence.independent_consensus(
+                    token_id=token_id,
+                    decision_at=event.available_timestamp,
+                    stage=actor_stage,
+                ),
+            }
+            state = self.store.conn.execute(
+                "SELECT creator_address,launched_at FROM token_realtime_state WHERE token_id=?",
+                (token_id,),
+            ).fetchone()
+            if state and state["creator_address"]:
+                actor_evidence["creator_prior_at_launch"] = (
+                    self.actor_intelligence.creator_profile_at(
+                        event.chain, str(state["creator_address"]), str(state["launched_at"])
+                    )
+                )
+            feature["actor_intelligence"] = actor_evidence
+            feature["trigger_event_id"] = event.event_id
+            with self.store._lock, self.store.conn:
+                self.store.conn.execute(
+                    "UPDATE trajectory_feature_snapshots_v15 SET feature_json=? WHERE token_id=? "
+                    "AND decision_timestamp=? AND feature_version=?",
+                    (
+                        json.dumps(feature, default=str, separators=(",", ":"), sort_keys=True),
+                        token_id,
+                        event.available_timestamp,
+                        "realtime-trajectory-v1",
+                    ),
+                )
+            model_finish = iso()
+            decision_at = event.available_timestamp
+        self.realtime_fabric.complete(
+            event.event_id,
+            feature_ready_timestamp=feature_ready,
+            model_start_timestamp=model_start,
+            model_finish_timestamp=model_finish,
+            decision_timestamp=decision_at,
+        )
+        return "PROCESSED"
 
     async def handle_launch_event(self, event: LaunchEvent) -> str:
         launch_event_id, created = self.store.record_launch_event(event)
@@ -354,7 +470,10 @@ class IntelligenceService:
         return await self._monitor_candidate(self.store.candidate_for_token(token_id), discovery)
 
     async def _monitor_candidate(
-        self, candidate: Any, discovery: DiscoveryEvent | None = None
+        self,
+        candidate: Any,
+        discovery: DiscoveryEvent | None = None,
+        market_override: Any = _MARKET_UNSET,
     ) -> str:
         token_id = int(candidate["token_id"])
         candidate_id = int(candidate["id"])
@@ -398,7 +517,11 @@ class IntelligenceService:
             )
             return str(CandidateState.EXPIRED)
         try:
-            market = await self.market.market_snapshot(address, chain)
+            market = (
+                await self.market.market_snapshot(address, chain)
+                if market_override is _MARKET_UNSET
+                else market_override
+            )
         except ProviderError as exc:
             self.store.update_candidate(
                 candidate_id,
@@ -1049,6 +1172,11 @@ class IntelligenceService:
             ],
         }
         self.store.save_evaluation(token_id, score, evidence)
+        realtime_feature = self.realtime_features.latest(token_id, market.captured_at)
+        realtime_capital = (realtime_feature or {}).get("capital_trajectory") or {}
+        realtime_buyers = (realtime_feature or {}).get("buyer_arrival") or {}
+        realtime_available = (realtime_feature or {}).get("available_timestamp") or market.captured_at
+        realtime_observed = (realtime_feature or {}).get("decision_timestamp") or market.captured_at
         v3_evidence = {
             "market_cap": TimedValue(
                 market.market_cap_usd,
@@ -1072,21 +1200,21 @@ class IntelligenceService:
                 "KNOWN" if market.price_usd is not None else "UNKNOWN",
             ),
             "real_sol_reserve": TimedValue(
-                discovery.metadata.get("real_sol_reserve"),
-                market.captured_at,
-                market.captured_at,
-                discovery.source,
+                realtime_capital.get("real_sol_reserve"),
+                realtime_observed,
+                realtime_available,
+                "canonical_realtime_fabric",
                 "KNOWN"
-                if discovery.metadata.get("real_sol_reserve") is not None
+                if realtime_capital.get("real_sol_reserve") is not None
                 else "UNKNOWN",
             ),
             "independent_buyer_velocity": TimedValue(
-                discovery.metadata.get("independent_buyer_velocity"),
-                market.captured_at,
-                market.captured_at,
-                discovery.source,
+                realtime_buyers.get("independent_new_buyers_per_second"),
+                realtime_observed,
+                realtime_available,
+                "canonical_realtime_fabric",
                 "KNOWN"
-                if discovery.metadata.get("independent_buyer_velocity") is not None
+                if realtime_buyers.get("independent_new_buyers_per_second") is not None
                 else "UNKNOWN",
             ),
         }
@@ -1128,6 +1256,7 @@ class IntelligenceService:
             v2_decision={"state": "NOT_EVALUATED_LIVE_RESEARCH_ONLY"},
             features={
                 "v15": v15_features,
+                "realtime_trajectory": realtime_feature,
                 "v3_available": {
                     name: value.value for name, value in v3_evidence.items()
                 },
@@ -1271,6 +1400,7 @@ class IntelligenceService:
                 "actor_concentration": concentration,
                 "buyer_replacement": buyer_replacement,
                 "historical_context": v15_features.get("historical_context"),
+                "realtime_intelligence": realtime_feature,
             }
         )
         signal_id = self.store.create_signal(
@@ -1320,7 +1450,7 @@ class IntelligenceService:
         reconciled = self.store.reconcile_stale_candidates(self.settings.candidate_max_age_minutes)
         if reconciled:
             results["STALE_PENDING_RECONCILIATION"] = reconciled
-        for candidate in self.store.active_candidates(
+        candidates = self.store.active_candidates(
             self.settings.max_active_candidates,
             self.settings.max_active_candidates_per_chain,
             self.settings.scheduler_fresh_reserved_slots,
@@ -1328,9 +1458,25 @@ class IntelligenceService:
             self.settings.scheduler_near_signal_reserved_slots,
             genesis_reserved=self.settings.scheduler_genesis_reserved_slots,
             priority_reserved=self.settings.scheduler_priority_reserved_slots,
-        ):
+        )
+        prefetched: dict[tuple[str, str], Any] = {}
+        batch_fetch = getattr(self.market, "market_snapshots", None)
+        if batch_fetch:
+            by_chain: dict[str, list[str]] = {}
+            for candidate in candidates:
+                by_chain.setdefault(str(candidate["chain"]), []).append(
+                    str(candidate["token_address"])
+                )
+            for chain, addresses in by_chain.items():
+                for address, snapshot in (await batch_fetch(addresses, chain)).items():
+                    prefetched[(chain, address)] = snapshot
+        for candidate in candidates:
             try:
-                result = await self._monitor_candidate(candidate)
+                key = (str(candidate["chain"]), str(candidate["token_address"]))
+                result = await self._monitor_candidate(
+                    candidate,
+                    market_override=prefetched.get(key, _MARKET_UNSET),
+                )
             except Exception:
                 self.log.exception(
                     "candidate monitoring failed",
@@ -1353,6 +1499,8 @@ class IntelligenceService:
             if snapshot and snapshot.market_cap_usd is not None and snapshot.market_cap_usd > 0:
                 self.store.save_snapshot(int(token["token_id"]), snapshot)
                 monitored += 1
+        if monitored:
+            self.actor_intelligence.build_wallet_copyability(matured_before=iso())
         return monitored
 
     async def scan_once(self) -> dict[str, int]:
@@ -1451,6 +1599,16 @@ class IntelligenceService:
                 elif not destinations:
                     remote_id = await self.notifier.send(content)
                 self.store.mark_outbox_sent(int(row["id"]), remote_id, claim_token)
+                trigger = (payload.get("realtime_intelligence") or {}).get(
+                    "trigger_event_id"
+                )
+                if trigger:
+                    with self.store._lock, self.store.conn:
+                        self.store.conn.execute(
+                            "UPDATE canonical_events SET discord_sent_timestamp=? "
+                            "WHERE event_id=?",
+                            (iso(), str(trigger)),
+                        )
                 self.store.record_latency(
                     "DISCORD_DELIVERY",
                     (datetime.now(UTC) - delivery_started).total_seconds() * 1000,
@@ -1474,12 +1632,14 @@ class IntelligenceService:
         return sent
 
     async def run(self) -> None:
+        recovered_realtime = self.realtime_fabric.recover_stale_claims()
         log_event(
             self.log,
             logging.INFO,
             "restart_recovery",
             active_signals=len(self.store.active_signals()),
             pending_outbox=len(self.store.pending_outbox()),
+            recovered_realtime_claims=recovered_realtime,
         )
 
         async def scanner() -> None:
@@ -1544,12 +1704,41 @@ class IntelligenceService:
                 finally:
                     self.launch_queue.task_done(event)
 
+        async def realtime_worker() -> None:
+            while not self.stop_event.is_set():
+                rows = self.realtime_fabric.claim_pending(
+                    self.settings.realtime_processing_batch
+                )
+                if not rows:
+                    self.realtime_wake.clear()
+                    try:
+                        await asyncio.wait_for(self.realtime_wake.wait(), timeout=0.5)
+                    except TimeoutError:
+                        pass
+                    continue
+                for event in rows:
+                    try:
+                        await self.handle_realtime_event(event)
+                    except Exception as exc:
+                        self.realtime_fabric.fail(event.event_id, str(exc))
+                        self.log.exception(
+                            "canonical event processing failed",
+                            extra={"fields": {"event_id": event.event_id}},
+                        )
+
         tasks = [scanner(), candidate_monitor(), outcome_monitor(), tracker()]
         if self.launch_sources:
             tasks.append(launch_worker())
             tasks.extend(
                 source.run(self.offer_launch_event, self.stop_event)
                 for source in self.launch_sources
+            )
+        if self.settings.realtime_fabric_enabled:
+            tasks.append(realtime_worker())
+        if self.realtime_sources:
+            tasks.extend(
+                source.run_events(self.offer_realtime_event, self.stop_event)
+                for source in self.realtime_sources
             )
         await asyncio.gather(*tasks)
 

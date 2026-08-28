@@ -53,6 +53,16 @@ class Settings:
     bnb_launch_creator_data_word_index: int | None = None
     event_queue_max: int = 2_048
     launch_source_reconnect_seconds: float = 2
+    realtime_fabric_enabled: bool = True
+    pumpfun_native_enabled: bool = True
+    pumpfun_curve_monitor_enabled: bool = True
+    realtime_silence_seconds: float = 90
+    realtime_backfill_limit: int = 100
+    realtime_processing_batch: int = 100
+    pumpportal_api_key: str | None = None
+    pumpportal_websocket_url: str = "wss://pumpportal.fun/api/data"
+    helius_api_key: str | None = None
+    helius_curated_accounts: tuple[str, ...] = ()
     gmgn_enabled: bool = False
     gmgn_api_key: str | None = None
     gmgn_base_url: str = "https://openapi.gmgn.ai"
@@ -204,6 +214,22 @@ class Settings:
             ),
             event_queue_max=_int("EVENT_QUEUE_MAX", 2_048),
             launch_source_reconnect_seconds=_float("LAUNCH_SOURCE_RECONNECT_SECONDS", 2),
+            realtime_fabric_enabled=_bool("REALTIME_FABRIC_ENABLED", True),
+            pumpfun_native_enabled=_bool("PUMPFUN_NATIVE_ENABLED", True),
+            pumpfun_curve_monitor_enabled=_bool("PUMPFUN_CURVE_MONITOR_ENABLED", True),
+            realtime_silence_seconds=_float("REALTIME_SILENCE_SECONDS", 90),
+            realtime_backfill_limit=_int("REALTIME_BACKFILL_LIMIT", 100),
+            realtime_processing_batch=_int("REALTIME_PROCESSING_BATCH", 100),
+            pumpportal_api_key=os.getenv("PUMPPORTAL_API_KEY") or None,
+            pumpportal_websocket_url=os.getenv(
+                "PUMPPORTAL_WEBSOCKET_URL", "wss://pumpportal.fun/api/data"
+            ),
+            helius_api_key=os.getenv("HELIUS_API_KEY") or None,
+            helius_curated_accounts=tuple(
+                value.strip()
+                for value in os.getenv("HELIUS_CURATED_ACCOUNTS", "").split(",")
+                if value.strip()
+            ),
             gmgn_enabled=_bool("GMGN_ENABLED", False),
             gmgn_api_key=os.getenv("GMGN_API_KEY") or None,
             gmgn_base_url=os.getenv("GMGN_BASE_URL", "https://openapi.gmgn.ai").rstrip("/"),
@@ -369,7 +395,13 @@ class Settings:
             "QUALIFIED_ONLY",
         }:
             raise ValueError("Unsupported DISCORD_DEFAULT_ALERT_TIER")
-        if min(self.event_queue_max, self.min_sample_for_edge_metrics) <= 0:
+        if min(
+            self.event_queue_max,
+            self.min_sample_for_edge_metrics,
+            self.realtime_silence_seconds,
+            self.realtime_backfill_limit,
+            self.realtime_processing_batch,
+        ) <= 0:
             raise ValueError("Event queue and edge sample settings must be positive")
         if self.historical_live_latency_budget_ms <= 0:
             raise ValueError("Historical live latency budget must be positive")

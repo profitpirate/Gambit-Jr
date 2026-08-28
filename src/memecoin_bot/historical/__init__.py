@@ -41,6 +41,8 @@ from .intelligence_v3 import (
     liquidity_order_flow_features,
     monotonic_target_probabilities,
 )
+from .realtime_replay import build_realtime_event_replay, write_replay_manifest
+from .realtime_research import run_realtime_trajectory_research, write_realtime_research
 from .research import ResearchEngine
 from .store import (
     ApprovedFeatureStore,
@@ -94,6 +96,7 @@ __all__ = [
     "activity_evidence",
     "actor_clusters",
     "assess_actionable_outcome",
+    "build_realtime_event_replay",
     "buyer_quality",
     "copyability_scores",
     "creator_reputation",
@@ -109,6 +112,9 @@ __all__ = [
     "normalize_regime_dataset",
     "point_in_time_rows",
     "run_real_research",
+    "run_realtime_trajectory_research",
     "select_wallet_corpus",
     "write_completion_report",
+    "write_realtime_research",
+    "write_replay_manifest",
 ]

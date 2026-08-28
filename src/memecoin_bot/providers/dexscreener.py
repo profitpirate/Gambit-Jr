@@ -81,12 +81,50 @@ class DexScreenerProvider:
         self, token_address: str, chain: str = "solana"
     ) -> MarketSnapshot | None:
         data = await self.client.request(f"{self.base_url}/token-pairs/v1/{chain}/{token_address}")
-        pairs = _items(data)
+        return self._market_snapshot_from_pairs(
+            token_address, chain, _items(data), allow_unmatched=True
+        )
+
+    async def market_snapshots(
+        self, token_addresses: list[str], chain: str = "solana"
+    ) -> dict[str, MarketSnapshot | None]:
+        """Fetch candidate markets in DexScreener's documented 30-token batches.
+
+        Missing tokens are returned as ``None``. A failed chunk is omitted so the
+        caller can retry those addresses individually without turning one provider
+        error into a batch-wide false negative.
+        """
+        addresses = list(dict.fromkeys(value for value in token_addresses if value))
+        output: dict[str, MarketSnapshot | None] = {}
+        for offset in range(0, len(addresses), 30):
+            chunk = addresses[offset : offset + 30]
+            try:
+                data = await self.client.request(
+                    f"{self.base_url}/tokens/v1/{chain}/{','.join(chunk)}"
+                )
+            except ProviderError:
+                continue
+            pairs = _items(data)
+            for address in chunk:
+                output[address] = self._market_snapshot_from_pairs(address, chain, pairs)
+        return output
+
+    def _market_snapshot_from_pairs(
+        self,
+        token_address: str,
+        chain: str,
+        pairs: list[dict[str, Any]],
+        *,
+        allow_unmatched: bool = False,
+    ) -> MarketSnapshot | None:
         if not pairs:
             return None
         matching = [
             p for p in pairs if (p.get("baseToken") or {}).get("address") == token_address
-        ] or pairs
+        ]
+        if not matching and not allow_unmatched:
+            return None
+        matching = matching or pairs
         pair = max(matching, key=lambda p: _number((p.get("liquidity") or {}).get("usd")) or -1)
         base = pair.get("baseToken") or {}
         txns = pair.get("txns") or {}

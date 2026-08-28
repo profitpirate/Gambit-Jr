@@ -22,6 +22,13 @@ from memecoin_bot.providers.gmgn import GmgnProvider
 from memecoin_bot.providers.launch_events import EvmFactoryLaunchSource, SolanaProgramLaunchSource
 from memecoin_bot.providers.solana_rpc import SolanaRpcProvider
 from memecoin_bot.radar_board import start_radar_board
+from memecoin_bot.realtime.providers import (
+    EvmFactoryRealtimeSource,
+    HeliusCuratedSource,
+    NativePumpFunSource,
+    PumpCurveAccountSource,
+    PumpPortalSource,
+)
 from memecoin_bot.replay import ReplayRunner
 from memecoin_bot.service import IntelligenceService
 
@@ -133,7 +140,11 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
     else:
         store.set_provider_health("gmgn", False, 0, "GMGN_DISABLED", "DISABLED")
     launch_sources = []
-    if settings.direct_launch_discovery_enabled and settings.pumpfun_discovery_enabled:
+    if (
+        not settings.realtime_fabric_enabled
+        and settings.direct_launch_discovery_enabled
+        and settings.pumpfun_discovery_enabled
+    ):
         pump_client = ResilientJsonClient(
             "solana_direct_launch",
             settings.provider_timeout_seconds,
@@ -150,10 +161,11 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
                 reconnect_seconds=settings.launch_source_reconnect_seconds,
             )
         )
-    else:
+    elif not settings.realtime_fabric_enabled:
         store.set_provider_health(
             "solana_direct_launch", False, 0, "DIRECT_LAUNCH_DISABLED", "DISABLED"
         )
+    bnb_realtime_poller = None
     if settings.direct_launch_discovery_enabled and settings.bnb_launch_discovery_enabled:
         bnb_launch_client = ResilientJsonClient(
             "bsc_direct_launch",
@@ -163,20 +175,20 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
             settings.provider_circuit_cooldown_seconds,
             callback,
         )
-        launch_sources.append(
-            EvmFactoryLaunchSource(
-                settings.bsc_rpc_url,
-                settings.bnb_launch_factory_addresses,
-                settings.bnb_launch_event_topics,
-                bnb_launch_client,
-                token_topic_index=settings.bnb_launch_token_topic_index,
-                token_data_word_index=settings.bnb_launch_token_data_word_index,
-                creator_data_word_index=settings.bnb_launch_creator_data_word_index,
-                load_cursor=store.launch_cursor,
-                save_cursor=store.save_launch_cursor,
-                poll_seconds=settings.launch_source_reconnect_seconds,
-            )
+        bnb_realtime_poller = EvmFactoryLaunchSource(
+            settings.bsc_rpc_url,
+            settings.bnb_launch_factory_addresses,
+            settings.bnb_launch_event_topics,
+            bnb_launch_client,
+            token_topic_index=settings.bnb_launch_token_topic_index,
+            token_data_word_index=settings.bnb_launch_token_data_word_index,
+            creator_data_word_index=settings.bnb_launch_creator_data_word_index,
+            load_cursor=store.launch_cursor,
+            save_cursor=store.save_launch_cursor,
+            poll_seconds=settings.launch_source_reconnect_seconds,
         )
+        if not settings.realtime_fabric_enabled:
+            launch_sources.append(bnb_realtime_poller)
     else:
         store.set_provider_health(
             "bsc_direct_launch", False, 0, "DIRECT_LAUNCH_DISABLED", "DISABLED"
@@ -198,6 +210,71 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
             ApprovedFeatureStore(settings.approved_feature_store_path),
             settings.historical_live_latency_budget_ms,
         )
+    realtime_sources = []
+    if settings.realtime_fabric_enabled and bnb_realtime_poller is not None:
+        realtime_sources.append(
+            EvmFactoryRealtimeSource(
+                bnb_realtime_poller,
+                silence_seconds=settings.realtime_silence_seconds,
+            )
+        )
+    if settings.realtime_fabric_enabled and settings.pumpfun_native_enabled:
+        realtime_sources.append(
+            NativePumpFunSource(
+                settings.solana_rpc_url,
+                rpc_client,
+                program_id=settings.pumpfun_program_ids[0],
+                reconnect_seconds=settings.launch_source_reconnect_seconds,
+                silence_seconds=settings.realtime_silence_seconds,
+                backfill_limit=settings.realtime_backfill_limit,
+            )
+        )
+        if settings.pumpfun_curve_monitor_enabled:
+            realtime_sources.append(
+                PumpCurveAccountSource(
+                    settings.solana_rpc_url,
+                    rpc_client,
+                    store.realtime_curve_targets,
+                    silence_seconds=settings.realtime_silence_seconds,
+                )
+            )
+    else:
+        store.set_provider_health(
+            "solana_pumpfun_native", False, 0, "REALTIME_NATIVE_DISABLED", "DISABLED"
+        )
+    if settings.realtime_fabric_enabled and settings.pumpportal_api_key:
+        realtime_sources.append(
+            PumpPortalSource(
+                settings.pumpportal_api_key,
+                settings.pumpportal_websocket_url,
+                settings.launch_source_reconnect_seconds,
+                settings.realtime_silence_seconds,
+            )
+        )
+    else:
+        store.set_provider_health(
+            "pumpportal_redundancy",
+            False,
+            0,
+            "PUMPPORTAL_API_KEY_NOT_CONFIGURED",
+            "NOT_CONFIGURED",
+        )
+    if (
+        settings.realtime_fabric_enabled
+        and settings.helius_api_key
+        and settings.helius_curated_accounts
+    ):
+        realtime_sources.append(
+            HeliusCuratedSource(settings.helius_api_key, settings.helius_curated_accounts)
+        )
+    else:
+        store.set_provider_health(
+            "helius_curated",
+            False,
+            0,
+            "HELIUS_KEY_OR_CURATED_ACCOUNTS_NOT_CONFIGURED",
+            "NOT_CONFIGURED",
+        )
     service = IntelligenceService(
         settings,
         store,
@@ -208,6 +285,7 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
         gmgn,
         launch_sources,
         historical_context,
+        realtime_sources,
     )
     return store, service
 
@@ -278,6 +356,13 @@ async def async_main(args: argparse.Namespace) -> int:
                 )
             )
             return 0
+        if args.command == "realtime-research":
+            report = service.learning_lab.run_store()
+            output = Path(args.output)
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
+            print(json.dumps(report, indent=2, default=str))
+            return 0
         server = start_health_server(
             settings.health_port, lambda: store.status_stats(service.started_at)
         )
@@ -324,6 +409,11 @@ def parser() -> argparse.ArgumentParser:
     manual_scan.add_argument("--chain", choices=("solana", "bsc"), default="solana")
     sub.add_parser("status")
     sub.add_parser("performance")
+    research = sub.add_parser(
+        "realtime-research",
+        help="Run the human-gated realtime challenger lab from matured operational evidence",
+    )
+    research.add_argument("--output", default="outputs/realtime-challenger.json")
     return p
 
 

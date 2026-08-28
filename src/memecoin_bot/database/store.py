@@ -396,8 +396,14 @@ class Store:
                 "SELECT c.*,t.token_address,t.symbol,t.name,t.pair_address,t.chain,t.metadata_json,"
                 "t.first_discovered_at token_discovered_at FROM candidates c "
                 "JOIN tokens t ON t.id=c.token_id WHERE c.state NOT IN (?,?) "
-                "AND (c.next_retry_at IS NULL OR c.next_retry_at<=?)",
-                (str(CandidateState.REJECTED_UNSAFE), str(CandidateState.EXPIRED), now),
+                "AND (c.next_retry_at IS NULL OR c.next_retry_at<=?) "
+                "AND (c.next_monitor_at IS NULL OR c.next_monitor_at<=?)",
+                (
+                    str(CandidateState.REJECTED_UNSAFE),
+                    str(CandidateState.EXPIRED),
+                    now,
+                    now,
+                ),
             )
         )
         rows = [row for row in rows if row["state"] != str(CandidateState.SIGNALLED)]
@@ -1128,6 +1134,14 @@ class Store:
                 "INSERT INTO outbox(event_key,event_type,payload_json,created_at) VALUES(?,?,?,?)",
                 (f"signal:{signal_id}", "SIGNAL", _json(payload), now),
             )
+            trigger = (message_payload.get("realtime_intelligence") or {}).get(
+                "trigger_event_id"
+            )
+            if trigger:
+                self.conn.execute(
+                    "UPDATE canonical_events SET discord_enqueue_timestamp=? WHERE event_id=?",
+                    (now, str(trigger)),
+                )
             self.conn.execute(
                 "UPDATE token_outcomes SET signal_id=?,final_lifecycle_state='SIGNALLED',"
                 "non_signal_reason=NULL,updated_at=? WHERE token_id=?",
@@ -1724,6 +1738,25 @@ class Store:
         ).fetchone()
         result["gmgn"] = json.loads(gmgn[0]) if gmgn else None
         result["wallet_intelligence"] = json.loads(wallet[0]) if wallet else None
+        realtime_state = self.conn.execute(
+            "SELECT * FROM token_realtime_state WHERE token_id=?", (row["id"],)
+        ).fetchone()
+        realtime_feature = self.conn.execute(
+            "SELECT decision_timestamp,available_timestamp,evidence_mode,feature_json "
+            "FROM trajectory_feature_snapshots_v15 WHERE token_id=? "
+            "ORDER BY decision_timestamp DESC LIMIT 1",
+            (row["id"],),
+        ).fetchone()
+        result["realtime_state"] = dict(realtime_state) if realtime_state else None
+        result["realtime_intelligence"] = (
+            {
+                **json.loads(realtime_feature["feature_json"]),
+                "available_timestamp": realtime_feature["available_timestamp"],
+                "evidence_mode": realtime_feature["evidence_mode"],
+            }
+            if realtime_feature
+            else None
+        )
         result["unknown_fields"] = json.loads(result.pop("unknown_fields_json") or "[]")
         result["waiting_reasons"] = json.loads(result.pop("waiting_reasons_json") or "[]")
         result["timeline"] = [
@@ -1769,8 +1802,9 @@ class Store:
         stale_cutoff = (now - timedelta(minutes=candidate_max_age_minutes)).isoformat()
         one = lambda sql, args=(): self.conn.execute(sql, args).fetchone()[0]
         providers = self.conn.execute(
-            "SELECT COUNT(*),COALESCE(SUM(CASE WHEN state='HEALTHY' THEN 1 ELSE 0 END),0),"
-            "COALESCE(SUM(CASE WHEN state!='DISABLED' THEN 1 ELSE 0 END),0) FROM provider_health"
+            "SELECT COUNT(*),COALESCE(SUM(CASE WHEN state IN ('HEALTHY','CONNECTED') "
+            "THEN 1 ELSE 0 END),0),COALESCE(SUM(CASE WHEN state NOT IN "
+            "('DISABLED','NOT_CONFIGURED') THEN 1 ELSE 0 END),0) FROM provider_health"
         ).fetchone()
         provider_rows = [
             dict(r)
@@ -2702,6 +2736,93 @@ class Store:
             "outbox_pending": len(self.pending_outbox()),
             "latency": self.latency_report(),
             "state_reconciliation": self.reconcile_v14_state(),
+            "realtime_fabric": self.realtime_fabric_health(),
+        }
+
+    def realtime_curve_targets(self, limit: int = 500) -> list[dict[str, Any]]:
+        """Active authoritative tokens whose real Pump curve account is known."""
+        return [
+            dict(row)
+            for row in self.conn.execute(
+                "SELECT t.token_address,r.bonding_curve_address,r.monitoring_temperature,"
+                "r.last_event_at FROM token_realtime_state r JOIN tokens t ON t.id=r.token_id "
+                "LEFT JOIN candidates c ON c.token_id=t.id WHERE r.bonding_curve_address IS NOT NULL "
+                "AND COALESCE(r.curve_complete,0)!=1 AND COALESCE(c.authoritative_state,'DISCOVERED') "
+                "NOT IN ('EXPIRED','REJECTED_UNSAFE','FAILED_OUTCOME') "
+                "ORDER BY CASE r.monitoring_temperature WHEN 'GENESIS' THEN 0 WHEN 'HOT' THEN 1 "
+                "WHEN 'WARM' THEN 2 ELSE 3 END,r.last_event_at DESC LIMIT ?",
+                (limit,),
+            )
+        ]
+
+    def realtime_fabric_health(self) -> dict[str, Any]:
+        tables = {
+            str(row[0])
+            for row in self.conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name IN "
+                "('canonical_events','token_event_timeline_v15','curve_observations_v15')"
+            )
+        }
+        if "canonical_events" not in tables:
+            return {"state": "NOT_MIGRATED"}
+        row = self.conn.execute(
+            "SELECT COUNT(*) total,SUM(processing_status='PENDING') pending,"
+            "SUM(processing_status='PROCESSING') processing,SUM(processing_status='FAILED') failed,"
+            "SUM(processing_status='PROCESSED') processed FROM canonical_events"
+        ).fetchone()
+        coverage = self.conn.execute(
+            "SELECT COUNT(DISTINCT token_id) tokens,"
+            "SUM(real_sol_reserves IS NOT NULL) real_sol_observations FROM curve_observations_v15"
+        ).fetchone()
+        return {
+            "state": "ACTIVE",
+            "total": int(row[0] or 0),
+            "pending": int(row[1] or 0),
+            "processing": int(row[2] or 0),
+            "failed": int(row[3] or 0),
+            "processed": int(row[4] or 0),
+            "curve_tokens": int(coverage[0] or 0),
+            "real_sol_observations": int(coverage[1] or 0),
+            "latency": self.realtime_latency_report(),
+        }
+
+    def realtime_latency_report(self) -> dict[str, dict[str, Any]]:
+        from memecoin_bot.alpha_engine import latency_summary, percentile
+
+        fields = {
+            "provider": ("source_timestamp", "received_timestamp"),
+            "availability": ("received_timestamp", "available_timestamp"),
+            "source_to_feature": ("source_timestamp", "feature_ready_timestamp"),
+            "model": ("model_start_timestamp", "model_finish_timestamp"),
+            "source_to_decision": ("source_timestamp", "decision_timestamp"),
+            "discord_queue": ("decision_timestamp", "discord_enqueue_timestamp"),
+            "discord_delivery": ("discord_enqueue_timestamp", "discord_sent_timestamp"),
+            "source_to_discord": ("source_timestamp", "discord_sent_timestamp"),
+        }
+        grouped: dict[str, list[float]] = {name: [] for name in fields}
+        rows = self.conn.execute(
+            "SELECT source_timestamp,received_timestamp,available_timestamp,"
+            "feature_ready_timestamp,model_start_timestamp,model_finish_timestamp,"
+            "decision_timestamp,discord_enqueue_timestamp,discord_sent_timestamp "
+            "FROM canonical_events WHERE event_type!='PROVIDER_HEALTH'"
+        )
+        for row in rows:
+            for name, (start, finish) in fields.items():
+                if row[start] is None or row[finish] is None:
+                    continue
+                elapsed = (
+                    datetime.fromisoformat(str(row[finish]))
+                    - datetime.fromisoformat(str(row[start]))
+                ).total_seconds() * 1_000
+                if elapsed >= 0:
+                    grouped[name].append(elapsed)
+        return {
+            name: {
+                **latency_summary(values),
+                "p90_ms": percentile(values, 0.90),
+                "p99_ms": percentile(values, 0.99),
+            }
+            for name, values in grouped.items()
         }
 
     def right_tail_performance(self, min_sample: int = 30) -> dict[str, Any]:
