@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+import statistics
 import tempfile
 import threading
 import time
@@ -183,7 +184,9 @@ class HistoricalWarehouse(_SqliteStore):
                 tuple(values[name] for name in columns),
             )
 
-    def ingest_raw(self, evidence: RawEvidence) -> tuple[str, bool]:
+    def ingest_raw(
+        self, evidence: RawEvidence, *, refresh_coverage: bool = True
+    ) -> tuple[str, bool]:
         evidence.validate()
         payload_bytes = _json(evidence.payload).encode()
         payload_hash = hashlib.sha256(payload_bytes).hexdigest()
@@ -216,9 +219,13 @@ class HistoricalWarehouse(_SqliteStore):
                 ),
             )
             inserted = cursor.rowcount == 1
-            if inserted:
+            if inserted and refresh_coverage:
                 self._refresh_dataset_coverage(evidence.dataset_id)
         return evidence_id, inserted
+
+    def refresh_dataset_coverage(self, dataset_id: str) -> None:
+        with self._lock, self.conn:
+            self._refresh_dataset_coverage(dataset_id)
 
     def _refresh_dataset_coverage(self, dataset_id: str) -> None:
         archive_paths = self.conn.execute(
@@ -353,13 +360,11 @@ class HistoricalWarehouse(_SqliteStore):
         _parse_timestamp(decision_at)
         rows = self.conn.execute(
             "SELECT feature_name,feature_value_json,observed_at,available_at,confidence,missing_state "
-            "FROM point_in_time_features f WHERE entity_key=? AND feature_version=? "
-            "AND observed_at<=? AND available_at<=? AND feature_id=(SELECT feature_id FROM "
-            "point_in_time_features newer WHERE newer.entity_key=f.entity_key AND "
-            "newer.feature_name=f.feature_name AND newer.feature_version=f.feature_version "
-            "AND newer.observed_at<=? AND newer.available_at<=? ORDER BY newer.observed_at DESC,"
-            "newer.available_at DESC LIMIT 1)",
-            (entity_key, feature_version, decision_at, decision_at, decision_at, decision_at),
+            "FROM (SELECT feature_name,feature_value_json,observed_at,available_at,confidence,"
+            "missing_state,ROW_NUMBER() OVER(PARTITION BY feature_name ORDER BY observed_at DESC,"
+            "available_at DESC) AS recency FROM point_in_time_features WHERE entity_key=? AND "
+            "feature_version=? AND observed_at<=? AND available_at<=?) WHERE recency=1",
+            (entity_key, feature_version, decision_at, decision_at),
         ).fetchall()
         return {
             row["feature_name"]: {
@@ -451,6 +456,210 @@ class HistoricalWarehouse(_SqliteStore):
 
     def coverage_map(self) -> list[dict[str, Any]]:
         return [dict(row) for row in self.conn.execute("SELECT * FROM datasets ORDER BY dataset_id")]
+
+    def assess_coverage(self, dataset_id: str, assessment: dict[str, Any]) -> None:
+        required = {
+            "timestamp_precision",
+            "survivorship_bias",
+            "quality_state",
+            "licensing_limitations",
+            "cost_class",
+            "information_gain",
+        }
+        missing = sorted(required - assessment.keys())
+        if missing:
+            raise ValueError(f"coverage assessment fields missing: {', '.join(missing)}")
+        with self._lock, self.conn:
+            self.conn.execute(
+                "INSERT INTO dataset_coverage_assessments VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) "
+                "ON CONFLICT(dataset_id) DO UPDATE SET launch_platform=excluded.launch_platform,"
+                "normalized_rows=excluded.normalized_rows,missing_ranges_json=excluded.missing_ranges_json,"
+                "completeness_estimate=excluded.completeness_estimate,"
+                "point_in_time_safe=excluded.point_in_time_safe,"
+                "timestamp_precision=excluded.timestamp_precision,"
+                "survivorship_bias=excluded.survivorship_bias,quality_state=excluded.quality_state,"
+                "licensing_limitations=excluded.licensing_limitations,cost_class=excluded.cost_class,"
+                "information_gain=excluded.information_gain,assessed_at=excluded.assessed_at",
+                (
+                    dataset_id,
+                    assessment.get("launch_platform"),
+                    int(assessment.get("normalized_rows") or 0),
+                    _json(assessment.get("missing_ranges") or []),
+                    assessment.get("completeness_estimate"),
+                    int(bool(assessment.get("point_in_time_safe"))),
+                    assessment["timestamp_precision"],
+                    assessment["survivorship_bias"],
+                    assessment["quality_state"],
+                    assessment["licensing_limitations"],
+                    assessment["cost_class"],
+                    assessment["information_gain"],
+                    _now(),
+                ),
+            )
+
+    def coverage_manifest(self) -> list[dict[str, Any]]:
+        rows = self.conn.execute(
+            "SELECT d.*,a.launch_platform,a.normalized_rows,a.completeness_estimate AS "
+            "assessed_completeness,a.point_in_time_safe AS assessed_point_in_time_safe,"
+            "a.survivorship_bias,a.quality_state,a.licensing_limitations,a.cost_class,"
+            "a.information_gain,a.assessed_at FROM datasets d LEFT JOIN "
+            "dataset_coverage_assessments a ON a.dataset_id=d.dataset_id ORDER BY d.dataset_id"
+        ).fetchall()
+        result = []
+        for row in rows:
+            item = dict(row)
+            item["raw_bytes"] = item.pop("storage_bytes")
+            item["missing_ranges"] = json.loads(item.pop("missing_ranges_json"))
+            item["cost"] = json.loads(item.pop("cost_json"))
+            item["point_in_time_safe"] = bool(item["point_in_time_safe"])
+            result.append(item)
+        return result
+
+    def record_research_decision(self, record: dict[str, Any]) -> str:
+        decision_id = _uuid(
+            record["feature_name"],
+            record["feature_version"],
+            record["dataset_version"],
+            record["approval_state"],
+        )
+        with self._lock, self.conn:
+            self.conn.execute(
+                "INSERT OR REPLACE INTO research_decisions VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                (
+                    decision_id,
+                    record.get("research_run_id"),
+                    record["feature_name"],
+                    record["feature_version"],
+                    record["dataset_version"],
+                    int(record.get("sample_size") or 0),
+                    _json(record.get("train_window") or {}),
+                    _json(record.get("validation_window") or {}),
+                    _json(record.get("test_window") or {}),
+                    _json(record.get("baseline") or {}),
+                    _json(record.get("ablation") or {}),
+                    record.get("leakage_state", "UNKNOWN"),
+                    record.get("drift_state", "UNKNOWN"),
+                    record["approval_state"],
+                    record.get("approved_by"),
+                    record.get("merge_policy", "EXPLANATION_ONLY"),
+                    _json(record.get("limitations") or []),
+                    _now(),
+                ),
+            )
+        return decision_id
+
+    def record_latency(
+        self,
+        operation: str,
+        samples_ms: list[float],
+        *,
+        throughput_per_second: float | None = None,
+        storage_bytes: int | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> str:
+        if not samples_ms:
+            raise ValueError("latency measurement requires samples")
+        ordered = sorted(samples_ms)
+        p95_index = min(len(ordered) - 1, int((len(ordered) - 1) * 0.95))
+        measurement_id = str(uuid.uuid4())
+        with self._lock, self.conn:
+            self.conn.execute(
+                "INSERT INTO latency_measurements_v15 VALUES(?,?,?,?,?,?,?,?,?,?)",
+                (
+                    measurement_id,
+                    operation,
+                    len(ordered),
+                    statistics.median(ordered),
+                    ordered[p95_index],
+                    max(ordered),
+                    throughput_per_second,
+                    storage_bytes,
+                    _now(),
+                    _json(metadata or {}),
+                ),
+            )
+        return measurement_id
+
+    def record_acquisition_requirement(self, record: dict[str, Any]) -> None:
+        with self._lock, self.conn:
+            self.conn.execute(
+                "INSERT OR REPLACE INTO acquisition_requirements VALUES(?,?,?,?,?,?,?,?)",
+                (
+                    record["source_name"],
+                    record.get("credential_name"),
+                    record["expected_coverage"],
+                    record["cost_class"],
+                    record["expected_information_gain"],
+                    record["state"],
+                    record["limitation"],
+                    _now(),
+                ),
+            )
+
+    def operator_status(self) -> dict[str, Any]:
+        def scalar(query: str) -> int:
+            return int(self.conn.execute(query).fetchone()[0])
+
+        latest_research = self.conn.execute(
+            "SELECT research_run_id,metrics_json,result_json,leakage_state,created_at "
+            "FROM research_runs ORDER BY created_at DESC LIMIT 1"
+        ).fetchone()
+        research_summary = None
+        if latest_research:
+            research_summary = dict(latest_research)
+            research_summary["metrics"] = json.loads(research_summary.pop("metrics_json"))
+            research_summary["result"] = json.loads(research_summary.pop("result_json"))
+        sizes = {
+            "warehouse_bytes": self.path.stat().st_size if self.path.exists() else 0,
+            "raw_archive_bytes": sum(
+                path.stat().st_size for path in self.archive.root.rglob("*.json")
+            )
+            if self.archive.root.exists()
+            else 0,
+        }
+        return {
+            "datasets": self.coverage_manifest(),
+            "backfills": [dict(row) for row in self.conn.execute(
+                "SELECT * FROM backfill_jobs ORDER BY updated_at DESC"
+            )],
+            "entities": scalar("SELECT COUNT(*) FROM canonical_entities"),
+            "normalized_events": scalar("SELECT COUNT(*) FROM normalized_events"),
+            "point_in_time_features": scalar("SELECT COUNT(*) FROM point_in_time_features"),
+            "outcomes": scalar("SELECT COUNT(*) FROM outcomes"),
+            "runner_corpus": scalar("SELECT COUNT(*) FROM outcomes WHERE peak_multiple>=5"),
+            "failure_corpus": scalar(
+                "SELECT COUNT(*) FROM outcomes WHERE rugged=1 OR peak_multiple<1"
+            ),
+            "research_runs": scalar("SELECT COUNT(*) FROM research_runs"),
+            "latest_research": research_summary,
+            "wallet_memory_entities": scalar(
+                "SELECT COUNT(DISTINCT entity_key) FROM point_in_time_features "
+                "WHERE feature_name LIKE 'wallet_%' OR feature_name LIKE '%alpha_wallet%'"
+            ),
+            "creator_memory_entities": scalar(
+                "SELECT COUNT(DISTINCT entity_key) FROM point_in_time_features "
+                "WHERE feature_name LIKE 'creator_%' OR feature_name LIKE 'deployer_%'"
+            ),
+            "buyer_memory_entities": scalar(
+                "SELECT COUNT(DISTINCT entity_key) FROM point_in_time_features "
+                "WHERE feature_name LIKE 'buyer_%'"
+            ),
+            "approved_research_features": scalar(
+                "SELECT COUNT(*) FROM research_decisions WHERE approval_state='APPROVED'"
+            ),
+            "research_decisions": [dict(row) for row in self.conn.execute(
+                "SELECT * FROM research_decisions ORDER BY decided_at DESC"
+            )],
+            "shadow_decisions": scalar("SELECT COUNT(*) FROM shadow_decisions"),
+            "drift_observations": scalar("SELECT COUNT(*) FROM drift_observations"),
+            "latency": [dict(row) for row in self.conn.execute(
+                "SELECT * FROM latency_measurements_v15 ORDER BY measured_at DESC"
+            )],
+            "acquisition_requirements": [dict(row) for row in self.conn.execute(
+                "SELECT * FROM acquisition_requirements ORDER BY source_name"
+            )],
+            **sizes,
+        }
 
     def begin_backfill(self, dataset_id: str, provider: str, job_id: str | None = None) -> str:
         job_id = job_id or str(uuid.uuid4())
@@ -574,6 +783,22 @@ class ApprovedFeatureStore(_SqliteStore):
     def approve(self, record: dict[str, Any]) -> None:
         if not record.get("approved_by") or not record.get("research_run_id"):
             raise ValueError("manual approver and research run are required")
+        governance_fields = {
+            "dataset_version",
+            "train_window",
+            "validation_window",
+            "test_window",
+            "baseline",
+            "ablation",
+            "leakage_state",
+            "drift_state",
+            "approval_state",
+        }
+        missing = sorted(governance_fields - record.keys())
+        if missing:
+            raise ValueError(f"feature approval evidence missing: {', '.join(missing)}")
+        if record["approval_state"] != "APPROVED" or record["leakage_state"] != "PASS":
+            raise ValueError("production features require APPROVED state and PASS leakage result")
         if int(record.get("sample_size") or 0) <= 0:
             raise ValueError("an approved feature requires a positive research sample")
         max_contribution = float(record.get("max_contribution", 0))
@@ -600,6 +825,24 @@ class ApprovedFeatureStore(_SqliteStore):
                 f"INSERT INTO approved_feature_registry({','.join(values)}) VALUES("
                 f"{','.join('?' for _ in values)})",
                 tuple(values.values()),
+            )
+            self.conn.execute(
+                "INSERT INTO feature_approval_evidence_v15 VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                (
+                    record["feature_name"],
+                    record["feature_version"],
+                    record["dataset_version"],
+                    _json(record["train_window"]),
+                    _json(record["validation_window"]),
+                    _json(record["test_window"]),
+                    _json(record["baseline"]),
+                    _json(record["ablation"]),
+                    record["leakage_state"],
+                    record["drift_state"],
+                    record["approval_state"],
+                    record["approved_by"],
+                    record.get("approved_at") or _now(),
+                ),
             )
 
     def publish_snapshot(

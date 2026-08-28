@@ -57,8 +57,12 @@ class BackfillEngine:
             latest = max((record.source_timestamp for record in page.records), default=None)
             ingested = 0
             for record in page.records:
-                _evidence_id, inserted = self.warehouse.ingest_raw(record)
+                _evidence_id, inserted = self.warehouse.ingest_raw(
+                    record, refresh_coverage=False
+                )
                 ingested += int(inserted)
+            if ingested:
+                self.warehouse.refresh_dataset_coverage(provider.dataset_id)
             pages += 1
             state = "COMPLETE" if page.next_cursor is None else "RUNNING"
             self.warehouse.checkpoint_backfill(

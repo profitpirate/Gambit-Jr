@@ -241,7 +241,12 @@ class UnicodeAndDiscordTests(unittest.TestCase):
             with self.subTest(event_type=event_type):
                 card = format_discord_event(event_type, payload)
                 self.assertIn(address, card["content"])
-                self.assertEqual(card["embeds"][0]["fields"][0]["value"], "BNB CHAIN")
+                chain_field = next(
+                    field
+                    for field in card["embeds"][0]["fields"]
+                    if field["name"] == "Chain"
+                )
+                self.assertEqual(chain_field["value"], "BNB CHAIN")
                 self.assertLessEqual(len(card["embeds"][0]["description"]), 4096)
 
 

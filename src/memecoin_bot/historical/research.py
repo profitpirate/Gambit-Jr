@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import statistics
@@ -147,20 +148,39 @@ class ResearchEngine:
         for row in rows:
             by_outcome[row["outcome_id"]][row["feature_name"]] = row.get("value")
             outcome_values[row["outcome_id"]] = row
+        def first_numeric(features: dict[str, Any], *names: str) -> float | None:
+            return next(
+                (
+                    value
+                    for name in names
+                    if (value := _numeric(features.get(name))) is not None
+                ),
+                None,
+            )
+
         selectors = {
-            "random": lambda features: 0.5,
-            "mc_only": lambda features: _numeric(features.get("market_cap_usd")),
-            "volume_only": lambda features: _numeric(features.get("volume_5m_usd")),
-            "momentum_only": lambda features: _numeric(features.get("momentum_acceleration")),
-            "liquidity_only": lambda features: _numeric(features.get("liquidity_usd")),
+            "random": lambda features: int(
+                hashlib.sha256(str(features.get("_outcome_id", "")).encode()).hexdigest()[:12],
+                16,
+            ),
+            "mc_only": lambda features: first_numeric(features, "market_cap_usd"),
+            "volume_only": lambda features: first_numeric(
+                features, "volume_5m_usd", "market_initial_volume_usd"
+            ),
+            "momentum_only": lambda features: first_numeric(
+                features, "momentum_acceleration", "market_initial_momentum"
+            ),
+            "liquidity_only": lambda features: first_numeric(features, "liquidity_usd"),
             "safety_filtered_momentum": lambda features: (
-                _numeric(features.get("momentum_acceleration"))
+                first_numeric(features, "momentum_acceleration", "market_initial_momentum")
                 if not features.get("terminal_safety_failure")
                 else None
             ),
         }
         results = {}
         for name, selector in selectors.items():
+            for outcome_id, features in by_outcome.items():
+                features["_outcome_id"] = outcome_id
             scored = [
                 (selector(features), outcome_values[outcome_id])
                 for outcome_id, features in by_outcome.items()
@@ -177,10 +197,13 @@ class ResearchEngine:
         return results
 
     @staticmethod
-    def ablations(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    def ablations(
+        rows: list[dict[str, Any]], train_rows: list[dict[str, Any]] | None = None
+    ) -> dict[str, Any]:
         families = {
             "wallet": ("wallet", "alpha"),
             "creator": ("creator", "deployer"),
+            "funding_graph": ("funding", "funder", "cluster"),
             "narrative": ("narrative", "social"),
             "buyer_quality": ("buyer",),
             "runner_fingerprint": ("fingerprint", "similarity"),
@@ -188,16 +211,112 @@ class ResearchEngine:
             "payoff": ("payoff",),
             "regime": ("regime",),
         }
-        return {
-            family: {
-                "removed_feature_rows": sum(
-                    any(marker in row["feature_name"].lower() for marker in markers)
-                    for row in rows
-                ),
-                "requires_prospective_scoring": True,
+        training = train_rows or rows
+        by_feature: dict[str, dict[str, list[float]]] = defaultdict(
+            lambda: {"runner": [], "other": []}
+        )
+        for row in training:
+            value = _numeric(row.get("value"))
+            if value is None:
+                continue
+            cohort = "runner" if float(row.get("peak_multiple") or 0) >= 5 else "other"
+            by_feature[row["feature_name"]][cohort].append(value)
+        model = {}
+        for name, cohorts in by_feature.items():
+            values = cohorts["runner"] + cohorts["other"]
+            if not cohorts["runner"] or not cohorts["other"] or len(values) < 3:
+                continue
+            scale = statistics.pstdev(values)
+            if not scale:
+                continue
+            direction = 1 if statistics.mean(cohorts["runner"]) >= statistics.mean(
+                cohorts["other"]
+            ) else -1
+            model[name] = {
+                "center": statistics.mean(values),
+                "scale": scale,
+                "direction": direction,
             }
-            for family, markers in families.items()
-        }
+
+        def precision(excluded: tuple[str, ...]) -> dict[str, Any]:
+            feature_maps: dict[str, dict[str, Any]] = defaultdict(dict)
+            outcomes: dict[str, dict[str, Any]] = {}
+            for row in rows:
+                feature_maps[row["outcome_id"]][row["feature_name"]] = row.get("value")
+                outcomes[row["outcome_id"]] = row
+            scored = []
+            for outcome_id, features in feature_maps.items():
+                contributions = []
+                for feature_name, spec in model.items():
+                    if any(marker in feature_name.lower() for marker in excluded):
+                        continue
+                    value = _numeric(features.get(feature_name))
+                    if value is not None:
+                        contributions.append(
+                            spec["direction"] * (value - spec["center"]) / spec["scale"]
+                        )
+                if contributions:
+                    scored.append((statistics.mean(contributions), outcomes[outcome_id]))
+            scored.sort(key=lambda item: item[0], reverse=True)
+            selected = scored[: max(1, math.ceil(len(scored) * 0.2))]
+            return {
+                "model_features": sum(
+                    not any(marker in name.lower() for marker in excluded) for name in model
+                ),
+                "scored_sample": len(scored),
+                "selected_sample": len(selected),
+                "5x_precision": _rate(
+                    [float(outcome.get("peak_multiple") or 0) >= 5 for _, outcome in selected]
+                ),
+            }
+
+        full = precision(())
+        results: dict[str, Any] = {"full_model": full}
+        for family, markers in families.items():
+            value = precision(markers)
+            value["removed_feature_rows"] = sum(
+                any(marker in row["feature_name"].lower() for marker in markers) for row in rows
+            )
+            value["incremental_precision"] = (
+                None
+                if full["5x_precision"] is None or value["5x_precision"] is None
+                else full["5x_precision"] - value["5x_precision"]
+            )
+            value["available_for_ablation"] = value["removed_feature_rows"] > 0
+            results[family] = value
+        return results
+
+    @staticmethod
+    def drift_analysis(
+        train_rows: list[dict[str, Any]], test_rows: list[dict[str, Any]]
+    ) -> dict[str, Any]:
+        def grouped(rows: list[dict[str, Any]]) -> dict[str, list[float]]:
+            result: dict[str, list[float]] = defaultdict(list)
+            for row in rows:
+                value = _numeric(row.get("value"))
+                if value is not None:
+                    result[row["feature_name"]].append(value)
+            return result
+
+        train = grouped(train_rows)
+        test = grouped(test_rows)
+        result = {}
+        for name in sorted(train.keys() & test.keys()):
+            if not train[name] or not test[name]:
+                continue
+            baseline = statistics.median(train[name])
+            current = statistics.median(test[name])
+            scale = statistics.pstdev(train[name]) or 1.0
+            standardized_shift = (current - baseline) / scale
+            result[name] = {
+                "train_sample": len(train[name]),
+                "test_sample": len(test[name]),
+                "train_median": baseline,
+                "test_median": current,
+                "standardized_shift": standardized_shift,
+                "state": "WARNING" if abs(standardized_shift) >= 1 else "STABLE",
+            }
+        return result
 
     def run_walk_forward(
         self,
@@ -232,7 +351,8 @@ class ResearchEngine:
         result = {
             "fingerprints": self.fingerprint_findings(windows["train"]),
             "baselines": self.baseline_comparison(test_rows),
-            "ablations": self.ablations(test_rows),
+            "ablations": self.ablations(test_rows, windows["train"]),
+            "drift": self.drift_analysis(windows["train"], test_rows),
         }
         run_id = str(uuid.uuid4())
         with self.warehouse._lock, self.warehouse.conn:

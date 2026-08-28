@@ -38,6 +38,13 @@ def _number(value: float | None, suffix: str = "") -> str:
     )
 
 
+def _confidence(value: float | None) -> str:
+    if value is None:
+        return "UNKNOWN"
+    numeric = float(value)
+    return f"{numeric * 100:.0f}%" if 0 <= numeric <= 1 else f"{numeric:.1f}%"
+
+
 def signal_payload(
     discovery: DiscoveryEvent,
     market: MarketSnapshot,
@@ -186,73 +193,86 @@ def format_discord_event(event_type: str, p: dict[str, Any]) -> dict[str, Any]:
         "FAILED": "GAMBIT JR — FAILED",
     }.get(event_type, f"GAMBIT JR — {event_type}")
     address = str(p.get("token_address") or "UNKNOWN")
-    fields = [
-        {"name": "Chain", "value": _chain_label(p.get("chain")), "inline": True},
-        {"name": "Contract address", "value": address, "inline": False},
-    ]
-    if p.get("market_cap_usd") is not None or p.get("signal_market_cap_usd") is not None:
-        fields += [
+    if event_type == "SIGNAL":
+        why_now = p.get("why_now") or p.get("thesis") or []
+        risks = p.get("failure_reasons") or p.get("risks") or []
+        historical = p.get("historical_context") or {}
+        fields = [
+            {
+                "name": "Tier",
+                "value": _safe(p.get("v15_signal_tier")),
+                "inline": True,
+            },
+            {"name": "Chain", "value": _chain_label(p.get("chain")), "inline": True},
+            {"name": "Contract address", "value": address, "inline": False},
             {
                 "name": "Market cap",
                 "value": _money(p.get("market_cap_usd", p.get("signal_market_cap_usd"))),
                 "inline": True,
             },
             {"name": "Liquidity", "value": _money(p.get("liquidity_usd")), "inline": True},
+            {
+                "name": "Entry",
+                "value": _safe(p.get("entry_status")),
+                "inline": True,
+            },
+            {
+                "name": "Runner potential",
+                "value": _number(p.get("runner_score")),
+                "inline": True,
+            },
+            {
+                "name": "Failure risk",
+                "value": _number(p.get("failure_score")),
+                "inline": True,
+            },
+            {
+                "name": "Confidence / evidence coverage",
+                "value": (
+                    f"{_confidence(p.get('confidence'))} / "
+                    f"{_number(p.get('evidence_coverage'), '%')}"
+                ),
+                "inline": True,
+            },
+            {
+                "name": "Why now",
+                "value": _safe(" • ".join(why_now) or "No additional verified catalyst", 700),
+                "inline": False,
+            },
+            {
+                "name": "Historical context",
+                "value": (
+                    f"{_safe(historical.get('state'))} • "
+                    f"{len(historical.get('features') or [])} approved features"
+                    if historical
+                    else "UNKNOWN • no approved point-in-time context"
+                ),
+                "inline": False,
+            },
+            {
+                "name": "Risks",
+                "value": _safe(" • ".join(risks) or "No additional known risk", 700),
+                "inline": False,
+            },
         ]
-    if event_type == "SIGNAL":
-        why_now = p.get("why_now") or p.get("thesis") or []
-        risks = p.get("failure_reasons") or p.get("risks") or []
-        historical = p.get("historical_context") or {}
-        fields.extend(
-            [
+    else:
+        fields = [
+            {"name": "Chain", "value": _chain_label(p.get("chain")), "inline": True},
+            {"name": "Contract address", "value": address, "inline": False},
+        ]
+        if p.get("market_cap_usd") is not None or p.get("signal_market_cap_usd") is not None:
+            fields += [
                 {
-                    "name": "V1.5 tier",
-                    "value": _safe(p.get("v15_signal_tier")),
+                    "name": "Market cap",
+                    "value": _money(p.get("market_cap_usd", p.get("signal_market_cap_usd"))),
                     "inline": True,
                 },
                 {
-                    "name": "Runner / failure",
-                    "value": (
-                        f"{_number(p.get('runner_score'))} / "
-                        f"{_number(p.get('failure_score'))}"
-                    ),
+                    "name": "Liquidity",
+                    "value": _money(p.get("liquidity_usd")),
                     "inline": True,
-                },
-                {
-                    "name": "Coverage / entry",
-                    "value": (
-                        f"{_number(p.get('evidence_coverage'), '%')} / "
-                        f"{_safe(p.get('entry_status'))}"
-                    ),
-                    "inline": True,
-                },
-                {
-                    "name": "Survival",
-                    "value": _safe(p.get("survival_grade")),
-                    "inline": True,
-                },
-                {
-                    "name": "Why now",
-                    "value": _safe(" • ".join(why_now) or "No additional verified catalyst", 700),
-                    "inline": False,
-                },
-                {
-                    "name": "Major risks",
-                    "value": _safe(" • ".join(risks) or "No additional known risk", 700),
-                    "inline": False,
-                },
-                {
-                    "name": "Historical edge",
-                    "value": (
-                        f"{_safe(historical.get('state'))} • "
-                        f"{len(historical.get('features') or [])} approved features"
-                        if historical
-                        else "UNKNOWN • no approved point-in-time context"
-                    ),
-                    "inline": False,
                 },
             ]
-        )
     if event_type in {"GENESIS_RADAR", "EARLY_RADAR"}:
         fields.append(
             {
@@ -332,20 +352,30 @@ def format_event(event_type: str, p: dict[str, Any]) -> str:
         )[:1990]
     if event_type == "SIGNAL":
         shadow = "[SHADOW TEST — REAL DATA, NO TRADING]\n" if p.get("shadow") else ""
-        scores = p["component_scores"]
-        maxima = p["component_maxima"]
+        scores = p.get("component_scores") or {}
+        maxima = p.get("component_maxima") or {}
+
+        def component(name: str) -> str:
+            score = scores.get(name)
+            maximum = maxima.get(name)
+            return (
+                "UNKNOWN"
+                if score is None or maximum is None
+                else f"{float(score):.1f}/{float(maximum):.0f}"
+            )
+
         developer = p.get("developer") or {}
         narrative = p.get("narrative") or {}
         momentum = p.get("momentum") or {}
         social_display = (
             "UNKNOWN"
             if (p.get("social") or {}).get("score") is None
-            else f"{scores['social']:.1f}/{maxima['social']:.0f}"
+            else component("social")
         )
         developer_display = (
             "UNKNOWN"
             if developer.get("score") is None
-            else f"{scores['developer']:.1f}/{maxima['developer']:.0f}"
+            else component("developer")
         )
         thesis = (
             "; ".join(_safe(x) for x in p.get("thesis") or [])
@@ -356,9 +386,9 @@ def format_event(event_type: str, p: dict[str, Any]) -> str:
             or "Very young, highly volatile asset; limited history."
         )
         return (
-            f"{shadow}🚨 GAMBIT JR SHADOW — {_safe(p['classification']).replace('_', ' ')}\n\n"
+            f"{shadow}🚨 GAMBIT JR SHADOW — {_safe(p.get('classification') or p.get('v15_signal_tier')).replace('_', ' ')}\n\n"
             f"{_safe(p.get('name'))} (${_safe(p.get('symbol'))})\n"
-            f"CA: `{_safe(p['token_address'], 80)}`\n\n"
+            f"CA: `{_safe(p.get('token_address'), 80)}`\n\n"
             f"Signal MC: {_money(p.get('signal_market_cap_usd'))}\n"
             f"Liquidity: {_money(p.get('liquidity_usd'))}\n"
             f"Holders: {_number(p.get('holders'))}\n"
@@ -368,12 +398,12 @@ def format_event(event_type: str, p: dict[str, Any]) -> str:
             f"Runner: {_number(p.get('runner_score'))} | Failure: {_number(p.get('failure_score'))}\n"
             f"Coverage: {_number(p.get('evidence_coverage'), '%')} | "
             f"Entry: {_safe(p.get('entry_status'))} | Survival: {_safe(p.get('survival_grade'))}\n\n"
-            f"Narrative: {scores['narrative']:.1f}/{maxima['narrative']:.0f} ({_safe(narrative.get('label'))})\n"
+            f"Narrative: {component('narrative')} ({_safe(narrative.get('label'))})\n"
             f"Social Velocity: {social_display}\n"
-            f"On-chain: {scores['onchain']:.1f}/{maxima['onchain']:.0f}\n"
+            f"On-chain: {component('onchain')}\n"
             f"Developer: {developer_display}\n"
-            f"Momentum: {scores['momentum']:.1f}/{maxima['momentum']:.0f}\n"
-            f"Safety evidence: {scores['safety']:.1f}/{maxima['safety']:.0f}\n\n"
+            f"Momentum: {component('momentum')}\n"
+            f"Safety evidence: {component('safety')}\n\n"
             f"Dev: {_safe(developer.get('classification'))}\n"
             f"Top 10: {_number(p.get('top10_percent'), '%')}\n"
             f"Bundlers: {_number(p.get('bundled_percent'), '%')}\n"

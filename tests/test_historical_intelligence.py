@@ -253,8 +253,17 @@ def approved_record() -> dict:
         "target_feature": "creator_quality",
         "research_run_id": "research-1",
         "research_evidence": {"5x_lift": 0.08},
+        "dataset_version": "2021-2026-v1",
         "sample_size": 1000,
         "walk_forward": {"windows": 4, "state": "PASS"},
+        "train_window": ["2021-01-01", "2023-01-01"],
+        "validation_window": ["2023-01-01", "2024-01-01"],
+        "test_window": ["2024-01-01", "2025-01-01"],
+        "baseline": {"random": 0.1, "full": 0.2},
+        "ablation": {"creator": 0.05},
+        "leakage_state": "PASS",
+        "drift_state": "STABLE",
+        "approval_state": "APPROVED",
         "approved_by": "operator@example.invalid",
         "merge_policy": "BOUNDED_BLEND",
         "max_contribution": 0.2,
@@ -267,6 +276,12 @@ def test_only_manually_approved_features_reach_bounded_live_context(tmp_path):
     try:
         with pytest.raises(ValueError, match="approver"):
             store.approve(approved_record() | {"approved_by": ""})
+        with pytest.raises(ValueError, match="approval evidence missing"):
+            incomplete = approved_record()
+            incomplete.pop("ablation")
+            store.approve(incomplete)
+        with pytest.raises(ValueError, match="APPROVED state"):
+            store.approve(approved_record() | {"approval_state": "RESEARCH_ONLY"})
         store.approve(approved_record())
         store.publish_snapshot(
             chain="solana",

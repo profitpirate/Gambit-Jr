@@ -1,0 +1,105 @@
+[
+  {
+    "case": "solana_premium",
+    "event_type": "SIGNAL",
+    "payload": {
+      "v15_signal_tier": "PREMIUM",
+      "name": "Solana Runner",
+      "symbol": "RUN",
+      "chain": "solana",
+      "token_address": "So11111111111111111111111111111111111111112",
+      "pair_address": "9wFFmG3D5J4kPjLw8DG4cE4qcw2ZMJ8uL2jRZKqkEw9f",
+      "market_cap_usd": 184200,
+      "liquidity_usd": 47200,
+      "entry_status": "ACTIONABLE",
+      "runner_score": 88,
+      "failure_score": 16,
+      "confidence": 0.82,
+      "evidence_coverage": 84,
+      "why_now": ["independent buyer replacement", "liquidity expanding"],
+      "historical_context": {"state": "EMPTY", "features": []},
+      "failure_reasons": ["young pool", "creator history unknown"]
+    }
+  },
+  {
+    "case": "bnb_strong_unicode_long_name",
+    "event_type": "SIGNAL",
+    "payload": {
+      "v15_signal_tier": "STRONG",
+      "name": "龙之社区 — A Very Long Unicode Community Token Name That Must Stay Safe",
+      "symbol": "龙🚀",
+      "chain": "bsc",
+      "token_address": "0x1111111111111111111111111111111111111111",
+      "market_cap_usd": 98000,
+      "liquidity_usd": 21100,
+      "entry_status": "WATCH_SPREAD",
+      "runner_score": 76,
+      "failure_score": 31,
+      "confidence": 0.68,
+      "evidence_coverage": 71,
+      "why_now": ["volume acceleration"],
+      "historical_context": {"state": "STALE", "features": []},
+      "risks": ["degraded holder provider"]
+    }
+  },
+  {
+    "case": "high_risk_missing_market",
+    "event_type": "SIGNAL",
+    "payload": {
+      "v15_signal_tier": "HIGH-RISK MOMENTUM",
+      "name": "Unknown Market",
+      "symbol": "UNK",
+      "chain": "solana",
+      "token_address": "11111111111111111111111111111111",
+      "market_cap_usd": null,
+      "liquidity_usd": null,
+      "entry_status": "UNKNOWN",
+      "runner_score": 69,
+      "failure_score": 72,
+      "confidence": 0.41,
+      "evidence_coverage": 46,
+      "why_now": [],
+      "historical_context": null,
+      "failure_reasons": ["market provider degraded", "liquidity unknown"]
+    }
+  },
+  {
+    "case": "catalyst_revival",
+    "event_type": "SIGNAL",
+    "payload": {
+      "v15_signal_tier": "CATALYST REVIVAL",
+      "name": "Second Wind",
+      "symbol": "WIND",
+      "chain": "solana",
+      "token_address": "Reviva1111111111111111111111111111111111111",
+      "market_cap_usd": 265000,
+      "liquidity_usd": 38900,
+      "entry_status": "LATE_REVIVAL",
+      "runner_score": 73,
+      "failure_score": 43,
+      "confidence": 0.63,
+      "evidence_coverage": 66,
+      "why_now": ["buyer cohort renewed after dormancy"],
+      "historical_context": {"state": "FALLBACK", "features": []},
+      "failure_reasons": ["prior drawdown"]
+    }
+  },
+  {
+    "case": "radar_early",
+    "event_type": "GENESIS_RADAR",
+    "payload": {
+      "classification": "GENESIS_RADAR",
+      "name": "Fresh Launch",
+      "symbol": "FRESH",
+      "chain": "solana",
+      "token_address": "Fresh11111111111111111111111111111111111111",
+      "pair_address": "Pair111111111111111111111111111111111111111",
+      "market_cap_usd": 18200,
+      "liquidity_usd": 9100,
+      "radar_score": 64,
+      "reasons": ["new pool", "early volume"],
+      "penalties": [],
+      "snapshot_count": 2
+    }
+  }
+]

@@ -1,0 +1,71 @@
+name: V1.5 release gates
+
+on:
+  push:
+    branches:
+      - codex/gambit-jr-v1.5-finalization
+  workflow_dispatch:
+    inputs:
+      production_sha:
+        description: Immutable finalization commit approved for production
+        required: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip build
+      - run: python -m pip install -e .[dev]
+      - run: pytest
+      - run: ruff check .
+      - run: python -m build
+      - run: docker build -t gambit-jr:${{ github.sha }} .
+
+  staging-contract:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cp .env.staging.example .env.staging
+      - run: docker compose -f docker-compose.staging.yml config --quiet
+      - run: test "$(docker compose -f docker-compose.staging.yml config | grep -c '/app/staging/')" -ge 4
+      - run: test "$(docker compose -f docker-compose.staging.yml config | grep -c 'SHADOW_SEND_ALERTS: \"false\"')" -ge 1
+      - run: docker compose -f docker-compose.staging.yml up -d --build
+      - name: Wait for isolated staging health
+        run: |
+          for attempt in $(seq 1 30); do
+            curl --fail --silent http://127.0.0.1:18080/health && exit 0
+            sleep 3
+          done
+          docker compose -f docker-compose.staging.yml logs
+          exit 1
+      - name: Create isolated research warehouse schema
+        run: |
+          docker compose -f docker-compose.staging.yml exec -T bot-staging \
+            gambit-history --warehouse /app/staging/historical/warehouse.db \
+            --archive /app/staging/archive coverage
+      - name: Run staging acceptance inside staging container
+        run: |
+          docker compose -f docker-compose.staging.yml exec -T bot-staging \
+            python scripts/staging_acceptance.py \
+            --health-url http://127.0.0.1:8080/health \
+            --operational /app/staging/operational/memecoin.db \
+            --warehouse /app/staging/historical/warehouse.db \
+            --approved /app/staging/approved/approved_features.db
+      - if: always()
+        run: docker compose -f docker-compose.staging.yml down
+
+  production-approval:
+    if: github.event_name == 'workflow_dispatch'
+    needs: [validate, staging-contract]
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Verify immutable approval input
+        run: test "${{ inputs.production_sha }}" = "${{ github.sha }}"
+      - name: Deployment remains host-controlled
+        run: echo "Run scripts/release_v15.sh on the production host with this approved SHA."

@@ -414,7 +414,10 @@ def test_signal_card_has_full_contract_and_five_chain_aware_actions():
     )
     validate_webhook_payload(payload)
     assert payload["embeds"][0]["title"] == "PREMIUM • Example Token ($EXM)"
-    assert payload["embeds"][0]["fields"][1]["value"].startswith("So111")
+    contract = next(
+        field for field in payload["embeds"][0]["fields"] if field["name"] == "Contract address"
+    )
+    assert contract["value"].startswith("So111")
     components = payload["components"][0]["components"]
     assert [component["label"] for component in components] == [
         "Copy CA",
@@ -484,4 +487,4 @@ def test_automatic_signal_payload_passes_shared_webhook_validator():
     }
     message = format_discord_event("SIGNAL", payload)
     validate_webhook_payload(message)
-    assert any(field["name"] == "V1.5 tier" for field in message["embeds"][0]["fields"])
+    assert any(field["name"] == "Tier" for field in message["embeds"][0]["fields"])

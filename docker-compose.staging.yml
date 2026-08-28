@@ -1,0 +1,30 @@
+name: gambit-jr-v15-staging
+
+services:
+  bot-staging:
+    build: .
+    restart: unless-stopped
+    env_file: .env.staging
+    environment:
+      DATABASE_PATH: /app/staging/operational/memecoin.db
+      HISTORICAL_WAREHOUSE_PATH: /app/staging/historical/warehouse.db
+      HISTORICAL_ARCHIVE_PATH: /app/staging/archive
+      APPROVED_FEATURE_STORE_PATH: /app/staging/approved/approved_features.db
+      SHADOW_MODE: "true"
+      SHADOW_SEND_ALERTS: "false"
+      HEALTH_PORT: "8080"
+    volumes:
+      - staging-operational:/app/staging/operational
+      - staging-historical:/app/staging/historical
+      - staging-archive:/app/staging/archive
+      - staging-approved:/app/staging/approved
+      - staging-evidence:/app/evidence
+    ports:
+      - "127.0.0.1:18080:8080"
+
+volumes:
+  staging-operational:
+  staging-historical:
+  staging-archive:
+  staging-approved:
+  staging-evidence:

@@ -14,12 +14,15 @@ falls back to live evidence and is written to `production_context_audit`.
 ## Historical coverage map: shipped state
 
 No third-party historical export, paid subscription, or five-year dataset is present in this
-repository. Therefore the honest shipped coverage is zero imported external observations. Jr does
-not manufacture history and does not relabel current state as point-in-time history.
+repository, so the Git checkout itself still bundles zero external observations. A real
+credential-free acquisition was executed into ignored local research storage during finalization;
+its counts and limitations are recorded in `docs/v15-finalization.md`. Jr does not manufacture
+history and does not relabel current state as point-in-time history.
 
-The first legitimate source is Jr's own accumulated `token_snapshots`. Transfer it with
-`gambit-history ingest-operational`. These rows are marked first-party observed history, start at the
-earliest actual operational snapshot, and explicitly record the missing range before that date.
+The highest-value legitimate source is Jr's accumulated operational database. Transfer its
+allowlisted evidence tables with `gambit-history ingest-operational-all`, or transfer snapshots only
+with `gambit-history ingest-operational`. These rows are marked first-party observed history, start
+at the earliest actual observation, and explicitly record the missing range before that date.
 Provider exports enter through `gambit-history ingest-jsonl`; each dataset manifest must state the
 provider, chain, acquisition and refresh methods, precision, reliability, completeness estimate,
 history kind, point-in-time safety, missing ranges, rate limit, and cost.
