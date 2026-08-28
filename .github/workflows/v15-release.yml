@@ -33,7 +33,8 @@ jobs:
       - run: cp .env.staging.example .env.staging
       - run: docker compose -f docker-compose.staging.yml config --quiet
       - run: test "$(docker compose -f docker-compose.staging.yml config | grep -c '/app/staging/')" -ge 4
-      - run: test "$(docker compose -f docker-compose.staging.yml config | grep -c 'SHADOW_SEND_ALERTS: \"false\"')" -ge 1
+      - run: |
+          test "$(docker compose -f docker-compose.staging.yml config | grep -c 'SHADOW_SEND_ALERTS: \"false\"')" -ge 1
       - run: docker compose -f docker-compose.staging.yml up -d --build
       - name: Wait for isolated staging health
         run: |
