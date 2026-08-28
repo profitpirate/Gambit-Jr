@@ -16,6 +16,7 @@ from memecoin_bot.historical.intelligence_v2 import (
     survival_v2,
 )
 from memecoin_bot.historical.intelligence_v2_research import (
+    TIMESTAMPS,
     IntelligenceV2Experiment,
     _calibration,
     _percentile_scores,
@@ -264,6 +265,11 @@ def test_research_ranking_is_deterministic_and_frequency_locked():
     assert [row["mint"] for row in selected] == ["a", "b"]
     assert indexes == [1, 2]
     assert _percentile_scores([0.5, 0.5, 0.1]) == [1.0, 0.5, 0.0]
+
+
+def test_research_windows_cover_every_native_required_trajectory_timestamp():
+    assert TIMESTAMPS == (30, 60, 180, 300, 600, 1800)
+    assert 90 not in TIMESTAMPS
 
 
 def test_calibration_reports_brier_ece_and_reliability_without_claiming_perfection():

@@ -22,7 +22,7 @@ from .intelligence_v2 import (
 from .runner_autopsy import reconstruct_decision
 
 FREQUENCIES = (0.001, 0.0025, 0.005, 0.01, 0.02, 0.05)
-TIMESTAMPS = (30, 60, 180)
+TIMESTAMPS = (30, 60, 180, 300, 600, 1800)
 WINDOWS = {
     "train": ("2026-06-05", "2026-06-16"),
     "validation": ("2026-06-16", "2026-06-21"),
