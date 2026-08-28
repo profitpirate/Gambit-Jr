@@ -50,6 +50,7 @@ from .store import (
     HistoricalWarehouse,
     RawEvidence,
 )
+from .thesis_research import run_runner_thesis_research, write_runner_thesis_research
 from .wallet_v3 import (
     FollowerOutcome,
     WalletHistory,
@@ -113,8 +114,10 @@ __all__ = [
     "point_in_time_rows",
     "run_real_research",
     "run_realtime_trajectory_research",
+    "run_runner_thesis_research",
     "select_wallet_corpus",
     "write_completion_report",
     "write_realtime_research",
     "write_replay_manifest",
+    "write_runner_thesis_research",
 ]

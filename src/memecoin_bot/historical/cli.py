@@ -99,6 +99,13 @@ def parser() -> argparse.ArgumentParser:
 
     commands.add_parser("coverage", help="Print the machine-readable historical coverage map")
     commands.add_parser("operator-status", help="Print offline research/operator status")
+    sources = commands.add_parser(
+        "ingest-research-sources", help="Register actually examined public research sources"
+    )
+    sources.add_argument("--manifest", required=True)
+    commands.add_parser(
+        "research-source-status", help="Print the fail-closed 200-source research gate"
+    )
 
     approve = commands.add_parser("approve-feature", help="Publish a manual feature approval")
     approve.add_argument("--feature-store", default="data/production/approved_features.db")
@@ -121,6 +128,18 @@ async def _run(args: argparse.Namespace) -> dict[str, Any] | list[dict[str, Any]
             return warehouse.coverage_manifest()
         if args.command == "operator-status":
             return warehouse.operator_status()
+        if args.command == "research-source-status":
+            return warehouse.research_source_report()
+        if args.command == "ingest-research-sources":
+            records = json.loads(Path(args.manifest).read_text(encoding="utf-8"))
+            if not isinstance(records, list):
+                raise ValueError("research source manifest must be a JSON array")
+            source_ids = [warehouse.record_research_source(record) for record in records]
+            return {
+                "ingested": len(source_ids),
+                "source_ids": source_ids,
+                "gate": warehouse.research_source_report(),
+            }
         if args.command == "finalize-public":
             return await _finalize_public(warehouse, args)
         if args.command == "research-public-corpora":

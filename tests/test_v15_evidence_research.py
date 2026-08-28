@@ -7,6 +7,7 @@ import pytest
 from memecoin_bot.historical.evidence_research import (
     ALL_LAUNCH_FEATURES,
     WALK_FORWARDS,
+    audit_attested_calls,
     storage_projection,
     verify_corpora,
 )
@@ -81,6 +82,8 @@ def test_public_corpus_verification_is_checksum_fail_closed(tmp_path, monkeypatc
         "TRENCHES_FILES": ("trenches-pumpfun-forward-2026-08", {"a.bin": digest}),
         "MELT_FILES": ("MELT", {"b.bin": digest}),
         "LAUNCH_CORPUS_FILES": ("Pumpfun_Memecoin_Corpus", {"c.bin": digest}),
+        "COIN_MEME_FILES": ("Coin-Meme", {"d.bin": digest}),
+        "SENTIMENT_FILES": ("pump-fun-sentiment-100k", {"e.bin": digest}),
     }
     for constant, (directory, files) in sources.items():
         monkeypatch.setattr(evidence_research, constant, files)
@@ -92,6 +95,19 @@ def test_public_corpus_verification_is_checksum_fail_closed(tmp_path, monkeypatc
     (tmp_path / "MELT" / "b.bin").write_bytes(b"tampered")
     with pytest.raises(ValueError, match="checksum verification"):
         verify_corpora(tmp_path)
+
+
+def test_attested_calls_fail_closed_when_data_hash_does_not_match(tmp_path):
+    directory = tmp_path / "solana-memecoin-calls"
+    directory.mkdir()
+    calls = b'{"mint":"A"}\n'
+    (directory / "calls.jsonl").write_bytes(calls)
+    (directory / "attest.json").write_text(
+        '{"sha256":"not-the-current-file","calls":1}', encoding="utf-8"
+    )
+    result = audit_attested_calls(tmp_path)
+    assert result["state"] == "ATTESTATION_MISMATCH"
+    assert result["eligible_for_research"] is False
 
 
 def test_walk_forward_windows_are_strictly_chronological_and_embargoed():

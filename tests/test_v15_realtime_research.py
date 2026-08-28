@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
 import duckdb
@@ -8,6 +9,7 @@ import numpy as np
 from memecoin_bot.historical.intelligence_v3_execution import ResearchData
 from memecoin_bot.historical.realtime_replay import build_realtime_event_replay
 from memecoin_bot.historical.realtime_research import _cohort_autopsy, _effects
+from memecoin_bot.historical.thesis_research import thesis_archetype_scores
 
 
 def _copy_sql(path: Path) -> str:
@@ -92,3 +94,33 @@ def test_low_performance_autopsy_and_hypotheses_are_quantitative_not_approved() 
     )
     assert effects[0]["development_effect"] is not None
     assert all(row["status"] != "APPROVED" for row in effects)
+
+
+def test_runner_thesis_archetypes_are_label_free_and_independently_ranked() -> None:
+    count = 4
+    features = {"log_market_cap": np.ones(count)}
+    for band in range(6):
+        features[f"b{band}_trade_count"] = np.asarray([1, 2, 3, 4], dtype=float)
+        features[f"b{band}_new_buyer_count"] = np.asarray([1, 1, 2, 6], dtype=float)
+        features[f"b{band}_net_sol"] = np.asarray([-2, -1, 1, 5], dtype=float)
+        features[f"b{band}_sell_pressure"] = np.asarray([0.9, 0.7, 0.3, 0.1])
+    features["first_sell_seconds"] = np.asarray([np.nan, 30, 20, 10])
+    features["buyers_after_first_sell"] = np.asarray([0, 0, 2, 8], dtype=float)
+    data = ResearchData(
+        mint=np.asarray(["A", "B", "C", "D"]),
+        creator=np.asarray(["A", "B", "C", "D"]),
+        decision_day=np.asarray(["2026-06-05"] * count),
+        timestamp_seconds=np.full(count, 180),
+        peak_multiple=np.asarray([99, 1, 1, 0], dtype=float),
+        terminal_failure=np.asarray([False, False, False, True]),
+        max_adverse_excursion=np.zeros(count),
+        graduated=np.zeros(count, dtype=bool),
+        features=features,
+        control_score=np.zeros(count),
+    )
+    scores = thesis_archetype_scores(data, np.ones(count, dtype=bool), np)
+    assert scores["ACTIONABLE_THESIS"][3] > scores["ACTIONABLE_THESIS"][0]
+    assert scores["INDEPENDENT_FAILURE_RISK"][0] > scores["INDEPENDENT_FAILURE_RISK"][3]
+    changed_labels = replace(data, peak_multiple=np.asarray([0, 0, 0, 100], dtype=float))
+    changed = thesis_archetype_scores(changed_labels, np.ones(count, dtype=bool), np)
+    assert np.array_equal(scores["RUNNER_THESIS_MAX"], changed["RUNNER_THESIS_MAX"])

@@ -90,6 +90,44 @@ def test_raw_archive_is_content_addressed_deduplicated_and_immutable(warehouse):
         )
 
 
+def test_research_source_registry_requires_examined_evidence(warehouse):
+    record = {
+        "title": "An examined public study",
+        "url": "https://example.test/study",
+        "source_type": "paper",
+        "category": "market_microstructure",
+        "publisher": "fixture publisher",
+        "access_state": "FULL_TEXT",
+        "reliability_state": "PEER_REVIEWED",
+        "relevance_state": "HIGH",
+        "research_method": "chronological observational study",
+        "data_window": "2024-01 through 2025-12",
+        "population": "all launches observed by the fixture",
+        "claim": "liquidity velocity is associated with survival",
+        "test_method": "reproduce on the independent warehouse cohort",
+        "result": "pending independent replication",
+        "limitations": "observational and venue-specific",
+        "license_state": "public paper; data license not asserted",
+        "acquisition_state": "examined",
+        "provenance": {"content_sha256": "abc", "retrieved_from": "publisher"},
+        "hypotheses": [{"name": "liquidity_velocity", "direction": "UNTESTED"}],
+    }
+    source_id = warehouse.record_research_source(record)
+    assert source_id == warehouse.record_research_source(record)
+    report = warehouse.research_source_report(required_high_relevance=2)
+    assert report["total_examined"] == 1
+    assert report["high_relevance"] == 1
+    assert report["gate_passed"] is False
+    assert report["remaining"] == 1
+
+    with pytest.raises(ValueError, match="metadata-only"):
+        warehouse.record_research_source(
+            {**record, "url": "https://example.test/thin", "access_state": "METADATA_ONLY"}
+        )
+    with pytest.raises(ValueError, match="fields missing"):
+        warehouse.record_research_source({"title": "incomplete"})
+
+
 def test_point_in_time_features_exclude_future_availability(warehouse):
     evidence_id, _ = warehouse.ingest_raw(evidence())
     entity_key = warehouse.upsert_entity("token", "solana", "Token111", T0)

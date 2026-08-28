@@ -2,6 +2,7 @@
 
 from memecoin_bot.realtime.events import CanonicalEvent, CanonicalEventType, ProviderState
 from memecoin_bot.realtime.fabric import CanonicalEventFabric, IngestResult
+from memecoin_bot.realtime.thesis import RunnerThesis, RunnerThesisEngine
 
 __all__ = [
     "CanonicalEvent",
@@ -9,4 +10,6 @@ __all__ = [
     "CanonicalEventType",
     "IngestResult",
     "ProviderState",
+    "RunnerThesis",
+    "RunnerThesisEngine",
 ]

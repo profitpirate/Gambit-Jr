@@ -2783,6 +2783,20 @@ class Store:
             "processed": int(row[4] or 0),
             "curve_tokens": int(coverage[0] or 0),
             "real_sol_observations": int(coverage[1] or 0),
+            "runner_theses": int(
+                self.conn.execute("SELECT COUNT(*) FROM runner_theses_v15").fetchone()[0]
+            ),
+            "prospective_shadow_calls": int(
+                self.conn.execute("SELECT COUNT(*) FROM prospective_shadow_calls_v15").fetchone()[0]
+            ),
+            "prospective_shadow_outcomes": int(
+                self.conn.execute(
+                    "SELECT COUNT(*) FROM prospective_shadow_outcomes_v15"
+                ).fetchone()[0]
+            ),
+            "runner_reflections": int(
+                self.conn.execute("SELECT COUNT(*) FROM runner_reflections_v15").fetchone()[0]
+            ),
             "latency": self.realtime_latency_report(),
         }
 

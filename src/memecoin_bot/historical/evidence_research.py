@@ -66,6 +66,27 @@ LAUNCH_CORPUS_FILES = {
     "trades/trades-00017.parquet": "3e48808f2ee97c7238af48446ef1ee2028b93fed58f11715dce6ef5a15fbe580",
 }
 
+COIN_MEME_FILES = {
+    "data/destription+finance.csv": (
+        "63725a6af181d29f8382d7e5f9c2a73af561922281df44a394168bbb51a735f9"
+    ),
+}
+
+SENTIMENT_FILES = {
+    "data/train-2026-03-04T16-18-11.jsonl": (
+        "47ba5a8dc1bfc1bd967e351bbd26af79d6c9c91bd87e99c91db36b5a60c26171"
+    ),
+    "data/train-2026-03-04T16-18-36.jsonl": (
+        "e6d7e31064f9bcc23e2be4ad3fe6ea4ea4da29884579152a5d945c4565029e8d"
+    ),
+    "data/train-2026-03-04T16-19-16.jsonl": (
+        "d5b971866ad76211fe856f30a5494b4ee3a8fd54d9d7e77d0cb4bf7a702bee0f"
+    ),
+    "data/train-2026-03-04T16-20-12.jsonl": (
+        "1f74d7336e2bc32b6ebbdf7d6a6c7b27d324a118e6b2b77b9f80f66a59d9b758"
+    ),
+}
+
 LAUNCH_FEATURES = {
     "creator": ("creator_past_tokens", "creator_past_rugs"),
     "entry": (
@@ -135,6 +156,8 @@ def verify_corpora(root: str | Path) -> dict[str, Any]:
         "trenches": (base / "trenches-pumpfun-forward-2026-08", TRENCHES_FILES),
         "melt": (base / "MELT", MELT_FILES),
         "launch_corpus": (base / "Pumpfun_Memecoin_Corpus", LAUNCH_CORPUS_FILES),
+        "coin_meme": (base / "Coin-Meme", COIN_MEME_FILES),
+        "sentiment": (base / "pump-fun-sentiment-100k", SENTIMENT_FILES),
     }
     result: dict[str, Any] = {}
     for source, (directory, expected) in sources.items():
@@ -159,6 +182,34 @@ def verify_corpora(root: str | Path) -> dict[str, Any]:
     if not all(source["verified"] for source in result.values()):
         raise ValueError("one or more corpus files failed checksum verification")
     return result
+
+
+def audit_attested_calls(root: str | Path) -> dict[str, Any]:
+    directory = Path(root) / "solana-memecoin-calls"
+    calls = directory / "calls.jsonl"
+    attestation = directory / "attest.json"
+    if not calls.exists() or not attestation.exists():
+        return {
+            "verified": False,
+            "state": "MISSING",
+            "eligible_for_research": False,
+        }
+    record = json.loads(attestation.read_text(encoding="utf-8"))
+    actual = _sha256(calls)
+    expected = str(record.get("sha256") or "").lower()
+    verified = actual == expected
+    return {
+        "verified": verified,
+        "state": "VERIFIED" if verified else "ATTESTATION_MISMATCH",
+        "eligible_for_research": verified,
+        "actual_sha256": actual,
+        "attested_sha256": expected,
+        "attested_calls": record.get("calls"),
+        "bytes": calls.stat().st_size,
+        "exclusion_reason": None
+        if verified
+        else "calls file is newer than or different from the hash-anchored attestation",
+    }
 
 
 def _scalar(connection: Any, sql: str, parameters: list[Any]) -> Any:
@@ -513,6 +564,8 @@ def _summaries(connection: Any, root: Path) -> dict[str, Any]:
     trenches = root / "trenches-pumpfun-forward-2026-08"
     melt = root / "MELT"
     corpus = root / "Pumpfun_Memecoin_Corpus"
+    coin_meme = str(root / "Coin-Meme" / "data" / "destription+finance.csv")
+    sentiment = str(root / "pump-fun-sentiment-100k" / "data" / "*.jsonl")
     trenches_features = str(trenches / "features.parquet")
     trenches_labels = str(trenches / "labels.parquet")
     trenches_observations = str(trenches / "observations.parquet")
@@ -634,6 +687,49 @@ def _summaries(connection: Any, root: Path) -> dict[str, Any]:
             "reason": "published audit found a stale wallet aggregation snapshot",
         },
         "funding_graph": funders,
+        "coin_meme_2024": _rows(
+            connection,
+            """
+            WITH source AS (
+              SELECT *, try_strptime(createdAt, '%d/%m/%Y, %H:%M:%S') created_at,
+                     try_strptime(bonding_completeTime, '%d/%m/%Y, %H:%M:%S') migrated_at,
+                     try_cast(replace(mCap, ',', '') AS DOUBLE) market_cap
+              FROM read_csv_auto(?, header=true, all_varchar=true)
+            )
+            SELECT count(*) AS row_count, count(DISTINCT token_address) tokens,
+                   min(created_at)::VARCHAR earliest, max(created_at)::VARCHAR latest,
+                   sum((description IS NULL OR trim(description)='')::INTEGER)
+                     missing_descriptions,
+                   sum((migrated_at IS NULL)::INTEGER) missing_migration_times,
+                   median(date_diff('second', created_at, migrated_at))
+                     median_seconds_to_migration,
+                   median(market_cap) median_published_market_cap
+            FROM source
+            """,
+            [coin_meme],
+        )[0]
+        | {
+            "population_bias": "MIGRATED_TOKENS_ONLY",
+            "point_in_time_safe": False,
+            "eligible_for_failure_rate_or_feature_approval": False,
+        },
+        "sentiment_2026": _rows(
+            connection,
+            """
+            SELECT count(*) AS row_count, count(DISTINCT mint) tokens,
+                   count(DISTINCT agent_key) agents, min(datetime) earliest,
+                   max(datetime) latest, sum(validated::INTEGER) validated,
+                   sum((quality_score>=0.7)::INTEGER) quality_ge_07,
+                   sum((summary IS NULL OR trim(summary)='')::INTEGER) missing_summary
+            FROM read_json_auto(?)
+            """,
+            [sentiment],
+        )[0]
+        | {
+            "outcomes_available": False,
+            "sentiment_origin": "AI_AGENT_GENERATED",
+            "eligible_for_feature_approval_alone": False,
+        },
         "liquidity_history": _rows(
             connection,
             """
@@ -745,6 +841,32 @@ def _register_file_evidence(
             "point_in_time_safe": True,
             "missing": ["July 3 websocket outage", "raw trade files not acquired in this run"],
         },
+        "coin_meme": {
+            "directory": root / "Coin-Meme",
+            "dataset_id": "coin-meme-pumpfun-2024",
+            "version": "github-main-2024-11-01",
+            "provider": "github_coin_meme_public_release",
+            "earliest": "2024-01-29T07:00:18+00:00",
+            "point_in_time_safe": False,
+            "missing": [
+                "migrated tokens only; non-graduates, rugs and dead launches are absent",
+                "published snapshot fields have no per-field availability timestamps",
+                "no transaction paths or fixed-horizon outcomes",
+            ],
+        },
+        "sentiment": {
+            "directory": root / "pump-fun-sentiment-100k",
+            "dataset_id": "pump-studio-sentiment-2026-02-19-03-04",
+            "version": "hf-2026-03-04",
+            "provider": "huggingface_pump_studio_public_release",
+            "earliest": "2026-02-19T22:27:54.926+00:00",
+            "point_in_time_safe": True,
+            "missing": [
+                "no fixed-horizon outcome truth",
+                "AI-agent sentiment is not independent human social evidence",
+                "only 13 days of observations",
+            ],
+        },
     }
     evidence_ids = {}
     acquired = datetime.now(UTC).isoformat()
@@ -795,6 +917,38 @@ def _register_file_evidence(
             )
             evidence_ids[f"{source}:{relative}"] = evidence_id
         warehouse.refresh_dataset_coverage(definition["dataset_id"])
+        if source == "coin_meme":
+            warehouse.assess_coverage(
+                definition["dataset_id"],
+                {
+                    "launch_platform": "pump.fun",
+                    "normalized_rows": 3_751,
+                    "completeness_estimate": None,
+                    "point_in_time_safe": False,
+                    "timestamp_precision": "second where present",
+                    "survivorship_bias": "SEVERE_MIGRATED_ONLY",
+                    "quality_state": "RESEARCH_CONTEXT_ONLY",
+                    "licensing_limitations": "MIT repository; upstream source rights not expanded",
+                    "cost_class": "FREE_PUBLIC_DATASET",
+                    "information_gain": "2024 narrative and migration context only",
+                },
+            )
+        elif source == "sentiment":
+            warehouse.assess_coverage(
+                definition["dataset_id"],
+                {
+                    "launch_platform": "pump.fun",
+                    "normalized_rows": 193_410,
+                    "completeness_estimate": None,
+                    "point_in_time_safe": True,
+                    "timestamp_precision": "millisecond analysis and snapshot timestamps",
+                    "survivorship_bias": "UNKNOWN_AGENT_SELECTION_POLICY",
+                    "quality_state": "NARRATIVE_CONTEXT_ONLY",
+                    "licensing_limitations": "CC BY-NC-SA 4.0; non-commercial research only",
+                    "cost_class": "FREE_PUBLIC_DATASET",
+                    "information_gain": "timestamped narrative/risk-factor context without outcomes",
+                },
+            )
     return evidence_ids
 
 
@@ -1448,6 +1602,7 @@ def run_public_evidence_research(
     started = time.perf_counter()
     root_path = Path(root)
     verified = verify_corpora(root_path)
+    call_audit = audit_attested_calls(root_path)
     duckdb = _duckdb()
     connection = duckdb.connect()
     evidence_ids = _register_file_evidence(warehouse, root_path, verified) if warehouse else {}
@@ -1477,6 +1632,7 @@ def run_public_evidence_research(
         "generated_at": datetime.now(UTC).isoformat(),
         "code_version": code_version,
         "verification": verified,
+        "rejected_or_pending_sources": {"attested_call_feed": call_audit},
         "summaries": summaries,
         "research": {
             "splits": WALK_FORWARDS,

@@ -596,6 +596,125 @@ class HistoricalWarehouse(_SqliteStore):
                 ),
             )
 
+    def record_research_source(self, record: dict[str, Any]) -> str:
+        """Record one actually examined source and its falsifiable evidence trail."""
+
+        required = {
+            "title",
+            "url",
+            "source_type",
+            "category",
+            "publisher",
+            "access_state",
+            "reliability_state",
+            "relevance_state",
+            "research_method",
+            "data_window",
+            "population",
+            "claim",
+            "test_method",
+            "result",
+            "limitations",
+            "license_state",
+            "acquisition_state",
+            "provenance",
+        }
+        missing = sorted(required - record.keys())
+        if missing:
+            raise ValueError(f"research source fields missing: {', '.join(missing)}")
+        for name in required - {"provenance"}:
+            if not str(record[name]).strip():
+                raise ValueError(f"research source field cannot be empty: {name}")
+        if record["access_state"] == "METADATA_ONLY" and record["relevance_state"] == "HIGH":
+            raise ValueError("metadata-only sources cannot be counted as high relevance")
+        provenance_json = _json(record["provenance"])
+        provenance_hash = hashlib.sha256(provenance_json.encode()).hexdigest()
+        source_id = _uuid(record["url"], provenance_hash)
+        examined_at = record.get("examined_at") or _now()
+        with self._lock, self.conn:
+            self.conn.execute(
+                "INSERT INTO research_sources_v15 VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
+                "ON CONFLICT(url) DO UPDATE SET title=excluded.title,source_type=excluded.source_type,"
+                "category=excluded.category,publisher=excluded.publisher,published_at=excluded.published_at,"
+                "examined_at=excluded.examined_at,access_state=excluded.access_state,"
+                "reliability_state=excluded.reliability_state,relevance_state=excluded.relevance_state,"
+                "research_method=excluded.research_method,data_window=excluded.data_window,"
+                "population=excluded.population,claim=excluded.claim,test_method=excluded.test_method,"
+                "result=excluded.result,limitations=excluded.limitations,license_state=excluded.license_state,"
+                "acquisition_state=excluded.acquisition_state,provenance_hash=excluded.provenance_hash,"
+                "provenance_json=excluded.provenance_json,updated_at=excluded.updated_at",
+                (
+                    source_id,
+                    record["title"],
+                    record["url"],
+                    record["source_type"],
+                    record["category"],
+                    record["publisher"],
+                    record.get("published_at"),
+                    examined_at,
+                    record["access_state"],
+                    record["reliability_state"],
+                    record["relevance_state"],
+                    record["research_method"],
+                    record["data_window"],
+                    record["population"],
+                    record["claim"],
+                    record["test_method"],
+                    record["result"],
+                    record["limitations"],
+                    record["license_state"],
+                    record["acquisition_state"],
+                    provenance_hash,
+                    provenance_json,
+                    examined_at,
+                    _now(),
+                ),
+            )
+            actual_id = self.conn.execute(
+                "SELECT source_id FROM research_sources_v15 WHERE url=?", (record["url"],)
+            ).fetchone()[0]
+            for hypothesis in record.get("hypotheses") or []:
+                self.conn.execute(
+                    "INSERT INTO research_source_hypotheses_v15 VALUES(?,?,?) "
+                    "ON CONFLICT(source_id,hypothesis) DO UPDATE SET "
+                    "evidence_direction=excluded.evidence_direction",
+                    (actual_id, hypothesis["name"], hypothesis["direction"]),
+                )
+        return str(actual_id)
+
+    def research_source_report(self, *, required_high_relevance: int = 200) -> dict[str, Any]:
+        counts = {
+            row[0]: int(row[1])
+            for row in self.conn.execute(
+                "SELECT relevance_state,COUNT(*) FROM research_sources_v15 "
+                "GROUP BY relevance_state"
+            )
+        }
+        access = {
+            row[0]: int(row[1])
+            for row in self.conn.execute(
+                "SELECT access_state,COUNT(*) FROM research_sources_v15 GROUP BY access_state"
+            )
+        }
+        categories = {
+            row[0]: int(row[1])
+            for row in self.conn.execute(
+                "SELECT category,COUNT(*) FROM research_sources_v15 "
+                "WHERE relevance_state='HIGH' GROUP BY category ORDER BY category"
+            )
+        }
+        high = counts.get("HIGH", 0)
+        return {
+            "total_examined": sum(counts.values()),
+            "high_relevance": high,
+            "required_high_relevance": required_high_relevance,
+            "gate_passed": high >= required_high_relevance,
+            "remaining": max(0, required_high_relevance - high),
+            "by_relevance": counts,
+            "by_access": access,
+            "high_relevance_by_category": categories,
+        }
+
     def operator_status(self) -> dict[str, Any]:
         def scalar(query: str) -> int:
             return int(self.conn.execute(query).fetchone()[0])
@@ -631,6 +750,7 @@ class HistoricalWarehouse(_SqliteStore):
                 "SELECT COUNT(*) FROM outcomes WHERE rugged=1 OR peak_multiple<1"
             ),
             "research_runs": scalar("SELECT COUNT(*) FROM research_runs"),
+            "research_sources": self.research_source_report(),
             "latest_research": research_summary,
             "wallet_memory_entities": scalar(
                 "SELECT COUNT(DISTINCT entity_key) FROM point_in_time_features "

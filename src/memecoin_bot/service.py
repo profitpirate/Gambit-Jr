@@ -61,6 +61,7 @@ from memecoin_bot.realtime import CanonicalEvent, CanonicalEventFabric, Canonica
 from memecoin_bot.realtime.actors import ActorIntelligence
 from memecoin_bot.realtime.features import RealtimeFeatureProjector
 from memecoin_bot.realtime.learning import AdaptiveLearningLab
+from memecoin_bot.realtime.thesis import RunnerThesisEngine
 from memecoin_bot.safety import SafetyGates
 from memecoin_bot.scoring import ScoringEngine
 from memecoin_bot.signals import format_discord_event, radar_payload, signal_payload
@@ -170,6 +171,7 @@ class IntelligenceService:
         self.launch_queue = BoundedLaunchQueue(settings.event_queue_max)
         self.realtime_fabric = CanonicalEventFabric(store)
         self.realtime_features = RealtimeFeatureProjector(store)
+        self.runner_theses = RunnerThesisEngine(store)
         self.actor_intelligence = ActorIntelligence(store)
         self.learning_lab = AdaptiveLearningLab(store)
         self.realtime_wake = asyncio.Event()
@@ -284,6 +286,12 @@ class IntelligenceService:
                 )
             feature["actor_intelligence"] = actor_evidence
             feature["trigger_event_id"] = event.event_id
+            feature["runner_thesis"] = self.runner_theses.evaluate(
+                token_id,
+                event.available_timestamp,
+                feature,
+                trigger_event_id=event.event_id,
+            ).to_dict()
             with self.store._lock, self.store.conn:
                 self.store.conn.execute(
                     "UPDATE trajectory_feature_snapshots_v15 SET feature_json=? WHERE token_id=? "

@@ -599,7 +599,7 @@ async def test_clean_database_restart_keeps_command_center_operational(tmp_path)
     await second_view.navigate(interaction, "system", "gambit:menu:system")
     assert interaction.edits[0]["embed"].title == PAGE_TITLES["system"]
     assert restarted.conn.execute("PRAGMA quick_check").fetchone()[0] == "ok"
-    assert restarted.conn.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0] == 11
+    assert restarted.conn.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0] == 12
     restarted.close()
 
 
