@@ -9,6 +9,7 @@ from typing import Any
 from urllib.parse import urlsplit
 
 import discord
+from discord.webhook.async_ import async_context
 
 from memecoin_bot.discord.validation import (
     DiscordPayloadValidationError,
@@ -110,6 +111,45 @@ def log_discord_http_failure(
         duration_ms=round((time.monotonic() - started) * 1000, 1),
         result="failure",
     )
+
+
+async def edit_deferred_original_exact(
+    interaction: discord.Interaction,
+    *,
+    content: str | None = None,
+    embed: discord.Embed | None = None,
+    view: discord.ui.View | None = None,
+) -> None:
+    """Edit an acknowledged interaction using the documented PATCH field set."""
+    if not hasattr(interaction, "_state"):
+        await interaction.edit_original_response(
+            **{
+                key: value
+                for key, value in {"content": content, "embed": embed, "view": view}.items()
+                if value is not None
+            }
+        )
+        return
+    payload: dict[str, Any] = {"allowed_mentions": {"parse": []}}
+    if content is not None:
+        payload["content"] = content
+    if embed is not None:
+        payload["embeds"] = [embed.to_dict()]
+    if view is not None:
+        payload["components"] = view.to_components()
+
+    adapter = async_context.get()
+    http = interaction._state.http
+    data = await adapter.edit_original_interaction_response(
+        interaction.application_id,
+        interaction.token,
+        session=interaction._session,
+        proxy=http.proxy,
+        proxy_auth=http.proxy_auth,
+        payload=payload,
+    )
+    if view is not None and not view.is_finished() and view.is_dispatchable():
+        interaction._state.store_view(view, int(data["id"]))
 
 
 @dataclass
@@ -238,10 +278,10 @@ class InteractionResponder:
         components = component_count(view)
         try:
             if self.deferred:
-                message = await self.interaction.edit_original_response(
+                message = await self._edit_deferred_original_exact(
                     content=content, embed=embed, view=view
                 )
-                state = "deferred_original_edit"
+                state = "deferred_original_exact_edit"
             elif not self.interaction.response.is_done():
                 initial_kwargs: dict[str, Any] = {"ephemeral": self.visibility.ephemeral}
                 if content is not None:
@@ -289,6 +329,27 @@ class InteractionResponder:
         )
         return message
 
+    async def _edit_deferred_original_exact(
+        self,
+        *,
+        content: str | None,
+        embed: discord.Embed | None,
+        view: discord.ui.View | None,
+    ) -> None:
+        """PATCH the deferred response with only fields Discord accepts for an edit.
+
+        discord.py's shared send/edit serializer includes send-only defaults on an
+        interaction-message PATCH. Discord has rejected that shape in production even
+        though mocked adapters accepted it. Keep the pinned library for interaction
+        lifecycle/state, but make this protocol boundary explicit and observable.
+        """
+        await edit_deferred_original_exact(
+            self.interaction,
+            content=content,
+            embed=embed,
+            view=view,
+        )
+
     async def followup_text(
         self, content: str, visibility: ResponseVisibility = ResponseVisibility.PRIVATE
     ) -> discord.WebhookMessage | None:
@@ -321,7 +382,7 @@ class InteractionResponder:
 async def respond_command_error(interaction: discord.Interaction, message: str) -> None:
     try:
         if interaction.response.is_done():
-            await interaction.edit_original_response(content=message, embed=None, view=None)
+            await edit_deferred_original_exact(interaction, content=message)
         else:
             await interaction.response.send_message(message, ephemeral=True)
     except (discord.HTTPException, discord.InteractionResponded):

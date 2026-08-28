@@ -30,9 +30,9 @@ This document records the production-owned V1.5 path and the Discord interaction
 
 ## Discord response contract
 
-`InteractionResponder` owns command acknowledgement and delivery. A command chooses public/private visibility before defer. A deferred command completes its primary response with `Interaction.edit_original_response`; `followup.send` is reserved for additional notices. The response helper omits absent optional arguments on initial sends, which is required by the tested discord.py 2.7.1 serializer.
+`InteractionResponder` owns command acknowledgement and delivery. A command chooses public/private visibility before transport. Fast commands use the initial interaction endpoint; only provider-bound `/scan` and `/compare` defer. Deferred commands and component updates use an exact original-response PATCH with present fields only. The payload excludes generic send-only defaults and null placeholders; `followup.send` is reserved for additional notices.
 
-`MenuView(timeout=900)` and `ScanView(..., timeout=900)` are the finite views attached to private messages. `MenuView(timeout=None)` and the stateless `ScanView(None, None, timeout=None)` are restart routers registered with `Client.add_view`; stable custom IDs allow dispatch after restart, but they do not make an ephemeral message live forever. An expired private session is recreated with `/menu` or `/scan`.
+`MenuView(timeout=900)`, `ScanView(..., timeout=900)`, and `TokenActionView(timeout=900)` are the finite views attached to private messages. Their stateless `timeout=None` variants are restart routers registered with `Client.add_view`; stable custom IDs allow menu, Refresh, Watch, and Copy CA dispatch after restart, but they do not make an ephemeral message live forever. An expired private session is recreated with `/menu` or `/scan`.
 
 All card/view payloads pass `discord.validation` before transport. HTTP failures record sanitized status, Discord code/text, route/method, command, interaction/ack/defer state, visibility, payload kind, content/embed/view/component facts, duration, and result. Tokens and webhook/interaction paths are redacted.
 

@@ -12,6 +12,7 @@ from memecoin_bot.database import Store
 from memecoin_bot.discord import DiscordNotifier, NullNotifier
 from memecoin_bot.discovery import DiscoveryPoller
 from memecoin_bot.health import start_health_server
+from memecoin_bot.historical import ApprovedFeatureStore, HistoricalContextReader
 from memecoin_bot.observability.logging import configure_logging
 from memecoin_bot.providers.base import ResilientJsonClient
 from memecoin_bot.providers.bsc_rpc import BscRpcProvider, ChainSafetyRouter
@@ -191,6 +192,12 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
         )
     else:
         raise ValueError("Discord credentials required when alerts are enabled")
+    historical_context = None
+    if settings.historical_live_context_enabled:
+        historical_context = HistoricalContextReader(
+            ApprovedFeatureStore(settings.approved_feature_store_path),
+            settings.historical_live_latency_budget_ms,
+        )
     service = IntelligenceService(
         settings,
         store,
@@ -200,6 +207,7 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
         notifier,
         gmgn,
         launch_sources,
+        historical_context,
     )
     return store, service
 
@@ -295,6 +303,7 @@ async def async_main(args: argparse.Namespace) -> int:
             board.shutdown()
         return 0
     finally:
+        service.close()
         store.close()
 
 

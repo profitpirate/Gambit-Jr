@@ -119,6 +119,14 @@ def _buttons(p: dict[str, Any]) -> list[dict[str, Any]]:
     pair = str(p.get("pair_address") or address)
     if not address:
         return []
+    components = [
+        {
+            "type": 2,
+            "style": 1,
+            "label": "Copy CA",
+            "custom_id": "gambit:token:copy_ca",
+        },
+    ]
     links = [
         ("DexScreener", f"https://dexscreener.com/{quote(chain)}/{quote(pair)}"),
         (
@@ -132,14 +140,18 @@ def _buttons(p: dict[str, Any]) -> list[dict[str, Any]]:
             else f"https://solscan.io/token/{quote(address)}",
         ),
     ]
-    return [
+    components.extend(
+        {"type": 2, "style": 5, "label": label, "url": url} for label, url in links
+    )
+    components.append(
         {
-            "type": 1,
-            "components": [
-                {"type": 2, "style": 5, "label": label, "url": url} for label, url in links
-            ],
+            "type": 2,
+            "style": 2,
+            "label": "Watch",
+            "custom_id": "gambit:token:watch",
         }
-    ]
+    )
+    return [{"type": 1, "components": components}]
 
 
 def format_discord_event(event_type: str, p: dict[str, Any]) -> dict[str, Any]:
@@ -164,7 +176,10 @@ def format_discord_event(event_type: str, p: dict[str, Any]) -> dict[str, Any]:
         "PRIORITY_RADAR": "GAMBIT JR — PRIORITY RADAR",
         "RADAR_MILESTONE": "GAMBIT JR — RADAR OUTCOME",
         "RADAR_RISK": "GAMBIT JR — RADAR RISK",
-        "SIGNAL": f"GAMBIT JR — {str(p.get('classification', 'SIGNAL')).replace('_', ' ')}",
+        "SIGNAL": (
+            f"{_safe(p.get('v15_signal_tier') or p.get('classification') or 'SIGNAL')} • "
+            f"{_safe(p.get('name') or p.get('symbol'))} (${_safe(p.get('symbol'))})"
+        ),
         "MILESTONE": "GAMBIT JR — MILESTONE",
         "UPGRADE": "GAMBIT JR — SIGNAL UPGRADE",
         "DETERIORATION": "GAMBIT JR — DETERIORATION",
@@ -185,6 +200,9 @@ def format_discord_event(event_type: str, p: dict[str, Any]) -> dict[str, Any]:
             {"name": "Liquidity", "value": _money(p.get("liquidity_usd")), "inline": True},
         ]
     if event_type == "SIGNAL":
+        why_now = p.get("why_now") or p.get("thesis") or []
+        risks = p.get("failure_reasons") or p.get("risks") or []
+        historical = p.get("historical_context") or {}
         fields.extend(
             [
                 {
@@ -212,6 +230,26 @@ def format_discord_event(event_type: str, p: dict[str, Any]) -> dict[str, Any]:
                     "name": "Survival",
                     "value": _safe(p.get("survival_grade")),
                     "inline": True,
+                },
+                {
+                    "name": "Why now",
+                    "value": _safe(" • ".join(why_now) or "No additional verified catalyst", 700),
+                    "inline": False,
+                },
+                {
+                    "name": "Major risks",
+                    "value": _safe(" • ".join(risks) or "No additional known risk", 700),
+                    "inline": False,
+                },
+                {
+                    "name": "Historical edge",
+                    "value": (
+                        f"{_safe(historical.get('state'))} • "
+                        f"{len(historical.get('features') or [])} approved features"
+                        if historical
+                        else "UNKNOWN • no approved point-in-time context"
+                    ),
+                    "inline": False,
                 },
             ]
         )

@@ -207,7 +207,12 @@ class UnicodeAndDiscordTests(unittest.TestCase):
         card = format_discord_event("EARLY_RADAR", payload)
         self.assertIn(address, card["content"])
         self.assertEqual(card["embeds"][0]["fields"][0]["value"], "BNB CHAIN")
-        urls = [button["url"] for row in card["components"] for button in row["components"]]
+        urls = [
+            button["url"]
+            for row in card["components"]
+            for button in row["components"]
+            if "url" in button
+        ]
         self.assertTrue(all(url.startswith("https://") for url in urls))
         self.assertTrue(any("bscscan.com/token/" in url for url in urls))
 

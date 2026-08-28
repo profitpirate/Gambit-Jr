@@ -143,6 +143,7 @@ class IntelligenceService:
         notifier: Any,
         gmgn: Any | None = None,
         launch_sources: list[Any] | None = None,
+        historical_context: Any | None = None,
     ):
         self.settings = settings
         self.store = store
@@ -152,6 +153,7 @@ class IntelligenceService:
         self.notifier = notifier
         self.gmgn = gmgn
         self.launch_sources = launch_sources or []
+        self.historical_context = historical_context
         self.launch_queue = BoundedLaunchQueue(settings.event_queue_max)
         self.safety_gates = SafetyGates(settings)
         self.scoring = ScoringEngine(settings)
@@ -165,6 +167,10 @@ class IntelligenceService:
         self.started_at = iso()
         self.log = logging.getLogger("memecoin_bot.service")
         self.stop_event = asyncio.Event()
+
+    def close(self) -> None:
+        if self.historical_context is not None:
+            self.historical_context.store.close()
 
     async def offer_launch_event(self, event: LaunchEvent) -> None:
         result = self.launch_queue.offer(event)
@@ -950,6 +956,20 @@ class IntelligenceService:
                 ],
             }
         )
+        if self.historical_context is not None:
+            self.historical_context.apply(
+                chain,
+                address,
+                market.captured_at,
+                str(v15_stage),
+                v15_features,
+            )
+            historical = v15_features.get("historical_context") or {}
+            if historical.get("state") == "APPLIED":
+                v15_features["why_now"] = [
+                    *v15_features["why_now"],
+                    "approved historical context",
+                ][:2]
         v15_decision = evaluate_v15(v15_stage, v15_features)
         self.store.record_v15_decision(
             candidate_id, v15_decision, self.settings, address, chain, market
@@ -1157,6 +1177,7 @@ class IntelligenceService:
                 "tradeability": trade,
                 "actor_concentration": concentration,
                 "buyer_replacement": buyer_replacement,
+                "historical_context": v15_features.get("historical_context"),
             }
         )
         signal_id = self.store.create_signal(

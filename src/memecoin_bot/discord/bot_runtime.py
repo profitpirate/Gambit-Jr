@@ -41,6 +41,7 @@ from memecoin_bot.discord.responses import (
     SAFE_INTERNAL_ERROR,
     InteractionResponder,
     ResponseVisibility,
+    edit_deferred_original_exact,
     respond_command_error,
     respond_component_error,
 )
@@ -94,8 +95,101 @@ PRIVATE_COMMANDS = frozenset(
         "watchlist",
     }
 )
+DEFERRED_COMMANDS = frozenset({"compare", "scan"})
 
 if discord is not None:
+
+    def _message_target(interaction: discord.Interaction) -> tuple[str, str]:
+        message = getattr(interaction, "message", None)
+        embeds = getattr(message, "embeds", []) if message else []
+        if not embeds:
+            raise ValueError("Token metadata is unavailable; run /token or /scan again.")
+        embed = embeds[0]
+        fields = list(getattr(embed, "fields", []))
+        address_field = next(
+            (field for field in fields if str(field.name).lower() == "contract address"),
+            None,
+        )
+        chain_field = next(
+            (field for field in fields if str(field.name).lower() == "chain"), None
+        )
+        description = str(getattr(embed, "description", "") or "")
+        address = str(address_field.value).strip() if address_field else ""
+        if not address and "`" in description:
+            address = description.split("`", 2)[1].strip()
+        chain_text = str(chain_field.value).lower() if chain_field else ""
+        chain = "bsc" if "bnb" in chain_text or "bsc" in chain_text else "solana"
+        if not address:
+            raise ValueError("Contract address is unavailable; run /token or /scan again.")
+        return address, chain
+
+    class TokenActionView(discord.ui.View):
+        """Stateless actions for automatic alerts and token intelligence cards."""
+
+        def __init__(
+            self,
+            store: object,
+            logger: logging.Logger | None = None,
+            *,
+            timeout: float | None = 900,
+        ):
+            super().__init__(timeout=timeout)
+            self.store = store
+            self.log = logger or logging.getLogger("memecoin_bot.discord")
+
+        @discord.ui.button(
+            label="Copy CA",
+            style=discord.ButtonStyle.primary,
+            custom_id="gambit:token:copy_ca",
+        )
+        async def copy_ca(
+            self, interaction: discord.Interaction, _button: discord.ui.Button
+        ) -> None:
+            try:
+                address, _chain = _message_target(interaction)
+                await interaction.response.send_message(
+                    f"Contract address:\n```\n{address}\n```",
+                    ephemeral=True,
+                )
+            except (ValueError, discord.HTTPException, discord.InteractionResponded) as error:
+                _safe_failure_log(
+                    self.log,
+                    "component_callback_failed",
+                    error,
+                    custom_id="gambit:token:copy_ca",
+                    result="failure",
+                )
+                await respond_component_error(interaction, SAFE_INTERNAL_ERROR)
+
+        @discord.ui.button(
+            label="Watch",
+            style=discord.ButtonStyle.secondary,
+            custom_id="gambit:token:watch",
+        )
+        async def watch(
+            self, interaction: discord.Interaction, _button: discord.ui.Button
+        ) -> None:
+            async def add_watch() -> None:
+                address, chain = _message_target(interaction)
+                created = await asyncio.to_thread(
+                    self.store.add_watch,
+                    interaction.guild_id,
+                    interaction.user.id,
+                    chain,
+                    address,
+                )
+                await interaction.followup.send(
+                    "Added to your watchlist." if created else "Already on your watchlist.",
+                    ephemeral=True,
+                )
+
+            await run_component_callback(
+                interaction,
+                "gambit:token:watch",
+                self.log,
+                add_watch,
+                ephemeral_defer=True,
+            )
 
     class ScanView(discord.ui.View):
         def __init__(
@@ -171,9 +265,7 @@ if discord is not None:
                     address, chain, interaction.guild_id, interaction.user.id
                 )
                 embed = validate_message(card_payload=scan_card(result), view=self)
-                await interaction.edit_original_response(
-                    embed=embed, view=self
-                )
+                await edit_deferred_original_exact(interaction, embed=embed, view=self)
 
             await run_component_callback(
                 interaction, "gambit:scan:refresh", self.log, refresh_scan
@@ -205,6 +297,20 @@ if discord is not None:
                 ephemeral_defer=True,
             )
 
+        @discord.ui.button(
+            label="Copy CA",
+            style=discord.ButtonStyle.secondary,
+            custom_id="gambit:scan:copy_ca",
+        )
+        async def copy_ca(
+            self, interaction: discord.Interaction, _button: discord.ui.Button
+        ) -> None:
+            address, _chain = self.target(interaction)
+            await interaction.response.send_message(
+                f"Contract address:\n```\n{address}\n```",
+                ephemeral=True,
+            )
+
 else:  # pragma: no cover - deployment dependency guard
     ScanView = object
 
@@ -220,6 +326,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
     menu_data = CommandCenterData(service, store, settings)
     client.add_view(MenuView(menu_data, log, timeout=None))
     client.add_view(ScanView(service, store, None, None, log, timeout=None))
+    client.add_view(TokenActionView(store, log, timeout=None))
     response_sessions: dict[int, InteractionResponder] = {}
     active_command_names: dict[int, str] = {}
 
@@ -312,7 +419,8 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             )
             session = InteractionResponder(interaction, command, visibility, log)
             response_sessions[id(interaction)] = session
-            await session.defer()
+            if command in DEFERRED_COMMANDS:
+                await session.defer()
             return True
         await interaction.response.send_message(
             "This command is available in Discord server text channels.", ephemeral=True
@@ -330,6 +438,8 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             stats["v14"] = store.v14_health()
             queue = getattr(service, "launch_queue", None)
             stats["event_queue"] = queue.stats() if queue else {}
+            historical = getattr(service, "historical_context", None)
+            stats["historical_context"] = historical.status() if historical else {"enabled": False}
             await send_card(interaction, status_card(stats))
 
     @tree.command(name="menu", description="Open the complete Gambit Jr command center")
@@ -520,7 +630,10 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             await send_text(interaction, "Token is not tracked.")
             return
         await send_card(
-            interaction, smartmoney_card(data) if smart_only else token_card(data), True
+            interaction,
+            smartmoney_card(data) if smart_only else token_card(data),
+            True,
+            TokenActionView(store, log, timeout=900),
         )
 
     @tree.command(name="radar", description="Show active Radar calls and ongoing outcomes")

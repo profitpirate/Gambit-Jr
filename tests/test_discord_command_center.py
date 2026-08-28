@@ -19,6 +19,7 @@ from memecoin_bot.discord.command_center import (
     CommandCenterData,
     MenuView,
 )
+from memecoin_bot.signals import format_discord_event
 
 
 class FakeResponse:
@@ -72,6 +73,15 @@ class FakeInteraction:
 
     async def original_response(self):
         return SimpleNamespace(id=99, edit=AsyncMock())
+
+
+def primary_payload(interaction: FakeInteraction) -> dict:
+    payloads = [
+        *interaction.edits,
+        *(row for row in interaction.response.messages if row.get("kind") != "defer"),
+    ]
+    assert len(payloads) == 1
+    return payloads[0]
 
 
 class FakeStore:
@@ -420,7 +430,7 @@ async def test_menu_command_sends_actual_ephemeral_view_and_all_commands_remain_
     tree, _client, _store = await capture_runtime()
     interaction = FakeInteraction()
     await tree.get_command("menu").callback(interaction)
-    sent = interaction.edits[0]
+    sent = primary_payload(interaction)
     assert isinstance(sent["view"], MenuView)
     assert sent["view"].timeout == 900
     assert sent["embed"].title == PAGE_TITLES["home"]
@@ -433,7 +443,7 @@ async def test_registered_menu_e2e_sequence_has_no_duplicate_responses():
     tree, _client, _store = await capture_runtime()
     opened = FakeInteraction()
     await tree.get_command("menu").callback(opened)
-    view = opened.edits[0]["view"]
+    view = primary_payload(opened)["view"]
 
     title = PAGE_TITLES["home"]
     for page in ("overview", "radar", "performance", "system", "home"):
@@ -489,6 +499,36 @@ async def test_scan_persistent_router_recovers_target_after_simulated_restart():
 
 
 @pytest.mark.asyncio
+async def test_persistent_token_copy_and_watch_use_exact_full_contract_after_restart():
+    _tree, client, store = await capture_runtime()
+    address = "So11111111111111111111111111111111111111111"
+    payload = format_discord_event(
+        "EARLY_RADAR",
+        {
+            "name": "Example",
+            "symbol": "EXM",
+            "chain": "solana",
+            "token_address": address,
+            "reasons": ["TEST"],
+        },
+    )
+    router = next(
+        view for view in client.persistent_views if isinstance(view, bot_runtime.TokenActionView)
+    )
+
+    copied = FakeInteraction()
+    copied.message.embeds = [discord.Embed.from_dict(payload["embeds"][0])]
+    await item(router, "gambit:token:copy_ca").callback(copied)
+    assert address in copied.response.messages[0]["content"]
+
+    watched = FakeInteraction()
+    watched.message.embeds = [discord.Embed.from_dict(payload["embeds"][0])]
+    await item(router, "gambit:token:watch").callback(watched)
+    assert watched.followup.messages[0]["content"] == "Added to your watchlist."
+    assert "add_watch" in store.calls
+
+
+@pytest.mark.asyncio
 async def test_all_24_registered_commands_complete_one_primary_response():
     tree, _client, _store = await capture_runtime()
     calls = {
@@ -521,7 +561,7 @@ async def test_all_24_registered_commands_complete_one_primary_response():
     for name, arguments in calls.items():
         interaction = FakeInteraction(admin=True)
         await tree.get_command(name).callback(interaction, *arguments)
-        assert len(interaction.edits) == 1, name
+        primary_payload(interaction)
         assert interaction.followup.messages == [], name
 
 
@@ -563,7 +603,7 @@ async def test_unauthorized_setup_is_rejected_before_store_mutation():
     interaction = FakeInteraction(admin=False)
     await tree.get_command("setup").callback(interaction)
     assert store.setup_called is False
-    assert interaction.edits[0]["content"] == "Manage Server permission is required."
+    assert primary_payload(interaction)["content"] == "Manage Server permission is required."
     assert interaction.followup.messages == []
 
 
@@ -576,7 +616,7 @@ async def test_global_tree_error_uses_safe_followup_after_defer(caplog):
     with caplog.at_level(logging.INFO, logger="memecoin_bot.discord"):
         await tree.on_error(interaction, error)
     assert interaction.edits[0]["content"] == SAFE_ERROR
-    assert interaction.edits[0]["embed"] is None
+    assert "embed" not in interaction.edits[0]
     assert interaction.followup.messages == []
     assert "not-visible" not in caplog.text
 

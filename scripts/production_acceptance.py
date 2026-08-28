@@ -40,6 +40,7 @@ from memecoin_bot.discord.validation import (
     validate_view,
     validate_webhook_payload,
 )
+from memecoin_bot.historical import ApprovedFeatureStore
 from memecoin_bot.signals import format_discord_event
 
 EXPECTED_DISCORD_VERSION = "2.7.1"
@@ -138,6 +139,8 @@ def _validate_discord_artifacts(store: Store, settings: Settings) -> dict[str, i
         MenuView(data, timeout=None),
         bot_runtime.ScanView(service, store, "So111", "solana", timeout=900),
         bot_runtime.ScanView(service, store, None, None, timeout=None),
+        bot_runtime.TokenActionView(store, timeout=900),
+        bot_runtime.TokenActionView(store, timeout=None),
     ]
     for view in views:
         validate_view(view)
@@ -185,6 +188,14 @@ def _validate_discord_artifacts(store: Store, settings: Settings) -> dict[str, i
         },
     )
     validate_webhook_payload(automatic)
+    actions = automatic["components"][0]["components"]
+    assert [value["label"] for value in actions] == [
+        "Copy CA",
+        "DexScreener",
+        "Open GMGN",
+        "Solscan",
+        "Watch",
+    ]
     return {
         "card_builders": len(cards),
         "views": len(views),
@@ -208,6 +219,39 @@ def run_acceptance(settings: Settings) -> tuple[dict[str, Any], int]:
         discord.__version__ == EXPECTED_DISCORD_VERSION,
         discord.__version__,
     )
+    separate_paths = {
+        settings.database_path.resolve(),
+        settings.historical_warehouse_path.resolve(),
+        settings.approved_feature_store_path.resolve(),
+    }
+    acceptance.require(
+        "storage_separation",
+        len(separate_paths) == 3,
+        sorted(str(path) for path in separate_paths),
+    )
+    approved_path = Path(settings.approved_feature_store_path)
+    acceptance.require("approved_feature_store_exists", approved_path.is_file(), str(approved_path))
+    if approved_path.is_file():
+        feature_store = ApprovedFeatureStore(approved_path)
+        try:
+            feature_tables = {
+                str(row[0])
+                for row in feature_store.conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                )
+            }
+            acceptance.require(
+                "approved_feature_schema",
+                {
+                    "approved_feature_registry",
+                    "production_feature_snapshots",
+                    "production_context_audit",
+                }
+                <= feature_tables,
+                sorted(feature_tables),
+            )
+        finally:
+            feature_store.close()
 
     command_names = _registered_command_names()
     expected_names = set(bot_runtime.EXPECTED_COMMAND_NAMES)

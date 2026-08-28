@@ -1,5 +1,12 @@
 # Gambit Jr — V1.5 Runner/Survival Intelligence
 
+The final V1.5 storage and research contract is documented in
+[`docs/v15-historical-intelligence.md`](docs/v15-historical-intelligence.md). It adds an immutable raw
+archive, separate point-in-time research warehouse, explicit approved production feature store,
+checkpointed provider-neutral backfills, leakage-failing chronological research, bounded historical
+live context, and signal-first contract actions. No external historical corpus is bundled or claimed;
+coverage reports remain empty until legitimate observations are ingested.
+
 V1.5 adds a production-consumed decision core with independent runner and failure
 scores, setup conviction separate from evidence coverage, stage-specific evaluation,
 provider conflict/freshness states, notional tradeability estimates, effective actor

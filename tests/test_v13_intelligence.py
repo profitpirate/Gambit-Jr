@@ -227,7 +227,12 @@ class PersistenceV13Tests(unittest.TestCase):
             "liquidity_usd": 24000, "radar_score": 89, "reasons": ["VOLUME_ACCELERATING"]})
         self.assertIn(address, card["content"])
         self.assertIn("QUEENDAO", card["embeds"][0]["description"])
-        urls = [button["url"] for row in card["components"] for button in row["components"]]
+        urls = [
+            button["url"]
+            for row in card["components"]
+            for button in row["components"]
+            if "url" in button
+        ]
         self.assertTrue(any("gmgn.ai/bsc/token/" in url for url in urls))
 
 

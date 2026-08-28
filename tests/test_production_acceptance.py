@@ -8,11 +8,14 @@ from pathlib import Path
 
 from memecoin_bot.config import Settings
 from memecoin_bot.database import Store
+from memecoin_bot.historical import ApprovedFeatureStore
 
 
 def test_production_acceptance_passes_migrated_registered_database(tmp_path, monkeypatch):
     database = tmp_path / "acceptance.db"
     monkeypatch.setenv("DATABASE_PATH", str(database))
+    feature_database = tmp_path / "approved-features.db"
+    monkeypatch.setenv("APPROVED_FEATURE_STORE_PATH", str(feature_database))
     monkeypatch.setenv("DISCORD_TOKEN", "acceptance-secret-must-not-appear")
     settings = Settings.from_env()
     store = Store(database)
@@ -25,11 +28,13 @@ def test_production_acceptance_passes_migrated_registered_database(tmp_path, mon
         {},
     )
     store.close()
+    ApprovedFeatureStore(feature_database).close()
 
     root = Path(__file__).resolve().parents[1]
     environment = os.environ.copy()
     environment["DATABASE_PATH"] = str(database)
     environment["DISCORD_TOKEN"] = "acceptance-secret-must-not-appear"
+    environment["APPROVED_FEATURE_STORE_PATH"] = str(feature_database)
     completed = subprocess.run(
         [sys.executable, "scripts/production_acceptance.py"],
         cwd=root,

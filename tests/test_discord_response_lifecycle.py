@@ -247,6 +247,9 @@ async def test_deferred_primary_edits_original_with_matching_visibility(
     assert adapter.ephemeral is ephemeral
     assert len(adapter.edits) == 1
     assert adapter.edits[0]["embeds"][0]["title"] == "GAMBIT JR • COMMAND CENTER"
+    assert "tts" not in adapter.edits[0]
+    assert "content" not in adapter.edits[0]
+    assert "components" not in adapter.edits[0]
     assert adapter.followups == []
 
 
@@ -378,6 +381,48 @@ def test_menu_and_scan_views_serialize_without_invalid_components():
     assert len(menu_rows) == 2
     assert len(scan_rows) == 1
     assert len({item.custom_id for item in menu.children}) == len(menu.children)
+
+
+def test_signal_card_has_full_contract_and_five_chain_aware_actions():
+    payload = format_discord_event(
+        "SIGNAL",
+        {
+            "classification": "QUALIFIED",
+            "v15_signal_tier": "PREMIUM",
+            "name": "Example Token",
+            "symbol": "EXM",
+            "chain": "solana",
+            "token_address": "So11111111111111111111111111111111111111111",
+            "component_scores": {
+                "narrative": 10,
+                "social": 10,
+                "onchain": 10,
+                "developer": 10,
+                "momentum": 10,
+                "safety": 5,
+            },
+            "component_maxima": {
+                "narrative": 25,
+                "social": 20,
+                "onchain": 20,
+                "developer": 15,
+                "momentum": 15,
+                "safety": 5,
+            },
+            "confidence": 0.8,
+        },
+    )
+    validate_webhook_payload(payload)
+    assert payload["embeds"][0]["title"] == "PREMIUM • Example Token ($EXM)"
+    assert payload["embeds"][0]["fields"][1]["value"].startswith("So111")
+    components = payload["components"][0]["components"]
+    assert [component["label"] for component in components] == [
+        "Copy CA",
+        "DexScreener",
+        "Open GMGN",
+        "Solscan",
+        "Watch",
+    ]
 
 
 def test_every_card_and_component_payload_is_json_serializable():

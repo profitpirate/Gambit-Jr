@@ -18,6 +18,7 @@ from memecoin_bot.discord.cards import (
 )
 from memecoin_bot.discord.responses import (
     SAFE_INTERNAL_ERROR,
+    edit_deferred_original_exact,
     log_discord_http_failure,
     respond_component_error,
 )
@@ -240,6 +241,8 @@ class CommandCenterData:
         stats["v14"] = await asyncio.to_thread(self.store.v14_health)
         queue = getattr(self.service, "launch_queue", None)
         stats["event_queue"] = queue.stats() if queue else None
+        historical = getattr(self.service, "historical_context", None)
+        stats["historical_context"] = historical.status() if historical else {"enabled": False}
         payload = status_card(stats)
         payload["embed"]["title"] = PAGE_TITLES["system"]
         return payload
@@ -322,9 +325,7 @@ class MenuView(discord.ui.View):
                 await interaction.response.defer()
             payload = await self.data.render(page, interaction)
             embed = validate_message(card_payload=payload, view=self)
-            await interaction.edit_original_response(
-                embed=embed, view=self
-            )
+            await edit_deferred_original_exact(interaction, embed=embed, view=self)
         except discord.HTTPException as error:
             log_discord_http_failure(
                 self.log,

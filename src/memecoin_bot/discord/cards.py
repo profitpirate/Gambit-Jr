@@ -88,6 +88,8 @@ def status_card(stats: dict[str, Any]) -> dict[str, Any]:
     reconciliation = stats.get("state_reconciliation")
     v14 = stats.get("v14") or {}
     queue = stats.get("event_queue") or {}
+    history = stats.get("historical_context") or {}
+    latest_history = history.get("latest_lookup") or {}
     live = (
         f"Watching: **{_value(stats.get('candidates_watching'))}**\n"
         f"Pending: **{_value(stats.get('pending_evidence'))}**\n"
@@ -136,6 +138,15 @@ def status_card(stats: dict[str, Any]) -> dict[str, Any]:
                 f"Event queue: **{_value(queue.get('size'))} / {_value(queue.get('maxsize'))}**\n"
                 f"Persisted events: **{_value(v14.get('event_queue_persisted'))}**\n"
                 f"Wallet clusters: **{_value(v14.get('wallet_clusters'))}**",
+                False,
+            ),
+            _field(
+                "APPROVED HISTORICAL CONTEXT",
+                f"Enabled: **{_value(history.get('enabled'), 'NO')}**\n"
+                f"Approved features: **{_value(history.get('approved_features'), '0')}**\n"
+                f"Published snapshots: **{_value(history.get('published_snapshots'), '0')}**\n"
+                f"Last lookup: **{_value(latest_history.get('state'), 'NONE')}** • "
+                f"{_value(latest_history.get('latency_ms'), 'UNKNOWN')} ms",
                 False,
             ),
         ],

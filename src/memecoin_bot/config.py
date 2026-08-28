@@ -63,6 +63,11 @@ class Settings:
     gmgn_circuit_cooldown_seconds: float = 60
     gmgn_concurrency: int = 4
     database_path: Path = Path("data/memecoin.db")
+    historical_warehouse_path: Path = Path("data/historical/warehouse.db")
+    historical_archive_path: Path = Path("data/archive/historical")
+    approved_feature_store_path: Path = Path("data/production/approved_features.db")
+    historical_live_context_enabled: bool = True
+    historical_live_latency_budget_ms: float = 25
     log_level: str = "INFO"
     shadow_mode: bool = True
     shadow_send_alerts: bool = True
@@ -209,6 +214,21 @@ class Settings:
             gmgn_circuit_cooldown_seconds=_float("GMGN_CIRCUIT_COOLDOWN_SECONDS", 60),
             gmgn_concurrency=_int("GMGN_CONCURRENCY", 4),
             database_path=Path(os.getenv("DATABASE_PATH", "data/memecoin.db")),
+            historical_warehouse_path=Path(
+                os.getenv("HISTORICAL_WAREHOUSE_PATH", "data/historical/warehouse.db")
+            ),
+            historical_archive_path=Path(
+                os.getenv("HISTORICAL_ARCHIVE_PATH", "data/archive/historical")
+            ),
+            approved_feature_store_path=Path(
+                os.getenv(
+                    "APPROVED_FEATURE_STORE_PATH", "data/production/approved_features.db"
+                )
+            ),
+            historical_live_context_enabled=_bool("HISTORICAL_LIVE_CONTEXT_ENABLED", True),
+            historical_live_latency_budget_ms=_float(
+                "HISTORICAL_LIVE_LATENCY_BUDGET_MS", 25
+            ),
             log_level=os.getenv("LOG_LEVEL", "INFO"),
             shadow_mode=_bool("SHADOW_MODE", True),
             shadow_send_alerts=_bool("SHADOW_SEND_ALERTS", True),
@@ -351,6 +371,15 @@ class Settings:
             raise ValueError("Unsupported DISCORD_DEFAULT_ALERT_TIER")
         if min(self.event_queue_max, self.min_sample_for_edge_metrics) <= 0:
             raise ValueError("Event queue and edge sample settings must be positive")
+        if self.historical_live_latency_budget_ms <= 0:
+            raise ValueError("Historical live latency budget must be positive")
+        paths = {
+            self.database_path.resolve(),
+            self.historical_warehouse_path.resolve(),
+            self.approved_feature_store_path.resolve(),
+        }
+        if len(paths) != 3:
+            raise ValueError("live, historical, and approved feature databases must be separate")
 
     def config_fingerprint(self) -> str:
         """Stable fingerprint of decision settings; credentials are deliberately excluded."""
@@ -360,6 +389,7 @@ class Settings:
             "radar_version": self.radar_version,
             "feature_version": self.feature_version,
             "model_version": self.model_version,
+            "historical_live_context_enabled": self.historical_live_context_enabled,
             "weights": self.weights,
             "thresholds": [
                 self.watch_threshold,
