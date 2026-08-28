@@ -292,7 +292,7 @@ class HistoricalWarehouse(_SqliteStore):
     ) -> str:
         if _parse_timestamp(available_at) < _parse_timestamp(observed_at):
             raise ValueError("event availability cannot precede observation")
-        event_id = _uuid(evidence_id, event_type, observed_at)
+        event_id = _uuid(evidence_id, event_type, entity_key, observed_at, _json(values))
         with self._lock, self.conn:
             self.conn.execute(
                 "INSERT OR IGNORE INTO normalized_events VALUES(?,?,?,?,?,?,?,?,?)",

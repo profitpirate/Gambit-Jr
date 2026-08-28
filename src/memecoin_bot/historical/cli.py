@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from .backfill import BackfillEngine
+from .evidence_research import run_public_evidence_research, storage_projection, write_report
 from .finalization import (
     measure_local_latency,
     normalize_ranked_pool_ohlcv,
@@ -72,6 +73,14 @@ def parser() -> argparse.ArgumentParser:
     public.add_argument("--report", default="outputs/v15-finalization-evidence.json")
     public.add_argument("--code-version", default="working-tree")
 
+    evidence = commands.add_parser(
+        "research-public-corpora",
+        help="Verify and research checksum-pinned public launch corpora",
+    )
+    evidence.add_argument("--data-root", required=True)
+    evidence.add_argument("--report", default="outputs/v15-real-evidence.json")
+    evidence.add_argument("--code-version", default="working-tree")
+
     dune = commands.add_parser("ingest-dune", help="Ingest a reviewed Dune query result")
     dune.add_argument("--query-id", type=int, required=True)
     dune.add_argument("--chain", required=True)
@@ -114,6 +123,13 @@ async def _run(args: argparse.Namespace) -> dict[str, Any] | list[dict[str, Any]
             return warehouse.operator_status()
         if args.command == "finalize-public":
             return await _finalize_public(warehouse, args)
+        if args.command == "research-public-corpora":
+            report = run_public_evidence_research(
+                args.data_root, warehouse=warehouse, code_version=args.code_version
+            )
+            report["storage_projection"] = storage_projection(report)
+            write_report(report, args.report)
+            return report
         if args.command == "ingest-dune":
             provider = DuneQueryProvider(
                 args.query_id,
