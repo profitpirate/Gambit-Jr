@@ -55,9 +55,7 @@ class FakeInteraction:
         self.guild_id = 101
         self.channel_id = 202
         self.channel = SimpleNamespace(id=202)
-        self.user = SimpleNamespace(
-            id=303, guild_permissions=SimpleNamespace(manage_guild=admin)
-        )
+        self.user = SimpleNamespace(id=303, guild_permissions=SimpleNamespace(manage_guild=admin))
         self.response = FakeResponse()
         self.followup = FakeFollowup()
         self.edits: list[dict] = []
@@ -319,9 +317,19 @@ async def test_home_back_and_refresh_edit_without_channel_spam(command_center):
 
 
 @pytest.mark.asyncio
-async def test_authoritative_store_methods_feed_pages_and_missing_values_are_unknown(command_center):
+async def test_authoritative_store_methods_feed_pages_and_missing_values_are_unknown(
+    command_center,
+):
     view, _, store, _ = command_center
-    for page in ("overview", "radar", "intelligence", "watchlist", "performance", "system", "settings"):
+    for page in (
+        "overview",
+        "radar",
+        "intelligence",
+        "watchlist",
+        "performance",
+        "system",
+        "settings",
+    ):
         await view.navigate(FakeInteraction(), page, "gambit:menu:navigate")
     assert {
         "status_stats",
@@ -481,9 +489,7 @@ async def test_scan_persistent_router_recovers_target_after_simulated_restart():
     await tree.get_command("scan").callback(opened, "So111", "solana")
     scan_embed = opened.edits[0]["embed"]
     router = next(
-        view
-        for view in client.persistent_views
-        if isinstance(view, bot_runtime.ScanView)
+        view for view in client.persistent_views if isinstance(view, bot_runtime.ScanView)
     )
 
     refresh = FakeInteraction()
@@ -593,7 +599,7 @@ async def test_clean_database_restart_keeps_command_center_operational(tmp_path)
     await second_view.navigate(interaction, "system", "gambit:menu:system")
     assert interaction.edits[0]["embed"].title == PAGE_TITLES["system"]
     assert restarted.conn.execute("PRAGMA quick_check").fetchone()[0] == "ok"
-    assert restarted.conn.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0] == 8
+    assert restarted.conn.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0] == 9
     restarted.close()
 
 

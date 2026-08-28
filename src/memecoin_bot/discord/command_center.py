@@ -24,6 +24,7 @@ from memecoin_bot.discord.responses import (
 )
 from memecoin_bot.discord.validation import component_count, validate_message
 from memecoin_bot.observability.logging import event
+from memecoin_bot.v15_engine import operator_model_status
 
 SAFE_ERROR = SAFE_INTERNAL_ERROR
 MENU_PAGES = (
@@ -118,10 +119,14 @@ class CommandCenterData:
             key=lambda row: float(row["max_multiple"]),
             reverse=True,
         )[:3]
-        runner_lines = "\n".join(
-            f"**{row.get('name') or row.get('symbol') or 'UNKNOWN'}** • "
-            f"{float(row['max_multiple']):.2f}x" for row in runners
-        ) or "No measured runners available."
+        runner_lines = (
+            "\n".join(
+                f"**{row.get('name') or row.get('symbol') or 'UNKNOWN'}** • "
+                f"{float(row['max_multiple']):.2f}x"
+                for row in runners
+            )
+            or "No measured runners available."
+        )
         return card(
             PAGE_TITLES["overview"],
             "Live operational and measured intelligence snapshot.",
@@ -158,16 +163,22 @@ class CommandCenterData:
             asyncio.to_thread(self.store.radar_board, 8),
             asyncio.to_thread(self.store.candidates_report, 5),
         )
-        radar_lines = "\n".join(
-            f"**{row.get('name') or row.get('symbol') or 'UNKNOWN'}** • "
-            f"{row.get('state') or 'UNKNOWN'} • {row.get('chain') or 'UNKNOWN'}"
-            for row in radar[:5]
-        ) or "No active Radar evidence."
-        candidate_lines = "\n".join(
-            f"**{row.get('name') or row.get('symbol') or 'UNKNOWN'}** • "
-            f"{row.get('state') or 'UNKNOWN'}"
-            for row in candidates[:3]
-        ) or "No active candidates."
+        radar_lines = (
+            "\n".join(
+                f"**{row.get('name') or row.get('symbol') or 'UNKNOWN'}** • "
+                f"{row.get('state') or 'UNKNOWN'} • {row.get('chain') or 'UNKNOWN'}"
+                for row in radar[:5]
+            )
+            or "No active Radar evidence."
+        )
+        candidate_lines = (
+            "\n".join(
+                f"**{row.get('name') or row.get('symbol') or 'UNKNOWN'}** • "
+                f"{row.get('state') or 'UNKNOWN'}"
+                for row in candidates[:3]
+            )
+            or "No active candidates."
+        )
         return card(
             PAGE_TITLES["radar"],
             "Current Store-backed Radar and candidate state.",
@@ -183,16 +194,22 @@ class CommandCenterData:
             asyncio.to_thread(self.store.cluster_report, 5),
             asyncio.to_thread(self.store.narrative_report, None, 5),
         )
-        cluster_lines = "\n".join(
-            f"**{str(row.get('chain') or 'UNKNOWN').upper()}** • "
-            f"{row.get('risk_state') or 'UNKNOWN'} • "
-            f"{row.get('member_count') if row.get('member_count') is not None else 'UNKNOWN'} wallets"
-            for row in clusters[:3]
-        ) or "No wallet clusters observed."
-        narrative_lines = "\n".join(
-            f"**{row.get('label') or 'UNKNOWN'}** • {row.get('freshness') or 'UNKNOWN'}"
-            for row in narratives[:3]
-        ) or "No narrative evidence available."
+        cluster_lines = (
+            "\n".join(
+                f"**{str(row.get('chain') or 'UNKNOWN').upper()}** • "
+                f"{row.get('risk_state') or 'UNKNOWN'} • "
+                f"{row.get('member_count') if row.get('member_count') is not None else 'UNKNOWN'} wallets"
+                for row in clusters[:3]
+            )
+            or "No wallet clusters observed."
+        )
+        narrative_lines = (
+            "\n".join(
+                f"**{row.get('label') or 'UNKNOWN'}** • {row.get('freshness') or 'UNKNOWN'}"
+                for row in narratives[:3]
+            )
+            or "No narrative evidence available."
+        )
         return card(
             PAGE_TITLES["intelligence"],
             "Graph, creator and narrative context from stored evidence.",
@@ -243,6 +260,7 @@ class CommandCenterData:
         stats["event_queue"] = queue.stats() if queue else None
         historical = getattr(self.service, "historical_context", None)
         stats["historical_context"] = historical.status() if historical else {"enabled": False}
+        stats["model"] = operator_model_status(self.settings)
         payload = status_card(stats)
         payload["embed"]["title"] = PAGE_TITLES["system"]
         return payload
@@ -307,9 +325,7 @@ class MenuView(discord.ui.View):
         title = getattr(embeds[0], "title", None) if embeds else None
         return next((page for page, expected in PAGE_TITLES.items() if title == expected), "home")
 
-    async def navigate(
-        self, interaction: discord.Interaction, page: str, custom_id: str
-    ) -> None:
+    async def navigate(self, interaction: discord.Interaction, page: str, custom_id: str) -> None:
         started = time.monotonic()
         event(
             self.log,
@@ -390,9 +406,7 @@ class MenuView(discord.ui.View):
         row=1,
     )
     async def refresh(self, interaction: discord.Interaction, _button: discord.ui.Button) -> None:
-        await self.navigate(
-            interaction, self.current_page(interaction), "gambit:menu:refresh"
-        )
+        await self.navigate(interaction, self.current_page(interaction), "gambit:menu:refresh")
 
     async def on_error(
         self, interaction: discord.Interaction, error: Exception, item: discord.ui.Item[Any]

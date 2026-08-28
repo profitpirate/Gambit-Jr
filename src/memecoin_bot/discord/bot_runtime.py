@@ -47,6 +47,7 @@ from memecoin_bot.discord.responses import (
 )
 from memecoin_bot.discord.validation import validate_message
 from memecoin_bot.observability.logging import event
+from memecoin_bot.v15_engine import operator_model_status
 
 CommandCallback = TypeVar("CommandCallback", bound=Callable[..., Awaitable[None]])
 EXPECTED_COMMAND_NAMES = frozenset(
@@ -110,9 +111,7 @@ if discord is not None:
             (field for field in fields if str(field.name).lower() == "contract address"),
             None,
         )
-        chain_field = next(
-            (field for field in fields if str(field.name).lower() == "chain"), None
-        )
+        chain_field = next((field for field in fields if str(field.name).lower() == "chain"), None)
         description = str(getattr(embed, "description", "") or "")
         address = str(address_field.value).strip() if address_field else ""
         if not address and "`" in description:
@@ -166,9 +165,7 @@ if discord is not None:
             style=discord.ButtonStyle.secondary,
             custom_id="gambit:token:watch",
         )
-        async def watch(
-            self, interaction: discord.Interaction, _button: discord.ui.Button
-        ) -> None:
+        async def watch(self, interaction: discord.Interaction, _button: discord.ui.Button) -> None:
             async def add_watch() -> None:
                 address, chain = _message_target(interaction)
                 created = await asyncio.to_thread(
@@ -267,9 +264,7 @@ if discord is not None:
                 embed = validate_message(card_payload=scan_card(result), view=self)
                 await edit_deferred_original_exact(interaction, embed=embed, view=self)
 
-            await run_component_callback(
-                interaction, "gambit:scan:refresh", self.log, refresh_scan
-            )
+            await run_component_callback(interaction, "gambit:scan:refresh", self.log, refresh_scan)
 
         @discord.ui.button(
             label="Watch", style=discord.ButtonStyle.secondary, custom_id="gambit:scan:watch"
@@ -440,6 +435,7 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             stats["event_queue"] = queue.stats() if queue else {}
             historical = getattr(service, "historical_context", None)
             stats["historical_context"] = historical.status() if historical else {"enabled": False}
+            stats["model"] = operator_model_status(settings)
             await send_card(interaction, status_card(stats))
 
     @tree.command(name="menu", description="Open the complete Gambit Jr command center")
@@ -527,7 +523,8 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         )
         await send_text(
             interaction,
-            "Added to your watchlist." if created else "Already on your watchlist.", ephemeral=True
+            "Added to your watchlist." if created else "Already on your watchlist.",
+            ephemeral=True,
         )
 
     @tree.command(name="unwatch", description="Remove a token from your watchlist")

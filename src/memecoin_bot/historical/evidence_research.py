@@ -45,6 +45,25 @@ LAUNCH_CORPUS_FILES = {
         "34a63b8333a41b3cc84d05461febe725cf37842fa0e21d6ea00472dcdcfa1e72"
     ),
     "wallet_stats.parquet": "4750101ddd335caa606e287be793df97b92daedee647b282d972fd3daf309a80",
+    "snapshots.parquet": "41b6a221dca6ea01d68fac2129c3c5cd3966a27839f267e0f6aa4e980b6fc7d8",
+    "trades/trades-00000.parquet": "646f56bba13514a7aa2cdbaf5ac37499175d4e0a6d5bee07f7f7f96c7e481154",
+    "trades/trades-00001.parquet": "93da769636d25d5541301b98f1f7039282556de00dbcd6e3ea7ef736c2b8bde0",
+    "trades/trades-00002.parquet": "2e2d91f9c73fb247e53cbc368fb9c52e93bd113febe10aef3a30a8add0dca3cb",
+    "trades/trades-00003.parquet": "14450a575d5896ddf8b6f9ce8e9f601b87d0ab9042ff2cb46445c1bdf6db9070",
+    "trades/trades-00004.parquet": "39e39b93691e124c801335e1ed454ed0c7bc1ace6e24456570af8d7a4c7fae47",
+    "trades/trades-00005.parquet": "e171c5121d1ca56df35289abac57e1bdf8c53761b00abdac6be084517046c387",
+    "trades/trades-00006.parquet": "77627cdcd584e0bf97e6e62e3e9bccd2825cccfef0b7316371eedd2fa67705a0",
+    "trades/trades-00007.parquet": "c265053ef06620601ad6b2160177e0affba8423da70aeba13fecea2cc842d4c5",
+    "trades/trades-00008.parquet": "414500a26f1cf781f89f7a8430e77bfacfb279a974685abb67f7ff769cbec847",
+    "trades/trades-00009.parquet": "a74896ca0de21cfaf489542dbb7fd95d3a222d8e808da163be1f2b6a5b4f48ea",
+    "trades/trades-00010.parquet": "28c66eec063058a59fbb8844cc599096f6e51ba7111471bda01b7b3288b450ae",
+    "trades/trades-00011.parquet": "ec51848bd92dcf21617055728ce615aafd004b25b20d14c11e67857b9022e6a8",
+    "trades/trades-00012.parquet": "4652bbebdff44cbe785d5eddd46b1164f4ee572f79ce00879f20e978e2f4afa0",
+    "trades/trades-00013.parquet": "c84e1ddc6f3898024fda0b779ef87ab58d93f13d50c1e2424a38a33dfdf843d2",
+    "trades/trades-00014.parquet": "7e177f81732948ff8adcf07c6c762710fb39c154644f18834ec52ec925b51dd9",
+    "trades/trades-00015.parquet": "d3b144b5cfea6046bfb9be5b940500406f0a05524af630365bd9523149f2238d",
+    "trades/trades-00016.parquet": "db90859dbd371141a6e8c2f673d478462ef79da2ace6a1bcfa6fa06e91c2a9a0",
+    "trades/trades-00017.parquet": "3e48808f2ee97c7238af48446ef1ee2028b93fed58f11715dce6ef5a15fbe580",
 }
 
 LAUNCH_FEATURES = {

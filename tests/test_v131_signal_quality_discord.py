@@ -125,6 +125,7 @@ class ReconciliationAndSchedulerTests(unittest.TestCase):
                   last_error TEXT,updated_at TEXT NOT NULL);
                 CREATE TABLE outbox(id INTEGER PRIMARY KEY);
                 CREATE TABLE radar_events(id INTEGER PRIMARY KEY);
+                CREATE TABLE signals(id INTEGER PRIMARY KEY,signal_timestamp TEXT);
                 INSERT INTO tokens VALUES(1,'solana','preserved-v13');
                 INSERT INTO candidates VALUES(1,1,'PENDING_EVIDENCE','PAIR_NOT_AVAILABLE','2026-08-21T00:00:00+00:00',NULL,NULL,NULL);
                 INSERT INTO provider_health VALUES('gmgn',0,0,NULL,'now','DISABLED','now');
@@ -283,9 +284,7 @@ class ProviderAndGuildTests(unittest.TestCase):
             db.ensure_guild_alert_delivery(1, 1, 11)
             db.ensure_guild_alert_delivery(1, 2, 22)
             self.assertEqual(len(db.pending_guild_alert_deliveries(1)), 2)
-            self.assertTrue(
-                db.alert_allowed("QUALIFIED", "SIGNAL", {"v15_signal_tier": "PREMIUM"})
-            )
+            self.assertTrue(db.alert_allowed("QUALIFIED", "SIGNAL", {"v15_signal_tier": "PREMIUM"}))
             self.assertFalse(db.alert_allowed("PRIORITY", "EARLY_RADAR", {"priority": "HOT"}))
             db.close()
 

@@ -77,19 +77,32 @@ def card(
 
 def status_card(stats: dict[str, Any]) -> dict[str, Any]:
     provider_rows = stats.get("provider_status")
-    providers = "UNKNOWN" if provider_rows is None else (
-        "\n".join(
-            f"{'🟢' if p['state'] == 'HEALTHY' else '⚪' if p['state'] == 'DISABLED' else '🟠' if p['state'] in {'DEGRADED', 'RATE_LIMITED', 'CIRCUIT_OPEN'} else '🔴'} "
-            f"{str(p['provider']).upper()} — {str(p['state']).replace('_', ' ')}"
-            for p in provider_rows
+    providers = (
+        "UNKNOWN"
+        if provider_rows is None
+        else (
+            "\n".join(
+                f"{'🟢' if p['state'] == 'HEALTHY' else '⚪' if p['state'] == 'DISABLED' else '🟠' if p['state'] in {'DEGRADED', 'RATE_LIMITED', 'CIRCUIT_OPEN'} else '🔴'} "
+                f"{str(p['provider']).upper()} — {str(p['state']).replace('_', ' ')}"
+                for p in provider_rows
+            )
+            or "No provider observations yet"
         )
-        or "No provider observations yet"
     )
     reconciliation = stats.get("state_reconciliation")
     v14 = stats.get("v14") or {}
     queue = stats.get("event_queue") or {}
     history = stats.get("historical_context") or {}
     latest_history = history.get("latest_lookup") or {}
+    model = stats.get("model") or {}
+    latency = v14.get("latency") or {}
+    latency_lines = (
+        "\n".join(
+            f"{name}: p95 **{_value(values.get('p95_ms'))} ms**"
+            for name, values in sorted(latency.items())
+        )
+        or "No latency observations yet"
+    )
     live = (
         f"Watching: **{_value(stats.get('candidates_watching'))}**\n"
         f"Pending: **{_value(stats.get('pending_evidence'))}**\n"
@@ -149,6 +162,15 @@ def status_card(stats: dict[str, Any]) -> dict[str, Any]:
                 f"{_value(latest_history.get('latency_ms'), 'UNKNOWN')} ms",
                 False,
             ),
+            _field(
+                "MODEL / RESEARCH",
+                f"Active: **{_value(model.get('active_model'))}**\n"
+                f"Control: **{_value(model.get('control'))}**\n"
+                f"Candidate: **{_value(model.get('candidate_state'))}**\n"
+                f"Signal truth: **{_value(model.get('signal_truth'))}**",
+                False,
+            ),
+            _field("LATENCY", latency_lines, False),
         ],
     )
 

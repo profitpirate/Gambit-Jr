@@ -1,0 +1,78 @@
+{
+  "name": "CONTROL_V15",
+  "frozen_at_commit": "f8adfc96b61ce8263be8611fb5a8e9d8c41bf158",
+  "software_version": "1.5.0",
+  "scoring_version": "v1.5-runner-failure",
+  "radar_version": "v1.5-signal-policy",
+  "config_fingerprint": "5bbe917a4b7cde5a085fc22e4b28b03a955c3ed6e6f7c1cf3e865c0aa7b8f215",
+  "thresholds": {
+    "watch": 65,
+    "strong": 75,
+    "high_conviction": 85,
+    "minimum_signal_confidence": 0.6
+  },
+  "weights": {
+    "developer": 15,
+    "momentum": 15,
+    "narrative": 25,
+    "onchain": 20,
+    "safety": 5,
+    "social": 20
+  },
+  "stage_features": {
+    "NEW": [
+      "launch_verified",
+      "early_demand",
+      "buyer_independence",
+      "creator_quality",
+      "early_liquidity",
+      "survival_quality",
+      "payoff_quality"
+    ],
+    "BONDING": [
+      "curve_progress",
+      "momentum_acceleration",
+      "buyer_retention",
+      "buyer_replacement",
+      "concentration_trend",
+      "survival_quality",
+      "payoff_quality"
+    ],
+    "MIGRATED": [
+      "amm_liquidity",
+      "tradeability",
+      "migration_continuity",
+      "buyer_quality",
+      "buyer_replacement",
+      "actor_independence",
+      "post_migration_momentum",
+      "survival_quality",
+      "payoff_quality"
+    ],
+    "REVIVAL": [
+      "abnormal_volume",
+      "new_wallet_cohort",
+      "fresh_catalyst",
+      "renewed_liquidity",
+      "narrative_relevance",
+      "survival_quality",
+      "payoff_quality"
+    ]
+  },
+  "tier_rule_source": "src/memecoin_bot/v15_engine.py@f8adfc96b61ce8263be8611fb5a8e9d8c41bf158",
+  "historical_context": {
+    "enabled": true,
+    "approved_features_only": true,
+    "approved_features_at_freeze": 0,
+    "lookup_p95_budget_ms": 25
+  },
+  "comparison_contract": {
+    "maturity_horizon_days": 7,
+    "primary_metric": "core_qualified_2x_precision",
+    "core_tiers": ["PREMIUM", "STRONG"],
+    "specialist_tiers": ["HIGH_RISK_MOMENTUM", "CATALYST_REVIVAL"],
+    "required_point_estimate": 0.8,
+    "minimum_matured_core_signals": 250,
+    "minimum_independent_test_windows": 3
+  }
+}

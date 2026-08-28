@@ -9,7 +9,7 @@ not change live scoring, feature approvals, the signals-first Discord UX, or pro
 | Gate | State | Evidence |
 |---|---:|---|
 | Code complete | PASS | Reproducible verifier, materializer, cohort summaries, baselines, ablations, drift and walk-forward runner. |
-| Data complete | FAIL | No production Jr DB copy, no broad BNB launch corpus, limited calendar coverage, and no raw trades for the 798k-launch corpus. |
+| Data complete | FAIL | No production Jr DB copy, no broad BNB launch corpus, only 39 calendar days, and only 48-hour maturity. |
 | Research complete | FAIL | Two short Solana walk-forwards and three differently sampled public releases are insufficient for approval. |
 | Historical features approved | **0** | Every candidate remains `RESEARCH_ONLY`; corrupt, stale and look-ahead fields are rejected. |
 | Challenger ready | FAIL | No approved feature and no prospective shadow decisions. |
@@ -21,8 +21,8 @@ not change live scoring, feature approvals, the signals-first Discord UX, or pro
 |---|---:|---:|---|---|
 | [Trenches forward corpus](https://huggingface.co/datasets/Tr4m0ryp/trenches-pumpfun-forward-2026-08) | 9 | 104,580,833 | 730,850 point-in-time observations; decoded trade and funder memory | Vendor-enriched sample and documented 69.09-hour outage |
 | [MELT](https://huggingface.co/datasets/Zinteck/MELT) | 4 | 293,856,476 | 41,470 launches and 3,328,964 coordination edges | CC BY-NC 4.0 research use; migration-time features; creator column is constant |
-| [Pump.fun Memecoin Corpus](https://huggingface.co/datasets/Slinky21/Pumpfun_Memecoin_Corpus) | 5 | 383,280,266 | Exhaustive launch rows for 2026-06-05 through 2026-07-14 | Solana/Pump.fun only; July 3 outage; raw trade partitions not acquired |
-| **Total selected** | **18** | **781,717,575** | All files SHA-256 verified before research or materialization | Source releases remain subject to their published limitations |
+| [Pump.fun Memecoin Corpus](https://huggingface.co/datasets/Slinky21/Pumpfun_Memecoin_Corpus) | 24 | 6,695,411,376 | Launches, 33.58M raw trades, 26.93M PIT snapshots, outcomes and liquidity | Solana/Pump.fun only; July 3 outage; 48-hour post-launch maturity |
+| **Total selected** | **37** | **7,093,848,685** | All files SHA-256 verified before research or materialization | Source releases remain subject to their published limitations |
 
 The direct Pump.fun frontend API was Cloudflare-denied and was not bypassed. Existing Jr history is
 still blocked on an operator-supplied, read-only copy of the production SQLite database. The
@@ -43,7 +43,12 @@ one-minute-entry cohort has 3,445 usable outcomes: 1,186 at 2x, 534 at 5x and 27
 
 Other materialized or summarized evidence:
 
-- 1,016,374 wallet identities; stale published wallet activity totals were rejected.
+- 1,016,374 wallet identities; stale published wallet activity totals were rejected. Raw trades
+  independently contain 1,006,641 wallets, 622,870 mints and 33,581,765 transactions.
+- 26,934,864 pre-graduation snapshots cover 769,082 mints. At T+3m, 740,800 launches have
+  actionable price evidence and 572,910 (77.337%) also have reconstructed raw buyer trajectories.
+- Rebuilt raw buyer history contains 9,017,065 wallet–mint states across 621,384 mints and
+  635,117 wallets within the first hour; 6,276,912 token-level distinct buyers are observed by T+3m.
 - 342,341 decoded trades, 48,561 wallets, 137,398 wallet–mint first entries and 19,267 repeat wallets.
 - 67,722 token–funder relationships across 7,997 funders.
 - 46,519 repeat creators and 15,998 creators with at least five launches.
@@ -96,9 +101,32 @@ indexes.
 
 Remaining evidence blockers are: the read-only production Jr DB copy; a broad, non-survivor-only
 BNB launch/failure universe; longer time coverage and independent providers; full transaction-level
-history for the large launch corpus; field-level availability timestamps; and enough subsequent
+history outside Pump.fun; seven-day outcomes; field-level availability timestamps; and enough subsequent
 data for prospective shadow validation. Until those exist, the only defensible decision is
 `RESEARCH_ONLY`, zero approved features, no challenger, and no production deployment.
+
+## Final edge checkpoint
+
+The new transaction/snapshot pass evaluated 112,859 launches in three non-overlapping 48-hour
+windows. These windows were used for error analysis and are now retired; they are not represented
+as untouched sealed evidence. Each comparison selected 1,128 core signals (99.95 per 10,000
+launches) from the identical universe and actionable T+3m reference.
+
+| Model | 2x precision | 95% Wilson interval | 5x | 10x | 20x recall |
+|---|---:|---:|---:|---:|---:|
+| CONTROL_V15 reconstruction | 14.27% | 12.35–16.44% | 2.66% | 0.27% | 0.00% |
+| CANDIDATE_V15 research rule | 16.22% | 14.19–18.49% | 2.39% | 0.18% | 0.00% |
+| Safety-filtered momentum | 15.34% | 13.35–17.56% | 2.48% | 0.27% | 0.00% |
+| Market-cap only | **34.22%** | 31.51–37.04% | 21.99% | 11.61% | 35.60% |
+| Volume only | 17.82% | 15.70–20.16% | 3.37% | 0.71% | 1.05% |
+| Momentum only | 20.48% | 18.23–22.93% | 3.81% | 0.80% | 0.00% |
+| Deterministic random | 2.66% | 1.87–3.77% | 0.89% | 0.27% | 0.52% |
+
+The control result is explicitly a reconstruction through the frozen V1.5 decision rules because
+the production operational database containing exact historical input vectors is not present.
+Liquidity-only is unavailable at the pre-graduation actionable timestamp and is not fabricated.
+The candidate is not promoted: it fails 80%, loses badly to market-cap-only, destroys major-runner
+recall, has no seven-day maturity, and has no later three-window sealed holdout.
 
 A bounded BNB provider pass confirmed that [Dune](https://dune.com/data) exposes historical BNB
 raw/decoded and DEX tables behind its query/API access, while

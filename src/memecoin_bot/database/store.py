@@ -30,6 +30,10 @@ class Store:
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA foreign_keys=ON")
         self.conn.execute("PRAGMA busy_timeout=30000")
+        # Migration 001 only establishes WAL for a clean database. Enforce the
+        # same production contract when opening an upgraded database.
+        self.conn.execute("PRAGMA journal_mode=WAL")
+        self.conn.execute("PRAGMA synchronous=NORMAL")
         self.migrations_dir = Path(migrations_dir) if migrations_dir else self._find_migrations()
 
     def _find_migrations(self) -> Path:
@@ -506,6 +510,17 @@ class Store:
         """Persist an attempt before any provider call or early return."""
         attempted_at = attempted_at or iso()
         with self._lock, self.conn:
+            previous = self.conn.execute(
+                "SELECT last_attempted_at FROM candidates WHERE id=?", (candidate_id,)
+            ).fetchone()
+            if not previous:
+                raise KeyError(candidate_id)
+            if previous[0] and datetime.fromisoformat(attempted_at) <= datetime.fromisoformat(
+                str(previous[0])
+            ):
+                attempted_at = (
+                    datetime.fromisoformat(str(previous[0])) + timedelta(microseconds=1)
+                ).isoformat()
             self.conn.execute(
                 "UPDATE candidates SET last_attempted_at=?,attempt_count=attempt_count+1,"
                 "pending_since=COALESCE(pending_since,?),updated_at=? WHERE id=?",
@@ -514,8 +529,6 @@ class Store:
             row = self.conn.execute(
                 "SELECT attempt_count FROM candidates WHERE id=?", (candidate_id,)
             ).fetchone()
-            if not row:
-                raise KeyError(candidate_id)
             return int(row[0])
 
     def schedule_candidate_retry(
@@ -533,12 +546,18 @@ class Store:
             now_dt = now_dt.replace(tzinfo=UTC)
         with self._lock, self.conn:
             row = self.conn.execute(
-                "SELECT consecutive_missing_pair_count,consecutive_provider_failure_count,reason "
+                "SELECT consecutive_missing_pair_count,consecutive_provider_failure_count,reason,"
+                "last_attempted_at "
                 "FROM candidates WHERE id=?",
                 (candidate_id,),
             ).fetchone()
             if not row:
                 raise KeyError(candidate_id)
+            if row[3]:
+                last_attempted = datetime.fromisoformat(str(row[3]))
+                if last_attempted.tzinfo is None:
+                    last_attempted = last_attempted.replace(tzinfo=UTC)
+                now_dt = max(now_dt, last_attempted)
             missing = int(row[0] or 0) + int(retry_class == "MISSING_PAIR")
             provider = int(row[1] or 0) + int(retry_class == "PROVIDER")
             count = missing if retry_class == "MISSING_PAIR" else provider
@@ -1005,8 +1024,9 @@ class Store:
                 "onchain_state_json,risk_flags_json,scoring_version,current_market_cap_usd,current_score,"
                 "ath_market_cap_usd,atl_market_cap_usd,last_monitored_at,created_at,normalized_score,confidence,"
                 "candidate_history_json,current_signal_class,radar_timestamp,radar_market_cap_usd,"
-                "radar_to_signal_seconds,radar_to_signal_multiple,discovery_to_signal_seconds) "
-                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                "radar_to_signal_seconds,radar_to_signal_multiple,discovery_to_signal_seconds,"
+                "v15_signal_tier) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (
                     token_id,
                     now,
@@ -1039,6 +1059,7 @@ class Store:
                     radar_seconds,
                     radar_multiple,
                     discovery_seconds,
+                    str(message_payload.get("v15_signal_tier") or "UNKNOWN"),
                 ),
             )
             signal_id = int(cur.lastrowid)
@@ -1251,9 +1272,7 @@ class Store:
                 args += (claim_token,)
             self.conn.execute(sql, args)
 
-    def mark_outbox_error(
-        self, outbox_id: int, error: str, claim_token: str | None = None
-    ) -> None:
+    def mark_outbox_error(self, outbox_id: int, error: str, claim_token: str | None = None) -> None:
         with self._lock, self.conn:
             sql = (
                 "UPDATE outbox SET attempts=attempts+1,last_error=?,claim_token=NULL,claimed_at=NULL "
@@ -1560,12 +1579,62 @@ class Store:
             )
         }
         accounted = sum(states.values())
+        orphan_candidates = int(
+            self.conn.execute(
+                "SELECT COUNT(*) FROM candidates c LEFT JOIN tokens t ON t.id=c.token_id "
+                "WHERE t.id IS NULL"
+            ).fetchone()[0]
+        )
+        orphan_signals = int(
+            self.conn.execute(
+                "SELECT COUNT(*) FROM signals s LEFT JOIN tokens t ON t.id=s.token_id "
+                "WHERE t.id IS NULL"
+            ).fetchone()[0]
+        )
+        ghost_qualified = int(
+            self.conn.execute(
+                "SELECT COUNT(*) FROM candidates c LEFT JOIN signals s ON s.id=c.signal_id "
+                "WHERE c.authoritative_state='QUALIFIED_SIGNAL' AND s.id IS NULL"
+            ).fetchone()[0]
+        )
+        duplicate_candidates = int(
+            self.conn.execute(
+                "SELECT COUNT(*) FROM (SELECT token_id FROM candidates GROUP BY token_id "
+                "HAVING COUNT(*)>1)"
+            ).fetchone()[0]
+        )
+        integrity_difference = (
+            total
+            - accounted
+            + orphan_candidates
+            + orphan_signals
+            + ghost_qualified
+            + duplicate_candidates
+        )
         return {
             "total_tracked": total,
             "states": states,
             "accounted": accounted,
-            "difference": total - accounted,
-            "reconciled": total == accounted,
+            "orphan_candidates": orphan_candidates,
+            "orphan_signals": orphan_signals,
+            "ghost_qualified": ghost_qualified,
+            "duplicate_candidates": duplicate_candidates,
+            "difference": integrity_difference,
+            "reconciled": integrity_difference == 0,
+        }
+
+    def database_integrity(self) -> dict[str, Any]:
+        """Return bounded, read-only integrity evidence for operator health."""
+        quick_check = str(self.conn.execute("PRAGMA quick_check(1)").fetchone()[0])
+        foreign_key_violation = self.conn.execute("PRAGMA foreign_key_check").fetchone()
+        journal_mode = str(self.conn.execute("PRAGMA journal_mode").fetchone()[0]).upper()
+        return {
+            "quick_check": quick_check,
+            "foreign_key_violations": 0 if foreign_key_violation is None else 1,
+            "journal_mode": journal_mode,
+            "healthy": quick_check == "ok"
+            and foreign_key_violation is None
+            and journal_mode == "WAL",
         }
 
     def token_intelligence(self, address: str, chain: str | None = None) -> dict[str, Any] | None:
@@ -1667,7 +1736,9 @@ class Store:
                 (three_hours,),
             ),
             "stale_beyond_ttl": one(
-                "SELECT COUNT(*) FROM candidates WHERE state NOT IN ('REJECTED_UNSAFE','EXPIRED','SIGNALLED') AND first_discovered_at<?",
+                "SELECT COUNT(*) FROM candidates WHERE state NOT IN "
+                "('REJECTED_UNSAFE','EXPIRED','SIGNALLED','QUALIFIED_SIGNAL') "
+                "AND first_discovered_at<?",
                 (stale_cutoff,),
             ),
             "candidates_watching": one("SELECT COUNT(*) FROM candidates WHERE state='CANDIDATE'"),
@@ -1690,7 +1761,6 @@ class Store:
             "providers_total": int(providers[2]),
             "providers_configured": int(providers[0]),
             "provider_status": provider_rows,
-            "database": "OK",
             "outbox_pending": one("SELECT COUNT(*) FROM outbox WHERE sent_at IS NULL"),
             "discord_deliveries_pending": one(
                 "SELECT (SELECT COUNT(*) FROM alert_deliveries WHERE status!='SENT') + "
@@ -1706,6 +1776,16 @@ class Store:
         ).fetchone()
         result["last_alert_error"] = last_alert[0] if last_alert else None
         result["state_reconciliation"] = self.state_reconciliation()
+        result["database"] = self.database_integrity()
+        result["status"] = (
+            "DOWN"
+            if not result["database"]["healthy"]
+            else "DEGRADED"
+            if not result["state_reconciliation"]["reconciled"]
+            or result["discord_deliveries_failed"] > 0
+            or (result["providers_total"] > 0 and result["providers_healthy"] == 0)
+            else "HEALTHY"
+        )
         return result
 
     def missed_report(
@@ -2262,19 +2342,12 @@ class Store:
     def latency_report(self) -> dict[str, dict[str, Any]]:
         from memecoin_bot.alpha_engine import latency_summary
 
-        metrics = [
-            str(row[0])
-            for row in self.conn.execute("SELECT DISTINCT metric FROM latency_observations_v14")
-        ]
-        return {
-            metric: latency_summary(
-                float(row[0])
-                for row in self.conn.execute(
-                    "SELECT milliseconds FROM latency_observations_v14 WHERE metric=?", (metric,)
-                )
-            )
-            for metric in metrics
-        }
+        grouped: dict[str, list[float]] = {}
+        for row in self.conn.execute(
+            "SELECT metric,milliseconds FROM latency_observations_v14 ORDER BY metric"
+        ):
+            grouped.setdefault(str(row[0]), []).append(float(row[1]))
+        return {metric: latency_summary(values) for metric, values in grouped.items()}
 
     def save_wallet_graph(self, chain: str, token_address: str, result: Any) -> list[int]:
         now = iso()

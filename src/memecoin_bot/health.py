@@ -16,7 +16,7 @@ def start_health_server(port: int, status: Callable[[], dict]) -> ThreadingHTTPS
                 return
             try:
                 payload = status()
-                code = 200
+                code = 503 if str(payload.get("status", "")).upper() in {"DOWN", "ERROR"} else 200
             except (
                 AttributeError,
                 KeyError,

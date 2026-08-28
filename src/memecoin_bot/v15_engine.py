@@ -115,6 +115,20 @@ STAGE_FEATURES = {
 }
 
 
+def operator_model_status(settings: Any) -> dict[str, Any]:
+    """One operator-facing declaration of active and research-only model state."""
+    fingerprint = getattr(settings, "config_fingerprint", None)
+    return {
+        "active_model": getattr(settings, "model_version", "UNKNOWN"),
+        "control": "CONTROL_V15",
+        "candidate": "CANDIDATE_V15",
+        "candidate_state": "RESEARCH_ONLY_NOT_ACTIVE",
+        "scoring_version": settings.scoring_version,
+        "config_fingerprint": fingerprint() if callable(fingerprint) else "UNKNOWN",
+        "signal_truth": "v15_decisions.signal_tier",
+    }
+
+
 def grade(score: float) -> str:
     if score >= 80:
         return "HIGH"
@@ -163,7 +177,9 @@ def provider_truth(
     }
 
 
-def tradeability(liquidity_usd: float | None, notionals: tuple[int, ...] = (50, 100, 250, 500, 1000)) -> dict[str, Any]:
+def tradeability(
+    liquidity_usd: float | None, notionals: tuple[int, ...] = (50, 100, 250, 500, 1000)
+) -> dict[str, Any]:
     if liquidity_usd is None or liquidity_usd <= 0:
         return {"grade": "UNKNOWN", "estimates": {}, "method": "constant_product_estimate"}
     estimates = {}
@@ -301,7 +317,11 @@ def evaluate_v15(stage: Stage | str, features: dict[str, Any]) -> V15Decision:
     if tier == SignalTier.PREMIUM and (
         coverage < 75 or critical or conflicts or stale or entry != EntryStatus.OPEN
     ):
-        tier = SignalTier.STRONG if runner >= 60 and entry != EntryStatus.CHASING else SignalTier.SILENT_WATCH
+        tier = (
+            SignalTier.STRONG
+            if runner >= 60 and entry != EntryStatus.CHASING
+            else SignalTier.SILENT_WATCH
+        )
     if entry in {EntryStatus.CHASING, EntryStatus.CLOSED, EntryStatus.UNKNOWN} and tier in {
         SignalTier.PREMIUM,
         SignalTier.STRONG,

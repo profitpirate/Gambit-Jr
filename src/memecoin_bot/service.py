@@ -625,8 +625,7 @@ class IntelligenceService:
                 }.intersection(safety.warnings)
                 else (
                     5.0
-                    if chain == "bsc"
-                    or (not safety.mint_authority and not safety.freeze_authority)
+                    if chain == "bsc" or (not safety.mint_authority and not safety.freeze_authority)
                     else 0.0
                 )
             )
@@ -791,9 +790,7 @@ class IntelligenceService:
         )
         v15_stage = _v15_stage(discovery, market)
         liquidity_quality = (
-            None
-            if market.liquidity_usd is None
-            else min(100.0, market.liquidity_usd / 250)
+            None if market.liquidity_usd is None else min(100.0, market.liquidity_usd / 250)
         )
         momentum_quality = (
             None
@@ -814,9 +811,7 @@ class IntelligenceService:
             else None
         )
         buyer_cohorts = (
-            list((gmgn_snapshot.info or {}).get("buyer_cohorts") or [])
-            if gmgn_snapshot
-            else []
+            list((gmgn_snapshot.info or {}).get("buyer_cohorts") or []) if gmgn_snapshot else []
         )
         buyer_replacement = buyer_trajectory(buyer_cohorts)
         freshness_limit = max(60.0, self.settings.gmgn_cache_ttl_seconds * 2)
@@ -864,13 +859,9 @@ class IntelligenceService:
             )
         self.store.record_v15_provider_evidence(candidate_id, provenance)
         stale_evidence = [
-            row["field_name"]
-            for row in provenance
-            if float(row["age_seconds"]) > freshness_limit
+            row["field_name"] for row in provenance if float(row["age_seconds"]) > freshness_limit
         ]
-        provider_conflicts = [
-            warning for warning in safety.warnings if "CONFLICT" in warning
-        ]
+        provider_conflicts = [warning for warning in safety.warnings if "CONFLICT" in warning]
         survival_quality = survival_result.get("score")
         payoff_quality = payoff_result.get("score")
         if v15_stage == Stage.MIGRATED:
@@ -893,9 +884,7 @@ class IntelligenceService:
                 if gmgn_snapshot
                 else None,
                 "buyer_replacement": buyer_replacement.get("score"),
-                "concentration_trend": (gmgn_snapshot.info or {}).get(
-                    "concentration_trend_score"
-                )
+                "concentration_trend": (gmgn_snapshot.info or {}).get("concentration_trend_score")
                 if gmgn_snapshot
                 else None,
                 "survival_quality": survival_quality,
@@ -931,8 +920,7 @@ class IntelligenceService:
                 "current_market_cap": market.market_cap_usd,
                 "age_minutes": age_minutes,
                 "vertical_acceleration": momentum.get("acceleration"),
-                "sell_restriction_unknown": "BSC_TRANSFER_RESTRICTIONS_UNKNOWN"
-                in safety.warnings,
+                "sell_restriction_unknown": "BSC_TRANSFER_RESTRICTIONS_UNKNOWN" in safety.warnings,
                 "concentration_unknown": (
                     safety.top10_percent is None and actor_independence is None
                 ),
@@ -949,7 +937,9 @@ class IntelligenceService:
                 "why_now": [
                     reason
                     for reason in (
-                        "momentum acceleration" if momentum_quality and momentum_quality >= 70 else None,
+                        "momentum acceleration"
+                        if momentum_quality and momentum_quality >= 70
+                        else None,
                         "tradeable liquidity" if trade["grade"] == "GOOD" else None,
                     )
                     if reason
@@ -1173,6 +1163,7 @@ class IntelligenceService:
                 "v15_stage": str(v15_decision.stage),
                 "provider_conflicts": v15_decision.provider_conflicts,
                 "critical_unknowns": v15_decision.critical_unknowns,
+                "failure_reasons": v15_decision.failure_reasons,
                 "why_now": v15_decision.why_now,
                 "tradeability": trade,
                 "actor_concentration": concentration,
