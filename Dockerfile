@@ -9,7 +9,9 @@ COPY migrations ./migrations
 COPY scripts ./scripts
 RUN pip install --no-cache-dir .
 
-RUN useradd --create-home --uid 10001 bot && mkdir -p /app/data /app/evidence \
+RUN useradd --create-home --uid 10001 bot && mkdir -p \
+    /app/data /app/evidence /app/staging/operational /app/staging/historical \
+    /app/staging/archive /app/staging/approved \
     && chown -R bot:bot /app
 USER bot
 
