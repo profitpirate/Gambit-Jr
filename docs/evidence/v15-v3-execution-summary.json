@@ -1,0 +1,127 @@
+{
+  "approved_features": 0,
+  "candidate": "INTELLIGENCE_V3_TARGET_GRADIENT_AVAILABLE_DATA",
+  "data": {
+    "calibration_observations": 350448,
+    "evaluation_landmark_seconds": 60,
+    "fit_landmarks_seconds": [30, 60, 180, 300, 600, 1800],
+    "loaded_observations": 4448550,
+    "loaded_unique_mints": 742793,
+    "outer_rows": 318214,
+    "train_observations": 943831
+  },
+  "horizon_hours": 48,
+  "outer_natural_prevalence": {
+    "10x": {"count": 612, "rate": 0.0019232340500417958},
+    "20x": {"count": 282, "rate": 0.0008861960818820039},
+    "2x": {"count": 5012, "rate": 0.01575040695883902},
+    "3x": {"count": 2721, "rate": 0.008550849428372101},
+    "50x": {"count": 133, "rate": 0.00041795772656137063},
+    "5x": {"count": 1384, "rate": 0.004349274387676218}
+  },
+  "primary_frontier_1_percent": {
+    "buyer_order_flow": {
+      "10x_precision": 0.009113764927718416,
+      "20x_recall": 0.04609929078014184,
+      "2x_precision": 0.05311125078566939,
+      "50x_recall": 0.06766917293233082,
+      "5x_precision": 0.018227529855436832,
+      "signals": 3182,
+      "terminal_failure_rate": 0.03268384663733501
+    },
+    "control_reconstruction": {
+      "10x_precision": 0.017284726587052168,
+      "20x_recall": 0.06382978723404255,
+      "2x_precision": 0.18667504714016342,
+      "50x_recall": 0.03007518796992481,
+      "5x_precision": 0.03614079195474544,
+      "signals": 3182,
+      "terminal_failure_rate": 0.11219358893777498
+    },
+    "market_cap_plus_buyer_flow": {
+      "10x_precision": 0.00754242614707731,
+      "20x_recall": 0.05673758865248227,
+      "2x_precision": 0.035512256442489,
+      "50x_recall": 0.06015037593984962,
+      "5x_precision": 0.0147705845380264,
+      "signals": 3182,
+      "terminal_failure_rate": 0.017913262099308613
+    },
+    "market_cap_stage": {
+      "10x_precision": 0.008170961659333752,
+      "20x_recall": 0.06028368794326241,
+      "2x_precision": 0.05216844751728473,
+      "50x_recall": 0.05263157894736842,
+      "5x_precision": 0.01571338780641106,
+      "signals": 3182,
+      "terminal_failure_rate": 0.017284726587052168
+    },
+    "random": {
+      "10x_precision": 0.0009428032683846638,
+      "20x_recall": 0.0070921985815602835,
+      "2x_precision": 0.017284726587052168,
+      "50x_recall": 0.007518796992481203,
+      "5x_precision": 0.0028284098051539913,
+      "signals": 3182,
+      "terminal_failure_rate": 0.008485229415461974
+    },
+    "v3_target_specific_gradient": {
+      "10x_precision": 0.0147705845380264,
+      "20x_recall": 0.08865248226950355,
+      "2x_precision": 0.139220615964802,
+      "2x_wilson_95": [0.12762696193423825, 0.1516843190326708],
+      "50x_recall": 0.09774436090225563,
+      "5x_precision": 0.03896920175989944,
+      "signals": 3182,
+      "terminal_failure_rate": 0.035826524198617225
+    },
+    "v3_two_stage": {
+      "10x_precision": 0.006285355122564425,
+      "20x_recall": 0.03900709219858156,
+      "2x_precision": 0.033626649905719674,
+      "50x_recall": 0.045112781954887216,
+      "5x_precision": 0.011313639220615965,
+      "signals": 3182,
+      "terminal_failure_rate": 0.06033940917661848
+    }
+  },
+  "production_ready": false,
+  "sealed_validation": false,
+  "shadow_replay": {
+    "public_route_rows": 0,
+    "rows": 318214,
+    "sha256": "da0bc9f8a52d1b15520ffdb673c0fe1a28e262b715b7a5f3f6c12e0e4856e2fc",
+    "state": "RETROSPECTIVE_REPLAY_PERSISTED_EXTERNAL_RESEARCH_ONLY",
+    "validation_gate": "ABSTAIN_UNSEALED_VALIDATION"
+  },
+  "social": {
+    "base_pr_auc": 0.02696419680466531,
+    "base_plus_telegram_pr_auc": 0.025804941718548673,
+    "rows": 832941,
+    "telegram_incremental_pr_auc": -0.001159255086116636
+  },
+  "truth_state": "FITTED_CALIBRATED_RETROSPECTIVE_NOT_SEALED",
+  "v2_frozen_comparator": {
+    "frequency": 0.010002706482024448,
+    "model": "COMBINED_POLICY_V2",
+    "rows": 177352,
+    "signals": 1774,
+    "2x_precision": 0.03664036076662908,
+    "5x_precision": 0.010710259301014656,
+    "10x_precision": 0.005636978579481398,
+    "20x_recall": 0.016666666666666666,
+    "50x_recall": 0.009009009009009009,
+    "terminal_failure_rate": 0.007891770011273957
+  },
+  "version": "INTELLIGENCE_V3_AVAILABLE_DATA_2026_08_28",
+  "wallet_copyability": {
+    "state": "MEASURED_DETERMINISTIC_SUBSET_PREGRAD_PRICE_PATH_ONLY",
+    "rows": 72688,
+    "wallets": 387,
+    "15s_copyable_2x_skill": 0.15607734806629833,
+    "30s_copyable_2x_skill": 0.16290726817042606,
+    "60s_copyable_2x_skill": 0.13987138263665594,
+    "120s_copyable_2x_skill": 0.11482558139534883,
+    "decision": "REJECT"
+  }
+}

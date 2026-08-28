@@ -3,6 +3,7 @@ from __future__ import annotations
 import sqlite3
 from datetime import UTC, datetime, timedelta
 
+import numpy as np
 import pytest
 
 from memecoin_bot.discord.cards import v3_operator_preview_card
@@ -14,6 +15,7 @@ from memecoin_bot.historical.intelligence_v3 import (
     EntryActionability,
     HazardForecast,
     MarketPathPoint,
+    PredictionUncertainty,
     SelectiveGatePolicy,
     TimedValue,
     TradeEvent,
@@ -22,6 +24,12 @@ from memecoin_bot.historical.intelligence_v3 import (
     activity_evidence,
     assess_actionable_outcome,
     liquidity_order_flow_features,
+    monotonic_target_probabilities,
+)
+from memecoin_bot.historical.intelligence_v3_execution import (
+    AVAILABLE_FEATURES,
+    ResearchData,
+    _persist_shadow_replay,
 )
 from memecoin_bot.historical.intelligence_v3_research import (
     assert_group_isolation,
@@ -227,9 +235,64 @@ def test_discrete_competing_risk_model_handles_time_varying_covariates() -> None
     model.fit(rows, iterations=40)
     forecast = model.forecast([{"flow": 1.0}, {"flow": 1.2}, {"flow": 1.4}])
     assert forecast.quick_2x is not None
+    assert forecast.right_tail_10x is not None
+    assert forecast.extreme_right_tail_20x is not None
+    assert (
+        forecast.extreme_right_tail_20x
+        <= forecast.right_tail_10x
+        <= forecast.mid_5x
+        <= forecast.quick_2x
+    )
+    assert forecast.right_tail == forecast.right_tail_10x
     assert forecast.terminal_failure is not None
     assert forecast.calibrated is False
     assert forecast.validation_state == "UNVALIDATED"
+
+
+def test_nested_milestone_consistency_correction_and_invalid_structure() -> None:
+    corrected = monotonic_target_probabilities(
+        {"2X": 0.6, "5X": 0.1, "10X": 0.4, "20X": 0.3}
+    )
+    assert corrected == {"2X": 0.6, "5X": 0.1, "10X": 0.1, "20X": 0.1}
+    with pytest.raises(ValueError, match="monotonic"):
+        HazardForecast(
+            quick_2x=0.6,
+            mid_5x=0.1,
+            right_tail_10x=0.4,
+            extreme_right_tail_20x=0.3,
+        ).validate()
+
+
+def test_extreme_right_tail_can_nominate_without_quick_2x() -> None:
+    uncertainty = PredictionUncertainty(
+        evidence_coverage=1,
+        data_quality=1,
+        model_disagreement=0.1,
+        calibration_uncertainty=0.1,
+        regime_distance=0.1,
+        out_of_distribution_score=0.1,
+        predictive_uncertainty=0.1,
+        probability_support_count=500,
+    )
+    envelope = V3ShadowEngine().evaluate(
+        decision_timestamp=NOW,
+        evidence=_known_evidence(),
+        forecast=HazardForecast(
+            extreme_right_tail_20x=0.04,
+            terminal_failure=0.02,
+            calibrated=True,
+            validation_state="RETROSPECTIVE_VALIDATED",
+        ),
+        actionability=EntryActionability(True, 0.9, True, 30),
+        legacy_result={},
+        v15_result={},
+        uncertainty_evidence=uncertainty,
+    )
+    assert envelope.candidate_generation == "NOMINATED"
+    assert envelope.primary_nominator == "EXTREME_RIGHT_TAIL_20X"
+    assert envelope.quick_2x_hazard is None
+    assert envelope.uncertainty == 0.1
+    assert envelope.coverage == 1
 
 
 def test_actionable_outcome_applies_delay_cost_and_sellability() -> None:
@@ -252,6 +315,123 @@ def test_actionable_outcome_applies_delay_cost_and_sellability() -> None:
     )
     assert immediate.actionable_outcome == CompetingOutcome.HIT_2X_BEFORE_STOP
     assert delayed.actionable_outcome == CompetingOutcome.UNSELLABLE
+
+
+def test_actionable_outcome_records_nested_milestones_without_double_counting() -> None:
+    path = [
+        MarketPathPoint(NOW, 1, 1000, 5000, True),
+        MarketPathPoint("2026-08-28T12:00:15+00:00", 2, 2000, 5000, True),
+        MarketPathPoint("2026-08-28T12:00:30+00:00", 5, 5000, 5000, True),
+        MarketPathPoint("2026-08-28T12:00:45+00:00", 10, 10000, 5000, True),
+        MarketPathPoint("2026-08-28T12:01:00+00:00", 20, 20000, 5000, True),
+    ]
+    outcome = assess_actionable_outcome(
+        decision_timestamp=NOW,
+        path=path,
+        delay_seconds=0,
+        fee_percent=0,
+        trade_notional_usd=0,
+    )
+    assert outcome.actionable_outcome == CompetingOutcome.HIT_20X_BEFORE_FAILURE
+    assert outcome.time_to_2x_seconds == 15
+    assert outcome.time_to_5x_seconds == 30
+    assert outcome.time_to_10x_seconds == 45
+    assert outcome.time_to_20x_seconds == 60
+
+
+@pytest.mark.parametrize(
+    ("peak", "terminal_kwargs", "expected", "last_milestone"),
+    [
+        (2, {"liquidity_collapse": True}, CompetingOutcome.HIT_2X_BEFORE_STOP, 2),
+        (5, {"liquidity_collapse": True}, CompetingOutcome.HIT_5X_BEFORE_STOP, 5),
+        (1.1, {"terminal_failure": True}, CompetingOutcome.TERMINAL_SAFETY_FAILURE, None),
+        (0.2, {}, CompetingOutcome.SEVERE_DRAWDOWN, None),
+    ],
+)
+def test_actionable_outcome_preserves_targets_reached_before_stop(
+    peak: float,
+    terminal_kwargs: dict[str, bool],
+    expected: CompetingOutcome,
+    last_milestone: int | None,
+) -> None:
+    terminal_at = "2026-08-28T12:00:30+00:00"
+    path = [
+        MarketPathPoint(NOW, 1, 1000, 5000, True),
+        MarketPathPoint("2026-08-28T12:00:15+00:00", peak, 2000, 5000, True),
+        MarketPathPoint(terminal_at, peak, 2000, 0, True, **terminal_kwargs),
+    ]
+    outcome = assess_actionable_outcome(
+        decision_timestamp=NOW,
+        path=path,
+        delay_seconds=0,
+        fee_percent=0,
+        trade_notional_usd=0,
+    )
+    assert outcome.actionable_outcome == expected
+    assert outcome.terminal_event == (
+        CompetingOutcome.LIQUIDITY_COLLAPSE
+        if terminal_kwargs.get("liquidity_collapse")
+        else CompetingOutcome.TERMINAL_SAFETY_FAILURE
+        if terminal_kwargs.get("terminal_failure")
+        else CompetingOutcome.SEVERE_DRAWDOWN
+    )
+    if last_milestone is not None:
+        assert getattr(outcome, f"time_to_{last_milestone}x_seconds") == 15
+
+
+def test_actionable_outcome_records_explicit_maturity_censoring() -> None:
+    outcome = assess_actionable_outcome(
+        decision_timestamp=NOW,
+        path=[
+            MarketPathPoint(NOW, 1, 1000, 5000, True),
+            MarketPathPoint("2026-08-28T12:01:00+00:00", 1.5, 1500, 5000, True),
+        ],
+        delay_seconds=0,
+        fee_percent=0,
+        trade_notional_usd=0,
+    )
+    assert outcome.actionable_outcome == CompetingOutcome.CENSORED
+    assert outcome.censoring_reason == "MATURITY_WINDOW_ENDED"
+
+
+def test_research_replay_persists_every_candidate_with_no_public_route(tmp_path) -> None:
+    feature_values = {name: np.asarray([0.0, 1.0]) for name in AVAILABLE_FEATURES}
+    feature_values["clean_flow_coverage"] = np.asarray([1.0, 1.0])
+    feature_values["snapshot_staleness_seconds"] = np.asarray([0.0, 0.0])
+    data = ResearchData(
+        mint=np.asarray(["a", "b"]),
+        creator=np.asarray(["c1", "c2"]),
+        decision_day=np.asarray(["2026-06-28", "2026-06-29"]),
+        timestamp_seconds=np.asarray([60, 60]),
+        peak_multiple=np.asarray([2.0, 1.0]),
+        terminal_failure=np.asarray([False, True]),
+        max_adverse_excursion=np.asarray([0.0, -0.9]),
+        graduated=np.asarray([True, False]),
+        features=feature_values,
+        control_score=np.asarray([0.5, 0.1]),
+    )
+    output = tmp_path / "shadow.db"
+    result = _persist_shadow_replay(
+        output,
+        data,
+        np.asarray([True, True]),
+        np.asarray([[0.2, 0.1, 0.05, 0.01], [0.01, 0.005, 0.001, 0.0001]]),
+        np.asarray([[0.1, 0.05, 0.02, 0.005], [0.02, 0.01, 0.002, 0.0002]]),
+        np.asarray([0.01, 0.8]),
+        np.asarray([[0.1, 0.05, 0.01, 0.001], [0.2, 0.1, 0.02, 0.002]]),
+        0.02,
+        0.1,
+    )
+    assert result["rows"] == 2
+    assert result["public_route_invariant"] is True
+    connection = sqlite3.connect(output)
+    try:
+        with pytest.raises(sqlite3.IntegrityError):
+            connection.execute(
+                "UPDATE intelligence_v3_research_replay SET public_route=1"
+            )
+    finally:
+        connection.close()
 
 
 def _walk_rows() -> list[dict[str, object]]:

@@ -259,9 +259,17 @@ def v3_operator_preview_card(data: dict[str, Any]) -> dict[str, Any]:
         fields=[
             _field("2X BEFORE STOP", probability(data.get("quick_2x_hazard"))),
             _field("5X BEFORE STOP", probability(data.get("mid_5x_hazard"))),
-            _field("20X+ BEFORE FAILURE", probability(data.get("right_tail_hazard"))),
+            _field(
+                "10X+ BEFORE STOP",
+                probability(data.get("right_tail_10x_hazard", data.get("right_tail_hazard"))),
+            ),
+            _field(
+                "20X+ BEFORE FAILURE",
+                probability(data.get("extreme_right_tail_20x_hazard")),
+            ),
             _field("ENTRY ACTIONABILITY", probability(data.get("entry_actionability"))),
             _field("HARD FAILURE", probability(data.get("terminal_failure_hazard"))),
+            _field("LIQUIDITY FAILURE", probability(data.get("liquidity_failure_hazard"))),
             _field("COPYABILITY", probability(data.get("copyability"))),
             _field(
                 "EVIDENCE / UNCERTAINTY",
@@ -271,6 +279,13 @@ def v3_operator_preview_card(data: dict[str, Any]) -> dict[str, Any]:
             ),
             _field("WHY NOW", why or "No verified positive contributor", False),
             _field("RISKS", risks or "No verified risk contributor", False),
+            _field(
+                "NOMINATION / GATE",
+                f"{_value(data.get('primary_nominator') or data.get('nominated_by'), 'NONE')} • "
+                f"{_value(data.get('precision_gate'), 'REJECTED')} • "
+                f"{_value(data.get('abstain_reason'), 'NO ABSTENTION')}",
+                False,
+            ),
             _field(
                 "WALLET CONSENSUS",
                 _value(data.get("independent_wallet_consensus"), "NOT VALIDATED"),
