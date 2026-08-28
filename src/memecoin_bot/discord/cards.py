@@ -237,6 +237,49 @@ def scan_card(data: dict[str, Any]) -> dict[str, Any]:
     )
 
 
+def v3_operator_preview_card(data: dict[str, Any]) -> dict[str, Any]:
+    """Render a research preview; callers must enforce operator/test-guild access."""
+
+    def probability(value: Any) -> str:
+        return "UNKNOWN" if value is None else f"{float(value) * 100:.1f}%"
+
+    why = "\n".join(f"- {item}" for item in data.get("positive_evidence") or [])
+    risks = "\n".join(
+        f"- {item}"
+        for item in [
+            *(data.get("hard_risk_evidence") or []),
+            *(data.get("negative_evidence") or []),
+        ]
+    )
+    return card(
+        f"V3 RESEARCH • {_value(data.get('symbol') or data.get('token_address'))} • "
+        f"{str(data.get('chain') or 'UNKNOWN').upper()}",
+        f"`{_value(data.get('token_address'))}`\n"
+        "Operator/test-guild preview only • no public notifier route",
+        fields=[
+            _field("2X BEFORE STOP", probability(data.get("quick_2x_hazard"))),
+            _field("5X BEFORE STOP", probability(data.get("mid_5x_hazard"))),
+            _field("20X+ BEFORE FAILURE", probability(data.get("right_tail_hazard"))),
+            _field("ENTRY ACTIONABILITY", probability(data.get("entry_actionability"))),
+            _field("HARD FAILURE", probability(data.get("terminal_failure_hazard"))),
+            _field("COPYABILITY", probability(data.get("copyability"))),
+            _field(
+                "EVIDENCE / UNCERTAINTY",
+                f"Coverage {probability(data.get('coverage'))} • "
+                f"Uncertainty {probability(data.get('uncertainty'))}",
+                False,
+            ),
+            _field("WHY NOW", why or "No verified positive contributor", False),
+            _field("RISKS", risks or "No verified risk contributor", False),
+            _field(
+                "WALLET CONSENSUS",
+                _value(data.get("independent_wallet_consensus"), "NOT VALIDATED"),
+                False,
+            ),
+        ],
+        footer="GAMBIT JR • V3 RESEARCH ONLY • NO PUBLIC ROUTE • NO EXECUTION",
+        links=token_links(data),
+    )
 def compare_card(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
     def line(value: dict[str, Any]) -> str:
         market = value.get("market") or {}

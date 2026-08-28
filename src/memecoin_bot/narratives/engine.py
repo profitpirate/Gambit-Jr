@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
+from datetime import UTC, datetime
 from typing import Any
 
 from memecoin_bot.models import DiscoveryEvent, MarketSnapshot
@@ -39,6 +41,17 @@ CATEGORIES: dict[str, set[str]] = {
 }
 
 
+@dataclass(frozen=True, slots=True)
+class NarrativeObservation:
+    narrative_id: str
+    observed_at: str
+    available_at: str
+    capital_flow: float | None
+    independent_tokens: int | None
+    leader_token: str | None = None
+    catalyst_id: str | None = None
+
+
 class NarrativeEngine:
     def assess(self, discovery: DiscoveryEvent, market: MarketSnapshot) -> dict[str, Any]:
         description = str(discovery.metadata.get("description") or "")
@@ -74,3 +87,48 @@ class NarrativeEngine:
             "acceleration": None,
             "limitation": "TOKEN_METADATA_FIT_ONLY_NO_EXTERNAL_CATALYST_VELOCITY",
         }
+
+    def assess_history(
+        self,
+        observations: list[NarrativeObservation],
+        decision_timestamp: str,
+    ) -> dict[str, Any]:
+        decision = _time(decision_timestamp)
+        ordered = sorted(observations, key=lambda row: _time(row.observed_at))
+        for row in ordered:
+            observed = _time(row.observed_at)
+            available = _time(row.available_at)
+            if available < observed or available > decision:
+                raise ValueError("narrative evidence violates point-in-time availability")
+        if len(ordered) < 2:
+            return {"score": None, "reason": "INSUFFICIENT_PIT_NARRATIVE_HISTORY"}
+        first, last = ordered[0], ordered[-1]
+        elapsed = max(1.0, (_time(last.observed_at) - _time(first.observed_at)).total_seconds())
+        velocity = (
+            (last.capital_flow - first.capital_flow) / elapsed
+            if last.capital_flow is not None and first.capital_flow is not None
+            else None
+        )
+        saturation = last.independent_tokens
+        return {
+            "score": None,
+            "reason": "DYNAMIC_COMPONENTS_REQUIRE_OOS_VALIDATION",
+            "narrative_id": last.narrative_id,
+            "narrative_birth": first.observed_at,
+            "narrative_velocity": velocity,
+            "narrative_acceleration": None,
+            "narrative_leader": last.leader_token,
+            "copycat_distance": None,
+            "saturation": saturation,
+            "capital_fragmentation": None,
+            "revival": first.capital_flow == 0 and (last.capital_flow or 0) > 0,
+            "catalyst_alignment": last.catalyst_id,
+            "decay": velocity is not None and velocity < 0,
+        }
+
+
+def _time(value: str) -> datetime:
+    parsed = datetime.fromisoformat(value)
+    if parsed.tzinfo is None:
+        raise ValueError(f"timestamp must include timezone: {value}")
+    return parsed.astimezone(UTC)

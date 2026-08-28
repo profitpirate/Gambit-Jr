@@ -977,6 +977,66 @@ class Store:
             )
             return int(cur.lastrowid)
 
+    def save_v3_shadow_decision(
+        self,
+        *,
+        candidate_id: int,
+        token_id: int,
+        envelope: dict[str, Any],
+        control_decision: dict[str, Any],
+        v2_decision: dict[str, Any],
+        features: dict[str, Any],
+        latency: dict[str, Any] | None = None,
+        veto_reasons: list[str] | None = None,
+    ) -> int:
+        """Persist a V3 comparison without creating a signal or outbox event."""
+        if envelope.get("public_route") is not False:
+            raise ValueError("Intelligence V3 shadow decisions cannot use a public route")
+        if envelope.get("model_versions", {}).get("v3") != "INTELLIGENCE_V3_RESEARCH":
+            raise ValueError("invalid V3 research model identity")
+        with self._lock, self.conn:
+            before = int(self.conn.execute("SELECT COUNT(*) FROM outbox").fetchone()[0])
+            self.conn.execute(
+                "INSERT INTO intelligence_v3_shadow_decisions("
+                "candidate_id,token_id,decision_timestamp,available_evidence_timestamp,"
+                "control_decision_json,v2_decision_json,v3_decision_json,features_json,"
+                "latency_json,veto_reasons_json,model_version,public_route,created_at) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(candidate_id,decision_timestamp,"
+                "model_version) DO UPDATE SET control_decision_json=excluded.control_decision_json,"
+                "v2_decision_json=excluded.v2_decision_json,v3_decision_json=excluded.v3_decision_json,"
+                "features_json=excluded.features_json,latency_json=excluded.latency_json,"
+                "veto_reasons_json=excluded.veto_reasons_json",
+                (
+                    candidate_id,
+                    token_id,
+                    str(envelope["decision_timestamp"]),
+                    str(envelope["available_evidence_timestamp"]),
+                    _json(control_decision),
+                    _json(v2_decision),
+                    _json(envelope),
+                    _json(features),
+                    _json(latency or {}),
+                    _json(veto_reasons or []),
+                    "INTELLIGENCE_V3_RESEARCH",
+                    0,
+                    iso(),
+                ),
+            )
+            after = int(self.conn.execute("SELECT COUNT(*) FROM outbox").fetchone()[0])
+            if after != before:
+                raise RuntimeError("V3 shadow persistence changed the public outbox")
+            row = self.conn.execute(
+                "SELECT id FROM intelligence_v3_shadow_decisions "
+                "WHERE candidate_id=? AND decision_timestamp=? AND model_version=?",
+                (
+                    candidate_id,
+                    str(envelope["decision_timestamp"]),
+                    "INTELLIGENCE_V3_RESEARCH",
+                ),
+            ).fetchone()
+            assert row is not None
+            return int(row[0])
+
     def create_signal(
         self,
         token_id: int,

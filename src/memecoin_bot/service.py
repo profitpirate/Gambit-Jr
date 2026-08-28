@@ -28,6 +28,11 @@ from memecoin_bot.config import Settings
 from memecoin_bot.database import Store
 from memecoin_bot.developers import DeveloperEngine
 from memecoin_bot.discovery import DiscoveryPoller
+from memecoin_bot.historical.intelligence_v3 import (
+    EntryActionability,
+    TimedValue,
+    V3ShadowEngine,
+)
 from memecoin_bot.intelligence import (
     entry_quality,
     intelligence_pillar,
@@ -163,6 +168,7 @@ class IntelligenceService:
         self.onchain = OnchainEngine()
         self.momentum = MomentumEngine()
         self.radar = RadarEngine(settings)
+        self.v3_shadow = V3ShadowEngine()
         self.tracker = SignalTracker(store, market, settings)
         self.started_at = iso()
         self.log = logging.getLogger("memecoin_bot.service")
@@ -1043,6 +1049,102 @@ class IntelligenceService:
             ],
         }
         self.store.save_evaluation(token_id, score, evidence)
+        v3_evidence = {
+            "market_cap": TimedValue(
+                market.market_cap_usd,
+                market.captured_at,
+                market.captured_at,
+                market.source,
+                "KNOWN" if market.market_cap_usd is not None else "UNKNOWN",
+            ),
+            "liquidity": TimedValue(
+                market.liquidity_usd,
+                market.captured_at,
+                market.captured_at,
+                market.source,
+                "KNOWN" if market.liquidity_usd is not None else "UNKNOWN",
+            ),
+            "price": TimedValue(
+                market.price_usd,
+                market.captured_at,
+                market.captured_at,
+                market.source,
+                "KNOWN" if market.price_usd is not None else "UNKNOWN",
+            ),
+            "real_sol_reserve": TimedValue(
+                discovery.metadata.get("real_sol_reserve"),
+                market.captured_at,
+                market.captured_at,
+                discovery.source,
+                "KNOWN"
+                if discovery.metadata.get("real_sol_reserve") is not None
+                else "UNKNOWN",
+            ),
+            "independent_buyer_velocity": TimedValue(
+                discovery.metadata.get("independent_buyer_velocity"),
+                market.captured_at,
+                market.captured_at,
+                discovery.source,
+                "KNOWN"
+                if discovery.metadata.get("independent_buyer_velocity") is not None
+                else "UNKNOWN",
+            ),
+        }
+        v3_envelope = self.v3_shadow.evaluate(
+            decision_timestamp=market.captured_at,
+            evidence=v3_evidence,
+            forecast=None,
+            actionability=EntryActionability(
+                valid=trade["grade"] in {"GOOD", "LIMITED"},
+                score={"GOOD": 0.9, "LIMITED": 0.55, "POOR": 0.1}.get(trade["grade"]),
+                sellable=None if trade["grade"] == "UNKNOWN" else trade["grade"] != "POOR",
+                delay_seconds=0,
+                reason="TRADEABILITY_UNKNOWN" if trade["grade"] == "UNKNOWN" else None,
+            ),
+            legacy_result={
+                "classification": str(score.classification),
+                "normalized_score": score.normalized_score,
+                "confidence": score.confidence,
+                "hard_rejections": list(score.hard_rejections),
+            },
+            v15_result=v15_decision.to_dict(),
+            positive_evidence=v15_decision.why_now,
+            negative_evidence=v15_decision.critical_unknowns,
+            hard_risk_evidence=(
+                v15_decision.failure_reasons
+                if v15_features.get("terminal_safety_failure")
+                else []
+            ),
+            feature_versions={"shadow_adapter": "v3.0.0", "control_features": "v15"},
+        )
+        self.store.save_v3_shadow_decision(
+            candidate_id=candidate_id,
+            token_id=token_id,
+            envelope=v3_envelope.to_dict(),
+            control_decision={
+                "legacy": v3_envelope.legacy_result,
+                "v15": v3_envelope.v15_result,
+            },
+            v2_decision={"state": "NOT_EVALUATED_LIVE_RESEARCH_ONLY"},
+            features={
+                "v15": v15_features,
+                "v3_available": {
+                    name: value.value for name, value in v3_evidence.items()
+                },
+            },
+            latency={
+                "provider_seconds": _evidence_age_seconds(
+                    market.captured_at, market.captured_at
+                ),
+                "model_seconds": None,
+                "discord_seconds": None,
+            },
+            veto_reasons=[
+                *score.hard_rejections,
+                *v15_decision.failure_reasons,
+                *([v3_envelope.abstain_reason] if v3_envelope.abstain_reason else []),
+            ],
+        )
         signal_grade = score.classification in {
             SignalClass.WATCH,
             SignalClass.STRONG,

@@ -1,3 +1,3 @@
-from .engine import NarrativeEngine
+from .engine import NarrativeEngine, NarrativeObservation
 
-__all__ = ["NarrativeEngine"]
+__all__ = ["NarrativeEngine", "NarrativeObservation"]
