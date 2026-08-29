@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import json
-import urllib.error
-import urllib.request
 from typing import Any
+from urllib import error, request
 
 from memecoin_bot.discord.validation import validate_webhook_payload
 
@@ -76,11 +75,11 @@ class DiscordNotifier:
                 }
                 if self.authorization:
                     headers["Authorization"] = self.authorization
-                request = urllib.request.Request(url, data=payload, headers=headers, method="POST")
+                outbound = request.Request(url, data=payload, headers=headers, method="POST")
                 try:
-                    with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                    with request.urlopen(outbound, timeout=self.timeout) as response:
                         return response.status, response.read(), dict(response.headers)
-                except urllib.error.HTTPError as exc:
+                except error.HTTPError as exc:
                     return exc.code, exc.read(), dict(exc.headers)
 
             status, body, headers = await asyncio.to_thread(perform)
