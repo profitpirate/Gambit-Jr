@@ -295,6 +295,8 @@ def v3_operator_preview_card(data: dict[str, Any]) -> dict[str, Any]:
         footer="GAMBIT JR • V3 RESEARCH ONLY • NO PUBLIC ROUTE • NO EXECUTION",
         links=token_links(data),
     )
+
+
 def compare_card(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
     def line(value: dict[str, Any]) -> str:
         market = value.get("market") or {}

@@ -110,8 +110,7 @@ def group_purge_window(
 
     def allowed(index: int, blocked: Mapping[str, set[str]]) -> bool:
         return all(
-            not _row_groups(rows[index], field).intersection(blocked[field])
-            for field in blocked
+            not _row_groups(rows[index], field).intersection(blocked[field]) for field in blocked
         )
 
     validation = tuple(index for index in window.validation_indexes if allowed(index, test_groups))
@@ -130,14 +129,18 @@ def group_purge_window(
     )
 
 
-def natural_prevalence_sample_weights(labels: Sequence[bool], sampled: Sequence[bool]) -> list[float]:
+def natural_prevalence_sample_weights(
+    labels: Sequence[bool], sampled: Sequence[bool]
+) -> list[float]:
     """Weights a computational sample back to untouched event prevalence."""
     if len(labels) != len(sampled) or not labels:
         raise ValueError("labels and sampled masks must be non-empty and equal length")
     population_positive = sum(labels)
     population_negative = len(labels) - population_positive
     selected_positive = sum(label and keep for label, keep in zip(labels, sampled, strict=True))
-    selected_negative = sum((not label) and keep for label, keep in zip(labels, sampled, strict=True))
+    selected_negative = sum(
+        (not label) and keep for label, keep in zip(labels, sampled, strict=True)
+    )
     if selected_positive == 0 or selected_negative == 0:
         raise ValueError("sample must retain both classes")
     positive_weight = population_positive / selected_positive
@@ -148,12 +151,17 @@ def natural_prevalence_sample_weights(labels: Sequence[bool], sampled: Sequence[
     ]
 
 
-def calibration_report(probabilities: Sequence[float], labels: Sequence[bool], bins: int = 10) -> dict[str, Any]:
+def calibration_report(
+    probabilities: Sequence[float], labels: Sequence[bool], bins: int = 10
+) -> dict[str, Any]:
     if len(probabilities) != len(labels) or not probabilities:
         raise ValueError("probabilities and labels must be non-empty and equal length")
     if any(not 0 <= value <= 1 for value in probabilities):
         raise ValueError("probabilities must be between zero and one")
-    brier = sum((probability - float(label)) ** 2 for probability, label in zip(probabilities, labels, strict=True)) / len(labels)
+    brier = sum(
+        (probability - float(label)) ** 2
+        for probability, label in zip(probabilities, labels, strict=True)
+    ) / len(labels)
     reliability = []
     ece = 0.0
     for bin_index in range(bins):
@@ -170,9 +178,21 @@ def calibration_report(probabilities: Sequence[float], labels: Sequence[bool], b
         observed = sum(labels[index] for index in indexes) / len(indexes)
         ece += len(indexes) / len(labels) * abs(predicted - observed)
         reliability.append(
-            {"lower": lower, "upper": upper, "count": len(indexes), "predicted": predicted, "observed": observed}
+            {
+                "lower": lower,
+                "upper": upper,
+                "count": len(indexes),
+                "predicted": predicted,
+                "observed": observed,
+            }
         )
-    return {"sample": len(labels), "prevalence": sum(labels) / len(labels), "brier": brier, "ece": ece, "reliability": reliability}
+    return {
+        "sample": len(labels),
+        "prevalence": sum(labels) / len(labels),
+        "brier": brier,
+        "ece": ece,
+        "reliability": reliability,
+    }
 
 
 def precision_frequency_frontier(
@@ -200,12 +220,16 @@ def precision_frequency_frontier(
         for threshold in (20.0, 50.0):
             universe_hits = sum(outcome(row, threshold) for row in rows)
             selected_hits = sum(outcome(row, threshold) for row in selected)
-            record[f"{int(threshold)}x_recall"] = selected_hits / universe_hits if universe_hits else None
+            record[f"{int(threshold)}x_recall"] = (
+                selected_hits / universe_hits if universe_hits else None
+            )
         reports.append(record)
     return reports
 
 
-def wilson_interval(successes: int, sample: int, confidence_z: float = 1.959963984540054) -> tuple[float | None, float | None]:
+def wilson_interval(
+    successes: int, sample: int, confidence_z: float = 1.959963984540054
+) -> tuple[float | None, float | None]:
     if sample == 0:
         return None, None
     if not 0 <= successes <= sample:
@@ -213,7 +237,11 @@ def wilson_interval(successes: int, sample: int, confidence_z: float = 1.9599639
     rate = successes / sample
     denominator = 1 + confidence_z**2 / sample
     centre = (rate + confidence_z**2 / (2 * sample)) / denominator
-    spread = confidence_z * math.sqrt(rate * (1 - rate) / sample + confidence_z**2 / (4 * sample**2)) / denominator
+    spread = (
+        confidence_z
+        * math.sqrt(rate * (1 - rate) / sample + confidence_z**2 / (4 * sample**2))
+        / denominator
+    )
     return max(0.0, centre - spread), min(1.0, centre + spread)
 
 

@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from memecoin_bot.historical.backfill import BackfillEngine
+from memecoin_bot.historical.dune_registry import DuneQueryRegistry
 from memecoin_bot.historical.providers import (
     DuneMonthHistoricalProvider,
     OperationalHistoryProvider,
@@ -156,9 +157,7 @@ class ConvergenceOrchestrator:
         now = _now()
         config = {
             "operational_database_configured": bool(self.operational_database),
-            "dune_configured": bool(
-                self.environment.get("DUNE_API_KEY") and self.environment.get("DUNE_QUERY_ID")
-            ),
+            "dune_configured": bool(self.environment.get("DUNE_API_KEY")),
             "public_route": False,
         }
         with self.warehouse._lock, self.warehouse.conn:
@@ -261,7 +260,9 @@ class ConvergenceOrchestrator:
             (run_id, phase_name),
         ).fetchone()
         exhausted = bool(row and int(row["attempt"]) >= int(row["maximum_attempts"]))
-        state = ConvergenceState.BLOCKED_EXTERNAL if exhausted else ConvergenceState.RETRYABLE_FAILURE
+        state = (
+            ConvergenceState.BLOCKED_EXTERNAL if exhausted else ConvergenceState.RETRYABLE_FAILURE
+        )
         retry = None if exhausted else (datetime.now(UTC) + timedelta(seconds=30)).isoformat()
         with self.warehouse._lock, self.warehouse.conn:
             self.warehouse.conn.execute(
@@ -348,20 +349,65 @@ class ConvergenceOrchestrator:
             blockers.append("read-only production DATABASE_PATH copy is absent")
         key = self.environment.get("DUNE_API_KEY")
         query = self.environment.get("DUNE_QUERY_ID")
-        if key and query:
+        if key:
+            registry = DuneQueryRegistry()
+            registry.register(self.warehouse)
+            configured_query_names = self.environment.get("DUNE_QUERY_NAMES")
+            query_names = tuple(
+                value.strip()
+                for value in (
+                    configured_query_names
+                    or (
+                        "monthly_universe"
+                        if query
+                        else "monthly_universe,pumpfun_launches,pumpfun_trades,"
+                        "pumpswap_trades,migrations,wallet_activity,creator_activity,"
+                        "outcome_reconstruction"
+                    )
+                ).split(",")
+                if value.strip()
+            )
             month_results = {}
-            for month in historical_months("2024-01", "2026-08"):
-                provider = DuneMonthHistoricalProvider(int(query), month, key)
-                self._register_dune_dataset(provider.dataset_id, month, int(query))
-                month_results[month] = await BackfillEngine(self.warehouse).run(provider)
+            current_month = datetime.now(UTC).strftime("%Y-%m")
+            for month in historical_months("2024-01", current_month):
+                month_results[month] = {}
+                for query_name in query_names:
+                    spec = registry.spec(query_name)
+                    if month < spec.minimum_date[:7]:
+                        month_results[month][query_name] = {
+                            "state": "NOT_APPLICABLE_BEFORE_MINIMUM_DATE",
+                            "minimum_date": spec.minimum_date,
+                        }
+                        continue
+                    provider = DuneMonthHistoricalProvider(
+                        int(query) if query else None,
+                        month,
+                        key,
+                        query_name=query_name,
+                        registry=registry,
+                        entity_field=(
+                            "creator" if query_name == "creator_activity" else "token_address"
+                        ),
+                        parquet_root=self.environment.get(
+                            "DUNE_PARQUET_ROOT", "data/historical/parquet"
+                        ),
+                    )
+                    self._register_dune_dataset(
+                        provider.dataset_id,
+                        month,
+                        query_name,
+                        provider.query_spec.schema_version,
+                        provider.query_id,
+                    )
+                    month_results[month][query_name] = await BackfillEngine(self.warehouse).run(
+                        provider
+                    )
             acquired["dune_months"] = month_results
         else:
-            blockers.append("DUNE_API_KEY and reviewed DUNE_QUERY_ID are not configured")
+            blockers.append("DUNE_API_KEY is not configured")
         raw = self._count("raw_evidence")
         state = (
-            ConvergenceState.PASSED_ENGINEERING
-            if acquired
-            else ConvergenceState.BLOCKED_EXTERNAL
+            ConvergenceState.PASSED_ENGINEERING if acquired else ConvergenceState.BLOCKED_EXTERNAL
         )
         return PhaseResult(
             state,
@@ -369,7 +415,7 @@ class ConvergenceOrchestrator:
                 "acquired": acquired,
                 "blockers": blockers,
                 "raw_evidence_rows": raw,
-                "target_months": historical_months("2024-01", "2026-08"),
+                "target_months": historical_months("2024-01", datetime.now(UTC).strftime("%Y-%m")),
                 "raw_corpora_committed_to_git": False,
             },
         )
@@ -378,7 +424,11 @@ class ConvergenceOrchestrator:
         preflight = self.providers.refresh()
         probes = await self.providers.probe() if live_probes else []
         live = [row for row in probes if row["state"] not in {"BLOCKED_EXTERNAL", "REJECTED"}]
-        state = ConvergenceState.PASSED_ENGINEERING if live or not live_probes else ConvergenceState.BLOCKED_EXTERNAL
+        state = (
+            ConvergenceState.PASSED_ENGINEERING
+            if live or not live_probes
+            else ConvergenceState.BLOCKED_EXTERNAL
+        )
         return PhaseResult(
             state,
             {
@@ -392,13 +442,17 @@ class ConvergenceOrchestrator:
     async def _normalization(self) -> PhaseResult:
         raw = self._count("raw_evidence")
         normalized = self._count("normalized_events")
-        state = ConvergenceState.PASSED_ENGINEERING if normalized else ConvergenceState.BLOCKED_EXTERNAL
+        state = (
+            ConvergenceState.PASSED_ENGINEERING if normalized else ConvergenceState.BLOCKED_EXTERNAL
+        )
         return PhaseResult(
             state,
             {
                 "raw_evidence": raw,
                 "normalized_events": normalized,
-                "reason": None if normalized else "no schema-reviewed raw evidence is available to normalize",
+                "reason": None
+                if normalized
+                else "no schema-reviewed raw evidence is available to normalize",
             },
         )
 
@@ -433,7 +487,11 @@ class ConvergenceOrchestrator:
                 "SELECT COUNT(*) FROM outcomes WHERE class_name LIKE 'ACTIONABLE%'"
             ).fetchone()[0]
         )
-        state = ConvergenceState.PASSED_RESEARCH if outcomes >= 250 and actionable else ConvergenceState.AWAITING_MATURITY
+        state = (
+            ConvergenceState.PASSED_RESEARCH
+            if outcomes >= 250 and actionable
+            else ConvergenceState.AWAITING_MATURITY
+        )
         return PhaseResult(
             state,
             {
@@ -451,7 +509,11 @@ class ConvergenceOrchestrator:
                 "SELECT COUNT(*) FROM research_decisions WHERE approval_state='APPROVED'"
             ).fetchone()[0]
         )
-        state = ConvergenceState.PASSED_RESEARCH if sources["gate_passed"] else ConvergenceState.FAILED_RESEARCH
+        state = (
+            ConvergenceState.PASSED_RESEARCH
+            if sources["gate_passed"]
+            else ConvergenceState.FAILED_RESEARCH
+        )
         return PhaseResult(
             state,
             {
@@ -469,7 +531,9 @@ class ConvergenceOrchestrator:
             ).fetchone()[0]
         )
         return PhaseResult(
-            ConvergenceState.PASSED_RESEARCH if runners >= 100 else ConvergenceState.FAILED_RESEARCH,
+            ConvergenceState.PASSED_RESEARCH
+            if runners >= 100
+            else ConvergenceState.FAILED_RESEARCH,
             {"5x_runner_cohort": runners, "minimum_research_sample": 100},
         )
 
@@ -480,7 +544,9 @@ class ConvergenceOrchestrator:
             ).fetchone()[0]
         )
         return PhaseResult(
-            ConvergenceState.PASSED_RESEARCH if failures >= 100 else ConvergenceState.FAILED_RESEARCH,
+            ConvergenceState.PASSED_RESEARCH
+            if failures >= 100
+            else ConvergenceState.FAILED_RESEARCH,
             {"failure_cohort": failures, "minimum_research_sample": 100},
         )
 
@@ -506,7 +572,9 @@ class ConvergenceOrchestrator:
             ).fetchone()[0]
         )
         return PhaseResult(
-            ConvergenceState.APPROVED_FOR_HUMAN_REVIEW if approved else ConvergenceState.FAILED_RESEARCH,
+            ConvergenceState.APPROVED_FOR_HUMAN_REVIEW
+            if approved
+            else ConvergenceState.FAILED_RESEARCH,
             {
                 "approved_challenger_decisions": approved,
                 "retired_holdouts": retired,
@@ -524,7 +592,9 @@ class ConvergenceOrchestrator:
     async def _drift(self) -> PhaseResult:
         observations = self._count("drift_observations")
         return PhaseResult(
-            ConvergenceState.PASSED_RESEARCH if observations else ConvergenceState.AWAITING_MATURITY,
+            ConvergenceState.PASSED_RESEARCH
+            if observations
+            else ConvergenceState.AWAITING_MATURITY,
             {"drift_observations": observations},
         )
 
@@ -540,7 +610,9 @@ class ConvergenceOrchestrator:
             ).fetchone()[0]
         )
         return PhaseResult(
-            ConvergenceState.PASSED_ENGINEERING if integrity == "ok" and not unresolved_high else ConvergenceState.RETRYABLE_FAILURE,
+            ConvergenceState.PASSED_ENGINEERING
+            if integrity == "ok" and not unresolved_high
+            else ConvergenceState.RETRYABLE_FAILURE,
             {
                 "db_integrity": integrity,
                 "recorded_findings": findings,
@@ -601,7 +673,10 @@ class ConvergenceOrchestrator:
 
     def historical_status(self) -> dict[str, Any]:
         datasets = self.warehouse.coverage_manifest()
-        by_month = {month: {"state": "MISSING", "tokens": 0, "events": 0} for month in historical_months("2024-01", "2026-08")}
+        by_month = {
+            month: {"state": "MISSING", "tokens": 0, "events": 0}
+            for month in historical_months("2024-01", "2026-08")
+        }
         for row in datasets:
             earliest = row.get("earliest_timestamp")
             latest = row.get("latest_timestamp")
@@ -645,14 +720,25 @@ class ConvergenceOrchestrator:
             }
         )
 
-    def _register_dune_dataset(self, dataset_id: str, month: str, query_id: int) -> None:
+    def _register_dune_dataset(
+        self,
+        dataset_id: str,
+        month: str,
+        query_name: str,
+        schema_version: str,
+        query_id: int | None,
+    ) -> None:
         self.warehouse.register_dataset(
             {
                 "dataset_id": dataset_id,
-                "dataset_version": f"dune-query-{query_id}-{month}-v1",
+                "dataset_version": f"dune-{query_name}-{schema_version}-{month}",
                 "provider": "dune_month_partition",
                 "chain": "solana",
-                "acquisition_method": "reviewed_parameterized_dune_query",
+                "acquisition_method": (
+                    "repository_owned_direct_sql"
+                    if query_id is None
+                    else "repository_owned_direct_sql_with_saved_query_fallback"
+                ),
                 "refresh_method": "immutable_month_partition_execution",
                 "timestamp_precision": "query-defined chain block time",
                 "reliability": "INDEXED_ONCHAIN_QUERY",

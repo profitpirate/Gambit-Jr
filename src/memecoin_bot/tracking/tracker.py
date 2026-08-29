@@ -59,15 +59,13 @@ class SignalTracker:
                 is not None
             )
             if multiple <= self.settings.failure_multiple and self.store.fail_signal(
-                    int(signal["id"]),
-                    dict(
-                        payload,
-                        current_multiple=multiple,
-                        max_drawdown=max_drawdown,
-                        outcome_class=(
-                            "FAILED_AFTER_RUNNER" if reached_2x else "FAILED_BEFORE_2X"
-                        ),
-                    ),
-                ):
+                int(signal["id"]),
+                dict(
+                    payload,
+                    current_multiple=multiple,
+                    max_drawdown=max_drawdown,
+                    outcome_class=("FAILED_AFTER_RUNNER" if reached_2x else "FAILED_BEFORE_2X"),
+                ),
+            ):
                 stats["failed"] += 1
         return stats

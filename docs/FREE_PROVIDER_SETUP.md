@@ -8,7 +8,9 @@ signup page: https://dashboard.helius.dev/signup
 
 free tier: 1,000,000 credits/month and 10 requests/second; standard WebSocket traffic is credit-metered
 
-required ENV variable: `HELIUS_API_KEY`
+required ENV variable: `HELIUS_API_KEY`; leave `SOLANA_RPC_URL` at the public
+mainnet default to make Helius the derived primary automatically. Public mainnet
+remains the configured fallback. The key is never logged or fingerprinted.
 
 why it is useful: selective hot-account, creator, wallet and transaction enrichment on a production-grade Solana RPC
 
@@ -32,7 +34,14 @@ signup page: https://dune.com/auth/register
 
 free tier: 15 low-limit query executions/minute and 40 result requests/minute, subject to Dune credits and current plan limits
 
-required ENV variable: `DUNE_API_KEY`, plus the reviewed saved-query identifier in `DUNE_QUERY_ID`
+required ENV variable: `DUNE_API_KEY`
+
+Gambit owns and versions the SQL in
+`src/memecoin_bot/historical/sql/dune/`, renders strict monthly parameters,
+executes `POST /v1/sql/execute`, polls, pages, validates schemas, writes Parquet
+outside Git, and checkpoints each partition. `DUNE_QUERY_ID` is not mandatory.
+Only when Dune explicitly rejects direct SQL for the current plan does Gambit
+emit a one-time instruction and use a configured saved-query ID as fallback.
 
 why it is useful: month-partitioned, indexed Solana history without downloading the full chain archive
 

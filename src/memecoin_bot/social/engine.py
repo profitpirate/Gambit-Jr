@@ -69,9 +69,7 @@ class SocialEngine:
         first, last = ordered[0], ordered[-1]
         seconds = max(1.0, (_time(last.observed_at) - _time(first.observed_at)).total_seconds())
         mentions_velocity = _velocity(first.mentions, last.mentions, seconds)
-        mentioners_velocity = _velocity(
-            first.unique_mentioners, last.unique_mentioners, seconds
-        )
+        mentioners_velocity = _velocity(first.unique_mentioners, last.unique_mentioners, seconds)
         sentiment = last.sentiment
         bot_adjusted = (
             sentiment * (1 - last.bot_spam_share)
@@ -88,16 +86,12 @@ class SocialEngine:
             "attention_acceleration": mentioners_velocity,
             "sentiment": sentiment,
             "bot_adjusted_sentiment": bot_adjusted,
-            "promotional_concentration": (
-                _ratio(last.official_mentions, last.mentions)
-            ),
+            "promotional_concentration": (_ratio(last.official_mentions, last.mentions)),
             "official_channel_activity": last.official_mentions,
             "investor_activity": last.investor_mentions,
             "cross_platform_confirmation": len({row.platform for row in ordered}),
             "provider_provenance": sorted({row.source for row in ordered}),
-            "available_evidence_timestamp": max(
-                (row.available_at for row in ordered), key=_time
-            ),
+            "available_evidence_timestamp": max((row.available_at for row in ordered), key=_time),
         }
 
 

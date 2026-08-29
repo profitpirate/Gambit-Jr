@@ -56,9 +56,7 @@ FEATURE_GROUPS: dict[str, tuple[str, ...]] = {
     "regime": ("regime_day", "launch_intensity"),
 }
 
-AVAILABLE_FEATURES = tuple(
-    feature for family in FEATURE_GROUPS.values() for feature in family
-)
+AVAILABLE_FEATURES = tuple(feature for family in FEATURE_GROUPS.values() for feature in family)
 
 
 @dataclass(frozen=True, slots=True)
@@ -353,7 +351,9 @@ def _control_reconstruction(values: Mapping[str, Any], np: Any) -> Any:
                 "survival",
                 "payoff",
             )
-        known = [candidates[name][index] for name in names if math.isfinite(candidates[name][index])]
+        known = [
+            candidates[name][index] for name in names if math.isfinite(candidates[name][index])
+        ]
         scores[index] = statistics.fmean(known) / 100 if known else 0.0
     return scores
 
@@ -369,9 +369,7 @@ def chronological_masks(data: ResearchData) -> dict[str, Any]:
         name: (data.decision_day >= lower) & (data.decision_day < upper)
         for name, (lower, upper) in WINDOWS.items()
     }
-    future = masks["calibration"] | masks["outer_1"] | masks["outer_2"] | masks[
-        "outer_3_partial"
-    ]
+    future = masks["calibration"] | masks["outer_1"] | masks["outer_2"] | masks["outer_3_partial"]
     future_creators = set(data.creator[future])
     outer_all_times = masks["outer_1"] | masks["outer_2"] | masks["outer_3_partial"]
     outer_creators = set(data.creator[outer_all_times])
@@ -429,9 +427,7 @@ def fit_binary_probability(
     train_x = feature_matrix(data, features, train_mask)
     train_y = labels[train_mask]
     if len(set(train_y.tolist())) < 2:
-        estimator = ConstantProbabilityEstimator(
-            (float(train_y.sum()) + 1) / (len(train_y) + 2)
-        )
+        estimator = ConstantProbabilityEstimator((float(train_y.sum()) + 1) / (len(train_y) + 2))
     elif kind == "logistic":
         estimator = Pipeline(
             [
@@ -490,7 +486,9 @@ def stable_random_scores(mints: Sequence[str]) -> Any:
     )
 
 
-def wilson_interval(successes: int, sample: int, z: float = 1.959963984540054) -> list[float] | None:
+def wilson_interval(
+    successes: int, sample: int, z: float = 1.959963984540054
+) -> list[float] | None:
     if sample <= 0:
         return None
     rate = successes / sample
@@ -500,7 +498,9 @@ def wilson_interval(successes: int, sample: int, z: float = 1.959963984540054) -
     return [max(0.0, center - margin), min(1.0, center + margin)]
 
 
-def selection_metrics(data: ResearchData, mask: Any, scores: Any, frequency: float) -> dict[str, Any]:
+def selection_metrics(
+    data: ResearchData, mask: Any, scores: Any, frequency: float
+) -> dict[str, Any]:
     _, np = _dependencies()
     local = np.flatnonzero(mask)
     count = max(1, round(len(local) * frequency))
@@ -531,9 +531,7 @@ def selection_metrics(data: ResearchData, mask: Any, scores: Any, frequency: flo
         result[f"{target}x_wilson_95"] = wilson_interval(successes, len(selected))
     for target in (20, 50):
         available = int((universe_peak >= target).sum())
-        result[f"{target}x_recall"] = (
-            int((peak >= target).sum()) / available if available else None
-        )
+        result[f"{target}x_recall"] = int((peak >= target).sum()) / available if available else None
     result["median_entry_market_cap"] = float(
         np.nanmedian(data.features["log_market_cap"][selected])
     )
@@ -570,14 +568,17 @@ def calibration_metrics(labels: Any, probabilities: Any, bins: int = 10) -> dict
         support = int(chosen.sum())
         ece += support / len(labels) * abs(predicted - observed)
         reliability.append(
-            {"lower": edges[index], "upper": edges[index + 1], "support": support,
-             "predicted": predicted, "observed": observed}
+            {
+                "lower": edges[index],
+                "upper": edges[index + 1],
+                "support": support,
+                "predicted": predicted,
+                "observed": observed,
+            }
         )
     logits = np.log(probabilities / (1 - probabilities))
     if len(set(labels)) > 1:
-        calibration_fit = LogisticRegression(C=1e6, max_iter=300).fit(
-            logits.reshape(-1, 1), labels
-        )
+        calibration_fit = LogisticRegression(C=1e6, max_iter=300).fit(logits.reshape(-1, 1), labels)
         slope = float(calibration_fit.coef_[0, 0])
         intercept = float(calibration_fit.intercept_[0])
     else:
@@ -729,9 +730,7 @@ def _two_stage_from_predictions(
 ) -> Any:
     import numpy as np
 
-    gate_x = np.column_stack(
-        [specialist, failure, feature_matrix(data, gate_features, mask)]
-    )
+    gate_x = np.column_stack([specialist, failure, feature_matrix(data, gate_features, mask)])
     raw = np.clip(stage_b.predict_proba(gate_x)[:, 1], 1e-8, 1 - 1e-8)
     logits = np.log(raw / (1 - raw)).reshape(-1, 1)
     return calibrator.predict_proba(logits)[:, 1]
@@ -740,9 +739,7 @@ def _two_stage_from_predictions(
 def _audit_features(data: ResearchData) -> dict[str, Any]:
     _, np = _dependencies()
     result = {}
-    boundaries = np.flatnonzero(
-        np.concatenate(([True], data.mint[1:] != data.mint[:-1]))
-    )
+    boundaries = np.flatnonzero(np.concatenate(([True], data.mint[1:] != data.mint[:-1])))
     units = {
         "log_market_cap": "log1p_SOL",
         "curve_progress": "percent",
@@ -796,17 +793,13 @@ def _uncertainty_summary(
     train_x = feature_matrix(data, AVAILABLE_FEATURES, train_mask)
     outer_x = feature_matrix(data, AVAILABLE_FEATURES, outer_mask)
     centers = np.nanmedian(train_x, axis=0)
-    scales = np.nanpercentile(train_x, 75, axis=0) - np.nanpercentile(
-        train_x, 25, axis=0
-    )
+    scales = np.nanpercentile(train_x, 75, axis=0) - np.nanpercentile(train_x, 25, axis=0)
     scales = np.where(scales > 1e-9, scales, 1.0)
     train_distance = np.nanmean(np.abs((train_x - centers) / scales), axis=1)
     outer_distance = np.nanmean(np.abs((outer_x - centers) / scales), axis=1)
     threshold = float(np.nanpercentile(train_distance, 99))
     ood = np.clip(outer_distance / max(threshold, 1e-9), 0, 2) / 2
-    disagreement = np.mean(
-        np.abs(logistic_probabilities - boosted_probabilities), axis=1
-    )
+    disagreement = np.mean(np.abs(logistic_probabilities - boosted_probabilities), axis=1)
     coverage = np.isfinite(outer_x).mean(axis=1)
     train_end = date.fromisoformat(WINDOWS["train"][1])
     regime_distance = np.asarray(
@@ -872,17 +865,14 @@ def _persist_shadow_replay(
     thresholds = np.quantile(calibration_probabilities, 0.99, axis=0)
     feature_matrix_outer = feature_matrix(data, AVAILABLE_FEATURES, mask)
     coverage = np.isfinite(feature_matrix_outer).mean(axis=1)
-    disagreement = np.mean(
-        np.abs(target_probabilities - comparison_probabilities), axis=1
-    )
+    disagreement = np.mean(np.abs(target_probabilities - comparison_probabilities), axis=1)
     regime_distance = np.asarray(
         [
             min(
                 1.0,
                 max(
                     0,
-                    (date.fromisoformat(day) - date.fromisoformat(WINDOWS["train"][1])).days
-                    / 24,
+                    (date.fromisoformat(day) - date.fromisoformat(WINDOWS["train"][1])).days / 24,
                 ),
             )
             for day in data.decision_day[mask]
@@ -961,9 +951,7 @@ def _persist_shadow_replay(
                                 "calibration_uncertainty_ece": calibration_ece,
                                 "regime_distance": float(regime_distance[position]),
                                 "out_of_distribution_score": None,
-                                "predictive_uncertainty": float(
-                                    predictive_uncertainty[position]
-                                ),
+                                "predictive_uncertainty": float(predictive_uncertainty[position]),
                             },
                             sort_keys=True,
                             separators=(",", ":"),
@@ -974,9 +962,7 @@ def _persist_shadow_replay(
                         json.dumps(
                             {
                                 "batch_seconds": inference_seconds,
-                                "per_candidate_ms": inference_seconds
-                                / max(1, len(local))
-                                * 1000,
+                                "per_candidate_ms": inference_seconds / max(1, len(local)) * 1000,
                                 "provider_discord_user_latency": None,
                             },
                             sort_keys=True,
@@ -992,9 +978,7 @@ def _persist_shadow_replay(
                 rows(),
             )
         count = int(
-            connection.execute(
-                "SELECT count(*) FROM intelligence_v3_research_replay"
-            ).fetchone()[0]
+            connection.execute("SELECT count(*) FROM intelligence_v3_research_replay").fetchone()[0]
         )
         public_count = int(
             connection.execute(
@@ -1053,9 +1037,16 @@ def _evaluate_fixed_threshold(
         chosen &= scores < upper
     selected = local[chosen]
     if not len(selected):
-        return {"signals": 0, "2x_precision": None, "5x_precision": None,
-                "10x_precision": None, "20x_recall": 0.0, "50x_recall": 0.0,
-                "terminal_failure_rate": None, "median_adverse_excursion": None}
+        return {
+            "signals": 0,
+            "2x_precision": None,
+            "5x_precision": None,
+            "10x_precision": None,
+            "20x_recall": 0.0,
+            "50x_recall": 0.0,
+            "terminal_failure_rate": None,
+            "median_adverse_excursion": None,
+        }
     peak = data.peak_multiple[selected]
     universe = data.peak_multiple[local]
     return {
@@ -1093,9 +1084,7 @@ def run_available_data_experiment(
     market_model = fit_probability_model(
         data, market_features, train, calibration, 2, kind="logistic"
     )
-    flow_model = fit_probability_model(
-        data, flow_features, train, calibration, 2, kind="logistic"
-    )
+    flow_model = fit_probability_model(data, flow_features, train, calibration, 2, kind="logistic")
     market_flow_model = fit_probability_model(
         data, market_flow_features, train, calibration, 2, kind="logistic"
     )
@@ -1143,17 +1132,13 @@ def run_available_data_experiment(
             for target, model in boosted.items()
         }
     )
-    failure_outer = failure_model.probabilities(
-        feature_matrix(data, all_features, outer)
-    )
+    failure_outer = failure_model.probabilities(feature_matrix(data, all_features, outer))
     all_outer_predictions = {
         "random": stable_random_scores(data.mint[outer]),
         "market_cap_stage": market_model.probabilities(
             feature_matrix(data, market_features, outer)
         ),
-        "buyer_order_flow": flow_model.probabilities(
-            feature_matrix(data, flow_features, outer)
-        ),
+        "buyer_order_flow": flow_model.probabilities(feature_matrix(data, flow_features, outer)),
         "market_cap_plus_buyer_flow": market_flow_model.probabilities(
             feature_matrix(data, market_flow_features, outer)
         ),
@@ -1180,7 +1165,9 @@ def run_available_data_experiment(
         }
         for name, score in predictions[window].items():
             models.setdefault(name, {})[window] = {
-                "frontier": [selection_metrics(data, mask, score, frequency) for frequency in FREQUENCIES]
+                "frontier": [
+                    selection_metrics(data, mask, score, frequency) for frequency in FREQUENCIES
+                ]
             }
         models["v3_target_specific_logistic"][window]["specialists"] = {
             f"{target}x": [
@@ -1220,9 +1207,7 @@ def run_available_data_experiment(
     )
     for family, removed in FEATURE_GROUPS.items():
         kept = tuple(feature for feature in all_features if feature not in removed)
-        model = fit_probability_model(
-            data, kept, train, calibration, 2, kind="logistic"
-        )
+        model = fit_probability_model(data, kept, train, calibration, 2, kind="logistic")
         score = model.probabilities(feature_matrix(data, kept, outer))
         pr_auc = average_precision_score((data.peak_multiple[outer] >= 2).astype(int), score)
         ablations[family] = {
@@ -1278,9 +1263,7 @@ def run_available_data_experiment(
     selected = local[np.argsort(-score)[: max(1, round(len(local) * 0.01))]]
     for stop in (0.30, 0.50, 0.70):
         known = selected[np.isfinite(data.max_adverse_excursion[selected])]
-        success = (data.peak_multiple[known] >= 2) & (
-            data.max_adverse_excursion[known] > -stop
-        )
+        success = (data.peak_multiple[known] >= 2) & (data.max_adverse_excursion[known] > -stop)
         stop_sensitivity[f"minus_{int(stop * 100)}_percent"] = {
             "sample": len(known),
             "conservative_2x_precision": float(success.mean()) if len(known) else None,
@@ -1300,9 +1283,7 @@ def run_available_data_experiment(
     )
     boosted_calibration = monotonic_probability_matrix(
         {
-            target: model.probabilities(
-                feature_matrix(data, all_features, calibration_eval)
-            )
+            target: model.probabilities(feature_matrix(data, all_features, calibration_eval))
             for target, model in boosted.items()
         }
     )
@@ -1354,9 +1335,7 @@ def run_available_data_experiment(
         "feature_categories": {
             "available": list(AVAILABLE_FEATURES),
             "partially_available": [
-                name
-                for name, audit in feature_audit.items()
-                if audit["row_coverage"] < 1
+                name for name, audit in feature_audit.items() if audit["row_coverage"] < 1
             ],
             "unavailable": sorted(unavailable),
             "corrupt_or_rejected": [
@@ -1366,9 +1345,7 @@ def run_available_data_experiment(
                 "top-10 concentration above 100 percent",
             ],
             "live_reproducible": [
-                name
-                for name, audit in feature_audit.items()
-                if audit["live_reproducible"]
+                name for name, audit in feature_audit.items() if audit["live_reproducible"]
             ],
             "research_only_licensed": list(AVAILABLE_FEATURES),
         },
@@ -1503,9 +1480,11 @@ def run_red_pump_social_incremental(root: str | Path) -> dict[str, Any]:
     return {
         "state": "MEASURED_RESEARCH_ONLY_COLLECTOR_BIASED",
         "rows": len(y),
-        "dates": {"train": ["2026-05-08", "2026-05-24"],
-                  "calibration": ["2026-05-25", "2026-05-31"],
-                  "test": ["2026-06-01", "2026-06-10"]},
+        "dates": {
+            "train": ["2026-05-08", "2026-05-24"],
+            "calibration": ["2026-05-25", "2026-05-31"],
+            "test": ["2026-06-01", "2026-06-10"],
+        },
         "natural_prevalence": float(y.mean()),
         "raw_telegram_rate": float(telegram_yes.mean()),
         "raw_no_telegram_rate": float(telegram_no.mean()),
@@ -1603,21 +1582,12 @@ def run_wallet_copyability_study(
         histories: dict[str, list[int]] = {}
         for index in np.flatnonzero(train):
             histories.setdefault(str(wallet[index]), []).append(index)
-        eligible = {
-            name: indexes
-            for name, indexes in histories.items()
-            if len(indexes) >= 5
-        }
+        eligible = {name: indexes for name, indexes in histories.items() if len(indexes) >= 5}
         skills = {
-            name: (
-                (sum(multiple[index] >= 2 for index in indexes) + 1)
-                / (len(indexes) + 2)
-            )
+            name: ((sum(multiple[index] >= 2 for index in indexes) + 1) / (len(indexes) + 2))
             for name, indexes in eligible.items()
         }
-        threshold = (
-            float(np.quantile(list(skills.values()), 0.9)) if skills else math.inf
-        )
+        threshold = float(np.quantile(list(skills.values()), 0.9)) if skills else math.inf
         skilled = {name for name, score in skills.items() if score >= threshold}
         test_indexes = np.flatnonzero(test)
         selected = np.asarray(

@@ -155,9 +155,7 @@ class PredictionUncertainty:
         cls, forecast: HazardForecast | None, evidence_coverage: float
     ) -> PredictionUncertainty:
         validated = bool(
-            forecast
-            and forecast.calibrated
-            and forecast.validation_state == "SEALED_VALIDATED"
+            forecast and forecast.calibrated and forecast.validation_state == "SEALED_VALIDATED"
         )
         return cls(
             evidence_coverage=evidence_coverage,
@@ -258,7 +256,9 @@ class V3DecisionEnvelope:
             self.out_of_distribution_score,
         ):
             if value is not None and not 0 <= value <= 1:
-                raise ValueError("probabilities, confidence, coverage and uncertainty must be [0, 1]")
+                raise ValueError(
+                    "probabilities, confidence, coverage and uncertainty must be [0, 1]"
+                )
         if self.right_tail_hazard != self.right_tail_10x_hazard:
             raise ValueError("right_tail_hazard must alias the 10X+ probability")
         nested = [
@@ -344,8 +344,7 @@ class V3ShadowEngine:
             0.0,
             min(
                 1.0,
-                uncertainty_state.data_quality
-                * (1.0 - uncertainty_state.predictive_uncertainty),
+                uncertainty_state.data_quality * (1.0 - uncertainty_state.predictive_uncertainty),
             ),
         )
         hard_risks = sorted(set(hard_risk_evidence))
@@ -402,9 +401,7 @@ class V3ShadowEngine:
             abstain = "SELECTIVE_GATE_REJECTED"
 
         envelope = V3DecisionEnvelope(
-            candidate_generation=(
-                "NOMINATED" if primary_nominator != "NONE" else "NOT_NOMINATED"
-            ),
+            candidate_generation=("NOMINATED" if primary_nominator != "NONE" else "NOT_NOMINATED"),
             quick_2x_hazard=hazards.quick_2x,
             mid_5x_hazard=hazards.mid_5x,
             right_tail_10x_hazard=hazards.right_tail_10x,
@@ -539,9 +536,7 @@ class DiscreteCompetingRiskModel:
             event: _sigmoid(
                 sum(
                     coefficient * value
-                    for coefficient, value in zip(
-                        self.coefficients[event], vector, strict=True
-                    )
+                    for coefficient, value in zip(self.coefficients[event], vector, strict=True)
                 )
             )
             for event in HAZARD_EVENTS
@@ -558,8 +553,7 @@ class DiscreteCompetingRiskModel:
         total = sum(target_risk.values())
         if total >= 1:
             target_risk = {
-                event: value / (total + 1e-12) * 0.999999
-                for event, value in target_risk.items()
+                event: value / (total + 1e-12) * 0.999999 for event, value in target_risk.items()
             }
         return target_risk
 
@@ -598,9 +592,7 @@ class DiscreteCompetingRiskModel:
             extreme_right_tail_20x=consistent["20X"],
             terminal_failure=sum(stop_probabilities["TERMINAL_FAILURE"]) / 4,
             liquidity_failure=sum(stop_probabilities["LIQUIDITY_COLLAPSE"]) / 4,
-            expected_time_to_target_seconds=(
-                target_time / target_mass if target_mass else None
-            ),
+            expected_time_to_target_seconds=(target_time / target_mass if target_mass else None),
             expected_time_to_failure_seconds=(
                 failure_time / failure_mass if failure_mass else None
             ),
@@ -678,8 +670,12 @@ def liquidity_order_flow_features(
     }
     for seconds in windows_seconds:
         boundary = min(decision, launch + timedelta(seconds=seconds))
-        window_trades = [event for event in trades if launch <= _timestamp(event.timestamp) <= boundary]
-        window_states = [state for state in ordered_states if launch <= _timestamp(state.timestamp) <= boundary]
+        window_trades = [
+            event for event in trades if launch <= _timestamp(event.timestamp) <= boundary
+        ]
+        window_states = [
+            state for state in ordered_states if launch <= _timestamp(state.timestamp) <= boundary
+        ]
         buys = [event for event in window_trades if event.side == "buy"]
         sells = [event for event in window_trades if event.side == "sell"]
         buy_sol = sum(max(0.0, event.sol_amount) for event in buys)
@@ -771,9 +767,7 @@ def activity_evidence(
         "whale_driven_demand": whale_share is not None and whale_share >= 0.5,
         "wash_volume": authentic_volume is not None and authentic_volume < 0.7,
         "sybil_buyer_growth": independence is not None and independence < 0.5,
-        "creator_linked_flow": (
-            creator_linked_share is not None and creator_linked_share >= 0.25
-        ),
+        "creator_linked_flow": (creator_linked_share is not None and creator_linked_share >= 0.25),
         "bundle_driven_flow": bundle_linked_share is not None and bundle_linked_share >= 0.4,
         "repeated_tiny_buys": tiny_buy_share is not None and tiny_buy_share >= 0.5,
         "buy_sell_recycle": recycled_share is not None and recycled_share >= 0.4,
@@ -833,23 +827,23 @@ def assess_actionable_outcome(
     trade_notional_usd: float = 100,
     severe_drawdown: float = 0.70,
 ) -> OutcomeAssessment:
-    if delay_seconds < 0 or min(
-        provider_latency_seconds, model_latency_seconds, discord_latency_seconds
-    ) < 0:
+    if (
+        delay_seconds < 0
+        or min(provider_latency_seconds, model_latency_seconds, discord_latency_seconds) < 0
+    ):
         raise ValueError("latencies and delay must be non-negative")
     ordered = sorted(path, key=lambda row: _timestamp(row.timestamp))
     if not ordered:
         raise ValueError("an observed market path is required")
     decision = _timestamp(decision_timestamp)
     total_delay = (
-        delay_seconds
-        + provider_latency_seconds
-        + model_latency_seconds
-        + discord_latency_seconds
+        delay_seconds + provider_latency_seconds + model_latency_seconds + discord_latency_seconds
     )
     entry_at = decision + timedelta(seconds=total_delay)
     raw_entry = next((point for point in ordered if _timestamp(point.timestamp) >= decision), None)
-    delayed_entry = next((point for point in ordered if _timestamp(point.timestamp) >= entry_at), None)
+    delayed_entry = next(
+        (point for point in ordered if _timestamp(point.timestamp) >= entry_at), None
+    )
     raw = _path_outcome(ordered, raw_entry, severe_drawdown, 0.0)
     impact = (
         1.0
@@ -857,9 +851,7 @@ def assess_actionable_outcome(
         else trade_notional_usd / (delayed_entry.liquidity / 2 + trade_notional_usd)
     )
     cost = fee_percent / 100 + impact
-    actionable = _path_outcome(
-        ordered, delayed_entry, severe_drawdown, cost
-    )
+    actionable = _path_outcome(ordered, delayed_entry, severe_drawdown, cost)
     return OutcomeAssessment(
         delay_seconds=delay_seconds,
         raw_outcome=raw.outcome,
@@ -955,9 +947,7 @@ def _path_outcome(
     )
 
 
-def _expected_utility(
-    forecast: HazardForecast, actionability: EntryActionability
-) -> float | None:
+def _expected_utility(forecast: HazardForecast, actionability: EntryActionability) -> float | None:
     if forecast.quick_2x is None or actionability.score is None:
         return None
     terminal = forecast.terminal_failure or 0.0
@@ -966,12 +956,7 @@ def _expected_utility(
     twenty_x = forecast.extreme_right_tail_20x or 0.0
     return round(
         actionability.score
-        * (
-            forecast.quick_2x
-            + 3 * (forecast.mid_5x or 0)
-            + 5 * ten_x
-            + 10 * twenty_x
-        )
+        * (forecast.quick_2x + 3 * (forecast.mid_5x or 0) + 5 * ten_x + 10 * twenty_x)
         - 2 * terminal
         - liquidity,
         8,

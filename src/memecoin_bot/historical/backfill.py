@@ -51,16 +51,14 @@ class BackfillEngine:
         pages = 0
         while maximum_pages is None or pages < maximum_pages:
             page = await self._fetch_with_retry(provider, cursor, job_id)
-            earliest = min(
-                (record.source_timestamp for record in page.records), default=None
-            )
+            earliest = min((record.source_timestamp for record in page.records), default=None)
             latest = max((record.source_timestamp for record in page.records), default=None)
             ingested = 0
             for record in page.records:
-                _evidence_id, inserted = self.warehouse.ingest_raw(
-                    record, refresh_coverage=False
-                )
+                evidence_id, inserted = self.warehouse.ingest_raw(record, refresh_coverage=False)
                 ingested += int(inserted)
+                if inserted and record.provider == "dune_month_partition":
+                    self.warehouse.normalize_dune_evidence(record, evidence_id)
             if ingested:
                 self.warehouse.refresh_dataset_coverage(provider.dataset_id)
             pages += 1
@@ -74,6 +72,9 @@ class BackfillEngine:
                 latest=latest,
                 state=state,
             )
+            partition = page.metadata.get("dune_partition")
+            if partition:
+                self.warehouse.record_dune_partition(partition)
             if page.retry_after_seconds:
                 await asyncio.sleep(
                     min(page.retry_after_seconds, self.maximum_rate_limit_sleep_seconds)

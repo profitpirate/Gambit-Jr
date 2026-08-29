@@ -5,6 +5,7 @@ import json
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import quote_plus
 
 
 def _bool(name: str, default: bool) -> bool:
@@ -41,6 +42,7 @@ class Settings:
     discord_social_observation_enabled: bool = False
     discord_social_channel_ids: tuple[int, ...] = ()
     solana_rpc_url: str = "https://api.mainnet-beta.solana.com"
+    solana_fallback_rpc_url: str = "https://api.mainnet-beta.solana.com"
     dexscreener_base_url: str = "https://api.dexscreener.com"
     geckoterminal_base_url: str = "https://api.geckoterminal.com/api/v2"
     bsc_rpc_url: str = "https://bsc-dataseed.bnbchain.org"
@@ -60,7 +62,11 @@ class Settings:
     pumpfun_curve_monitor_enabled: bool = True
     realtime_silence_seconds: float = 90
     realtime_backfill_limit: int = 100
+    realtime_backfill_max_pages: int = 20
+    realtime_enrichment_queue_max: int = 2_048
+    realtime_enrichment_concurrency: int = 4
     realtime_processing_batch: int = 100
+    realtime_token_lanes: int = 8
     pumpportal_api_key: str | None = None
     pumpportal_websocket_url: str = "wss://pumpportal.fun/api/data"
     helius_api_key: str | None = None
@@ -88,7 +94,9 @@ class Settings:
     historical_live_latency_budget_ms: float = 25
     log_level: str = "INFO"
     shadow_mode: bool = True
-    shadow_send_alerts: bool = True
+    shadow_send_alerts: bool = False
+    public_alerts_enabled: bool = False
+    operator_shadow_alerts_enabled: bool = False
     discovery_interval_seconds: float = 30
     max_discoveries_per_cycle: int = 20
     monitor_interval_seconds: float = 30
@@ -182,15 +190,16 @@ class Settings:
             discord_channel_id=int(channel) if channel else None,
             discord_channel_ids=channels,
             discord_webhook_url=os.getenv("DISCORD_WEBHOOK_URL") or None,
-            discord_social_observation_enabled=_bool(
-                "DISCORD_SOCIAL_OBSERVATION_ENABLED", False
-            ),
+            discord_social_observation_enabled=_bool("DISCORD_SOCIAL_OBSERVATION_ENABLED", False),
             discord_social_channel_ids=tuple(
                 int(value.strip())
                 for value in os.getenv("DISCORD_SOCIAL_CHANNEL_IDS", "").split(",")
                 if value.strip()
             ),
             solana_rpc_url=os.getenv("SOLANA_RPC_URL", "https://api.mainnet-beta.solana.com"),
+            solana_fallback_rpc_url=os.getenv(
+                "SOLANA_FALLBACK_RPC_URL", "https://api.mainnet-beta.solana.com"
+            ),
             dexscreener_base_url=os.getenv("DEXSCREENER_BASE_URL", "https://api.dexscreener.com"),
             geckoterminal_base_url=os.getenv(
                 "GECKOTERMINAL_BASE_URL", "https://api.geckoterminal.com/api/v2"
@@ -235,7 +244,11 @@ class Settings:
             pumpfun_curve_monitor_enabled=_bool("PUMPFUN_CURVE_MONITOR_ENABLED", True),
             realtime_silence_seconds=_float("REALTIME_SILENCE_SECONDS", 90),
             realtime_backfill_limit=_int("REALTIME_BACKFILL_LIMIT", 100),
+            realtime_backfill_max_pages=_int("REALTIME_BACKFILL_MAX_PAGES", 20),
+            realtime_enrichment_queue_max=_int("REALTIME_ENRICHMENT_QUEUE_MAX", 2_048),
+            realtime_enrichment_concurrency=_int("REALTIME_ENRICHMENT_CONCURRENCY", 4),
             realtime_processing_batch=_int("REALTIME_PROCESSING_BATCH", 100),
+            realtime_token_lanes=_int("REALTIME_TOKEN_LANES", 8),
             pumpportal_api_key=os.getenv("PUMPPORTAL_API_KEY") or None,
             pumpportal_websocket_url=os.getenv(
                 "PUMPPORTAL_WEBSOCKET_URL", "wss://pumpportal.fun/api/data"
@@ -248,9 +261,7 @@ class Settings:
             ),
             bluesky_social_enabled=_bool("BLUESKY_SOCIAL_ENABLED", False),
             telegram_social_enabled=_bool("TELEGRAM_SOCIAL_ENABLED", False),
-            telegram_api_id=(
-                _int("TELEGRAM_API_ID", 0) if os.getenv("TELEGRAM_API_ID") else None
-            ),
+            telegram_api_id=(_int("TELEGRAM_API_ID", 0) if os.getenv("TELEGRAM_API_ID") else None),
             telegram_api_hash=os.getenv("TELEGRAM_API_HASH") or None,
             telegram_session=os.getenv("TELEGRAM_SESSION") or None,
             telegram_channels=tuple(
@@ -275,17 +286,17 @@ class Settings:
                 os.getenv("HISTORICAL_ARCHIVE_PATH", "data/archive/historical")
             ),
             approved_feature_store_path=Path(
-                os.getenv(
-                    "APPROVED_FEATURE_STORE_PATH", "data/production/approved_features.db"
-                )
+                os.getenv("APPROVED_FEATURE_STORE_PATH", "data/production/approved_features.db")
             ),
             historical_live_context_enabled=_bool("HISTORICAL_LIVE_CONTEXT_ENABLED", True),
-            historical_live_latency_budget_ms=_float(
-                "HISTORICAL_LIVE_LATENCY_BUDGET_MS", 25
-            ),
+            historical_live_latency_budget_ms=_float("HISTORICAL_LIVE_LATENCY_BUDGET_MS", 25),
             log_level=os.getenv("LOG_LEVEL", "INFO"),
             shadow_mode=_bool("SHADOW_MODE", True),
-            shadow_send_alerts=_bool("SHADOW_SEND_ALERTS", True),
+            shadow_send_alerts=_bool("SHADOW_SEND_ALERTS", False),
+            public_alerts_enabled=_bool("PUBLIC_ALERTS_ENABLED", False),
+            operator_shadow_alerts_enabled=_bool(
+                "OPERATOR_SHADOW_ALERTS_ENABLED", _bool("SHADOW_SEND_ALERTS", False)
+            ),
             discovery_interval_seconds=_float("DISCOVERY_INTERVAL_SECONDS", 30),
             max_discoveries_per_cycle=_int("MAX_DISCOVERIES_PER_CYCLE", 20),
             monitor_interval_seconds=_float("MONITOR_INTERVAL_SECONDS", 30),
@@ -439,13 +450,20 @@ class Settings:
             "QUALIFIED_ONLY",
         }:
             raise ValueError("Unsupported DISCORD_DEFAULT_ALERT_TIER")
-        if min(
-            self.event_queue_max,
-            self.min_sample_for_edge_metrics,
-            self.realtime_silence_seconds,
-            self.realtime_backfill_limit,
-            self.realtime_processing_batch,
-        ) <= 0:
+        if (
+            min(
+                self.event_queue_max,
+                self.min_sample_for_edge_metrics,
+                self.realtime_silence_seconds,
+                self.realtime_backfill_limit,
+                self.realtime_backfill_max_pages,
+                self.realtime_enrichment_queue_max,
+                self.realtime_enrichment_concurrency,
+                self.realtime_processing_batch,
+                self.realtime_token_lanes,
+            )
+            <= 0
+        ):
             raise ValueError("Event queue and edge sample settings must be positive")
         if self.historical_live_latency_budget_ms <= 0:
             raise ValueError("Historical live latency budget must be positive")
@@ -456,6 +474,25 @@ class Settings:
         }
         if len(paths) != 3:
             raise ValueError("live, historical, and approved feature databases must be separate")
+
+    def effective_solana_rpc_url(self) -> str:
+        """Prefer Helius only when the operator left the public mainnet default in place."""
+        public_defaults = {
+            "https://api.mainnet-beta.solana.com",
+            "https://api.mainnet-beta.solana.com/",
+        }
+        if self.helius_api_key and self.solana_rpc_url in public_defaults:
+            return f"https://mainnet.helius-rpc.com/?api-key={quote_plus(self.helius_api_key)}"
+        return self.solana_rpc_url
+
+    def effective_solana_websocket_url(self) -> str:
+        if self.helius_api_key and self.solana_rpc_url in {
+            "https://api.mainnet-beta.solana.com",
+            "https://api.mainnet-beta.solana.com/",
+        }:
+            return f"wss://mainnet.helius-rpc.com/?api-key={quote_plus(self.helius_api_key)}"
+        value = self.solana_rpc_url
+        return value.replace("https://", "wss://", 1).replace("http://", "ws://", 1)
 
     def config_fingerprint(self) -> str:
         """Stable fingerprint of decision settings; credentials are deliberately excluded."""

@@ -11,6 +11,7 @@ class ReplayTests(unittest.IsolatedAsyncioTestCase):
     async def test_full_replay_scores_rejects_signals_and_tracks(self) -> None:
         with temp_db_path() as path:
             config = settings(path)
+            config.public_alerts_enabled = True
             db = store(path)
             fixture = Path(__file__).resolve().parents[1] / "fixtures" / "replay_lifecycle.json"
             report = await ReplayRunner(config, db).run(fixture)
@@ -23,6 +24,7 @@ class ReplayTests(unittest.IsolatedAsyncioTestCase):
     async def test_v12_multichain_replay_uses_production_radar_and_lifecycle(self) -> None:
         with temp_db_path() as path:
             config = settings(path)
+            config.public_alerts_enabled = True
             db = store(path)
             fixture = Path(__file__).resolve().parents[1] / "fixtures" / "replay_v12_multichain.json"
             report = await ReplayRunner(config, db).run(fixture)

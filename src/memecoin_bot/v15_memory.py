@@ -19,11 +19,19 @@ def rank_alpha_wallet(history: list[dict[str, Any]]) -> dict[str, Any]:
         return {"score": None, "grade": "UNKNOWN", "sample": 0}
     right_tail = sum(float(row.get("peak_multiple") or 0) >= 5 for row in matured) / len(matured)
     rug_rate = sum(bool(row.get("rug_before_2x")) for row in matured) / len(matured)
-    early = sum(float(row.get("entry_age_minutes") or 10_000) <= 10 for row in matured) / len(matured)
+    early = sum(float(row.get("entry_age_minutes") or 10_000) <= 10 for row in matured) / len(
+        matured
+    )
     recency = sum(float(row.get("days_ago") or 10_000) <= 30 for row in matured) / len(matured)
     score = max(0.0, min(100.0, 50 * right_tail + 25 * early + 15 * recency - 40 * rug_rate))
     # Small samples remain ranked but cannot be called proven.
-    grade = "PROVEN" if score >= 70 and len(matured) >= 20 else "PROMISING" if score >= 55 else "UNPROVEN"
+    grade = (
+        "PROVEN"
+        if score >= 70 and len(matured) >= 20
+        else "PROMISING"
+        if score >= 55
+        else "UNPROVEN"
+    )
     return {"score": round(score, 2), "grade": grade, "sample": len(matured), "rug_rate": rug_rate}
 
 
@@ -40,8 +48,12 @@ def operator_relationship(evidence: dict[str, Any]) -> str:
 def classify_regime(observations: list[dict[str, Any]]) -> MarketRegime:
     if len(observations) < 5:
         return MarketRegime.NORMAL
-    runner_rate = sum(float(row.get("peak_multiple") or 0) >= 2 for row in observations) / len(observations)
-    failure_rate = sum(bool(row.get("failed_before_2x")) for row in observations) / len(observations)
+    runner_rate = sum(float(row.get("peak_multiple") or 0) >= 2 for row in observations) / len(
+        observations
+    )
+    failure_rate = sum(bool(row.get("failed_before_2x")) for row in observations) / len(
+        observations
+    )
     if runner_rate >= 0.35 and failure_rate <= 0.4:
         return MarketRegime.HOT
     if runner_rate <= 0.12 or failure_rate >= 0.7:
@@ -115,7 +127,9 @@ class UnknownSocialCatalystProvider:
         }
 
 
-def social_state(metadata_match: bool, velocity: float | None, catalyst_confirmed: bool = False) -> str:
+def social_state(
+    metadata_match: bool, velocity: float | None, catalyst_confirmed: bool = False
+) -> str:
     if catalyst_confirmed:
         return "CATALYST_CONFIRMED"
     if velocity is not None and velocity > 0:

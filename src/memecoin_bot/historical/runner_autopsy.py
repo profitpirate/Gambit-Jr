@@ -226,7 +226,9 @@ def cohort_funnel(rows: Iterable[Mapping[str, Any]], threshold: int) -> dict[str
             "count": len(strict_path),
             "percent": len(strict_path) / total if total else None,
         }
-    result["miss_reasons"] = dict(Counter(miss_reason(row) for row in cohort if row.get("tier") not in CORE_TIERS))
+    result["miss_reasons"] = dict(
+        Counter(miss_reason(row) for row in cohort if row.get("tier") not in CORE_TIERS)
+    )
     return result
 
 
@@ -242,11 +244,15 @@ def standardized_effect(runners: Sequence[float], others: Sequence[float]) -> fl
     return (statistics.mean(runners) - statistics.mean(others)) / pooled if pooled else 0.0
 
 
-def mutual_information_binary(values: Sequence[float], labels: Sequence[bool], bins: int = 10) -> float:
+def mutual_information_binary(
+    values: Sequence[float], labels: Sequence[bool], bins: int = 10
+) -> float:
     if not values or len(values) != len(labels):
         return 0.0
     ordered = sorted(values)
-    cuts = [ordered[min(len(ordered) - 1, int(len(ordered) * index / bins))] for index in range(1, bins)]
+    cuts = [
+        ordered[min(len(ordered) - 1, int(len(ordered) * index / bins))] for index in range(1, bins)
+    ]
     cells: Counter[tuple[int, bool]] = Counter()
     label_counts = Counter(labels)
     bucket_counts: Counter[int] = Counter()
@@ -259,7 +265,9 @@ def mutual_information_binary(values: Sequence[float], labels: Sequence[bool], b
     for bucket, label in sorted(cells):
         count = cells[bucket, label]
         joint = count / sample
-        result += joint * math.log(joint / (bucket_counts[bucket] / sample * label_counts[label] / sample))
+        result += joint * math.log(
+            joint / (bucket_counts[bucket] / sample * label_counts[label] / sample)
+        )
     return result
 
 
@@ -269,11 +277,7 @@ def feature_diagnostics(
     findings = []
     for name in feature_names:
         known = sorted(
-            (
-                (value, row)
-                for row in rows
-                if (value := _number(row.get(name))) is not None
-            ),
+            ((value, row) for row in rows if (value := _number(row.get(name))) is not None),
             key=lambda item: (item[0], str(item[1].get("mint"))),
         )
         runners = [value for value, row in known if float(row.get("peak_multiple") or 0) >= 2]
@@ -305,7 +309,10 @@ def feature_diagnostics(
             value = standardized_effect(positive, negative)
             if value is not None:
                 week_effects.append(value)
-        stable = not week_effects or all(value == 0 or math.copysign(1, value) == math.copysign(1, effect or 1) for value in week_effects)
+        stable = not week_effects or all(
+            value == 0 or math.copysign(1, value) == math.copysign(1, effect or 1)
+            for value in week_effects
+        )
         magnitude = abs(effect or 0)
         if len(known) < len(rows) * 0.25:
             classification = "INSUFFICIENT DATA"
@@ -333,9 +340,7 @@ def feature_diagnostics(
                 "distribution_p10": ordered_values[len(ordered_values) // 10]
                 if ordered_values
                 else None,
-                "distribution_p50": statistics.median(ordered_values)
-                if ordered_values
-                else None,
+                "distribution_p50": statistics.median(ordered_values) if ordered_values else None,
                 "distribution_p90": ordered_values[len(ordered_values) * 9 // 10]
                 if ordered_values
                 else None,
@@ -382,7 +387,10 @@ def rank_model(
     scored = [(value, row) for row in rows if (value := _number(score(row))) is not None]
     scored.sort(key=lambda item: (-item[0], str(item[1]["mint"])))
     selected = [row for _, row in scored[: max(1, round(len(rows) * fraction))]]
-    return {"metrics": selection_metrics(selected, rows), "selected_mints": [row["mint"] for row in selected]}
+    return {
+        "metrics": selection_metrics(selected, rows),
+        "selected_mints": [row["mint"] for row in selected],
+    }
 
 
 def stable_random_score(row: Mapping[str, Any]) -> float:
@@ -405,8 +413,7 @@ def fit_histogram_score(
             continue
         ordered = sorted(value for value, _ in pairs)
         cuts = [
-            ordered[min(len(ordered) - 1, len(ordered) * index // bins)]
-            for index in range(1, bins)
+            ordered[min(len(ordered) - 1, len(ordered) * index // bins)] for index in range(1, bins)
         ]
         counts = [[1, 2] for _ in range(bins)]
         for value, label in pairs:
@@ -443,8 +450,7 @@ def fit_interaction_grid(
     def cuts(values: list[float]) -> list[float]:
         ordered = sorted(values)
         return [
-            ordered[min(len(ordered) - 1, len(ordered) * index // bins)]
-            for index in range(1, bins)
+            ordered[min(len(ordered) - 1, len(ordered) * index // bins)] for index in range(1, bins)
         ]
 
     first_cuts = cuts([row[0] for row in known])
@@ -474,7 +480,9 @@ def replay_cards(rows: Iterable[Mapping[str, Any]], limit: int = 10) -> list[dic
     cards = []
     for mint, history in grouped.items():
         ordered = sorted(history, key=lambda row: int(row.get("timestamp_seconds") or 0))
-        reference = next((row for row in ordered if row.get("timestamp_seconds") == 180), ordered[-1])
+        reference = next(
+            (row for row in ordered if row.get("timestamp_seconds") == 180), ordered[-1]
+        )
         cards.append(
             {
                 "mint": mint,
@@ -512,9 +520,7 @@ def render_autopsy_markdown(result: Mapping[str, Any]) -> str:
     def best(metric: str) -> tuple[str, Mapping[str, Any]]:
         return max(
             models.items(),
-            key=lambda item: (
-                float(item[1][metric]) if item[1].get(metric) is not None else -1
-            ),
+            key=lambda item: float(item[1][metric]) if item[1].get(metric) is not None else -1,
         )
 
     best_2x = best("2x_precision")
@@ -531,9 +537,11 @@ def render_autopsy_markdown(result: Mapping[str, Any]) -> str:
     lines = [
         "# Gambit Jr V1.5 runner-intelligence failure autopsy",
         "",
-        ("This is a diagnostic-only reconstruction. It does not modify `CONTROL_V15`, approve a "
-        "feature, create a challenger, or authorize production deployment. June/July rows are "
-        "retired diagnostics and are not sealed evidence."),
+        (
+            "This is a diagnostic-only reconstruction. It does not modify `CONTROL_V15`, approve a "
+            "feature, create a challenger, or authorize production deployment. June/July rows are "
+            "retired diagnostics and are not sealed evidence."
+        ),
         "",
         "## Evidence boundary and outcome-label correction",
         "",
@@ -541,21 +549,29 @@ def render_autopsy_markdown(result: Mapping[str, Any]) -> str:
         f"- Quality-bounded analysis rows: **{result['valid_analysis_rows']:,}**",
         "- Exact historical production provider vectors: **unavailable**",
         "- Outcome maturity: **48 hours**, not the required seven days",
-        ("- Rejected prior fields: `edge_3m.peak_48h` and `tokens.peak_market_cap_sol` "
-        "contained impossible unit/reserve outliers"),
+        (
+            "- Rejected prior fields: `edge_3m.peak_48h` and `tokens.peak_market_cap_sol` "
+            "contained impossible unit/reserve outliers"
+        ),
         "- Replacement: dimensionless point-in-time market-cap and post-graduation price ratios",
         "",
-        ("The previously reported 34.22% market-cap-only figure used the rejected derived peak "
-        "field. It is not retained as valid autopsy evidence. The corrected chronological "
-        "diagnostic result is reported below."),
+        (
+            "The previously reported 34.22% market-cap-only figure used the rejected derived peak "
+            "field. It is not retained as valid autopsy evidence. The corrected chronological "
+            "diagnostic result is reported below."
+        ),
         "",
         "## 1–6. Runner attrition funnels at T+3m",
         "",
-        ("Counts in the main columns are independent diagnostics; `strict final` applies discovery, "
-        "coverage, score, OPEN entry, failure and public-tier gates in sequence."),
+        (
+            "Counts in the main columns are independent diagnostics; `strict final` applies discovery, "
+            "coverage, score, OPEN entry, failure and public-tier gates in sequence."
+        ),
         "",
-        ("| Cohort | Total | Early | Coverage | Score ≥60 | Score ≥75 | Entry OPEN | Failure <40 | "
-        "Core tier | Strict final |"),
+        (
+            "| Cohort | Total | Early | Coverage | Score ≥60 | Score ≥75 | Entry OPEN | Failure <40 | "
+            "Core tier | Strict final |"
+        ),
         "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for cohort, funnel in result["funnels"].items():
@@ -573,13 +589,17 @@ def render_autopsy_markdown(result: Mapping[str, Any]) -> str:
     lines.extend(
         [
             "",
-            ("`reconstructed_signaled` means the observable-field reconstruction reached PREMIUM "
-            "or STRONG. It is not a claim that a historical live Discord alert exists."),
+            (
+                "`reconstructed_signaled` means the observable-field reconstruction reached PREMIUM "
+                "or STRONG. It is not a claim that a historical live Discord alert exists."
+            ),
             "",
             "## 7–12. Exact miss attribution",
             "",
-            ("| Cohort | Missed | Discovery | Intelligence/score | Entry | Failure gate | Coverage | "
-            "State/provider |"),
+            (
+                "| Cohort | Missed | Discovery | Intelligence/score | Entry | Failure gate | Coverage | "
+                "State/provider |"
+            ),
             "|---|---:|---:|---:|---:|---:|---:|---:|",
         ]
     )
@@ -595,10 +615,12 @@ def render_autopsy_markdown(result: Mapping[str, Any]) -> str:
     lines.extend(
         [
             "",
-            ("The dominant measured loss is intelligence: RunnerScore remains below 60 despite "
-            "the evidence being present. CHASING is the second-largest decisive loss. Failure "
-            "penalties are not the decisive reason for any reconstructed 5x+ miss, although the "
-            "failure result is only a lower bound because several live risk inputs are absent."),
+            (
+                "The dominant measured loss is intelligence: RunnerScore remains below 60 despite "
+                "the evidence being present. CHASING is the second-largest decisive loss. Failure "
+                "penalties are not the decisive reason for any reconstructed 5x+ miss, although the "
+                "failure result is only a lower bound because several live risk inputs are absent."
+            ),
             "",
             "## Multi-timestamp runner replay",
             "",
@@ -609,8 +631,10 @@ def render_autopsy_markdown(result: Mapping[str, Any]) -> str:
             [
                 f"### {cohort}",
                 "",
-                ("| Time | Observed | Median score | Core tier | Coverage ≥75 | OPEN | EXTENDED | "
-                "CHASING | UNKNOWN |"),
+                (
+                    "| Time | Observed | Median score | Core tier | Coverage ≥75 | OPEN | EXTENDED | "
+                    "CHASING | UNKNOWN |"
+                ),
                 "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
             ]
         )
@@ -625,14 +649,18 @@ def render_autopsy_markdown(result: Mapping[str, Any]) -> str:
         lines.append("")
     lines.extend(
         [
-            ("The earliest aggregate identification point is usually T+60s, not T+3m. Core-tier "
-            "counts then decay, while UNKNOWN entry states rise sharply after migration because "
-            "the source lacks a unit-consistent SOL/USD call-market-cap bridge."),
+            (
+                "The earliest aggregate identification point is usually T+60s, not T+3m. Core-tier "
+                "counts then decay, while UNKNOWN entry states rise sharply after migration because "
+                "the source lacks a unit-consistent SOL/USD call-market-cap bridge."
+            ),
             "",
             "## 13–17. Feature diagnostics",
             "",
-            ("| Rank | Feature | Coverage | 2x effect | 5x effect | 10x effect | 20x effect | "
-            "Stability/class |"),
+            (
+                "| Rank | Feature | Coverage | 2x effect | 5x effect | 10x effect | 20x effect | "
+                "Stability/class |"
+            ),
             "|---:|---|---:|---:|---:|---:|---:|---|",
         ]
     )
@@ -648,27 +676,33 @@ def render_autopsy_markdown(result: Mapping[str, Any]) -> str:
     lines.extend(
         [
             "",
-            ("Buyer count/growth are the strongest stable positive right-tail descriptors. Volume "
-            "and trade count have positive right-tail effects but reverse direction across weeks. "
-            "Corrected concentration score is negatively associated with runners: the current "
-            "intuition that lower concentration is always better is misleading in this corpus and "
-            "should not be promoted without causal/safety review."),
+            (
+                "Buyer count/growth are the strongest stable positive right-tail descriptors. Volume "
+                "and trade count have positive right-tail effects but reverse direction across weeks. "
+                "Corrected concentration score is negatively associated with runners: the current "
+                "intuition that lower concentration is always better is misleading in this corpus and "
+                "should not be promoted without causal/safety review."
+            ),
             "",
             "## 18. Discovery versus intelligence",
             "",
-            (f"For 5x misses, discovery accounts for "
-            f"{_percent(miss_5x['discovery']['percent_of_misses'])}, intelligence/score for "
-            f"{_percent(miss_5x['intelligence']['percent_of_misses'])}, entry for "
-            f"{_percent(miss_5x['entry']['percent_of_misses'])}, coverage for "
-            f"{_percent(miss_5x['coverage']['percent_of_misses'])}, and state/provider gaps for "
-            f"{_percent(miss_5x['state_or_provider']['percent_of_misses'])}. The intelligence "
-            f"share is {_percent(miss_20x['intelligence']['percent_of_misses'])} at 20x and "
-            f"{_percent(miss_50x['intelligence']['percent_of_misses'])} at 50x."),
+            (
+                f"For 5x misses, discovery accounts for "
+                f"{_percent(miss_5x['discovery']['percent_of_misses'])}, intelligence/score for "
+                f"{_percent(miss_5x['intelligence']['percent_of_misses'])}, entry for "
+                f"{_percent(miss_5x['entry']['percent_of_misses'])}, coverage for "
+                f"{_percent(miss_5x['coverage']['percent_of_misses'])}, and state/provider gaps for "
+                f"{_percent(miss_5x['state_or_provider']['percent_of_misses'])}. The intelligence "
+                f"share is {_percent(miss_20x['intelligence']['percent_of_misses'])} at 20x and "
+                f"{_percent(miss_50x['intelligence']['percent_of_misses'])} at 50x."
+            ),
             "",
             "## 19–20. Replay cards",
             "",
-            ("Each card contains what the reconstruction knew and decided at every available "
-            "timestamp. Full machine-readable cards remain in the JSON evidence artifact."),
+            (
+                "Each card contains what the reconstruction knew and decided at every available "
+                "timestamp. Full machine-readable cards remain in the JSON evidence artifact."
+            ),
             "",
         ]
     )
@@ -688,9 +722,7 @@ def render_autopsy_markdown(result: Mapping[str, Any]) -> str:
         lines.append("")
     lines.extend(["### False-positive examples", ""])
     for card in result["false_positive_cards"][:20]:
-        reference = next(
-            point for point in card["timeline"] if point["timestamp_seconds"] == 180
-        )
+        reference = next(point for point in card["timeline"] if point["timestamp_seconds"] == 180)
         lines.append(
             f"- `{card['mint']}` — peak {float(card['peak_multiple']):.2f}x; T+3m "
             f"score={reference['runner_score']:.1f}, failure="
@@ -701,15 +733,19 @@ def render_autopsy_markdown(result: Mapping[str, Any]) -> str:
             "",
             "## 21. Diagnostic-window protection",
             "",
-            (f"Feature ordering was fitted on {result['feature_ranking_fit_window']['rows']:,} rows "
-            "from June 5–20. Models were evaluated on "
-            f"{result['model_diagnostic_window']['rows']:,} later rows from July 5–13. Both are "
-            "retired diagnostics; neither is sealed or eligible for approval."),
+            (
+                f"Feature ordering was fitted on {result['feature_ranking_fit_window']['rows']:,} rows "
+                "from June 5–20. Models were evaluated on "
+                f"{result['model_diagnostic_window']['rows']:,} later rows from July 5–13. Both are "
+                "retired diagnostics; neither is sealed or eligible for approval."
+            ),
             "",
             "## 22–25. Experimental model comparison",
             "",
-            ("All models emit the top 1% of the identical corrected, pre-graduation SOL-denominated "
-            "diagnostic universe."),
+            (
+                "All models emit the top 1% of the identical corrected, pre-graduation SOL-denominated "
+                "diagnostic universe."
+            ),
             "",
             "| Model | 2x | 3x | 5x | 10x | 20x recall | 50x recall | Failure |",
             "|---|---:|---:|---:|---:|---:|---:|---:|",
@@ -725,13 +761,15 @@ def render_autopsy_markdown(result: Mapping[str, Any]) -> str:
     lines.extend(
         [
             "",
-            (f"No experiment is approvable. `{best_2x[0]}` has the highest corrected 2x precision "
-            f"({_percent(best_2x[1]['2x_precision'])}); `{best_5x[0]}` has the highest 5x "
-            f"precision ({_percent(best_5x[1]['5x_precision'])}); and `{best_10x[0]}` has the "
-            f"highest 10x precision ({_percent(best_10x[1]['10x_precision'])}). Market-cap "
-            "priors dominate the corrected right tail, while the observable CONTROL mean remains "
-            "strongest for 2x. The objectives conflict, so a single uncalibrated mean dilutes "
-            "cohort-specific evidence."),
+            (
+                f"No experiment is approvable. `{best_2x[0]}` has the highest corrected 2x precision "
+                f"({_percent(best_2x[1]['2x_precision'])}); `{best_5x[0]}` has the highest 5x "
+                f"precision ({_percent(best_5x[1]['5x_precision'])}); and `{best_10x[0]}` has the "
+                f"highest 10x precision ({_percent(best_10x[1]['10x_precision'])}). Market-cap "
+                "priors dominate the corrected right tail, while the observable CONTROL mean remains "
+                "strongest for 2x. The objectives conflict, so a single uncalibrated mean dilutes "
+                "cohort-specific evidence."
+            ),
             "",
             "## Market-cap prior and sweet spots",
             "",
@@ -750,13 +788,15 @@ def render_autopsy_markdown(result: Mapping[str, Any]) -> str:
     lines.extend(
         [
             "",
-            (f"The <1 SOL revival/extreme-low bucket is the strongest right-tail prior but carries "
-            f"{_percent(extreme_low['failure_rate'])} terminal failure. The 250–1000 SOL bucket "
-            f"has {_percent(overextended['2x_rate'])} 2x but "
-            f"{_percent(overextended['failure_rate'])} failure and a "
-            f"{float(overextended.get('median_max_adverse_excursion') or 0):.3f} median adverse "
-            "excursion. Both are high-risk specialist regimes, not general PREMIUM evidence. The "
-            "20–30 SOL mass is a dead zone."),
+            (
+                f"The <1 SOL revival/extreme-low bucket is the strongest right-tail prior but carries "
+                f"{_percent(extreme_low['failure_rate'])} terminal failure. The 250–1000 SOL bucket "
+                f"has {_percent(overextended['2x_rate'])} 2x but "
+                f"{_percent(overextended['failure_rate'])} failure and a "
+                f"{float(overextended.get('median_max_adverse_excursion') or 0):.3f} median adverse "
+                "excursion. Both are high-risk specialist regimes, not general PREMIUM evidence. The "
+                "20–30 SOL mass is a dead zone."
+            ),
             "",
             "## Runner-score calibration",
             "",
@@ -773,9 +813,11 @@ def render_autopsy_markdown(result: Mapping[str, Any]) -> str:
     lines.extend(
         [
             "",
-            ("The score is not calibrated: most rows collapse into 50–60, and the tiny 20–30 "
-            "bucket has much higher outcomes than adjacent buckets. Thresholds 60 and 75 separate "
-            "some 2x probability, but not a monotonic calibrated probability scale."),
+            (
+                "The score is not calibrated: most rows collapse into 50–60, and the tiny 20–30 "
+                "bucket has much higher outcomes than adjacent buckets. Thresholds 60 and 75 separate "
+                "some 2x probability, but not a monotonic calibrated probability scale."
+            ),
             "",
             "## Failure-score calibration and penalty effectiveness",
             "",
@@ -803,72 +845,114 @@ def render_autopsy_markdown(result: Mapping[str, Any]) -> str:
     lines.extend(
         [
             "",
-            ("The observed failure score is a lower bound. Missing sell-restriction, connected "
-            "cluster, terminal-safety and liquidity-deterioration histories prevent a definitive "
-            "claim that the live FailureScore is or is not killing runners."),
+            (
+                "The observed failure score is a lower bound. Missing sell-restriction, connected "
+                "cluster, terminal-safety and liquidity-deterioration histories prevent a definitive "
+                "claim that the live FailureScore is or is not killing runners."
+            ),
             "",
             "## Buyer, creator, wallet and interaction findings",
             "",
-            ("- Buyer count/growth/acceleration are observed and highly informative; retention, "
-            "seller replacement, actor independence and cluster concentration are not."),
-            ("- The live 85/55/20 buyer compression discards magnitude and acceleration. Buyer "
-            "count and growth show strong positive 5x/10x/right-tail descriptive effects."),
-            ("- Source-reported point-in-time creator counts are positive descriptively, but no "
-            "aligned funder history or point-in-time wallet-quality vector exists for control tests."),
-            ("- No tested interaction grid beats the additive observable CONTROL mean. Feature "
-            "interactions are therefore not shown necessary by this evidence."),
+            (
+                "- Buyer count/growth/acceleration are observed and highly informative; retention, "
+                "seller replacement, actor independence and cluster concentration are not."
+            ),
+            (
+                "- The live 85/55/20 buyer compression discards magnitude and acceleration. Buyer "
+                "count and growth show strong positive 5x/10x/right-tail descriptive effects."
+            ),
+            (
+                "- Source-reported point-in-time creator counts are positive descriptively, but no "
+                "aligned funder history or point-in-time wallet-quality vector exists for control tests."
+            ),
+            (
+                "- No tested interaction grid beats the additive observable CONTROL mean. Feature "
+                "interactions are therefore not shown necessary by this evidence."
+            ),
             "",
             "## Stage and regime results",
             "",
-            ("NEW has higher reconstructed core precision than BONDING; MIGRATED has no public-core "
-            "signals because unit-consistent entry evidence is missing. Weekly precision varies "
-            "materially, confirming regime instability. SOL-volatility segmentation is unavailable "
-            "and was not fabricated; launch-intensity results are present in the JSON artifact."),
+            (
+                "NEW has higher reconstructed core precision than BONDING; MIGRATED has no public-core "
+                "signals because unit-consistent entry evidence is missing. Weekly precision varies "
+                "materially, confirming regime instability. SOL-volatility segmentation is unavailable "
+                "and was not fabricated; launch-intensity results are present in the JSON artifact."
+            ),
             "",
             "## 26. Intelligence-path code audit",
             "",
-            ("1. RunnerScore is the unweighted mean of whatever numeric stage features happen to be "
-            "known; missingness silently changes feature weights per token."),
+            (
+                "1. RunnerScore is the unweighted mean of whatever numeric stage features happen to be "
+                "known; missingness silently changes feature weights per token."
+            ),
             "2. Market cap is absent from RunnerScore and only influences entry/payoff indirectly.",
-            ("3. `survival_engine` can emit score 100 with fewer than three known inputs even while "
-            "grading the same evidence merely ACCEPTABLE."),
+            (
+                "3. `survival_engine` can emit score 100 with fewer than three known inputs even while "
+                "grading the same evidence merely ACCEPTABLE."
+            ),
             "4. `migration_continuity` is always populated as `None` in the live service.",
-            ("5. `liquidity_deterioration` has a failure weight but is never populated by the live "
-            "feature builder."),
+            (
+                "5. `liquidity_deterioration` has a failure weight but is never populated by the live "
+                "feature builder."
+            ),
             "6. Buyer trajectory compresses evidence to 85/55/20, losing magnitude and timing.",
-            ("7. The autopsy itself found and rejected the prior corrupted peak field, salted random "
-            "ranking, same-window feature ordering, and non-causal miss precedence before reporting."),
+            (
+                "7. The autopsy itself found and rejected the prior corrupted peak field, salted random "
+                "ranking, same-window feature ordering, and non-causal miss precedence before reporting."
+            ),
             "",
-            ("No live scoring change was made: changing these items would alter frozen CONTROL and "
-            "requires later independent validation."),
+            (
+                "No live scoring change was made: changing these items would alter frozen CONTROL and "
+                "requires later independent validation."
+            ),
             "",
             "## 27. Evidence-backed proposed fixes",
             "",
-            ("1. **Replace outcome plumbing first.** Use the dimensionless PIT outcome builder; risk "
-            "is label drift; validate against later seven-day data and manual path samples."),
-            ("2. **Make market-cap regime explicit.** Separate extreme-low revival/high-risk and "
-            "overextended specialist paths; risk is rug concentration; require terminal-failure and "
-            "drawdown gates on a new holdout."),
-            ("3. **Preserve raw buyer dimensions.** Test buyer count, growth and acceleration instead "
-            "of 85/55/20; risk is provider/gameability drift; validate chronologically by regime."),
-            ("4. **Calibrate per cohort.** Separate QUICK_2X, MID_5X and RIGHT_TAIL_20X objectives; "
-            "risk is signal fragmentation; compare at fixed frequency on later data."),
-            ("5. **Align survival score with evidence confidence.** Do not award 100 for sparse "
-            "acceptable evidence; risk is reduced recall; ablate prospectively."),
-            ("6. **Acquire missing vectors.** Production DB, aligned wallet/funder/cluster/liquidity and "
-            "seven-day outcomes are prerequisites for a definitive failure-gate autopsy."),
+            (
+                "1. **Replace outcome plumbing first.** Use the dimensionless PIT outcome builder; risk "
+                "is label drift; validate against later seven-day data and manual path samples."
+            ),
+            (
+                "2. **Make market-cap regime explicit.** Separate extreme-low revival/high-risk and "
+                "overextended specialist paths; risk is rug concentration; require terminal-failure and "
+                "drawdown gates on a new holdout."
+            ),
+            (
+                "3. **Preserve raw buyer dimensions.** Test buyer count, growth and acceleration instead "
+                "of 85/55/20; risk is provider/gameability drift; validate chronologically by regime."
+            ),
+            (
+                "4. **Calibrate per cohort.** Separate QUICK_2X, MID_5X and RIGHT_TAIL_20X objectives; "
+                "risk is signal fragmentation; compare at fixed frequency on later data."
+            ),
+            (
+                "5. **Align survival score with evidence confidence.** Do not award 100 for sparse "
+                "acceptable evidence; risk is reduced recall; ablate prospectively."
+            ),
+            (
+                "6. **Acquire missing vectors.** Production DB, aligned wallet/funder/cluster/liquidity and "
+                "seven-day outcomes are prerequisites for a definitive failure-gate autopsy."
+            ),
             "",
             "## 28–30. Best model, tests and final truth",
             "",
-            (f"- Best corrected diagnostic 2x precision: "
-            f"**{_percent(best_2x[1]['2x_precision'])}** (`{best_2x[0]}`)."),
-            (f"- Best corrected diagnostic 5x precision: "
-            f"**{_percent(best_5x[1]['5x_precision'])}** (`{best_5x[0]}`)."),
-            (f"- Best corrected diagnostic 10x precision: "
-            f"**{_percent(best_10x[1]['10x_precision'])}** (`{best_10x[0]}`)."),
-            (f"- Best 20x recall: **{_percent(best_20x[1]['20x_recall'])}** "
-            f"(`{best_20x[0]}`); best 50x recall: "
-            f"**{_percent(best_50x[1]['50x_recall'])}** (`{best_50x[0]}`)."),
+            (
+                f"- Best corrected diagnostic 2x precision: "
+                f"**{_percent(best_2x[1]['2x_precision'])}** (`{best_2x[0]}`)."
+            ),
+            (
+                f"- Best corrected diagnostic 5x precision: "
+                f"**{_percent(best_5x[1]['5x_precision'])}** (`{best_5x[0]}`)."
+            ),
+            (
+                f"- Best corrected diagnostic 10x precision: "
+                f"**{_percent(best_10x[1]['10x_precision'])}** (`{best_10x[0]}`)."
+            ),
+            (
+                f"- Best 20x recall: **{_percent(best_20x[1]['20x_recall'])}** "
+                f"(`{best_20x[0]}`); best 50x recall: "
+                f"**{_percent(best_50x[1]['50x_recall'])}** (`{best_50x[0]}`)."
+            ),
             "- Approved features: **0**. Challenger decisions: **0**.",
             "",
             "### Final truth",
@@ -876,10 +960,14 @@ def render_autopsy_markdown(result: Mapping[str, Any]) -> str:
             "- **DO WE KNOW WHY JR MISSES RUNNERS? YES**, within the observable reconstruction.",
             "- **PRIMARY FAILURE SOURCE: INTELLIGENCE**, followed by ENTRY.",
             "- **IS CURRENT RUNNER SCORE STRUCTURALLY FLAWED? YES.**",
-            ("- **IS MARKET CAP BEING UNDERUSED? YES**, but market-cap-only is not the corrected best "
-            "2x model and its strongest regimes are high failure-risk."),
-            ("- **IS FAILURE SCORE KILLING GOOD RUNNERS? INCONCLUSIVE.** Observable penalties are not "
-            "the decisive 5x+ miss, but the exact live risk vector is unavailable."),
+            (
+                "- **IS MARKET CAP BEING UNDERUSED? YES**, but market-cap-only is not the corrected best "
+                "2x model and its strongest regimes are high failure-risk."
+            ),
+            (
+                "- **IS FAILURE SCORE KILLING GOOD RUNNERS? INCONCLUSIVE.** Observable penalties are not "
+                "the decisive 5x+ miss, but the exact live risk vector is unavailable."
+            ),
             "- **ARE FEATURE INTERACTIONS NECESSARY? NO evidence of necessity.**",
             "- **DOES ANY EXPERIMENT BEAT MARKET-CAP-ONLY? YES**, on retired diagnostics only.",
             "- **PRODUCTION READY: NO.**",
@@ -1205,17 +1293,17 @@ class RunnerAutopsy:
             row
             for row in reference
             if row["evaluated"]
-            and not bool(row.get("initial_top10_pct_corrected") is not None
-                         and float(row["initial_top10_pct_corrected"]) > 100)
+            and not bool(
+                row.get("initial_top10_pct_corrected") is not None
+                and float(row["initial_top10_pct_corrected"]) > 100
+            )
             and 0.01 <= float(row.get("current_market_cap") or 0) <= 1_000_000
             and row.get("peak_multiple") is not None
         ]
         tables = {row[0] for row in self.connection.execute("SHOW TABLES").fetchall()}
         if "edge_3m" in tables:
             drawdowns = dict(
-                self.connection.execute(
-                    "SELECT mint,max_adverse_excursion FROM edge_3m"
-                ).fetchall()
+                self.connection.execute("SELECT mint,max_adverse_excursion FROM edge_3m").fetchall()
             )
         else:
             drawdowns = {}
@@ -1257,24 +1345,20 @@ class RunnerAutopsy:
             "MARKET_CAP_ONLY": rank_model(
                 diagnostic_test, lambda row: -float(row["log_market_cap"])
             ),
-            "VOLUME_ONLY": rank_model(
-                diagnostic_test, lambda row: row.get("log_buy_volume")
-            ),
-            "MOMENTUM_ONLY": rank_model(
-                diagnostic_test, lambda row: row.get("momentum_score")
-            ),
+            "VOLUME_ONLY": rank_model(diagnostic_test, lambda row: row.get("log_buy_volume")),
+            "MOMENTUM_ONLY": rank_model(diagnostic_test, lambda row: row.get("momentum_score")),
             "SAFETY_FILTERED_MOMENTUM": rank_model(
                 diagnostic_test,
-                lambda row: row.get("momentum_score")
-                if float(row.get("failure_score_lower_bound") or 0) < 40
-                else None,
+                lambda row: (
+                    row.get("momentum_score")
+                    if float(row.get("failure_score_lower_bound") or 0) < 40
+                    else None
+                ),
             ),
             "CONTROL_AVAILABLE_MEAN": rank_model(
                 diagnostic_test, lambda row: row.get("runner_score")
             ),
-            "WEIGHTED_FEATURES": rank_model(
-                diagnostic_test, lambda row: weighted(row, ranked)
-            ),
+            "WEIGHTED_FEATURES": rank_model(diagnostic_test, lambda row: weighted(row, ranked)),
         }
         for count in (1, 2, 3, 5, len(ranked)):
             selected = ranked[:count]
@@ -1283,8 +1367,10 @@ class RunnerAutopsy:
             )
         models["MC_PRIOR_PLUS_TOP3"] = rank_model(
             diagnostic_test,
-            lambda row: -0.65 * float(row["log_market_cap"])
-            + 0.35 * float(normalized(row, ranked[:3]) or 0),
+            lambda row: (
+                -0.65 * float(row["log_market_cap"])
+                + 0.35 * float(normalized(row, ranked[:3]) or 0)
+            ),
         )
         interactions = {
             "MC_MOMENTUM": ("log_market_cap", "momentum_score"),
@@ -1301,9 +1387,7 @@ class RunnerAutopsy:
             diagnostic_test, fit_histogram_score(train, ranked[:5])
         )
         stage_models = {
-            stage: self._model_scores(
-                [row for row in train if row["stage"] == stage], FEATURES
-            )
+            stage: self._model_scores([row for row in train if row["stage"] == stage], FEATURES)
             for stage in ("NEW", "BONDING", "MIGRATED")
         }
 
@@ -1316,9 +1400,7 @@ class RunnerAutopsy:
         calibration = []
         for lower in range(0, 100, 10):
             bucket = [
-                row
-                for row in valid
-                if lower <= float(row.get("runner_score") or 0) < lower + 10
+                row for row in valid if lower <= float(row.get("runner_score") or 0) < lower + 10
             ]
             calibration.append(
                 {
@@ -1336,14 +1418,14 @@ class RunnerAutopsy:
         mc_buckets = []
         boundaries = (0.01, 1, 5, 10, 20, 30, 50, 100, 250, 1000, float("inf"))
         for lower, upper in pairwise(boundaries):
-            bucket = [
-                row for row in mc_rows if lower <= float(row["current_market_cap"]) < upper
-            ]
+            bucket = [row for row in mc_rows if lower <= float(row["current_market_cap"]) < upper]
             if not bucket:
                 continue
             mc_buckets.append(
                 {
-                    "bucket_sol": f"{lower:g}-{upper:g}" if math.isfinite(upper) else f">={lower:g}",
+                    "bucket_sol": f"{lower:g}-{upper:g}"
+                    if math.isfinite(upper)
+                    else f">={lower:g}",
                     "population": len(bucket),
                     "market_cap_min": min(float(row["current_market_cap"]) for row in bucket),
                     "market_cap_max": max(float(row["current_market_cap"]) for row in bucket),
@@ -1397,9 +1479,7 @@ class RunnerAutopsy:
         launch_intensity_results = {
             name: {
                 "launches": len(cohort),
-                **selection_metrics(
-                    [row for row in cohort if row["tier"] in CORE_TIERS], cohort
-                ),
+                **selection_metrics([row for row in cohort if row["tier"] in CORE_TIERS], cohort),
             }
             for name, cohort in sorted(intensity.items())
         }
@@ -1445,7 +1525,10 @@ class RunnerAutopsy:
             miss_attribution[f"{threshold}x"] = {
                 "missed": len(misses),
                 **{
-                    name: {"count": count, "percent_of_misses": count / len(misses) if misses else None}
+                    name: {
+                        "count": count,
+                        "percent_of_misses": count / len(misses) if misses else None,
+                    }
                     for name, count in categories.items()
                 },
             }
@@ -1460,7 +1543,9 @@ class RunnerAutopsy:
             failure_suppression[f"{threshold}x"] = {
                 "blocked": len(blocked),
                 "reasons": dict(
-                    Counter(reason for row in blocked for reason in row.get("failure_reasons") or [])
+                    Counter(
+                        reason for row in blocked for reason in row.get("failure_reasons") or []
+                    )
                 ),
             }
         failure_calibration = []
@@ -1474,9 +1559,7 @@ class RunnerAutopsy:
                 {
                     "bucket": f"{lower}-{lower + 20}",
                     "sample": len(bucket),
-                    "2x_rate": _rate(
-                        [float(row.get("peak_multiple") or 0) >= 2 for row in bucket]
-                    ),
+                    "2x_rate": _rate([float(row.get("peak_multiple") or 0) >= 2 for row in bucket]),
                     "terminal_failure_rate": _rate(
                         [bool(row.get("terminal_failure")) for row in bucket]
                     ),
@@ -1493,12 +1576,8 @@ class RunnerAutopsy:
             cohort = [row for row in valid if reason in (row.get("failure_reasons") or [])]
             penalty_effectiveness[reason] = {
                 "sample": len(cohort),
-                "2x_rate": _rate(
-                    [float(row.get("peak_multiple") or 0) >= 2 for row in cohort]
-                ),
-                "5x_rate": _rate(
-                    [float(row.get("peak_multiple") or 0) >= 5 for row in cohort]
-                ),
+                "2x_rate": _rate([float(row.get("peak_multiple") or 0) >= 2 for row in cohort]),
+                "5x_rate": _rate([float(row.get("peak_multiple") or 0) >= 5 for row in cohort]),
                 "terminal_failure_rate": _rate(
                     [bool(row.get("terminal_failure")) for row in cohort]
                 ),
@@ -1507,14 +1586,18 @@ class RunnerAutopsy:
             row for row in valid if row.get("tier") in CORE_TIERS and row["peak_multiple"] < 2
         ]
         false_positive_causes = {
-            "high_momentum": sum(float(row.get("momentum_score") or 0) >= 75 for row in false_positives),
+            "high_momentum": sum(
+                float(row.get("momentum_score") or 0) >= 75 for row in false_positives
+            ),
             "coarse_buyer_positive": sum(
                 float(row.get("buyer_growth_score") or 0) >= 75 for row in false_positives
             ),
             "survival_score_100": sum(
                 float(row.get("survival_score") or 0) >= 100 for row in false_positives
             ),
-            "payoff_positive": sum(float(row.get("payoff_score") or 0) >= 70 for row in false_positives),
+            "payoff_positive": sum(
+                float(row.get("payoff_score") or 0) >= 70 for row in false_positives
+            ),
         }
         full_history = self.rows(
             "timestamp_seconds=180 OR mint IN (SELECT mint FROM runner_autopsy_replay "
@@ -1558,9 +1641,7 @@ class RunnerAutopsy:
                 [row for row in full_history if str(row["mint"]) in mints], 10
             )
         fp_mints = {str(row["mint"]) for row in false_positives}
-        fp_cards = replay_cards(
-            [row for row in full_history if str(row["mint"]) in fp_mints], 20
-        )
+        fp_cards = replay_cards([row for row in full_history if str(row["mint"]) in fp_mints], 20)
         return {
             "truth_state": "DIAGNOSTIC_ONLY_RETIRED_WINDOWS_NOT_SEALED",
             "reference_timestamp_seconds": 180,
@@ -1644,7 +1725,5 @@ class RunnerAutopsy:
         result = self.run()
         Path(output).write_text(json.dumps(result, indent=2, default=str) + "\n", encoding="utf-8")
         if markdown_output is not None:
-            Path(markdown_output).write_text(
-                render_autopsy_markdown(result), encoding="utf-8"
-            )
+            Path(markdown_output).write_text(render_autopsy_markdown(result), encoding="utf-8")
         return result

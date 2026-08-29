@@ -209,9 +209,7 @@ def decode_anchor_event(raw: bytes) -> dict[str, Any] | None:
     return None
 
 
-def anchor_events_from_logs(
-    logs: list[Any], program_id: str | None = None
-) -> list[dict[str, Any]]:
+def anchor_events_from_logs(logs: list[Any], program_id: str | None = None) -> list[dict[str, Any]]:
     """Decode Anchor events, optionally restricting data to one invocation stack.
 
     A transaction can contain ``Program data`` emitted by CPI programs. Solana
@@ -226,9 +224,7 @@ def anchor_events_from_logs(
         if text.startswith("Program ") and " invoke [" in text:
             invocation_stack.append(text.split(" ", 2)[1])
             continue
-        if text.startswith("Program ") and (
-            text.endswith(" success") or " failed: " in text
-        ):
+        if text.startswith("Program ") and (text.endswith(" success") or " failed: " in text):
             completed = text.split(" ", 2)[1]
             if completed in invocation_stack:
                 while invocation_stack:
@@ -238,9 +234,7 @@ def anchor_events_from_logs(
         marker = "Program data: "
         if marker not in text:
             continue
-        if program_id is not None and (
-            not invocation_stack or invocation_stack[-1] != program_id
-        ):
+        if program_id is not None and (not invocation_stack or invocation_stack[-1] != program_id):
             continue
         encoded = text.split(marker, 1)[1].strip()
         try:
@@ -253,12 +247,10 @@ def anchor_events_from_logs(
     return events
 
 
-def jito_tip_evidence(
-    transaction: dict[str, Any], tip_accounts: set[str]
-) -> dict[str, Any]:
+def jito_tip_evidence(transaction: dict[str, Any], tip_accounts: set[str]) -> dict[str, Any]:
     """Find observable transfers to official Jito tip accounts; not a bundle proof."""
     result = transaction.get("result") or transaction
-    message = ((result.get("transaction") or {}).get("message") or {})
+    message = (result.get("transaction") or {}).get("message") or {}
     meta = result.get("meta") or {}
     instructions = list(message.get("instructions") or [])
     for group in meta.get("innerInstructions") or []:

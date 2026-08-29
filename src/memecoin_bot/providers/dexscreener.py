@@ -119,9 +119,7 @@ class DexScreenerProvider:
     ) -> MarketSnapshot | None:
         if not pairs:
             return None
-        matching = [
-            p for p in pairs if (p.get("baseToken") or {}).get("address") == token_address
-        ]
+        matching = [p for p in pairs if (p.get("baseToken") or {}).get("address") == token_address]
         if not matching and not allow_unmatched:
             return None
         matching = matching or pairs

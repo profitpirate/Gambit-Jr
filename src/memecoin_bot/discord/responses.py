@@ -212,7 +212,9 @@ class InteractionResponder:
                 started=started,
             )
             raise
-        return await self._primary(embed=embed, view=view, payload_kind="embed_view" if view else "embed")
+        return await self._primary(
+            embed=embed, view=view, payload_kind="embed_view" if view else "embed"
+        )
 
     async def primary_text(self, content: str) -> discord.InteractionMessage | None:
         started = time.monotonic()
@@ -248,9 +250,7 @@ class InteractionResponder:
             command_name=self.command_name,
             error_type=type(error).__name__,
             validation_message=sanitize_discord_text(error),
-            interaction_type=getattr(
-                getattr(self.interaction, "type", None), "name", "UNKNOWN"
-            ),
+            interaction_type=getattr(getattr(self.interaction, "type", None), "name", "UNKNOWN"),
             response_state="deferred" if self.deferred else "unacknowledged",
             response_acknowledged=self.interaction.response.is_done(),
             defer_occurred=self.deferred,

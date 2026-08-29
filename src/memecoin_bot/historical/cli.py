@@ -387,9 +387,7 @@ async def _finalize_public(
         )
     )
     acquisition[ohlcv.dataset_id] = await engine.run(ohlcv)
-    normalization[ohlcv.dataset_id] = normalize_ranked_pool_ohlcv(
-        warehouse, ohlcv.dataset_id
-    )
+    normalization[ohlcv.dataset_id] = normalize_ranked_pool_ohlcv(warehouse, ohlcv.dataset_id)
 
     for requirement in (
         {

@@ -27,7 +27,7 @@ gambit-convergence = "memecoin_bot.convergence.__main__:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-memecoin_bot = ["historical/migrations/**/*.sql"]
+memecoin_bot = ["historical/migrations/**/*.sql", "historical/sql/dune/*.sql", "historical/sql/dune/*.json"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

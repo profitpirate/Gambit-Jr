@@ -1,5 +1,10 @@
 # Gambit Jr V1.5 convergence result
 
+This report preserves the earlier convergence evidence window. The current
+authoritative architecture and provider contract are in
+`docs/v15-authoritative-runner-final.md`; repository-owned direct Dune SQL now
+supersedes the saved-query requirement recorded by the older probe artifact.
+
 ## Pass/fail delta
 
 | Previously failing requirement | Action taken | Current status | Evidence |
@@ -9,7 +14,7 @@
 | Process death/restart not proven | Hard-killed a real child after it built a HOT candidate and claimed a convergence phase; reopened both databases and safely reclaimed work. | PASS | `test_hard_killed_worker_is_recovered_by_a_real_restart` |
 | No current provider admission truth | Added dated capabilities, credential preflight and real probes with coverage/latency/errors. | PASS engineering / BLOCKED_EXTERNAL for credentials | live-probe evidence JSON |
 | Keyless live flow not proven | Real native Solana, DexScreener, GeckoTerminal and Bluesky transports returned data. | PASS transport only | 146 REST/RPC records plus 5 Bluesky envelopes; exact table below |
-| Dune history not month-resumable | Added reviewed saved-query execute/poll/page client and 32 explicit month partitions. | PASS engineering / BLOCKED_EXTERNAL data | Dune contract test; `DUNE_API_KEY` and `DUNE_QUERY_ID` absent |
+| Dune history not month-resumable | Added eight repository-owned queries with direct execute/poll/page, dynamic 2024-present month partitions, Parquet and resumable checkpoints; a saved query is fallback-only. | PASS engineering / BLOCKED_EXTERNAL data | Direct-SQL contract tests; `DUNE_API_KEY` absent |
 | Continuous >=24-month universe absent | Preserved the existing 7GB real corpus, bias labels and explicit month ledger; did not invent coverage. | FAIL_RESEARCH | only Jun–Jul 2026 has broad launch-universe depth; 32-month table below |
 | Production operational history absent | Added read-only allowlisted operational import; no production DB copy was provided. | BLOCKED_EXTERNAL | `--operational-db` provider path implemented; no VPS access used |
 | Social/narrative source absent | Added authorized Discord, authorized Telegram and keyless Bluesky plugins with privacy/PIT controls; extended DEX promotional observations. | BLOCKED_EXTERNAL / FAIL_RESEARCH | Bluesky transport live but zero CA matches; Discord/Telegram credentials/allowlists absent |
@@ -53,7 +58,7 @@ Official facts were rechecked on 2026-08-29 against [Dune rate limits](https://d
 | Bluesky Jetstream | social transport | keyless | yes | yes transport | 5 envelopes, 0 CA matches | 814.36/915.66ms | 0 | public posts only | ENRICHMENT transport; social result FAIL_RESEARCH |
 | Helius | selective Solana primary/enrichment | free credit tier | no | no | 0 | unavailable | 1 preflight | no key | BLOCKED_EXTERNAL |
 | PumpPortal | launch/migration speed | free event classes; keyed | no | no | 0 | unavailable | 1 preflight | no key | BLOCKED_EXTERNAL |
-| Dune | indexed historical backbone | free credit/rate tier | no | no | 0 | unavailable | 1 preflight | no key/query id | BLOCKED_EXTERNAL |
+| Dune | indexed historical backbone | free credit/rate tier | no | no | 0 | unavailable | 1 preflight | no API key; query ID optional fallback only | BLOCKED_EXTERNAL |
 | Authorized Discord | social | existing bot credentials | no allowlist | no | 0 | unavailable | 0 | authorized channels only | BLOCKED_EXTERNAL |
 | Telegram | social | official API | no | no | 0 | unavailable | 0 | authorized/public channels only | BLOCKED_EXTERNAL |
 | Reddit | slow narrative | approval/credential dependent | no | no | 0 | unavailable | 0 | not integrated as critical | BLOCKED_EXTERNAL |

@@ -61,7 +61,7 @@ def _load_replay_data(database: str | Path) -> tuple[ResearchData, tuple[str, ..
           d.max_adverse_excursion,r.stage,r.current_market_cap,
           r.curve_progress,r.momentum_score,r.buyer_growth_score,r.creator_score,
           r.concentration_score,r.liquidity_score,r.survival_score,r.payoff_score,
-          r.tradeability_score,{','.join(projections)},
+          r.tradeability_score,{",".join(projections)},
           max(x.first_sell_seconds) first_sell_seconds,
           max(x.buyers_after_first_sell) buyers_after_first_sell
         FROM runner_autopsy_replay r
@@ -209,9 +209,7 @@ def run_realtime_trajectory_research(database: str | Path) -> dict[str, Any]:
     outer_creators = set(data.creator[outer])
     train &= np.asarray([creator not in outer_creators for creator in data.creator])
     calibration &= np.asarray([creator not in outer_creators for creator in data.creator])
-    candidate = fit_probability_model(
-        data, features, train, calibration, 2, kind="logistic"
-    )
+    candidate = fit_probability_model(data, features, train, calibration, 2, kind="logistic")
     failure = fit_binary_probability(
         data,
         features,
@@ -230,9 +228,7 @@ def run_realtime_trajectory_research(database: str | Path) -> dict[str, Any]:
             ("model", LogisticRegression(max_iter=300, C=0.35, solver="lbfgs")),
         ]
     ).fit(
-        np.column_stack(
-            [data.control_score[calibration], candidate_cal, failure_cal]
-        ),
+        np.column_stack([data.control_score[calibration], candidate_cal, failure_cal]),
         (data.peak_multiple[calibration] >= 2).astype(int),
     )
     candidate_outer = candidate.probabilities(feature_matrix(data, features, outer))
@@ -252,9 +248,7 @@ def run_realtime_trajectory_research(database: str | Path) -> dict[str, Any]:
     for rows in frontiers.values():
         for row in rows:
             if row["median_entry_market_cap"] is not None:
-                row["median_entry_market_cap"] = float(
-                    np.expm1(row["median_entry_market_cap"])
-                )
+                row["median_entry_market_cap"] = float(np.expm1(row["median_entry_market_cap"]))
     autopsy = _cohort_autopsy(data, outer, candidate_outer, np)
     hypotheses = _effects(data, train, outer, np)
     one_percent = {

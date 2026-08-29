@@ -69,8 +69,16 @@ def creator_reputation(outcomes: list[dict[str, Any]], decision_at: str) -> dict
         return {"state": "UNKNOWN", "score": None, "sample": 0, "as_of": decision_at}
     survived = sum(float(row.get("survival_hours") or 0) >= 24 for row in known)
     runners = sum(float(row.get("peak_multiple") or 0) >= 5 for row in known)
-    failed = sum(bool(row.get("rugged")) or float(row.get("peak_multiple") or 0) < 1 for row in known)
-    score = max(0.0, min(100.0, 45 * survived / len(known) + 40 * runners / len(known) - 55 * failed / len(known) + 30))
+    failed = sum(
+        bool(row.get("rugged")) or float(row.get("peak_multiple") or 0) < 1 for row in known
+    )
+    score = max(
+        0.0,
+        min(
+            100.0,
+            45 * survived / len(known) + 40 * runners / len(known) - 55 * failed / len(known) + 30,
+        ),
+    )
     return {
         "state": "KNOWN",
         "score": round(score, 2),
@@ -91,7 +99,9 @@ def buyer_quality(cohort: dict[str, Any] | None) -> dict[str, Any]:
     retained = int(cohort.get("retained_buyers") or 0) / size
     alpha = int(cohort.get("independent_alpha_families") or 0)
     sybil = float(cohort.get("connected_actor_percent") or 0) / 100
-    score = max(0.0, min(100.0, 35 * independent + 30 * retained + min(25, alpha * 5) - 35 * sybil + 10))
+    score = max(
+        0.0, min(100.0, 35 * independent + 30 * retained + min(25, alpha * 5) - 35 * sybil + 10)
+    )
     state = "HIGH" if score >= 70 else "MEDIUM" if score >= 45 else "LOW"
     return {"state": state, "score": round(score, 2), "sample": size}
 
@@ -188,7 +198,11 @@ def hierarchical_prior(
         "recent_regime": (recent_regime, recent_weight),
         "live": (live, max(0.0, 1 - long_weight - recent_weight)),
     }
-    known = [(name, float(value), weight) for name, (value, weight) in inputs.items() if value is not None]
+    known = [
+        (name, float(value), weight)
+        for name, (value, weight) in inputs.items()
+        if value is not None
+    ]
     if not known:
         return {"state": "UNKNOWN", "value": None, "components": {}}
     weight_sum = sum(weight for _, _, weight in known)

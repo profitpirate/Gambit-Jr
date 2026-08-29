@@ -119,13 +119,14 @@ def operator_model_status(settings: Any) -> dict[str, Any]:
     """One operator-facing declaration of active and research-only model state."""
     fingerprint = getattr(settings, "config_fingerprint", None)
     return {
-        "active_model": getattr(settings, "model_version", "UNKNOWN"),
-        "control": "CONTROL_V15",
-        "candidate": "CANDIDATE_V15",
+        "active_model": "runner-decision-v1",
+        "champion": "CONTROL_V15",
+        "control_systems": ["SCORING_LEGACY", "ALPHA_V14", "V15_DETERMINISTIC"],
+        "research_systems": ["V3_SHADOW", "RUNNER_THESIS_HEURISTIC"],
         "candidate_state": "RESEARCH_ONLY_NOT_ACTIVE",
         "scoring_version": settings.scoring_version,
         "config_fingerprint": fingerprint() if callable(fingerprint) else "UNKNOWN",
-        "signal_truth": "v15_decisions.signal_tier",
+        "signal_truth": "runner_decisions_v15.route_state",
     }
 
 

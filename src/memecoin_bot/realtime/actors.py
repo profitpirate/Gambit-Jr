@@ -89,8 +89,7 @@ class ActorIntelligence:
                         max(
                             0.0,
                             (
-                                _timestamp(str(migration[0]))
-                                - _timestamp(str(row["launched_at"]))
+                                _timestamp(str(migration[0])) - _timestamp(str(row["launched_at"]))
                             ).total_seconds(),
                         )
                         if migration and migration[0]
@@ -150,7 +149,11 @@ class ActorIntelligence:
             "distinct_prior_funders": len(set(funders)),
             "wallet_rotation": "UNKNOWN_NO_IDENTITY_RESOLUTION",
             "narrative_reuse": "UNKNOWN_UNLESS_TIMESTAMPED_NARRATIVE_MEMBERSHIP_EXISTS",
-            "sample_confidence": "PROVEN" if len(rows) >= 20 else "PROVISIONAL" if rows else "UNKNOWN",
+            "sample_confidence": "PROVEN"
+            if len(rows) >= 20
+            else "PROVISIONAL"
+            if rows
+            else "UNKNOWN",
             "point_in_time": True,
         }
 
@@ -315,7 +318,9 @@ class ActorIntelligence:
         funders: dict[str, set[str]] = defaultdict(set)
         for row in self.store.conn.execute(
             "SELECT funded_wallet,funder_wallet FROM wallet_funding_edges_v15 WHERE funded_wallet IN "
-            f"({','.join('?' for _ in profiles)}) AND first_funded_at<=?" if profiles else "SELECT NULL,NULL WHERE 0",
+            f"({','.join('?' for _ in profiles)}) AND first_funded_at<=?"
+            if profiles
+            else "SELECT NULL,NULL WHERE 0",
             (*profiles, decision_at) if profiles else (),
         ):
             funders[str(row[1])].add(str(row[0]))
@@ -357,10 +362,10 @@ class ActorIntelligence:
             "independent_smart_wallet_count": len(clusters),
             "copyable_consensus": len(clusters) >= 2,
             "strategy_matched_consensus": len(clusters) >= 2 and len(strategies) == 1,
-            "linked_wallet_share": (
-                1 - len(clusters) / len(profiles) if profiles else None
+            "linked_wallet_share": (1 - len(clusters) / len(profiles) if profiles else None),
+            "profile_sample_floor": min(
+                (int(row["sample"]) for row in profiles.values()), default=0
             ),
-            "profile_sample_floor": min((int(row["sample"]) for row in profiles.values()), default=0),
             "point_in_time": True,
         }
 
@@ -399,7 +404,10 @@ class ActorIntelligence:
             by_funder[str(row["funder_wallet"])].add(str(row["funded_wallet"]))
         largest = max((len(values) for values in by_funder.values()), default=0)
         recencies = [
-            max(0.0, (_timestamp(decision_at) - _timestamp(str(row["last_funded_at"]))).total_seconds())
+            max(
+                0.0,
+                (_timestamp(decision_at) - _timestamp(str(row["last_funded_at"]))).total_seconds(),
+            )
             for row in rows
         ]
         creator_row = self.store.conn.execute(
@@ -419,8 +427,7 @@ class ActorIntelligence:
             else set()
         )
         creator_linked = sum(
-            str(row["funder_wallet"]) == creator
-            or str(row["funder_wallet"]) in creator_funders
+            str(row["funder_wallet"]) == creator or str(row["funder_wallet"]) in creator_funders
             for row in rows
         )
         return {

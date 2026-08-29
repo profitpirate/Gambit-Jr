@@ -13,6 +13,8 @@ from urllib.parse import quote_plus
 
 import aiohttp
 
+from memecoin_bot.historical.providers import DuneExecutionClient
+
 DOCS_CHECKED_AT = "2026-08-29"
 
 
@@ -139,10 +141,15 @@ def capabilities() -> tuple[ProviderCapability, ...]:
             "dune",
             "targeted month-partitioned historical Pump.fun research",
             "FREE_CREDIT_METERED",
-            ("DUNE_API_KEY", "DUNE_QUERY_ID"),
-            "https://docs.dune.com/api-reference/overview/rate-limits",
+            ("DUNE_API_KEY",),
+            "https://docs.dune.com/api-reference/executions/endpoint/execute-sql",
             "https://dune.com/auth/register",
-            ("saved_parameterized_query", "execution_polling", "paginated_results"),
+            (
+                "repository_owned_direct_sql",
+                "saved_query_optional_fallback",
+                "execution_polling",
+                "paginated_results",
+            ),
             {"free_execute_rpm": 15, "free_result_rpm": 40},
             {"monthly_usd": 0, "execution_is_credit_metered": True},
             "HISTORICAL_BACKBONE",
@@ -274,7 +281,9 @@ class ProviderRegistry:
                 )
         return output
 
-    async def probe(self, providers: set[str] | None = None, timeout: float = 12) -> list[dict[str, Any]]:
+    async def probe(
+        self, providers: set[str] | None = None, timeout: float = 12
+    ) -> list[dict[str, Any]]:
         self.refresh()
         selected = providers or {
             "native_solana_rpc",
@@ -383,7 +392,9 @@ class ProviderRegistry:
         )
 
     async def _probe_dexscreener(self, started: str, timeout: float) -> ProviderProbe:
-        base = self.environment.get("DEXSCREENER_BASE_URL", "https://api.dexscreener.com").rstrip("/")
+        base = self.environment.get("DEXSCREENER_BASE_URL", "https://api.dexscreener.com").rstrip(
+            "/"
+        )
         paths = (
             "/token-profiles/latest/v1",
             "/token-boosts/latest/v1",
@@ -421,9 +432,7 @@ class ProviderRegistry:
         base = self.environment.get(
             "GECKOTERMINAL_BASE_URL", "https://api.geckoterminal.com/api/v2"
         ).rstrip("/")
-        payload, latency = await _request_json(
-            f"{base}/networks/solana/new_pools?page=1", timeout
-        )
+        payload, latency = await _request_json(f"{base}/networks/solana/new_pools?page=1", timeout)
         rows = payload.get("data") or []
         return ProviderProbe(
             "geckoterminal",
@@ -475,9 +484,7 @@ class ProviderRegistry:
         )
 
     async def _probe_pumpportal(self, started: str, timeout: float) -> ProviderProbe:
-        base = self.environment.get(
-            "PUMPPORTAL_WEBSOCKET_URL", "wss://pumpportal.fun/api/data"
-        )
+        base = self.environment.get("PUMPPORTAL_WEBSOCKET_URL", "wss://pumpportal.fun/api/data")
         url = f"{base}?api-key={quote_plus(self.environment['PUMPPORTAL_API_KEY'])}"
         client_timeout = aiohttp.ClientTimeout(total=timeout)
         begun = time.perf_counter()
@@ -505,11 +512,16 @@ class ProviderRegistry:
         )
 
     async def _probe_dune(self, started: str, timeout: float) -> ProviderProbe:
-        query_id = int(self.environment["DUNE_QUERY_ID"])
-        headers = {"X-Dune-API-Key": self.environment["DUNE_API_KEY"]}
-        payload, latency = await _request_json(
-            f"https://api.dune.com/api/v1/query/{query_id}", timeout, headers=headers
+        begun = time.perf_counter()
+        client = DuneExecutionClient(
+            self.environment["DUNE_API_KEY"],
+            timeout_seconds=timeout,
+            maximum_polls=max(2, round(timeout / 2)),
         )
+        execution_id = await client.execute_sql("SELECT 1 AS gambit_direct_sql_probe")
+        await client.wait(execution_id)
+        payload = await client.results(execution_id, 0, 1)
+        latency = (time.perf_counter() - begun) * 1000
         return ProviderProbe(
             "dune",
             started,
@@ -517,8 +529,8 @@ class ProviderRegistry:
             "HISTORICAL_BACKBONE" if payload else "REJECTED",
             events_seen=int(bool(payload)),
             latencies_ms=(latency,),
-            coverage={"query_metadata_read": True, "historical_rows_ingested": False},
-            evidence={"query_id": query_id, "credential_redacted": True},
+            coverage={"direct_sql_executed": True, "historical_rows_ingested": False},
+            evidence={"execution_id": execution_id, "credential_redacted": True},
         )
 
     def _persist_probe(self, probe: ProviderProbe) -> dict[str, Any]:

@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from memecoin_bot.models import iso
+from memecoin_bot.realtime.decision import derive_freshness, derive_latency
 
 THESIS_VERSION = "runner-thesis-shadow-v1"
 ANALOGUE_FEATURE_VERSION = "runner-analogue-vector-v1"
@@ -84,9 +85,9 @@ class RunnerThesis:
     contradictory_evidence: list[dict[str, Any]]
     unresolved_risks: list[str]
     evidence_freshness: dict[str, Any]
-    runner_probability: float
-    failure_probability: float
-    actionable_probability: float
+    heuristic_runner_score: float
+    heuristic_failure_score: float
+    heuristic_actionability_score: float
     confidence: float
     uncertainty: float
     analogous_successes: list[dict[str, Any]]
@@ -95,11 +96,27 @@ class RunnerThesis:
     next_observation_required: list[str]
     call_readiness: str
     feature_vector: dict[str, float]
+    latency: dict[str, Any]
+    score_semantics: str = "HEURISTIC_NOT_CALIBRATED"
     thesis_version: str = THESIS_VERSION
     public_route: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+    # Compatibility properties only. The authoritative RunnerDecision never
+    # consumes these as calibrated probabilities.
+    @property
+    def runner_probability(self) -> float:
+        return self.heuristic_runner_score
+
+    @property
+    def failure_probability(self) -> float:
+        return self.heuristic_failure_score
+
+    @property
+    def actionable_probability(self) -> float:
+        return self.heuristic_actionability_score
 
 
 @dataclass(frozen=True, slots=True)
@@ -148,8 +165,10 @@ class RunnerThesisEngine:
         trigger_event_id: str | None = None,
         entry_market_cap: float | None = None,
         entry_price: float | None = None,
+        runtime_timestamps: dict[str, str] | None = None,
     ) -> RunnerThesis:
-        decision = _timestamp(decision_timestamp)
+        model_started_at = iso()
+        _timestamp(decision_timestamp)
         token = self.store.conn.execute(
             "SELECT chain,token_address FROM tokens WHERE id=?", (token_id,)
         ).fetchone()
@@ -170,40 +189,64 @@ class RunnerThesisEngine:
         contradictory.extend(risk_evidence)
         known_dimensions = len(vector)
         confidence = _clamp(0.12 + 0.055 * known_dimensions + 0.25 * best.coverage)
-        runner_probability = _sigmoid(-1.55 + 3.2 * best.score + 0.35 * best.coverage)
-        failure_probability = _sigmoid(-2.35 + 4.1 * risk_score)
+        runner_score = _sigmoid(-1.55 + 3.2 * best.score + 0.35 * best.coverage)
+        failure_score = _sigmoid(-2.35 + 4.1 * risk_score)
         entry_score = self._entry_score(feature, entry_market_cap, entry_price)
-        actionable_probability = _sigmoid(
+        actionability_score = _sigmoid(
             -1.85
-            + 2.15 * runner_probability
+            + 2.15 * runner_score
             + 1.65 * entry_score
             + 0.55 * confidence
-            - 1.25 * failure_probability
+            - 1.25 * failure_score
         )
         analogues = self.analogues(
             str(token["chain"]), stage, decision_timestamp, vector, best.name
         )
+        model_finished_at = iso()
+        effective_decision_timestamp = (
+            model_finished_at if runtime_timestamps else decision_timestamp
+        )
+        effective_decision = _timestamp(effective_decision_timestamp)
         state, readiness = self._state(
             previous,
-            decision,
+            effective_decision,
             best.name,
-            runner_probability,
-            failure_probability,
-            actionable_probability,
+            runner_score,
+            failure_score,
+            actionability_score,
             confidence,
         )
         next_observation = self._next_observation(
             feature, state, best.name, supporting, contradictory
         )
         thesis_id = hashlib.sha256(
-            f"{token_id}|{decision_timestamp}|{THESIS_VERSION}".encode()
+            f"{token_id}|{effective_decision_timestamp}|{THESIS_VERSION}".encode()
         ).hexdigest()
+        latency = (
+            derive_latency(
+                source_timestamp=runtime_timestamps["source"],
+                received_timestamp=runtime_timestamps["received"],
+                normalized_timestamp=runtime_timestamps["normalized"],
+                feature_timestamp=runtime_timestamps["feature"],
+                model_start_timestamp=model_started_at,
+                model_finish_timestamp=model_finished_at,
+                decision_timestamp=model_finished_at,
+            )
+            if runtime_timestamps
+            else dict(feature.get("latency") or {"state": "NOT_MEASURED_BY_CALLER"})
+        )
+        latency["timestamps"] = {
+            **dict(runtime_timestamps or {}),
+            "model_start": model_started_at,
+            "model_finish": model_finished_at,
+            "decision": effective_decision_timestamp,
+        }
         thesis = RunnerThesis(
             thesis_id=thesis_id,
             token_id=token_id,
             prior_thesis_id=previous["thesis_id"] if previous else None,
             trigger_event_id=trigger_event_id,
-            decision_timestamp=decision_timestamp,
+            decision_timestamp=effective_decision_timestamp,
             available_at=iso(),
             thesis_type=best.name,
             formation_reason=self._formation_reason(best),
@@ -214,15 +257,16 @@ class RunnerThesisEngine:
             contradictory_evidence=contradictory,
             unresolved_risks=risks,
             evidence_freshness={
-                "decision_timestamp": decision_timestamp,
+                **derive_freshness(
+                    list(feature.get("provenance") or []), effective_decision_timestamp
+                ),
+                "decision_timestamp": effective_decision_timestamp,
                 "token_age_seconds": feature.get("token_age_seconds"),
                 "trigger_event_id": trigger_event_id,
-                "all_evidence_available_by_decision": True,
-                "stale_evidence_count": 0,
             },
-            runner_probability=round(runner_probability, 6),
-            failure_probability=round(failure_probability, 6),
-            actionable_probability=round(actionable_probability, 6),
+            heuristic_runner_score=round(runner_score, 6),
+            heuristic_failure_score=round(failure_score, 6),
+            heuristic_actionability_score=round(actionability_score, 6),
             confidence=round(confidence, 6),
             uncertainty=round(1.0 - confidence, 6),
             analogous_successes=analogues["successes"],
@@ -231,6 +275,7 @@ class RunnerThesisEngine:
             next_observation_required=next_observation,
             call_readiness=readiness,
             feature_vector=vector,
+            latency=latency,
         )
         self._persist(thesis, previous)
         if state == "CALL_READY":
@@ -268,11 +313,15 @@ class RunnerThesisEngine:
             raise ValueError("outcome_available_at must follow the decision timestamp")
         if peak_multiple < 0 or not math.isfinite(float(peak_multiple)):
             raise ValueError("peak_multiple must be finite and non-negative")
-        vector = self._feature_vector(features) if "capital_trajectory" in features else {
-            str(name): float(value)
-            for name, value in features.items()
-            if isinstance(value, (int, float)) and math.isfinite(float(value))
-        }
+        vector = (
+            self._feature_vector(features)
+            if "capital_trajectory" in features
+            else {
+                str(name): float(value)
+                for name, value in features.items()
+                if isinstance(value, (int, float)) and math.isfinite(float(value))
+            }
+        )
         analogue_id = hashlib.sha256(
             f"{entity_key}|{decision_timestamp}|{ANALOGUE_FEATURE_VERSION}".encode()
         ).hexdigest()
@@ -407,8 +456,7 @@ class RunnerThesisEngine:
         ).fetchone()
         if existing:
             same_adverse = (
-                existing["maximum_adverse_excursion"] is None
-                and maximum_adverse_excursion is None
+                existing["maximum_adverse_excursion"] is None and maximum_adverse_excursion is None
             ) or (
                 existing["maximum_adverse_excursion"] is not None
                 and maximum_adverse_excursion is not None
@@ -462,8 +510,7 @@ class RunnerThesisEngine:
             evidence={"shadow_call_id": shadow_call_id, **evidence},
         )
         false_positive = bool(
-            float(call["actionable_probability"]) >= 0.56
-            and (not reached[2] or terminal_failure)
+            float(call["actionable_probability"]) >= 0.56 and (not reached[2] or terminal_failure)
         )
         brier = (float(call["runner_probability"]) - int(reached[2])) ** 2
         error_class = (
@@ -583,23 +630,59 @@ class RunnerThesisEngine:
         consensus = _path(feature, "actor_intelligence", "wallet_consensus") or {}
         funder = _path(feature, "actor_intelligence", "funder") or {}
         candidates: dict[str, tuple[Any, Callable[[Any], float | None]]] = {
-            "capital_velocity": (capital.get("real_sol_velocity"), lambda value: _signed_positive(value, 0.04)),
-            "capital_acceleration": (capital.get("real_sol_acceleration"), lambda value: _signed_positive(value, 0.004)),
+            "capital_velocity": (
+                capital.get("real_sol_velocity"),
+                lambda value: _signed_positive(value, 0.04),
+            ),
+            "capital_acceleration": (
+                capital.get("real_sol_acceleration"),
+                lambda value: _signed_positive(value, 0.004),
+            ),
             "capital_persistence": (capital.get("capital_persistence"), _ratio),
-            "curve_progress_velocity": (capital.get("curve_progress_velocity"), lambda value: _signed_positive(value, 0.015)),
-            "buyer_velocity": (buyer.get("new_buyers_per_second"), lambda value: _positive(value, 0.12)),
-            "independent_buyer_velocity": (buyer.get("independent_new_buyers_per_second"), lambda value: _positive(value, 0.08)),
+            "curve_progress_velocity": (
+                capital.get("curve_progress_velocity"),
+                lambda value: _signed_positive(value, 0.015),
+            ),
+            "buyer_velocity": (
+                buyer.get("new_buyers_per_second"),
+                lambda value: _positive(value, 0.12),
+            ),
+            "independent_buyer_velocity": (
+                buyer.get("independent_new_buyers_per_second"),
+                lambda value: _positive(value, 0.08),
+            ),
             "buyer_retention": (buyer.get("buyer_retention"), _ratio),
-            "buyer_replacement": (buyer.get("buyer_replacement"), lambda value: _positive(value, 4.0)),
-            "sell_absorption": (selling.get("sell_absorption_rate"), lambda value: _positive(value, 1.5)),
-            "buyers_after_sell": (selling.get("buyers_after_first_meaningful_sell"), lambda value: _positive(value, 5.0)),
-            "wash_cleanliness": (activity.get("wash_probability"), lambda value: 1 - _ratio(value) if _ratio(value) is not None else None),
-            "wallet_independence": (consensus.get("linked_wallet_share"), lambda value: 1 - _ratio(value) if _ratio(value) is not None else None),
-            "smart_consensus": (consensus.get("independent_smart_wallet_count"), lambda value: _positive(value, 2.0)),
+            "buyer_replacement": (
+                buyer.get("buyer_replacement"),
+                lambda value: _positive(value, 4.0),
+            ),
+            "sell_absorption": (
+                selling.get("sell_absorption_rate"),
+                lambda value: _positive(value, 1.5),
+            ),
+            "buyers_after_sell": (
+                selling.get("buyers_after_first_meaningful_sell"),
+                lambda value: _positive(value, 5.0),
+            ),
+            "wash_cleanliness": (
+                activity.get("wash_probability"),
+                lambda value: 1 - _ratio(value) if _ratio(value) is not None else None,
+            ),
+            "wallet_independence": (
+                consensus.get("linked_wallet_share"),
+                lambda value: 1 - _ratio(value) if _ratio(value) is not None else None,
+            ),
+            "smart_consensus": (
+                consensus.get("independent_smart_wallet_count"),
+                lambda value: _positive(value, 2.0),
+            ),
             "funder_independence": (funder.get("funder_independence"), _ratio),
             "migration_flow": (migration.get("flow_survival"), lambda value: _positive(value, 1.0)),
             "migration_buyers": (migration.get("buyer_retention"), _ratio),
-            "migration_liquidity": (migration.get("liquidity_continuity"), lambda value: _positive(value, 1.0)),
+            "migration_liquidity": (
+                migration.get("liquidity_continuity"),
+                lambda value: _positive(value, 1.0),
+            ),
         }
         output: dict[str, float] = {}
         for name, (raw, transform) in candidates.items():
@@ -618,7 +701,9 @@ class RunnerThesisEngine:
             )
             possible = sum(spec[1] for spec in specs)
             observed = sum(row.weight for row in components)
-            score = sum(row.value * row.weight for row in components) / observed if observed else 0.0
+            score = (
+                sum(row.value * row.weight for row in components) / observed if observed else 0.0
+            )
             return _Archetype(name, score, observed / possible if possible else 0.0, components)
 
         archetypes = [
@@ -626,19 +711,49 @@ class RunnerThesisEngine:
                 "ORGANIC_ACCELERATION",
                 (
                     ("capital_velocity", 1.3, "native_curve", "real capital is arriving"),
-                    ("capital_acceleration", 1.0, "native_curve", "capital arrival is accelerating"),
-                    ("independent_buyer_velocity", 1.2, "wallet_graph", "independent buyers are arriving"),
-                    ("buyer_replacement", 0.8, "trade_sequence", "new cohorts replace early buyers"),
-                    ("wash_cleanliness", 0.7, "activity_adjustment", "flow is not explained by wash evidence"),
+                    (
+                        "capital_acceleration",
+                        1.0,
+                        "native_curve",
+                        "capital arrival is accelerating",
+                    ),
+                    (
+                        "independent_buyer_velocity",
+                        1.2,
+                        "wallet_graph",
+                        "independent buyers are arriving",
+                    ),
+                    (
+                        "buyer_replacement",
+                        0.8,
+                        "trade_sequence",
+                        "new cohorts replace early buyers",
+                    ),
+                    (
+                        "wash_cleanliness",
+                        0.7,
+                        "activity_adjustment",
+                        "flow is not explained by wash evidence",
+                    ),
                 ),
             ),
             build(
                 "SMART_MONEY_CONSENSUS",
                 (
                     ("smart_consensus", 1.4, "wallet_strategy", "multiple skilled wallets entered"),
-                    ("wallet_independence", 1.3, "wallet_graph", "wallet confirmations are independent"),
+                    (
+                        "wallet_independence",
+                        1.3,
+                        "wallet_graph",
+                        "wallet confirmations are independent",
+                    ),
                     ("funder_independence", 1.0, "funder_graph", "funding sources are independent"),
-                    ("independent_buyer_velocity", 0.8, "wallet_graph", "broader demand confirms the wallets"),
+                    (
+                        "independent_buyer_velocity",
+                        0.8,
+                        "wallet_graph",
+                        "broader demand confirms the wallets",
+                    ),
                 ),
             ),
             build(
@@ -647,14 +762,24 @@ class RunnerThesisEngine:
                     ("migration_liquidity", 1.2, "migration", "liquidity survived migration"),
                     ("migration_flow", 1.2, "migration", "buying flow survived migration"),
                     ("migration_buyers", 1.0, "migration", "buyers remained after migration"),
-                    ("sell_absorption", 0.8, "trade_sequence", "post-migration selling was absorbed"),
+                    (
+                        "sell_absorption",
+                        0.8,
+                        "trade_sequence",
+                        "post-migration selling was absorbed",
+                    ),
                 ),
             ),
             build(
                 "SECOND_LEG_SELL_ABSORPTION",
                 (
                     ("sell_absorption", 1.4, "trade_sequence", "fresh buying absorbed sellers"),
-                    ("buyers_after_sell", 1.1, "trade_sequence", "new buyers arrived after first sell"),
+                    (
+                        "buyers_after_sell",
+                        1.1,
+                        "trade_sequence",
+                        "new buyers arrived after first sell",
+                    ),
                     ("buyer_replacement", 0.9, "trade_sequence", "a replacement cohort formed"),
                     ("capital_persistence", 0.8, "native_curve", "capital remained persistent"),
                 ),
@@ -662,10 +787,20 @@ class RunnerThesisEngine:
             build(
                 "EARLY_CURVE_ACCELERATION",
                 (
-                    ("curve_progress_velocity", 1.2, "native_curve", "curve progress is moving quickly"),
+                    (
+                        "curve_progress_velocity",
+                        1.2,
+                        "native_curve",
+                        "curve progress is moving quickly",
+                    ),
                     ("capital_velocity", 1.2, "native_curve", "real SOL is arriving"),
                     ("buyer_velocity", 1.0, "trade_sequence", "early buyer arrival is strong"),
-                    ("wash_cleanliness", 0.7, "activity_adjustment", "early flow is not wash-dominated"),
+                    (
+                        "wash_cleanliness",
+                        0.7,
+                        "activity_adjustment",
+                        "early flow is not wash-dominated",
+                    ),
                 ),
             ),
             build(
@@ -674,7 +809,12 @@ class RunnerThesisEngine:
                     ("capital_acceleration", 1.2, "native_curve", "capital has reaccelerated"),
                     ("buyer_replacement", 1.0, "trade_sequence", "a fresh buyer cohort arrived"),
                     ("sell_absorption", 0.9, "trade_sequence", "returning demand absorbed supply"),
-                    ("wallet_independence", 0.7, "wallet_graph", "the revival is independently funded"),
+                    (
+                        "wallet_independence",
+                        0.7,
+                        "wallet_graph",
+                        "the revival is independently funded",
+                    ),
                 ),
             ),
         ]
@@ -687,7 +827,9 @@ class RunnerThesisEngine:
                 score *= 0.35
             if archetype.name == "REVIVAL_REACCELERATION" and age < 1_800:
                 score *= 0.45
-            adjusted.append(_Archetype(archetype.name, score, archetype.coverage, archetype.components))
+            adjusted.append(
+                _Archetype(archetype.name, score, archetype.coverage, archetype.components)
+            )
         return adjusted
 
     @staticmethod
@@ -715,8 +857,18 @@ class RunnerThesisEngine:
         selling = feature.get("first_sell") or {}
         facts = (
             ("capital_reversal", capital.get("capital_reversal"), "native_curve", 0.85),
-            ("buyer_deceleration", buyer.get("buyer_deceleration_observed"), "trade_sequence", 0.55),
-            ("first_sell_not_absorbed", selling.get("first_sell_absorbed") is False, "trade_sequence", 0.8),
+            (
+                "buyer_deceleration",
+                buyer.get("buyer_deceleration_observed"),
+                "trade_sequence",
+                0.55,
+            ),
+            (
+                "first_sell_not_absorbed",
+                selling.get("first_sell_absorbed") is False,
+                "trade_sequence",
+                0.8,
+            ),
         )
         for name, active, source, strength in facts:
             if active:
@@ -755,7 +907,11 @@ class RunnerThesisEngine:
             risks.append(("capital_reversal", 0.7, True, "native_curve"))
         if selling.get("first_sell_absorbed") is False:
             risks.append(("unabsorbed_first_sell", 0.65, False, "trade_sequence"))
-        score = _clamp(sum(row[1] for row in risks) / max(1.0, sum(min(1.0, row[1]) for row in risks))) if risks else 0.15
+        score = (
+            _clamp(sum(row[1] for row in risks) / max(1.0, sum(min(1.0, row[1]) for row in risks)))
+            if risks
+            else 0.15
+        )
         unresolved = []
         coverage = feature.get("coverage") or {}
         for name in ("wallet_linkage", "funder", "bundle", "migration"):
@@ -783,9 +939,7 @@ class RunnerThesisEngine:
         monitoring = str(_path(feature, "monitoring", "state") or "")
         activity = _path(feature, "activity_adjustment", "adjusted_volume_sol")
         liquidity_proxy = _positive(activity, 5.0) if activity is not None else None
-        state_score = {"GENESIS": 0.9, "HOT": 0.85, "WARM": 0.65, "COLD": 0.35}.get(
-            monitoring, 0.5
-        )
+        state_score = {"GENESIS": 0.9, "HOT": 0.85, "WARM": 0.65, "COLD": 0.35}.get(monitoring, 0.5)
         market_cap_score = 0.6
         if entry_market_cap is not None and entry_market_cap > 0:
             market_cap_score = math.exp(-max(0.0, math.log10(entry_market_cap) - 6.0) / 2.0)
@@ -827,7 +981,9 @@ class RunnerThesisEngine:
                     and float(previous["runner_probability"]) >= 0.6
                     and float(previous["failure_probability"]) <= 0.45
                 )
-            return ("CALL_READY", "SHADOW_CALL_READY") if reconfirmed else ("CONFIRMED", "RECONFIRM")
+            return (
+                ("CALL_READY", "SHADOW_CALL_READY") if reconfirmed else ("CONFIRMED", "RECONFIRM")
+            )
         if previous:
             delta = runner - float(previous["runner_probability"])
             if delta <= -0.08 or failure - float(previous["failure_probability"]) >= 0.12:
@@ -843,7 +999,10 @@ class RunnerThesisEngine:
         strongest = sorted(
             archetype.components, key=lambda row: (-row.value * row.weight, row.name)
         )[:3]
-        return "; ".join(row.rationale for row in strongest) or "insufficient evidence to form a thesis"
+        return (
+            "; ".join(row.rationale for row in strongest)
+            or "insufficient evidence to form a thesis"
+        )
 
     @staticmethod
     def _horizon(thesis_type: str, stage: str) -> str:
@@ -924,9 +1083,9 @@ class RunnerThesisEngine:
                     _json(thesis.contradictory_evidence),
                     _json(thesis.unresolved_risks),
                     _json(thesis.evidence_freshness),
-                    thesis.runner_probability,
-                    thesis.failure_probability,
-                    thesis.actionable_probability,
+                    thesis.heuristic_runner_score,
+                    thesis.heuristic_failure_score,
+                    thesis.heuristic_actionability_score,
                     thesis.confidence,
                     thesis.uncertainty,
                     _json(thesis.analogous_successes),
@@ -951,20 +1110,22 @@ class RunnerThesisEngine:
                     thesis.decision_timestamp,
                     previous["state"] if previous else None,
                     thesis.state,
-                    thesis.runner_probability - float(previous["runner_probability"])
+                    thesis.heuristic_runner_score - float(previous["runner_probability"])
                     if previous
                     else None,
-                    thesis.failure_probability - float(previous["failure_probability"])
+                    thesis.heuristic_failure_score - float(previous["failure_probability"])
                     if previous
                     else None,
-                    thesis.actionable_probability - float(previous["actionable_probability"])
+                    thesis.heuristic_actionability_score - float(previous["actionable_probability"])
                     if previous
                     else None,
                     _json(
                         {
                             "formation_reason": thesis.formation_reason,
                             "supporting": [row["evidence"] for row in thesis.supporting_evidence],
-                            "contradictory": [row["evidence"] for row in thesis.contradictory_evidence],
+                            "contradictory": [
+                                row["evidence"] for row in thesis.contradictory_evidence
+                            ],
                         }
                     ),
                 ),
@@ -990,13 +1151,13 @@ class RunnerThesisEngine:
                     thesis.decision_timestamp,
                     thesis.thesis_type,
                     thesis.stage,
-                    "RESEARCH_SHADOW",
-                    "OPEN" if thesis.actionable_probability >= 0.56 else "LIMITED",
+                    "RESEARCH_SHADOW_CALL",
+                    "OPEN" if thesis.heuristic_actionability_score >= 0.56 else "LIMITED",
                     entry_market_cap,
                     entry_price,
-                    thesis.runner_probability,
-                    thesis.failure_probability,
-                    thesis.actionable_probability,
+                    thesis.heuristic_runner_score,
+                    thesis.heuristic_failure_score,
+                    thesis.heuristic_actionability_score,
                     thesis.confidence,
                     _json(
                         {
@@ -1007,7 +1168,7 @@ class RunnerThesisEngine:
                             "frozen_at_decision_time": True,
                         }
                     ),
-                    _json({"source_to_decision_ms": None, "discord_ms": None}),
+                    _json(thesis.latency),
                     THESIS_VERSION,
                     0,
                     iso(),

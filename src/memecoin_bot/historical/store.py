@@ -384,7 +384,9 @@ class HistoricalWarehouse(_SqliteStore):
         measured = _parse_timestamp(record["measurement_end_at"])
         available = _parse_timestamp(record["available_at"])
         if measured < decision or available < measured:
-            raise ValueError("outcomes must be measured after decision and available after measurement")
+            raise ValueError(
+                "outcomes must be measured after decision and available after measurement"
+            )
         peak = record.get("peak_multiple")
         rugged = bool(record.get("rugged"))
         class_name = record.get("class_name") or self.classify_outcome(peak, rugged)
@@ -455,7 +457,9 @@ class HistoricalWarehouse(_SqliteStore):
         return "SURVIVED" if peak > 0 else "DEAD"
 
     def coverage_map(self) -> list[dict[str, Any]]:
-        return [dict(row) for row in self.conn.execute("SELECT * FROM datasets ORDER BY dataset_id")]
+        return [
+            dict(row) for row in self.conn.execute("SELECT * FROM datasets ORDER BY dataset_id")
+        ]
 
     def assess_coverage(self, dataset_id: str, assessment: dict[str, Any]) -> None:
         required = {
@@ -686,8 +690,7 @@ class HistoricalWarehouse(_SqliteStore):
         counts = {
             row[0]: int(row[1])
             for row in self.conn.execute(
-                "SELECT relevance_state,COUNT(*) FROM research_sources_v15 "
-                "GROUP BY relevance_state"
+                "SELECT relevance_state,COUNT(*) FROM research_sources_v15 GROUP BY relevance_state"
             )
         }
         access = {
@@ -738,9 +741,10 @@ class HistoricalWarehouse(_SqliteStore):
         }
         return {
             "datasets": self.coverage_manifest(),
-            "backfills": [dict(row) for row in self.conn.execute(
-                "SELECT * FROM backfill_jobs ORDER BY updated_at DESC"
-            )],
+            "backfills": [
+                dict(row)
+                for row in self.conn.execute("SELECT * FROM backfill_jobs ORDER BY updated_at DESC")
+            ],
             "entities": scalar("SELECT COUNT(*) FROM canonical_entities"),
             "normalized_events": scalar("SELECT COUNT(*) FROM normalized_events"),
             "point_in_time_features": scalar("SELECT COUNT(*) FROM point_in_time_features"),
@@ -767,17 +771,26 @@ class HistoricalWarehouse(_SqliteStore):
             "approved_research_features": scalar(
                 "SELECT COUNT(*) FROM research_decisions WHERE approval_state='APPROVED'"
             ),
-            "research_decisions": [dict(row) for row in self.conn.execute(
-                "SELECT * FROM research_decisions ORDER BY decided_at DESC"
-            )],
+            "research_decisions": [
+                dict(row)
+                for row in self.conn.execute(
+                    "SELECT * FROM research_decisions ORDER BY decided_at DESC"
+                )
+            ],
             "shadow_decisions": scalar("SELECT COUNT(*) FROM shadow_decisions"),
             "drift_observations": scalar("SELECT COUNT(*) FROM drift_observations"),
-            "latency": [dict(row) for row in self.conn.execute(
-                "SELECT * FROM latency_measurements_v15 ORDER BY measured_at DESC"
-            )],
-            "acquisition_requirements": [dict(row) for row in self.conn.execute(
-                "SELECT * FROM acquisition_requirements ORDER BY source_name"
-            )],
+            "latency": [
+                dict(row)
+                for row in self.conn.execute(
+                    "SELECT * FROM latency_measurements_v15 ORDER BY measured_at DESC"
+                )
+            ],
+            "acquisition_requirements": [
+                dict(row)
+                for row in self.conn.execute(
+                    "SELECT * FROM acquisition_requirements ORDER BY source_name"
+                )
+            ],
             **sizes,
         }
 
@@ -828,6 +841,262 @@ class HistoricalWarehouse(_SqliteStore):
         row = self.conn.execute("SELECT * FROM backfill_jobs WHERE job_id=?", (job_id,)).fetchone()
         return dict(row) if row else None
 
+    def record_dune_partition(self, record: dict[str, Any]) -> None:
+        month = datetime.strptime(str(record["month"]), "%Y-%m").replace(tzinfo=UTC)
+        parquet = record.get("parquet") or {}
+        with self._lock, self.conn:
+            self.conn.execute(
+                "INSERT INTO dune_partition_state_v15(query_name,schema_version,partition_year,"
+                "partition_month,execution_id,result_offset,row_count,content_sha256,schema_sha256,"
+                "source_coverage_json,quality_state,parquet_path,state,last_error,updated_at) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?, ?,?,?,?) ON CONFLICT(query_name,schema_version,"
+                "partition_year,partition_month) DO UPDATE SET execution_id=excluded.execution_id,"
+                "result_offset=excluded.result_offset,row_count=MAX(dune_partition_state_v15.row_count,"
+                "excluded.row_count),content_sha256=COALESCE(excluded.content_sha256,content_sha256),"
+                "schema_sha256=COALESCE(excluded.schema_sha256,schema_sha256),parquet_path="
+                "COALESCE(excluded.parquet_path,parquet_path),state=excluded.state,"
+                "quality_state=excluded.quality_state,last_error=excluded.last_error,"
+                "updated_at=excluded.updated_at",
+                (
+                    record["query_name"],
+                    record["schema_version"],
+                    month.year,
+                    month.month,
+                    record.get("execution_id"),
+                    int(record.get("offset") or 0),
+                    int(record.get("total_rows") or 0),
+                    parquet.get("content_sha256"),
+                    parquet.get("schema_sha256"),
+                    _json({"repository_sql": True, "partial_results": False}),
+                    (
+                        "SCHEMA_VALIDATED"
+                        if int(record.get("total_rows") or 0) > 0
+                        else "VALID_EMPTY_RESULT"
+                    ),
+                    parquet.get("parquet_path"),
+                    record.get("state", "RUNNING"),
+                    record.get("error"),
+                    _now(),
+                ),
+            )
+            partition_key = (
+                f"{record['query_name']}:{record['schema_version']}:"
+                f"{month.year:04d}-{month.month:02d}"
+            )
+            self.conn.execute(
+                "INSERT INTO data_quality_v15 VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(partition_key) "
+                "DO UPDATE SET assessed_at=excluded.assessed_at,row_count=excluded.row_count,"
+                "coverage_json=excluded.coverage_json,quality_state=excluded.quality_state,"
+                "evidence_json=excluded.evidence_json",
+                (
+                    partition_key,
+                    _now(),
+                    int(record.get("total_rows") or 0),
+                    0,
+                    _json({"state": "NOT_PROFILED_UNTIL_COMPLETE_CORPUS"}),
+                    _json({"repository_sql": True, "partial_results": False}),
+                    (
+                        "SCHEMA_VALIDATED"
+                        if int(record.get("total_rows") or 0) > 0
+                        else "VALID_EMPTY_RESULT"
+                    ),
+                    _json(
+                        {
+                            "execution_id": record.get("execution_id"),
+                            "content_sha256": parquet.get("content_sha256"),
+                            "schema_sha256": parquet.get("schema_sha256"),
+                        }
+                    ),
+                ),
+            )
+
+    def normalize_dune_evidence(self, evidence: RawEvidence, evidence_id: str) -> None:
+        """Populate compact owned tables from a schema-validated repository query row."""
+        payload = evidence.payload
+        query_name = str(evidence.provenance.get("query_name") or "")
+        token = str(payload.get("token_address") or evidence.entity_id)
+        observed = evidence.source_timestamp
+        available = evidence.availability_timestamp
+        token_queries = {
+            "monthly_universe",
+            "pumpfun_launches",
+            "pumpfun_trades",
+            "pumpswap_trades",
+            "migrations",
+            "wallet_activity",
+            "outcome_reconstruction",
+        }
+        with self._lock, self.conn:
+            if query_name in token_queries and token:
+                self.conn.execute(
+                    "INSERT INTO historical_tokens_v15 VALUES(?,?,?,?,?,?) ON CONFLICT(token_id) "
+                    "DO UPDATE SET first_seen_at=MIN(first_seen_at,excluded.first_seen_at),"
+                    "available_at=MAX(available_at,excluded.available_at)",
+                    (
+                        token,
+                        evidence.chain,
+                        payload.get("creator"),
+                        observed,
+                        available,
+                        _json({"evidence_id": evidence_id, "query_name": query_name}),
+                    ),
+                )
+            if query_name in {"monthly_universe", "pumpfun_launches"}:
+                launch_id = _uuid("dune-launch", token, str(payload.get("tx_id") or observed))
+                self.conn.execute(
+                    "INSERT OR IGNORE INTO historical_launches_v15 VALUES(?,?,?,?,?,?,?)",
+                    (
+                        launch_id,
+                        token,
+                        observed,
+                        payload.get("creator"),
+                        payload.get("tx_id"),
+                        available,
+                        _json({"evidence_id": evidence_id}),
+                    ),
+                )
+            elif query_name in {"pumpfun_trades", "pumpswap_trades"}:
+                trade_id = _uuid(
+                    "dune-trade",
+                    str(payload.get("tx_id") or observed),
+                    token,
+                    str(payload.get("side") or ""),
+                )
+                self.conn.execute(
+                    "INSERT OR IGNORE INTO historical_trades_v15 VALUES(?,?,?,?,?,?,?,?,?,?)",
+                    (
+                        trade_id,
+                        token,
+                        observed,
+                        payload.get("trader"),
+                        payload.get("side"),
+                        None,
+                        payload.get("token_amount"),
+                        (
+                            float(payload["amount_usd"]) / float(payload["token_amount"])
+                            if payload.get("amount_usd") is not None and payload.get("token_amount")
+                            else None
+                        ),
+                        available,
+                        _json(
+                            {"evidence_id": evidence_id, "amount_usd": payload.get("amount_usd")}
+                        ),
+                    ),
+                )
+                wallet = payload.get("trader")
+                side = str(payload.get("side") or "").lower()
+                landmark_table = (
+                    "buyer_landmarks_v15"
+                    if side == "buy"
+                    else "seller_landmarks_v15"
+                    if side == "sell"
+                    else None
+                )
+                if wallet and landmark_table:
+                    self.conn.execute(
+                        f"INSERT OR IGNORE INTO {landmark_table} VALUES(?,?,?,?,?,?)",
+                        (
+                            token,
+                            wallet,
+                            "TRADE",
+                            observed,
+                            _json(
+                                {
+                                    "token_amount": payload.get("token_amount"),
+                                    "amount_usd": payload.get("amount_usd"),
+                                    "tx_id": payload.get("tx_id"),
+                                }
+                            ),
+                            available,
+                        ),
+                    )
+            elif query_name == "migrations":
+                self.conn.execute(
+                    "INSERT OR IGNORE INTO migration_events_v15 VALUES(?,?,?,?,?,?)",
+                    (
+                        token,
+                        observed,
+                        payload.get("venue"),
+                        payload.get("tx_id"),
+                        available,
+                        _json({"evidence_id": evidence_id}),
+                    ),
+                )
+            elif query_name == "wallet_activity":
+                for wallet, direction in (
+                    (payload.get("from_owner"), "OUT"),
+                    (payload.get("to_owner"), "IN"),
+                ):
+                    if wallet:
+                        self.conn.execute(
+                            "INSERT OR IGNORE INTO wallet_token_entries_v15 VALUES(?,?,?,?,?)",
+                            (
+                                token,
+                                wallet,
+                                observed,
+                                _json(
+                                    {
+                                        "direction": direction,
+                                        "amount": payload.get("amount"),
+                                        "amount_usd": payload.get("amount_usd"),
+                                        "evidence_id": evidence_id,
+                                    }
+                                ),
+                                available,
+                            ),
+                        )
+                        self.conn.execute(
+                            "INSERT OR IGNORE INTO wallet_history_v15 VALUES(?,?,?,?)",
+                            (
+                                wallet,
+                                observed,
+                                _json(
+                                    {
+                                        "token_id": token,
+                                        "direction": direction,
+                                        "amount": payload.get("amount"),
+                                        "amount_usd": payload.get("amount_usd"),
+                                        "tx_id": payload.get("tx_id"),
+                                    }
+                                ),
+                                available,
+                            ),
+                        )
+            elif query_name == "creator_activity" and payload.get("creator"):
+                self.conn.execute(
+                    "INSERT OR IGNORE INTO creator_history_v15 VALUES(?,?,?,?)",
+                    (
+                        payload["creator"],
+                        observed,
+                        _json(
+                            {
+                                "tx_id": payload.get("tx_id"),
+                                "success": payload.get("success"),
+                                "evidence_id": evidence_id,
+                            }
+                        ),
+                        available,
+                    ),
+                )
+            elif query_name == "outcome_reconstruction":
+                self.conn.execute(
+                    "INSERT OR IGNORE INTO token_landmarks_v15 VALUES(?,?,?,?,?)",
+                    (
+                        token,
+                        "MARKET_PRICE_OBSERVATION",
+                        observed,
+                        _json(
+                            {
+                                "price_usd": payload.get("price_usd"),
+                                "amount_usd": payload.get("amount_usd"),
+                                "tx_id": payload.get("tx_id"),
+                                "evidence_id": evidence_id,
+                            }
+                        ),
+                        available,
+                    ),
+                )
+
     def record_shadow_decision(
         self,
         *,
@@ -870,9 +1139,7 @@ class HistoricalWarehouse(_SqliteStore):
         metric_value: float,
         warning_threshold: float,
     ) -> str:
-        drift_id = _uuid(
-            feature_name, segment_type, segment_value, current_window, metric_name
-        )
+        drift_id = _uuid(feature_name, segment_type, segment_value, current_window, metric_name)
         state = "WARNING" if abs(metric_value) >= warning_threshold else "STABLE"
         with self._lock, self.conn:
             self.conn.execute(
@@ -1003,7 +1270,9 @@ class ApprovedFeatureStore(_SqliteStore):
             )
         return snapshot_id
 
-    def context_at(self, chain: str, entity_id: str, decision_at: str, stage: str) -> list[dict[str, Any]]:
+    def context_at(
+        self, chain: str, entity_id: str, decision_at: str, stage: str
+    ) -> list[dict[str, Any]]:
         _parse_timestamp(decision_at)
         rows = self.conn.execute(
             "SELECT r.*,s.feature_value_json,s.observed_at,s.available_at,s.expires_at,"

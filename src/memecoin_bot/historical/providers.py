@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
+import os
 import sqlite3
+import tempfile
 import time
 from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime, timedelta
@@ -12,6 +15,7 @@ from typing import Any
 import aiohttp
 
 from .backfill import BackfillPage
+from .dune_registry import DuneQueryRegistry
 from .store import RawEvidence
 
 JsonFetcher = Callable[[str], Awaitable[Any]]
@@ -49,14 +53,17 @@ class PublicJsonClient:
             if delay > 0:
                 await __import__("asyncio").sleep(delay)
             timeout = aiohttp.ClientTimeout(total=self.timeout_seconds)
-            async with aiohttp.ClientSession(timeout=timeout) as session, session.get(
-                url,
+            async with (
+                aiohttp.ClientSession(timeout=timeout) as session,
+                session.get(
+                    url,
                     headers={
                         "Accept": "application/json",
                         "User-Agent": "Gambit-Jr-Historical-Research/1.5",
                         **self.extra_headers,
                     },
-            ) as response:
+                ) as response,
+            ):
                 self._last_request = time.monotonic()
                 if response.status == 429:
                     retry_after = response.headers.get("Retry-After")
@@ -210,9 +217,7 @@ class GeckoTerminalPoolProvider:
         next_page = page + 1
         return BackfillPage(
             records,
-            {"page": next_page}
-            if rows and next_page <= self.maximum_pages
-            else None,
+            {"page": next_page} if rows and next_page <= self.maximum_pages else None,
             None,
             metadata={"request_url": url, "maximum_free_page": 10},
         )
@@ -333,10 +338,13 @@ class DuneQueryProvider:
         self.observed_at_field = observed_at_field
         self.available_at_field = available_at_field
         self.page_size = min(1000, page_size)
-        self.fetch_json = fetch_json or PublicJsonClient(
-            minimum_interval_seconds=1,
-            extra_headers={"X-Dune-API-Key": str(api_key)},
-        ).fetch
+        self.fetch_json = (
+            fetch_json
+            or PublicJsonClient(
+                minimum_interval_seconds=1,
+                extra_headers={"X-Dune-API-Key": str(api_key)},
+            ).fetch
+        )
         self.base_url = base_url.rstrip("/")
 
     async def fetch_page(self, cursor: Any) -> BackfillPage:
@@ -419,10 +427,8 @@ class DuneExecutionClient:
         headers = {"X-Dune-API-Key": self.api_key}
         async with aiohttp.ClientSession(timeout=timeout, headers=headers) as session:
             for attempt in range(6):
-                async with session.request(
-                    method, f"{self.base_url}{path}", json=body
-                ) as response:
-                    if response.status == 429:
+                async with session.request(method, f"{self.base_url}{path}", json=body) as response:
+                    if response.status == 429 or 500 <= response.status < 600:
                         retry = min(float(response.headers.get("Retry-After", 2**attempt)), 60)
                         await asyncio.sleep(retry)
                         continue
@@ -442,6 +448,20 @@ class DuneExecutionClient:
         execution_id = payload.get("execution_id")
         if not execution_id:
             raise ValueError("Dune execution response omitted execution_id")
+        return str(execution_id)
+
+    async def execute_sql(self, sql: str, *, performance: str = "medium") -> str:
+        """Execute repository-owned SQL without creating or depending on a saved query."""
+        if performance not in {"small", "medium", "large"}:
+            raise ValueError("unsupported Dune performance tier")
+        payload = await self._request(
+            "POST",
+            "/sql/execute",
+            body={"sql": sql, "performance": performance},
+        )
+        execution_id = payload.get("execution_id")
+        if not execution_id:
+            raise ValueError("Dune direct SQL response omitted execution_id")
         return str(execution_id)
 
     async def wait(self, execution_id: str) -> dict[str, Any]:
@@ -468,19 +488,74 @@ class DuneExecutionClient:
         )
 
 
-class DuneMonthHistoricalProvider:
-    """Targeted month partition backed by one reviewed Dune saved query.
+class DuneParquetPartitionWriter:
+    """Write compact immutable Dune result pages outside version control."""
 
-    The query must accept ``month_start`` and ``month_end`` parameters and return
-    the configured entity/observed columns. Missing availability is conservatively
-    set to acquisition time; it is never backdated to the event.
+    def __init__(self, root: str | Path):
+        self.root = Path(root)
+
+    def write(
+        self,
+        query_name: str,
+        month: str,
+        offset: int,
+        rows: list[dict[str, Any]],
+    ) -> dict[str, Any] | None:
+        if not rows:
+            return None
+        try:
+            import duckdb
+        except ImportError as exc:  # pragma: no cover - optional research dependency
+            raise RuntimeError("install the research extra to persist Dune Parquet") from exc
+        canonical = [
+            json.dumps(row, default=str, separators=(",", ":"), sort_keys=True) for row in rows
+        ]
+        content_sha = hashlib.sha256("\n".join(canonical).encode()).hexdigest()
+        schema_sha = hashlib.sha256(
+            json.dumps(sorted(rows[0]), separators=(",", ":")).encode()
+        ).hexdigest()
+        partition = self.root / query_name / f"year={month[:4]}" / f"month={month[5:7]}"
+        partition.mkdir(parents=True, exist_ok=True)
+        target = partition / f"part-{offset:012d}-{content_sha[:12]}.parquet"
+        if not target.exists():
+            with tempfile.NamedTemporaryFile(
+                "w", suffix=".jsonl", encoding="utf-8", delete=False
+            ) as handle:
+                handle.write("\n".join(canonical))
+                source_path = Path(handle.name)
+            temporary = target.with_suffix(".parquet.tmp")
+            source_sql = source_path.resolve().as_posix().replace("'", "''")
+            target_sql = temporary.resolve().as_posix().replace("'", "''")
+            connection = duckdb.connect()
+            try:
+                connection.execute(
+                    f"COPY (SELECT * FROM read_json_auto('{source_sql}')) "
+                    f"TO '{target_sql}' (FORMAT PARQUET, COMPRESSION ZSTD)"
+                )
+            finally:
+                connection.close()
+                source_path.unlink(missing_ok=True)
+            os.replace(temporary, target)
+        return {
+            "parquet_path": str(target),
+            "content_sha256": content_sha,
+            "schema_sha256": schema_sha,
+            "row_count": len(rows),
+        }
+
+
+class DuneMonthHistoricalProvider:
+    """Targeted month partition backed by repository SQL or a saved-query fallback.
+
+    Direct SQL is authoritative. ``query_id`` remains only a compatibility fallback
+    for plans that reject direct execution; it is never mandatory.
     """
 
     name = "dune_month_partition"
 
     def __init__(
         self,
-        query_id: int,
+        query_id: int | None,
         month: str,
         api_key: str | None,
         *,
@@ -490,6 +565,9 @@ class DuneMonthHistoricalProvider:
         available_at_field: str | None = None,
         page_size: int = 5_000,
         client: DuneExecutionClient | None = None,
+        query_name: str = "monthly_universe",
+        registry: DuneQueryRegistry | None = None,
+        parquet_root: str | Path | None = None,
     ):
         start = datetime.strptime(month, "%Y-%m").replace(tzinfo=UTC)
         if start.month == 12:
@@ -498,31 +576,61 @@ class DuneMonthHistoricalProvider:
             end = start.replace(month=start.month + 1)
         if not api_key and client is None:
             raise ValueError("DUNE_API_KEY is required")
-        self.query_id = int(query_id)
+        self.query_id = int(query_id) if query_id is not None else None
+        self.query_name = query_name
+        self.registry = registry or DuneQueryRegistry()
+        self.query_spec = self.registry.spec(query_name)
+        self.parquet_writer = (
+            DuneParquetPartitionWriter(parquet_root) if parquet_root is not None else None
+        )
         self.month = month
         self.start = start.isoformat()
         self.end = end.isoformat()
-        self.dataset_id = f"dune-pumpfun-{month}"
+        self.dataset_id = f"dune-{query_name}-{month}"
         self.chain = chain
         self.entity_field = entity_field
         self.observed_at_field = observed_at_field
         self.available_at_field = available_at_field
         self.page_size = min(max(int(page_size), 1), 10_000)
         self.client = client or DuneExecutionClient(str(api_key))
+        self.execution_mode = "DIRECT_SQL"
 
     async def fetch_page(self, cursor: Any) -> BackfillPage:
         checkpoint = dict(cursor or {})
         execution_id = checkpoint.get("execution_id")
+        self.execution_mode = str(checkpoint.get("execution_mode") or "DIRECT_SQL")
         if not execution_id:
-            execution_id = await self.client.execute(
-                self.query_id,
-                {"month_start": self.start, "month_end": self.end},
-            )
+            parameters = {"month_start": self.start, "month_end": self.end}
+            try:
+                execution_id = await self.client.execute_sql(
+                    self.registry.render(self.query_name, parameters)
+                )
+                self.execution_mode = "DIRECT_SQL"
+            except (AttributeError, NotImplementedError, aiohttp.ClientResponseError) as exc:
+                direct_unavailable = isinstance(exc, (AttributeError, NotImplementedError)) or (
+                    isinstance(exc, aiohttp.ClientResponseError) and exc.status in {403, 404, 405}
+                )
+                if not direct_unavailable:
+                    raise
+                if self.query_id is None:
+                    raise RuntimeError(
+                        "Dune direct SQL is unavailable on this plan. Create one saved query from "
+                        f"historical/sql/dune/{self.query_spec.template_path.name} and set "
+                        "DUNE_QUERY_ID once; repository SQL remains the source of truth."
+                    ) from exc
+                execution_id = await self.client.execute(self.query_id, parameters)
+                self.execution_mode = "SAVED_QUERY_FALLBACK"
             await self.client.wait(str(execution_id))
         offset = int(checkpoint.get("offset", 0))
         response = await self.client.results(str(execution_id), offset, self.page_size)
         result = response.get("result") or {}
         rows = result.get("rows") or []
+        self.registry.validate_columns(self.query_name, rows)
+        parquet = (
+            self.parquet_writer.write(self.query_name, self.month, offset, rows)
+            if self.parquet_writer
+            else None
+        )
         metadata = result.get("metadata") or response.get("result_metadata") or {}
         total = int(metadata.get("total_row_count") or offset + len(rows))
         acquired_at = _utc_now()
@@ -543,12 +651,24 @@ class DuneMonthHistoricalProvider:
                     entity_id=str(row[self.entity_field]),
                     source_timestamp=observed,
                     availability_timestamp=available,
-                    endpoint_type="dune_parameterized_month_result",
+                    endpoint_type=(
+                        "dune_direct_sql_month_result"
+                        if self.execution_mode == "DIRECT_SQL"
+                        else "dune_saved_query_month_result"
+                    ),
                     payload=row,
-                    schema_version=f"dune-query-{self.query_id}",
+                    schema_version=(
+                        f"dune-owned-{self.query_name}-{self.query_spec.schema_version}"
+                        if self.execution_mode == "DIRECT_SQL"
+                        else f"dune-saved-query-{self.query_id}"
+                    ),
                     acquisition_version="v1.5-convergence-v1",
                     provenance={
                         "query_id": self.query_id,
+                        "query_name": self.query_name,
+                        "sql_sha256": self.query_spec.sql_sha256,
+                        "direct_sql": self.execution_mode == "DIRECT_SQL",
+                        "execution_mode": self.execution_mode,
                         "execution_id": str(execution_id),
                         "month": self.month,
                         "offset": offset,
@@ -560,7 +680,11 @@ class DuneMonthHistoricalProvider:
             )
         next_offset = offset + len(rows)
         next_cursor = (
-            {"execution_id": str(execution_id), "offset": next_offset}
+            {
+                "execution_id": str(execution_id),
+                "offset": next_offset,
+                "execution_mode": self.execution_mode,
+            }
             if rows and next_offset < total
             else None
         )
@@ -570,9 +694,23 @@ class DuneMonthHistoricalProvider:
             max(0, total - next_offset),
             metadata={
                 "query_id": self.query_id,
+                "query_name": self.query_name,
+                "sql_sha256": self.query_spec.sql_sha256,
+                "direct_sql": self.execution_mode == "DIRECT_SQL",
+                "execution_mode": self.execution_mode,
                 "execution_id": str(execution_id),
                 "month": self.month,
                 "total_rows": total,
+                "dune_partition": {
+                    "query_name": self.query_name,
+                    "schema_version": self.query_spec.schema_version,
+                    "month": self.month,
+                    "execution_id": str(execution_id),
+                    "offset": next_offset,
+                    "total_rows": total,
+                    "parquet": parquet,
+                    "state": "COMPLETE" if next_cursor is None else "RUNNING",
+                },
             },
         )
 
@@ -610,10 +748,13 @@ class BirdeyeOhlcvProvider:
         self.chain = chain
         self.candle_type = candle_type
         self.dataset_id = f"birdeye-{chain}-{candle_type.lower()}-ohlcv"
-        self.fetch_json = fetch_json or PublicJsonClient(
-            minimum_interval_seconds=1,
-            extra_headers={"X-API-KEY": str(api_key), "x-chain": chain},
-        ).fetch
+        self.fetch_json = (
+            fetch_json
+            or PublicJsonClient(
+                minimum_interval_seconds=1,
+                extra_headers={"X-API-KEY": str(api_key), "x-chain": chain},
+            ).fetch
+        )
         self.base_url = base_url.rstrip("/")
 
     async def fetch_page(self, cursor: Any) -> BackfillPage:
@@ -626,10 +767,8 @@ class BirdeyeOhlcvProvider:
             f"&time_from={self.start}&time_to={self.end}"
         )
         response = await self.fetch_json(url)
-        rows = ((response.get("data") or {}).get("items") or [])
-        interval_seconds = {"1H": 3600, "4H": 14_400, "1D": 86_400}.get(
-            self.candle_type, 86_400
-        )
+        rows = (response.get("data") or {}).get("items") or []
+        interval_seconds = {"1H": 3600, "4H": 14_400, "1D": 86_400}.get(self.candle_type, 86_400)
         records = []
         for row in rows:
             opened = datetime.fromtimestamp(int(row["unixTime"]), UTC)
@@ -840,9 +979,7 @@ class OperationalHistoryProvider:
         try:
             existing = {
                 row[0]
-                for row in connection.execute(
-                    "SELECT name FROM sqlite_master WHERE type='table'"
-                )
+                for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")
             }
             while table_index < len(self.TABLES):
                 table = self.TABLES[table_index]
@@ -850,11 +987,11 @@ class OperationalHistoryProvider:
                     table_index += 1
                     last_rowid = 0
                     continue
-                columns = {
-                    row[1] for row in connection.execute(f'PRAGMA table_info("{table}")')
-                }
+                columns = {row[1] for row in connection.execute(f'PRAGMA table_info("{table}")')}
                 timestamp_column = next((name for name in self.TIMESTAMPS if name in columns), None)
-                entity_column = next((name for name in self.ENTITY_COLUMNS if name in columns), None)
+                entity_column = next(
+                    (name for name in self.ENTITY_COLUMNS if name in columns), None
+                )
                 if timestamp_column is None or entity_column is None:
                     table_index += 1
                     last_rowid = 0

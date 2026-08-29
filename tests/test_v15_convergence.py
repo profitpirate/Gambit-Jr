@@ -86,9 +86,12 @@ def test_provider_preflight_is_dated_truthful_and_never_persists_credentials(
     helius = next(row for row in registry.status() if row["provider"] == "helius")
     assert helius["current_docs_checked_at"] == "2026-08-29"
     assert helius["cost"]["wss_metered"] is True
-    assert next(row for row in capabilities() if row.provider == "dexscreener").rate_limit[
-        "token_batch_max"
-    ] == 30
+    assert (
+        next(row for row in capabilities() if row.provider == "dexscreener").rate_limit[
+            "token_batch_max"
+        ]
+        == 30
+    )
 
 
 @pytest.mark.asyncio
@@ -128,6 +131,9 @@ class FakeDuneClient:
                 "token_address": "So11111111111111111111111111111111111111112",
                 "observed_at": "2024-01-02 03:04:05",
                 "creator": "creator-1",
+                "tx_id": "tx-1",
+                "block_slot": 123,
+                "source": "fixture",
             }
         ]
         return {

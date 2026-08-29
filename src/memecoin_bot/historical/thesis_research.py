@@ -32,9 +32,7 @@ def thesis_archetype_scores(data: Any, development: Any, np: Any) -> dict[str, A
     trades_late = feature["b4_trade_count"] + feature["b5_trade_count"]
     buyers_late = feature["b4_new_buyer_count"] + feature["b5_new_buyer_count"]
     net_late = feature["b4_net_sol"] + feature["b5_net_sol"]
-    sell_values = np.column_stack(
-        [feature["b4_sell_pressure"], feature["b5_sell_pressure"]]
-    )
+    sell_values = np.column_stack([feature["b4_sell_pressure"], feature["b5_sell_pressure"]])
     sell_known = np.isfinite(sell_values)
     sell_late = np.divide(
         np.nansum(sell_values, axis=1),
@@ -74,8 +72,10 @@ def thesis_archetype_scores(data: Any, development: Any, np: Any) -> dict[str, A
         + 0.30 * _robust_scale(-net_late, development, np)
         + 0.25 * _robust_scale(-buyers_late, development, np)
     )
-    actionable = runner - np.maximum(failure, 0) - 0.15 * _robust_scale(
-        feature["log_market_cap"], development, np
+    actionable = (
+        runner
+        - np.maximum(failure, 0)
+        - 0.15 * _robust_scale(feature["log_market_cap"], development, np)
     )
     return {
         "EARLY_CURVE_ACCELERATION": early_curve,
@@ -106,7 +106,9 @@ def run_runner_thesis_research(database: str | Path) -> dict[str, Any]:
             for frequency in FREQUENCIES
         ],
         **{
-            name: [selection_metrics(data, outer, score[outer], frequency) for frequency in FREQUENCIES]
+            name: [
+                selection_metrics(data, outer, score[outer], frequency) for frequency in FREQUENCIES
+            ]
             for name, score in scores.items()
             if name != "INDEPENDENT_FAILURE_RISK"
         },
@@ -118,9 +120,7 @@ def run_runner_thesis_research(database: str | Path) -> dict[str, Any]:
     for rows in frontiers.values():
         for row in rows:
             if row["median_entry_market_cap"] is not None:
-                row["median_entry_market_cap"] = float(
-                    np.expm1(row["median_entry_market_cap"])
-                )
+                row["median_entry_market_cap"] = float(np.expm1(row["median_entry_market_cap"]))
     control_precision = one_percent["CONTROL_RECONSTRUCTION"]["2x_precision"] or 0.0
     candidate_precision = one_percent["ACTIONABLE_THESIS"]["2x_precision"] or 0.0
     result = {

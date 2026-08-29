@@ -34,9 +34,7 @@ def validate_card(payload: dict[str, Any]) -> discord.Embed:
     if "title" in data:
         total += len(_text(data["title"], "embed.title", 256))
     if "description" in data:
-        description = _text(
-            data["description"], "embed.description", 4096, allow_empty=True
-        )
+        description = _text(data["description"], "embed.description", 4096, allow_empty=True)
         if description:
             total += len(description)
         else:
@@ -157,7 +155,10 @@ def component_count(view: discord.ui.View | None) -> int:
 
 
 def validate_message(
-    *, content: str | None = None, card_payload: dict[str, Any] | None = None, view: discord.ui.View | None = None
+    *,
+    content: str | None = None,
+    card_payload: dict[str, Any] | None = None,
+    view: discord.ui.View | None = None,
 ) -> discord.Embed | None:
     if content is None and card_payload is None and view is None:
         raise DiscordPayloadValidationError("Discord message cannot be empty")

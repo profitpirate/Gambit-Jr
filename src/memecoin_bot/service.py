@@ -47,7 +47,6 @@ from memecoin_bot.models import (
     CandidateState,
     DiscoveryEvent,
     SafetyAssessment,
-    SignalClass,
     iso,
 )
 from memecoin_bot.momentum import MomentumEngine
@@ -59,8 +58,11 @@ from memecoin_bot.providers.dexscreener import DexScreenerProvider
 from memecoin_bot.radar import RadarEngine
 from memecoin_bot.realtime import CanonicalEvent, CanonicalEventFabric, CanonicalEventType
 from memecoin_bot.realtime.actors import ActorIntelligence
+from memecoin_bot.realtime.decision import RunnerDecisionEngine
 from memecoin_bot.realtime.features import RealtimeFeatureProjector
+from memecoin_bot.realtime.lanes import TokenLaneExecutor
 from memecoin_bot.realtime.learning import AdaptiveLearningLab
+from memecoin_bot.realtime.outcomes import DecisionOutcomeLedger
 from memecoin_bot.realtime.thesis import RunnerThesisEngine
 from memecoin_bot.safety import SafetyGates
 from memecoin_bot.scoring import ScoringEngine
@@ -68,7 +70,6 @@ from memecoin_bot.signals import format_discord_event, radar_payload, signal_pay
 from memecoin_bot.social import SocialEngine
 from memecoin_bot.tracking import SignalTracker
 from memecoin_bot.v15_engine import (
-    SignalTier,
     Stage,
     buyer_trajectory,
     economic_concentration,
@@ -172,6 +173,8 @@ class IntelligenceService:
         self.realtime_fabric = CanonicalEventFabric(store)
         self.realtime_features = RealtimeFeatureProjector(store)
         self.runner_theses = RunnerThesisEngine(store)
+        self.runner_decisions = RunnerDecisionEngine(store)
+        self.decision_outcomes = DecisionOutcomeLedger(store)
         self.actor_intelligence = ActorIntelligence(store)
         self.learning_lab = AdaptiveLearningLab(store)
         self.realtime_wake = asyncio.Event()
@@ -221,9 +224,12 @@ class IntelligenceService:
 
     async def handle_realtime_event(self, event: CanonicalEvent) -> str:
         feature_ready = model_start = model_finish = decision_at = None
-        token_id, _ = self.realtime_fabric.project(event)
-        if token_id is not None:
-            model_start = iso()
+        token_id, _ = await asyncio.to_thread(self.realtime_fabric.project, event)
+        normalized_row = self.store.conn.execute(
+            "SELECT normalized_timestamp FROM canonical_events WHERE event_id=?",
+            (event.event_id,),
+        ).fetchone()
+        normalized_at = str(normalized_row[0]) if normalized_row else event.available_timestamp
         if event.event_type == CanonicalEventType.TOKEN_CREATED:
             launch = LaunchEvent(
                 event_key=event.event_id,
@@ -248,10 +254,14 @@ class IntelligenceService:
             )
             await self.handle_launch_event(launch)
         if token_id is not None:
-            feature_ready = iso()
+            await asyncio.to_thread(self.realtime_features.apply, token_id, event)
             # Every event updates a bounded PIT trajectory snapshot. This is
             # research/shadow evidence and cannot route a public alert itself.
-            feature = self.realtime_features.compute(token_id, event.available_timestamp)
+            feature = await asyncio.to_thread(
+                self.realtime_features.compute, token_id, event.available_timestamp
+            )
+            feature_ready = iso()
+            model_start = iso()
             age = float(feature.get("token_age_seconds") or 0)
             actor_stage = (
                 "BONDING_SNIPER"
@@ -265,10 +275,13 @@ class IntelligenceService:
                 else "UNKNOWN"
             )
             actor_evidence = {
-                "funder": self.actor_intelligence.funder_graph(
-                    token_id, event.available_timestamp
+                "funder": await asyncio.to_thread(
+                    self.actor_intelligence.funder_graph,
+                    token_id,
+                    event.available_timestamp,
                 ),
-                "wallet_consensus": self.actor_intelligence.independent_consensus(
+                "wallet_consensus": await asyncio.to_thread(
+                    self.actor_intelligence.independent_consensus,
                     token_id=token_id,
                     decision_at=event.available_timestamp,
                     stage=actor_stage,
@@ -279,19 +292,60 @@ class IntelligenceService:
                 (token_id,),
             ).fetchone()
             if state and state["creator_address"]:
-                actor_evidence["creator_prior_at_launch"] = (
-                    self.actor_intelligence.creator_profile_at(
-                        event.chain, str(state["creator_address"]), str(state["launched_at"])
-                    )
+                actor_evidence["creator_prior_at_launch"] = await asyncio.to_thread(
+                    self.actor_intelligence.creator_profile_at,
+                    event.chain,
+                    str(state["creator_address"]),
+                    str(state["launched_at"]),
                 )
             feature["actor_intelligence"] = actor_evidence
             feature["trigger_event_id"] = event.event_id
-            feature["runner_thesis"] = self.runner_theses.evaluate(
+            feature_ready = iso()
+            model_start = feature_ready
+            thesis = await asyncio.to_thread(
+                self.runner_theses.evaluate,
                 token_id,
                 event.available_timestamp,
                 feature,
                 trigger_event_id=event.event_id,
-            ).to_dict()
+                runtime_timestamps={
+                    "source": event.source_timestamp,
+                    "received": event.received_timestamp,
+                    "normalized": normalized_at,
+                    "feature": feature_ready,
+                },
+            )
+            model_finish = str(thesis.latency["timestamps"]["model_finish"])
+            decision_at = thesis.decision_timestamp
+            latency = thesis.latency
+            feature["latency"] = latency
+            feature["runner_thesis"] = thesis.to_dict()
+            runner_decision = await asyncio.to_thread(
+                self.runner_decisions.decide,
+                token_id=token_id,
+                token_address=event.canonical_token,
+                chain=event.chain,
+                decision_at=decision_at,
+                stage=thesis.stage,
+                thesis=feature["runner_thesis"],
+                v15_control={
+                    "signal_tier": "NO_SIGNAL",
+                    "evidence_coverage": thesis.confidence,
+                    "runner_score": thesis.heuristic_runner_score,
+                    "failure_score": thesis.heuristic_failure_score,
+                    "critical_unknowns": thesis.unresolved_risks,
+                },
+                legacy_control={"state": "CONTROL_NOT_RUN_ON_CANONICAL_EVENT"},
+                waiting_reasons=[],
+                hard_rejections=[],
+                entry_state={"state": "REALTIME_RESEARCH_NO_ENTRY"},
+                provider_health={event.source: "OBSERVED"},
+                provenance=list(feature.get("provenance") or []),
+                latency=latency,
+                trigger_event_id=event.event_id,
+                research_only=True,
+            )
+            feature["runner_decision"] = runner_decision.to_dict()
             with self.store._lock, self.store.conn:
                 self.store.conn.execute(
                     "UPDATE trajectory_feature_snapshots_v15 SET feature_json=? WHERE token_id=? "
@@ -303,8 +357,6 @@ class IntelligenceService:
                         "realtime-trajectory-v1",
                     ),
                 )
-            model_finish = iso()
-            decision_at = event.available_timestamp
         self.realtime_fabric.complete(
             event.event_id,
             feature_ready_timestamp=feature_ready,
@@ -654,6 +706,85 @@ class IntelligenceService:
                 market,
                 rejected_score,
                 hard_rejections=hard_rejections,
+            )
+            rejected_at = iso()
+            self.runner_decisions.decide(
+                token_id=token_id,
+                candidate_id=candidate_id,
+                token_address=address,
+                chain=chain,
+                decision_at=rejected_at,
+                stage="SAFETY",
+                thesis=None,
+                v15_control={
+                    "signal_tier": "NO_SIGNAL",
+                    "evidence_coverage": 0,
+                    "critical_unknowns": [],
+                    "authority": "CHAMPION_CONTROL",
+                },
+                legacy_control={
+                    "classification": str(rejected_score.classification),
+                    "authority": "CONTROL_ONLY",
+                },
+                waiting_reasons=[],
+                hard_rejections=hard_rejections,
+                entry_state={
+                    "state": "REJECTED_UNSAFE",
+                    "decision_price": market.price_usd,
+                    "decision_market_cap": market.market_cap_usd,
+                    "liquidity_usd": market.liquidity_usd,
+                },
+                provider_health={
+                    "safety": {
+                        "state": "DEGRADED" if safety_unavailable else "HEALTHY",
+                        "latency_ms": enrichment["safety"].get("latency_ms"),
+                    }
+                },
+                provenance=[
+                    {
+                        "field_name": "market",
+                        "source_timestamp": market.captured_at,
+                        "received_timestamp": market.captured_at,
+                        "available_timestamp": market.captured_at,
+                    },
+                    {
+                        "field_name": "safety",
+                        "source_timestamp": safety.checked_at,
+                        "received_timestamp": safety.checked_at,
+                        "available_timestamp": safety.checked_at,
+                    },
+                ],
+                latency={
+                    "source_to_receive_ms": 0.0,
+                    "receive_to_normalize_ms": 0.0,
+                    "normalize_to_feature_ms": 0.0,
+                    "feature_to_model_ms": 0.0,
+                    "model_to_decision_ms": round(
+                        max(
+                            0.0,
+                            (datetime.fromisoformat(rejected_at) - attempted_at).total_seconds()
+                            * 1000,
+                        ),
+                        3,
+                    ),
+                    "source_to_decision_ms": round(
+                        max(
+                            0.0,
+                            (
+                                datetime.fromisoformat(rejected_at)
+                                - datetime.fromisoformat(market.captured_at)
+                            ).total_seconds()
+                            * 1000,
+                        ),
+                        3,
+                    ),
+                    "decision_to_enqueue": {"state": "NOT_ROUTED"},
+                    "discord_delivery": {"state": "NOT_ROUTED"},
+                    "timestamps": {
+                        "source": market.captured_at,
+                        "decision": rejected_at,
+                    },
+                },
             )
             log_event(
                 self.log,
@@ -1183,7 +1314,9 @@ class IntelligenceService:
         realtime_feature = self.realtime_features.latest(token_id, market.captured_at)
         realtime_capital = (realtime_feature or {}).get("capital_trajectory") or {}
         realtime_buyers = (realtime_feature or {}).get("buyer_arrival") or {}
-        realtime_available = (realtime_feature or {}).get("available_timestamp") or market.captured_at
+        realtime_available = (realtime_feature or {}).get(
+            "available_timestamp"
+        ) or market.captured_at
         realtime_observed = (realtime_feature or {}).get("decision_timestamp") or market.captured_at
         v3_evidence = {
             "market_cap": TimedValue(
@@ -1212,9 +1345,7 @@ class IntelligenceService:
                 realtime_observed,
                 realtime_available,
                 "canonical_realtime_fabric",
-                "KNOWN"
-                if realtime_capital.get("real_sol_reserve") is not None
-                else "UNKNOWN",
+                "KNOWN" if realtime_capital.get("real_sol_reserve") is not None else "UNKNOWN",
             ),
             "independent_buyer_velocity": TimedValue(
                 realtime_buyers.get("independent_new_buyers_per_second"),
@@ -1247,9 +1378,7 @@ class IntelligenceService:
             positive_evidence=v15_decision.why_now,
             negative_evidence=v15_decision.critical_unknowns,
             hard_risk_evidence=(
-                v15_decision.failure_reasons
-                if v15_features.get("terminal_safety_failure")
-                else []
+                v15_decision.failure_reasons if v15_features.get("terminal_safety_failure") else []
             ),
             feature_versions={"shadow_adapter": "v3.0.0", "control_features": "v15"},
         )
@@ -1265,14 +1394,10 @@ class IntelligenceService:
             features={
                 "v15": v15_features,
                 "realtime_trajectory": realtime_feature,
-                "v3_available": {
-                    name: value.value for name, value in v3_evidence.items()
-                },
+                "v3_available": {name: value.value for name, value in v3_evidence.items()},
             },
             latency={
-                "provider_seconds": _evidence_age_seconds(
-                    market.captured_at, market.captured_at
-                ),
+                "provider_seconds": _evidence_age_seconds(market.captured_at, market.captured_at),
                 "model_seconds": None,
                 "discord_seconds": None,
             },
@@ -1282,16 +1407,65 @@ class IntelligenceService:
                 *([v3_envelope.abstain_reason] if v3_envelope.abstain_reason else []),
             ],
         )
-        signal_grade = score.classification in {
-            SignalClass.WATCH,
-            SignalClass.STRONG,
-            SignalClass.HIGH_CONVICTION,
-        } and v15_decision.signal_tier in {
-            SignalTier.PREMIUM,
-            SignalTier.STRONG,
-            SignalTier.HIGH_RISK_MOMENTUM,
-            SignalTier.CATALYST_REVIVAL,
-        }
+        authoritative_decision_at = iso()
+        model_latency_ms = max(
+            0.0,
+            (datetime.fromisoformat(authoritative_decision_at) - attempted_at).total_seconds()
+            * 1000,
+        )
+        runner_decision = self.runner_decisions.decide(
+            token_id=token_id,
+            candidate_id=candidate_id,
+            token_address=address,
+            chain=chain,
+            decision_at=authoritative_decision_at,
+            stage=str(v15_stage),
+            thesis=(realtime_feature or {}).get("runner_thesis"),
+            v15_control=v15_decision.to_dict(),
+            legacy_control={
+                "classification": str(score.classification),
+                "normalized_score": score.normalized_score,
+                "confidence": score.confidence,
+                "component_scores": score.component_scores,
+                "authority": "CONTROL_ONLY",
+            },
+            waiting_reasons=sorted(set(waiting)),
+            hard_rejections=list(score.hard_rejections),
+            entry_state={
+                "state": entry_state,
+                "decision_price": market.price_usd,
+                "decision_market_cap": market.market_cap_usd,
+                "liquidity_usd": market.liquidity_usd,
+                "tradeability": trade,
+            },
+            provider_health={
+                name: {
+                    "state": "HEALTHY" if result.get("value") is not None else "DEGRADED",
+                    "latency_ms": result.get("latency_ms"),
+                }
+                for name, result in enrichment.items()
+            },
+            provenance=provenance,
+            latency={
+                "candidate_attempt_to_decision_ms": round(model_latency_ms, 3),
+                "source_to_receive_ms": 0.0,
+                "receive_to_normalize_ms": 0.0,
+                "normalize_to_feature_ms": round(model_latency_ms, 3),
+                "feature_to_model_ms": 0.0,
+                "model_to_decision_ms": 0.0,
+                "source_to_decision_ms": round(model_latency_ms, 3),
+                "decision_to_enqueue": {"state": "PENDING_ROUTE_POLICY"},
+                "discord_delivery": {"state": "PENDING_ROUTE_POLICY"},
+                "timestamps": {
+                    "source": market.captured_at,
+                    "decision": authoritative_decision_at,
+                },
+            },
+            trigger_event_id=(realtime_feature or {}).get("trigger_event_id"),
+            public_alerts_enabled=self.settings.public_alerts_enabled,
+            operator_shadow_alerts_enabled=self.settings.operator_shadow_alerts_enabled,
+        )
+        signal_grade = runner_decision.routes_alert
         existing_signal_id = candidate["signal_id"]
         if existing_signal_id:
             if signal_grade and not waiting:
@@ -1409,6 +1583,7 @@ class IntelligenceService:
                 "buyer_replacement": buyer_replacement,
                 "historical_context": v15_features.get("historical_context"),
                 "realtime_intelligence": realtime_feature,
+                "runner_decision": runner_decision.to_dict(),
             }
         )
         signal_id = self.store.create_signal(
@@ -1431,6 +1606,15 @@ class IntelligenceService:
             safety.holder_count,
         )
         if signal_id:
+            outbox = self.store.conn.execute(
+                "SELECT created_at FROM outbox WHERE event_key=?",
+                (f"signal:{signal_id}",),
+            ).fetchone()
+            if outbox:
+                self.runner_decisions.mark_enqueued(
+                    runner_decision.decision_id,
+                    str(outbox["created_at"]),
+                )
             self.store.update_candidate(
                 candidate_id,
                 CandidateState.QUALIFIED_SIGNAL,
@@ -1506,6 +1690,7 @@ class IntelligenceService:
                 continue
             if snapshot and snapshot.market_cap_usd is not None and snapshot.market_cap_usd > 0:
                 self.store.save_snapshot(int(token["token_id"]), snapshot)
+                self.decision_outcomes.refresh_token(int(token["token_id"]))
                 monitored += 1
         if monitored:
             self.actor_intelligence.build_wallet_copyability(matured_before=iso())
@@ -1574,12 +1759,26 @@ class IntelligenceService:
                     if not channels and self.settings.discord_channel_id:
                         channels = (self.settings.discord_channel_id,)
                     if has_guild_settings:
+                        decision_id = str(
+                            (payload.get("runner_decision") or {}).get("decision_id") or ""
+                        )
+                        if decision_id:
+                            self.runner_decisions.mark_delivery_suppressed(
+                                decision_id, "GUILD_POLICY_SUPPRESSED"
+                            )
                         self.store.mark_outbox_sent(
                             int(row["id"]), "policy-suppressed", claim_token
                         )
                         sent += 1
                         continue
                     if not channels and hasattr(self.notifier, "send_to"):
+                        decision_id = str(
+                            (payload.get("runner_decision") or {}).get("decision_id") or ""
+                        )
+                        if decision_id:
+                            self.runner_decisions.mark_delivery_suppressed(
+                                decision_id, "NO_CONFIGURED_DESTINATION"
+                            )
                         self.store.mark_outbox_sent(
                             int(row["id"]), "no-configured-destination", claim_token
                         )
@@ -1607,15 +1806,16 @@ class IntelligenceService:
                 elif not destinations:
                     remote_id = await self.notifier.send(content)
                 self.store.mark_outbox_sent(int(row["id"]), remote_id, claim_token)
-                trigger = (payload.get("realtime_intelligence") or {}).get(
-                    "trigger_event_id"
-                )
+                delivered_at = iso()
+                decision_id = str((payload.get("runner_decision") or {}).get("decision_id") or "")
+                if decision_id:
+                    self.runner_decisions.mark_discord_delivered(decision_id, delivered_at)
+                trigger = (payload.get("realtime_intelligence") or {}).get("trigger_event_id")
                 if trigger:
                     with self.store._lock, self.store.conn:
                         self.store.conn.execute(
-                            "UPDATE canonical_events SET discord_sent_timestamp=? "
-                            "WHERE event_id=?",
-                            (iso(), str(trigger)),
+                            "UPDATE canonical_events SET discord_sent_timestamp=? WHERE event_id=?",
+                            (delivered_at, str(trigger)),
                         )
                 self.store.record_latency(
                     "DISCORD_DELIVERY",
@@ -1713,26 +1913,30 @@ class IntelligenceService:
                     self.launch_queue.task_done(event)
 
         async def realtime_worker() -> None:
-            while not self.stop_event.is_set():
-                rows = self.realtime_fabric.claim_pending(
-                    self.settings.realtime_processing_batch
+            lanes = TokenLaneExecutor(
+                self.settings.realtime_token_lanes,
+                queue_size=max(
+                    self.settings.realtime_processing_batch * 2,
+                    self.settings.realtime_token_lanes,
+                ),
+            )
+
+            def on_error(event: CanonicalEvent, error: Exception) -> None:
+                self.log.error(
+                    "canonical event processing failed",
+                    extra={"fields": {"event_id": event.event_id}},
+                    exc_info=(type(error), error, error.__traceback__),
                 )
-                if not rows:
-                    self.realtime_wake.clear()
-                    try:
-                        await asyncio.wait_for(self.realtime_wake.wait(), timeout=0.5)
-                    except TimeoutError:
-                        pass
-                    continue
-                for event in rows:
-                    try:
-                        await self.handle_realtime_event(event)
-                    except Exception as exc:
-                        self.realtime_fabric.fail(event.event_id, str(exc))
-                        self.log.exception(
-                            "canonical event processing failed",
-                            extra={"fields": {"event_id": event.event_id}},
-                        )
+
+            await lanes.run(
+                claim=self.realtime_fabric.claim_pending,
+                handle=self.handle_realtime_event,
+                fail=self.realtime_fabric.fail,
+                wake=self.realtime_wake,
+                stop=self.stop_event,
+                batch_size=self.settings.realtime_processing_batch,
+                on_error=on_error,
+            )
 
         tasks = [scanner(), candidate_monitor(), outcome_monitor(), tracker()]
         if self.launch_sources:

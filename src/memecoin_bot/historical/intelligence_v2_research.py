@@ -577,9 +577,7 @@ class IntelligenceV2Experiment:
                 "selected_weights": dict(selected_weights),
                 "selection_window": "validation",
                 "batch_inference_ms": latency_ms,
-                "per_decision_inference_ms": (
-                    latency_ms / len(diagnostic) if diagnostic else None
-                ),
+                "per_decision_inference_ms": (latency_ms / len(diagnostic) if diagnostic else None),
                 "calibration": _calibration(
                     probabilities,
                     [float(row["peak_multiple"]) >= threshold for row in diagnostic],

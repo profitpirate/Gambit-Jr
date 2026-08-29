@@ -74,8 +74,18 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
         settings.provider_circuit_cooldown_seconds,
         callback,
     )
+    primary_solana_url = settings.effective_solana_rpc_url()
+    helius_is_primary = primary_solana_url != settings.solana_rpc_url
     rpc_client = ResilientJsonClient(
-        "solana_rpc",
+        "helius_solana_primary" if helius_is_primary else "solana_rpc",
+        settings.provider_timeout_seconds,
+        settings.provider_max_retries,
+        settings.provider_circuit_failures,
+        settings.provider_circuit_cooldown_seconds,
+        callback,
+    )
+    fallback_rpc_client = ResilientJsonClient(
+        "solana_public_fallback",
         settings.provider_timeout_seconds,
         settings.provider_max_retries,
         settings.provider_circuit_failures,
@@ -107,7 +117,7 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
         callback,
     )
     market = DexScreenerProvider(settings.dexscreener_base_url, dex_client)
-    solana = SolanaRpcProvider(settings.solana_rpc_url, rpc_client)
+    solana = SolanaRpcProvider(primary_solana_url, rpc_client)
     bsc = BscRpcProvider(settings.bsc_rpc_url, bsc_client)
     safety = ChainSafetyRouter({"solana": solana, "bsc": bsc})
     discovery = DiscoveryPoller(
@@ -156,7 +166,7 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
         )
         launch_sources.append(
             SolanaProgramLaunchSource(
-                settings.solana_rpc_url,
+                primary_solana_url,
                 settings.pumpfun_program_ids,
                 pump_client,
                 reconnect_seconds=settings.launch_source_reconnect_seconds,
@@ -194,7 +204,10 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
         store.set_provider_health(
             "bsc_direct_launch", False, 0, "DIRECT_LAUNCH_DISABLED", "DISABLED"
         )
-    if settings.shadow_mode and not settings.shadow_send_alerts:
+    alert_transport_enabled = (
+        settings.public_alerts_enabled or settings.operator_shadow_alerts_enabled
+    )
+    if not alert_transport_enabled:
         notifier = NullNotifier()
     elif settings.discord_webhook_url or settings.discord_token:
         notifier = DiscordNotifier(
@@ -222,18 +235,25 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
     if settings.realtime_fabric_enabled and settings.pumpfun_native_enabled:
         realtime_sources.append(
             NativePumpFunSource(
-                settings.solana_rpc_url,
+                primary_solana_url,
                 rpc_client,
                 program_id=settings.pumpfun_program_ids[0],
                 reconnect_seconds=settings.launch_source_reconnect_seconds,
                 silence_seconds=settings.realtime_silence_seconds,
                 backfill_limit=settings.realtime_backfill_limit,
+                backfill_max_pages=settings.realtime_backfill_max_pages,
+                fallback_rpc_url=settings.solana_fallback_rpc_url if helius_is_primary else None,
+                fallback_client=fallback_rpc_client if helius_is_primary else None,
+                enrichment_queue_max=settings.realtime_enrichment_queue_max,
+                enrichment_concurrency=settings.realtime_enrichment_concurrency,
+                load_cursor=store.launch_cursor,
+                save_cursor=store.save_launch_cursor,
             )
         )
         if settings.pumpfun_curve_monitor_enabled:
             realtime_sources.append(
                 PumpCurveAccountSource(
-                    settings.solana_rpc_url,
+                    primary_solana_url,
                     rpc_client,
                     store.realtime_curve_targets,
                     silence_seconds=settings.realtime_silence_seconds,
@@ -257,8 +277,8 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
             "pumpportal_redundancy",
             False,
             0,
-            "PUMPPORTAL_API_KEY_NOT_CONFIGURED",
-            "NOT_CONFIGURED",
+            "OPTIONAL_REDUNDANCY_UNAVAILABLE",
+            "OPTIONAL_REDUNDANCY_UNAVAILABLE",
         )
     if (
         settings.realtime_fabric_enabled
@@ -271,13 +291,19 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
     else:
         store.set_provider_health(
             "helius_curated",
-            False,
+            bool(settings.helius_api_key),
             0,
-            "HELIUS_KEY_OR_CURATED_ACCOUNTS_NOT_CONFIGURED",
-            "NOT_CONFIGURED",
+            (
+                "CURATED_ACCOUNT_WATCHLIST_EMPTY"
+                if settings.helius_api_key
+                else "HELIUS_API_KEY_NOT_CONFIGURED"
+            ),
+            ("OPTIONAL_WATCHLIST_EMPTY" if settings.helius_api_key else "NOT_CONFIGURED"),
         )
+
     def known_token(chain: str, address: str) -> bool:
         return store.token_id(address, chain) is not None
+
     if settings.realtime_fabric_enabled and settings.bluesky_social_enabled:
         realtime_sources.append(
             BlueskyJetstreamSocialSource(

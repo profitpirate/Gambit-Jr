@@ -84,8 +84,7 @@ class ReplayRunner:
     async def run(self, fixture_path: str | Path) -> dict[str, Any]:
         fixture = self.load(fixture_path)
         source_times = [
-            datetime.fromisoformat(t["discovery"]["discovered_at"])
-            for t in fixture["tokens"]
+            datetime.fromisoformat(t["discovery"]["discovered_at"]) for t in fixture["tokens"]
         ]
         offset = datetime.now(UTC) - timedelta(minutes=2) - min(source_times)
         sequences: dict[str, list[MarketSnapshot]] = {}

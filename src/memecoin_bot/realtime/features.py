@@ -3,12 +3,15 @@ from __future__ import annotations
 import json
 import math
 import statistics
+from collections import Counter
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from itertools import pairwise
 from typing import Any
 
 from memecoin_bot.models import iso
+from memecoin_bot.realtime.events import CanonicalEvent
+from memecoin_bot.realtime.incremental import IncrementalTokenProjector
 
 FEATURE_VERSION = "realtime-trajectory-v1"
 WINDOW_BANDS = (
@@ -87,6 +90,10 @@ class RealtimeFeatureProjector:
 
     def __init__(self, store: Any):
         self.store = store
+        self.incremental = IncrementalTokenProjector(store)
+
+    def apply(self, token_id: int, event: CanonicalEvent) -> dict[str, Any]:
+        return self.incremental.apply(token_id, event)
 
     def latest(self, token_id: int, available_at: str) -> dict[str, Any] | None:
         row = self.store.conn.execute(
@@ -102,6 +109,10 @@ class RealtimeFeatureProjector:
 
     def compute(self, token_id: int, decision_timestamp: str | None = None) -> dict[str, Any]:
         decision_timestamp = decision_timestamp or iso()
+        incremental = self.incremental.snapshot(token_id, decision_timestamp)
+        if incremental is not None:
+            self._persist_incremental_feature(token_id, incremental)
+            return incremental
         decision = _timestamp(decision_timestamp)
         state = self.store.conn.execute(
             "SELECT * FROM token_realtime_state WHERE token_id=?", (token_id,)
@@ -156,6 +167,17 @@ class RealtimeFeatureProjector:
             "migration_continuity": migration,
             "coverage": coverage,
         }
+        feature["sequence_intelligence"] = self._sequence_intelligence(windows)
+        feature["capital_efficiency"] = self._capital_efficiency(trades, launched)
+        feature["sell_absorption_v2"] = self._sell_absorption_v2(
+            trades,
+            launched,
+            decision,
+            components,
+            selling,
+            capital,
+            str(state["migration_state"]),
+        )
         temperature = self._temperature(feature)
         feature["monitoring"] = temperature
         now = iso()
@@ -217,6 +239,260 @@ class RealtimeFeatureProjector:
             )
         return feature
 
+    @staticmethod
+    def _sequence_intelligence(windows: dict[str, Any]) -> dict[str, Any]:
+        ordered = [
+            windows[key]
+            for key in (f"{start}-{end}" for start, end in WINDOW_BANDS)
+            if key in windows
+        ]
+        net = [float(row.get("net_sol") or 0) for row in ordered]
+        velocity = [float(row.get("trade_velocity") or 0) for row in ordered]
+        return {
+            "net_flow_direction_by_band": [
+                0 if value == 0 else math.copysign(1, value) for value in net
+            ],
+            "net_flow_acceleration_by_transition": [right - left for left, right in pairwise(net)],
+            "trade_velocity_acceleration_by_transition": [
+                right - left for left, right in pairwise(velocity)
+            ],
+            "positive_persistence_bands": sum(value > 0 for value in net),
+            "reversal_count": sum(left * right < 0 for left, right in pairwise(net)),
+            "recovery_after_negative_band": any(left < 0 < right for left, right in pairwise(net)),
+        }
+
+    @staticmethod
+    def _capital_efficiency(trades: list[_Trade], launched: datetime) -> dict[str, Any]:
+        net = 0.0
+        buyers: set[str] = set()
+        milestones: dict[str, dict[str, Any]] = {}
+        buy_total = 0.0
+        buyer_sol: Counter[str] = Counter()
+        for index, trade in enumerate(trades, start=1):
+            if trade.side == "buy":
+                net += trade.quote_amount
+                buy_total += trade.quote_amount
+                if trade.actor != "UNKNOWN":
+                    buyers.add(trade.actor)
+                    buyer_sol[trade.actor] += trade.quote_amount
+            else:
+                net -= trade.quote_amount
+            for milestone in (5, 10, 20, 30):
+                key = str(milestone)
+                if key not in milestones and net >= milestone:
+                    milestones[key] = {
+                        "seconds": max(0.0, (trade.timestamp - launched).total_seconds()),
+                        "trade_count": index,
+                        "buyer_count": len(buyers),
+                    }
+        return {
+            "sol_gained_per_trade": _ratio(net, len(trades)),
+            "sol_gained_per_unique_buyer": _ratio(net, len(buyers)),
+            "sol_gained_per_independent_buyer": None,
+            "trades_to_milestones": {
+                key: value["trade_count"] for key, value in milestones.items()
+            },
+            "buyers_to_milestones": {
+                key: value["buyer_count"] for key, value in milestones.items()
+            },
+            "time_to_milestones_seconds": {
+                key: value["seconds"] for key, value in milestones.items()
+            },
+            "buyer_capital_concentration": _ratio(max(buyer_sol.values(), default=0.0), buy_total),
+        }
+
+    @staticmethod
+    def _sell_absorption_v2(
+        trades: list[_Trade],
+        launched: datetime,
+        decision: datetime,
+        components: dict[str, str],
+        selling: dict[str, Any],
+        capital: dict[str, Any],
+        migration_state: str,
+    ) -> dict[str, Any]:
+        meaningful: list[_Trade] = []
+        buy_sol = 0.0
+        for trade in trades:
+            if trade.side == "buy":
+                buy_sol += trade.quote_amount
+            elif trade.quote_amount >= max(0.05, buy_sol * 0.05):
+                meaningful.append(trade)
+        first = meaningful[0] if meaningful else None
+        second = meaningful[1] if len(meaningful) > 1 else None
+        after_first = [row for row in trades if first and row.timestamp > first.timestamp]
+        after_buys = [row for row in after_first if row.side == "buy"]
+        after_sells = [row for row in after_first if row.side == "sell"]
+        fresh_buyers = {row.actor for row in after_buys if row.actor != "UNKNOWN"}
+        buyer_counts = Counter(
+            row.actor for row in trades if row.side == "buy" and row.actor != "UNKNOWN"
+        )
+        independent = {components[row.actor] for row in after_buys if components.get(row.actor)}
+        responses: dict[str, dict[str, Any]] = {}
+        for horizon in (5, 10, 20, 30):
+            rows = [
+                row
+                for row in after_first
+                if first and (row.timestamp - first.timestamp).total_seconds() <= horizon
+            ]
+            responses[str(horizon)] = {
+                "buy_sol": sum(row.quote_amount for row in rows if row.side == "buy"),
+                "sell_sol": sum(row.quote_amount for row in rows if row.side == "sell"),
+                "buyer_count": len(
+                    {row.actor for row in rows if row.side == "buy" and row.actor != "UNKNOWN"}
+                ),
+            }
+        after_second_buy = sum(
+            row.quote_amount
+            for row in trades
+            if second and row.side == "buy" and row.timestamp > second.timestamp
+        )
+        elapsed = max(1.0, (decision - first.timestamp).total_seconds()) if first else None
+        return {
+            "model_name": "SELL_ABSORPTION_V2",
+            "authority": "RESEARCH_ONLY",
+            "first_meaningful_sell": (
+                {
+                    "timestamp": first.timestamp.isoformat(),
+                    "seconds_since_launch": max(0.0, (first.timestamp - launched).total_seconds()),
+                    "seller": first.actor,
+                    "sell_sol": first.quote_amount,
+                }
+                if first
+                else None
+            ),
+            "responses_5_10_20_30_seconds": responses,
+            "fresh_buyer_count": len(fresh_buyers),
+            "fresh_independent_buyer_count": len(independent) if components else None,
+            "repeat_buyer_count": len(
+                {row.actor for row in after_buys if buyer_counts[row.actor] > 1}
+            ),
+            "buyer_replacement": max(
+                0, len(fresh_buyers) - len({row.actor for row in after_sells})
+            ),
+            "seller_identity": first.actor if first else None,
+            "seller_historical_behavior": None,
+            "seller_size_relative_to_prior_buy_sol": (
+                _ratio(
+                    first.quote_amount,
+                    sum(
+                        row.quote_amount
+                        for row in trades
+                        if row.actor == first.actor
+                        and row.side == "buy"
+                        and row.timestamp < first.timestamp
+                    ),
+                )
+                if first
+                else None
+            ),
+            "real_sol_recovery": selling.get("real_sol_recovery_after_first_sell"),
+            "real_sol_reacceleration": capital.get("real_sol_acceleration"),
+            "second_meaningful_sell": (
+                {
+                    "timestamp": second.timestamp.isoformat(),
+                    "seller": second.actor,
+                    "sell_sol": second.quote_amount,
+                }
+                if second
+                else None
+            ),
+            "second_sell_absorption_ratio": (
+                _ratio(after_second_buy, second.quote_amount) if second else None
+            ),
+            "post_sell_wallet_arrivals": len(fresh_buyers),
+            "post_sell_net_flow_sol": sum(row.quote_amount for row in after_buys)
+            - sum(row.quote_amount for row in after_sells),
+            "post_sell_curve_velocity_sol_per_second": capital.get("real_sol_velocity"),
+            "post_sell_trade_intensity_per_second": (
+                _ratio(len(after_first), elapsed) if first else None
+            ),
+            "post_sell_market_cap_expansion": None,
+            "migration_proximity": None,
+            "migration_continuation": migration_state,
+            "capital_lost_per_sell": _ratio(
+                sum(row.quote_amount for row in trades if row.side == "sell"),
+                sum(row.side == "sell" for row in trades),
+            ),
+            "capital_replacement_ratio": _ratio(
+                sum(row.quote_amount for row in after_buys),
+                sum(row.quote_amount for row in after_sells),
+            ),
+            "coverage": {
+                "independent_wallet_linkage": bool(components),
+                "seller_history": False,
+                "market_cap_series": False,
+                "migration_proximity": False,
+            },
+        }
+
+    def _persist_incremental_feature(self, token_id: int, feature: dict[str, Any]) -> None:
+        decision_timestamp = str(feature["decision_timestamp"])
+        coverage = dict(feature["coverage"])
+        wash = dict(feature["activity_adjustment"])
+        buyer = dict(feature["buyer_arrival"])
+        temperature = dict(feature["monitoring"])
+        now = iso()
+        decision = _timestamp(decision_timestamp)
+        with self.store._lock, self.store.conn:
+            self.store.conn.execute(
+                "INSERT INTO trajectory_feature_snapshots_v15(token_id,decision_timestamp,"
+                "available_timestamp,feature_version,evidence_mode,feature_json,coverage_json) "
+                "VALUES(?,?,?,?,?,?,?) ON CONFLICT(token_id,decision_timestamp,feature_version) "
+                "DO UPDATE SET available_timestamp=excluded.available_timestamp,"
+                "feature_json=excluded.feature_json,coverage_json=excluded.coverage_json",
+                (
+                    token_id,
+                    decision_timestamp,
+                    now,
+                    feature["feature_version"],
+                    feature["evidence_mode"],
+                    _json(feature),
+                    _json(coverage),
+                ),
+            )
+            self.store.conn.execute(
+                "INSERT INTO activity_evidence_v15(token_id,observed_at,raw_buyers,"
+                "adjusted_buyers,raw_volume,adjusted_volume,raw_net_flow,adjusted_net_flow,"
+                "linked_wallet_share,bundle_linked_share,wash_probability,evidence_json) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(token_id,observed_at) DO UPDATE SET "
+                "evidence_json=excluded.evidence_json",
+                (
+                    token_id,
+                    decision_timestamp,
+                    buyer["raw_buyers"],
+                    buyer["adjusted_independent_buyers"],
+                    wash["raw_volume_sol"],
+                    wash["adjusted_volume_sol"],
+                    wash["raw_net_flow_sol"],
+                    wash["adjusted_net_flow_sol"],
+                    wash["linked_wallet_share"],
+                    wash["bundle_linked_share"],
+                    wash["wash_probability"],
+                    _json(wash),
+                ),
+            )
+            next_monitor = (
+                (decision + timedelta(seconds=temperature["interval_seconds"])).isoformat()
+                if temperature["interval_seconds"] is not None
+                else None
+            )
+            self.store.conn.execute(
+                "UPDATE token_realtime_state SET monitoring_temperature=?,updated_at=? "
+                "WHERE token_id=?",
+                (temperature["state"], now, token_id),
+            )
+            self.store.conn.execute(
+                "UPDATE candidates SET monitoring_temperature=?,realtime_priority=?,"
+                "next_monitor_at=? WHERE token_id=?",
+                (
+                    temperature["state"],
+                    temperature["priority"],
+                    next_monitor,
+                    token_id,
+                ),
+            )
+
     def _migration_continuity(
         self,
         token_id: int,
@@ -259,9 +535,7 @@ class RealtimeFeatureProjector:
         pre_reserve = next(
             (row.real_sol for row in reversed(pre_curves) if row.real_sol is not None), None
         )
-        post_reserve = next(
-            (row.real_sol for row in post_curves if row.real_sol is not None), None
-        )
+        post_reserve = next((row.real_sol for row in post_curves if row.real_sol is not None), None)
         liquidity = (
             _ratio(float(post_reserve), float(pre_reserve))
             if pre_reserve not in (None, 0) and post_reserve is not None
@@ -343,16 +617,12 @@ class RealtimeFeatureProjector:
                     transaction=row["transaction_signature"],
                     slot=row["slot_or_block"],
                     creator_linked=(
-                        bool(row["creator_linked"])
-                        if row["creator_linked"] is not None
-                        else None
+                        bool(row["creator_linked"]) if row["creator_linked"] is not None else None
                     ),
                     funder=row["funder"],
                     cluster=row["wallet_cluster"],
                     likely_bundled=(
-                        bool(row["likely_bundled"])
-                        if row["likely_bundled"] is not None
-                        else None
+                        bool(row["likely_bundled"]) if row["likely_bundled"] is not None else None
                     ),
                 )
             )
@@ -388,9 +658,7 @@ class RealtimeFeatureProjector:
                         if row["virtual_sol_reserves"] is not None
                         else None
                     ),
-                    float(row["curve_progress"])
-                    if row["curve_progress"] is not None
-                    else None,
+                    float(row["curve_progress"]) if row["curve_progress"] is not None else None,
                 )
             )
         return output
@@ -457,14 +725,15 @@ class RealtimeFeatureProjector:
         sells = [row for row in trades if row.side == "sell"]
         buyers = {row.actor for row in buys if row.actor != "UNKNOWN"}
         known_components = {components[row.actor] for row in buys if row.actor in components}
-        unknown_linkage = {row.actor for row in buys if row.actor not in components and row.actor != "UNKNOWN"}
+        unknown_linkage = {
+            row.actor for row in buys if row.actor not in components and row.actor != "UNKNOWN"
+        }
         first = {row.actor for row in buys if (row.timestamp - launched).total_seconds() <= 15}
         second = {
-            row.actor
-            for row in buys
-            if 15 < (row.timestamp - launched).total_seconds() <= 30
+            row.actor for row in buys if 15 < (row.timestamp - launched).total_seconds() <= 30
         }
-        repeat = {actor for actor in buyers if sum(row.actor == actor for row in buys) > 1}
+        buyer_counts = Counter(row.actor for row in buys if row.actor != "UNKNOWN")
+        repeat = {actor for actor, count in buyer_counts.items() if count > 1}
         sold = {row.actor for row in sells}
         sizes = [row.quote_amount for row in buys]
         total = sum(sizes)
@@ -539,16 +808,22 @@ class RealtimeFeatureProjector:
         after = [row for row in trades if meaningful and row.timestamp > meaningful.timestamp]
         after_buys = [row for row in after if row.side == "buy"]
         after_sells = [row for row in after if row.side == "sell"]
-        reserve_before = self._nearest_curve(curves, meaningful.timestamp, before=True) if meaningful else None
+        reserve_before = (
+            self._nearest_curve(curves, meaningful.timestamp, before=True) if meaningful else None
+        )
         reserve_after = self._nearest_curve(curves, decision, before=True) if meaningful else None
         recovery = None
-        if reserve_before and reserve_after and reserve_before.real_sol is not None and reserve_after.real_sol is not None:
+        if (
+            reserve_before
+            and reserve_after
+            and reserve_before.real_sol is not None
+            and reserve_after.real_sol is not None
+        ):
             recovery = reserve_after.real_sol - reserve_before.real_sol
         sell_velocities = []
         for start, end in WINDOW_BANDS:
             count = sum(
-                start < max(0.0, (row.timestamp - launched).total_seconds()) <= end
-                for row in sells
+                start < max(0.0, (row.timestamp - launched).total_seconds()) <= end for row in sells
             )
             sell_velocities.append(count / (end - start))
         return {
@@ -582,9 +857,7 @@ class RealtimeFeatureProjector:
         }
 
     @staticmethod
-    def _nearest_curve(
-        curves: list[_Curve], timestamp: datetime, *, before: bool
-    ) -> _Curve | None:
+    def _nearest_curve(curves: list[_Curve], timestamp: datetime, *, before: bool) -> _Curve | None:
         rows = [row for row in curves if row.timestamp <= timestamp] if before else curves
         return rows[-1] if rows else None
 
@@ -614,9 +887,7 @@ class RealtimeFeatureProjector:
         for left, right in pairwise(progress):
             elapsed = (right.timestamp - left.timestamp).total_seconds()
             if elapsed > 0:
-                progress_velocities.append(
-                    (float(right.progress) - float(left.progress)) / elapsed
-                )
+                progress_velocities.append((float(right.progress) - float(left.progress)) / elapsed)
         progress_accelerations = []
         for index in range(1, len(progress_velocities)):
             elapsed = (progress[index + 1].timestamp - progress[index].timestamp).total_seconds()
@@ -670,7 +941,9 @@ class RealtimeFeatureProjector:
             },
             "capital_persistence": _ratio(sum(value > 0 for value in velocities), len(velocities)),
             "capital_reversal": any(value < 0 for value in velocities),
-            "capital_drawdown_sol": peak - current if peak is not None and current is not None else None,
+            "capital_drawdown_sol": peak - current
+            if peak is not None and current is not None
+            else None,
             "peak_real_sol": peak,
             "time_to_peak_seconds": (
                 max(0.0, (real[values.index(peak)].timestamp - launched).total_seconds())
@@ -689,7 +962,10 @@ class RealtimeFeatureProjector:
         recycled: set[tuple[str | None, str]] = set()
         for actor, rows in by_actor.items():
             for left, right in pairwise(rows):
-                if left.side != right.side and (right.timestamp - left.timestamp).total_seconds() <= 15:
+                if (
+                    left.side != right.side
+                    and (right.timestamp - left.timestamp).total_seconds() <= 15
+                ):
                     recycled.add((right.transaction, actor))
         size_counts: dict[float, int] = {}
         for row in trades:
@@ -731,11 +1007,17 @@ class RealtimeFeatureProjector:
             "adjusted_trade_count": len(trades) - len(flagged),
             "rapid_recycle_events": len(recycled),
             "repeated_size_values": sorted(repeated_sizes),
-            "creator_linked_events": sum(row.actor == creator for row in trades) if creator else None,
+            "creator_linked_events": sum(row.actor == creator for row in trades)
+            if creator
+            else None,
             "linked_wallet_share": _ratio(linked, len(actors)) if components else None,
             "bundle_linked_share": _ratio(len(bundled), len(trades)),
             "wash_probability": probability,
-            "wash_state": "HIGH" if probability >= 0.6 else "MEDIUM" if probability >= 0.3 else "LOW",
+            "wash_state": "HIGH"
+            if probability >= 0.6
+            else "MEDIUM"
+            if probability >= 0.3
+            else "LOW",
             "method": "probabilistic_event_heuristics_not_identity_proof",
         }
 
@@ -771,7 +1053,9 @@ class RealtimeFeatureProjector:
             )
             buyers = {row.actor for row in buys}
             independent = {components.get(actor, actor) for actor in buyers} if components else None
-            first_reserve = next((row.real_sol for row in curve_rows if row.real_sol is not None), None)
+            first_reserve = next(
+                (row.real_sol for row in curve_rows if row.real_sol is not None), None
+            )
             last_reserve = next(
                 (row.real_sol for row in reversed(curve_rows) if row.real_sol is not None), None
             )
@@ -816,7 +1100,9 @@ class RealtimeFeatureProjector:
             state, interval, priority = "GENESIS", 1.0, 100.0
         elif (velocity is not None and velocity >= 0.02) or buyer_velocity >= 0.1:
             state, interval, priority = "HOT", 2.0, 90.0
-        elif age <= 1_800 and (feature["windows"] or feature["capital_trajectory"]["real_sol_reserve"] is not None):
+        elif age <= 1_800 and (
+            feature["windows"] or feature["capital_trajectory"]["real_sol_reserve"] is not None
+        ):
             state, interval, priority = "WARM", 10.0, 60.0
         elif age > 10_800:
             state, interval, priority = "DEAD", None, 0.0

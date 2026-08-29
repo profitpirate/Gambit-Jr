@@ -122,7 +122,9 @@ def copyability_scores(outcomes: Sequence[FollowerOutcome]) -> dict[str, float |
     drawdown = sum(max(0.0, row.drawdown or 0.0) for row in usable) / len(usable)
     return {
         "positions": len(outcomes),
-        "copyability_score": max(0.0, sellability * (0.6 * two + 0.3 * five + 0.1 * tail) - 0.25 * drawdown),
+        "copyability_score": max(
+            0.0, sellability * (0.6 * two + 0.3 * five + 0.1 * tail) - 0.25 * drawdown
+        ),
         "copyable_2x_skill": two,
         "copyable_5x_skill": five,
         "copyable_right_tail_skill": tail,
@@ -153,6 +155,8 @@ def independent_wallet_consensus(
     component_scores = [max(scores) for scores in components.values()]
     return {
         "independent_validated_wallet_count": len(component_scores),
-        "copyable_consensus_score": sum(component_scores) / len(component_scores) if component_scores else 0.0,
+        "copyable_consensus_score": sum(component_scores) / len(component_scores)
+        if component_scores
+        else 0.0,
         "raw_wallet_count": len(wallet_scores),
     }

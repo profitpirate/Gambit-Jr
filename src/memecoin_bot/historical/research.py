@@ -84,9 +84,7 @@ class ResearchEngine:
         rows = [dict(row) for row in self.warehouse.conn.execute(query, parameters)]
         for row in rows:
             row["value"] = (
-                None
-                if row["feature_value_json"] is None
-                else json.loads(row["feature_value_json"])
+                None if row["feature_value_json"] is None else json.loads(row["feature_value_json"])
             )
         self.assert_point_in_time(rows)
         return rows
@@ -111,7 +109,9 @@ class ResearchEngine:
         }
 
     @staticmethod
-    def fingerprint_findings(rows: list[dict[str, Any]], threshold: float = 5) -> list[dict[str, Any]]:
+    def fingerprint_findings(
+        rows: list[dict[str, Any]], threshold: float = 5
+    ) -> list[dict[str, Any]]:
         grouped: dict[str, dict[str, list[float]]] = defaultdict(
             lambda: {"runner": [], "non_runner": []}
         )
@@ -148,13 +148,10 @@ class ResearchEngine:
         for row in rows:
             by_outcome[row["outcome_id"]][row["feature_name"]] = row.get("value")
             outcome_values[row["outcome_id"]] = row
+
         def first_numeric(features: dict[str, Any], *names: str) -> float | None:
             return next(
-                (
-                    value
-                    for name in names
-                    if (value := _numeric(features.get(name))) is not None
-                ),
+                (value for name in names if (value := _numeric(features.get(name))) is not None),
                 None,
             )
 
@@ -229,9 +226,9 @@ class ResearchEngine:
             scale = statistics.pstdev(values)
             if not scale:
                 continue
-            direction = 1 if statistics.mean(cohorts["runner"]) >= statistics.mean(
-                cohorts["other"]
-            ) else -1
+            direction = (
+                1 if statistics.mean(cohorts["runner"]) >= statistics.mean(cohorts["other"]) else -1
+            )
             model[name] = {
                 "center": statistics.mean(values),
                 "scale": scale,

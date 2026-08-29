@@ -1,5 +1,7 @@
 from .backfill import BackfillEngine, BackfillPage, HistoricalProvider
 from .challenger import ChallengerPolicy, ShadowChallenger
+from .dune_registry import DuneQueryRegistry, DuneQuerySpec
+from .evaluation import EvaluationUniverse, evaluation_universe_hash, require_same_universe
 from .finalization import (
     measure_local_latency,
     normalize_ranked_pool_ohlcv,
@@ -44,6 +46,7 @@ from .intelligence_v3 import (
 from .realtime_replay import build_realtime_event_replay, write_replay_manifest
 from .realtime_research import run_realtime_trajectory_research, write_realtime_research
 from .research import ResearchEngine
+from .runner_models import TargetSpecificRunnerResearch, enforce_nested_probabilities
 from .store import (
     ApprovedFeatureStore,
     HistoricalContextReader,
@@ -73,7 +76,10 @@ __all__ = [
     "CurveState",
     "DiscreteCompetingRiskModel",
     "DiscreteHazardRow",
+    "DuneQueryRegistry",
+    "DuneQuerySpec",
     "EntryActionability",
+    "EvaluationUniverse",
     "FollowerOutcome",
     "HazardForecast",
     "HistoricalContextReader",
@@ -85,6 +91,7 @@ __all__ = [
     "ResearchEngine",
     "SelectiveGatePolicy",
     "ShadowChallenger",
+    "TargetSpecificRunnerResearch",
     "TimedValue",
     "TradeEvent",
     "V3DecisionEnvelope",
@@ -102,6 +109,8 @@ __all__ = [
     "copyability_scores",
     "creator_reputation",
     "empirical_wallet_reputation",
+    "enforce_nested_probabilities",
+    "evaluation_universe_hash",
     "fingerprint_similarity",
     "funding_relationship",
     "hierarchical_prior",
@@ -112,6 +121,7 @@ __all__ = [
     "normalize_ranked_pool_ohlcv",
     "normalize_regime_dataset",
     "point_in_time_rows",
+    "require_same_universe",
     "run_real_research",
     "run_realtime_trajectory_research",
     "run_runner_thesis_research",

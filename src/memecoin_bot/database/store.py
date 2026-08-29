@@ -1130,17 +1130,16 @@ class Store:
             )
             signal_id = int(cur.lastrowid)
             payload = dict(message_payload, signal_id=signal_id)
+            enqueue_at = iso()
             self.conn.execute(
                 "INSERT INTO outbox(event_key,event_type,payload_json,created_at) VALUES(?,?,?,?)",
-                (f"signal:{signal_id}", "SIGNAL", _json(payload), now),
+                (f"signal:{signal_id}", "SIGNAL", _json(payload), enqueue_at),
             )
-            trigger = (message_payload.get("realtime_intelligence") or {}).get(
-                "trigger_event_id"
-            )
+            trigger = (message_payload.get("realtime_intelligence") or {}).get("trigger_event_id")
             if trigger:
                 self.conn.execute(
                     "UPDATE canonical_events SET discord_enqueue_timestamp=? WHERE event_id=?",
-                    (now, str(trigger)),
+                    (enqueue_at, str(trigger)),
                 )
             self.conn.execute(
                 "UPDATE token_outcomes SET signal_id=?,final_lifecycle_state='SIGNALLED',"

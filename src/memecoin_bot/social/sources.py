@@ -16,7 +16,9 @@ from memecoin_bot.realtime.events import CanonicalEvent, CanonicalEventType
 Emit = Callable[[CanonicalEvent], Awaitable[None]]
 KnownToken = Callable[[str, str], bool]
 
-SOLANA_ADDRESS = re.compile(r"(?<![1-9A-HJ-NP-Za-km-z])[1-9A-HJ-NP-Za-km-z]{32,44}(?![1-9A-HJ-NP-Za-km-z])")
+SOLANA_ADDRESS = re.compile(
+    r"(?<![1-9A-HJ-NP-Za-km-z])[1-9A-HJ-NP-Za-km-z]{32,44}(?![1-9A-HJ-NP-Za-km-z])"
+)
 BNB_ADDRESS = re.compile(r"(?<![0-9a-fA-F])0x[0-9a-fA-F]{40}(?![0-9a-fA-F])")
 
 
@@ -117,7 +119,9 @@ class BlueskyJetstreamSocialSource:
         self.silence_seconds = silence_seconds
         self.cursor: str | None = None
 
-    def parse_message(self, raw: dict[str, Any], received_at: str | None = None) -> list[CanonicalEvent]:
+    def parse_message(
+        self, raw: dict[str, Any], received_at: str | None = None
+    ) -> list[CanonicalEvent]:
         payload = raw.get("payload") or {}
         if payload.get("operation") == "delete":
             return []
@@ -129,7 +133,9 @@ class BlueskyJetstreamSocialSource:
             source=self.name,
             platform="bluesky",
             source_event_id=f"{payload.get('did')}:{payload.get('collection')}:{payload.get('rkey')}",
-            source_event_at=str(payload.get("time") or record.get("createdAt") or received_at or iso()),
+            source_event_at=str(
+                payload.get("time") or record.get("createdAt") or received_at or iso()
+            ),
             received_at=received_at,
             author_id=str(payload.get("did") or "") or None,
             engagement=None,
@@ -170,7 +176,7 @@ class BlueskyJetstreamSocialSource:
             except (TimeoutError, aiohttp.ClientError, ConnectionError, json.JSONDecodeError):
                 reconnects += 1
                 try:
-                    await asyncio.wait_for(stop.wait(), timeout=min(60, 2**min(reconnects, 5)))
+                    await asyncio.wait_for(stop.wait(), timeout=min(60, 2 ** min(reconnects, 5)))
                 except TimeoutError:
                     pass
 

@@ -137,7 +137,14 @@ class CanonicalEventFabric:
             self.store.conn.execute(
                 "UPDATE canonical_events SET confirmation_sources_json=?,provider_latency_json=?,"
                 "conflicts_json=?,confidence=MAX(confidence,?),last_seen_at=? WHERE event_id=?",
-                (_json(sources), _json(latencies), _json(conflicts), event.confidence, now, event_id),
+                (
+                    _json(sources),
+                    _json(latencies),
+                    _json(conflicts),
+                    event.confidence,
+                    now,
+                    event_id,
+                ),
             )
             return IngestResult(
                 event_id,
@@ -327,7 +334,9 @@ class CanonicalEventFabric:
         }:
             migration_state, migration_completed = "MIGRATED", event.source_timestamp
         existing_event_at = _timestamp(str(row["last_event_at"])) if row else None
-        current_is_latest = existing_event_at is None or _timestamp(event.source_timestamp) >= existing_event_at
+        current_is_latest = (
+            existing_event_at is None or _timestamp(event.source_timestamp) >= existing_event_at
+        )
         evidence = _loads(row["evidence_json"], {}) if row else {}
         evidence[str(event.event_type)] = {
             "event_id": event.event_id,
@@ -428,7 +437,9 @@ class CanonicalEventFabric:
         progress = None
         if initial and real_token is not None:
             progress = max(0.0, min(1.0, (initial - int(real_token)) / initial))
-        mode = "LIVE_NATIVE" if event.source.startswith(("solana_", "helius_")) else "LIVE_REDUNDANT"
+        mode = (
+            "LIVE_NATIVE" if event.source.startswith(("solana_", "helius_")) else "LIVE_REDUNDANT"
+        )
         self.store.conn.execute(
             "INSERT OR IGNORE INTO curve_observations_v15(event_id,token_id,observed_at,available_at,"
             "slot_or_block,virtual_token_reserves,virtual_quote_reserves,real_token_reserves,"
@@ -496,7 +507,8 @@ class CanonicalEventFabric:
                 side,
                 payload.get("sol_amount") or payload.get("quote_amount"),
                 payload.get("token_amount"),
-                payload.get("quote_symbol") or ("SOL" if payload.get("sol_amount") is not None else None),
+                payload.get("quote_symbol")
+                or ("SOL" if payload.get("sol_amount") is not None else None),
                 payload.get("creator_linked"),
                 payload.get("funder"),
                 payload.get("wallet_cluster"),

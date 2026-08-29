@@ -1,6 +1,48 @@
 # Gambit Jr V1.5 final code, security and performance audit
 
-Audit date: 2026-08-29. Scope: `src/`, `tests/`, `scripts/`, packaging, the historical warehouse schema and operational SQLite schema. The final deterministic repository audit parsed 136 Python files and 42,877 lines. Its latest persisted result contains 11 findings: 5 `FIXED`, 4 `PASS`, 2 `REVIEWED`, 0 `OPEN`.
+## Round-two authoritative architecture ledger
+
+| ID | Severity | File/function | Problem and impact | Fix | Regression test/evidence | Status |
+|---|---|---|---|---|---|---|
+| R2-001 | CRITICAL | `service.py` / signal policy | Legacy classification and V1.5 state could compete for final routing. | Final promotion now consumes only `RunnerDecision.routes_alert`; earlier engines are stored as named controls. | authoritative decision + service regression suite | FIXED |
+| R2-002 | HIGH | `realtime/thesis.py` | Fixed sigmoids were named probabilities despite no empirical calibration. | Public thesis contract now exposes heuristic scores and explicit `HEURISTIC_NOT_CALIBRATED`; calibrated target slots remain null. | `test_runner_decision_is_single_authority_and_never_labels_heuristics_as_probability` | FIXED |
+| R2-003 | HIGH | `realtime/learning.py` | A hand-built control/V3 average minus failure could destroy positive runner signal. | Removed hidden hybrid from calculation and comparison frontiers. | repository scan for `control_v3_hybrid` | FIXED |
+| R2-004 | CRITICAL | learning/outcomes | Discovery-based peaks could label a late decision as a winner. | Added immutable decision entry state and target outcomes beginning at `decision_at`. | `test_outcomes_start_at_decision_not_discovery` | FIXED |
+| R2-005 | CRITICAL | `historical/evaluation.py` | Different universes could be compared as apparent lift/deterioration. | Canonical contract/member hash and fail-closed same-universe check. | `test_evaluation_hash_refuses_cross_universe_comparison` | FIXED |
+| R2-006 | HIGH | `historical/runner_models.py` | Linear univariate averaging missed interactions; model responsibilities were conflated. | Chronological regularized logistic and nonlinear HGB candidates; separately fitted runner targets, terminal failure and copyability. | nonlinear/independent target research test | FIXED |
+| R2-007 | HIGH | `realtime/features.py` | Sell absorption, capital efficiency and sequences were reduced to coarse endpoints. | Added 5/10/20/30s responses, second-sell response, capital milestones and eight sequence bands. | sell-absorption and feature projector tests | FIXED |
+| R2-008 | HIGH | `realtime/features.py` | Repeated buyer scans introduced avoidable O(N²) cost. | Single-pass `Counter`, sets and persisted actor/window counters. | 10K test + 10K/50K/100K benchmark | FIXED |
+| R2-009 | HIGH | `realtime/incremental.py` | Every event rebuilt full token history. | Compact restart-safe O(1) scalar/actor/window updates with one transaction per event; full projector is reconciliation fallback. | 100K bounded-state benchmark | FIXED |
+| R2-010 | HIGH | `realtime/lanes.py` / service | One serial worker allowed an unrelated HOT token to block others. | Eight bounded hash lanes preserve same-token order and permit cross-token concurrency. | ordering/concurrency test; 100/1,000-token benchmark | FIXED |
+| R2-011 | HIGH | `realtime/providers.py` | Pump event emission waited for `getTransaction`. | Decode Anchor log payload first; queue only missing enrichment asynchronously. | fast path asserts zero RPC calls | FIXED |
+| R2-012 | HIGH | `realtime/providers.py` | RPC enrichment could duplicate work or exhaust quotas. | Bounded queue/semaphores/retries, LRU transaction cache, signature coalescing and public fallback. | fallback/rate-limit/provider tests | FIXED |
+| R2-013 | HIGH | `realtime/providers.py` | Shallow recovery could silently miss long gaps. | Cursor-based paginated signatures with maximum pages and explicit `gap_incomplete`. | paginated backfill boundary test | FIXED |
+| R2-014 | HIGH | `historical/sql/dune` / providers | User had to own a saved Dune query and result paging. | Eight versioned repo SQL templates, strict registry, direct execute/poll/page/Parquet/checkpoint; saved ID optional. | Dune schema/parameter/empty/page/resume tests | FIXED |
+| R2-015 | HIGH | config/main/provider sources | Helius key did not automatically own primary Solana transport. | Derive primary RPC/WSS only for public defaults; public RPC remains fallback; key is redacted/excluded from fingerprint. | config/fallback tests | FIXED |
+| R2-016 | MEDIUM | provider admission | Region-blocked PumpPortal could block production capability state. | Classified as optional redundancy when native/Helius paths satisfy core transport. | provider capability tests | FIXED |
+| R2-017 | HIGH | evidence/latency | Freshness and delivery latency contained asserted or null fields. | Provenance-derived freshness plus measured enqueue/delivery lifecycle; non-routes use explicit states. | freshness and delivery latency tests | FIXED |
+| R2-018 | CRITICAL | shadow configuration | Research inference could imply a user-facing alert. | Separate research, operator and public states; both alert routes default false. | route-state tests and staging config | FIXED |
+| R2-019 | MEDIUM | `database/store.py` | Store remained broad and risked duplicated ownership if split carelessly. | Kept one transactional authority; added bounded domain facades for decisions, outcomes and incremental state instead of a second DB owner. | migration/restart/full suite | PROVEN NON-ISSUE / IMPROVED |
+| R2-020 | CRITICAL | repository/security | Data, keys, credentials or generated artifacts could enter Git. | SQL/templates only; Parquet, databases, `.env`, caches and output roots remain ignored; provider errors redact keys. | final path/secret scan | PASS |
+
+Round-two scans also checked duplicate brains, duplicate calculations, unused
+gates, sync hot-path SQL, N+1/O(N²) loops, unbounded queues/memory, duplicate RPC,
+future leakage, wrong outcome anchors, inconsistent units, silent fallbacks,
+null latency and fake freshness. Remaining legacy probability column names belong
+to the additive V1.5 research schema and are compatibility storage only; the
+current object/API labels them as heuristics and they have no route authority.
+
+### Round-two measured performance
+
+The new authoritative benchmark measured 10K/50K/100K HOT-token streams at
+1,061/922/835 events per second. Write p95 was 1.398/1.663/1.851 ms, compact
+state stayed below 2.9 KB, peak traced memory stayed below 0.4 MB, and every
+SQLite run finished WAL `quick_check=ok` with zero foreign-key violations.
+Eight token lanes processed 100 and 1,000 distinct tokens with eight concurrent
+handlers and zero failures. See `docs/v15-authoritative-runner-final.md` for the
+full measured table and explicit exclusions.
+
+Audit date: 2026-08-29. Scope: `src/`, `tests/`, `scripts`, packaging, the historical warehouse schema and operational SQLite schema. The final deterministic repository audit parsed 145 Python files. Its current result contains 13 findings: 5 `FIXED`, 6 `PASS`, 2 `REVIEWED`, 0 `OPEN`.
 
 ## Finding ledger
 

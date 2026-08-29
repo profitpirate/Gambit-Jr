@@ -147,9 +147,7 @@ def _buttons(p: dict[str, Any]) -> list[dict[str, Any]]:
             else f"https://solscan.io/token/{quote(address)}",
         ),
     ]
-    components.extend(
-        {"type": 2, "style": 5, "label": label, "url": url} for label, url in links
-    )
+    components.extend({"type": 2, "style": 5, "label": label, "url": url} for label, url in links)
     components.append(
         {
             "type": 2,
@@ -368,15 +366,9 @@ def format_event(event_type: str, p: dict[str, Any]) -> str:
         narrative = p.get("narrative") or {}
         momentum = p.get("momentum") or {}
         social_display = (
-            "UNKNOWN"
-            if (p.get("social") or {}).get("score") is None
-            else component("social")
+            "UNKNOWN" if (p.get("social") or {}).get("score") is None else component("social")
         )
-        developer_display = (
-            "UNKNOWN"
-            if developer.get("score") is None
-            else component("developer")
-        )
+        developer_display = "UNKNOWN" if developer.get("score") is None else component("developer")
         thesis = (
             "; ".join(_safe(x) for x in p.get("thesis") or [])
             or "Evidence met configured deterministic thresholds."

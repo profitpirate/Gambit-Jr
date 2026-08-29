@@ -59,7 +59,9 @@ class RepositoryAuditor:
         return {
             "audit_run_id": audit_run_id,
             "python_files": len(python_files),
-            "python_lines": sum(len(path.read_text(encoding="utf-8").splitlines()) for path in python_files),
+            "python_lines": sum(
+                len(path.read_text(encoding="utf-8").splitlines()) for path in python_files
+            ),
             "findings": [asdict(finding) for finding in findings],
             "summary": self._summary(findings),
             "database": database,
@@ -69,7 +71,11 @@ class RepositoryAuditor:
     def _python_files(self) -> list[Path]:
         return [
             path
-            for root in (self.repository / "src", self.repository / "tests", self.repository / "scripts")
+            for root in (
+                self.repository / "src",
+                self.repository / "tests",
+                self.repository / "scripts",
+            )
             if root.exists()
             for path in root.rglob("*.py")
             if not any(part in EXCLUDED_PARTS or part.startswith(".tmp") for part in path.parts)
@@ -91,7 +97,8 @@ class RepositoryAuditor:
             for node in ast.walk(tree):
                 if isinstance(node, ast.ExceptHandler) and (
                     node.type is None
-                    or isinstance(node.type, ast.Name) and node.type.id in {"Exception", "BaseException"}
+                    or isinstance(node.type, ast.Name)
+                    and node.type.id in {"Exception", "BaseException"}
                 ):
                     broad += 1
                 if (
@@ -103,11 +110,48 @@ class RepositoryAuditor:
                     and self._inside_async(node, parents)
                 ):
                     blocking_async += 1
-                if isinstance(node, (ast.List, ast.Dict, ast.Set)) and isinstance(
-                    parents.get(node), (ast.Assign, ast.AnnAssign)
-                ) and isinstance(parents.get(parents[node]), ast.Module):
+                if (
+                    isinstance(node, (ast.List, ast.Dict, ast.Set))
+                    and isinstance(parents.get(node), (ast.Assign, ast.AnnAssign))
+                    and isinstance(parents.get(parents[node]), ast.Module)
+                ):
                     mutable_module_state += 1
         findings = [
+            AuditFinding(
+                "ARCHITECTURE",
+                "src/memecoin_bot/service.py",
+                "RunnerDecision final gate",
+                "Multiple live engines could independently appear to authorize a signal.",
+                "CRITICAL",
+                "Consume only RunnerDecision.routes_alert for the terminal route; retain older "
+                "systems as named controls/research evidence.",
+                "tests/test_v15_authoritative_architecture.py",
+                (
+                    "PASS"
+                    if "signal_grade = runner_decision.routes_alert"
+                    in (self.repository / "src/memecoin_bot/service.py").read_text(encoding="utf-8")
+                    else "OPEN"
+                ),
+                {"champion": "CONTROL_V15"},
+            ),
+            AuditFinding(
+                "CORRECTNESS",
+                "src/memecoin_bot/realtime/learning.py",
+                "hidden hybrid inventory",
+                "Hand arithmetic combining control, V3 and failure obscured model authority.",
+                "HIGH",
+                "Remove the hidden hybrid and compare each explicit model on one universe.",
+                "tests/test_v15_authoritative_architecture.py",
+                (
+                    "PASS"
+                    if "control_v3_hybrid_score"
+                    not in (self.repository / "src/memecoin_bot/realtime/learning.py").read_text(
+                        encoding="utf-8"
+                    )
+                    else "OPEN"
+                ),
+                {},
+            ),
             AuditFinding(
                 "ARCHITECTURE",
                 "src/memecoin_bot/convergence/runner.py",
@@ -122,13 +166,14 @@ class RepositoryAuditor:
             AuditFinding(
                 "ARCHITECTURE",
                 "src/memecoin_bot/historical/providers.py",
-                "DuneQueryProvider",
-                "Latest-result ingestion could mix periods and did not execute immutable month partitions.",
+                "DuneMonthHistoricalProvider",
+                "Saved-query ownership and latest-result ingestion could mix periods or require manual SQL.",
                 "HIGH",
-                "Added a reviewed-query execute/poll/result adapter with 2024-01..2026-08 partitions.",
-                "tests/test_v15_convergence.py",
+                "Added repository SQL registry and direct execute/poll/page/Parquet/checkpoints; "
+                "saved query is fallback-only.",
+                "tests/test_v15_authoritative_architecture.py",
                 "FIXED",
-                {},
+                {"repository_sql_templates": 8, "query_id_mandatory": False},
             ),
             AuditFinding(
                 "CORRECTNESS",
@@ -248,7 +293,10 @@ class RepositoryAuditor:
 
     def _dependency_findings(self) -> list[AuditFinding]:
         pyproject = (self.repository / "pyproject.toml").read_text(encoding="utf-8")
-        explicit = all(name in pyproject for name in ("aiohttp", "discord.py", "duckdb", "pytz", "scikit-learn"))
+        explicit = all(
+            name in pyproject
+            for name in ("aiohttp", "discord.py", "duckdb", "pytz", "scikit-learn")
+        )
         social_declared = "telethon" in pyproject
         return [
             AuditFinding(
@@ -260,7 +308,10 @@ class RepositoryAuditor:
                 "Declare runtime, research and optional social dependencies in their owning extras.",
                 "CI package build and pip check",
                 "PASS" if explicit and social_declared else "OPEN",
-                {"core_and_research_declared": explicit, "optional_social_declared": social_declared},
+                {
+                    "core_and_research_declared": explicit,
+                    "optional_social_declared": social_declared,
+                },
             )
         ]
 
@@ -294,7 +345,9 @@ class RepositoryAuditor:
                 )
             finally:
                 connection.close()
-        failed = [row for row in checks if row["integrity"] != "ok" or row["foreign_key_violations"]]
+        failed = [
+            row for row in checks if row["integrity"] != "ok" or row["foreign_key_violations"]
+        ]
         findings.append(
             AuditFinding(
                 "DATABASE",
@@ -386,7 +439,6 @@ class RepositoryAuditor:
             "passed": sum(row.status == "PASS" for row in findings),
             "open": sum(row.status == "OPEN" for row in findings),
             "remaining_high_or_critical": sum(
-                row.status == "OPEN" and row.severity in {"HIGH", "CRITICAL"}
-                for row in findings
+                row.status == "OPEN" and row.severity in {"HIGH", "CRITICAL"} for row in findings
             ),
         }

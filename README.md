@@ -1,5 +1,18 @@
 # Gambit Jr — V1.5 Runner/Survival Intelligence
 
+V1.5 now has one final signal authority: `RunnerDecision`. The older scoring,
+Alpha, V1.5 deterministic, V3 and Runner Thesis outputs remain explicit controls
+or research evidence; none can independently route a signal. CONTROL_V15 is the
+champion until a target-specific calibrated challenger passes an unseen,
+same-universe chronological evaluation and receives explicit approval.
+
+Repository-owned Dune SQL lives in `src/memecoin_bot/historical/sql/dune/`.
+`DUNE_API_KEY` is sufficient for preferred direct SQL execution; `DUNE_QUERY_ID`
+is only an optional saved-query fallback for plans that reject direct SQL. With a
+Helius key and the default public Solana URL, the runtime safely derives Helius
+RPC/WSS endpoints as primary and retains public mainnet as fallback. Keys are not
+included in fingerprints or logs.
+
 The final V1.5 storage and research contract is documented in
 [`docs/v15-historical-intelligence.md`](docs/v15-historical-intelligence.md). It adds an immutable raw
 archive, separate point-in-time research warehouse, explicit approved production feature store,
@@ -248,8 +261,9 @@ credentials block only their provider jobs. See [`docs/FREE_PROVIDER_SETUP.md`](
 for the small worthwhile provider set and [`docs/v15-code-audit-final.md`](docs/v15-code-audit-final.md)
 for the final architecture, security, dependency, database and performance audit.
 
-V1.4 defaults remain `SHADOW_MODE=true` and `SHADOW_SEND_ALERTS=true`. Qualifying messages are
-explicitly labelled read-only shadow signals. There is no wallet, private key,
+Safe defaults are `SHADOW_MODE=true`, `OPERATOR_SHADOW_ALERTS_ENABLED=false`, and
+`PUBLIC_ALERTS_ENABLED=false`. A research shadow call is persisted evidence only;
+operator shadow and public Discord delivery are separate explicit routes. There is no wallet, private key,
 transaction signing, swap, purchase, or sale path.
 
 ## V1.3 intelligence upgrade
