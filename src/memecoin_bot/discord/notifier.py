@@ -9,6 +9,9 @@ from typing import Any
 from memecoin_bot.discord.validation import validate_webhook_payload
 
 
+_INTERNAL_SUPPRESSED = "internal-research-event-suppressed"
+
+
 class NullNotifier:
     async def send(self, content: str | dict[str, Any]) -> str | None:
         return "shadow-not-sent"
@@ -50,6 +53,13 @@ class DiscordNotifier:
         return await self._send_url(self.url, content)
 
     async def _send_url(self, url: str, content: str | dict[str, Any]) -> str | None:
+        # Legacy Genesis/Radar events are still persisted for replay, research and
+        # backward compatibility, but they are not a user-facing alert taxonomy.
+        # The formatter marks those payloads explicitly so delivery can stop here
+        # without deleting evidence or changing the research pipeline.
+        if isinstance(content, dict) and content.get("_gambit_internal_event") is True:
+            return _INTERNAL_SUPPRESSED
+
         message = (
             content
             if isinstance(content, dict)
@@ -62,7 +72,7 @@ class DiscordNotifier:
             def perform(url: str = url) -> tuple[int, bytes, dict[str, str]]:
                 headers = {
                     "Content-Type": "application/json",
-                    "User-Agent": "DiscordBot (memecoin-intelligence, 1.0)",
+                    "User-Agent": "DiscordBot (gambit-jr, 1.5)",
                 }
                 if self.authorization:
                     headers["Authorization"] = self.authorization
