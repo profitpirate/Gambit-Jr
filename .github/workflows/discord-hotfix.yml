@@ -1,0 +1,49 @@
+name: Discord product hotfix gates
+
+on:
+  push:
+    branches:
+      - hotfix/discord-product-v2
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip build
+      - run: python -m pip install -e .[dev,research]
+      - run: pytest
+      - run: ruff check .
+      - run: python -m build
+      - run: docker build -t gambit-jr:${{ github.sha }} .
+
+  staging-contract:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cp .env.staging.example .env.staging
+      - run: docker compose -f docker-compose.staging.yml config --quiet
+      - run: docker compose -f docker-compose.staging.yml up -d --build
+      - name: Wait for isolated staging health
+        run: |
+          for attempt in $(seq 1 30); do
+            curl --fail --silent http://127.0.0.1:18080/health && exit 0
+            sleep 3
+          done
+          docker compose -f docker-compose.staging.yml logs
+          exit 1
+      - name: Run staging acceptance
+        run: |
+          docker compose -f docker-compose.staging.yml exec -T bot-staging \
+            python scripts/staging_acceptance.py \
+            --health-url http://127.0.0.1:8080/health \
+            --operational /app/staging/operational/memecoin.db \
+            --warehouse /app/staging/historical/warehouse.db \
+            --approved /app/staging/approved/approved_features.db
+      - if: always()
+        run: docker compose -f docker-compose.staging.yml down
