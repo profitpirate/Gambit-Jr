@@ -8,7 +8,6 @@ import urllib.request
 
 from memecoin_bot.discord.validation import validate_webhook_payload
 
-
 _INTERNAL_SUPPRESSED = "internal-research-event-suppressed"
 
 
