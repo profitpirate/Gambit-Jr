@@ -55,16 +55,16 @@ class DiscordNotifier:
     async def _send_url(self, url: str, content: str | dict[str, Any]) -> str | None:
         # Legacy Genesis/Radar events are still persisted for replay, research and
         # backward compatibility, but they are not a user-facing alert taxonomy.
-        # The formatter marks those payloads explicitly so delivery can stop here
-        # without deleting evidence or changing the research pipeline.
         if isinstance(content, dict) and content.get("_gambit_internal_event") is True:
             return _INTERNAL_SUPPRESSED
 
-        message = (
-            content
-            if isinstance(content, dict)
-            else {"content": content, "allowed_mentions": {"parse": []}}
-        )
+        if isinstance(content, dict):
+            # Import lazily to keep the notifier usable during package bootstrap.
+            from memecoin_bot.discord.product_policy import prepare_outbound_message
+
+            message = prepare_outbound_message(content)
+        else:
+            message = {"content": content, "allowed_mentions": {"parse": []}}
         validate_webhook_payload(message)
         payload = json.dumps(message).encode()
         for attempt in range(4):
