@@ -35,6 +35,7 @@ _IDENTIFIER_LABELS = {
 }
 
 _PHRASE_REPLACEMENTS = (
+    (r"`?/radar`?", "`/candidates`"),
     (r"GAMBIT JR\s*[—-]\s*GENESIS RADAR", "GAMBIT JR — EARLY OBSERVATION"),
     (r"GAMBIT JR\s*[—-]\s*STANDARD RADAR", "GAMBIT JR — DEVELOPING SETUP"),
     (r"GAMBIT JR\s*[—-]\s*HOT RADAR", "GAMBIT JR — HOT SETUP"),
@@ -58,6 +59,8 @@ _PHRASE_REPLACEMENTS = (
     (r"\bRADAR\b", "CALLS"),
     (r"\bGENESIS\b", "EARLY"),
     (r"\bQUALIFIED SIGNAL\b", "QUALIFIED CALL"),
+    (r"\bSIGNALS\b", "CALLS"),
+    (r"\bSIGNAL\b", "CALL"),
 )
 
 _SNAKE_CASE = re.compile(r"\b[A-Za-z][A-Za-z0-9]*(?:_[A-Za-z0-9]+)+\b")
@@ -170,7 +173,9 @@ def _clean_signal_payload(payload: dict[str, Any], evidence: dict[str, Any]) -> 
             confidence = evidence.get("confidence")
             coverage = evidence.get("evidence_coverage")
             if confidence is not None and coverage is not None:
-                field["value"] = f"{_percent(confidence)} confidence • {_percent(coverage)} coverage"
+                field["value"] = (
+                    f"{_percent(confidence)} confidence • {_percent(coverage)} coverage"
+                )
             elif confidence is not None:
                 field["value"] = f"{_percent(confidence)} confidence"
             elif coverage is not None:
