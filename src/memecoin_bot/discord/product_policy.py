@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import functools
 import importlib
 import re
@@ -81,10 +82,7 @@ def _humanize_identifier(token: str) -> str:
         mapped = _IDENTIFIER_LABELS.get(token.upper())
     if mapped is not None:
         return mapped
-    words = []
-    for word in token.lower().split("_"):
-        words.append(_ACRONYMS.get(word, word))
-    return " ".join(words)
+    return " ".join(_ACRONYMS.get(word, word) for word in token.lower().split("_"))
 
 
 def humanize_text(value: Any) -> Any:
@@ -146,20 +144,17 @@ def apply_product_presentation(payload: dict[str, Any]) -> dict[str, Any]:
     return payload
 
 
-def _percent(value: Any) -> str:
-    if value is None:
-        return "UNKNOWN"
-    number = float(value)
-    if 0 <= number <= 1:
-        number *= 100
-    return f"{number:.0f}%"
-
-
-def _clean_signal_payload(payload: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any]:
+def _clean_delivered_signal(payload: dict[str, Any]) -> None:
     embeds = payload.get("embeds") or []
     if not embeds:
-        return payload
+        return
     embed = embeds[0]
+    original_title = str(embed.get("title") or "CALL")
+    title_parts = [part.strip() for part in original_title.split("•", 1)]
+    category = humanize_text(title_parts[0]).upper()
+    identity = title_parts[1] if len(title_parts) > 1 else ""
+    embed["title"] = f"GAMBIT JR — {category} CALL" + (f" • {identity}" if identity else "")
+
     fields = []
     for raw in embed.get("fields") or []:
         name = str(raw.get("name") or "")
@@ -170,33 +165,26 @@ def _clean_signal_payload(payload: dict[str, Any], evidence: dict[str, Any]) -> 
             field["name"] = "Call category"
         elif name == "Confidence / evidence coverage":
             field["name"] = "Evidence confidence"
-            confidence = evidence.get("confidence")
-            coverage = evidence.get("evidence_coverage")
-            if confidence is not None and coverage is not None:
-                field["value"] = (
-                    f"{_percent(confidence)} confidence • {_percent(coverage)} coverage"
-                )
-            elif confidence is not None:
-                field["value"] = f"{_percent(confidence)} confidence"
-            elif coverage is not None:
-                field["value"] = f"{_percent(coverage)} evidence coverage"
-            else:
-                field["value"] = "Awaiting measured evidence"
         elif name == "Why now":
             field["name"] = "Why it matters now"
         fields.append(field)
     embed["fields"] = fields
-    name = evidence.get("name") or evidence.get("symbol") or "Tracked token"
-    symbol = evidence.get("symbol")
-    address = evidence.get("token_address") or "UNKNOWN"
-    identity = f"**{name}**" + (f" (${symbol})" if symbol else "")
-    route = "Operator shadow call" if evidence.get("shadow") else "Read-only intelligence call"
-    embed["description"] = f"{identity}\n`{address}`\n{route} • no trade is executed"
-    tier = str(evidence.get("v15_signal_tier") or evidence.get("classification") or "CALL")
-    tier = humanize_text(tier).upper()
-    embed["title"] = f"GAMBIT JR — {tier} CALL"
-    payload["content"] = f"{embed['title']}\n`{address}`"
-    return payload
+
+    description_lines = []
+    for line in str(embed.get("description") or "").splitlines():
+        stripped = line.strip()
+        if stripped.startswith("Score:") or stripped.startswith("V1.5 Tier:"):
+            continue
+        description_lines.append(line)
+    embed["description"] = "\n".join(description_lines)
+
+
+def prepare_outbound_message(payload: dict[str, Any]) -> dict[str, Any]:
+    message = copy.deepcopy(payload)
+    embeds = message.get("embeds") or []
+    if embeds and any(field.get("name") == "Tier" for field in embeds[0].get("fields") or []):
+        _clean_delivered_signal(message)
+    return apply_product_presentation(message)
 
 
 def install_discord_product_policy() -> None:
@@ -222,16 +210,11 @@ def install_discord_product_policy() -> None:
 
     @functools.wraps(original_format)
     def calls_first_format(event_type: str, evidence: dict[str, Any]) -> dict[str, Any]:
-        if event_type in _LEGACY_INTERNAL_EVENTS:
-            return {
-                "_gambit_internal_event": True,
-                "event_type": event_type,
-                "allowed_mentions": {"parse": []},
-            }
         payload = original_format(event_type, evidence)
-        if event_type == "SIGNAL":
-            payload = _clean_signal_payload(payload, evidence)
-        return apply_product_presentation(payload)
+        if event_type in _LEGACY_INTERNAL_EVENTS:
+            payload["_gambit_internal_event"] = True
+            payload["event_type"] = event_type
+        return payload
 
     formatting.format_discord_event = calls_first_format
     signals_package.format_discord_event = calls_first_format
@@ -239,14 +222,13 @@ def install_discord_product_policy() -> None:
     original_menu_init = command_center.MenuView.__init__
 
     @functools.wraps(original_menu_init)
-    def persistent_menu_init(self: Any, *args: Any, **kwargs: Any) -> None:
-        kwargs["timeout"] = None
+    def safe_menu_init(self: Any, *args: Any, **kwargs: Any) -> None:
         original_menu_init(self, *args, **kwargs)
         for child in self.children:
             if getattr(child, "custom_id", None) == "gambit:menu:refresh":
                 child.emoji = None
 
-    command_center.MenuView.__init__ = persistent_menu_init
+    command_center.MenuView.__init__ = safe_menu_init
 
     original_select_init = command_center.MenuSelect.__init__
 
