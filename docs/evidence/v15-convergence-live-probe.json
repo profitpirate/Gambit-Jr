@@ -1,0 +1,65 @@
+{
+  "schema_version": "v15-convergence-live-probe-v1",
+  "observed_at": "2026-08-29T00:04:06.788819+00:00",
+  "environment": "local Windows read-only/keyless probe; no VPS or production deployment",
+  "credential_values_persisted": false,
+  "public_route": false,
+  "providers": [
+    {
+      "provider": "native_solana_rpc",
+      "state": "SECONDARY",
+      "events": 1,
+      "tokens": 0,
+      "latency_p50_ms": 510.2046,
+      "latency_p95_ms": 510.2046,
+      "errors": 0,
+      "coverage": {"mainnet_slot_observed": true, "slot": 442465646}
+    },
+    {
+      "provider": "dexscreener",
+      "state": "ENRICHMENT",
+      "events": 120,
+      "matching_events": 120,
+      "tokens": 105,
+      "latency_p50_ms": 206.44925,
+      "latency_p95_ms": 295.7666,
+      "errors": 0,
+      "coverage": {"profiles": 30, "boosts": 30, "takeovers": 30, "ads": 30, "promotional_not_runner_proof": true}
+    },
+    {
+      "provider": "geckoterminal",
+      "state": "SECONDARY",
+      "events": 20,
+      "tokens": 20,
+      "latency_p50_ms": 208.213,
+      "latency_p95_ms": 208.213,
+      "errors": 0,
+      "coverage": {"solana_new_pool_page": 1, "rolling_window_only": true}
+    },
+    {
+      "provider": "bluesky_jetstream",
+      "state": "ENRICHMENT",
+      "events": 5,
+      "matching_events": 0,
+      "tokens": 0,
+      "latency_p50_ms": 814.3583,
+      "latency_p95_ms": 915.6616,
+      "errors": 0,
+      "coverage": {"collection": "app.bsky.feed.post", "content_persisted": false},
+      "qualification": "transport live only; no useful CA mention and no predictive social result"
+    },
+    {"provider": "helius", "state": "BLOCKED_EXTERNAL", "events": 0, "errors": 1, "required_env": ["HELIUS_API_KEY"]},
+    {"provider": "pumpportal", "state": "BLOCKED_EXTERNAL", "events": 0, "errors": 1, "required_env": ["PUMPPORTAL_API_KEY"]},
+    {"provider": "dune", "state": "BLOCKED_EXTERNAL", "events": 0, "errors": 1, "required_env": ["DUNE_API_KEY", "DUNE_QUERY_ID"]},
+    {"provider": "discord_authorized", "state": "BLOCKED_EXTERNAL_CREDENTIAL", "events": 0},
+    {"provider": "telegram", "state": "BLOCKED_EXTERNAL_CREDENTIAL", "events": 0},
+    {"provider": "reddit", "state": "BLOCKED_EXTERNAL_CREDENTIAL", "events": 0},
+    {"provider": "x_direct_api", "state": "REJECTED", "events": 0}
+  ],
+  "claims_not_made": [
+    "No configured credentialed provider is marked live.",
+    "Five Bluesky envelopes are not claimed as five token mentions.",
+    "No social feature or model is approved.",
+    "This bounded probe is not a sustained production SLA."
+  ]
+}

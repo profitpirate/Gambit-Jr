@@ -1080,10 +1080,10 @@ class PumpCurveAccountSource:
 class HeliusCuratedSource:
     """Selective free-tier-compatible Helius standard RPC account feed.
 
-    Helius' enhanced ``transactionSubscribe`` is deliberately not used here: it is
-    a paid add-on. Standard ``logsSubscribe`` notifications trigger narrowly scoped
-    ``getTransaction`` enrichment, while the native Pump source remains the broad
-    no-key fallback.
+    ``transactionSubscribe`` is deliberately not used. Current standard WebSocket
+    traffic is free-plan available but credit-metered; ``logsSubscribe`` notifications
+    trigger narrowly scoped ``getTransaction`` enrichment while native Pump remains
+    the broad no-key fallback.
     """
 
     name = "helius_curated"

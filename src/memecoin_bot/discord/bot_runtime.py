@@ -47,6 +47,7 @@ from memecoin_bot.discord.responses import (
 )
 from memecoin_bot.discord.validation import validate_message
 from memecoin_bot.observability.logging import event
+from memecoin_bot.social import AuthorizedDiscordSocialSource
 from memecoin_bot.v15_engine import operator_model_status
 
 CommandCallback = TypeVar("CommandCallback", bound=Callable[..., Awaitable[None]])
@@ -314,7 +315,14 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
     if discord is None or app_commands is None:
         raise RuntimeError("discord.py is required for slash commands")
 
+    social_observation_enabled = bool(
+        getattr(settings, "discord_social_observation_enabled", False)
+    )
     intents = discord.Intents.none()
+    if social_observation_enabled:
+        intents.guilds = True
+        intents.guild_messages = True
+        intents.message_content = True
     client = discord.Client(intents=intents)
     tree = app_commands.CommandTree(client)
     log = logging.getLogger("memecoin_bot.discord")
@@ -324,6 +332,14 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
     client.add_view(TokenActionView(store, log, timeout=None))
     response_sessions: dict[int, InteractionResponder] = {}
     active_command_names: dict[int, str] = {}
+    discord_social = (
+        AuthorizedDiscordSocialSource(
+            getattr(settings, "discord_social_channel_ids", ()),
+            lambda chain, address: store.token_id(address, chain) is not None,
+        )
+        if social_observation_enabled
+        else None
+    )
 
     def track_command(callback: CommandCallback) -> CommandCallback:
         @functools.wraps(callback)
@@ -870,6 +886,20 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
                 command_names=sorted(command.name for command in synced),
                 result="success",
             )
+
+    @client.event
+    async def on_message(message: discord.Message) -> None:
+        if discord_social is None or message.guild is None:
+            return
+        for social_event in discord_social.parse_message(
+            message_id=message.id,
+            channel_id=message.channel.id,
+            author_id=message.author.id,
+            content=message.content,
+            created_at=message.created_at,
+            author_is_bot=message.author.bot,
+        ):
+            await service.offer_realtime_event(social_event)
 
     service_task = asyncio.create_task(service.run(), name="intelligence-service")
     try:

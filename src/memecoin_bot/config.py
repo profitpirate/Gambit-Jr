@@ -38,6 +38,8 @@ class Settings:
     discord_channel_id: int | None = None
     discord_channel_ids: tuple[int, ...] = ()
     discord_webhook_url: str | None = None
+    discord_social_observation_enabled: bool = False
+    discord_social_channel_ids: tuple[int, ...] = ()
     solana_rpc_url: str = "https://api.mainnet-beta.solana.com"
     dexscreener_base_url: str = "https://api.dexscreener.com"
     geckoterminal_base_url: str = "https://api.geckoterminal.com/api/v2"
@@ -63,6 +65,12 @@ class Settings:
     pumpportal_websocket_url: str = "wss://pumpportal.fun/api/data"
     helius_api_key: str | None = None
     helius_curated_accounts: tuple[str, ...] = ()
+    bluesky_social_enabled: bool = False
+    telegram_social_enabled: bool = False
+    telegram_api_id: int | None = None
+    telegram_api_hash: str | None = None
+    telegram_session: str | None = None
+    telegram_channels: tuple[str, ...] = ()
     gmgn_enabled: bool = False
     gmgn_api_key: str | None = None
     gmgn_base_url: str = "https://openapi.gmgn.ai"
@@ -174,6 +182,14 @@ class Settings:
             discord_channel_id=int(channel) if channel else None,
             discord_channel_ids=channels,
             discord_webhook_url=os.getenv("DISCORD_WEBHOOK_URL") or None,
+            discord_social_observation_enabled=_bool(
+                "DISCORD_SOCIAL_OBSERVATION_ENABLED", False
+            ),
+            discord_social_channel_ids=tuple(
+                int(value.strip())
+                for value in os.getenv("DISCORD_SOCIAL_CHANNEL_IDS", "").split(",")
+                if value.strip()
+            ),
             solana_rpc_url=os.getenv("SOLANA_RPC_URL", "https://api.mainnet-beta.solana.com"),
             dexscreener_base_url=os.getenv("DEXSCREENER_BASE_URL", "https://api.dexscreener.com"),
             geckoterminal_base_url=os.getenv(
@@ -228,6 +244,18 @@ class Settings:
             helius_curated_accounts=tuple(
                 value.strip()
                 for value in os.getenv("HELIUS_CURATED_ACCOUNTS", "").split(",")
+                if value.strip()
+            ),
+            bluesky_social_enabled=_bool("BLUESKY_SOCIAL_ENABLED", False),
+            telegram_social_enabled=_bool("TELEGRAM_SOCIAL_ENABLED", False),
+            telegram_api_id=(
+                _int("TELEGRAM_API_ID", 0) if os.getenv("TELEGRAM_API_ID") else None
+            ),
+            telegram_api_hash=os.getenv("TELEGRAM_API_HASH") or None,
+            telegram_session=os.getenv("TELEGRAM_SESSION") or None,
+            telegram_channels=tuple(
+                value.strip()
+                for value in os.getenv("TELEGRAM_CHANNELS", "").split(",")
                 if value.strip()
             ),
             gmgn_enabled=_bool("GMGN_ENABLED", False),
@@ -363,6 +391,22 @@ class Settings:
             raise ValueError("MISSED_RUNNER_MULTIPLE cannot exceed MAJOR_MISSED_RUNNER_MULTIPLE")
         if self.gmgn_enabled and not self.gmgn_api_key:
             raise ValueError("GMGN_ENABLED requires a read-only GMGN_API_KEY")
+        if self.discord_social_observation_enabled and (
+            not self.discord_token or not self.discord_social_channel_ids
+        ):
+            raise ValueError(
+                "DISCORD_SOCIAL_OBSERVATION_ENABLED requires DISCORD_TOKEN and an explicit "
+                "DISCORD_SOCIAL_CHANNEL_IDS allowlist"
+            )
+        if self.telegram_social_enabled and not (
+            self.telegram_api_id
+            and self.telegram_api_hash
+            and self.telegram_session
+            and self.telegram_channels
+        ):
+            raise ValueError(
+                "TELEGRAM_SOCIAL_ENABLED requires API credentials, session and authorized channels"
+            )
         if (
             min(
                 self.gmgn_timeout_seconds,

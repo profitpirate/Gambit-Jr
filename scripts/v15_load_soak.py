@@ -18,6 +18,7 @@ async def run(
     database: Path, *, events: int, queue_size: int, burst_multiplier: int
 ) -> dict[str, Any]:
     started = time.perf_counter()
+    cpu_started = time.process_time()
     tracemalloc.start()
     store = Store(database)
     store.migrate()
@@ -79,6 +80,7 @@ async def run(
     _current, peak_memory = tracemalloc.get_traced_memory()
     tracemalloc.stop()
     elapsed = max(time.perf_counter() - started, 1e-9)
+    cpu_seconds = max(time.process_time() - cpu_started, 0.0)
     expected_persisted = events + len(burst)
     state = (
         "PASS"
@@ -105,6 +107,8 @@ async def run(
         "database_integrity": integrity,
         "state_reconciliation": reconciliation,
         "elapsed_seconds": elapsed,
+        "cpu_seconds": cpu_seconds,
+        "single_core_cpu_percent": cpu_seconds / elapsed * 100,
         "throughput_per_second": persisted / elapsed,
         "peak_traced_memory_bytes": peak_memory,
         "database_bytes": database.stat().st_size,

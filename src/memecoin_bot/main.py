@@ -31,6 +31,7 @@ from memecoin_bot.realtime.providers import (
 )
 from memecoin_bot.replay import ReplayRunner
 from memecoin_bot.service import IntelligenceService
+from memecoin_bot.social import BlueskyJetstreamSocialSource, TelegramAuthorizedSocialSource
 
 
 def build(settings: Settings) -> tuple[Store, IntelligenceService]:
@@ -274,6 +275,43 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
             0,
             "HELIUS_KEY_OR_CURATED_ACCOUNTS_NOT_CONFIGURED",
             "NOT_CONFIGURED",
+        )
+    def known_token(chain: str, address: str) -> bool:
+        return store.token_id(address, chain) is not None
+    if settings.realtime_fabric_enabled and settings.bluesky_social_enabled:
+        realtime_sources.append(
+            BlueskyJetstreamSocialSource(
+                known_token, silence_seconds=settings.realtime_silence_seconds
+            )
+        )
+    else:
+        store.set_provider_health(
+            "bluesky_jetstream_social",
+            False,
+            0,
+            "BLUESKY_SOCIAL_DISABLED",
+            "DISABLED",
+        )
+    if settings.realtime_fabric_enabled and settings.telegram_social_enabled:
+        assert settings.telegram_api_id is not None
+        assert settings.telegram_api_hash is not None
+        assert settings.telegram_session is not None
+        realtime_sources.append(
+            TelegramAuthorizedSocialSource(
+                settings.telegram_api_id,
+                settings.telegram_api_hash,
+                settings.telegram_session,
+                settings.telegram_channels,
+                known_token,
+            )
+        )
+    else:
+        store.set_provider_health(
+            "telegram_authorized_social",
+            False,
+            0,
+            "TELEGRAM_SOCIAL_DISABLED",
+            "DISABLED",
         )
     service = IntelligenceService(
         settings,

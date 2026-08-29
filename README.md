@@ -230,6 +230,24 @@ memecoin-bot once --output evidence/live-shadow.json
 memecoin-bot run
 ```
 
+Run and inspect the durable V1.5 research loop separately from the public runtime:
+
+```bash
+python -m memecoin_bot.convergence run
+python -m memecoin_bot.convergence status
+python -m memecoin_bot.convergence providers --probe
+python -m memecoin_bot.convergence historical
+python -m memecoin_bot.convergence champion
+python -m memecoin_bot.convergence metrics
+python -m memecoin_bot.convergence audits
+python -m memecoin_bot.convergence report
+```
+
+The convergence store is shadow/research-only and cannot route public signals. Missing optional
+credentials block only their provider jobs. See [`docs/FREE_PROVIDER_SETUP.md`](docs/FREE_PROVIDER_SETUP.md)
+for the small worthwhile provider set and [`docs/v15-code-audit-final.md`](docs/v15-code-audit-final.md)
+for the final architecture, security, dependency, database and performance audit.
+
 V1.4 defaults remain `SHADOW_MODE=true` and `SHADOW_SEND_ALERTS=true`. Qualifying messages are
 explicitly labelled read-only shadow signals. There is no wallet, private key,
 transaction signing, swap, purchase, or sale path.

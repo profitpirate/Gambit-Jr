@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import sqlite3
 import time
@@ -14,6 +15,7 @@ from .backfill import BackfillPage
 from .store import RawEvidence
 
 JsonFetcher = Callable[[str], Awaitable[Any]]
+JsonRequester = Callable[[str, dict[str, Any]], Awaitable[Any]]
 
 
 def _iso_from_milliseconds(value: int) -> str:
@@ -384,6 +386,203 @@ class DuneQueryProvider:
             max(0, total - next_offset),
             metadata={"query_id": self.query_id, "total_rows": total},
         )
+
+
+class DuneExecutionClient:
+    """Bounded Dune execute/poll/result client for reviewed, parameterized queries."""
+
+    def __init__(
+        self,
+        api_key: str,
+        *,
+        base_url: str = "https://api.dune.com/api/v1",
+        timeout_seconds: float = 30,
+        poll_seconds: float = 2,
+        maximum_polls: int = 900,
+    ):
+        if not api_key:
+            raise ValueError("DUNE_API_KEY is required")
+        self.api_key = api_key
+        self.base_url = base_url.rstrip("/")
+        self.timeout_seconds = timeout_seconds
+        self.poll_seconds = poll_seconds
+        self.maximum_polls = maximum_polls
+
+    async def _request(
+        self,
+        method: str,
+        path: str,
+        *,
+        body: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        timeout = aiohttp.ClientTimeout(total=self.timeout_seconds)
+        headers = {"X-Dune-API-Key": self.api_key}
+        async with aiohttp.ClientSession(timeout=timeout, headers=headers) as session:
+            for attempt in range(6):
+                async with session.request(
+                    method, f"{self.base_url}{path}", json=body
+                ) as response:
+                    if response.status == 429:
+                        retry = min(float(response.headers.get("Retry-After", 2**attempt)), 60)
+                        await asyncio.sleep(retry)
+                        continue
+                    response.raise_for_status()
+                    payload = await response.json()
+                    if not isinstance(payload, dict):
+                        raise TypeError("Dune API returned a non-object response")
+                    return payload
+        raise RuntimeError("Dune API rate limit did not recover within bounded retries")
+
+    async def execute(self, query_id: int, parameters: dict[str, Any]) -> str:
+        payload = await self._request(
+            "POST",
+            f"/query/{int(query_id)}/execute",
+            body={"query_parameters": parameters, "performance": "medium"},
+        )
+        execution_id = payload.get("execution_id")
+        if not execution_id:
+            raise ValueError("Dune execution response omitted execution_id")
+        return str(execution_id)
+
+    async def wait(self, execution_id: str) -> dict[str, Any]:
+        for _attempt in range(self.maximum_polls):
+            payload = await self._request("GET", f"/execution/{execution_id}/status")
+            state = str(payload.get("state") or "")
+            if state in {"QUERY_STATE_COMPLETED", "QUERY_STATE_SUCCESS"}:
+                return payload
+            if state in {
+                "QUERY_STATE_FAILED",
+                "QUERY_STATE_CANCELLED",
+                "QUERY_STATE_EXPIRED",
+            }:
+                detail = payload.get("error") or state
+                raise RuntimeError(f"Dune execution failed: {detail}")
+            await asyncio.sleep(self.poll_seconds)
+        raise TimeoutError("Dune execution did not complete within bounded polling")
+
+    async def results(self, execution_id: str, offset: int, limit: int) -> dict[str, Any]:
+        return await self._request(
+            "GET",
+            f"/execution/{execution_id}/results?limit={limit}&offset={offset}"
+            "&allow_partial_results=false",
+        )
+
+
+class DuneMonthHistoricalProvider:
+    """Targeted month partition backed by one reviewed Dune saved query.
+
+    The query must accept ``month_start`` and ``month_end`` parameters and return
+    the configured entity/observed columns. Missing availability is conservatively
+    set to acquisition time; it is never backdated to the event.
+    """
+
+    name = "dune_month_partition"
+
+    def __init__(
+        self,
+        query_id: int,
+        month: str,
+        api_key: str | None,
+        *,
+        chain: str = "solana",
+        entity_field: str = "token_address",
+        observed_at_field: str = "observed_at",
+        available_at_field: str | None = None,
+        page_size: int = 5_000,
+        client: DuneExecutionClient | None = None,
+    ):
+        start = datetime.strptime(month, "%Y-%m").replace(tzinfo=UTC)
+        if start.month == 12:
+            end = start.replace(year=start.year + 1, month=1)
+        else:
+            end = start.replace(month=start.month + 1)
+        if not api_key and client is None:
+            raise ValueError("DUNE_API_KEY is required")
+        self.query_id = int(query_id)
+        self.month = month
+        self.start = start.isoformat()
+        self.end = end.isoformat()
+        self.dataset_id = f"dune-pumpfun-{month}"
+        self.chain = chain
+        self.entity_field = entity_field
+        self.observed_at_field = observed_at_field
+        self.available_at_field = available_at_field
+        self.page_size = min(max(int(page_size), 1), 10_000)
+        self.client = client or DuneExecutionClient(str(api_key))
+
+    async def fetch_page(self, cursor: Any) -> BackfillPage:
+        checkpoint = dict(cursor or {})
+        execution_id = checkpoint.get("execution_id")
+        if not execution_id:
+            execution_id = await self.client.execute(
+                self.query_id,
+                {"month_start": self.start, "month_end": self.end},
+            )
+            await self.client.wait(str(execution_id))
+        offset = int(checkpoint.get("offset", 0))
+        response = await self.client.results(str(execution_id), offset, self.page_size)
+        result = response.get("result") or {}
+        rows = result.get("rows") or []
+        metadata = result.get("metadata") or response.get("result_metadata") or {}
+        total = int(metadata.get("total_row_count") or offset + len(rows))
+        acquired_at = _utc_now()
+        records = []
+        for row in rows:
+            observed = _coerce_utc(row[self.observed_at_field])
+            available = (
+                _coerce_utc(row[self.available_at_field])
+                if self.available_at_field and row.get(self.available_at_field)
+                else acquired_at
+            )
+            records.append(
+                RawEvidence(
+                    dataset_id=self.dataset_id,
+                    provider=self.name,
+                    chain=self.chain,
+                    entity_type="pumpfun_launch_evidence",
+                    entity_id=str(row[self.entity_field]),
+                    source_timestamp=observed,
+                    availability_timestamp=available,
+                    endpoint_type="dune_parameterized_month_result",
+                    payload=row,
+                    schema_version=f"dune-query-{self.query_id}",
+                    acquisition_version="v1.5-convergence-v1",
+                    provenance={
+                        "query_id": self.query_id,
+                        "execution_id": str(execution_id),
+                        "month": self.month,
+                        "offset": offset,
+                        "availability_from_source": bool(self.available_at_field),
+                        "partial_results_allowed": False,
+                        "credential_name": "DUNE_API_KEY",
+                    },
+                )
+            )
+        next_offset = offset + len(rows)
+        next_cursor = (
+            {"execution_id": str(execution_id), "offset": next_offset}
+            if rows and next_offset < total
+            else None
+        )
+        return BackfillPage(
+            records,
+            next_cursor,
+            max(0, total - next_offset),
+            metadata={
+                "query_id": self.query_id,
+                "execution_id": str(execution_id),
+                "month": self.month,
+                "total_rows": total,
+            },
+        )
+
+
+def _coerce_utc(value: Any) -> str:
+    text = str(value).strip().replace("Z", "+00:00")
+    parsed = datetime.fromisoformat(text)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=UTC)
+    return parsed.astimezone(UTC).isoformat()
 
 
 class BirdeyeOhlcvProvider:
