@@ -173,7 +173,7 @@ def _clean_delivered_signal(payload: dict[str, Any]) -> None:
     description_lines = []
     for line in str(embed.get("description") or "").splitlines():
         stripped = line.strip()
-        if stripped.startswith("Score:") or stripped.startswith("V1.5 Tier:"):
+        if stripped.startswith(("Score:", "V1.5 Tier:")):
             continue
         description_lines.append(line)
     embed["description"] = "\n".join(description_lines)
