@@ -28,6 +28,9 @@ jobs:
       - uses: actions/checkout@v4
       - run: cp .env.staging.example .env.staging
       - run: docker compose -f docker-compose.staging.yml config --quiet
+      - run: test "$(docker compose -f docker-compose.staging.yml config | grep -c '/app/staging/')" -ge 4
+      - run: |
+          test "$(docker compose -f docker-compose.staging.yml config | grep -c 'SHADOW_SEND_ALERTS: \"false\"')" -ge 1
       - run: docker compose -f docker-compose.staging.yml up -d --build
       - name: Wait for isolated staging health
         run: |
@@ -37,6 +40,11 @@ jobs:
           done
           docker compose -f docker-compose.staging.yml logs
           exit 1
+      - name: Create isolated research warehouse schema
+        run: |
+          docker compose -f docker-compose.staging.yml exec -T bot-staging \
+            gambit-history --warehouse /app/staging/historical/warehouse.db \
+            --archive /app/staging/archive coverage
       - name: Run staging acceptance
         run: |
           docker compose -f docker-compose.staging.yml exec -T bot-staging \
