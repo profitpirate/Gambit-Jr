@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
-from typing import Any
+import typing
 from urllib import error, request
 
 from memecoin_bot.discord.validation import validate_webhook_payload
@@ -12,7 +12,7 @@ _INTERNAL_SUPPRESSED = "internal-research-event-suppressed"
 
 
 class NullNotifier:
-    async def send(self, content: str | dict[str, Any]) -> str | None:
+    async def send(self, content: str | dict[str, typing.Any]) -> str | None:
         return "shadow-not-sent"
 
 
@@ -39,19 +39,21 @@ class DiscordNotifier:
         else:
             raise ValueError("Discord requires webhook URL or both bot token and channel ID")
 
-    async def send_to(self, channel_id: int, content: str | dict[str, Any]) -> str | None:
+    async def send_to(
+        self, channel_id: int, content: str | dict[str, typing.Any]
+    ) -> str | None:
         if not self.token:
             return await self.send(content)
         return await self._send_url(
             f"https://discord.com/api/v10/channels/{channel_id}/messages", content
         )
 
-    async def send(self, content: str | dict[str, Any]) -> str | None:
+    async def send(self, content: str | dict[str, typing.Any]) -> str | None:
         if not self.url:
             raise RuntimeError("Discord destination is not configured; use send_to")
         return await self._send_url(self.url, content)
 
-    async def _send_url(self, url: str, content: str | dict[str, Any]) -> str | None:
+    async def _send_url(self, url: str, content: str | dict[str, typing.Any]) -> str | None:
         # Legacy Genesis/Radar events are still persisted for replay, research and
         # backward compatibility, but they are not a user-facing alert taxonomy.
         if isinstance(content, dict) and content.get("_gambit_internal_event") is True:
