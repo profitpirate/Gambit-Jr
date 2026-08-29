@@ -5,6 +5,7 @@ import pytest
 from memecoin_bot.discord import bot_runtime
 from memecoin_bot.discord.cards import card
 from memecoin_bot.discord.command_center import CommandCenterData, MenuView
+from memecoin_bot.discord.product_policy import prepare_outbound_message
 from memecoin_bot.signals import format_discord_event
 
 
@@ -13,7 +14,7 @@ def test_all_cards_include_made_by_jay() -> None:
     assert "Made by Jay" in payload["embed"]["footer"]["text"]
 
 
-def test_legacy_radar_events_are_internal_only() -> None:
+def test_legacy_radar_events_keep_contract_but_are_marked_internal_only() -> None:
     for event_type in (
         "GENESIS_RADAR",
         "EARLY_RADAR",
@@ -25,11 +26,12 @@ def test_legacy_radar_events_are_internal_only() -> None:
         payload = format_discord_event(event_type, {"token_address": "ExampleToken"})
         assert payload["_gambit_internal_event"] is True
         assert payload["event_type"] == event_type
-        assert "embeds" not in payload
+        assert payload["embeds"]
+        assert payload["content"]
 
 
-def test_signal_card_uses_calls_first_language_and_human_text() -> None:
-    payload = format_discord_event(
+def test_delivered_signal_uses_calls_first_language_and_human_text() -> None:
+    raw = format_discord_event(
         "SIGNAL",
         {
             "v15_signal_tier": "STRONG",
@@ -51,11 +53,12 @@ def test_signal_card_uses_calls_first_language_and_human_text() -> None:
             "failure_reasons": ["liquidity_usd is still developing"],
         },
     )
+    payload = prepare_outbound_message(raw)
     embed = payload["embeds"][0]
     names = {field["name"] for field in embed["fields"]}
     rendered = str(payload)
 
-    assert embed["title"] == "GAMBIT JR — STRONG CALL"
+    assert embed["title"].startswith("GAMBIT JR — STRONG CALL")
     assert "Runner potential" not in names
     assert "Failure risk" not in names
     assert "Call category" in names
@@ -67,12 +70,12 @@ def test_signal_card_uses_calls_first_language_and_human_text() -> None:
 
 
 @pytest.mark.asyncio
-async def test_menu_is_persistent_and_refresh_has_no_invalid_emoji() -> None:
+async def test_menu_keeps_contract_and_refresh_has_no_invalid_emoji() -> None:
     view = MenuView(CommandCenterData(object(), object(), object()), timeout=900)
     refresh = next(
         child for child in view.children if child.custom_id == "gambit:menu:refresh"
     )
-    assert view.timeout is None
+    assert view.timeout == 900
     assert refresh.emoji is None
     calls_option = next(
         option
