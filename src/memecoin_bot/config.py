@@ -71,12 +71,48 @@ class Settings:
     pumpportal_websocket_url: str = "wss://pumpportal.fun/api/data"
     helius_api_key: str | None = None
     helius_curated_accounts: tuple[str, ...] = ()
+    birdeye_api_key: str | None = None
+    birdeye_base_url: str = "https://public-api.birdeye.so"
+    solana_tracker_api_key: str | None = None
+    solana_tracker_rpc_url: str | None = None
+    solana_tracker_wss_url: str | None = None
+    solana_tracker_data_url: str = "https://data.solanatracker.io"
+    alchemy_api_key: str | None = None
+    alchemy_solana_rpc_url: str | None = None
+    alchemy_solana_wss_url: str | None = None
+    shyft_api_key: str | None = None
+    shyft_solana_rpc_url: str | None = None
+    solscan_api_key: str | None = None
+    solscan_base_url: str = "https://pro-api.solscan.io/v2.0"
+    coingecko_api_key: str | None = None
+    coingecko_base_url: str = "https://api.coingecko.com/api/v3"
+    neynar_api_key: str | None = None
+    youtube_api_key: str | None = None
+    youtube_cache_ttl_seconds: float = 21_600
+    youtube_max_searches_per_process: int = 8
     bluesky_social_enabled: bool = False
     telegram_social_enabled: bool = False
     telegram_api_id: int | None = None
     telegram_api_hash: str | None = None
     telegram_session: str | None = None
     telegram_channels: tuple[str, ...] = ()
+    telegram_public_channels: tuple[str, ...] = ()
+    telegram_public_min_interval_seconds: float = 1
+    mastodon_instance_urls: tuple[str, ...] = ()
+    mastodon_access_token: str | None = None
+    dune_api_key: str | None = None
+    dune_start_month: str | None = None
+    dune_end_month: str | None = None
+    dune_max_executions: int = 0
+    dune_dry_run: bool = True
+    dune_query_names: tuple[str, ...] = (
+        "monthly_universe",
+        "pumpfun_launches",
+        "pumpfun_trades",
+        "outcome_reconstruction",
+    )
+    dune_parquet_root: Path = Path("data/historical/parquet")
+    dune_pilot_sample_rows: int = 10_000
     gmgn_enabled: bool = False
     gmgn_api_key: str | None = None
     gmgn_base_url: str = "https://openapi.gmgn.ai"
@@ -259,6 +295,33 @@ class Settings:
                 for value in os.getenv("HELIUS_CURATED_ACCOUNTS", "").split(",")
                 if value.strip()
             ),
+            birdeye_api_key=os.getenv("BIRDEYE_API_KEY") or None,
+            birdeye_base_url=os.getenv(
+                "BIRDEYE_BASE_URL", "https://public-api.birdeye.so"
+            ).rstrip("/"),
+            solana_tracker_api_key=os.getenv("SOLANA_TRACKER_API_KEY") or None,
+            solana_tracker_rpc_url=os.getenv("SOLANA_TRACKER_RPC_URL") or None,
+            solana_tracker_wss_url=os.getenv("SOLANA_TRACKER_WSS_URL") or None,
+            solana_tracker_data_url=os.getenv(
+                "SOLANA_TRACKER_DATA_URL", "https://data.solanatracker.io"
+            ).rstrip("/"),
+            alchemy_api_key=os.getenv("ALCHEMY_API_KEY") or None,
+            alchemy_solana_rpc_url=os.getenv("ALCHEMY_SOLANA_RPC_URL") or None,
+            alchemy_solana_wss_url=os.getenv("ALCHEMY_SOLANA_WSS_URL") or None,
+            shyft_api_key=os.getenv("SHYFT_API_KEY") or None,
+            shyft_solana_rpc_url=os.getenv("SHYFT_SOLANA_RPC_URL") or None,
+            solscan_api_key=os.getenv("SOLSCAN_API_KEY") or None,
+            solscan_base_url=os.getenv(
+                "SOLSCAN_BASE_URL", "https://pro-api.solscan.io/v2.0"
+            ).rstrip("/"),
+            coingecko_api_key=os.getenv("COINGECKO_API_KEY") or None,
+            coingecko_base_url=os.getenv(
+                "COINGECKO_BASE_URL", "https://api.coingecko.com/api/v3"
+            ).rstrip("/"),
+            neynar_api_key=os.getenv("NEYNAR_API_KEY") or None,
+            youtube_api_key=os.getenv("YOUTUBE_API_KEY") or None,
+            youtube_cache_ttl_seconds=_float("YOUTUBE_CACHE_TTL_SECONDS", 21_600),
+            youtube_max_searches_per_process=_int("YOUTUBE_MAX_SEARCHES_PER_PROCESS", 8),
             bluesky_social_enabled=_bool("BLUESKY_SOCIAL_ENABLED", False),
             telegram_social_enabled=_bool("TELEGRAM_SOCIAL_ENABLED", False),
             telegram_api_id=(_int("TELEGRAM_API_ID", 0) if os.getenv("TELEGRAM_API_ID") else None),
@@ -269,6 +332,40 @@ class Settings:
                 for value in os.getenv("TELEGRAM_CHANNELS", "").split(",")
                 if value.strip()
             ),
+            telegram_public_channels=tuple(
+                value.strip().lstrip("@")
+                for value in os.getenv("TELEGRAM_PUBLIC_CHANNELS", "").split(",")
+                if value.strip()
+            ),
+            telegram_public_min_interval_seconds=_float(
+                "TELEGRAM_PUBLIC_MIN_INTERVAL_SECONDS", 1
+            ),
+            mastodon_instance_urls=tuple(
+                value.strip().rstrip("/")
+                for value in (
+                    os.getenv("MASTODON_INSTANCE_URLS")
+                    or os.getenv("MASTODON_INSTANCE_URL", "")
+                ).split(",")
+                if value.strip()
+            ),
+            mastodon_access_token=os.getenv("MASTODON_ACCESS_TOKEN") or None,
+            dune_api_key=os.getenv("DUNE_API_KEY") or None,
+            dune_start_month=os.getenv("DUNE_START_MONTH") or None,
+            dune_end_month=os.getenv("DUNE_END_MONTH") or None,
+            dune_max_executions=_int("DUNE_MAX_EXECUTIONS", 0),
+            dune_dry_run=_bool("DUNE_DRY_RUN", True),
+            dune_query_names=tuple(
+                value.strip()
+                for value in os.getenv(
+                    "DUNE_QUERY_NAMES",
+                    "monthly_universe,pumpfun_launches,pumpfun_trades,outcome_reconstruction",
+                ).split(",")
+                if value.strip()
+            ),
+            dune_parquet_root=Path(
+                os.getenv("DUNE_PARQUET_ROOT", "data/historical/parquet")
+            ),
+            dune_pilot_sample_rows=_int("DUNE_PILOT_SAMPLE_ROWS", 10_000),
             gmgn_enabled=_bool("GMGN_ENABLED", False),
             gmgn_api_key=os.getenv("GMGN_API_KEY") or None,
             gmgn_base_url=os.getenv("GMGN_BASE_URL", "https://openapi.gmgn.ai").rstrip("/"),
@@ -493,6 +590,20 @@ class Settings:
             return f"wss://mainnet.helius-rpc.com/?api-key={quote_plus(self.helius_api_key)}"
         value = self.solana_rpc_url
         return value.replace("https://", "wss://", 1).replace("http://", "ws://", 1)
+
+    def effective_alchemy_rpc_url(self) -> str | None:
+        if self.alchemy_solana_rpc_url:
+            return self.alchemy_solana_rpc_url
+        if self.alchemy_api_key:
+            return f"https://solana-mainnet.g.alchemy.com/v2/{quote_plus(self.alchemy_api_key)}"
+        return None
+
+    def effective_alchemy_websocket_url(self) -> str | None:
+        if self.alchemy_solana_wss_url:
+            return self.alchemy_solana_wss_url
+        if self.alchemy_api_key:
+            return f"wss://solana-mainnet.g.alchemy.com/v2/{quote_plus(self.alchemy_api_key)}"
+        return None
 
     def config_fingerprint(self) -> str:
         """Stable fingerprint of decision settings; credentials are deliberately excluded."""

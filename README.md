@@ -8,7 +8,9 @@ same-universe chronological evaluation and receives explicit approval.
 
 Repository-owned Dune SQL lives in `src/memecoin_bot/historical/sql/dune/`.
 `DUNE_API_KEY` is sufficient for preferred direct SQL execution; `DUNE_QUERY_ID`
-is only an optional saved-query fallback for plans that reject direct SQL. With a
+is only an optional saved-query fallback for plans that reject direct SQL. Dune is
+dry-run-only unless an explicit complete-month range, a positive execution cap and
+`DUNE_DRY_RUN=false` are all set. With a
 Helius key and the default public Solana URL, the runtime safely derives Helius
 RPC/WSS endpoints as primary and retains public mainnet as fallback. Keys are not
 included in fingerprints or logs.
@@ -211,7 +213,10 @@ milestones restart-safe.
 | Solana JSON-RPC/PubSub | Free public endpoint but heavily rate-limited | direct launch logs, mint configuration, supply, largest token accounts |
 | BSC JSON-RPC | Free public endpoint but rate-limited | verified factory logs, bytecode existence, and standard owner probe |
 | Dedicated Solana RPC | Optional paid/free-tier upgrade | better reliability for top-account distribution |
-| Social/news/developer providers | Not configured | interfaces return unknown; no fabricated evidence |
+| Helius / Alchemy / Shyft / Solana Tracker | Optional configured free/credit tiers | primary, secondary and tertiary Solana transport plus independent corroboration |
+| Birdeye / Solscan | Optional configured credit tiers | plan-exposed actor/holder evidence and indexed cross-checks; enrichment only |
+| CoinGecko | Keyless or optional demo key | slow SOL/broad-market regime context only |
+| Neynar / YouTube / Telegram public web / Mastodon / Bluesky | Optional research sources | normalized PIT social evidence; no hard-coded signal weight |
 
 The implementation follows the documented [DEX Screener API](https://docs.dexscreener.com/api/reference),
 [GeckoTerminal API](https://docs.coingecko.com/reference/latest-pools-list),
@@ -250,6 +255,9 @@ python -m memecoin_bot.convergence run
 python -m memecoin_bot.convergence status
 python -m memecoin_bot.convergence providers --probe
 python -m memecoin_bot.convergence historical
+python -m memecoin_bot.convergence historical-plan
+# Requires an explicit range/cap, DUNE_DRY_RUN=false, and --execute:
+python -m memecoin_bot.convergence historical-pilot --execute
 python -m memecoin_bot.convergence champion
 python -m memecoin_bot.convergence metrics
 python -m memecoin_bot.convergence audits

@@ -48,6 +48,9 @@ class BackfillEngine:
         job_id = self.warehouse.begin_backfill(provider.dataset_id, provider.name, job_id)
         prior = self.warehouse.backfill_status(job_id) or {}
         cursor = json.loads(prior["cursor_json"]) if prior.get("cursor_json") else None
+        bind_checkpoint = getattr(provider, "bind_checkpoint", None)
+        if bind_checkpoint:
+            bind_checkpoint(lambda value: self.warehouse.save_backfill_cursor(job_id, value))
         pages = 0
         while maximum_pages is None or pages < maximum_pages:
             page = await self._fetch_with_retry(provider, cursor, job_id)
@@ -89,14 +92,18 @@ class BackfillEngine:
     async def _fetch_with_retry(
         self, provider: HistoricalProvider, cursor: Any, job_id: str
     ) -> BackfillPage:
+        active_cursor = cursor
         for attempt in range(self.max_retries + 1):
             try:
-                return await provider.fetch_page(cursor)
+                return await provider.fetch_page(active_cursor)
             except Exception as error:
+                recovery_cursor = getattr(provider, "recovery_cursor", None)
+                if recovery_cursor is not None:
+                    active_cursor = recovery_cursor
                 if attempt >= self.max_retries:
                     self.warehouse.checkpoint_backfill(
                         job_id,
-                        cursor=cursor,
+                        cursor=active_cursor,
                         ingested=0,
                         queue_remaining=None,
                         earliest=None,

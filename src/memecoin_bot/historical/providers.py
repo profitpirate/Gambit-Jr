@@ -487,6 +487,13 @@ class DuneExecutionClient:
             "&allow_partial_results=false",
         )
 
+    async def sample_results(self, execution_id: str, sample_count: int) -> dict[str, Any]:
+        return await self._request(
+            "GET",
+            f"/execution/{execution_id}/results?sample_count={int(sample_count)}"
+            "&allow_partial_results=false",
+        )
+
 
 class DuneParquetPartitionWriter:
     """Write compact immutable Dune result pages outside version control."""
@@ -568,6 +575,8 @@ class DuneMonthHistoricalProvider:
         query_name: str = "monthly_universe",
         registry: DuneQueryRegistry | None = None,
         parquet_root: str | Path | None = None,
+        materialize_raw_records: bool = True,
+        maximum_result_rows: int | None = None,
     ):
         start = datetime.strptime(month, "%Y-%m").replace(tzinfo=UTC)
         if start.month == 12:
@@ -583,6 +592,10 @@ class DuneMonthHistoricalProvider:
         self.parquet_writer = (
             DuneParquetPartitionWriter(parquet_root) if parquet_root is not None else None
         )
+        self.materialize_raw_records = materialize_raw_records
+        self.maximum_result_rows = (
+            max(int(maximum_result_rows), 1) if maximum_result_rows is not None else None
+        )
         self.month = month
         self.start = start.isoformat()
         self.end = end.isoformat()
@@ -591,9 +604,19 @@ class DuneMonthHistoricalProvider:
         self.entity_field = entity_field
         self.observed_at_field = observed_at_field
         self.available_at_field = available_at_field
-        self.page_size = min(max(int(page_size), 1), 10_000)
+        # Dune's SDK uses 32,000 rows as its default maximum batch size. Keeping
+        # the same bound avoids thousands of unnecessary result-page requests for
+        # high-volume month partitions while remaining restart-safe.
+        self.page_size = min(max(int(page_size), 1), 32_000)
         self.client = client or DuneExecutionClient(str(api_key))
         self.execution_mode = "DIRECT_SQL"
+        self.recovery_cursor: dict[str, Any] | None = None
+        self.last_execution_metadata: dict[str, Any] = {}
+        self.last_result_metadata: dict[str, Any] = {}
+        self._checkpoint_callback: Any = None
+
+    def bind_checkpoint(self, callback: Any) -> None:
+        self._checkpoint_callback = callback
 
     async def fetch_page(self, cursor: Any) -> BackfillPage:
         checkpoint = dict(cursor or {})
@@ -620,9 +643,32 @@ class DuneMonthHistoricalProvider:
                     ) from exc
                 execution_id = await self.client.execute(self.query_id, parameters)
                 self.execution_mode = "SAVED_QUERY_FALLBACK"
-            await self.client.wait(str(execution_id))
+            self.recovery_cursor = {
+                "execution_id": str(execution_id),
+                "offset": 0,
+                "execution_mode": self.execution_mode,
+            }
+            if self._checkpoint_callback:
+                self._checkpoint_callback(self.recovery_cursor)
+            self.last_execution_metadata = await self.client.wait(str(execution_id))
+        else:
+            self.recovery_cursor = checkpoint
+            self.last_execution_metadata = await self.client.wait(str(execution_id))
         offset = int(checkpoint.get("offset", 0))
-        response = await self.client.results(str(execution_id), offset, self.page_size)
+        status_metadata = self.last_execution_metadata.get("result_metadata") or {}
+        source_total_rows = int(status_metadata.get("total_row_count") or 0)
+        source_result_bytes = int(status_metadata.get("total_result_set_bytes") or 0)
+        sampled_result = bool(
+            self.maximum_result_rows
+            and source_total_rows > self.maximum_result_rows
+        )
+        if sampled_result:
+            response = await self.client.sample_results(
+                str(execution_id), int(self.maximum_result_rows)
+            )
+            offset = 0
+        else:
+            response = await self.client.results(str(execution_id), offset, self.page_size)
         result = response.get("result") or {}
         rows = result.get("rows") or []
         self.registry.validate_columns(self.query_name, rows)
@@ -632,52 +678,63 @@ class DuneMonthHistoricalProvider:
             else None
         )
         metadata = result.get("metadata") or response.get("result_metadata") or {}
-        total = int(metadata.get("total_row_count") or offset + len(rows))
+        if not source_total_rows:
+            source_total_rows = int(metadata.get("total_row_count") or offset + len(rows))
+        if not source_result_bytes:
+            source_result_bytes = int(metadata.get("total_result_set_bytes") or 0)
+        materialized_total = len(rows) if sampled_result else source_total_rows
+        self.last_result_metadata = {
+            "materialization_mode": "BOUNDED_SERVER_SAMPLE" if sampled_result else "FULL_RESULT",
+            "source_total_rows": source_total_rows,
+            "source_result_bytes": source_result_bytes,
+            "materialized_rows": materialized_total,
+        }
         acquired_at = _utc_now()
         records = []
-        for row in rows:
-            observed = _coerce_utc(row[self.observed_at_field])
-            available = (
-                _coerce_utc(row[self.available_at_field])
-                if self.available_at_field and row.get(self.available_at_field)
-                else acquired_at
-            )
-            records.append(
-                RawEvidence(
-                    dataset_id=self.dataset_id,
-                    provider=self.name,
-                    chain=self.chain,
-                    entity_type="pumpfun_launch_evidence",
-                    entity_id=str(row[self.entity_field]),
-                    source_timestamp=observed,
-                    availability_timestamp=available,
-                    endpoint_type=(
-                        "dune_direct_sql_month_result"
-                        if self.execution_mode == "DIRECT_SQL"
-                        else "dune_saved_query_month_result"
-                    ),
-                    payload=row,
-                    schema_version=(
-                        f"dune-owned-{self.query_name}-{self.query_spec.schema_version}"
-                        if self.execution_mode == "DIRECT_SQL"
-                        else f"dune-saved-query-{self.query_id}"
-                    ),
-                    acquisition_version="v1.5-convergence-v1",
-                    provenance={
-                        "query_id": self.query_id,
-                        "query_name": self.query_name,
-                        "sql_sha256": self.query_spec.sql_sha256,
-                        "direct_sql": self.execution_mode == "DIRECT_SQL",
-                        "execution_mode": self.execution_mode,
-                        "execution_id": str(execution_id),
-                        "month": self.month,
-                        "offset": offset,
-                        "availability_from_source": bool(self.available_at_field),
-                        "partial_results_allowed": False,
-                        "credential_name": "DUNE_API_KEY",
-                    },
+        if self.materialize_raw_records:
+            for row in rows:
+                observed = _coerce_utc(row[self.observed_at_field])
+                available = (
+                    _coerce_utc(row[self.available_at_field])
+                    if self.available_at_field and row.get(self.available_at_field)
+                    else acquired_at
                 )
-            )
+                records.append(
+                    RawEvidence(
+                        dataset_id=self.dataset_id,
+                        provider=self.name,
+                        chain=self.chain,
+                        entity_type="pumpfun_launch_evidence",
+                        entity_id=str(row[self.entity_field]),
+                        source_timestamp=observed,
+                        availability_timestamp=available,
+                        endpoint_type=(
+                            "dune_direct_sql_month_result"
+                            if self.execution_mode == "DIRECT_SQL"
+                            else "dune_saved_query_month_result"
+                        ),
+                        payload=row,
+                        schema_version=(
+                            f"dune-owned-{self.query_name}-{self.query_spec.schema_version}"
+                            if self.execution_mode == "DIRECT_SQL"
+                            else f"dune-saved-query-{self.query_id}"
+                        ),
+                        acquisition_version="v1.5-convergence-v1",
+                        provenance={
+                            "query_id": self.query_id,
+                            "query_name": self.query_name,
+                            "sql_sha256": self.query_spec.sql_sha256,
+                            "direct_sql": self.execution_mode == "DIRECT_SQL",
+                            "execution_mode": self.execution_mode,
+                            "execution_id": str(execution_id),
+                            "month": self.month,
+                            "offset": offset,
+                            "availability_from_source": bool(self.available_at_field),
+                            "partial_results_allowed": False,
+                            "credential_name": "DUNE_API_KEY",
+                        },
+                    )
+                )
         next_offset = offset + len(rows)
         next_cursor = (
             {
@@ -685,13 +742,14 @@ class DuneMonthHistoricalProvider:
                 "offset": next_offset,
                 "execution_mode": self.execution_mode,
             }
-            if rows and next_offset < total
+            if not sampled_result and rows and next_offset < source_total_rows
             else None
         )
+        self.recovery_cursor = next_cursor
         return BackfillPage(
             records,
             next_cursor,
-            max(0, total - next_offset),
+            max(0, source_total_rows - next_offset) if not sampled_result else 0,
             metadata={
                 "query_id": self.query_id,
                 "query_name": self.query_name,
@@ -700,23 +758,41 @@ class DuneMonthHistoricalProvider:
                 "execution_mode": self.execution_mode,
                 "execution_id": str(execution_id),
                 "month": self.month,
-                "total_rows": total,
+                "total_rows": materialized_total,
+                "source_total_rows": source_total_rows,
+                "source_result_bytes": source_result_bytes,
+                "partial_results": sampled_result,
+                "materialization_mode": self.last_result_metadata["materialization_mode"],
                 "dune_partition": {
                     "query_name": self.query_name,
                     "schema_version": self.query_spec.schema_version,
                     "month": self.month,
                     "execution_id": str(execution_id),
                     "offset": next_offset,
-                    "total_rows": total,
+                    "total_rows": materialized_total,
+                    "source_total_rows": source_total_rows,
+                    "source_result_bytes": source_result_bytes,
+                    "partial_results": sampled_result,
+                    "materialization_mode": self.last_result_metadata[
+                        "materialization_mode"
+                    ],
                     "parquet": parquet,
-                    "state": "COMPLETE" if next_cursor is None else "RUNNING",
+                    "state": (
+                        "PILOT_SAMPLE_COMPLETE"
+                        if sampled_result
+                        else "COMPLETE" if next_cursor is None else "RUNNING"
+                    ),
                 },
             },
         )
 
 
 def _coerce_utc(value: Any) -> str:
-    text = str(value).strip().replace("Z", "+00:00")
+    text = str(value).strip()
+    if text.endswith(" UTC"):
+        text = f"{text[:-4]}+00:00"
+    elif text.endswith("Z"):
+        text = f"{text[:-1]}+00:00"
     parsed = datetime.fromisoformat(text)
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=UTC)

@@ -14,8 +14,24 @@ from urllib.parse import quote_plus
 import aiohttp
 
 from memecoin_bot.historical.providers import DuneExecutionClient
+from memecoin_bot.providers.external import (
+    AlchemySolanaClient,
+    BirdeyeClient,
+    CoinGeckoContextClient,
+    ProviderObservation,
+    ShyftSolanaClient,
+    SolanaTrackerClient,
+    SolscanClient,
+)
+from memecoin_bot.social.public_sources import (
+    MastodonPublicClient,
+    NeynarFarcasterClient,
+    TelegramPublicWebClient,
+    YouTubeResearchClient,
+)
 
 DOCS_CHECKED_AT = "2026-08-29"
+_PROBE_TOKEN = "So11111111111111111111111111111111111111112"
 
 
 def _now() -> str:
@@ -35,9 +51,12 @@ class ProviderCapability:
     cost: dict[str, Any]
     production_role: str
     credential_required: bool = False
+    configuration_sets: tuple[tuple[str, ...], ...] = ()
 
     def configured(self, environment: dict[str, str] | None = None) -> bool:
         values = environment if environment is not None else os.environ
+        if self.configuration_sets:
+            return any(all(values.get(name) for name in group) for group in self.configuration_sets)
         return not self.credential_required or all(values.get(name) for name in self.credential_env)
 
 
@@ -93,6 +112,95 @@ def capabilities() -> tuple[ProviderCapability, ...]:
             {"monthly_usd": 0, "monthly_credits": 1_000_000, "wss_metered": True},
             "PRIMARY_SELECTIVE_WHEN_ADMITTED",
             True,
+        ),
+        ProviderCapability(
+            "alchemy",
+            "secondary standard Solana RPC and WebSocket transport",
+            "FREE_CREDIT_METERED",
+            ("ALCHEMY_API_KEY", "ALCHEMY_SOLANA_RPC_URL", "ALCHEMY_SOLANA_WSS_URL"),
+            "https://www.alchemy.com/docs/reference/solana-subscription-api-endpoints",
+            "https://www.alchemy.com/",
+            ("getSlot", "slotSubscribe", "standard_solana_rpc"),
+            {"bandwidth_metered": True, "plan_dependent": True},
+            {"monthly_usd": 0, "free_credit_metered": True},
+            "SECONDARY_SOLANA_TRANSPORT",
+            True,
+            (("ALCHEMY_API_KEY",), ("ALCHEMY_SOLANA_RPC_URL",)),
+        ),
+        ProviderCapability(
+            "shyft",
+            "tertiary standard Solana RPC fallback",
+            "FREE_CREDIT_METERED",
+            ("SHYFT_API_KEY", "SHYFT_SOLANA_RPC_URL"),
+            "https://docs.shyft.to/solana/shyft-rpcs",
+            "https://shyft.to/",
+            ("getSlot", "standard_solana_rpc"),
+            {"plan_dependent": True},
+            {"monthly_usd": 0, "credit_metered": True},
+            "TERTIARY_SOLANA_FALLBACK",
+            True,
+            (("SHYFT_API_KEY",), ("SHYFT_SOLANA_RPC_URL",)),
+        ),
+        ProviderCapability(
+            "solana_tracker",
+            "independent Solana RPC, WebSocket and indexed token intelligence",
+            "FREE_CREDIT_METERED",
+            (
+                "SOLANA_TRACKER_API_KEY",
+                "SOLANA_TRACKER_RPC_URL",
+                "SOLANA_TRACKER_WSS_URL",
+            ),
+            "https://docs.solanatracker.io/quickstart",
+            "https://www.solanatracker.io/data-api",
+            ("getSlot", "slotSubscribe", "token_price", "token_metadata", "wallet_lookup"),
+            {"plan_dependent": True, "single_websocket_probe": True},
+            {"monthly_usd": 0, "credit_metered": True},
+            "INDEPENDENT_CORROBORATION",
+            True,
+            (("SOLANA_TRACKER_API_KEY",),),
+        ),
+        ProviderCapability(
+            "birdeye",
+            "wallet, holder, sniper, bundle, insider and smart-money enrichment",
+            "PLAN_DEPENDENT_CREDIT_METERED",
+            ("BIRDEYE_API_KEY",),
+            "https://docs.birdeye.so/reference/get-token-v1-holder-profile",
+            "https://bds.birdeye.so/",
+            (
+                "holder_profile",
+                "holder_count_when_available",
+                "wallet_activity_when_available",
+                "plan_exposed_labels_only",
+            ),
+            {"holder_profile_compute_units": 35, "plan_dependent": True},
+            {"credit_metered": True, "paid_fields_not_assumed": True},
+            "OPTIONAL_ACTOR_ENRICHMENT",
+            True,
+        ),
+        ProviderCapability(
+            "solscan",
+            "indexed Solana transaction, token and holder cross-check",
+            "PLAN_DEPENDENT_CREDIT_METERED",
+            ("SOLSCAN_API_KEY",),
+            "https://pro-api.solscan.io/pro-api-docs/v2.0/reference/v2-token-holders",
+            "https://solscan.io/apis",
+            ("token_holders", "token_metadata", "transaction_lookup"),
+            {"request_compute_units": 100, "probe_page_size": 10},
+            {"credit_metered": True},
+            "OPTIONAL_INDEXED_CROSS_CHECK",
+            True,
+        ),
+        ProviderCapability(
+            "coingecko",
+            "slow SOL and broad crypto regime context",
+            "KEYLESS_OR_DEMO_KEY",
+            ("COINGECKO_API_KEY",),
+            "https://docs.coingecko.com/reference/simple-price",
+            "https://www.coingecko.com/en/api",
+            ("sol_price", "sol_24h_change", "broad_market_context"),
+            {"public_rate_limit_dynamic": True, "retry_after_honoured": True},
+            {"monthly_usd": 0, "demo_key_optional": True},
+            "SLOW_REGIME_CONTEXT_ONLY",
         ),
         ProviderCapability(
             "pumpportal",
@@ -168,6 +276,58 @@ def capabilities() -> tuple[ProviderCapability, ...]:
             "SOCIAL_OBSERVATION",
         ),
         ProviderCapability(
+            "neynar_farcaster",
+            "crypto-native Farcaster mention and author-spread research",
+            "CREDIT_METERED_READ_ONLY",
+            ("NEYNAR_API_KEY",),
+            "https://docs.neynar.com/reference/search-casts",
+            "https://neynar.com/",
+            ("cast_search", "unique_authors", "engagement", "first_mention"),
+            {"plan_dependent": True, "probe_limit": 10},
+            {"credit_metered": True},
+            "RESEARCH_ONLY_SOCIAL_ENRICHMENT",
+            True,
+        ),
+        ProviderCapability(
+            "youtube",
+            "high-priority candidate and sampled narrative research",
+            "FREE_QUOTA_METERED",
+            ("YOUTUBE_API_KEY",),
+            "https://developers.google.com/youtube/v3/docs/search/list",
+            "https://console.cloud.google.com/apis/library/youtube.googleapis.com",
+            ("video_search", "channel_spread", "views", "comments", "publication_recency"),
+            {"quota_metered": True, "aggressive_cache_required": True, "probe_max_results": 5},
+            {"monthly_usd": 0, "daily_quota_limited": True},
+            "RESEARCH_ONLY_HIGH_PRIORITY_SOCIAL",
+            True,
+        ),
+        ProviderCapability(
+            "telegram_public_web",
+            "public Telegram channel preview narrative research without MTProto",
+            "KEYLESS_CONFIGURED_PUBLIC",
+            ("TELEGRAM_PUBLIC_CHANNELS", "TELEGRAM_CHANNELS"),
+            "https://telegram.org/faq_channels",
+            None,
+            ("public_preview", "recent_messages", "first_mention", "visible_forwards"),
+            {"minimum_request_interval_seconds": 1, "private_channels_unsupported": True},
+            {"monthly_usd": 0},
+            "OPTIONAL_PUBLIC_SOCIAL_RESEARCH",
+            False,
+        ),
+        ProviderCapability(
+            "mastodon",
+            "multi-instance public hashtag, name and contract-address research",
+            "KEYLESS_OR_OPTIONAL_TOKEN",
+            ("MASTODON_INSTANCE_URLS", "MASTODON_INSTANCE_URL", "MASTODON_ACCESS_TOKEN"),
+            "https://docs.joinmastodon.org/methods/search/",
+            None,
+            ("multi_instance_fallback", "public_search", "author_spread", "engagement"),
+            {"instance_specific": True, "fallback_sequential": True},
+            {"monthly_usd": 0, "access_token_optional": True},
+            "OPTIONAL_PUBLIC_SOCIAL_RESEARCH",
+            False,
+        ),
+        ProviderCapability(
             "discord_authorized",
             "mentions in guild channels explicitly visible to the Gambit bot",
             "OPERATOR_AUTHORIZED",
@@ -240,6 +400,22 @@ class ProviderRegistry:
                     admission = "CONFIGURED_PENDING_LIVE_PROBE"
                 else:
                     admission = "BLOCKED_EXTERNAL_CREDENTIAL"
+                existing = self.store.conn.execute(
+                    "SELECT configured,admission_state FROM provider_capabilities_v15 "
+                    "WHERE provider=?",
+                    (item.provider,),
+                ).fetchone()
+                if (
+                    existing
+                    and bool(existing["configured"]) == configured
+                    and existing["admission_state"]
+                    not in {
+                        "PENDING_LIVE_PROBE",
+                        "CONFIGURED_PENDING_LIVE_PROBE",
+                        "BLOCKED_EXTERNAL_CREDENTIAL",
+                    }
+                ):
+                    admission = str(existing["admission_state"])
                 self.store.conn.execute(
                     "INSERT INTO provider_capabilities_v15(provider,role,access_class,"
                     "credential_required,credential_env_json,documentation_url,signup_url,"
@@ -293,6 +469,16 @@ class ProviderRegistry:
             "helius",
             "pumpportal",
             "dune",
+            "birdeye",
+            "solana_tracker",
+            "alchemy",
+            "shyft",
+            "solscan",
+            "coingecko",
+            "neynar_farcaster",
+            "youtube",
+            "telegram_public_web",
+            "mastodon",
         }
         probes: list[ProviderProbe] = []
         for item in capabilities():
@@ -333,16 +519,161 @@ class ProviderRegistry:
                 return await self._probe_pumpportal(started, timeout)
             if provider == "dune":
                 return await self._probe_dune(started, timeout)
+            if provider == "birdeye":
+                observation = await BirdeyeClient(
+                    self.environment["BIRDEYE_API_KEY"],
+                    base_url=self.environment.get(
+                        "BIRDEYE_BASE_URL", "https://public-api.birdeye.so"
+                    ),
+                ).probe(_PROBE_TOKEN, timeout)
+                return _observation_probe(provider, started, "ENRICHMENT", observation)
+            if provider == "solana_tracker":
+                observation = await SolanaTrackerClient(
+                    self.environment["SOLANA_TRACKER_API_KEY"],
+                    rpc_url=self.environment.get("SOLANA_TRACKER_RPC_URL"),
+                    wss_url=self.environment.get("SOLANA_TRACKER_WSS_URL"),
+                    data_url=self.environment.get(
+                        "SOLANA_TRACKER_DATA_URL", "https://data.solanatracker.io"
+                    ),
+                ).probe(_PROBE_TOKEN, timeout)
+                return _observation_probe(provider, started, "INDEPENDENT_CORROBORATION", observation)
+            if provider == "alchemy":
+                observation = await AlchemySolanaClient(
+                    api_key=self.environment.get("ALCHEMY_API_KEY"),
+                    rpc_url=self.environment.get("ALCHEMY_SOLANA_RPC_URL"),
+                    wss_url=self.environment.get("ALCHEMY_SOLANA_WSS_URL"),
+                ).probe(timeout)
+                return _observation_probe(provider, started, "SECONDARY", observation)
+            if provider == "shyft":
+                observation = await ShyftSolanaClient(
+                    api_key=self.environment.get("SHYFT_API_KEY"),
+                    rpc_url=self.environment.get("SHYFT_SOLANA_RPC_URL"),
+                ).probe(timeout)
+                return _observation_probe(provider, started, "FALLBACK", observation)
+            if provider == "solscan":
+                observation = await SolscanClient(
+                    self.environment["SOLSCAN_API_KEY"],
+                    base_url=self.environment.get(
+                        "SOLSCAN_BASE_URL", "https://pro-api.solscan.io/v2.0"
+                    ),
+                ).probe(_PROBE_TOKEN, timeout)
+                return _observation_probe(provider, started, "ENRICHMENT", observation)
+            if provider == "coingecko":
+                observation = await CoinGeckoContextClient(
+                    api_key=self.environment.get("COINGECKO_API_KEY"),
+                    base_url=self.environment.get(
+                        "COINGECKO_BASE_URL", "https://api.coingecko.com/api/v3"
+                    ),
+                ).sol_context(timeout)
+                return _observation_probe(provider, started, "CONTEXT", observation)
+            if provider == "neynar_farcaster":
+                evidence, latency = await NeynarFarcasterClient(
+                    self.environment["NEYNAR_API_KEY"]
+                ).search(_PROBE_TOKEN, "solana", timeout, limit=5)
+                return ProviderProbe(
+                    provider,
+                    started,
+                    _now(),
+                    "ENRICHMENT",
+                    events_seen=max(1, evidence.mentions),
+                    matching_events=evidence.mentions,
+                    tokens_seen=int(evidence.mentions > 0),
+                    latencies_ms=(latency,),
+                    coverage={"cast_search": True, "raw_content_persisted": False},
+                    evidence={"credential_redacted": True, "schema_parsed": True},
+                )
+            if provider == "youtube":
+                evidence, latencies = await YouTubeResearchClient(
+                    self.environment["YOUTUBE_API_KEY"],
+                    cache_ttl_seconds=float(
+                        self.environment.get("YOUTUBE_CACHE_TTL_SECONDS", "21600")
+                    ),
+                    maximum_searches=1,
+                ).search(_PROBE_TOKEN, "Solana", timeout, high_priority=True, max_results=3)
+                assert evidence is not None
+                return ProviderProbe(
+                    provider,
+                    started,
+                    _now(),
+                    "ENRICHMENT",
+                    events_seen=max(1, evidence.mentions),
+                    matching_events=evidence.mentions,
+                    tokens_seen=int(evidence.mentions > 0),
+                    latencies_ms=latencies,
+                    coverage={"high_priority_search": True, "aggressive_cache": True},
+                    evidence={"credential_redacted": True, "schema_parsed": True},
+                )
+            if provider == "telegram_public_web":
+                channel = next(
+                    value.strip().lstrip("@")
+                    for value in (
+                        self.environment.get("TELEGRAM_PUBLIC_CHANNELS")
+                        or self.environment.get("TELEGRAM_CHANNELS")
+                        or "telegramtips"
+                    ).split(",")
+                    if value.strip()
+                )
+                evidence, latency = await TelegramPublicWebClient().search_channel(
+                    channel, _PROBE_TOKEN, "solana", timeout
+                )
+                return ProviderProbe(
+                    provider,
+                    started,
+                    _now(),
+                    "ENRICHMENT",
+                    events_seen=max(1, evidence.mentions),
+                    matching_events=evidence.mentions,
+                    tokens_seen=int(evidence.mentions > 0),
+                    latencies_ms=(latency,),
+                    coverage={"public_preview": True, "private_access_attempted": False},
+                )
+            if provider == "mastodon":
+                instances = tuple(
+                    value.strip()
+                    for value in (
+                        self.environment.get("MASTODON_INSTANCE_URLS")
+                        or self.environment.get("MASTODON_INSTANCE_URL")
+                        or "https://mastodon.social"
+                    ).split(",")
+                    if value.strip()
+                )
+                evidence, latencies, errors = await MastodonPublicClient(
+                    instances,
+                    access_token=self.environment.get("MASTODON_ACCESS_TOKEN"),
+                ).search(_PROBE_TOKEN, "solana", timeout)
+                return ProviderProbe(
+                    provider,
+                    started,
+                    _now(),
+                    "ENRICHMENT",
+                    events_seen=max(1, evidence.mentions),
+                    matching_events=evidence.mentions,
+                    tokens_seen=int(evidence.mentions > 0),
+                    latencies_ms=latencies,
+                    errors=tuple("instance unavailable" for _ in range(errors)),
+                    coverage={"multi_instance_fallback": True, "raw_content_persisted": False},
+                    evidence={"credential_redacted": True},
+                )
             raise ValueError(f"no live probe for {provider}")
-        except (TimeoutError, aiohttp.ClientError, ValueError, KeyError) as error:
-            credentialed = next(
-                item.credential_required for item in capabilities() if item.provider == provider
+        except (
+            TimeoutError,
+            aiohttp.ClientError,
+            ValueError,
+            TypeError,
+            KeyError,
+            RuntimeError,
+            StopIteration,
+        ) as error:
+            capability = next(item for item in capabilities() if item.provider == provider)
+            credentialed = capability.credential_required or any(
+                self.environment.get(name) for name in capability.credential_env
             )
-            detail = (
-                "provider probe failed; credential-bearing details redacted"
-                if credentialed
-                else str(error)[:240]
-            )
+            if credentialed and isinstance(error, aiohttp.ClientResponseError):
+                detail = f"provider returned HTTP {error.status}; credential-bearing details redacted"
+            elif credentialed:
+                detail = "provider probe failed; credential-bearing details redacted"
+            else:
+                detail = str(error)[:240]
             return ProviderProbe(
                 provider,
                 started,
@@ -560,15 +891,24 @@ class ProviderRegistry:
                 "UPDATE provider_capabilities_v15 SET admission_state=?,updated_at=? WHERE provider=?",
                 (probe.state, _now(), probe.provider),
             )
+        capability = next(item for item in capabilities() if item.provider == probe.provider)
         return {
             "provider": probe.provider,
+            "configured": capability.configured(self.environment),
+            "admission_state": probe.state,
+            "live_state": probe.state,
             "state": probe.state,
+            "events_seen": probe.events_seen,
             "events": probe.events_seen,
             "matching_events": probe.matching_events,
+            "tokens_seen": probe.tokens_seen,
             "tokens": probe.tokens_seen,
             "latency_p50_ms": values["latency_p50_ms"],
             "latency_p95_ms": values["latency_p95_ms"],
+            "error_count": values["error_count"],
             "errors": list(probe.errors),
+            "role": capability.production_role,
+            "capability_role": capability.role,
             "coverage": probe.coverage,
         }
 
@@ -619,6 +959,27 @@ def _percentile(values: tuple[float, ...], quantile: float) -> float | None:
     ordered = sorted(values)
     index = min(len(ordered) - 1, max(0, round((len(ordered) - 1) * quantile)))
     return ordered[index]
+
+
+def _observation_probe(
+    provider: str,
+    started_at: str,
+    state: str,
+    observation: ProviderObservation,
+) -> ProviderProbe:
+    return ProviderProbe(
+        provider,
+        started_at,
+        _now(),
+        state,
+        events_seen=observation.events_seen,
+        matching_events=observation.events_seen,
+        tokens_seen=observation.tokens_seen,
+        latencies_ms=observation.latencies_ms,
+        coverage=observation.coverage,
+        evidence=observation.evidence,
+        errors=observation.errors,
+    )
 
 
 def _json(value: Any) -> str:

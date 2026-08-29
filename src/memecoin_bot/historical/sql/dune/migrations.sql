@@ -6,7 +6,7 @@ WITH pumpswap AS (
         block_time, tx_id, block_slot
     FROM dex_solana.trades
     WHERE block_time < TIMESTAMP '{{month_end}}'
-      AND project_program_id = 'pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA'
+      AND project = 'pumpswap'
 ), first_trade AS (
     SELECT token_address, MIN(block_time) AS observed_at,
            MIN_BY(tx_id, block_time) AS tx_id,

@@ -841,6 +841,15 @@ class HistoricalWarehouse(_SqliteStore):
         row = self.conn.execute("SELECT * FROM backfill_jobs WHERE job_id=?", (job_id,)).fetchone()
         return dict(row) if row else None
 
+    def save_backfill_cursor(self, job_id: str, cursor: Any) -> None:
+        """Persist an upstream execution handle before its first result page completes."""
+        with self._lock, self.conn:
+            self.conn.execute(
+                "UPDATE backfill_jobs SET cursor_json=?,last_checkpoint_at=?,updated_at=? "
+                "WHERE job_id=?",
+                (_json(cursor), _now(), _now(), job_id),
+            )
+
     def record_dune_partition(self, record: dict[str, Any]) -> None:
         month = datetime.strptime(str(record["month"]), "%Y-%m").replace(tzinfo=UTC)
         parquet = record.get("parquet") or {}
@@ -853,7 +862,8 @@ class HistoricalWarehouse(_SqliteStore):
                 "partition_year,partition_month) DO UPDATE SET execution_id=excluded.execution_id,"
                 "result_offset=excluded.result_offset,row_count=MAX(dune_partition_state_v15.row_count,"
                 "excluded.row_count),content_sha256=COALESCE(excluded.content_sha256,content_sha256),"
-                "schema_sha256=COALESCE(excluded.schema_sha256,schema_sha256),parquet_path="
+                "schema_sha256=COALESCE(excluded.schema_sha256,schema_sha256),source_coverage_json="
+                "excluded.source_coverage_json,parquet_path="
                 "COALESCE(excluded.parquet_path,parquet_path),state=excluded.state,"
                 "quality_state=excluded.quality_state,last_error=excluded.last_error,"
                 "updated_at=excluded.updated_at",
@@ -867,9 +877,21 @@ class HistoricalWarehouse(_SqliteStore):
                     int(record.get("total_rows") or 0),
                     parquet.get("content_sha256"),
                     parquet.get("schema_sha256"),
-                    _json({"repository_sql": True, "partial_results": False}),
+                    _json(
+                        {
+                            "repository_sql": True,
+                            "partial_results": bool(record.get("partial_results")),
+                            "source_total_rows": record.get("source_total_rows"),
+                            "source_result_bytes": record.get("source_result_bytes"),
+                            "materialization_mode": record.get(
+                                "materialization_mode", "FULL_RESULT"
+                            ),
+                        }
+                    ),
                     (
-                        "SCHEMA_VALIDATED"
+                        "PILOT_SAMPLE_SCHEMA_VALIDATED"
+                        if record.get("partial_results")
+                        else "SCHEMA_VALIDATED"
                         if int(record.get("total_rows") or 0) > 0
                         else "VALID_EMPTY_RESULT"
                     ),
@@ -894,9 +916,17 @@ class HistoricalWarehouse(_SqliteStore):
                     int(record.get("total_rows") or 0),
                     0,
                     _json({"state": "NOT_PROFILED_UNTIL_COMPLETE_CORPUS"}),
-                    _json({"repository_sql": True, "partial_results": False}),
+                    _json(
+                        {
+                            "repository_sql": True,
+                            "partial_results": bool(record.get("partial_results")),
+                            "source_total_rows": record.get("source_total_rows"),
+                        }
+                    ),
                     (
-                        "SCHEMA_VALIDATED"
+                        "PILOT_SAMPLE_SCHEMA_VALIDATED"
+                        if record.get("partial_results")
+                        else "SCHEMA_VALIDATED"
                         if int(record.get("total_rows") or 0) > 0
                         else "VALID_EMPTY_RESULT"
                     ),

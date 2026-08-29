@@ -13,7 +13,8 @@ WITH raw AS (
     FROM dex_solana.trades
     WHERE block_time >= TIMESTAMP '{{month_start}}'
       AND block_time < TIMESTAMP '{{month_end}}'
-      AND project_program_id = 'pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA'
+      AND block_month = CAST(date_trunc('month', TIMESTAMP '{{month_start}}') AS DATE)
+      AND project = 'pumpswap'
 )
 SELECT token_address, observed_at, trader, side,
        SUM(token_amount) AS token_amount, SUM(amount_usd) AS amount_usd,

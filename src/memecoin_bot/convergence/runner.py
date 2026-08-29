@@ -13,9 +13,9 @@ from pathlib import Path
 from typing import Any
 
 from memecoin_bot.historical.backfill import BackfillEngine
+from memecoin_bot.historical.dune_pilot import DuneAcquisitionConfig, DunePilotRunner
 from memecoin_bot.historical.dune_registry import DuneQueryRegistry
 from memecoin_bot.historical.providers import (
-    DuneMonthHistoricalProvider,
     OperationalHistoryProvider,
 )
 from memecoin_bot.historical.store import HistoricalWarehouse
@@ -333,6 +333,7 @@ class ConvergenceOrchestrator:
     async def _historical_acquisition(self) -> PhaseResult:
         acquired: dict[str, Any] = {}
         blockers = []
+        target_months: list[str] = []
         existing = self.warehouse.coverage_manifest()
         if existing:
             acquired["existing_local_datasets"] = {
@@ -348,66 +349,29 @@ class ConvergenceOrchestrator:
         else:
             blockers.append("read-only production DATABASE_PATH copy is absent")
         key = self.environment.get("DUNE_API_KEY")
-        query = self.environment.get("DUNE_QUERY_ID")
         if key:
             registry = DuneQueryRegistry()
             registry.register(self.warehouse)
-            configured_query_names = self.environment.get("DUNE_QUERY_NAMES")
-            query_names = tuple(
-                value.strip()
-                for value in (
-                    configured_query_names
-                    or (
-                        "monthly_universe"
-                        if query
-                        else "monthly_universe,pumpfun_launches,pumpfun_trades,"
-                        "pumpswap_trades,migrations,wallet_activity,creator_activity,"
-                        "outcome_reconstruction"
-                    )
-                ).split(",")
-                if value.strip()
+            config = DuneAcquisitionConfig.from_environment(self.environment)
+            controlled = DunePilotRunner(
+                self.warehouse,
+                key,
+                config,
+                registry=registry,
             )
-            month_results = {}
-            current_month = datetime.now(UTC).strftime("%Y-%m")
-            for month in historical_months("2024-01", current_month):
-                month_results[month] = {}
-                for query_name in query_names:
-                    spec = registry.spec(query_name)
-                    if month < spec.minimum_date[:7]:
-                        month_results[month][query_name] = {
-                            "state": "NOT_APPLICABLE_BEFORE_MINIMUM_DATE",
-                            "minimum_date": spec.minimum_date,
-                        }
-                        continue
-                    provider = DuneMonthHistoricalProvider(
-                        int(query) if query else None,
-                        month,
-                        key,
-                        query_name=query_name,
-                        registry=registry,
-                        entity_field=(
-                            "creator" if query_name == "creator_activity" else "token_address"
-                        ),
-                        parquet_root=self.environment.get(
-                            "DUNE_PARQUET_ROOT", "data/historical/parquet"
-                        ),
-                    )
-                    self._register_dune_dataset(
-                        provider.dataset_id,
-                        month,
-                        query_name,
-                        provider.query_spec.schema_version,
-                        provider.query_id,
-                    )
-                    month_results[month][query_name] = await BackfillEngine(self.warehouse).run(
-                        provider
-                    )
-            acquired["dune_months"] = month_results
+            acquired["dune_controlled"] = await controlled.run(execute=not config.dry_run)
+            target_months = controlled.plan()["months"]
+            if not config.start_month:
+                blockers.append("explicit DUNE_START_MONTH and DUNE_END_MONTH are required")
+            elif config.dry_run:
+                blockers.append("DUNE_DRY_RUN is enabled; no historical query was executed")
         else:
             blockers.append("DUNE_API_KEY is not configured")
         raw = self._count("raw_evidence")
         state = (
-            ConvergenceState.PASSED_ENGINEERING if acquired else ConvergenceState.BLOCKED_EXTERNAL
+            ConvergenceState.PASSED_ENGINEERING
+            if raw or existing
+            else ConvergenceState.BLOCKED_EXTERNAL
         )
         return PhaseResult(
             state,
@@ -415,7 +379,7 @@ class ConvergenceOrchestrator:
                 "acquired": acquired,
                 "blockers": blockers,
                 "raw_evidence_rows": raw,
-                "target_months": historical_months("2024-01", datetime.now(UTC).strftime("%Y-%m")),
+                "target_months": target_months,
                 "raw_corpora_committed_to_git": False,
             },
         )

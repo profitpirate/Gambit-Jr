@@ -7,6 +7,8 @@ import os
 from pathlib import Path
 from typing import Any
 
+from memecoin_bot.config import load_dotenv
+from memecoin_bot.historical.dune_pilot import DuneAcquisitionConfig, DunePilotRunner
 from memecoin_bot.historical.store import HistoricalWarehouse
 
 from .audits import RepositoryAuditor
@@ -35,7 +37,17 @@ def parser() -> argparse.ArgumentParser:
     commands.add_parser("status", help="view the latest convergence cycle")
     providers = commands.add_parser("providers", help="view provider capability/admission state")
     providers.add_argument("--probe", action="store_true")
+    providers.add_argument("--provider", action="append", dest="provider_names")
     commands.add_parser("historical", help="view explicit monthly historical progress")
+    commands.add_parser(
+        "historical-plan",
+        help="print the controlled Dune month/query plan without executing queries",
+    )
+    pilot = commands.add_parser(
+        "historical-pilot", help="run only the explicitly bounded Dune plan"
+    )
+    pilot.add_argument("--execute", action="store_true")
+    pilot.add_argument("--force", action="store_true")
     commands.add_parser("champion", help="view the current champion and challenger state")
     commands.add_parser("metrics", help="view latest precision/recall evidence")
     audit = commands.add_parser("audits", help="run the full static, security, DB and query audit")
@@ -62,12 +74,19 @@ async def _run(args: argparse.Namespace) -> dict[str, Any] | list[dict[str, Any]
             return runner.status()
         if args.command == "providers":
             if args.probe:
-                await runner.providers.probe()
+                selected = set(args.provider_names) if args.provider_names else None
+                return await runner.providers.probe(selected)
             else:
                 runner.providers.refresh()
             return runner.providers.status()
         if args.command == "historical":
             return runner.historical_status()
+        if args.command in {"historical-plan", "historical-pilot"}:
+            config = DuneAcquisitionConfig.from_environment()
+            pilot_runner = DunePilotRunner(warehouse, os.getenv("DUNE_API_KEY"), config)
+            if args.command == "historical-plan":
+                return pilot_runner.plan()
+            return await pilot_runner.run(execute=args.execute, force=args.force)
         if args.command == "champion":
             return runner.champion_status()
         if args.command == "metrics":
@@ -104,6 +123,7 @@ def _metrics(warehouse: HistoricalWarehouse) -> dict[str, Any]:
 
 
 def main() -> None:
+    load_dotenv()
     args = parser().parse_args()
     print(json.dumps(asyncio.run(_run(args)), indent=2, default=str, sort_keys=True))
 
