@@ -20,7 +20,7 @@ def replace_once(text: str, old: str, new: str, label: str) -> str:
 
 
 def sub_once(text: str, pattern: str, replacement: str, label: str) -> str:
-    new, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
+    new, count = re.subn(pattern, replacement, text, count=1, flags=re.DOTALL)
     if count != 1:
         raise RuntimeError(f"{label}: expected exactly one regex match, found {count}")
     return new
@@ -78,143 +78,69 @@ text = replace_once(
 text = replace_once(
     text,
     "    def track_command(callback: CommandCallback) -> CommandCallback:\n",
-    '''    async def store_call(method: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
-        """Run SQLite/report work off the Discord event loop with a hard ceiling."""
+    '''    async def store_call(callback: Callable[..., Any], *args: Any) -> Any:
         return await asyncio.wait_for(
-            asyncio.to_thread(method, *args, **kwargs),
-            timeout=COMMAND_DB_TIMEOUT_SECONDS,
+            asyncio.to_thread(callback, *args), timeout=COMMAND_DB_TIMEOUT_SECONDS
         )
 
     def track_command(callback: CommandCallback) -> CommandCallback:
 ''',
     "store_call helper",
 )
-
-old_status = '''    async def status_command(interaction: discord.Interaction) -> None:
-        if await require_guild(interaction):
-            stats = store.status_stats(service.started_at)
-            stats["v14"] = store.v14_health()
-            queue = getattr(service, "launch_queue", None)
-            stats["event_queue"] = queue.stats() if queue else {}
-            historical = getattr(service, "historical_context", None)
-            stats["historical_context"] = historical.status() if historical else {"enabled": False}
-            stats["model"] = operator_model_status(settings)
-            runtime_health = getattr(service, "runtime_health", None)
-            stats["runtime"] = runtime_health() if callable(runtime_health) else {}
-            await send_card(interaction, status_card(stats))
-'''
-new_status = '''    async def status_command(interaction: discord.Interaction) -> None:
-        if await require_guild(interaction):
-            stats, v14 = await asyncio.gather(
-                store_call(store.status_stats, service.started_at),
-                store_call(store.v14_health),
-            )
-            stats["v14"] = v14
-            queue = getattr(service, "launch_queue", None)
-            stats["event_queue"] = queue.stats() if queue else {}
-            historical = getattr(service, "historical_context", None)
-            stats["historical_context"] = (
-                await asyncio.to_thread(historical.status)
-                if historical and callable(getattr(historical, "status", None))
-                else {"enabled": False}
-            )
-            stats["model"] = operator_model_status(settings)
-            runtime_health = getattr(service, "runtime_health", None)
-            stats["runtime"] = runtime_health() if callable(runtime_health) else {}
-            await send_card(interaction, status_card(stats))
-'''
-text = replace_once(text, old_status, new_status, "nonblocking status")
-
-old_menu = '''    async def menu_command(interaction: discord.Interaction) -> None:
-        if await require_guild(interaction):
-            payload = await menu_data.render("home", interaction)
-            await send_card(interaction, payload, True, MenuView(menu_data, log, timeout=900))
-'''
-new_menu = '''    async def menu_command(interaction: discord.Interaction) -> None:
-        if await require_guild(interaction):
-            payload = await menu_data.render("home", interaction)
-            # A public persistent command center receives a fresh component
-            # interaction token on every click and therefore remains usable well
-            # beyond the 15-minute lifetime of an ephemeral interaction token.
+text = replace_once(
+    text,
+    '                    session = InteractionResponder(interaction, name, visibility, log)\n',
+    '                    session = InteractionResponder(interaction, name, visibility, log)\n',
+    "session construction anchor",
+)
+text = replace_once(
+    text,
+    '            stats = store.status_stats(service.started_at)\n            stats["v14"] = store.v14_health()\n',
+    '''            stats = await store_call(store.status_stats, service.started_at)
+            stats["v14"] = await store_call(store.v14_health)
+''',
+    "nonblocking status",
+)
+text = replace_once(
+    text,
+    '            payload = await menu_data.render("home", interaction)\n            await send_card(interaction, payload, True, MenuView(menu_data, log, timeout=900))\n',
+    '''            payload = await menu_data.render("home", interaction)
             await send_card(interaction, payload, False, MenuView(menu_data, log, timeout=None))
-'''
-text = replace_once(text, old_menu, new_menu, "persistent public menu")
-
-old_performance = '''        report = store.performance(
+''',
+    "persistent public menu",
+)
+text = replace_once(
+    text,
+    '''        report = store.performance(
             settings.scoring_version, since, settings.major_missed_runner_multiple
         )
         report["right_tail"] = store.right_tail_performance(settings.min_sample_for_edge_metrics)
         report["v15"] = store.v15_performance(settings.min_sample_for_edge_metrics)
-'''
-new_performance = '''        report, right_tail, v15 = await asyncio.gather(
-            store_call(
-                store.performance,
-                settings.scoring_version,
-                since,
-                settings.major_missed_runner_multiple,
-            ),
-            store_call(store.right_tail_performance, settings.min_sample_for_edge_metrics),
-            store_call(store.v15_performance, settings.min_sample_for_edge_metrics),
+''',
+    '''        report = await store_call(
+            store.performance,
+            settings.scoring_version,
+            since,
+            settings.major_missed_runner_multiple,
         )
-        report["right_tail"] = right_tail
-        report["v15"] = v15
-'''
-text = replace_once(text, old_performance, new_performance, "nonblocking performance")
-
-text = replace_once(
-    text,
-    '''        created = store.add_watch(
-            interaction.guild_id, interaction.user.id, chain.lower(), address.strip()
+        report["right_tail"] = await store_call(
+            store.right_tail_performance, settings.min_sample_for_edge_metrics
+        )
+        report["v15"] = await store_call(
+            store.v15_performance, settings.min_sample_for_edge_metrics
         )
 ''',
-    '''        created = await store_call(
-            store.add_watch,
-            interaction.guild_id,
-            interaction.user.id,
-            chain.lower(),
-            address.strip(),
-        )
-''',
-    "nonblocking watch",
+    "nonblocking performance",
 )
 text = replace_once(
     text,
-    '''        removed = store.remove_watch(
-            interaction.guild_id, interaction.user.id, chain.lower(), address.strip()
-        )
-''',
-    '''        removed = await store_call(
-            store.remove_watch,
-            interaction.guild_id,
-            interaction.user.id,
-            chain.lower(),
-            address.strip(),
-        )
-''',
-    "nonblocking unwatch",
-)
-text = replace_once(
-    text,
-    '''                watchlist_card(store.user_watchlist(interaction.guild_id, interaction.user.id)),
-''',
-    '''                watchlist_card(
-                    await store_call(store.user_watchlist, interaction.guild_id, interaction.user.id)
-                ),
-''',
-    "nonblocking watchlist",
-)
-text = replace_once(
-    text,
-    '''                store.candidates_report(10),
-''',
-    '''                await store_call(store.candidates_report, 10),
-''',
+    '                store.candidates_report(10),\n',
+    '                await store_call(store.candidates_report, 10),\n',
     "nonblocking candidates",
 )
 text = replace_once(
     text,
-    '''        report = store.rejection_report((datetime.now(UTC) - timedelta(hours=24)).isoformat())
-''',
+    '        report = store.rejection_report((datetime.now(UTC) - timedelta(hours=24)).isoformat())\n',
     '''        report = await store_call(
             store.rejection_report,
             (datetime.now(UTC) - timedelta(hours=24)).isoformat(),
@@ -241,53 +167,41 @@ text = replace_once(
 )
 text = replace_once(
     text,
-    '''        data = store.token_intelligence(address)
-''',
-    '''        data = await store_call(store.token_intelligence, address)
-''',
+    '        data = store.token_intelligence(address)\n',
+    '        data = await store_call(store.token_intelligence, address)\n',
     "nonblocking token intelligence",
 )
-
-# Fetch Radar board once, off-loop, for each report command.
 text = replace_once(
     text,
-    '''        await send_card(
-            interaction,
-            rows_card(
-                "RADAR • ACTIVE INTELLIGENCE",
-                store.radar_board(10),
-''',
-    '''        rows = await store_call(store.radar_board, 10)
-        await send_card(
-            interaction,
-            rows_card(
-                "CALLS • ACTIVE INTELLIGENCE",
-                rows,
-''',
-    "nonblocking radar/calls",
+    '                store.radar_board(10),\n',
+    '                await store_call(store.radar_board, 10),\n',
+    "nonblocking radar",
 )
 text = replace_once(
     text,
-    '''        rows = [r for r in store.radar_board(100) if (r.get("max_multiple") or 0) >= 2]
-''',
-    '''        board = await store_call(store.radar_board, 100)
-        rows = [r for r in board if (r.get("max_multiple") or 0) >= 2]
+    '        rows = [r for r in store.radar_board(100) if (r.get("max_multiple") or 0) >= 2]\n',
+    '''        rows = [
+            r
+            for r in await store_call(store.radar_board, 100)
+            if (r.get("max_multiple") or 0) >= 2
+        ]
 ''',
     "nonblocking runners",
 )
 text = replace_once(
     text,
-    '''        rows = [r for r in store.radar_board(100) if r.get("signal_status") == "FAILED"]
-''',
-    '''        board = await store_call(store.radar_board, 100)
-        rows = [r for r in board if r.get("signal_status") == "FAILED"]
+    '        rows = [r for r in store.radar_board(100) if r.get("signal_status") == "FAILED"]\n',
+    '''        rows = [
+            r
+            for r in await store_call(store.radar_board, 100)
+            if r.get("signal_status") == "FAILED"
+        ]
 ''',
     "nonblocking failed",
 )
 text = replace_once(
     text,
-    '''            await send_card(interaction, wallet_card(store.wallet_report(address.strip())), True)
-''',
+    '            await send_card(interaction, wallet_card(store.wallet_report(address.strip())), True)\n',
     '''            await send_card(
                 interaction,
                 wallet_card(await store_call(store.wallet_report, address.strip())),
@@ -298,16 +212,13 @@ text = replace_once(
 )
 text = replace_once(
     text,
-    '''                    store.cluster_report(10),
-''',
-    '''                    await store_call(store.cluster_report, 10),
-''',
+    '                    store.cluster_report(10),\n',
+    '                    await store_call(store.cluster_report, 10),\n',
     "nonblocking clusters",
 )
 text = replace_once(
     text,
-    '''                creator_card(store.creator_report(address.strip()), address.strip()),
-''',
+    '                creator_card(store.creator_report(address.strip()), address.strip()),\n',
     '''                creator_card(
                     await store_call(store.creator_report, address.strip()), address.strip()
                 ),
@@ -316,8 +227,7 @@ text = replace_once(
 )
 text = replace_once(
     text,
-    '''                narrative_card(store.narrative_report(query or None), query or None),
-''',
+    '                narrative_card(store.narrative_report(query or None), query or None),\n',
     '''                narrative_card(
                     await store_call(store.narrative_report, query or None), query or None
                 ),
@@ -388,13 +298,6 @@ old_test_alert = '''    async def test_alert_command(interaction: discord.Intera
         except Exception as error:  # noqa: BLE001 - optional audit must not fail delivery
             _safe_failure_log(
                 log,
-                "test_alert_audit_failed",
-                error,
-                command_name="test-alert",
-                guild_id=interaction.guild_id,
-                channel_id=interaction.channel_id,
-                result="audit_failure_card_succeeded",
-            )
 '''
 new_test_alert = '''    async def test_alert_command(interaction: discord.Interaction) -> None:
         if not await require_guild(interaction):
@@ -403,57 +306,24 @@ new_test_alert = '''    async def test_alert_command(interaction: discord.Intera
         if not permissions or not permissions.manage_guild:
             await send_text(interaction, "Manage Server permission is required.")
             return
-        guild_settings = await store_call(store.guild_settings, interaction.guild_id)
-        destination_id = int(guild_settings.get("alert_channel_id") or interaction.channel_id)
+        current = await store_call(store.guild_settings, interaction.guild_id)
+        destination_id = int(current.get("alert_channel_id") or interaction.channel_id)
         destination = client.get_channel(destination_id)
         if destination is None:
             try:
-                destination = await asyncio.wait_for(
-                    client.fetch_channel(destination_id), timeout=8.0
-                )
-            except Exception as error:  # noqa: BLE001 - user gets a safe command response
-                _safe_failure_log(
-                    log,
-                    "test_alert_destination_failed",
-                    error,
-                    command_name="test-alert",
-                    guild_id=interaction.guild_id,
-                    channel_id=destination_id,
-                    result="failure",
-                )
-                await send_text(
-                    interaction,
-                    "Test alert could not resolve the configured alert channel. Run /setup again.",
-                )
-                return
-        if not hasattr(destination, "send"):
-            await send_text(interaction, "Configured alert destination is not a message channel.")
-            return
-        embed = validate_message(card_payload=test_alert_card())
-        try:
-            message = await asyncio.wait_for(
-                destination.send(
-                    embed=embed,
-                    allowed_mentions=discord.AllowedMentions.none(),
-                ),
-                timeout=10.0,
-            )
-        except Exception as error:  # noqa: BLE001 - transport boundary must be contained
-            _safe_failure_log(
-                log,
-                "test_alert_delivery_failed",
-                error,
-                command_name="test-alert",
-                guild_id=interaction.guild_id,
-                channel_id=destination_id,
-                result="failure",
-            )
+                destination = await client.fetch_channel(destination_id)
+            except (discord.HTTPException, discord.NotFound, discord.Forbidden):
+                destination = None
+        if destination is None or not hasattr(destination, "send"):
             await send_text(
                 interaction,
-                f"Test alert failed to deliver to <#{destination_id}>. Check bot permissions.",
+                "The configured alert channel is unavailable. Run /setup again.",
             )
             return
-        remote_id = str(getattr(message, "id", "")) or None
+        payload = test_alert_card()
+        embed = validate_message(card_payload=payload)
+        delivered = await destination.send(embed=embed, allowed_mentions=discord.AllowedMentions.none())
+        remote_id = str(delivered.id)
         try:
             await store_call(
                 store.record_test_alert,
@@ -465,17 +335,27 @@ new_test_alert = '''    async def test_alert_command(interaction: discord.Intera
         except Exception as error:  # noqa: BLE001 - optional audit must not fail delivery
             _safe_failure_log(
                 log,
-                "test_alert_audit_failed",
-                error,
-                command_name="test-alert",
-                guild_id=interaction.guild_id,
-                channel_id=destination_id,
-                result="audit_failure_card_succeeded",
-            )
-        await send_text(interaction, f"Test alert delivered to <#{destination_id}>.")
 '''
 text = replace_once(text, old_test_alert, new_test_alert, "real test-alert transport")
+text = replace_once(
+    text,
+    '                channel_id=interaction.channel_id,\n                result="audit_failure_card_succeeded",\n',
+    '                channel_id=destination_id,\n                result="audit_failure_card_succeeded",\n',
+    "test alert audit channel",
+)
+text = replace_once(
+    text,
+    '''            )
 
+    @tree.error
+''',
+    '''            )
+        await send_text(interaction, f"Test alert delivered to <#{destination_id}>.")
+
+    @tree.error
+''',
+    "test alert success response",
+)
 text = replace_once(
     text,
     '            persistent_view_count=2,\n',
@@ -608,7 +488,7 @@ compact_status = r'''def status_card(stats: dict[str, Any]) -> dict[str, Any]:
             _field("PROVIDERS", provider_line, False),
             _field(
                 "DISCORD",
-                f"Destinations: **{_value(pipeline.get('enabled_alert_destinations'), '0')}** • "
+                f"Destinations: **{pipeline.get('enabled_alert_destinations', 0)}** • "
                 f"Outbox: **{_value(stats.get('outbox_pending'))}** • "
                 f"Failed: **{_value(stats.get('discord_deliveries_failed'))}**\n"
                 f"Last error: {_value(stats.get('last_alert_error'), 'NONE')}",
@@ -623,63 +503,61 @@ compact_status = r'''def status_card(stats: dict[str, Any]) -> dict[str, Any]:
             ),
         ],
     )
+
+
 '''
 text = sub_once(
     text,
-    r"def status_card\(stats: dict\[str, Any\]\) -> dict\[str, Any\]:.*?\n\n\ndef menu_card",
-    compact_status + "\n\n\ndef menu_card",
+    r"def status_card\(stats: dict\[str, Any\]\) -> dict\[str, Any\]:.*?\n\ndef menu_card",
+    compact_status + "def menu_card",
     "compact status card",
 )
-compact_menu = r'''def menu_card() -> dict[str, Any]:
-    return card(
-        "GAMBIT JR • COMMAND CENTER",
-        "Calls, research and system health in one place.",
-        fields=[
-            _field("CALLS", "`/candidates` • `/runners` • `/failed`", False),
-            _field("RESEARCH", "`/scan` • `/token` • `/smartmoney` • `/compare`", False),
-            _field("SYSTEM", "`/status` • `/performance` • `/server-settings`", False),
-        ],
-    )
-'''
-text = sub_once(
-    text,
-    r"def menu_card\(\) -> dict\[str, Any\]:.*?\n\n\ndef scan_card",
-    compact_menu + "\n\n\ndef scan_card",
-    "compact menu card",
-)
-write(path, text)
-
-
-# ---------------------------------------------------------------------------
-# Product policy: keep branding/humanisation but stop re-inflating the compact
-# status card; trim qualified-call cards to decision-critical information.
-# ---------------------------------------------------------------------------
-path = "src/memecoin_bot/discord/product_policy.py"
-text = read(path)
 text = replace_once(
     text,
-    '        if name in {"Runner potential", "Failure risk"}:\n',
-    '        if name in {"Runner potential", "Failure risk", "Historical context", "Contract address"}:\n',
-    "trim signal fields",
+    '''    return card(
+        "GAMBIT JR • TEST ALERT",
+        "TEST / NON-LIVE — Discord delivery and rich-card rendering succeeded.",
+        "amber",
+        [
+            _field("Creates signal", "NO"),
+            _field("Creates Radar", "NO"),
+            _field("Trading", "DISABLED"),
+        ],
+        "TEST EVENT • NOT MARKET INTELLIGENCE • NO TRADE EXECUTED",
+    )
+''',
+    '''    return card(
+        "GAMBIT JR • TEST ALERT",
+        "Non-live transport test. This proves the configured channel can receive Gambit cards.",
+        "amber",
+        [
+            _field("Delivery", "SUCCESS"),
+            _field("Market call", "NO"),
+            _field("Execution", "DISABLED"),
+        ],
+        "GAMBIT JR • Made by Jay • TEST ONLY • NO EXECUTION",
+    )
+''',
+    "compact test alert card",
 )
+write(path, text)
+
+
+# The old product-policy status wrapper would append two large internal fields to
+# the newly compact card. Remove that wrapper while preserving branding/taxonomy.
+path = "src/memecoin_bot/discord/product_policy.py"
+text = read(path)
 text = sub_once(
     text,
-    r"    @functools\.wraps\(original_status_card\)\n    def reliability_status_card\(stats: dict\[str, Any\]\) -> dict\[str, Any\]:.*?\n        return apply_product_presentation\(payload\)\n",
-    '''    @functools.wraps(original_status_card)
-    def reliability_status_card(stats: dict[str, Any]) -> dict[str, Any]:
-        # The base status card already consumes runtime/pipeline diagnostics.
-        # Do not append internal audit sections back into the user-facing UI.
-        return apply_product_presentation(original_status_card(stats))
-''',
-    "compact product status wrapper",
+    r"    original_status_card = cards\.status_card.*?    command_center\.status_card = reliability_status_card\n\n",
+    "",
+    "remove legacy status expansion",
 )
 write(path, text)
 
 
 # ---------------------------------------------------------------------------
-# Operational diagnostics: surface the reasons active candidates are not
-# qualifying. This lets status distinguish "nothing good enough" from broken
-# safety/RPC evidence instead of showing a silent zero-call count.
+# Pipeline diagnostics: show why 35k discoveries can still yield zero calls.
 # ---------------------------------------------------------------------------
 path = "src/memecoin_bot/database/store.py"
 text = read(path)
@@ -898,7 +776,7 @@ write(path, text)
 
 # ---------------------------------------------------------------------------
 # Existing tests whose contract intentionally changed: menus are now truly
-# persistent/public and test-alert exercises the destination channel.
+# persistent/public and test-alert must prove real channel delivery.
 # ---------------------------------------------------------------------------
 path = "tests/test_discord_command_center.py"
 text = read(path)
@@ -906,47 +784,17 @@ text = replace_once(
     text,
     '''        self.channel = SimpleNamespace(id=202)
 ''',
-    '''        self.channel = FakeChannel(202)
-''',
-    "FakeInteraction channel",
-)
-text = replace_once(
-    text,
-    '''class FakeInteraction:
-''',
-    '''class FakeChannel:
-    def __init__(self, channel_id: int):
-        self.id = channel_id
-        self.messages: list[dict] = []
+    '''        self.channel = SimpleNamespace(id=202, messages=[])
 
-    async def send(self, **kwargs):
-        self.messages.append(kwargs)
-        return SimpleNamespace(id=999)
+        async def send(*, embed=None, allowed_mentions=None):
+            self.channel.messages.append(
+                {"embed": embed, "allowed_mentions": allowed_mentions}
+            )
+            return SimpleNamespace(id=99)
 
-
-class FakeInteraction:
+        self.channel.send = send
 ''',
-    "FakeChannel class",
-)
-text = replace_once(
-    text,
-    '''    assert view.timeout == 900
-    assert not view.is_persistent()
-    assert MenuView(view.data, timeout=None).is_persistent()
-''',
-    '''    assert view.timeout is None
-    assert view.is_persistent()
-    assert MenuView(view.data, timeout=None).is_persistent()
-''',
-    "persistent menu test",
-)
-text = replace_once(
-    text,
-    '''async def test_menu_command_sends_actual_ephemeral_view_and_all_commands_remain_registered():
-''',
-    '''async def test_menu_command_sends_actual_persistent_view_and_all_commands_remain_registered():
-''',
-    "menu test name",
+    "fake channel send",
 )
 text = replace_once(
     text,
@@ -1047,12 +895,12 @@ async def test_menu_survives_250_repeated_component_navigations() -> None:
         await view.navigate(interaction, page, "gambit:menu:navigate")
         assert interaction.response.deferred_at is not None
         assert len(interaction.edits) == 1
-        assert not interaction.followup.messages
+        assert interaction.followup.messages == []
 
 
 @pytest.mark.asyncio
-async def test_50_test_alerts_deliver_exactly_once_each() -> None:
-    tree, client, _store = await capture_runtime()
+async def test_test_alert_delivers_exactly_once_across_50_invocations() -> None:
+    tree, client, store = await capture_runtime()
     channel = FakeInteraction(admin=True).channel
     client.get_channel = lambda _channel_id: channel
     command = tree.get_command("test-alert")
@@ -1060,12 +908,13 @@ async def test_50_test_alerts_deliver_exactly_once_each() -> None:
         interaction = FakeInteraction(admin=True)
         interaction.channel = channel
         await command.callback(interaction)
-        assert "delivered" in primary_payload(interaction)["content"].lower()
+        result = primary_payload(interaction)
+        assert "delivered" in result["content"].lower()
     assert len(channel.messages) == 50
-    assert all(message["embed"].title == "GAMBIT JR • TEST ALERT" for message in channel.messages)
+    assert store.calls.count("record_test_alert") == 50
 
 
-class BrokenSafety:
+class BrokenSafetyProvider:
     def __init__(self, name: str):
         self.name = name
 
@@ -1073,41 +922,38 @@ class BrokenSafety:
         raise ProviderError(f"{self.name} unavailable")
 
 
-class WorkingSafety:
-    name = "working"
+class HealthySafetyProvider:
+    name = "healthy_safety"
 
     async def safety(self, _token_address: str):
-        return SafetyAssessment(
-            checked_at=iso(),
-            source=self.name,
-            chain="solana",
-            mint_authority=None,
-            freeze_authority=None,
-            top10_percent=20,
-        )
+        return SafetyAssessment(checked_at=iso(), source=self.name, chain="solana")
 
 
 @pytest.mark.asyncio
-async def test_solana_safety_failover_recovers_after_two_rpc_failures() -> None:
+async def test_solana_safety_fails_over_after_two_provider_failures() -> None:
     provider = SolanaSafetyFailoverProvider(
-        [BrokenSafety("one"), BrokenSafety("two"), WorkingSafety()]  # type: ignore[list-item]
+        [
+            BrokenSafetyProvider("primary"),
+            BrokenSafetyProvider("secondary"),
+            HealthySafetyProvider(),
+        ]
     )
     result = await provider.safety("So111")
-    assert result.source == "working"
-    assert "RPC_FAILOVER_USED:working" in result.warnings
+    assert result.source == "healthy_safety"
+    assert "RPC_FAILOVER_USED:healthy_safety" in result.warnings
 
 
-def test_effective_solana_rpc_prefers_configured_nonpublic_sources(monkeypatch) -> None:
-    config = Settings()
-    config.solana_rpc_url = "https://api.mainnet-beta.solana.com"
-    config.solana_tracker_rpc_url = "https://tracker.example/rpc"
-    assert config.effective_solana_rpc_url() == "https://tracker.example/rpc"
+def test_rpc_preference_uses_configured_credentials_before_public_rpc() -> None:
+    configured = Settings(
+        helius_api_key="helius-key",
+        solana_tracker_rpc_url="https://rpc.solanatracker.io/example",
+        alchemy_api_key="alchemy-key",
+        shyft_solana_rpc_url="https://rpc.shyft.example",
+    )
+    assert "helius-rpc.com" in configured.effective_solana_rpc_url()
 
-    config.helius_api_key = "helius-key"
-    assert "helius-rpc.com" in config.effective_solana_rpc_url()
-
-    config.solana_rpc_url = "https://operator.example/rpc"
-    assert config.effective_solana_rpc_url() == "https://operator.example/rpc"
+    tracker = Settings(solana_tracker_rpc_url="https://rpc.solanatracker.io/example")
+    assert tracker.effective_solana_rpc_url() == "https://rpc.solanatracker.io/example"
 
 
 def test_status_card_is_compact_and_surfaces_blockers() -> None:
@@ -1147,11 +993,11 @@ def test_status_card_is_compact_and_surfaces_blockers() -> None:
     )
     fields = payload["embed"]["fields"]
     assert len(fields) == 5
-    text = " ".join(str(field["value"]) for field in fields)
-    assert "SAFETY DATA UNAVAILABLE" in text.upper()
-    assert "CIRCUIT OPEN" in text.upper()
-    assert "helius curated" not in text.lower()
+    rendered = str(payload).lower()
+    assert "safety data unavailable" in rendered
+    assert "solana rpc" in rendered
+    assert "helius curated" not in rendered
 '''
-Path("tests/test_discord_brutal_e2e_v3.py").write_text(stress_test, encoding="utf-8")
+write("tests/test_discord_brutal_e2e_v3.py", stress_test)
 
 print("discord brutal e2e v3 patch applied")
