@@ -14,7 +14,7 @@ const BUILD_TIMEOUT_MS = Number(process.env.E4_BUILDER_TIMEOUT_MS || 1800);
 const connection = new Connection(RPC_URL, "processed");
 const JITO_TIP_ACCOUNTS = [
   "96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5",
-  "HFqU5x63VTqVQss8hp11i4wVV8bD44PvwucfZ2bU7gRe",
+  "HFqU5x63VTqvQss8hp11i4wVV8bD44PvwucfZ2bU7gRe",
   "Cw8CFyM9FkoMi7K7Crf6HNQqf4uEMzpKw6QNghXLvLkY",
   "ADaUMid9yfUytqMBgopwjb2DTLSokTSzL1zt6iGPaS49",
   "DfXygSm4jCyNCybVYYK6DwvWqjKee8pbDmJGcLWNDXjh",
@@ -69,7 +69,7 @@ async function buildSweep(request) {
   const to = new PublicKey(destination);
   const lamports = Math.floor(Number(request.amount) * 1_000_000_000);
   if (!Number.isSafeInteger(lamports) || lamports <= 0) throw new Error("invalid sweep amount");
-  const { blockhash } = await connection.getLatestBlockhash("processed");
+  const {blockhash} = await connection.getLatestBlockhash("processed");
   const instructions = [SystemProgram.transfer({fromPubkey: from, toPubkey: to, lamports})];
   const tipLamports = Math.floor(Number(request.tip_sol || 0) * 1_000_000_000);
   if (tipLamports > 0) {
