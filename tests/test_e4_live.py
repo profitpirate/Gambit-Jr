@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from memecoin_bot import e4_live
-from memecoin_bot import e4_runner  # applies corrected Store.save_position implementation
+from memecoin_bot import e4_hardening_v3  # noqa: F401 - applies production hardening
 
 
 class E4InvariantTests(unittest.TestCase):
@@ -70,29 +70,105 @@ class E4InvariantTests(unittest.TestCase):
 
 
 class E4PolicyTests(unittest.TestCase):
-    def event(self, event_id: int, kind: e4_live.EventKind, price: float, trader: str, sol: float, at_ns: int) -> e4_live.Event:
+    def event(
+        self,
+        event_id: int,
+        kind: e4_live.EventKind,
+        price: float,
+        trader: str,
+        sol: float,
+        at_ns: int,
+        *,
+        signature: str | None = None,
+        fdv: float = 6_000,
+    ) -> e4_live.Event:
         return e4_live.Event(
             event_id=event_id,
             kind=kind,
             mint="mint",
             source_ns=at_ns,
             received_ns=at_ns,
+            signature=signature,
             trader=trader,
             sol_amount=sol,
             token_amount=1000,
             price_sol=price,
-            fdv_usd=4878,
+            fdv_usd=fdv,
         )
 
-    def test_observed_birth_profile_can_enter(self) -> None:
+    def test_observed_bundled_microburst_can_enter(self) -> None:
         state = e4_live.TokenState("mint")
         now = time.time_ns()
-        state.apply(self.event(1, e4_live.EventKind.BUY, 0.001, "buyer-a", 2.0, now - 300_000_000), None)
-        state.apply(self.event(2, e4_live.EventKind.BUY, 0.0011, "buyer-b", 2.0, now), None)
-        accepted, score, fraction, _, _ = e4_live.E4Policy(e4_live.Settings(model_path=Path("missing.json"))).entry(state)
-        self.assertTrue(accepted)
-        self.assertGreater(score, 0.45)
+        state.apply(
+            self.event(
+                1,
+                e4_live.EventKind.CREATE,
+                0.001,
+                "creator",
+                0.0,
+                now,
+                signature="create",
+                fdv=3_000,
+            ),
+            None,
+        )
+        sequence = [
+            ("creator", 3.0, "create"),
+            ("buyer-1", 1.4, "bundle-a"),
+            ("buyer-2", 1.4, "bundle-a"),
+            ("buyer-3", 1.4, "bundle-a"),
+            ("buyer-4", 1.4, "bundle-b"),
+            ("buyer-5", 1.4, "bundle-b"),
+            ("buyer-6", 2.0, "bundle-b"),
+        ]
+        for index, (trader, amount, signature) in enumerate(sequence, start=2):
+            state.apply(
+                self.event(
+                    index,
+                    e4_live.EventKind.BUY,
+                    0.001 * (1.0 + 0.11 * (index - 1)),
+                    trader,
+                    amount,
+                    now + (index - 1) * 150_000,
+                    signature=signature,
+                    fdv=5_800,
+                ),
+                None,
+            )
+        accepted, score, fraction, reason, features = e4_live.E4Policy(
+            e4_live.Settings(model_path=Path("missing.json"))
+        ).entry(state)
+        self.assertTrue(accepted, reason)
+        self.assertGreater(score, 0.65)
         self.assertGreater(fraction, 0)
+        self.assertEqual(features["microburst_buyers"], 7)
+        self.assertEqual(features["microburst_bundled_buys"], 6)
+
+    def test_unbundled_fast_buyers_are_rejected(self) -> None:
+        state = e4_live.TokenState("mint")
+        now = time.time_ns()
+        state.apply(
+            self.event(1, e4_live.EventKind.CREATE, 0.001, "creator", 0, now, signature="create"),
+            None,
+        )
+        for index in range(2, 10):
+            state.apply(
+                self.event(
+                    index,
+                    e4_live.EventKind.BUY,
+                    0.001 * (1 + index * 0.1),
+                    f"buyer-{index}",
+                    2.0,
+                    now + index * 100_000,
+                    signature=f"single-{index}",
+                ),
+                None,
+            )
+        accepted, _, _, reason, _ = e4_live.E4Policy(
+            e4_live.Settings(model_path=Path("missing.json"))
+        ).entry(state)
+        self.assertFalse(accepted)
+        self.assertIn("multi-buy", reason)
 
     def test_wallet_touch_blocks_second_entry(self) -> None:
         state = e4_live.TokenState("mint")
