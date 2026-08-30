@@ -1,0 +1,37 @@
+{
+  "model_version": "e4-observed-v1",
+  "wallet": "E4EzXdwf7NNdqM2XGswWaWHfxgucVCo24PTCcrimTKBz",
+  "status": "OBSERVED_POLICY_BASELINE",
+  "evidence": {
+    "window_hours_approx": 32.4,
+    "swaps": 999,
+    "closed_memecoin_positions": 221,
+    "gross_win_rate": 0.751,
+    "gross_pnl_sol": 298.81,
+    "median_hold_ms": 3000,
+    "reentries": 0,
+    "max_concurrent_positions": 2,
+    "first_partial_30pct_count": 185,
+    "first_partial_20pct_count": 31,
+    "bonding_curve_entries": 219,
+    "total_entries": 221,
+    "median_entry_fdv_usd": 4878,
+    "entries_below_10000_fraction": 0.982,
+    "fully_exited_within_5s_fraction": 0.715,
+    "fully_exited_within_10s_fraction": 0.887,
+    "losers_exited_within_5s_fraction": 1.0,
+    "notes": [
+      "The Solscan exports were capped and do not represent lifetime performance.",
+      "The hidden selected-vs-ignored entry function cannot be calibrated from buys alone.",
+      "The live engine records point-in-time E4 oracle state so a negative-control model can replace only the fallback entry profile without changing execution invariants."
+    ]
+  },
+  "replication_invariants": {
+    "max_entries_per_mint": 1,
+    "max_concurrent_positions": 2,
+    "normal_first_partial_fraction": 0.30,
+    "acceleration_first_partial_fraction": 0.20,
+    "failure_window_ms": 5000,
+    "absolute_hold_horizon_ms": 60000
+  }
+}
