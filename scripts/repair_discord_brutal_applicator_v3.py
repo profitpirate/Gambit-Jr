@@ -39,7 +39,7 @@ if text.count(old_private) != 1:
     )
 text = text.replace(old_private, new_private, 1)
 
-old_setup = '''text = replace_once(
+old_setup = """text = replace_once(
     text,
     '''            interaction, settings_card(store.guild_settings(interaction.guild_id)), True
 ''',
@@ -49,8 +49,8 @@ old_setup = '''text = replace_once(
 ''',
     "nonblocking setup settings read",
 )
-'''
-new_setup = '''setup_settings_old = '''            interaction, settings_card(store.guild_settings(interaction.guild_id)), True
+"""
+new_setup = """setup_settings_old = '''            interaction, settings_card(store.guild_settings(interaction.guild_id)), True
 '''
 setup_settings_new = '''            interaction,
             settings_card(await store_call(store.guild_settings, interaction.guild_id)),
@@ -59,7 +59,7 @@ setup_settings_new = '''            interaction,
 if setup_settings_old not in text:
     raise RuntimeError("nonblocking setup settings read: selector not found")
 text = text.replace(setup_settings_old, setup_settings_new, 1)
-'''
+"""
 if text.count(old_setup) != 1:
     raise RuntimeError(f"expected one setup-selector applicator block, found {text.count(old_setup)}")
 text = text.replace(old_setup, new_setup, 1)
