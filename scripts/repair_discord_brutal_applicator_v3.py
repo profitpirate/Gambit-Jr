@@ -3,6 +3,18 @@ from pathlib import Path
 path = Path(__file__).with_name("apply_discord_brutal_e2e_v3.py")
 text = path.read_text(encoding="utf-8")
 
+old_sub = '''def sub_once(text: str, pattern: str, replacement: str, label: str) -> str:
+    new, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
+'''
+new_sub = '''def sub_once(text: str, pattern: str, replacement: str, label: str) -> str:
+    # A callable replacement prevents re.sub from interpreting backslashes in
+    # generated Python source (for example "\\n") as replacement escapes.
+    new, count = re.subn(pattern, lambda _match: replacement, text, count=1, flags=re.S)
+'''
+if text.count(old_sub) != 1:
+    raise RuntimeError(f"expected one sub_once implementation, found {text.count(old_sub)}")
+text = text.replace(old_sub, new_sub, 1)
+
 old_private = '''text = replace_once(
     text,
     '        "menu",\\n',
@@ -65,4 +77,4 @@ if text.count(old_setup) != 1:
 text = text.replace(old_setup, new_setup, 1)
 
 path.write_text(text, encoding="utf-8")
-print("repaired Discord applicator selectors")
+print("repaired Discord applicator selectors and replacements")
