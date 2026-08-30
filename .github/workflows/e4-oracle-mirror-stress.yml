@@ -1,0 +1,59 @@
+name: E4 oracle mirror stress
+
+on:
+  workflow_dispatch:
+    inputs:
+      signatures:
+        description: E4 wallet signatures to inspect
+        required: false
+        default: "800"
+      positions:
+        description: Closed positions to reconstruct
+        required: false
+        default: "30"
+  push:
+    branches:
+      - codex/gambit-jr-v2-e4-stress-hardening
+    paths:
+      - "scripts/e4_oracle_mirror_stress.py"
+      - ".github/workflows/e4-oracle-mirror-stress.yml"
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  reconstruct-and-simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - name: Compile mirror harness
+        run: python -m py_compile scripts/e4_oracle_mirror_stress.py
+      - name: Reconstruct E4 positions and simulate copy delay
+        env:
+          SIGNATURES: ${{ github.event.inputs.signatures || '800' }}
+          POSITIONS: ${{ github.event.inputs.positions || '30' }}
+        run: |
+          mkdir -p outputs
+          python scripts/e4_oracle_mirror_stress.py \
+            --signatures "$SIGNATURES" \
+            --positions "$POSITIONS" \
+            --primary-delay 250 \
+            --output outputs/e4-oracle-mirror-stress.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-oracle-mirror-stress-${{ github.run_id }}
+          path: |
+            outputs/e4-oracle-mirror-stress.json
+            outputs/e4-oracle-mirror-stress-timelines.jsonl
+          if-no-files-found: warn
+          retention-days: 14
