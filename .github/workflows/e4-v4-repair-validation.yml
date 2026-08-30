@@ -1,0 +1,43 @@
+name: E4 v4 repair validation
+
+on:
+  push:
+    branches:
+      - codex/gambit-jr-v2-e4-v4-repairs
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  regression-and-concurrency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - name: Compile E4 v4
+        run: >-
+          python -m compileall -q
+          src/memecoin_bot/e4_hardening_v4.py
+          tests/test_e4_v4_precision.py
+      - name: Full E4 regression and precision suite
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+      - name: Builder syntax
+        working-directory: tools/e4-builder
+        run: node --check daemon.mjs
+      - name: Production container
+        run: docker build -f Dockerfile.e4-prod -t gambit-e4-v4 .
