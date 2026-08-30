@@ -1,0 +1,33 @@
+name: E4 stress hardening
+
+on:
+  push:
+    branches:
+      - codex/gambit-jr-v2-e4-stress-hardening
+  workflow_dispatch:
+
+jobs:
+  stress-hardening:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - name: Existing E4 regression suite
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+      - name: Compile hardened runtime
+        run: python -m compileall -q src/memecoin_bot/e4_hardening.py src/memecoin_bot/e4_exec
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - working-directory: tools/e4-builder
+        run: node --check daemon.mjs
+      - name: Production container build
+        run: docker build -f Dockerfile.e4-exec -t gambit-jr-e4:stress .
