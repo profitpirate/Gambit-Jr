@@ -26,6 +26,8 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Once the repair is committed, every later run exercises the committed
+      # implementation directly instead of mutating it again.
       - name: Apply deterministic repair
         run: |
           if grep -q 'COMMAND_DB_TIMEOUT_SECONDS = 15.0' src/memecoin_bot/discord/bot_runtime.py; then
