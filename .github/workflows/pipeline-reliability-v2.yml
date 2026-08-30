@@ -1,0 +1,141 @@
+name: Pipeline reliability v2
+
+on:
+  push:
+    branches:
+      - fix/discord-pipeline-reliability-v2
+    paths:
+      - scripts/apply_pipeline_reliability_v2.py
+      - .github/workflows/pipeline-reliability-v2.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pipeline-reliability-v2
+  cancel-in-progress: true
+
+jobs:
+  apply-audit-test-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Apply deterministic reliability patch
+        run: python scripts/apply_pipeline_reliability_v2.py
+
+      - name: Show and validate source diff
+        run: |
+          git diff --check
+          git status --short
+          git diff --stat
+
+      - name: Install validation toolchain
+        run: |
+          python -m pip install --upgrade pip build pip-audit
+          python -m pip install -e '.[dev,research]'
+
+      - name: Targeted timeout, routing and full-pipeline E2E
+        run: |
+          pytest -q \
+            tests/test_pipeline_reliability_v2.py \
+            tests/test_discord_command_center.py \
+            tests/test_discord_response_lifecycle.py \
+            tests/test_discord_outbox.py \
+            tests/test_candidate_lifecycle.py \
+            tests/test_v15_engine.py
+
+      - name: Full regression suite
+        run: pytest -q
+
+      - name: Static and package audit
+        run: |
+          ruff check .
+          python -m build
+          python -m pip check
+          pip-audit --skip-editable . || pip-audit
+
+      - name: Container build
+        run: docker build -t gambit-jr:${{ github.sha }} .
+
+      - name: Isolated staging build and health
+        run: |
+          cp .env.staging.example .env.staging
+          docker compose -f docker-compose.staging.yml config --quiet
+          docker compose -f docker-compose.staging.yml up -d --build
+          for attempt in $(seq 1 40); do
+            if curl --fail --silent http://127.0.0.1:18080/health > /tmp/health.json; then
+              cat /tmp/health.json
+              break
+            fi
+            if [ "$attempt" = "40" ]; then
+              docker compose -f docker-compose.staging.yml logs
+              exit 1
+            fi
+            sleep 3
+          done
+
+      - name: Staging schema and acceptance
+        run: |
+          docker compose -f docker-compose.staging.yml exec -T bot-staging \
+            gambit-history --warehouse /app/staging/historical/warehouse.db \
+            --archive /app/staging/archive coverage
+          docker compose -f docker-compose.staging.yml exec -T bot-staging \
+            python scripts/staging_acceptance.py \
+            --health-url http://127.0.0.1:8080/health \
+            --operational /app/staging/operational/memecoin.db \
+            --warehouse /app/staging/historical/warehouse.db \
+            --approved /app/staging/approved/approved_features.db
+
+      - name: Code and secret audit
+        run: |
+          git diff --check
+          ! git diff -- . ':!*.example' | grep -E '(api[_-]?key|token|secret)[[:space:]]*=[[:space:]]*[A-Za-z0-9_-]{16,}' -i
+          ! git diff --name-only | grep -E '(^|/)(\.env|.*\.db|.*\.sqlite|.*\.parquet|provider-probe\.json)$'
+          python - <<'PY'
+          from pathlib import Path
+          required = {
+              'src/memecoin_bot/discord/bot_runtime.py',
+              'src/memecoin_bot/discord/command_center.py',
+              'src/memecoin_bot/discord/product_policy.py',
+              'src/memecoin_bot/service.py',
+              'src/memecoin_bot/v15_engine.py',
+              'src/memecoin_bot/database/store.py',
+              'tests/test_pipeline_reliability_v2.py',
+          }
+          changed = set(__import__('subprocess').check_output(
+              ['git', 'diff', '--name-only'], text=True
+          ).splitlines())
+          missing = required - changed
+          assert not missing, f'missing required changes: {sorted(missing)}'
+          for path in required:
+              assert Path(path).exists(), path
+          print({'required_changes': sorted(required), 'result': 'PASS'})
+          PY
+
+      - name: Tear down staging
+        if: always()
+        run: docker compose -f docker-compose.staging.yml down --remove-orphans || true
+
+      - name: Commit only after every gate passes
+        run: |
+          git config user.name "gambit-jr-reliability-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            src/memecoin_bot/discord/bot_runtime.py \
+            src/memecoin_bot/discord/command_center.py \
+            src/memecoin_bot/discord/product_policy.py \
+            src/memecoin_bot/service.py \
+            src/memecoin_bot/v15_engine.py \
+            src/memecoin_bot/database/store.py \
+            tests/test_pipeline_reliability_v2.py
+          git commit -m "fix: harden every Discord command and supervise the signal pipeline"
+          git push origin HEAD:fix/discord-pipeline-reliability-v2
