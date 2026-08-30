@@ -97,7 +97,13 @@ PRIVATE_COMMANDS = frozenset(
         "watchlist",
     }
 )
-DEFERRED_COMMANDS = frozenset({"compare", "scan"})
+DEFERRED_COMMANDS = EXPECTED_COMMAND_NAMES
+COMMAND_ACK_TIMEOUT_SECONDS = 2.5
+COMMAND_TIMEOUT_SECONDS = 30.0
+SAFE_TIMEOUT_ERROR = (
+    "Gambit Jr acknowledged the command, but the operation exceeded its safe time limit. "
+    "Please try again."
+)
 
 if discord is not None:
 
@@ -356,9 +362,39 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
                 channel_id=interaction.channel_id,
                 user_id=getattr(interaction.user, "id", None),
             )
+            session: InteractionResponder | None = None
             try:
-                await callback(interaction, *args, **kwargs)
-            except Exception as error:
+                # Acknowledge at the outermost command boundary. No command is
+                # allowed to touch SQLite, providers, rendering, or business logic
+                # before Discord receives its acknowledgement.
+                if command_allowed(interaction):
+                    visibility = (
+                        ResponseVisibility.PRIVATE
+                        if name in PRIVATE_COMMANDS
+                        else ResponseVisibility.PUBLIC
+                    )
+                    session = InteractionResponder(interaction, name, visibility, log)
+                    response_sessions[id(interaction)] = session
+                    await asyncio.wait_for(
+                        session.defer(), timeout=COMMAND_ACK_TIMEOUT_SECONDS
+                    )
+                await asyncio.wait_for(
+                    callback(interaction, *args, **kwargs),
+                    timeout=COMMAND_TIMEOUT_SECONDS,
+                )
+            except TimeoutError as error:
+                _safe_failure_log(
+                    log,
+                    "command_timeout",
+                    error,
+                    command_name=name,
+                    duration_ms=round((time.monotonic() - started) * 1000, 1),
+                    result="timeout",
+                )
+                if session is None or not session.primary_completed:
+                    await respond_command_error(interaction, SAFE_TIMEOUT_ERROR)
+                return
+            except Exception as error:  # noqa: BLE001 - command boundary must contain failures
                 _safe_failure_log(
                     log,
                     "command_completed",
@@ -367,7 +403,9 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
                     duration_ms=round((time.monotonic() - started) * 1000, 1),
                     result="failure",
                 )
-                raise
+                if session is None or not session.primary_completed:
+                    await respond_command_error(interaction, SAFE_INTERNAL_ERROR)
+                return
             finally:
                 response_sessions.pop(id(interaction), None)
                 active_command_names.pop(id(interaction), None)
@@ -420,22 +458,28 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
 
     async def require_guild(interaction: discord.Interaction) -> bool:
         if command_allowed(interaction):
-            command = active_command_names.get(id(interaction)) or getattr(
-                getattr(interaction, "command", None), "name", "unknown"
-            )
-            visibility = (
-                ResponseVisibility.PRIVATE
-                if command in PRIVATE_COMMANDS
-                else ResponseVisibility.PUBLIC
-            )
-            session = InteractionResponder(interaction, command, visibility, log)
-            response_sessions[id(interaction)] = session
-            if command in DEFERRED_COMMANDS:
-                await session.defer()
+            # The outer command wrapper normally creates and acknowledges this
+            # session. Keep a defensive fallback for direct callback tests and
+            # future command registration paths.
+            if id(interaction) not in response_sessions:
+                command = active_command_names.get(id(interaction)) or getattr(
+                    getattr(interaction, "command", None), "name", "unknown"
+                )
+                visibility = (
+                    ResponseVisibility.PRIVATE
+                    if command in PRIVATE_COMMANDS
+                    else ResponseVisibility.PUBLIC
+                )
+                session = InteractionResponder(interaction, command, visibility, log)
+                response_sessions[id(interaction)] = session
+                await asyncio.wait_for(
+                    session.defer(), timeout=COMMAND_ACK_TIMEOUT_SECONDS
+                )
             return True
-        await interaction.response.send_message(
-            "This command is available in Discord server text channels.", ephemeral=True
-        )
+        if not interaction.response.is_done():
+            await interaction.response.send_message(
+                "This command is available in Discord server text channels.", ephemeral=True
+            )
         return False
 
     @tree.command(
@@ -452,6 +496,8 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             historical = getattr(service, "historical_context", None)
             stats["historical_context"] = historical.status() if historical else {"enabled": False}
             stats["model"] = operator_model_status(settings)
+            runtime_health = getattr(service, "runtime_health", None)
+            stats["runtime"] = runtime_health() if callable(runtime_health) else {}
             await send_card(interaction, status_card(stats))
 
     @tree.command(name="menu", description="Open the complete Gambit Jr command center")
@@ -581,7 +627,10 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
                 store.candidates_report(10),
                 "No active candidates.",
                 lambda r: (
-                    f"**{r.get('name') or r.get('symbol')}** • {r.get('chain')} • {r.get('state')} • score {float(r.get('normalized_score') or 0):.1f}"
+                    f"**{r.get('name') or r.get('symbol') or 'UNKNOWN'}** • "
+                    f"{r.get('chain') or 'UNKNOWN'} • "
+                    f"{(str(r.get('decision_tier')) + ' call') if r.get('route_state') in {'OPERATOR_SHADOW_ALERT', 'PUBLIC_ALERT'} else 'developing setup'} • "
+                    f"{r.get('decision_reason') or r.get('reason') or 'evidence pending'}"
                 ),
             ),
         )
@@ -816,11 +865,25 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
             await send_text(interaction, "Manage Server permission is required.")
             return
         message = await send_card(interaction, test_alert_card())
-        if message is None:
-            message = await interaction.original_response()
-        store.record_test_alert(
-            interaction.guild_id, interaction.channel_id, interaction.user.id, str(message.id)
-        )
+        remote_id = str(message.id) if message is not None else None
+        try:
+            await asyncio.to_thread(
+                store.record_test_alert,
+                interaction.guild_id,
+                interaction.channel_id,
+                interaction.user.id,
+                remote_id,
+            )
+        except Exception as error:  # noqa: BLE001 - optional audit must not fail delivery
+            _safe_failure_log(
+                log,
+                "test_alert_audit_failed",
+                error,
+                command_name="test-alert",
+                guild_id=interaction.guild_id,
+                channel_id=interaction.channel_id,
+                result="audit_failure_card_succeeded",
+            )
 
     @tree.error
     async def on_tree_error(

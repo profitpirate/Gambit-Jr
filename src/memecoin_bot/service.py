@@ -78,6 +78,22 @@ from memecoin_bot.v15_engine import (
 )
 
 _MARKET_UNSET = object()
+_ROUTABLE_SIGNAL_TIERS = frozenset(
+    {"PREMIUM", "STRONG", "HIGH_RISK_MOMENTUM", "CATALYST_REVIVAL"}
+)
+
+
+def authoritative_signal_qualified(
+    signal_tier: Any,
+    blocking_reasons: list[str],
+    hard_rejections: list[str],
+) -> bool:
+    """Qualification truth is independent of whether a Discord route is enabled."""
+    return (
+        str(signal_tier) in _ROUTABLE_SIGNAL_TIERS
+        and not blocking_reasons
+        and not hard_rejections
+    )
 
 
 def fair_chain_sample(discoveries: list[DiscoveryEvent], limit: int) -> list[DiscoveryEvent]:
@@ -191,10 +207,89 @@ class IntelligenceService:
         self.started_at = iso()
         self.log = logging.getLogger("memecoin_bot.service")
         self.stop_event = asyncio.Event()
+        self.worker_state: dict[str, dict[str, Any]] = {}
 
     def close(self) -> None:
         if self.historical_context is not None:
             self.historical_context.store.close()
+
+    def _mark_worker_cycle(self, name: str, result: Any = None) -> None:
+        state = self.worker_state.setdefault(name, {})
+        state.update(
+            status="RUNNING",
+            last_success_at=iso(),
+            last_error=None,
+            cycles=int(state.get("cycles") or 0) + 1,
+            last_result=result,
+        )
+
+    async def _supervise_worker(self, name: str, factory: Any) -> None:
+        backoff = max(0.05, float(self.settings.launch_source_reconnect_seconds))
+        while not self.stop_event.is_set():
+            state = self.worker_state.setdefault(name, {})
+            state.update(status="RUNNING", last_started_at=iso())
+            try:
+                await factory()
+                if self.stop_event.is_set():
+                    break
+                raise RuntimeError(f"{name} returned unexpectedly")
+            except asyncio.CancelledError:
+                raise
+            except Exception as error:  # noqa: BLE001 - worker supervisor is a fault boundary
+                state.update(
+                    status="RESTARTING",
+                    last_error=f"{type(error).__name__}: {error}"[:500],
+                    last_error_at=iso(),
+                    restart_count=int(state.get("restart_count") or 0) + 1,
+                )
+                log_event(
+                    self.log,
+                    logging.ERROR,
+                    "pipeline_worker_restart",
+                    worker=name,
+                    restart_count=state["restart_count"],
+                    error=state["last_error"],
+                )
+                try:
+                    await asyncio.wait_for(self.stop_event.wait(), timeout=backoff)
+                except TimeoutError:
+                    pass
+                backoff = min(30.0, backoff * 2)
+        self.worker_state.setdefault(name, {})["status"] = "STOPPED"
+
+    def runtime_health(self) -> dict[str, Any]:
+        now = datetime.now(UTC)
+        thresholds = {
+            "scanner": max(60.0, self.settings.discovery_interval_seconds * 3),
+            "candidate_monitor": max(60.0, self.settings.candidate_monitor_interval_seconds * 3),
+            "tracker": max(60.0, self.settings.monitor_interval_seconds * 3),
+            "outcome_monitor": max(180.0, self.settings.outcome_monitor_interval_seconds * 3),
+        }
+        workers: dict[str, Any] = {}
+        healthy = True
+        starting = False
+        for name, threshold in thresholds.items():
+            raw = dict(self.worker_state.get(name) or {})
+            last_success = raw.get("last_success_at")
+            age = None
+            if last_success:
+                try:
+                    age = max(0.0, (now - datetime.fromisoformat(str(last_success))).total_seconds())
+                except ValueError:
+                    age = None
+            stale = age is not None and age > threshold
+            if not raw or last_success is None:
+                starting = True
+            if stale or raw.get("status") == "RESTARTING":
+                healthy = False
+            raw["heartbeat_age_seconds"] = round(age, 2) if age is not None else None
+            raw["stale"] = stale
+            workers[name] = raw
+        return {
+            "status": "HEALTHY" if healthy and not starting else "STARTING" if healthy else "DEGRADED",
+            "workers": workers,
+            "stop_requested": self.stop_event.is_set(),
+        }
 
     async def offer_launch_event(self, event: LaunchEvent) -> None:
         result = self.launch_queue.offer(event)
@@ -907,18 +1002,25 @@ class IntelligenceService:
             "safety": safety_score,
         }
         score = self.scoring.score(components, sorted(set(hard_rejections)))
-        waiting = self.safety_gates.readiness(market)
+        authoritative_waiting = self.safety_gates.readiness(market)
+        waiting = list(authoritative_waiting)
         if safety_unavailable:
+            authoritative_waiting.append("SAFETY_DATA_UNAVAILABLE")
             waiting.append("SAFETY_DATA_UNAVAILABLE")
         if momentum.get("score") is None:
+            # Legacy momentum readiness remains diagnostic evidence, but cannot
+            # secretly overrule the sole CONTROL_V15 decision authority.
             waiting.append(momentum.get("reason", "MOMENTUM_UNAVAILABLE"))
         if score.confidence < self.settings.min_confidence_for_signal:
-            waiting.append("INSUFFICIENT_EVIDENCE_COVERAGE")
+            waiting.append("LEGACY_CONTROL_EVIDENCE_INCOMPLETE")
         entry_state = entry_quality(
             candidate["radar_market_cap_usd"] or market.market_cap_usd, market.market_cap_usd
         )
         if entry_state in {"CHASING", "LATE"}:
+            authoritative_waiting.append("LATE_ENTRY_NOT_QUALIFIED")
             waiting.append("LATE_ENTRY_NOT_QUALIFIED")
+        authoritative_waiting = sorted(set(authoritative_waiting))
+        waiting = sorted(set(waiting))
         narrative_state = narrative_context(
             narrative.get("label"), candidate["first_discovered_at"]
         )
@@ -997,6 +1099,12 @@ class IntelligenceService:
                 "market_cap_usd": market.market_cap_usd,
                 "liquidity_usd": market.liquidity_usd,
                 "price_change_from_launch_percent": market.price_change_5m,
+                "age_seconds": _evidence_age_seconds(
+                    market.pair_created_at
+                    or discovery.estimated_creation_timestamp
+                    or candidate["first_discovered_at"],
+                    market.captured_at,
+                ),
             },
             survival_result["grade"],
         )
@@ -1136,7 +1244,13 @@ class IntelligenceService:
             v15_features = {
                 "amm_liquidity": liquidity_quality,
                 "tradeability": {"GOOD": 90, "LIMITED": 55, "POOR": 20}.get(trade["grade"]),
-                "migration_continuity": None,
+                "migration_continuity": (
+                    90.0
+                    if market.pair_address and market.pair_created_at
+                    else 70.0
+                    if market.pair_address
+                    else None
+                ),
                 "buyer_quality": wallet_quality,
                 "buyer_replacement": buyer_replacement.get("score"),
                 "actor_independence": actor_independence,
@@ -1413,6 +1527,20 @@ class IntelligenceService:
             (datetime.fromisoformat(authoritative_decision_at) - attempted_at).total_seconds()
             * 1000,
         )
+        operator_route_enabled = self.settings.operator_shadow_alerts_enabled or bool(
+            self.store.alert_destinations()
+        )
+        route_blockers = sorted(
+            {
+                *authoritative_waiting,
+                *v15_decision.critical_unknowns,
+                *(f"PROVIDER_CONFLICT:{name}" for name in v15_decision.provider_conflicts),
+                *(
+                    f"STALE_EVIDENCE:{name}"
+                    for name in (v15_decision.feature_vector.get("stale_evidence") or [])
+                ),
+            }
+        )
         runner_decision = self.runner_decisions.decide(
             token_id=token_id,
             candidate_id=candidate_id,
@@ -1429,7 +1557,7 @@ class IntelligenceService:
                 "component_scores": score.component_scores,
                 "authority": "CONTROL_ONLY",
             },
-            waiting_reasons=sorted(set(waiting)),
+            waiting_reasons=route_blockers,
             hard_rejections=list(score.hard_rejections),
             entry_state={
                 "state": entry_state,
@@ -1463,12 +1591,16 @@ class IntelligenceService:
             },
             trigger_event_id=(realtime_feature or {}).get("trigger_event_id"),
             public_alerts_enabled=self.settings.public_alerts_enabled,
-            operator_shadow_alerts_enabled=self.settings.operator_shadow_alerts_enabled,
+            operator_shadow_alerts_enabled=operator_route_enabled,
         )
-        signal_grade = runner_decision.routes_alert
+        qualified_signal = authoritative_signal_qualified(
+            v15_decision.signal_tier,
+            route_blockers,
+            list(score.hard_rejections),
+        )
         existing_signal_id = candidate["signal_id"]
         if existing_signal_id:
-            if signal_grade and not waiting:
+            if qualified_signal:
                 update = self.store.update_signal_intelligence(
                     int(existing_signal_id),
                     str(score.classification),
@@ -1514,14 +1646,18 @@ class IntelligenceService:
                 signal_id=int(existing_signal_id),
             )
             return str(CandidateState.SIGNALLED)
-        if waiting or not signal_grade:
+        if route_blockers or not qualified_signal:
             has_radar = radar_now or candidate["radar_triggered_at"] is not None
             state = (
                 CandidateState.EARLY_RADAR
                 if has_radar
                 else (CandidateState.PENDING_EVIDENCE if waiting else CandidateState.CANDIDATE)
             )
-            reason = waiting[0] if waiting else "SCORE_BELOW_WATCH"
+            reason = (
+                route_blockers[0]
+                if route_blockers
+                else f"CONTROL_V15_{v15_decision.signal_tier}"
+            )
             self.store.update_candidate(
                 candidate_id,
                 state,
@@ -1618,7 +1754,7 @@ class IntelligenceService:
             self.store.update_candidate(
                 candidate_id,
                 CandidateState.QUALIFIED_SIGNAL,
-                f"PROMOTED_{score.classification}",
+                f"PROMOTED_{v15_decision.signal_tier}",
                 market,
                 score,
                 unknown_fields=evidence["unknown_fields"],
@@ -1631,11 +1767,11 @@ class IntelligenceService:
                 token=address,
                 candidate_id=candidate_id,
                 signal_id=signal_id,
-                state=score.classification,
+                state=str(v15_decision.signal_tier),
                 score=score.normalized_score,
                 confidence=score.confidence,
             )
-        return str(score.classification)
+        return str(v15_decision.signal_tier)
 
     async def monitor_candidates_once(self) -> dict[str, int]:
         results: dict[str, int] = {}
@@ -1660,7 +1796,19 @@ class IntelligenceService:
                     str(candidate["token_address"])
                 )
             for chain, addresses in by_chain.items():
-                for address, snapshot in (await batch_fetch(addresses, chain)).items():
+                try:
+                    batch = await batch_fetch(addresses, chain)
+                except Exception as error:  # noqa: BLE001 - fall back to individual provider calls
+                    log_event(
+                        self.log,
+                        logging.WARNING,
+                        "candidate_batch_prefetch_failed",
+                        chain=chain,
+                        count=len(addresses),
+                        error=f"{type(error).__name__}: {error}",
+                    )
+                    continue
+                for address, snapshot in batch.items():
                     prefetched[(chain, address)] = snapshot
         for candidate in candidates:
             try:
@@ -1676,6 +1824,7 @@ class IntelligenceService:
                 )
                 result = "ERROR"
             results[result] = results.get(result, 0) + 1
+            await asyncio.sleep(0)
         return results
 
     async def monitor_outcomes_once(self) -> int:
@@ -1700,8 +1849,13 @@ class IntelligenceService:
         results: dict[str, int] = {}
         try:
             discoveries = await self.discovery.poll()
-        except ProviderError as exc:
-            log_event(self.log, logging.ERROR, "discovery_failure", error=str(exc))
+        except Exception as exc:  # noqa: BLE001 - discovery worker must remain supervised
+            log_event(
+                self.log,
+                logging.ERROR,
+                "discovery_failure",
+                error=f"{type(exc).__name__}: {exc}",
+            )
             return {"DISCOVERY_FAILURE": 1}
         for discovered in fair_chain_sample(discoveries, self.settings.max_discoveries_per_cycle):
             try:
@@ -1712,6 +1866,7 @@ class IntelligenceService:
                 )
                 result = "ERROR"
             results[result] = results.get(result, 0) + 1
+            await asyncio.sleep(0)
         return results
 
     async def flush_outbox(self) -> int:
@@ -1721,9 +1876,32 @@ class IntelligenceService:
             try:
                 delivery_started = datetime.now(UTC)
                 payload = json.loads(row["payload_json"])
+                route_state = str(
+                    (payload.get("runner_decision") or {}).get("route_state") or ""
+                )
+                if row["event_type"] == "SIGNAL" and route_state and route_state not in {
+                    "OPERATOR_SHADOW_ALERT",
+                    "PUBLIC_ALERT",
+                }:
+                    self.store.mark_outbox_sent(
+                        int(row["id"]), f"route-suppressed:{route_state}", claim_token
+                    )
+                    log_event(
+                        self.log,
+                        logging.INFO,
+                        "signal_delivery_suppressed",
+                        outbox_id=row["id"],
+                        route_state=route_state,
+                        reason=(payload.get("runner_decision") or {}).get("decision_reason"),
+                    )
+                    sent += 1
+                    continue
                 content = format_discord_event(row["event_type"], payload)
                 has_guild_settings = bool(
-                    self.store.conn.execute("SELECT COUNT(*) FROM guild_settings").fetchone()[0]
+                    self.store.conn.execute(
+                        "SELECT COUNT(*) FROM guild_settings WHERE alerts_enabled=1 "
+                        "AND alert_channel_id IS NOT NULL"
+                    ).fetchone()[0]
                 )
                 destinations = [
                     d
@@ -1852,8 +2030,9 @@ class IntelligenceService:
 
         async def scanner() -> None:
             while not self.stop_event.is_set():
-                await self.scan_once()
-                await self.flush_outbox()
+                result = await self.scan_once()
+                delivered = await self.flush_outbox()
+                self._mark_worker_cycle("scanner", {"scan": result, "delivered": delivered})
                 try:
                     await asyncio.wait_for(
                         self.stop_event.wait(), self.settings.discovery_interval_seconds
@@ -1863,11 +2042,9 @@ class IntelligenceService:
 
         async def tracker() -> None:
             while not self.stop_event.is_set():
-                try:
-                    await self.tracker.monitor_once()
-                    await self.flush_outbox()
-                except Exception:
-                    self.log.exception("tracking cycle failed")
+                result = await self.tracker.monitor_once()
+                delivered = await self.flush_outbox()
+                self._mark_worker_cycle("tracker", {"tracked": result, "delivered": delivered})
                 try:
                     await asyncio.wait_for(
                         self.stop_event.wait(), self.settings.monitor_interval_seconds
@@ -1877,8 +2054,11 @@ class IntelligenceService:
 
         async def candidate_monitor() -> None:
             while not self.stop_event.is_set():
-                await self.monitor_candidates_once()
-                await self.flush_outbox()
+                result = await self.monitor_candidates_once()
+                delivered = await self.flush_outbox()
+                self._mark_worker_cycle(
+                    "candidate_monitor", {"candidates": result, "delivered": delivered}
+                )
                 try:
                     await asyncio.wait_for(
                         self.stop_event.wait(), self.settings.candidate_monitor_interval_seconds
@@ -1888,7 +2068,8 @@ class IntelligenceService:
 
         async def outcome_monitor() -> None:
             while not self.stop_event.is_set():
-                await self.monitor_outcomes_once()
+                result = await self.monitor_outcomes_once()
+                self._mark_worker_cycle("outcome_monitor", {"monitored": result})
                 try:
                     await asyncio.wait_for(
                         self.stop_event.wait(), self.settings.outcome_monitor_interval_seconds
@@ -1899,18 +2080,14 @@ class IntelligenceService:
         async def launch_worker() -> None:
             while not self.stop_event.is_set():
                 try:
-                    event = await asyncio.wait_for(self.launch_queue.queue.get(), timeout=0.5)
+                    launch = await asyncio.wait_for(self.launch_queue.queue.get(), timeout=0.5)
                 except TimeoutError:
                     continue
                 try:
-                    await self.handle_launch_event(event)
-                except Exception:
-                    self.log.exception(
-                        "launch event processing failed",
-                        extra={"fields": {"event_key": event.event_key}},
-                    )
+                    result = await self.handle_launch_event(launch)
+                    self._mark_worker_cycle("launch_worker", {"result": result})
                 finally:
-                    self.launch_queue.task_done(event)
+                    self.launch_queue.task_done(launch)
 
         async def realtime_worker() -> None:
             lanes = TokenLaneExecutor(
@@ -1921,13 +2098,14 @@ class IntelligenceService:
                 ),
             )
 
-            def on_error(event: CanonicalEvent, error: Exception) -> None:
+            def on_error(realtime_event: CanonicalEvent, error: Exception) -> None:
                 self.log.error(
                     "canonical event processing failed",
-                    extra={"fields": {"event_id": event.event_id}},
+                    extra={"fields": {"event_id": realtime_event.event_id}},
                     exc_info=(type(error), error, error.__traceback__),
                 )
 
+            self._mark_worker_cycle("realtime_worker", {"state": "STARTED"})
             await lanes.run(
                 claim=self.realtime_fabric.claim_pending,
                 handle=self.handle_realtime_event,
@@ -1938,21 +2116,35 @@ class IntelligenceService:
                 on_error=on_error,
             )
 
-        tasks = [scanner(), candidate_monitor(), outcome_monitor(), tracker()]
+        workers: list[tuple[str, Any]] = [
+            ("scanner", scanner),
+            ("candidate_monitor", candidate_monitor),
+            ("outcome_monitor", outcome_monitor),
+            ("tracker", tracker),
+        ]
         if self.launch_sources:
-            tasks.append(launch_worker())
-            tasks.extend(
-                source.run(self.offer_launch_event, self.stop_event)
-                for source in self.launch_sources
-            )
+            workers.append(("launch_worker", launch_worker))
+            for index, source in enumerate(self.launch_sources):
+                workers.append(
+                    (
+                        f"launch_source:{index}:{type(source).__name__}",
+                        lambda source=source: source.run(self.offer_launch_event, self.stop_event),
+                    )
+                )
         if self.settings.realtime_fabric_enabled:
-            tasks.append(realtime_worker())
-        if self.realtime_sources:
-            tasks.extend(
-                source.run_events(self.offer_realtime_event, self.stop_event)
-                for source in self.realtime_sources
+            workers.append(("realtime_worker", realtime_worker))
+        for index, source in enumerate(self.realtime_sources):
+            workers.append(
+                (
+                    f"realtime_source:{index}:{type(source).__name__}",
+                    lambda source=source: source.run_events(
+                        self.offer_realtime_event, self.stop_event
+                    ),
+                )
             )
-        await asyncio.gather(*tasks)
+        await asyncio.gather(
+            *(self._supervise_worker(name, factory) for name, factory in workers)
+        )
 
     def stop(self) -> None:
         self.stop_event.set()

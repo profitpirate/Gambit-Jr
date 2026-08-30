@@ -261,6 +261,8 @@ class CommandCenterData:
         historical = getattr(self.service, "historical_context", None)
         stats["historical_context"] = historical.status() if historical else {"enabled": False}
         stats["model"] = operator_model_status(self.settings)
+        runtime_health = getattr(self.service, "runtime_health", None)
+        stats["runtime"] = runtime_health() if callable(runtime_health) else {}
         payload = status_card(stats)
         payload["embed"]["title"] = PAGE_TITLES["system"]
         return payload
@@ -400,7 +402,6 @@ class MenuView(discord.ui.View):
 
     @discord.ui.button(
         label="Refresh",
-        emoji="↻",
         style=discord.ButtonStyle.primary,
         custom_id="gambit:menu:refresh",
         row=1,

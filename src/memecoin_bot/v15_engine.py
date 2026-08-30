@@ -323,6 +323,15 @@ def evaluate_v15(stage: Stage | str, features: dict[str, Any]) -> V15Decision:
             if runner >= 60 and entry != EntryStatus.CHASING
             else SignalTier.SILENT_WATCH
         )
+    minimum_route_coverage = {
+        SignalTier.PREMIUM: 75.0,
+        SignalTier.STRONG: 55.0,
+        SignalTier.HIGH_RISK_MOMENTUM: 60.0,
+        SignalTier.CATALYST_REVIVAL: 60.0,
+    }
+    if tier in minimum_route_coverage and coverage < minimum_route_coverage[tier]:
+        critical.append("EVIDENCE_COVERAGE_BELOW_ROUTE_MINIMUM")
+        tier = SignalTier.SILENT_WATCH
     if entry in {EntryStatus.CHASING, EntryStatus.CLOSED, EntryStatus.UNKNOWN} and tier in {
         SignalTier.PREMIUM,
         SignalTier.STRONG,

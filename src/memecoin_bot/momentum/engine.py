@@ -13,8 +13,15 @@ class MomentumEngine:
     def assess_history(
         self, current: MarketSnapshot, previous: list[dict], minimum: int = 3
     ) -> dict:
+        if not previous:
+            result = self.assess(current, None)
+            if minimum > 1:
+                result["score"] = None
+                result["reason"] = "INSUFFICIENT_ROLLING_HISTORY"
+            result["snapshots_required"] = minimum
+            return result
         if len(previous) + 1 < minimum:
-            result = self.assess(current, previous[-1] if previous else None)
+            result = self.assess(current, previous[-1])
             result["score"] = None
             result["reason"] = "INSUFFICIENT_ROLLING_HISTORY"
             result["snapshots_required"] = minimum

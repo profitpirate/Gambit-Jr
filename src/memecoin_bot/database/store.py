@@ -932,12 +932,20 @@ class Store:
     def candidates_report(self, limit: int = 10) -> list[sqlite3.Row]:
         return list(
             self.conn.execute(
-                "SELECT c.*,t.symbol,t.name,t.token_address,t.chain FROM candidates c JOIN tokens t ON t.id=c.token_id "
+                "SELECT c.*,t.symbol,t.name,t.token_address,t.chain,"
+                "rd.tier AS decision_tier,rd.route_state,rd.confidence AS decision_confidence,"
+                "rd.decision_reason FROM candidates c JOIN tokens t ON t.id=c.token_id "
+                "LEFT JOIN runner_decisions_v15 rd ON rd.decision_id=("
+                "SELECT rd2.decision_id FROM runner_decisions_v15 rd2 "
+                "WHERE rd2.candidate_id=c.id ORDER BY rd2.decision_at DESC,rd2.created_at DESC LIMIT 1) "
                 "WHERE c.state NOT IN ('REJECTED_UNSAFE','EXPIRED','SIGNALLED') "
-                "ORDER BY COALESCE(c.normalized_score,-1) DESC,c.updated_at DESC LIMIT ?",
+                "ORDER BY CASE rd.route_state "
+                "WHEN 'PUBLIC_ALERT' THEN 0 WHEN 'OPERATOR_SHADOW_ALERT' THEN 1 ELSE 2 END,"
+                "rd.decision_at DESC,c.updated_at DESC LIMIT ?",
                 (limit,),
             )
         )
+
 
     def rejection_report(self, since: str) -> dict[str, Any]:
         hard: dict[str, int] = {}
@@ -1516,16 +1524,12 @@ class Store:
     def alert_allowed(tier: str, event_type: str, payload: dict[str, Any]) -> bool:
         # V1.5 externally routes only public signal classes and post-call
         # intelligence. Genesis/Radar remain queryable internal states.
-        if event_type in {
-            "MILESTONE",
-            "RADAR_MILESTONE",
-            "RADAR_RISK",
-            "FAILED",
-            "DETERIORATION",
-            "UPGRADE",
-        }:
+        if event_type in {"MILESTONE", "FAILED", "DETERIORATION", "UPGRADE"}:
             return True
         if event_type != "SIGNAL":
+            return False
+        route_state = str((payload.get("runner_decision") or {}).get("route_state") or "")
+        if route_state and route_state not in {"OPERATOR_SHADOW_ALERT", "PUBLIC_ALERT"}:
             return False
         return str(payload.get("v15_signal_tier") or payload.get("signal_tier") or "").upper() in {
             "PREMIUM",
@@ -1862,6 +1866,43 @@ class Store:
             "discord_deliveries_failed": one(
                 "SELECT (SELECT COUNT(*) FROM alert_deliveries WHERE status='FAILED') + "
                 "(SELECT COUNT(*) FROM alert_deliveries_v131 WHERE status='FAILED')"
+            ),
+        }
+        route_counts = {
+            str(row["route_state"]): int(row["count"])
+            for row in self.conn.execute(
+                "SELECT route_state,COUNT(*) AS count FROM runner_decisions_v15 GROUP BY route_state"
+            )
+        }
+        last_decision = self.conn.execute(
+            "SELECT decision_at,tier,route_state,decision_reason FROM runner_decisions_v15 "
+            "ORDER BY decision_at DESC,created_at DESC LIMIT 1"
+        ).fetchone()
+        last_qualified = self.conn.execute(
+            "SELECT decision_at,tier,route_state,decision_reason FROM runner_decisions_v15 "
+            "WHERE route_state IN ('OPERATOR_SHADOW_ALERT','PUBLIC_ALERT') "
+            "OR decision_reason='ALERT_ROUTES_DISABLED' "
+            "ORDER BY decision_at DESC,created_at DESC LIMIT 1"
+        ).fetchone()
+        last_signal_outbox = self.conn.execute(
+            "SELECT created_at,sent_at,remote_message_id,last_error FROM outbox "
+            "WHERE event_type='SIGNAL' ORDER BY id DESC LIMIT 1"
+        ).fetchone()
+        result["pipeline"] = {
+            "route_counts": route_counts,
+            "last_decision": dict(last_decision) if last_decision else None,
+            "last_qualified": dict(last_qualified) if last_qualified else None,
+            "last_signal_outbox": dict(last_signal_outbox) if last_signal_outbox else None,
+            "signals_persisted": result["signals"],
+            "enabled_alert_destinations": one(
+                "SELECT COUNT(*) FROM guild_settings WHERE alerts_enabled=1 "
+                "AND alert_channel_id IS NOT NULL"
+            ),
+            "route_suppressed": one(
+                "SELECT COUNT(*) FROM outbox WHERE remote_message_id LIKE 'route-suppressed:%'"
+            ),
+            "policy_suppressed": one(
+                "SELECT COUNT(*) FROM outbox WHERE remote_message_id='policy-suppressed'"
             ),
         }
         last_alert = self.conn.execute(
