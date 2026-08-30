@@ -177,7 +177,11 @@ new_lifetime_field = '''            _field(
 if text.count(old_lifetime_field) != 1:
     raise RuntimeError(f"expected one compact lifetime field, found {text.count(old_lifetime_field)}")
 text = text.replace(old_lifetime_field, new_lifetime_field, 1)
-text = text.replace('    assert len(fields) == 5\\n', '    assert len(fields) == 6\\n', 1)
+
+old_field_count = "    assert len(fields) == 5\n"
+if text.count(old_field_count) != 1:
+    raise RuntimeError(f"expected one compact status field assertion, found {text.count(old_field_count)}")
+text = text.replace(old_field_count, "    assert len(fields) == 6\n", 1)
 
 path.write_text(text, encoding="utf-8")
 print("repaired Discord applicator selectors, static audit, and compact status truth")
