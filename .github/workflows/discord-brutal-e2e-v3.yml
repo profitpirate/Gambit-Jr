@@ -28,8 +28,12 @@ jobs:
 
       - name: Apply deterministic repair
         run: |
-          python scripts/repair_discord_brutal_applicator_v3.py
-          python scripts/apply_discord_brutal_e2e_v3.py
+          if grep -q 'COMMAND_DB_TIMEOUT_SECONDS = 15.0' src/memecoin_bot/discord/bot_runtime.py; then
+            echo "Validated implementation is already present; running verification-only mode."
+          else
+            python scripts/repair_discord_brutal_applicator_v3.py
+            python scripts/apply_discord_brutal_e2e_v3.py
+          fi
 
       - name: Diff sanity
         run: |
@@ -97,6 +101,8 @@ jobs:
             sleep 3
           done
           docker compose -f docker-compose.staging.yml exec -T bot-staging \
+            python -c "from memecoin_bot.historical import ApprovedFeatureStore, HistoricalWarehouse; warehouse = HistoricalWarehouse('/app/staging/historical/warehouse.db', '/app/staging/archive'); warehouse.close(); approved = ApprovedFeatureStore('/app/staging/approved/approved_features.db'); approved.close()"
+          docker compose -f docker-compose.staging.yml exec -T bot-staging \
             python scripts/staging_acceptance.py \
             --health-url http://127.0.0.1:8080/health \
             --operational /app/staging/operational/memecoin.db \
@@ -130,5 +136,9 @@ jobs:
             tests/test_discord_brutal_e2e_v3.py \
             tests/test_discord_command_center.py \
             tests/test_pipeline_reliability_v2.py
-          git commit -m "fix: make Discord interactions durable under sustained load [skip ci]"
-          git push origin HEAD:fix/discord-brutal-e2e-v3
+          if git diff --cached --quiet; then
+            echo "No implementation changes to commit; verification-only run complete."
+          else
+            git commit -m "fix: make Discord interactions durable under sustained load"
+            git push origin HEAD:fix/discord-brutal-e2e-v3
+          fi
