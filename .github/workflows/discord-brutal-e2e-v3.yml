@@ -15,6 +15,7 @@ concurrency:
 
 jobs:
   repair-audit-stress-commit:
+    # This run verifies the committed tree directly; patch scripts are idempotent.
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
