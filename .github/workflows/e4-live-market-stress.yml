@@ -1,0 +1,56 @@
+name: E4 live market stress
+
+on:
+  push:
+    branches:
+      - codex/gambit-jr-v2-e4-stress-hardening
+  workflow_dispatch:
+    inputs:
+      capture_seconds:
+        description: Live Pump capture duration
+        required: false
+        default: "300"
+
+jobs:
+  live-market-stress:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - name: Compile harness and hardened runtime
+        run: python -m compileall -q scripts/e4_live_market_stress.py src/memecoin_bot/e4_hardening.py src/memecoin_bot/e4_hardening_v2.py
+      - name: E4 regression and repeated lifecycle stress
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+      - name: Capture live launches, benchmark execution and compare with E4
+        env:
+          E4_SOL_USD_FALLBACK: "150"
+        run: >-
+          python scripts/e4_live_market_stress.py
+          --capture-seconds "${{ github.event.inputs.capture_seconds || '300' }}"
+          --minimum-launches 20
+          --wallet-signatures 250
+          --builder-probes 24
+          --testnet-route-probes 5
+          --stress-iterations 10000
+          --output artifacts/e4-live-market-stress.json
+      - name: Upload full E4 stress evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: e4-live-market-stress-${{ github.run_id }}
+          path: |
+            artifacts/e4-live-market-stress.json
+            artifacts/e4-live-market-stress.md
+            artifacts/e4-live-market-stress-live-events.jsonl
+          if-no-files-found: error
+          retention-days: 30
