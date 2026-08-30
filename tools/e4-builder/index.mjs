@@ -9,11 +9,58 @@ import {
 
 const RPC_URL = process.env.E4_PRIMARY_RPC_URL || process.env.SOLANA_RPC_URL || "https://api.mainnet-beta.solana.com";
 const TRADE_LOCAL_URL = process.env.E4_PUMPPORTAL_TRADE_LOCAL_URL || "https://pumpportal.fun/api/trade-local";
+const BUILD_TIMEOUT_MS = Number(process.env.E4_BUILDER_TIMEOUT_MS || 1800);
 const connection = new Connection(RPC_URL, "processed");
+const JITO_TIP_ACCOUNTS = [
+  "96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5",
+  "HFqU5x63VTqvQss8hp11i4wVV8bD44PvwucfZ2bU7gRe",
+  "Cw8CFyM9FkoMi7K7Crf6HNQqf4uEMzpKw6QNghXLvLkY",
+  "ADaUMid9yfUytqMBgopwjb2DTLSokTSzL1zt6iGPaS49",
+  "DfXygSm4jCyNCybVYYK6DwvWqjKee8pbDmJGcLWNDXjh",
+  "ADuUkR4vqLUMWXxW9gh6D6L8pMSawimctcNZ5pGwDcEt",
+  "DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL",
+  "3AVi9Tg9Uo68tJfuvoKvqKNWKkC5wPdSSdeBnizKZ6jT",
+];
 
 function fail(message) {
   process.stderr.write(`${message}\n`);
   process.exit(1);
+}
+
+function deterministicTipAccount(request) {
+  const seed = String(request.request_id || request.mint || request.public_key || "e4");
+  let hash = 0;
+  for (const character of seed) hash = ((hash * 31) + character.charCodeAt(0)) >>> 0;
+  return new PublicKey(JITO_TIP_ACCOUNTS[hash % JITO_TIP_ACCOUNTS.length]);
+}
+
+async function appendJitoTip(transactionBytes, request) {
+  const requested = Number(request.tip_sol || 0);
+  if (!Number.isFinite(requested) || requested <= 0) return transactionBytes;
+  const lamports = Math.max(1_000, Math.floor(requested * 1_000_000_000));
+  if (!Number.isSafeInteger(lamports)) throw new Error("invalid Jito tip amount");
+  const original = VersionedTransaction.deserialize(transactionBytes);
+  const lookups = original.message.addressTableLookups || [];
+  const lookupAccounts = [];
+  for (const lookup of lookups) {
+    const response = await connection.getAddressLookupTable(lookup.accountKey, {commitment: "processed"});
+    if (!response.value) throw new Error(`missing address lookup table ${lookup.accountKey.toBase58()}`);
+    lookupAccounts.push(response.value);
+  }
+  const decompiled = TransactionMessage.decompile(original.message, {addressLookupTableAccounts: lookupAccounts});
+  decompiled.instructions.push(SystemProgram.transfer({
+    fromPubkey: new PublicKey(request.public_key),
+    toPubkey: deterministicTipAccount(request),
+    lamports,
+  }));
+  const message = new TransactionMessage({
+    payerKey: decompiled.payerKey,
+    recentBlockhash: decompiled.recentBlockhash,
+    instructions: decompiled.instructions,
+  }).compileToV0Message(lookupAccounts);
+  const output = Buffer.from(new VersionedTransaction(message).serialize());
+  if (output.length > 1232) throw new Error(`E4 transaction exceeds Solana packet limit after Jito tip: ${output.length}`);
+  return output;
 }
 
 async function buildSweep(request) {
@@ -23,14 +70,18 @@ async function buildSweep(request) {
   const to = new PublicKey(destination);
   const lamports = Math.floor(Number(request.amount) * 1_000_000_000);
   if (!Number.isSafeInteger(lamports) || lamports <= 0) throw new Error("invalid sweep amount");
-  const { blockhash } = await connection.getLatestBlockhash("processed");
-  const message = new TransactionMessage({
-    payerKey: from,
-    recentBlockhash: blockhash,
-    instructions: [SystemProgram.transfer({ fromPubkey: from, toPubkey: to, lamports })],
-  }).compileToV0Message();
-  const transaction = new VersionedTransaction(message);
-  return Buffer.from(transaction.serialize()).toString("base64");
+  const {blockhash} = await connection.getLatestBlockhash("processed");
+  const instructions = [SystemProgram.transfer({fromPubkey: from, toPubkey: to, lamports})];
+  const tipLamports = Math.floor(Number(request.tip_sol || 0) * 1_000_000_000);
+  if (tipLamports > 0) {
+    instructions.push(SystemProgram.transfer({
+      fromPubkey: from,
+      toPubkey: deterministicTipAccount(request),
+      lamports: Math.max(1_000, tipLamports),
+    }));
+  }
+  const message = new TransactionMessage({payerKey: from, recentBlockhash: blockhash, instructions}).compileToV0Message();
+  return Buffer.from(new VersionedTransaction(message).serialize()).toString("base64");
 }
 
 async function buildPump(request) {
@@ -42,20 +93,18 @@ async function buildPump(request) {
     denominatedInSol: request.denominated_in_sol ? "true" : "false",
     slippage: Number(request.slippage_bps) / 100,
     priorityFee: Number(request.priority_fee_sol || 0),
-    pool: request.pool || "auto",
+    pool: request.pool || "pump",
   };
   const response = await fetch(TRADE_LOCAL_URL, {
     method: "POST",
     headers: {"content-type": "application/json"},
     body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(Number(process.env.E4_BUILDER_TIMEOUT_MS || 1800)),
+    signal: AbortSignal.timeout(BUILD_TIMEOUT_MS),
   });
-  if (!response.ok) {
-    throw new Error(`trade-local HTTP ${response.status}: ${(await response.text()).slice(0, 500)}`);
-  }
+  if (!response.ok) throw new Error(`trade-local HTTP ${response.status}: ${(await response.text()).slice(0, 500)}`);
   const bytes = Buffer.from(await response.arrayBuffer());
   if (!bytes.length) throw new Error("trade-local returned an empty transaction");
-  return bytes.toString("base64");
+  return Buffer.from(await appendJitoTip(bytes, request)).toString("base64");
 }
 
 let input = "";
