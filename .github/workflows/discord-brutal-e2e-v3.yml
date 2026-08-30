@@ -28,6 +28,7 @@ jobs:
 
       - name: Apply deterministic repair
         run: |
+          python scripts/fix_status_snapshot_applicator.py
           if grep -q 'COMMAND_DB_TIMEOUT_SECONDS = 15.0' src/memecoin_bot/discord/bot_runtime.py; then
             echo "Discord durability implementation already present."
           else
@@ -132,6 +133,7 @@ jobs:
           git config user.name "gambit-jr-reliability-bot"
           git config user.email "actions@users.noreply.github.com"
           git add \
+            scripts/apply_status_snapshot_consistency.py \
             src/memecoin_bot/config.py \
             src/memecoin_bot/database/store.py \
             src/memecoin_bot/discord/bot_runtime.py \
