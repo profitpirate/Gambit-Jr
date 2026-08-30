@@ -54,11 +54,14 @@ def test_qualified_signal_is_terminal_for_staleness_and_reconciles(tmp_path):
             )
         )
         candidate_id, _ = db.ensure_candidate(token_id, old, "v1")
-        db.conn.execute(
-            "UPDATE candidates SET state='QUALIFIED_SIGNAL',"
-            "authoritative_state='QUALIFIED_SIGNAL' WHERE id=?",
-            (candidate_id,),
-        )
+        # Isolated reporting connections intentionally see committed operational
+        # truth only. Commit this direct fixture mutation before querying status.
+        with db.conn:
+            db.conn.execute(
+                "UPDATE candidates SET state='QUALIFIED_SIGNAL',"
+                "authoritative_state='QUALIFIED_SIGNAL' WHERE id=?",
+                (candidate_id,),
+            )
         # The missing signal is intentionally exposed as a ghost, while the
         # terminal state is never incorrectly counted as a stale candidate.
         stats = db.status_stats(datetime.now(UTC).isoformat(), candidate_max_age_minutes=1)
