@@ -10,17 +10,19 @@ permissions:
 
 jobs:
   bootstrap:
-    if: ${{ hashFiles('e4_payload.b64') != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Verify and unpack generated source
+        shell: bash
         run: |
+          test -f e4_payload.b64
           base64 --decode e4_payload.b64 > /tmp/e4_payload.tar.gz
           echo 'b639757a8211827e3980f9bce3ef3d63c11fede57205df17bb17625294b26f91  /tmp/e4_payload.tar.gz' | sha256sum --check
           tar --extract --gzip --file /tmp/e4_payload.tar.gz --directory .
           rm e4_payload.b64 .github/workflows/e4-bootstrap.yml
       - name: Commit generated E4 engine
+        shell: bash
         run: |
           git config user.name 'gambit-e4-builder'
           git config user.email 'actions@users.noreply.github.com'
