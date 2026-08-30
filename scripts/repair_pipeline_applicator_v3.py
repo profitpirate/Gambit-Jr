@@ -37,12 +37,45 @@ replace_once(
 )
 
 """
+
+# A token is classified as MIGRATED only when an AMM pair is directly observed.
+# Preserve that point-in-time pair evidence as migration continuity instead of
+# discarding it and requiring an unrelated credentialed provider to refill it.
+migration_patch = r"""
+replace_once(
+    SERVICE,
+    '''        if v15_stage == Stage.MIGRATED:
+            v15_features = {
+                "amm_liquidity": liquidity_quality,
+                "tradeability": {"GOOD": 90, "LIMITED": 55, "POOR": 20}.get(trade["grade"]),
+                "migration_continuity": None,
+''',
+    '''        if v15_stage == Stage.MIGRATED:
+            v15_features = {
+                "amm_liquidity": liquidity_quality,
+                "tradeability": {"GOOD": 90, "LIMITED": 55, "POOR": 20}.get(trade["grade"]),
+                "migration_continuity": (
+                    90.0
+                    if market.pair_address and market.pair_created_at
+                    else 70.0
+                    if market.pair_address
+                    else None
+                ),
+''',
+)
+
+"""
+
 service_declaration = 'SERVICE = "src/memecoin_bot/service.py"\n'
 if text.count(service_declaration) != 1:
     raise RuntimeError(
         f"expected one service declaration, found {text.count(service_declaration)}"
     )
-text = text.replace(service_declaration, service_declaration + payoff_patch, 1)
+text = text.replace(
+    service_declaration,
+    service_declaration + payoff_patch + migration_patch,
+    1,
+)
 
 old_route_insert = '''        operator_route_enabled = self.settings.operator_shadow_alerts_enabled or bool(
             self.store.alert_destinations()
@@ -171,4 +204,4 @@ if text.count(test_marker) != 1:
 text = text.replace(test_marker, test_case + test_marker, 1)
 
 path.write_text(text, encoding="utf-8")
-print("repaired route-blocker and payoff policy")
+print("repaired route-blocker, payoff, and migration-continuity policy")
