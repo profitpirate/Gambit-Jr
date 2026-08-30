@@ -54,7 +54,9 @@ jobs:
             tests/test_discord_response_lifecycle.py \
             tests/test_discord_outbox.py \
             tests/test_candidate_lifecycle.py \
-            tests/test_v15_engine.py
+            tests/test_v15_engine.py \
+            tests/test_replay.py \
+            tests/test_v12_radar_multichain.py
 
       - name: Authoritative multichain replay diagnostic
         run: |
