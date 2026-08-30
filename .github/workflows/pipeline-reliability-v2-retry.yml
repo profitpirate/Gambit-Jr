@@ -7,6 +7,7 @@ on:
     paths:
       - scripts/repair_pipeline_applicator_v2.py
       - scripts/repair_pipeline_applicator_v3.py
+      - tests/test_replay.py
       - .github/workflows/pipeline-reliability-v2-retry.yml
   workflow_dispatch:
 
