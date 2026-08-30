@@ -29,14 +29,14 @@ jobs:
       - working-directory: tools/e4-builder
         run: npm install --omit=dev
       - name: Compile harness and hardened runtime
-        run: python -m compileall -q scripts/e4_live_market_stress.py src/memecoin_bot/e4_hardening.py src/memecoin_bot/e4_hardening_v2.py
+        run: python -m compileall -q scripts/e4_live_market_stress.py scripts/e4_live_market_stress_v3.py src/memecoin_bot/e4_hardening.py src/memecoin_bot/e4_hardening_v2.py src/memecoin_bot/e4_hardening_v3.py
       - name: E4 regression and repeated lifecycle stress
         run: python -m unittest discover -s tests -p "test_e4*.py" -v
       - name: Capture live launches, benchmark execution and compare with E4
         env:
           E4_SOL_USD_FALLBACK: "150"
         run: >-
-          python scripts/e4_live_market_stress.py
+          python scripts/e4_live_market_stress_v3.py
           --capture-seconds "${{ github.event.inputs.capture_seconds || '300' }}"
           --minimum-launches 20
           --wallet-signatures 250
