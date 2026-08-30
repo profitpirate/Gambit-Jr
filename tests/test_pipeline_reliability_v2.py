@@ -221,12 +221,16 @@ def test_low_coverage_high_partial_score_is_silent_watch() -> None:
 @pytest.mark.asyncio
 async def test_test_alert_card_survives_optional_audit_failure() -> None:
     with patch.object(FakeStore, "record_test_alert", side_effect=RuntimeError("audit locked")):
-        tree, _client, _store = await capture_runtime()
+        tree, client, _store = await capture_runtime()
+        channel = FakeInteraction(admin=True).channel
+        client.get_channel = lambda _channel_id: channel
         interaction = FakeInteraction(admin=True)
+        interaction.channel = channel
         await tree.get_command("test-alert").callback(interaction)
         payload = primary_payload(interaction)
-        assert payload["embed"].title == "GAMBIT JR • TEST ALERT"
-        assert "couldn't complete" not in str(payload).lower()
+        assert "delivered" in payload["content"].lower()
+        assert len(channel.messages) == 1
+        assert channel.messages[0]["embed"].title == "GAMBIT JR • TEST ALERT"
 
 
 @pytest.mark.asyncio

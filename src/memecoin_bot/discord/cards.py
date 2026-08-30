@@ -76,137 +76,97 @@ def card(
 
 
 def status_card(stats: dict[str, Any]) -> dict[str, Any]:
-    provider_rows = stats.get("provider_status")
-    providers = (
-        "UNKNOWN"
-        if provider_rows is None
-        else (
-            "\n".join(
-                f"{'🟢' if p['state'] == 'HEALTHY' else '⚪' if p['state'] == 'DISABLED' else '🟠' if p['state'] in {'DEGRADED', 'RATE_LIMITED', 'CIRCUIT_OPEN'} else '🔴'} "
-                f"{str(p['provider']).upper()} — {str(p['state']).replace('_', ' ')}"
-                for p in provider_rows
-            )
-            or "No provider observations yet"
-        )
-    )
-    reconciliation = stats.get("state_reconciliation")
-    v14 = stats.get("v14") or {}
-    queue = stats.get("event_queue") or {}
-    history = stats.get("historical_context") or {}
-    latest_history = history.get("latest_lookup") or {}
+    provider_rows = list(stats.get("provider_status") or [])
+    pipeline = stats.get("pipeline") or {}
+    runtime = stats.get("runtime") or {}
     model = stats.get("model") or {}
-    latency = v14.get("latency") or {}
-    latency_lines = (
-        "\n".join(
-            f"{name}: p95 **{_value(values.get('p95_ms'))} ms**"
-            for name, values in sorted(latency.items())
+    blockers = pipeline.get("top_blockers") or []
+    last_decision = pipeline.get("last_decision") or {}
+    last_qualified = pipeline.get("last_qualified") or {}
+    disabled_count = sum(
+        str(row.get("state") or "").upper() in {"DISABLED", "NOT_CONFIGURED"}
+        for row in provider_rows
+    )
+
+    unhealthy = [
+        row
+        for row in provider_rows
+        if str(row.get("state") or "").upper()
+        in {"DEGRADED", "RATE_LIMITED", "CIRCUIT_OPEN", "FAILED", "ERROR", "DOWN"}
+    ]
+    provider_line = (
+        f"Healthy **{_value(stats.get('providers_healthy'))}/{_value(stats.get('providers_total'))}**"
+        f" • DISABLED **{disabled_count}**"
+    )
+    if unhealthy:
+        provider_line += "\n" + "\n".join(
+            f"• {str(row.get('provider') or 'provider').replace('_', ' ')} — "
+            f"{str(row.get('state') or 'UNKNOWN').replace('_', ' ')}"
+            for row in unhealthy[:4]
         )
-        or "No latency observations yet"
-    )
-    live = (
-        f"Watching: **{_value(stats.get('candidates_watching'))}**\n"
-        f"Pending: **{_value(stats.get('pending_evidence'))}**\n"
-        f"Radar: **{_value(stats.get('early_radar'))}**\n"
-        f"Active signals: **{_value(stats.get('active_signals'))}**"
-    )
-    pipeline = (
-        f"Pending >1h: **{_value(stats.get('pending_over_1h'))}**\n"
-        f"Pending >3h: **{_value(stats.get('pending_over_3h'))}**\n"
-        f"Stale beyond TTL: **{_value(stats.get('stale_beyond_ttl'))}**"
-    )
-    lifetime = (
-        f"Discovered: **{_value(stats.get('tokens_discovered'))}**\n"
-        f"Evaluated: **{_value(stats.get('tokens_evaluated'))}**\n"
-        f"Signals: **{_value(stats.get('signals'))}**\n"
-        f"Expired: **{_value(stats.get('expired'))}**"
-    )
+
+    blocker_lines = "\n".join(
+        f"• {str(row.get('reason') or 'UNKNOWN').replace('_', ' ')} — {row.get('count', 0)}"
+        for row in blockers[:4]
+    ) or "No dominant active blocker"
+
+    runtime_state = runtime.get("status") or stats.get("status") or "UNKNOWN"
+    delivery_failures = int(stats.get("discord_deliveries_failed") or 0)
+    system_state = "HEALTHY" if runtime_state == "HEALTHY" and delivery_failures == 0 else runtime_state
+
     return card(
-        "GAMBIT JR • SYSTEM STATUS",
-        "Discord-native shadow intelligence status",
-        "green",
+        "GAMBIT JR • STATUS",
+        f"**{system_state}** • live read-only intelligence",
+        "green" if system_state == "HEALTHY" else "amber",
         [
-            _field("LIVE", live, False),
-            _field("PIPELINE / PENDING", pipeline, False),
-            _field("PROVIDERS", providers, False),
-            _field("LIFETIME", lifetime, False),
             _field(
-                "DISCORD DELIVERY",
-                f"Outbox pending: **{_value(stats.get('outbox_pending'))}**\n"
-                f"Delivery pending/failed: **{_value(stats.get('discord_deliveries_pending'))} / {_value(stats.get('discord_deliveries_failed'))}**\n"
-                f"Last error: "
-                f"{'UNKNOWN' if 'last_alert_error' not in stats else _value(stats.get('last_alert_error'), 'NONE')}",
+                "CALL PIPELINE",
+                f"Developing: **{_value(stats.get('pending_evidence'))}** • "
+                f"Active calls: **{_value(stats.get('active_signals'))}**\n"
+                f"Last decision: **{_value(last_decision.get('tier'), 'NONE')}** • "
+                f"{_value(last_decision.get('decision_reason'), 'NO DECISION')}\n"
+                f"Last qualified: **{_value(last_qualified.get('tier'), 'NONE')}**",
                 False,
             ),
+            _field("TOP BLOCKERS", blocker_lines, False),
+            _field("PROVIDERS", provider_line, False),
             _field(
-                "STATE RECONCILIATION",
-                "UNKNOWN"
-                if reconciliation is None
-                else "OK"
-                if reconciliation.get("difference") == 0
-                else f"DIFFERENCE {_value(reconciliation.get('difference'))}",
-                False,
-            ),
-            _field(
-                "ALPHA ENGINE",
-                f"Event queue: **{_value(queue.get('size'))} / {_value(queue.get('maxsize'))}**\n"
-                f"Persisted events: **{_value(v14.get('event_queue_persisted'))}**\n"
-                f"Wallet clusters: **{_value(v14.get('wallet_clusters'))}**",
-                False,
-            ),
-            _field(
-                "APPROVED HISTORICAL CONTEXT",
-                f"Enabled: **{_value(history.get('enabled'), 'NO')}**\n"
-                f"Approved features: **{_value(history.get('approved_features'), '0')}**\n"
-                f"Published snapshots: **{_value(history.get('published_snapshots'), '0')}**\n"
-                f"Last lookup: **{_value(latest_history.get('state'), 'NONE')}** • "
-                f"{_value(latest_history.get('latency_ms'), 'UNKNOWN')} ms",
+                "DISCORD",
+                f"Destinations: **{_value(pipeline.get('enabled_alert_destinations'), '0')}** • "
+                f"Outbox: **{_value(stats.get('outbox_pending'))}** • "
+                f"Failed: **{_value(stats.get('discord_deliveries_failed'))}**\n"
+                f"Last error: {_value(stats.get('last_alert_error'), 'NONE')}",
                 False,
             ),
             _field(
                 "MODEL / RESEARCH",
-                f"Active: **{_value(model.get('active_model'))}**\n"
-                f"Control: **{_value(model.get('control'))}**\n"
-                f"Candidate: **{_value(model.get('candidate_state'))}**\n"
-                f"Signal truth: **{_value(model.get('signal_truth'))}**",
+                f"Model: **{_value(model.get('active_model'), 'UNKNOWN')}** • "
+                f"Research: **{_value(model.get('candidate_state'), 'UNKNOWN')}**",
                 False,
             ),
-            _field("LATENCY", latency_lines, False),
+            _field(
+                "LIFETIME",
+                f"Discovered **{_value(stats.get('tokens_discovered'))}** • "
+                f"Evaluated **{_value(stats.get('tokens_evaluated'))}** • "
+                f"Calls **{_value(stats.get('signals'))}**",
+                False,
+            ),
         ],
     )
+
 
 
 def menu_card() -> dict[str, Any]:
     return card(
         "GAMBIT JR • COMMAND CENTER",
-        "Ultra-early, read-only intelligence from launch through measured outcome.",
+        "Calls, research and system health in one place.",
         fields=[
-            _field(
-                "START HERE",
-                "`/scan` any supported CA • `/compare` two tokens • `/watch` a token",
-                False,
-            ),
-            _field(
-                "LIVE INTELLIGENCE",
-                "`/radar` `/runners` `/failed` `/token` `/smartmoney`",
-                False,
-            ),
-            _field(
-                "GRAPHS & CONTEXT",
-                "`/wallet` `/clusters` `/creator` `/narrative`",
-                False,
-            ),
-            _field(
-                "OPERATIONS",
-                "`/status` `/performance` `/watchlist` `/server-settings`",
-                False,
-            ),
-            _field(
-                "HOW JR THINKS",
-                "ATTENTION → LAUNCH → T0 → GRAPH → SURVIVAL → ASYMMETRY → GENESIS → QUALIFIED",
-                False,
-            ),
+            _field("CALLS", "`/candidates` • `/runners` • `/failed`", False),
+            _field("RESEARCH", "`/scan` • `/token` • `/smartmoney` • `/compare`", False),
+            _field("SYSTEM", "`/status` • `/performance` • `/server-settings`", False),
         ],
     )
+
 
 
 def scan_card(data: dict[str, Any]) -> dict[str, Any]:

@@ -1888,8 +1888,19 @@ class Store:
             "SELECT created_at,sent_at,remote_message_id,last_error FROM outbox "
             "WHERE event_type='SIGNAL' ORDER BY id DESC LIMIT 1"
         ).fetchone()
+        top_blockers = [
+            dict(row)
+            for row in self.conn.execute(
+                "SELECT COALESCE(NULLIF(reason,''),'UNKNOWN') AS reason,COUNT(*) AS count "
+                "FROM candidates WHERE state NOT IN "
+                "('REJECTED_UNSAFE','EXPIRED','SIGNALLED','QUALIFIED_SIGNAL') "
+                "AND first_discovered_at>=? GROUP BY reason ORDER BY count DESC LIMIT 5",
+                (stale_cutoff,),
+            )
+        ]
         result["pipeline"] = {
             "route_counts": route_counts,
+            "top_blockers": top_blockers,
             "last_decision": dict(last_decision) if last_decision else None,
             "last_qualified": dict(last_qualified) if last_qualified else None,
             "last_signal_outbox": dict(last_signal_outbox) if last_signal_outbox else None,

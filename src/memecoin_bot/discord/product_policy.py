@@ -158,7 +158,7 @@ def _clean_delivered_signal(payload: dict[str, Any]) -> None:
     fields = []
     for raw in embed.get("fields") or []:
         name = str(raw.get("name") or "")
-        if name in {"Runner potential", "Failure risk"}:
+        if name in {"Runner potential", "Failure risk", "Historical context", "Contract address"}:
             continue
         field = dict(raw)
         if name == "Tier":
@@ -210,52 +210,9 @@ def install_discord_product_policy() -> None:
 
     @functools.wraps(original_status_card)
     def reliability_status_card(stats: dict[str, Any]) -> dict[str, Any]:
-        payload = original_status_card(stats)
-        runtime = stats.get("runtime") or {}
-        pipeline = stats.get("pipeline") or {}
-        workers = runtime.get("workers") or {}
-        worker_lines = []
-        for name in ("scanner", "candidate_monitor", "tracker", "outcome_monitor"):
-            state = workers.get(name) or {}
-            worker_lines.append(
-                f"{name.replace('_', ' ').title()}: "
-                f"{state.get('status') or 'STARTING'} • "
-                f"heartbeat {state.get('heartbeat_age_seconds') if state.get('heartbeat_age_seconds') is not None else 'pending'}s • "
-                f"restarts {state.get('restart_count') or 0}"
-            )
-        last_decision = pipeline.get("last_decision") or {}
-        last_qualified = pipeline.get("last_qualified") or {}
-        last_outbox = pipeline.get("last_signal_outbox") or {}
-        payload["embed"]["fields"].extend(
-            [
-                {
-                    "name": "PIPELINE RUNTIME",
-                    "value": (
-                        f"Overall: **{runtime.get('status') or 'STARTING'}**\n"
-                        + "\n".join(worker_lines)
-                    )[:1024],
-                    "inline": False,
-                },
-                {
-                    "name": "CALL / DELIVERY TRUTH",
-                    "value": (
-                        f"Last decision: **{last_decision.get('tier') or 'NONE'}** • "
-                        f"{last_decision.get('route_state') or 'NONE'} • "
-                        f"{last_decision.get('decision_reason') or 'NO DECISION'}\n"
-                        f"Last qualified: **{last_qualified.get('tier') or 'NONE'}** • "
-                        f"{last_qualified.get('decision_at') or 'NONE'}\n"
-                        f"Last signal outbox: created {last_outbox.get('created_at') or 'NONE'} • "
-                        f"sent {last_outbox.get('sent_at') or 'NO'} • "
-                        f"remote {last_outbox.get('remote_message_id') or 'NONE'}\n"
-                        f"Enabled destinations: {pipeline.get('enabled_alert_destinations', 0)} • "
-                        f"route-suppressed: {pipeline.get('route_suppressed', 0)} • "
-                        f"policy-suppressed: {pipeline.get('policy_suppressed', 0)}"
-                    )[:1024],
-                    "inline": False,
-                },
-            ]
-        )
-        return apply_product_presentation(payload)
+        # The base status card already consumes runtime/pipeline diagnostics.
+        # Do not append internal audit sections back into the user-facing UI.
+        return apply_product_presentation(original_status_card(stats))
 
     cards.status_card = reliability_status_card
     bot_runtime.status_card = reliability_status_card

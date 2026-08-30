@@ -37,6 +37,9 @@ MENU_PAGES = (
     "system",
     "settings",
 )
+COMPONENT_ACK_TIMEOUT_SECONDS = 2.5
+COMPONENT_TIMEOUT_SECONDS = 30.0
+
 PAGE_TITLES = {
     "home": "GAMBIT JR • COMMAND CENTER",
     "overview": "COMMAND CENTER • OVERVIEW",
@@ -314,7 +317,7 @@ class MenuView(discord.ui.View):
         data: CommandCenterData,
         logger: logging.Logger | None = None,
         *,
-        timeout: float | None = 900,
+        timeout: float | None = None,
     ):
         super().__init__(timeout=timeout)
         self.data = data
@@ -340,8 +343,12 @@ class MenuView(discord.ui.View):
         )
         try:
             if not interaction.response.is_done():
-                await interaction.response.defer()
-            payload = await self.data.render(page, interaction)
+                await asyncio.wait_for(
+                    interaction.response.defer(), timeout=COMPONENT_ACK_TIMEOUT_SECONDS
+                )
+            payload = await asyncio.wait_for(
+                self.data.render(page, interaction), timeout=COMPONENT_TIMEOUT_SECONDS
+            )
             embed = validate_message(card_payload=payload, view=self)
             await edit_deferred_original_exact(interaction, embed=embed, view=self)
         except discord.HTTPException as error:
@@ -442,8 +449,11 @@ async def run_component_callback(
     )
     try:
         if not interaction.response.is_done():
-            await interaction.response.defer(ephemeral=ephemeral_defer)
-        await callback()
+            await asyncio.wait_for(
+                interaction.response.defer(ephemeral=ephemeral_defer),
+                timeout=COMPONENT_ACK_TIMEOUT_SECONDS,
+            )
+        await asyncio.wait_for(callback(), timeout=COMPONENT_TIMEOUT_SECONDS)
     except discord.HTTPException as error:
         log_discord_http_failure(
             logger,

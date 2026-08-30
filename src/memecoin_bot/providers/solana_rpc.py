@@ -9,9 +9,15 @@ from memecoin_bot.providers.base import ProviderError, ResilientJsonClient
 class SolanaRpcProvider:
     name = "solana_rpc"
 
-    def __init__(self, rpc_url: str, client: ResilientJsonClient):
+    def __init__(
+        self,
+        rpc_url: str,
+        client: ResilientJsonClient,
+        name: str = "solana_rpc",
+    ):
         self.rpc_url = rpc_url
         self.client = client
+        self.name = name
         self._request_id = 0
 
     async def _rpc(self, method: str, params: list[Any]) -> Any:
@@ -64,3 +70,29 @@ class SolanaRpcProvider:
             # Mint authorities remain real data; distribution is explicitly unknown.
             assessment.warnings.append(f"DISTRIBUTION_UNAVAILABLE:{exc}")
         return assessment
+
+
+class SolanaSafetyFailoverProvider:
+    """Try independent Solana RPC safety providers without relaxing evidence rules."""
+
+    name = "solana_safety_failover"
+
+    def __init__(self, providers: list[SolanaRpcProvider]):
+        if not providers:
+            raise ValueError("at least one Solana safety provider is required")
+        self.providers = providers
+
+    async def safety(self, token_address: str) -> SafetyAssessment:
+        failures: list[str] = []
+        for provider in self.providers:
+            try:
+                assessment = await provider.safety(token_address)
+            except ProviderError as error:
+                failures.append(f"{provider.name}:{type(error).__name__}")
+                continue
+            if failures:
+                assessment.warnings.append(f"RPC_FAILOVER_USED:{provider.name}")
+            return assessment
+        raise ProviderError(
+            "SOLANA_SAFETY_ALL_RPC_FAILED:" + ",".join(failures or ["UNKNOWN"])
+        )

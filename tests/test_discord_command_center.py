@@ -50,11 +50,21 @@ class FakeFollowup:
         return SimpleNamespace(id=99, edit=AsyncMock())
 
 
+class FakeChannel:
+    def __init__(self, channel_id: int):
+        self.id = channel_id
+        self.messages: list[dict] = []
+
+    async def send(self, **kwargs):
+        self.messages.append(kwargs)
+        return SimpleNamespace(id=999)
+
+
 class FakeInteraction:
     def __init__(self, title: str | None = PAGE_TITLES["home"], *, admin: bool = False):
         self.guild_id = 101
         self.channel_id = 202
-        self.channel = SimpleNamespace(id=202)
+        self.channel = FakeChannel(202)
         self.user = SimpleNamespace(id=303, guild_permissions=SimpleNamespace(manage_guild=admin))
         self.response = FakeResponse()
         self.followup = FakeFollowup()
@@ -262,8 +272,8 @@ def item(view: discord.ui.View, custom_id: str):
 
 def test_menu_is_persistent_mobile_component_tree_with_stable_ids(command_center):
     view, _, _, _ = command_center
-    assert view.timeout == 900
-    assert not view.is_persistent()
+    assert view.timeout is None
+    assert view.is_persistent()
     assert MenuView(view.data, timeout=None).is_persistent()
     assert len(view.children) == 4
     assert [child.custom_id for child in view.children] == [
@@ -434,13 +444,14 @@ async def capture_runtime(*, start_hook=None):
 
 
 @pytest.mark.asyncio
-async def test_menu_command_sends_actual_ephemeral_view_and_all_commands_remain_registered():
+async def test_menu_command_sends_actual_persistent_view_and_all_commands_remain_registered():
     tree, _client, _store = await capture_runtime()
     interaction = FakeInteraction()
     await tree.get_command("menu").callback(interaction)
     sent = primary_payload(interaction)
     assert isinstance(sent["view"], MenuView)
-    assert sent["view"].timeout == 900
+    assert sent["view"].timeout is None
+    assert interaction.response.messages[0]["ephemeral"] is False
     assert sent["embed"].title == PAGE_TITLES["home"]
     assert interaction.followup.messages == []
     assert len(tree.get_commands()) == 24

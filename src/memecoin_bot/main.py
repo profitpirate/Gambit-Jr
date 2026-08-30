@@ -20,7 +20,7 @@ from memecoin_bot.providers.dexscreener import DexScreenerProvider
 from memecoin_bot.providers.geckoterminal import GeckoTerminalDiscoveryProvider
 from memecoin_bot.providers.gmgn import GmgnProvider
 from memecoin_bot.providers.launch_events import EvmFactoryLaunchSource, SolanaProgramLaunchSource
-from memecoin_bot.providers.solana_rpc import SolanaRpcProvider
+from memecoin_bot.providers.solana_rpc import SolanaRpcProvider, SolanaSafetyFailoverProvider
 from memecoin_bot.radar_board import start_radar_board
 from memecoin_bot.realtime.providers import (
     EvmFactoryRealtimeSource,
@@ -75,9 +75,18 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
         callback,
     )
     primary_solana_url = settings.effective_solana_rpc_url()
-    helius_is_primary = primary_solana_url != settings.solana_rpc_url
+    if "helius-rpc.com" in primary_solana_url:
+        primary_solana_name = "helius_solana_primary"
+    elif settings.solana_tracker_rpc_url and primary_solana_url == settings.solana_tracker_rpc_url:
+        primary_solana_name = "solana_tracker_solana_primary"
+    elif settings.effective_alchemy_rpc_url() == primary_solana_url:
+        primary_solana_name = "alchemy_solana_primary"
+    elif settings.shyft_solana_rpc_url and primary_solana_url == settings.shyft_solana_rpc_url:
+        primary_solana_name = "shyft_solana_primary"
+    else:
+        primary_solana_name = "solana_rpc"
     rpc_client = ResilientJsonClient(
-        "helius_solana_primary" if helius_is_primary else "solana_rpc",
+        primary_solana_name,
         settings.provider_timeout_seconds,
         settings.provider_max_retries,
         settings.provider_circuit_failures,
@@ -117,9 +126,34 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
         callback,
     )
     market = DexScreenerProvider(settings.dexscreener_base_url, dex_client)
-    solana = SolanaRpcProvider(primary_solana_url, rpc_client)
+    solana = SolanaRpcProvider(primary_solana_url, rpc_client, primary_solana_name)
+    safety_providers = [solana]
+    fallback_specs = [
+        ("solana_tracker_safety", settings.solana_tracker_rpc_url),
+        ("alchemy_solana_safety", settings.effective_alchemy_rpc_url()),
+        ("shyft_solana_safety", settings.shyft_solana_rpc_url),
+        ("solana_public_fallback", settings.solana_fallback_rpc_url),
+    ]
+    seen_rpc_urls = {primary_solana_url.rstrip("/")}
+    for provider_name, provider_url in fallback_specs:
+        if not provider_url or provider_url.rstrip("/") in seen_rpc_urls:
+            continue
+        seen_rpc_urls.add(provider_url.rstrip("/"))
+        provider_client = ResilientJsonClient(
+            provider_name,
+            settings.provider_timeout_seconds,
+            settings.provider_max_retries,
+            settings.provider_circuit_failures,
+            settings.provider_circuit_cooldown_seconds,
+            callback,
+        )
+        safety_providers.append(
+            SolanaRpcProvider(provider_url, provider_client, provider_name)
+        )
     bsc = BscRpcProvider(settings.bsc_rpc_url, bsc_client)
-    safety = ChainSafetyRouter({"solana": solana, "bsc": bsc})
+    safety = ChainSafetyRouter(
+        {"solana": SolanaSafetyFailoverProvider(safety_providers), "bsc": bsc}
+    )
     discovery = DiscoveryPoller(
         [
             GeckoTerminalDiscoveryProvider(
@@ -242,8 +276,18 @@ def build(settings: Settings) -> tuple[Store, IntelligenceService]:
                 silence_seconds=settings.realtime_silence_seconds,
                 backfill_limit=settings.realtime_backfill_limit,
                 backfill_max_pages=settings.realtime_backfill_max_pages,
-                fallback_rpc_url=settings.solana_fallback_rpc_url if helius_is_primary else None,
-                fallback_client=fallback_rpc_client if helius_is_primary else None,
+                fallback_rpc_url=(
+                    settings.solana_fallback_rpc_url
+                    if settings.solana_fallback_rpc_url.rstrip("/")
+                    != primary_solana_url.rstrip("/")
+                    else None
+                ),
+                fallback_client=(
+                    fallback_rpc_client
+                    if settings.solana_fallback_rpc_url.rstrip("/")
+                    != primary_solana_url.rstrip("/")
+                    else None
+                ),
                 enrichment_queue_max=settings.realtime_enrichment_queue_max,
                 enrichment_concurrency=settings.realtime_enrichment_concurrency,
                 load_cursor=store.launch_cursor,

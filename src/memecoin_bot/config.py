@@ -573,23 +573,40 @@ class Settings:
             raise ValueError("live, historical, and approved feature databases must be separate")
 
     def effective_solana_rpc_url(self) -> str:
-        """Prefer Helius only when the operator left the public mainnet default in place."""
+        """Choose the strongest configured Solana HTTP endpoint before public RPC."""
         public_defaults = {
             "https://api.mainnet-beta.solana.com",
             "https://api.mainnet-beta.solana.com/",
         }
-        if self.helius_api_key and self.solana_rpc_url in public_defaults:
+        if self.solana_rpc_url not in public_defaults:
+            return self.solana_rpc_url
+        if self.helius_api_key:
             return f"https://mainnet.helius-rpc.com/?api-key={quote_plus(self.helius_api_key)}"
+        if self.solana_tracker_rpc_url:
+            return self.solana_tracker_rpc_url
+        alchemy = self.effective_alchemy_rpc_url()
+        if alchemy:
+            return alchemy
+        if self.shyft_solana_rpc_url:
+            return self.shyft_solana_rpc_url
         return self.solana_rpc_url
 
     def effective_solana_websocket_url(self) -> str:
-        if self.helius_api_key and self.solana_rpc_url in {
-            "https://api.mainnet-beta.solana.com",
-            "https://api.mainnet-beta.solana.com/",
-        }:
+        effective = self.effective_solana_rpc_url()
+        if self.helius_api_key and "helius-rpc.com" in effective:
             return f"wss://mainnet.helius-rpc.com/?api-key={quote_plus(self.helius_api_key)}"
-        value = self.solana_rpc_url
-        return value.replace("https://", "wss://", 1).replace("http://", "ws://", 1)
+        if (
+            self.solana_tracker_rpc_url
+            and effective == self.solana_tracker_rpc_url
+            and self.solana_tracker_wss_url
+        ):
+            return self.solana_tracker_wss_url
+        alchemy = self.effective_alchemy_rpc_url()
+        if alchemy and effective == alchemy:
+            alchemy_wss = self.effective_alchemy_websocket_url()
+            if alchemy_wss:
+                return alchemy_wss
+        return effective.replace("https://", "wss://", 1).replace("http://", "ws://", 1)
 
     def effective_alchemy_rpc_url(self) -> str | None:
         if self.alchemy_solana_rpc_url:
