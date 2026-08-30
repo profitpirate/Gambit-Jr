@@ -1,0 +1,153 @@
+name: SQLite runtime isolation v4
+
+on:
+  push:
+    branches:
+      - fix/sqlite-runtime-isolation-v4
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sqlite-runtime-isolation-v4
+  cancel-in-progress: false
+
+jobs:
+  repair-audit-stress-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Apply deterministic isolation repair
+        run: |
+          if grep -q 'def _isolated_connection' src/memecoin_bot/database/store.py; then
+            echo "SQLite runtime isolation implementation already present."
+          else
+            python scripts/apply_sqlite_runtime_isolation_v4.py
+          fi
+
+      - name: Diff sanity
+        run: |
+          git diff --check
+          git status --short
+          git diff --stat
+
+      - name: Install validation toolchain
+        run: |
+          python -m pip install --upgrade pip build pip-audit
+          python -m pip install -e '.[dev,research]'
+
+      - name: Targeted transaction, Discord, and pipeline E2E
+        run: |
+          pytest -q \
+            tests/test_sqlite_runtime_isolation_v4.py \
+            tests/test_discord_brutal_e2e_v3.py \
+            tests/test_status_snapshot_consistency.py \
+            tests/test_pipeline_reliability_v2.py \
+            tests/test_discord_command_center.py \
+            tests/test_discord_response_lifecycle.py \
+            tests/test_discord_outbox.py \
+            tests/test_live_discord_acceptance.py \
+            tests/test_candidate_lifecycle.py \
+            tests/test_v15_engine.py \
+            tests/test_replay.py \
+            tests/test_v12_radar_multichain.py
+
+      - name: Repeated transaction and interaction soak
+        run: |
+          for pass in 1 2 3 4 5; do
+            echo "=== isolation soak pass ${pass}/5 ==="
+            pytest -q \
+              tests/test_sqlite_runtime_isolation_v4.py \
+              tests/test_discord_brutal_e2e_v3.py \
+              tests/test_status_snapshot_consistency.py \
+              tests/test_pipeline_reliability_v2.py \
+              tests/test_discord_response_lifecycle.py \
+              tests/test_discord_outbox.py
+          done
+
+      - name: Full regression suite
+        run: pytest -q
+
+      - name: Static dependency and package audit
+        run: |
+          ruff check .
+          python -m build
+          python -m pip check
+          pip-audit --skip-editable . || pip-audit
+
+      - name: Container build
+        run: docker build -t gambit-jr:${{ github.sha }} .
+
+      - name: Isolated staging E2E and live health pressure
+        run: |
+          cp .env.staging.example .env.staging
+          docker compose -f docker-compose.staging.yml config --quiet
+          docker compose -f docker-compose.staging.yml up -d --build
+          for attempt in $(seq 1 40); do
+            if curl --fail --silent http://127.0.0.1:18080/health > /tmp/health.json; then
+              cat /tmp/health.json
+              break
+            fi
+            if [ "$attempt" = "40" ]; then
+              docker compose -f docker-compose.staging.yml logs
+              exit 1
+            fi
+            sleep 3
+          done
+
+          seq 1 200 | xargs -I{} -P25 sh -c \
+            'curl --fail --silent http://127.0.0.1:18080/health >/dev/null'
+          sleep 8
+
+          docker compose -f docker-compose.staging.yml logs --no-color > /tmp/staging.log
+          if grep -E \
+            'cannot start a transaction within a transaction|pipeline_worker_restart|database is locked' \
+            /tmp/staging.log; then
+            echo "Forbidden transaction/worker restart evidence found in staging logs."
+            exit 1
+          fi
+
+          docker compose -f docker-compose.staging.yml exec -T bot-staging \
+            python -c "from memecoin_bot.historical import ApprovedFeatureStore, HistoricalWarehouse; warehouse = HistoricalWarehouse('/app/staging/historical/warehouse.db', '/app/staging/archive'); warehouse.close(); approved = ApprovedFeatureStore('/app/staging/approved/approved_features.db'); approved.close()"
+          docker compose -f docker-compose.staging.yml exec -T bot-staging \
+            python scripts/staging_acceptance.py \
+            --health-url http://127.0.0.1:8080/health \
+            --operational /app/staging/operational/memecoin.db \
+            --warehouse /app/staging/historical/warehouse.db \
+            --approved /app/staging/approved/approved_features.db
+
+      - name: Final audit
+        run: |
+          git diff --check
+          ! git diff -- . ':!*.example' | grep -E '(api[_-]?key|token|secret)[[:space:]]*=[[:space:]]*[A-Za-z0-9_-]{16,}' -i
+          ! git diff --name-only | grep -E '(^|/)(\.env|.*\.db|.*\.sqlite|.*\.parquet|provider-probe\.json)$'
+
+      - name: Tear down staging
+        if: always()
+        run: docker compose -f docker-compose.staging.yml down --remove-orphans || true
+
+      - name: Commit validated implementation
+        if: success()
+        run: |
+          git config user.name "gambit-jr-reliability-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            src/memecoin_bot/database/store.py \
+            src/memecoin_bot/realtime/fabric.py \
+            src/memecoin_bot/radar_board.py \
+            tests/test_sqlite_runtime_isolation_v4.py
+          if git diff --cached --quiet; then
+            echo "No implementation changes to commit; verification-only run complete."
+          else
+            git commit -m "fix: isolate runtime SQLite leases and status reads"
+            git push origin HEAD:fix/sqlite-runtime-isolation-v4
+          fi
