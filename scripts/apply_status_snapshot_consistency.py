@@ -145,9 +145,7 @@ store_text = replace_once(store_text, old, new, "state reconciliation snapshot")
 STORE_PATH.write_text(store_text, encoding="utf-8")
 
 TEST_PATH.write_text(
-    '''from __future__ import annotations
-
-from typing import Any
+    '''from typing import Any
 
 from memecoin_bot.database import Store
 from memecoin_bot.models import DiscoveryEvent, iso
