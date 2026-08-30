@@ -1,0 +1,12 @@
+services:
+  e4:
+    build:
+      context: .
+      dockerfile: Dockerfile.e4-prod
+    restart: unless-stopped
+    env_file:
+      - .env.e4
+    volumes:
+      - ./data:/app/data
+      - ${E4_KEYPAIR_HOST_PATH:?set E4_KEYPAIR_HOST_PATH}:/run/secrets/e4-solana-keypair.json:ro
+    command: ["python", "-m", "memecoin_bot.e4_prod", "run", "--live"]
