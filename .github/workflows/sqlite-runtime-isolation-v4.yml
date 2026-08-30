@@ -44,6 +44,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip build pip-audit
           python -m pip install -e '.[dev,research]'
+          ruff check --fix scripts/apply_sqlite_runtime_isolation_v4.py
 
       - name: Targeted transaction, Discord, and pipeline E2E
         run: |
@@ -141,6 +142,7 @@ jobs:
           git config user.name "gambit-jr-reliability-bot"
           git config user.email "actions@users.noreply.github.com"
           git add \
+            scripts/apply_sqlite_runtime_isolation_v4.py \
             src/memecoin_bot/database/store.py \
             src/memecoin_bot/realtime/fabric.py \
             src/memecoin_bot/radar_board.py \
