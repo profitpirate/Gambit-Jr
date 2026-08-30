@@ -1,0 +1,97 @@
+name: E4 live-data validation
+
+on:
+  push:
+    branches:
+      - codex/gambit-jr-v2-e4-live-data-validation
+    paths:
+      - "scripts/e4_live_artifact_validation.py"
+      - "scripts/e4_oracle_mirror_stress_v2.py"
+      - ".github/workflows/e4-live-data-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_SOL_USD_FALLBACK: "110"
+
+jobs:
+  captured-live-replay:
+    name: Replay 472 captured real launches
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - name: Compile production replay harness
+        run: python -m py_compile scripts/e4_live_artifact_validation.py
+      - name: Production E4 regression before real-market replay
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+      - name: Download prior twenty-minute real-market capture
+        uses: actions/download-artifact@v4
+        with:
+          name: e4-long-oracle-holdout-33329118746
+          run-id: 33329118746
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: inputs
+      - name: Verify downloaded live evidence
+        run: |
+          ls -lah inputs
+          test -s inputs/e4-long-oracle-holdout-live-events.jsonl
+          test -s inputs/e4-long-oracle-holdout.json
+      - name: Repeated production-policy replay using real coins and real prices
+        run: >-
+          python scripts/e4_live_artifact_validation.py
+          --events inputs/e4-long-oracle-holdout-live-events.jsonl
+          --reference-report inputs/e4-long-oracle-holdout.json
+          --replay-rounds 250
+          --output outputs/e4-live-artifact-validation.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-live-artifact-validation-${{ github.run_id }}
+          path: outputs/e4-live-artifact-validation.json
+          if-no-files-found: error
+          retention-days: 30
+
+  actual-e4-mirror:
+    name: Mirror actual E4 positions on actual chain events
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - name: Compile bounded E4 mirror
+        run: python -m py_compile scripts/e4_oracle_mirror_stress_v2.py
+      - name: Run bounded actual-E4 and actual-market comparison
+        run: >-
+          python scripts/e4_oracle_mirror_stress_v2.py
+          --signatures 350
+          --positions 18
+          --primary-delay 250
+          --minimum-comparable-positions 12
+          --replay-rounds 150
+          --output outputs/e4-oracle-mirror-v2.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-oracle-mirror-v2-${{ github.run_id }}
+          path: |
+            outputs/e4-oracle-mirror-v2.json
+            outputs/e4-oracle-mirror-v2-checkpoint.json
+            outputs/e4-oracle-mirror-v2-timelines.jsonl
+          if-no-files-found: warn
+          retention-days: 30
