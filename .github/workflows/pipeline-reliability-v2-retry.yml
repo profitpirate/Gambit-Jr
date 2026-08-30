@@ -108,12 +108,13 @@ jobs:
           git config user.name "gambit-jr-reliability-bot"
           git config user.email "actions@users.noreply.github.com"
           git add \
+            src/memecoin_bot/database/store.py \
             src/memecoin_bot/discord/bot_runtime.py \
             src/memecoin_bot/discord/command_center.py \
             src/memecoin_bot/discord/product_policy.py \
+            src/memecoin_bot/momentum/engine.py \
             src/memecoin_bot/service.py \
             src/memecoin_bot/v15_engine.py \
-            src/memecoin_bot/database/store.py \
             tests/test_pipeline_reliability_v2.py
           git commit -m "fix: harden every Discord command and supervise the signal pipeline"
           git push origin HEAD:fix/discord-pipeline-reliability-v2
