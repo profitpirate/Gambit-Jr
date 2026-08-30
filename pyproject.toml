@@ -22,6 +22,7 @@ social = ["telethon>=1.36,<2"]
 memecoin-bot = "memecoin_bot.main:main"
 gambit-history = "memecoin_bot.historical.cli:main"
 gambit-convergence = "memecoin_bot.convergence.__main__:main"
+gambit-e4 = "memecoin_bot.e4_exec.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -37,4 +38,3 @@ asyncio_mode = "auto"
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-
