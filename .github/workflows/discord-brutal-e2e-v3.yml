@@ -27,7 +27,9 @@ jobs:
           python-version: "3.12"
 
       - name: Apply deterministic repair
-        run: python scripts/apply_discord_brutal_e2e_v3.py
+        run: |
+          python scripts/repair_discord_brutal_applicator_v3.py
+          python scripts/apply_discord_brutal_e2e_v3.py
 
       - name: Diff sanity
         run: |
