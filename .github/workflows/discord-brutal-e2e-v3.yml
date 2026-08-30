@@ -1,0 +1,121 @@
+name: Discord brutal E2E v3
+
+on:
+  push:
+    branches:
+      - fix/discord-brutal-e2e-v3
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: discord-brutal-e2e-v3
+  cancel-in-progress: true
+
+jobs:
+  repair-audit-stress-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Apply deterministic repair
+        run: python scripts/apply_discord_brutal_e2e_v3.py
+
+      - name: Diff sanity
+        run: |
+          git diff --check
+          git status --short
+          git diff --stat
+
+      - name: Install validation toolchain
+        run: |
+          python -m pip install --upgrade pip build pip-audit
+          python -m pip install -e '.[dev,research]'
+
+      - name: Targeted brutal Discord and pipeline E2E
+        run: |
+          pytest -q \
+            tests/test_discord_brutal_e2e_v3.py \
+            tests/test_pipeline_reliability_v2.py \
+            tests/test_discord_command_center.py \
+            tests/test_discord_response_lifecycle.py \
+            tests/test_discord_outbox.py \
+            tests/test_live_discord_acceptance.py \
+            tests/test_candidate_lifecycle.py \
+            tests/test_v15_engine.py \
+            tests/test_replay.py \
+            tests/test_v12_radar_multichain.py
+
+      - name: Full regression suite
+        run: pytest -q
+
+      - name: Static dependency and package audit
+        run: |
+          ruff check .
+          python -m build
+          python -m pip check
+          pip-audit --skip-editable . || pip-audit
+
+      - name: Container build
+        run: docker build -t gambit-jr:${{ github.sha }} .
+
+      - name: Isolated staging E2E
+        run: |
+          cp .env.staging.example .env.staging
+          docker compose -f docker-compose.staging.yml config --quiet
+          docker compose -f docker-compose.staging.yml up -d --build
+          for attempt in $(seq 1 40); do
+            if curl --fail --silent http://127.0.0.1:18080/health > /tmp/health.json; then
+              cat /tmp/health.json
+              break
+            fi
+            if [ "$attempt" = "40" ]; then
+              docker compose -f docker-compose.staging.yml logs
+              exit 1
+            fi
+            sleep 3
+          done
+          docker compose -f docker-compose.staging.yml exec -T bot-staging \
+            python scripts/staging_acceptance.py \
+            --health-url http://127.0.0.1:8080/health \
+            --operational /app/staging/operational/memecoin.db \
+            --warehouse /app/staging/historical/warehouse.db \
+            --approved /app/staging/approved/approved_features.db
+
+      - name: Final audit
+        run: |
+          git diff --check
+          ! git diff -- . ':!*.example' | grep -E '(api[_-]?key|token|secret)[[:space:]]*=[[:space:]]*[A-Za-z0-9_-]{16,}' -i
+          ! git diff --name-only | grep -E '(^|/)(\.env|.*\.db|.*\.sqlite|.*\.parquet|provider-probe\.json)$'
+
+      - name: Tear down staging
+        if: always()
+        run: docker compose -f docker-compose.staging.yml down --remove-orphans || true
+
+      - name: Commit validated implementation
+        if: success()
+        run: |
+          git config user.name "gambit-jr-reliability-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            src/memecoin_bot/config.py \
+            src/memecoin_bot/database/store.py \
+            src/memecoin_bot/discord/bot_runtime.py \
+            src/memecoin_bot/discord/cards.py \
+            src/memecoin_bot/discord/command_center.py \
+            src/memecoin_bot/discord/product_policy.py \
+            src/memecoin_bot/main.py \
+            src/memecoin_bot/providers/solana_rpc.py \
+            tests/test_discord_brutal_e2e_v3.py \
+            tests/test_discord_command_center.py \
+            tests/test_pipeline_reliability_v2.py
+          git commit -m "fix: make Discord interactions durable under sustained load"
+          git push origin HEAD:fix/discord-brutal-e2e-v3
