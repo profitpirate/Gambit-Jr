@@ -1,0 +1,44 @@
+name: E4 final execution
+
+on:
+  push:
+    branches:
+      - codex/gambit-jr-v2-e4-execution
+  pull_request:
+    paths:
+      - "src/memecoin_bot/e4_live.py"
+      - "src/memecoin_bot/e4_runner.py"
+      - "src/memecoin_bot/e4_production.py"
+      - "src/memecoin_bot/e4_final.py"
+      - "src/memecoin_bot/e4_exec/**"
+      - "tests/test_e4*.py"
+      - "tools/e4-builder/**"
+      - "requirements-e4.txt"
+      - "Dockerfile.e4-exec"
+      - "docker-compose.e4-exec.yml"
+      - ".github/workflows/e4-final.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - name: E4 tests
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+      - name: Compile E4 runtime
+        run: python -m compileall -q src/memecoin_bot/e4_live.py src/memecoin_bot/e4_runner.py src/memecoin_bot/e4_production.py src/memecoin_bot/e4_final.py src/memecoin_bot/e4_exec
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - working-directory: tools/e4-builder
+        run: node --check daemon.mjs
+      - name: Docker build
+        run: docker build -f Dockerfile.e4-exec -t gambit-jr-e4:ci .
