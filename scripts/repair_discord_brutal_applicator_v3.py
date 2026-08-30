@@ -111,9 +111,17 @@ if text.count(old_tracker_wss) != 1:
     raise RuntimeError(f"expected one tracker WSS template, found {text.count(old_tracker_wss)}")
 text = text.replace(old_tracker_wss, new_tracker_wss, 1)
 
-# Remove imports deliberately unused by the stress suite.
-text = text.replace("from types import SimpleNamespace\\n", "", 1)
-text = text.replace("from memecoin_bot.discord import bot_runtime\\n", "", 1)
+# Remove imports deliberately unused by the generated stress suite.
+for unused_import in (
+    "from types import SimpleNamespace\n",
+    "from memecoin_bot.discord import bot_runtime\n",
+):
+    if text.count(unused_import) != 1:
+        raise RuntimeError(
+            f"expected one generated unused import {unused_import.strip()!r}, "
+            f"found {text.count(unused_import)}"
+        )
+    text = text.replace(unused_import, "", 1)
 
 # Preserve useful old status contracts in compact summary form.
 old_status_head = '''    provider_rows = list(stats.get("provider_status") or [])
