@@ -1647,58 +1647,79 @@ class Store:
             return cur.rowcount == 1
 
     def state_reconciliation(self) -> dict[str, Any]:
-        total = int(self.conn.execute("SELECT COUNT(*) FROM tokens").fetchone()[0])
-        states = {
-            str(r[0]): int(r[1])
-            for r in self.conn.execute(
-                "SELECT COALESCE(c.state,'DISCOVERED'),COUNT(*) FROM tokens t LEFT JOIN candidates c "
-                "ON c.token_id=t.id GROUP BY COALESCE(c.state,'DISCOVERED')"
-            )
-        }
-        accounted = sum(states.values())
-        orphan_candidates = int(
-            self.conn.execute(
-                "SELECT COUNT(*) FROM candidates c LEFT JOIN tokens t ON t.id=c.token_id "
-                "WHERE t.id IS NULL"
-            ).fetchone()[0]
-        )
-        orphan_signals = int(
-            self.conn.execute(
-                "SELECT COUNT(*) FROM signals s LEFT JOIN tokens t ON t.id=s.token_id "
-                "WHERE t.id IS NULL"
-            ).fetchone()[0]
-        )
-        ghost_qualified = int(
-            self.conn.execute(
-                "SELECT COUNT(*) FROM candidates c LEFT JOIN signals s ON s.id=c.signal_id "
-                "WHERE c.authoritative_state='QUALIFIED_SIGNAL' AND s.id IS NULL"
-            ).fetchone()[0]
-        )
-        duplicate_candidates = int(
-            self.conn.execute(
-                "SELECT COUNT(*) FROM (SELECT token_id FROM candidates GROUP BY token_id "
-                "HAVING COUNT(*)>1)"
-            ).fetchone()[0]
-        )
-        integrity_difference = (
-            total
-            - accounted
-            + orphan_candidates
-            + orphan_signals
-            + ghost_qualified
-            + duplicate_candidates
-        )
-        return {
-            "total_tracked": total,
-            "states": states,
-            "accounted": accounted,
-            "orphan_candidates": orphan_candidates,
-            "orphan_signals": orphan_signals,
-            "ghost_qualified": ghost_qualified,
-            "duplicate_candidates": duplicate_candidates,
-            "difference": integrity_difference,
-            "reconciled": integrity_difference == 0,
-        }
+        """Read every reconciliation counter from one SQLite snapshot.
+
+        Discord and the health endpoint can query while the scanner is writing.
+        Without an explicit read transaction, separate SELECT statements may see
+        different committed versions and briefly report a false integrity failure.
+        WAL allows the writer to continue while this reader keeps one stable view.
+        """
+        with self._lock:
+            owns_snapshot = not self.conn.in_transaction
+            if owns_snapshot:
+                self.conn.execute("BEGIN")
+            try:
+                total = int(self.conn.execute("SELECT COUNT(*) FROM tokens").fetchone()[0])
+                states = {
+                    str(row[0]): int(row[1])
+                    for row in self.conn.execute(
+                        "SELECT COALESCE(c.state,'DISCOVERED'),COUNT(*) "
+                        "FROM tokens t LEFT JOIN candidates c ON c.token_id=t.id "
+                        "GROUP BY COALESCE(c.state,'DISCOVERED')"
+                    )
+                }
+                accounted = sum(states.values())
+                orphan_candidates = int(
+                    self.conn.execute(
+                        "SELECT COUNT(*) FROM candidates c LEFT JOIN tokens t ON t.id=c.token_id "
+                        "WHERE t.id IS NULL"
+                    ).fetchone()[0]
+                )
+                orphan_signals = int(
+                    self.conn.execute(
+                        "SELECT COUNT(*) FROM signals s LEFT JOIN tokens t ON t.id=s.token_id "
+                        "WHERE t.id IS NULL"
+                    ).fetchone()[0]
+                )
+                ghost_qualified = int(
+                    self.conn.execute(
+                        "SELECT COUNT(*) FROM candidates c LEFT JOIN signals s ON s.id=c.signal_id "
+                        "WHERE c.authoritative_state='QUALIFIED_SIGNAL' AND s.id IS NULL"
+                    ).fetchone()[0]
+                )
+                duplicate_candidates = int(
+                    self.conn.execute(
+                        "SELECT COUNT(*) FROM (SELECT token_id FROM candidates GROUP BY token_id "
+                        "HAVING COUNT(*)>1)"
+                    ).fetchone()[0]
+                )
+                integrity_difference = total - accounted
+                anomaly_count = (
+                    orphan_candidates
+                    + orphan_signals
+                    + ghost_qualified
+                    + duplicate_candidates
+                )
+                result = {
+                    "total_tracked": total,
+                    "states": states,
+                    "accounted": accounted,
+                    "orphan_candidates": orphan_candidates,
+                    "orphan_signals": orphan_signals,
+                    "ghost_qualified": ghost_qualified,
+                    "duplicate_candidates": duplicate_candidates,
+                    "difference": integrity_difference,
+                    "anomalies": anomaly_count,
+                    "reconciled": integrity_difference == 0 and anomaly_count == 0,
+                }
+            except Exception:
+                if owns_snapshot:
+                    self.conn.rollback()
+                raise
+            else:
+                if owns_snapshot:
+                    self.conn.commit()
+                return result
 
     def database_integrity(self) -> dict[str, Any]:
         """Return bounded, read-only integrity evidence for operator health."""

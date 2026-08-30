@@ -1,7 +1,4 @@
-from __future__ import annotations
-
 from pathlib import Path
-
 
 STORE_PATH = Path("src/memecoin_bot/database/store.py")
 TEST_PATH = Path("tests/test_status_snapshot_consistency.py")
