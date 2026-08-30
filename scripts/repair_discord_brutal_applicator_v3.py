@@ -76,5 +76,71 @@ if text.count(old_setup) != 1:
     raise RuntimeError(f"expected one setup-selector applicator block, found {text.count(old_setup)}")
 text = text.replace(old_setup, new_setup, 1)
 
+# Preserve the useful information expected by the older card contracts, but in
+# compact summary form rather than restoring the previous wall of provider/model
+# details.
+old_status_head = '''    provider_rows = list(stats.get("provider_status") or [])
+    pipeline = stats.get("pipeline") or {}
+    runtime = stats.get("runtime") or {}
+    blockers = pipeline.get("top_blockers") or []
+    last_decision = pipeline.get("last_decision") or {}
+    last_qualified = pipeline.get("last_qualified") or {}
+'''
+new_status_head = '''    provider_rows = list(stats.get("provider_status") or [])
+    pipeline = stats.get("pipeline") or {}
+    runtime = stats.get("runtime") or {}
+    model = stats.get("model") or {}
+    blockers = pipeline.get("top_blockers") or []
+    last_decision = pipeline.get("last_decision") or {}
+    last_qualified = pipeline.get("last_qualified") or {}
+    disabled_count = sum(
+        str(row.get("state") or "").upper() in {"DISABLED", "NOT_CONFIGURED"}
+        for row in provider_rows
+    )
+'''
+if text.count(old_status_head) != 1:
+    raise RuntimeError(f"expected one compact status head, found {text.count(old_status_head)}")
+text = text.replace(old_status_head, new_status_head, 1)
+
+old_provider_line = '''    provider_line = (
+        f"Healthy **{_value(stats.get('providers_healthy'))}/{_value(stats.get('providers_total'))}**"
+    )
+'''
+new_provider_line = '''    provider_line = (
+        f"Healthy **{_value(stats.get('providers_healthy'))}/{_value(stats.get('providers_total'))}**"
+        f" • DISABLED **{disabled_count}**"
+    )
+'''
+if text.count(old_provider_line) != 1:
+    raise RuntimeError(f"expected one compact provider line, found {text.count(old_provider_line)}")
+text = text.replace(old_provider_line, new_provider_line, 1)
+
+old_lifetime_field = '''            _field(
+                "LIFETIME",
+                f"Discovered **{_value(stats.get('tokens_discovered'))}** • "
+                f"Evaluated **{_value(stats.get('tokens_evaluated'))}** • "
+                f"Calls **{_value(stats.get('signals'))}**",
+                False,
+            ),
+'''
+new_lifetime_field = '''            _field(
+                "MODEL / RESEARCH",
+                f"Model: **{_value(model.get('active_model'), 'UNKNOWN')}** • "
+                f"Research: **{_value(model.get('candidate_state'), 'UNKNOWN')}**",
+                False,
+            ),
+            _field(
+                "LIFETIME",
+                f"Discovered **{_value(stats.get('tokens_discovered'))}** • "
+                f"Evaluated **{_value(stats.get('tokens_evaluated'))}** • "
+                f"Calls **{_value(stats.get('signals'))}**",
+                False,
+            ),
+'''
+if text.count(old_lifetime_field) != 1:
+    raise RuntimeError(f"expected one compact lifetime field, found {text.count(old_lifetime_field)}")
+text = text.replace(old_lifetime_field, new_lifetime_field, 1)
+text = text.replace('    assert len(fields) == 5\n', '    assert len(fields) == 6\n', 1)
+
 path.write_text(text, encoding="utf-8")
-print("repaired Discord applicator selectors and replacements")
+print("repaired Discord applicator selectors, escapes, and compact status truth")
