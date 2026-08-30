@@ -146,7 +146,8 @@ class E4SourceTests(unittest.IsolatedAsyncioTestCase):
             conn.commit()
             conn.close()
             source = e4_live.SQLiteEventSource(path, 0.001)
-            event = await asyncio.wait_for(anext(source.events()), timeout=1)
+            with patch.dict(os.environ, {"E4_CONSUME_EXISTING_EVENTS": "true"}, clear=False):
+                event = await asyncio.wait_for(anext(source.events()), timeout=1)
             self.assertEqual(event.kind, e4_live.EventKind.BUY)
             self.assertEqual(event.mint, "mint")
 
