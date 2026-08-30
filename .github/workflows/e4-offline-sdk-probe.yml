@@ -1,0 +1,40 @@
+name: E4 official offline SDK probe
+
+on:
+  push:
+    branches:
+      - codex/gambit-jr-v2-e4-v4-repairs
+    paths:
+      - "tools/e4-builder/sdk-probe.mjs"
+      - ".github/workflows/e4-offline-sdk-probe.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install current official Pump SDKs
+        run: >-
+          npm install --no-save
+          @pump-fun/pump-sdk
+          @pump-fun/pump-swap-sdk
+          @solana/web3.js
+          @solana/spl-token
+          @coral-xyz/anchor
+          bn.js
+      - name: Inspect offline builders
+        run: node tools/e4-builder/sdk-probe.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e4-offline-sdk-probe-${{ github.run_id }}
+          path: outputs/e4-offline-sdk-probe.json
+          if-no-files-found: error
+          retention-days: 14
