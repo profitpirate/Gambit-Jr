@@ -93,6 +93,15 @@ if text.count(momentum_marker) != 1:
     raise RuntimeError(f"expected one V1.5 marker, found {text.count(momentum_marker)}")
 text = text.replace(momentum_marker, momentum_patch + momentum_marker, 1)
 
+# Stage NEW/BONDING/REVIVAL each have seven lanes. A 60% floor accidentally
+# requires five lanes; 55% expresses the intended strict-majority four-lane
+# requirement while still rejecting three-lane partial scores.
+coverage_old = "        SignalTier.STRONG: 60.0,\n"
+coverage_new = "        SignalTier.STRONG: 55.0,\n"
+if text.count(coverage_old) != 1:
+    raise RuntimeError(f"expected one STRONG coverage threshold, found {text.count(coverage_old)}")
+text = text.replace(coverage_old, coverage_new, 1)
+
 raw_test_import = (
     "from memecoin_bot.models import DiscoveryEvent, MarketSnapshot, SafetyAssessment, iso\n"
     "from memecoin_bot.service import IntelligenceService\n"
@@ -129,6 +138,17 @@ raw_test_case = '''def test_momentum_minimum_one_handles_empty_history_without_c
 if text.count(raw_test_marker) != 1:
     raise RuntimeError(f"expected one generated test marker, found {text.count(raw_test_marker)}")
 text = text.replace(raw_test_marker, raw_test_case + raw_test_marker, 1)
+
+partial_old = "        name: 95 if index < 4 else None\n"
+partial_new = "        name: 95 if index < 3 else None\n"
+if text.count(partial_old) != 1:
+    raise RuntimeError(f"expected one sparse-evidence fixture, found {text.count(partial_old)}")
+text = text.replace(partial_old, partial_new, 1)
+coverage_assert_old = "    assert result.evidence_coverage < 60\n"
+coverage_assert_new = "    assert result.evidence_coverage < 55\n"
+if text.count(coverage_assert_old) != 1:
+    raise RuntimeError(f"expected one sparse coverage assertion, found {text.count(coverage_assert_old)}")
+text = text.replace(coverage_assert_old, coverage_assert_new, 1)
 
 authority_patch = r"""
 # CONTROL_V15 / RunnerDecision is the sole user-visible and lifecycle authority.
