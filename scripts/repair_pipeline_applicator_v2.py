@@ -2,7 +2,8 @@ from pathlib import Path
 
 path = Path(__file__).with_name("apply_pipeline_reliability_v2.py")
 text = path.read_text(encoding="utf-8")
-old = '''    BOT,
+
+status_old = '''    BOT,
     ''' + "'''" + '''                stats[\"model\"] = operator_model_status(settings)
             await send_card(interaction, status_card(stats))
 ''' + "'''" + ''',
@@ -12,7 +13,7 @@ old = '''    BOT,
             await send_card(interaction, status_card(stats))
 ''' + "'''" + ''',
 '''
-new = '''    BOT,
+status_new = '''    BOT,
     ''' + "'''" + '''            stats[\"model\"] = operator_model_status(settings)
             await send_card(interaction, status_card(stats))
 ''' + "'''" + ''',
@@ -22,8 +23,25 @@ new = '''    BOT,
             await send_card(interaction, status_card(stats))
 ''' + "'''" + ''',
 '''
-count = text.count(old)
-if count != 1:
-    raise RuntimeError(f"expected one status applicator block, found {count}")
-path.write_text(text.replace(old, new, 1), encoding="utf-8")
+if text.count(status_old) != 1:
+    raise RuntimeError(f"expected one status applicator block, found {text.count(status_old)}")
+text = text.replace(status_old, status_new, 1)
+
+waiting_old = """replace_once(
+    SERVICE,
+    '            waiting_reasons=sorted(set(waiting)),\\n',
+    '            waiting_reasons=authoritative_waiting,\\n',
+)
+"""
+waiting_new = """replace_once(
+    SERVICE,
+    '            waiting_reasons=sorted(set(waiting)),\\n            hard_rejections=list(score.hard_rejections),\\n',
+    '            waiting_reasons=authoritative_waiting,\\n            hard_rejections=list(score.hard_rejections),\\n',
+)
+"""
+if text.count(waiting_old) != 1:
+    raise RuntimeError(f"expected one waiting applicator block, found {text.count(waiting_old)}")
+text = text.replace(waiting_old, waiting_new, 1)
+
+path.write_text(text, encoding="utf-8")
 print("repaired reliability applicator")
