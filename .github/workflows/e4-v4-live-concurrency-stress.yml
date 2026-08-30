@@ -1,0 +1,55 @@
+name: E4 v4 live concurrency stress
+
+on:
+  push:
+    branches:
+      - codex/gambit-jr-v2-e4-v4-repairs
+    paths:
+      - "scripts/e4_v4_live_concurrency_stress.py"
+      - ".github/workflows/e4-v4-live-concurrency-stress.yml"
+  workflow_dispatch:
+    inputs:
+      capture_seconds:
+        description: Live Pump capture duration
+        required: false
+        default: "600"
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_SOL_USD_FALLBACK: "150"
+
+jobs:
+  real-market-two-position-stress:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - name: Compile real-market stress harness
+        run: python -m py_compile scripts/e4_v4_live_concurrency_stress.py
+      - name: Re-run all E4 regression and precision tests
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+      - name: Real newly launched tokens, rapid paths and two-position precision
+        run: >-
+          python scripts/e4_v4_live_concurrency_stress.py
+          --capture-seconds "${{ github.event.inputs.capture_seconds || '600' }}"
+          --minimum-launches 80
+          --wallet-signatures 250
+          --decision-delay-ms 5
+          --delays 0,25,50,100,250,500,1000
+          --output outputs/e4-v4-live-concurrency-stress.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v4-live-concurrency-${{ github.run_id }}
+          path: outputs/e4-v4-live-concurrency-stress.json
+          if-no-files-found: error
+          retention-days: 30
