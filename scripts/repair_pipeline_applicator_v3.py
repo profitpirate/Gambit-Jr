@@ -3,6 +3,48 @@ from pathlib import Path
 path = Path(__file__).with_name("apply_pipeline_reliability_v2.py")
 text = path.read_text(encoding="utf-8")
 
+# The payoff engine previously received only optional five-minute price change.
+# When that field was missing it returned UNKNOWN despite known age, market cap,
+# liquidity and survival. Feed the point-in-time age already available in the
+# evaluation so legitimate keyless evidence is not silently discarded.
+payoff_patch = r"""
+replace_once(
+    SERVICE,
+    '''        payoff_result = payoff_engine(
+            {
+                "market_cap_usd": market.market_cap_usd,
+                "liquidity_usd": market.liquidity_usd,
+                "price_change_from_launch_percent": market.price_change_5m,
+            },
+            survival_result["grade"],
+        )
+''',
+    '''        payoff_result = payoff_engine(
+            {
+                "market_cap_usd": market.market_cap_usd,
+                "liquidity_usd": market.liquidity_usd,
+                "price_change_from_launch_percent": market.price_change_5m,
+                "age_seconds": _evidence_age_seconds(
+                    market.pair_created_at
+                    or discovery.estimated_creation_timestamp
+                    or candidate["first_discovered_at"],
+                    market.captured_at,
+                ),
+            },
+            survival_result["grade"],
+        )
+''',
+)
+
+"""
+service_marker = (
+    "# ---------------------------------------------------------------------------\n"
+    "# Service: separate qualification from delivery, supervise every long-running\n"
+)
+if text.count(service_marker) != 1:
+    raise RuntimeError(f"expected one service marker, found {text.count(service_marker)}")
+text = text.replace(service_marker, payoff_patch + service_marker, 1)
+
 old_route_insert = '''        operator_route_enabled = self.settings.operator_shadow_alerts_enabled or bool(
             self.store.alert_destinations()
         )
@@ -75,7 +117,8 @@ if text.count(old_reason) != 1:
 text = text.replace(old_reason, new_reason, 1)
 
 # Add targeted tests to the generated reliability suite. These prevent a future
-# attempt to regain recall by silently routing unresolved safety evidence.
+# attempt to regain recall by silently routing unresolved safety evidence or by
+# dropping age-backed payoff evidence when an optional price-change field is absent.
 test_marker = "def test_all_registered_commands_defer_before_work() -> None:\n"
 test_case = '''def test_critical_unknown_blocks_an_otherwise_routable_strong_call() -> None:
     from memecoin_bot.service import authoritative_signal_qualified
@@ -107,10 +150,26 @@ def test_four_of_seven_stage_lanes_is_a_strict_majority_for_strong() -> None:
     assert result.signal_tier == SignalTier.STRONG
 
 
+def test_age_backed_payoff_is_known_without_optional_price_change() -> None:
+    from memecoin_bot.alpha_engine import SurvivalGrade, payoff_engine
+
+    result = payoff_engine(
+        {
+            "market_cap_usd": 30_000,
+            "liquidity_usd": 20_000,
+            "price_change_from_launch_percent": None,
+            "age_seconds": 120,
+        },
+        SurvivalGrade.STRONG,
+    )
+    assert result["score"] is not None
+    assert str(result["grade"]) in {"CONVEX", "EXCEPTIONAL"}
+
+
 '''
 if text.count(test_marker) != 1:
     raise RuntimeError(f"expected one generated test marker, found {text.count(test_marker)}")
 text = text.replace(test_marker, test_case + test_marker, 1)
 
 path.write_text(text, encoding="utf-8")
-print("repaired route-blocker policy")
+print("repaired route-blocker and payoff policy")
