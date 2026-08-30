@@ -54,7 +54,7 @@ if "\\n" not in block:
 block = block.replace("\\n", "\\\\n")
 text = text[:block_start] + block + text[block_end:]
 
-momentum_patch = r'''
+momentum_patch = r"""
 # ---------------------------------------------------------------------------
 # Momentum: an empty history must remain UNKNOWN, never crash the entire
 # candidate monitor when an operator configures a one-snapshot minimum.
@@ -87,27 +87,27 @@ replace_once(
 ''',
 )
 
-'''
+"""
 momentum_marker = "# ---------------------------------------------------------------------------\n# V1.5: low-coverage partial evidence cannot become a routable STRONG call.\n"
 if text.count(momentum_marker) != 1:
     raise RuntimeError(f"expected one V1.5 marker, found {text.count(momentum_marker)}")
 text = text.replace(momentum_marker, momentum_patch + momentum_marker, 1)
 
 raw_test_import = (
-    "from memecoin_bot.models import DiscoveryEvent, MarketSnapshot, SafetyAssessment, iso\\n"
-    "from memecoin_bot.service import IntelligenceService\\n"
+    "from memecoin_bot.models import DiscoveryEvent, MarketSnapshot, SafetyAssessment, iso\n"
+    "from memecoin_bot.service import IntelligenceService\n"
 )
 raw_test_import_replacement = (
-    "from memecoin_bot.models import DiscoveryEvent, MarketSnapshot, SafetyAssessment, iso\\n"
-    "from memecoin_bot.momentum import MomentumEngine\\n"
-    "from memecoin_bot.service import IntelligenceService\\n"
+    "from memecoin_bot.models import DiscoveryEvent, MarketSnapshot, SafetyAssessment, iso\n"
+    "from memecoin_bot.momentum import MomentumEngine\n"
+    "from memecoin_bot.service import IntelligenceService\n"
 )
 if text.count(raw_test_import) != 1:
     raise RuntimeError(f"expected one generated test import block, found {text.count(raw_test_import)}")
 text = text.replace(raw_test_import, raw_test_import_replacement, 1)
 
-raw_test_marker = "def test_all_registered_commands_defer_before_work() -> None:\\n"
-raw_test_case = r'''def test_momentum_minimum_one_handles_empty_history_without_crashing() -> None:
+raw_test_marker = "def test_all_registered_commands_defer_before_work() -> None:\n"
+raw_test_case = '''def test_momentum_minimum_one_handles_empty_history_without_crashing() -> None:
     snapshot = MarketSnapshot(
         token_address="MomentumEmpty111111111111111111111111111111",
         captured_at=iso(),
@@ -125,7 +125,7 @@ raw_test_case = r'''def test_momentum_minimum_one_handles_empty_history_without_
     assert result["snapshots_required"] == 1
 
 
-'''.replace("\n", "\\n")
+'''
 if text.count(raw_test_marker) != 1:
     raise RuntimeError(f"expected one generated test marker, found {text.count(raw_test_marker)}")
 text = text.replace(raw_test_marker, raw_test_case + raw_test_marker, 1)
