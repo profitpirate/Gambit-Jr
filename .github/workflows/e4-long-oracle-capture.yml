@@ -29,7 +29,7 @@ jobs:
         env:
           E4_SOL_USD_FALLBACK: "150"
         run: >-
-          python scripts/e4_live_market_stress.py
+          python scripts/e4_live_market_stress_v3.py
           --capture-seconds 1200
           --minimum-launches 100
           --wallet-signatures 600
