@@ -130,5 +130,43 @@ if text.count(raw_test_marker) != 1:
     raise RuntimeError(f"expected one generated test marker, found {text.count(raw_test_marker)}")
 text = text.replace(raw_test_marker, raw_test_case + raw_test_marker, 1)
 
+authority_patch = r"""
+# CONTROL_V15 / RunnerDecision is the sole user-visible and lifecycle authority.
+# Do not return or log the legacy compatibility scorer after a V1.5 call exists.
+replace_once(
+    SERVICE,
+    '''                f"PROMOTED_{score.classification}",
+''',
+    '''                f"PROMOTED_{v15_decision.signal_tier}",
+''',
+)
+replace_once(
+    SERVICE,
+    '''                state=score.classification,
+                score=score.normalized_score,
+''',
+    '''                state=str(v15_decision.signal_tier),
+                score=score.normalized_score,
+''',
+)
+replace_once(
+    SERVICE,
+    '''        return str(score.classification)
+
+    async def monitor_candidates_once''',
+    '''        return str(v15_decision.signal_tier)
+
+    async def monitor_candidates_once''',
+)
+
+"""
+authority_marker = (
+    "# ---------------------------------------------------------------------------\n"
+    "# Product presentation: expose the reason the pipeline is silent rather than\n"
+)
+if text.count(authority_marker) != 1:
+    raise RuntimeError(f"expected one product marker, found {text.count(authority_marker)}")
+text = text.replace(authority_marker, authority_patch + authority_marker, 1)
+
 path.write_text(text, encoding="utf-8")
 print("repaired reliability applicator")
