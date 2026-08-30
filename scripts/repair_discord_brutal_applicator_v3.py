@@ -9,7 +9,7 @@ old_sub = '''def sub_once(text: str, pattern: str, replacement: str, label: str)
 new_sub = '''def sub_once(text: str, pattern: str, replacement: str, label: str) -> str:
     # A callable replacement prevents re.sub from interpreting backslashes in
     # generated Python source (for example "\\n") as replacement escapes.
-    new, count = re.subn(pattern, lambda _match: replacement, text, count=1, flags=re.S)
+    new, count = re.subn(pattern, lambda _match: replacement, text, count=1, flags=re.DOTALL)
 '''
 if text.count(old_sub) != 1:
     raise RuntimeError(f"expected one sub_once implementation, found {text.count(old_sub)}")
@@ -51,6 +51,25 @@ if text.count(old_private) != 1:
     )
 text = text.replace(old_private, new_private, 1)
 
+# Generate the Store import in Ruff-sorted order, before the discord package imports.
+old_store_import = '''text = replace_once(
+    text,
+    "from memecoin_bot.discord.validation import validate_message\\n",
+    "from memecoin_bot.database import Store\\nfrom memecoin_bot.discord.validation import validate_message\\n",
+    "bot_runtime Store import",
+)
+'''
+new_store_import = '''text = replace_once(
+    text,
+    "from memecoin_bot.discord.cards import (\\n",
+    "from memecoin_bot.database import Store\\nfrom memecoin_bot.discord.cards import (\\n",
+    "bot_runtime Store import",
+)
+'''
+if text.count(old_store_import) != 1:
+    raise RuntimeError(f"expected one Store import applicator block, found {text.count(old_store_import)}")
+text = text.replace(old_store_import, new_store_import, 1)
+
 old_setup = """text = replace_once(
     text,
     '''            interaction, settings_card(store.guild_settings(interaction.guild_id)), True
@@ -76,9 +95,27 @@ if text.count(old_setup) != 1:
     raise RuntimeError(f"expected one setup-selector applicator block, found {text.count(old_setup)}")
 text = text.replace(old_setup, new_setup, 1)
 
-# Preserve the useful information expected by the older card contracts, but in
-# compact summary form rather than restoring the previous wall of provider/model
-# details.
+# Keep the generated WSS selection flat and deterministic.
+old_tracker_wss = '''        if self.solana_tracker_rpc_url and effective == self.solana_tracker_rpc_url:
+            if self.solana_tracker_wss_url:
+                return self.solana_tracker_wss_url
+'''
+new_tracker_wss = '''        if (
+            self.solana_tracker_rpc_url
+            and effective == self.solana_tracker_rpc_url
+            and self.solana_tracker_wss_url
+        ):
+            return self.solana_tracker_wss_url
+'''
+if text.count(old_tracker_wss) != 1:
+    raise RuntimeError(f"expected one tracker WSS template, found {text.count(old_tracker_wss)}")
+text = text.replace(old_tracker_wss, new_tracker_wss, 1)
+
+# Remove imports deliberately unused by the stress suite.
+text = text.replace("from types import SimpleNamespace\\n", "", 1)
+text = text.replace("from memecoin_bot.discord import bot_runtime\\n", "", 1)
+
+# Preserve useful old status contracts in compact summary form.
 old_status_head = '''    provider_rows = list(stats.get("provider_status") or [])
     pipeline = stats.get("pipeline") or {}
     runtime = stats.get("runtime") or {}
@@ -140,7 +177,7 @@ new_lifetime_field = '''            _field(
 if text.count(old_lifetime_field) != 1:
     raise RuntimeError(f"expected one compact lifetime field, found {text.count(old_lifetime_field)}")
 text = text.replace(old_lifetime_field, new_lifetime_field, 1)
-text = text.replace('    assert len(fields) == 5\n', '    assert len(fields) == 6\n', 1)
+text = text.replace('    assert len(fields) == 5\\n', '    assert len(fields) == 6\\n', 1)
 
 path.write_text(text, encoding="utf-8")
-print("repaired Discord applicator selectors, escapes, and compact status truth")
+print("repaired Discord applicator selectors, static audit, and compact status truth")
