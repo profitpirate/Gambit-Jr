@@ -36,6 +36,26 @@ class Store:
         self.conn.execute("PRAGMA synchronous=NORMAL")
         self.migrations_dir = Path(migrations_dir) if migrations_dir else self._find_migrations()
 
+    def _isolated_connection(self) -> sqlite3.Connection:
+        """Open a short-lived WAL connection for atomic leases and report snapshots.
+
+        The long-lived operational connection is shared by several supervised workers.
+        Explicit BEGIN statements must never inherit or collide with transaction state
+        from that connection, so lease claims use their own SQLite connection.
+        """
+        connection = sqlite3.connect(
+            self.path,
+            check_same_thread=False,
+            timeout=30,
+            isolation_level=None,
+        )
+        connection.row_factory = sqlite3.Row
+        connection.execute("PRAGMA foreign_keys=ON")
+        connection.execute("PRAGMA busy_timeout=30000")
+        connection.execute("PRAGMA journal_mode=WAL")
+        connection.execute("PRAGMA synchronous=NORMAL")
+        return connection
+
     def _find_migrations(self) -> Path:
         candidates = [Path.cwd() / "migrations", Path(__file__).resolve().parents[3] / "migrations"]
         for candidate in candidates:
@@ -1309,35 +1329,44 @@ class Store:
         )
 
     def claim_outbox(self, limit: int = 20, lease_seconds: int = 120) -> list[sqlite3.Row]:
-        """Atomically lease rows so concurrent flushers cannot deliver the same event."""
+        """Atomically lease rows on an isolated connection.
+
+        This prevents a health/report read or another worker's implicit transaction
+        on the long-lived connection from causing a nested-BEGIN failure.
+        """
         token = uuid.uuid4().hex
         expired = (datetime.now(UTC) - timedelta(seconds=lease_seconds)).isoformat()
-        with self._lock:
-            self.conn.execute("BEGIN IMMEDIATE")
-            try:
-                ids = [
-                    int(row[0])
-                    for row in self.conn.execute(
-                        "SELECT id FROM outbox WHERE sent_at IS NULL "
-                        "AND (claim_token IS NULL OR claimed_at<?) ORDER BY id LIMIT ?",
-                        (expired, limit),
-                    )
-                ]
-                if ids:
-                    placeholders = ",".join("?" for _ in ids)
-                    self.conn.execute(
-                        f"UPDATE outbox SET claim_token=?,claimed_at=? WHERE id IN ({placeholders})",
-                        (token, iso(), *ids),
-                    )
-                self.conn.commit()
-            except Exception:
-                self.conn.rollback()
-                raise
-        return list(
-            self.conn.execute(
-                "SELECT * FROM outbox WHERE claim_token=? AND sent_at IS NULL ORDER BY id", (token,)
+        connection = self._isolated_connection()
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            ids = [
+                int(row[0])
+                for row in connection.execute(
+                    "SELECT id FROM outbox WHERE sent_at IS NULL "
+                    "AND (claim_token IS NULL OR claimed_at<?) ORDER BY id LIMIT ?",
+                    (expired, limit),
+                )
+            ]
+            if ids:
+                placeholders = ",".join("?" for _ in ids)
+                connection.execute(
+                    f"UPDATE outbox SET claim_token=?,claimed_at=? WHERE id IN ({placeholders})",
+                    (token, iso(), *ids),
+                )
+            rows = list(
+                connection.execute(
+                    "SELECT * FROM outbox WHERE claim_token=? AND sent_at IS NULL ORDER BY id",
+                    (token,),
+                )
             )
-        )
+            connection.commit()
+            return rows
+        except Exception:
+            if connection.in_transaction:
+                connection.rollback()
+            raise
+        finally:
+            connection.close()
 
     def mark_outbox_sent(
         self, outbox_id: int, remote_id: str | None, claim_token: str | None = None
@@ -1817,6 +1846,24 @@ class Store:
         ]
 
     def status_stats(
+        self, started_at: str, candidate_max_age_minutes: float = 180
+    ) -> dict[str, Any]:
+        """Read one truthful status snapshot without touching the operational connection."""
+        reader = Store(self.path, self.migrations_dir)
+        try:
+            reader.conn.execute("BEGIN")
+            try:
+                return reader._status_stats_on_connection(
+                    started_at,
+                    candidate_max_age_minutes,
+                )
+            finally:
+                if reader.conn.in_transaction:
+                    reader.conn.rollback()
+        finally:
+            reader.close()
+
+    def _status_stats_on_connection(
         self, started_at: str, candidate_max_age_minutes: float = 180
     ) -> dict[str, Any]:
         today = datetime.now(UTC).date().isoformat()

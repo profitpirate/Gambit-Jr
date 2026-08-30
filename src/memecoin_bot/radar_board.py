@@ -5,6 +5,8 @@ import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
+from memecoin_bot.database import Store
+
 HTML = """<!doctype html><html><head><meta charset=utf-8><meta name=viewport content='width=device-width'>
 <title>Gambit Jr Live Intelligence</title><style>
 :root{color-scheme:dark;background:#07111f;color:#e5edf8;font:14px system-ui}body{margin:0;padding:24px}h1{letter-spacing:.16em}.sub{color:#69d5ff}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}.card,table{background:#0d1b2d;border:1px solid #213650;border-radius:10px}.card{padding:14px}table{width:100%;border-collapse:collapse;margin-top:20px;overflow:hidden}th,td{padding:10px;border-bottom:1px solid #1c3049;text-align:left}th{color:#85a5c8}.hot{color:#ffb84d}.risk{color:#ff6b7a}a{color:#69d5ff}@media(max-width:700px){body{padding:12px}.wide{overflow:auto}}
@@ -14,6 +16,15 @@ async function load(){const address=new URLSearchParams(location.search).get('ad
 
 
 def start_radar_board(port: int, store: object, started_at: str) -> ThreadingHTTPServer:
+    def read(method_name: str, *args: object) -> object:
+        if not isinstance(store, Store):
+            return getattr(store, method_name)(*args)
+        reader = Store(store.path, store.migrations_dir)
+        try:
+            return getattr(reader, method_name)(*args)
+        finally:
+            reader.close()
+
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self) -> None:
             path = urlparse(self.path)
@@ -21,17 +32,17 @@ def start_radar_board(port: int, store: object, started_at: str) -> ThreadingHTT
                 body, content_type = HTML.encode(), "text/html; charset=utf-8"
             elif path.path == "/api/status":
                 body, content_type = (
-                    json.dumps(store.status_stats(started_at), default=str).encode(),
+                    json.dumps(read("status_stats", started_at), default=str).encode(),
                     "application/json",
                 )
             elif path.path == "/api/radar":
                 body, content_type = (
-                    json.dumps(store.radar_board(), default=str).encode(),
+                    json.dumps(read("radar_board"), default=str).encode(),
                     "application/json",
                 )
             elif path.path == "/api/token":
                 address = parse_qs(path.query).get("address", [""])[0]
-                data = store.token_intelligence(address)
+                data = read("token_intelligence", address)
                 body, content_type = json.dumps(data, default=str).encode(), "application/json"
             else:
                 self.send_response(404)

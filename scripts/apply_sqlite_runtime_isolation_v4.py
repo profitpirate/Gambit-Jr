@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-
 STORE_PATH = Path("src/memecoin_bot/database/store.py")
 FABRIC_PATH = Path("src/memecoin_bot/realtime/fabric.py")
 RADAR_PATH = Path("src/memecoin_bot/radar_board.py")

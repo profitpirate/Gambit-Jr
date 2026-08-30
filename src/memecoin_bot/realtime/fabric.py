@@ -219,27 +219,30 @@ class CanonicalEventFabric:
         if limit <= 0:
             return []
         now = iso()
-        with self.store._lock:
-            self.store.conn.execute("BEGIN IMMEDIATE")
-            try:
-                rows = list(
-                    self.store.conn.execute(
-                        "SELECT * FROM canonical_events WHERE processing_status='PENDING' "
-                        "ORDER BY available_timestamp,event_id LIMIT ?",
-                        (limit,),
-                    )
+        connection = self.store._isolated_connection()
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            rows = list(
+                connection.execute(
+                    "SELECT * FROM canonical_events WHERE processing_status='PENDING' "
+                    "ORDER BY available_timestamp,event_id LIMIT ?",
+                    (limit,),
                 )
-                if rows:
-                    placeholders = ",".join("?" for _ in rows)
-                    self.store.conn.execute(
-                        f"UPDATE canonical_events SET processing_status='PROCESSING',claimed_at=?,"
-                        f"processing_attempts=processing_attempts+1 WHERE event_id IN ({placeholders})",
-                        (now, *(row["event_id"] for row in rows)),
-                    )
-                self.store.conn.commit()
-            except Exception:
-                self.store.conn.rollback()
-                raise
+            )
+            if rows:
+                placeholders = ",".join("?" for _ in rows)
+                connection.execute(
+                    f"UPDATE canonical_events SET processing_status='PROCESSING',claimed_at=?,"
+                    f"processing_attempts=processing_attempts+1 WHERE event_id IN ({placeholders})",
+                    (now, *(row["event_id"] for row in rows)),
+                )
+            connection.commit()
+        except Exception:
+            if connection.in_transaction:
+                connection.rollback()
+            raise
+        finally:
+            connection.close()
         return [self._event_from_row(row) for row in rows]
 
     @staticmethod
