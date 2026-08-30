@@ -6,6 +6,7 @@ on:
       - fix/discord-pipeline-reliability-v2
     paths:
       - scripts/repair_pipeline_applicator_v2.py
+      - scripts/repair_pipeline_applicator_v3.py
       - .github/workflows/pipeline-reliability-v2-retry.yml
   workflow_dispatch:
 
@@ -31,6 +32,7 @@ jobs:
       - name: Repair and apply deterministic patch
         run: |
           python scripts/repair_pipeline_applicator_v2.py
+          python scripts/repair_pipeline_applicator_v3.py
           python scripts/apply_pipeline_reliability_v2.py
 
       - name: Diff sanity
@@ -53,6 +55,47 @@ jobs:
             tests/test_discord_outbox.py \
             tests/test_candidate_lifecycle.py \
             tests/test_v15_engine.py
+
+      - name: Authoritative multichain replay diagnostic
+        run: |
+          python - <<'PY'
+          import asyncio
+          import json
+          from pathlib import Path
+
+          from memecoin_bot.replay import ReplayRunner
+          from tests.helpers import settings, store, temp_db_path
+
+          async def main() -> None:
+              with temp_db_path() as path:
+                  config = settings(path)
+                  config.public_alerts_enabled = True
+                  database = store(path)
+                  fixture = Path("fixtures/replay_v12_multichain.json")
+                  report = await ReplayRunner(config, database).run(fixture)
+                  rows = [
+                      dict(row)
+                      for row in database.conn.execute(
+                          "SELECT t.symbol,t.name,t.chain,c.state,c.reason,"
+                          "rd.tier,rd.route_state,rd.decision_reason,"
+                          "rd.critical_unknowns_json,rd.supporting_evidence_json,"
+                          "rd.contradicting_evidence_json,rd.controls_json "
+                          "FROM candidates c JOIN tokens t ON t.id=c.token_id "
+                          "LEFT JOIN runner_decisions_v15 rd ON rd.decision_id=("
+                          "SELECT rd2.decision_id FROM runner_decisions_v15 rd2 "
+                          "WHERE rd2.candidate_id=c.id "
+                          "ORDER BY rd2.decision_at DESC,rd2.created_at DESC LIMIT 1) "
+                          "ORDER BY t.chain,t.symbol"
+                      )
+                  ]
+                  print(json.dumps({
+                      "signals_created": report["signals_created"],
+                      "candidates": rows,
+                  }, indent=2, default=str))
+                  database.close()
+
+          asyncio.run(main())
+          PY
 
       - name: Full regression suite
         run: pytest -q
