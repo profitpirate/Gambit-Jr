@@ -15,7 +15,7 @@ def _has_entered(self: core.Store, mint: str) -> bool:
         row
         and (
             int(row[0]) >= 1
-            or str(row[1]) in {"BUY_PENDING", "BUY_UNCERTAIN", "BUY_CONFIRMED"}
+            or str(row[1]) in {"BUY_UNCERTAIN", "BUY_CONFIRMED"}
         )
     )
 
