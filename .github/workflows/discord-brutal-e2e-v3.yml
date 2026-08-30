@@ -16,7 +16,7 @@ concurrency:
 jobs:
   repair-audit-stress-commit:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:
@@ -55,6 +55,17 @@ jobs:
             tests/test_v15_engine.py \
             tests/test_replay.py \
             tests/test_v12_radar_multichain.py
+
+      - name: Repeated interaction and pipeline soak
+        run: |
+          for pass in 1 2 3 4 5; do
+            echo "=== reliability soak pass ${pass}/5 ==="
+            pytest -q \
+              tests/test_discord_brutal_e2e_v3.py \
+              tests/test_pipeline_reliability_v2.py \
+              tests/test_discord_response_lifecycle.py \
+              tests/test_discord_outbox.py
+          done
 
       - name: Full regression suite
         run: pytest -q
@@ -119,5 +130,5 @@ jobs:
             tests/test_discord_brutal_e2e_v3.py \
             tests/test_discord_command_center.py \
             tests/test_pipeline_reliability_v2.py
-          git commit -m "fix: make Discord interactions durable under sustained load"
+          git commit -m "fix: make Discord interactions durable under sustained load [skip ci]"
           git push origin HEAD:fix/discord-brutal-e2e-v3
