@@ -43,5 +43,16 @@ if text.count(waiting_old) != 1:
     raise RuntimeError(f"expected one waiting applicator block, found {text.count(waiting_old)}")
 text = text.replace(waiting_old, waiting_new, 1)
 
+# The applicator's triple-quoted replacement must contain two backslashes so
+# the generated Python source receives a literal \n escape rather than a real
+# newline inside an f-string.
+block_start = text.index('    original_status_card = cards.status_card')
+block_end = text.index('    original_format = formatting.format_discord_event', block_start)
+block = text[block_start:block_end]
+if "\\n" not in block:
+    raise RuntimeError("status replacement contains no escaped newline markers")
+block = block.replace("\\n", "\\\\n")
+text = text[:block_start] + block + text[block_end:]
+
 path.write_text(text, encoding="utf-8")
 print("repaired reliability applicator")
