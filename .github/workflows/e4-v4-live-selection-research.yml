@@ -1,0 +1,52 @@
+name: E4 v4 live selection research
+
+on:
+  push:
+    branches:
+      - codex/gambit-jr-v2-e4-v4-repairs
+    paths:
+      - "scripts/e4_selection_research_live.py"
+      - ".github/workflows/e4-v4-live-selection-research.yml"
+  workflow_dispatch:
+    inputs:
+      capture_seconds:
+        description: Live Pump capture duration
+        required: false
+        default: "900"
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_SOL_USD_FALLBACK: "150"
+
+jobs:
+  selected-vs-ignored:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - name: Compile research harness
+        run: python -m py_compile scripts/e4_selection_research_live.py
+      - name: Capture real launches and compare E4 selections
+        run: >-
+          python scripts/e4_selection_research_live.py
+          --capture-seconds "${{ github.event.inputs.capture_seconds || '900' }}"
+          --minimum-launches 100
+          --wallet-signatures 350
+          --active-radius-seconds 180
+          --output outputs/e4-selection-live-research.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v4-selection-research-${{ github.run_id }}
+          path: outputs/e4-selection-live-research.json
+          if-no-files-found: error
+          retention-days: 30
