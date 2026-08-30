@@ -37,13 +37,12 @@ replace_once(
 )
 
 """
-service_marker = (
-    "# ---------------------------------------------------------------------------\n"
-    "# Service: separate qualification from delivery, supervise every long-running\n"
-)
-if text.count(service_marker) != 1:
-    raise RuntimeError(f"expected one service marker, found {text.count(service_marker)}")
-text = text.replace(service_marker, payoff_patch + service_marker, 1)
+service_declaration = 'SERVICE = "src/memecoin_bot/service.py"\n'
+if text.count(service_declaration) != 1:
+    raise RuntimeError(
+        f"expected one service declaration, found {text.count(service_declaration)}"
+    )
+text = text.replace(service_declaration, service_declaration + payoff_patch, 1)
 
 old_route_insert = '''        operator_route_enabled = self.settings.operator_shadow_alerts_enabled or bool(
             self.store.alert_destinations()
