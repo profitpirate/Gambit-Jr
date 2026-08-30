@@ -27,8 +27,20 @@ class E4InvariantTests(unittest.TestCase):
             store = e4_live.Store(Path(directory) / "e4.db")
             try:
                 self.assertTrue(store.mark_entry("mint", 0.8, "accepted"))
+                self.assertFalse(store.has_entered("mint"))
+                self.assertFalse(store.mark_entry("mint", 0.9, "duplicate pending"))
+                store.order("request", "mint", "BUY", 0.05, None, "accepted")
+                store.receipt(
+                    "request",
+                    "signature",
+                    "direct",
+                    True,
+                    123,
+                    None,
+                    {"direct": "signature"},
+                )
                 self.assertTrue(store.has_entered("mint"))
-                self.assertFalse(store.mark_entry("mint", 0.9, "duplicate"))
+                self.assertFalse(store.mark_entry("mint", 0.9, "duplicate confirmed"))
             finally:
                 store.close()
 
