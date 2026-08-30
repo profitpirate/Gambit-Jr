@@ -18,7 +18,13 @@ class ReplayTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(report["evidence_type"], "SIMULATION_ONLY_NOT_LIVE_E2E")
             self.assertEqual(len(report["signals_created"]), 1)
             self.assertEqual(report["decisions"][1]["classification"], "REJECT")
-            self.assertEqual(len(report["milestones"]), 3)  # 1.5, 2, 3
+            # CONTROL_V15 now qualifies the valid setup at its first complete
+            # £30k decision snapshot. The later £400k observation therefore
+            # crosses every configured milestone through 10x, not merely 3x.
+            self.assertEqual(
+                sorted(float(row["multiple"]) for row in report["milestones"]),
+                [1.5, 2.0, 3.0, 5.0, 10.0],
+            )
             db.close()
 
     async def test_v12_multichain_replay_uses_production_radar_and_lifecycle(self) -> None:
