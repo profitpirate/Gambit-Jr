@@ -1,5 +1,6 @@
 name: E4 V11 finalisation
 
+# V11 rerun 2: idempotent consolidation + brutal certification.
 on:
   push:
     branches: [codex/e4-v11-final]
@@ -92,7 +93,7 @@ jobs:
         run: |
           git config user.name 'gambit-v11-finalizer'
           git config user.email 'actions@users.noreply.github.com'
-          git add src/memecoin_bot/e4_hardening_v10.py src/memecoin_bot/e4_pipelines_v10.py src/memecoin_bot/e4_pipeline_runtime_v10.py src/memecoin_bot/e4_exec/__main__.py tools/e4-builder/race-proxy-v3.mjs tools/e4-builder/fast-preload-v4.mjs tests/test_e4_hardening_v6.py tests/test_e4_live.py tests/test_e4_v10_direct_ca_social.py scripts/e4_v10_social_stream.py || true
+          git add src/memecoin_bot/e4_hardening_v10.py src/memecoin_bot/e4_pipelines_v10.py src/memecoin_bot/e4_pipeline_runtime_v10.py src/memecoin_bot/e4_exec/__main__.py tools/e4-builder/race-proxy-v3.mjs tools/e4-builder/fast-preload-v4.mjs tests/test_e4_hardening_v6.py tests/test_e4_live.py tests/test_e4_v10_direct_ca_social.py scripts/e4_v10_social_stream.py scripts/e4_v10_apply_all_patches.sh || true
           if ! git diff --cached --quiet; then
             git commit -m 'feat(e4): consolidate V11 production hardening [skip ci]'
             git push origin HEAD:codex/e4-v11-final
