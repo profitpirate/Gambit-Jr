@@ -1,0 +1,136 @@
+name: E4 v5 repair, live-market concurrency and selection research
+
+on:
+  push:
+    branches:
+      - codex/gambit-jr-v2-e4-repair-selection-concurrency
+  workflow_dispatch:
+    inputs:
+      capture_seconds:
+        description: Real Pump launch capture duration
+        required: false
+        default: "600"
+      research_positions:
+        description: E4 positions to enrich with creator/pre-entry history
+        required: false
+        default: "30"
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_SOL_USD_FALLBACK: "150"
+
+jobs:
+  regression:
+    name: v5 regression and production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - name: Compile repaired runtime and stress harnesses
+        run: >-
+          python -m compileall -q
+          src/memecoin_bot/e4_hardening_v5.py
+          scripts/e4_live_market_stress_v5.py
+          scripts/e4_real_market_concurrency_stress.py
+          scripts/e4_oracle_selection_research.py
+          scripts/e4_oracle_selection_research_live.py
+          tests/test_e4_hardening_v5.py
+      - name: Full E4 regression including v4 watchdog and v5 concurrency
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+      - name: Validate persistent builder source
+        run: node --check tools/e4-builder/daemon.mjs
+      - name: Production container build
+        run: docker build -f Dockerfile.e4-prod -t gambit-e4-v5:test .
+
+  live-market-concurrency:
+    name: real launches, two-position and rapid-movement stress
+    needs: regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      E4_SELECTION_MODE: RESEARCH_COHORT
+      E4_ALLOW_RESEARCH_LIVE: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - name: Capture and replay real newly launched Pump tokens
+        run: >-
+          python scripts/e4_live_market_stress_v5.py
+          --capture-seconds "${{ github.event.inputs.capture_seconds || '600' }}"
+          --minimum-launches 50
+          --wallet-signatures 350
+          --builder-probes 50
+          --testnet-route-probes 4
+          --stress-iterations 25000
+          --output artifacts/e4-v5-live-market.json
+      - name: Stress two simultaneous positions across real token trajectories
+        run: |
+          EVENTS="$(find artifacts -maxdepth 1 -name '*live-events.jsonl' -print -quit)"
+          test -n "$EVENTS"
+          python scripts/e4_real_market_concurrency_stress.py \
+            --events "$EVENTS" \
+            --pairs 3000 \
+            --output artifacts/e4-v5-real-market-concurrency.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v5-live-market-concurrency-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 30
+
+  selection-research:
+    name: E4 creator, pre-entry and route research
+    needs: regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - name: Reconstruct fresh E4 positions and enrich selection evidence
+        run: >-
+          python scripts/e4_oracle_selection_research_live.py
+          --wallet-signatures 400
+          --positions "${{ github.event.inputs.research_positions || '30' }}"
+          --prior-signatures 40
+          --creator-signatures 20
+          --workers 6
+          --concurrency 10
+          --timeout 6
+          --position-timeout 90
+          --output artifacts/e4-v5-selection-research.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v5-selection-research-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 30
