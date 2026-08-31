@@ -7,6 +7,7 @@ import {
   TransactionMessage,
   VersionedTransaction,
 } from "@solana/web3.js";
+import { buildLocal, prefetch, warm } from "./fast.mjs";
 
 const PRIMARY_RPC_URL = process.env.E4_PRIMARY_RPC_URL || process.env.SOLANA_RPC_URL || "https://api.mainnet-beta.solana.com";
 const FALLBACK_RPC_URLS = String(process.env.E4_FALLBACK_RPC_URLS || "")
@@ -19,6 +20,7 @@ const TRADE_LOCAL_URL = process.env.E4_PUMPPORTAL_TRADE_LOCAL_URL || "https://pu
 const BUILD_TIMEOUT_MS = Number(process.env.E4_BUILDER_TIMEOUT_MS || 2200);
 const BUILD_RETRIES = Math.max(1, Math.min(4, Number(process.env.E4_BUILDER_RETRIES || 3)));
 const ALT_RETRIES = Math.max(1, Math.min(4, Number(process.env.E4_ALT_RPC_RETRIES || 3)));
+const REMOTE_FALLBACK = String(process.env.E4_REMOTE_BUILDER_FALLBACK || "true").toLowerCase() !== "false";
 const MAX_WIRE_BYTES = 1232;
 const JITO_TIP_ACCOUNTS = [
   "96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5",
@@ -121,6 +123,7 @@ async function buildSweep(request) {
     transaction_base64: Buffer.from(transaction.serialize()).toString("base64"),
     tip_appended: requestedTip > 0,
     tip_account: requestedTip > 0 ? deterministicTipAccount(request).toBase58() : null,
+    builder_mode: "local_system",
   };
 }
 
@@ -137,19 +140,15 @@ async function appendJitoTip(raw, request) {
   const message = TransactionMessage.decompile(transaction.message, {addressLookupTableAccounts: lookups});
   const tipAccount = deterministicTipAccount(request);
   const lamports = Math.max(1_000, Math.floor(requestedSol * 1_000_000_000));
-  message.instructions.push(
-    SystemProgram.transfer({
-      fromPubkey: new PublicKey(request.public_key),
-      toPubkey: tipAccount,
-      lamports,
-    }),
-  );
+  message.instructions.push(SystemProgram.transfer({
+    fromPubkey: new PublicKey(request.public_key),
+    toPubkey: tipAccount,
+    lamports,
+  }));
   const compiled = message.compileToV0Message(lookups);
   const rebuilt = new VersionedTransaction(compiled);
   const bytes = Buffer.from(rebuilt.serialize());
-  if (bytes.length > MAX_WIRE_BYTES) {
-    throw new Error(`transaction with Jito tip exceeds Solana wire limit: ${bytes.length}`);
-  }
+  if (bytes.length > MAX_WIRE_BYTES) throw new Error(`transaction with Jito tip exceeds Solana wire limit: ${bytes.length}`);
   return {
     transaction_base64: bytes.toString("base64"),
     tip_appended: true,
@@ -158,7 +157,7 @@ async function appendJitoTip(raw, request) {
   };
 }
 
-async function buildPump(request) {
+async function buildPumpRemote(request) {
   const payload = {
     publicKey: request.public_key,
     action: String(request.side).toLowerCase(),
@@ -174,17 +173,42 @@ async function buildPump(request) {
     headers: {"content-type": "application/json"},
     body: JSON.stringify(payload),
   });
-  if (!response.ok) {
-    throw new Error(`trade-local HTTP ${response.status}: ${(await response.text()).slice(0, 500)}`);
-  }
+  if (!response.ok) throw new Error(`trade-local HTTP ${response.status}: ${(await response.text()).slice(0, 500)}`);
   const bytes = Buffer.from(await response.arrayBuffer());
   if (!bytes.length) throw new Error("trade-local returned an empty transaction");
-  return appendJitoTip(bytes, request);
+  return {...(await appendJitoTip(bytes, request)), builder_mode: "remote_pumpportal_fallback"};
+}
+
+async function buildTrade(request) {
+  const started = performance.now();
+  let localError = null;
+  if (String(request.pool || "pump").toLowerCase() === "pump") {
+    try {
+      const result = await buildLocal(request);
+      return {...result, total_builder_ms: performance.now() - started};
+    } catch (error) {
+      localError = error?.message || String(error);
+      if (!REMOTE_FALLBACK) throw error;
+    }
+  }
+  const remote = await buildPumpRemote(request);
+  return {...remote, local_error: localError, total_builder_ms: performance.now() - started};
 }
 
 async function handle(line) {
   const request = JSON.parse(line);
-  const built = request.side === "SWEEP" ? await buildSweep(request) : await buildPump(request);
+  const side = String(request.side || "").toUpperCase();
+  if (side === "WARM") {
+    const started = performance.now();
+    await warm();
+    return {request_id: request.request_id || null, warmed: true, builder_mode: "local_offline_pump_sdk", warm_ms: performance.now() - started};
+  }
+  if (side === "PREFETCH") {
+    const started = performance.now();
+    const result = await prefetch(request);
+    return {request_id: request.request_id || null, ...result, prefetch_ms: performance.now() - started};
+  }
+  const built = side === "SWEEP" ? await buildSweep(request) : await buildTrade(request);
   return {request_id: request.request_id || null, ...built};
 }
 
