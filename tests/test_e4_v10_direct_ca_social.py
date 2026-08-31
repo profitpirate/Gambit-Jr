@@ -46,7 +46,7 @@ class DirectCASocialTests(unittest.TestCase):
 
     def test_exact_ca_post_after_creation_can_enter_within_guard(self) -> None:
         manager = self.manager()
-        mint = "9xQeWvG816bUx9EPfEZn9Y6b7nWn1N5uVxkZ7L1pump"
+        mint = "Aijysj19Tv4yYFvUunHQRqpkVDggU9GNUFJpYaetpump"
         launch_ns = time.time_ns()
         manager.observe_social_post(
             {
@@ -78,7 +78,7 @@ class DirectCASocialTests(unittest.TestCase):
 
     def test_exact_ca_is_rejected_when_old_or_already_sold(self) -> None:
         manager = self.manager()
-        mint = "8xQeWvG816bUx9EPfEZn9Y6b7nWn1N5uVxkZ7L2pump"
+        mint = "GzVhofvBXc4kFSLF8Ndw26QN14WAPKiKiGc7WbcCpump"
         launch_ns = time.time_ns()
         manager.observe_social_post(
             {
