@@ -1,0 +1,121 @@
+name: E4 V10 three-pipeline E2E
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_V10_SERVICES_ENABLED: "false"
+  E4_REMOTE_BUILDER_FALLBACK: "false"
+
+jobs:
+  full-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+
+      - name: Compile every V10 production and pipeline component
+        run: |
+          python -m compileall -q \
+            src/memecoin_bot/e4_pipelines_v10.py \
+            src/memecoin_bot/e4_hardening_v10.py \
+            src/memecoin_bot/e4_fast_execution_v10.py \
+            src/memecoin_bot/e4_runtime_services_v10.py \
+            src/memecoin_bot/e4_exec_v10.py \
+            scripts/e4_social_stream_v10.py \
+            scripts/e4_creator_learner_v10.py \
+            scripts/e4_v10_supervisor.py \
+            scripts/e4_v10_live_holdout.py \
+            scripts/e4_v10_pipeline_stress.py
+          node --check tools/e4-builder/daemon-v2.mjs
+
+      - name: Complete E4 regression suite including V10
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+
+      - name: V10 single-process repeated stress
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_v10_pipeline_stress.py \
+            --iterations 200000 \
+            --workers 1 \
+            --narrative-iterations 25000 \
+            --output artifacts/e4-v10-stress-single.json
+
+      - name: V10 concurrent pressure stress
+        run: |
+          python scripts/e4_v10_pipeline_stress.py \
+            --iterations 300000 \
+            --workers 16 \
+            --narrative-iterations 50000 \
+            --output artifacts/e4-v10-stress-concurrent.json
+
+      - name: V10 sustained repeat stress
+        run: |
+          for run in 1 2 3 4 5; do
+            python scripts/e4_v10_pipeline_stress.py \
+              --iterations 50000 \
+              --workers 8 \
+              --narrative-iterations 10000 \
+              --output "artifacts/e4-v10-stress-repeat-${run}.json"
+          done
+
+      - name: Local Pump builder repeated warm validation
+        working-directory: tools/e4-builder
+        run: |
+          for run in $(seq 1 25); do
+            node daemon-v2.mjs --self-test >/tmp/e4-builder-${run}.log
+          done
+          cat /tmp/e4-builder-25.log
+
+      - name: Social bridge journal E2E
+        run: |
+          rm -rf var/e4
+          printf '%s\n' '{"source":"x-test","source_account":"authority","text":"Purple Monkey Dishwasher is coming","authority":0.99,"engagement_velocity":0.9}' \
+            | python scripts/e4_social_stream_v10.py --stdin-jsonl
+          test -s var/e4/social-stream.jsonl
+
+      - name: Production V10 import and runtime service lifecycle
+        env:
+          E4_V10_SERVICES_ENABLED: "true"
+          E4_LAUNCH_INTENT_SECRET: "ci-only-secret"
+        run: |
+          python - <<'PY'
+          import time
+          from memecoin_bot.e4_runtime_services_v10 import start_runtime_services, stop_runtime_services
+          start_runtime_services()
+          time.sleep(0.10)
+          stop_runtime_services()
+          print('V10 runtime services lifecycle PASS')
+          PY
+
+      - name: Production container build
+        run: docker build -f Dockerfile.e4-exec -t gambit-jr-e4:v10 .
+
+      - name: Upload E2E stress evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e4-v10-three-pipeline-e2e-${{ github.run_id }}
+          path: |
+            artifacts/e4-v10-stress-*.json
+            var/e4/social-stream.jsonl
+          if-no-files-found: warn
+          retention-days: 30
