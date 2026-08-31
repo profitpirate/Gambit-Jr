@@ -16,6 +16,7 @@ on:
       - codex/gambit-jr-v2-e4-v6-certification
     paths:
       - "scripts/e4_creator_forensics.py"
+      - "scripts/e4_build_identity_cache.py"
       - ".github/workflows/e4-creator-forensics.yml"
 
 permissions:
@@ -35,8 +36,8 @@ jobs:
           python-version: "3.12"
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -e .
-      - name: Compile bounded forensic harness
-        run: python -m py_compile scripts/e4_creator_forensics.py
+      - name: Compile bounded forensic harnesses
+        run: python -m py_compile scripts/e4_creator_forensics.py scripts/e4_build_identity_cache.py
       - name: Inspect creators, metadata sources and pre-entry public flow
         env:
           SIGNATURES: ${{ github.event.inputs.signatures || '1000' }}
@@ -49,10 +50,20 @@ jobs:
           --concurrency 12
           --timeout 6
           --output artifacts/e4-creator-forensics.json
+      - name: Build conservative creator affinity cache
+        if: success()
+        run: >-
+          python scripts/e4_build_identity_cache.py
+          --input artifacts/e4-creator-forensics.json
+          --output artifacts/e4-creator-affinity-analysis.json
+          --cache-output artifacts/creator-profiles.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: e4-creator-forensics-${{ github.run_id }}
-          path: artifacts/e4-creator-forensics.json
+          path: |
+            artifacts/e4-creator-forensics.json
+            artifacts/e4-creator-affinity-analysis.json
+            artifacts/creator-profiles.json
           if-no-files-found: warn
           retention-days: 30
