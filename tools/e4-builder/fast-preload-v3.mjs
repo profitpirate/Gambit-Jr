@@ -117,21 +117,23 @@ async function cachedFetch(input, init = undefined) {
 globalThis.fetch = cachedFetch;
 
 async function prewarm(url) {
-  const body = JSON.stringify({
-    jsonrpc: "2.0",
-    id: 1,
-    method: "getLatestBlockhash",
-    params: [{commitment: "processed"}],
-  });
-  try {
-    await cachedFetch(url, {
+  const requests = [
+    [],
+    [{commitment: "processed"}],
+    [{commitment: "confirmed"}],
+  ];
+  await Promise.allSettled(
+    requests.map((params, index) => cachedFetch(url, {
       method: "POST",
       headers: {"content-type": "application/json"},
-      body,
-    });
-  } catch {
-    // The normal builder path owns error reporting. Warm-up must never crash it.
-  }
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: index + 1,
+        method: "getLatestBlockhash",
+        params,
+      }),
+    })),
+  );
 }
 
 for (const url of rpcUrls) void prewarm(url);

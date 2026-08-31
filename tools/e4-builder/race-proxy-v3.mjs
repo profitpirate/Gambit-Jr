@@ -29,15 +29,12 @@ if (process.argv.includes("--self-test")) {
   function validResponse(line) {
     try {
       const value = JSON.parse(line);
-      if (!value || typeof value !== "object") return false;
-      return Boolean(
-        value.transaction ||
-        value.transaction_base64 ||
-        value.serialized_transaction ||
-        value.serializedTransaction ||
-        value.ok === true ||
-        value.success === true,
-      );
+      if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+      if (value.error || value.ok === false || value.success === false) return false;
+      // Different builder versions use different transaction field names. Any
+      // non-error JSON object is a valid first response; Python performs the
+      // authoritative schema validation before signing.
+      return true;
     } catch {
       return false;
     }
