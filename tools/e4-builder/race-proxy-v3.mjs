@@ -6,7 +6,9 @@ import {fileURLToPath} from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const daemon = path.join(here, "daemon-v2.mjs");
-const preload = path.join(here, "fast-preload-v3.mjs");
+const preload = process.env.E4_BUILDER_PRELOAD
+  ? path.resolve(process.env.E4_BUILDER_PRELOAD)
+  : path.join(here, "fast-preload-v4.mjs");
 
 if (process.argv.includes("--self-test")) {
   const child = spawn(process.execPath, ["--import", preload, daemon, "--self-test"], {
