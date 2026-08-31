@@ -9,12 +9,12 @@ on:
       capture_seconds:
         description: Live Pump capture duration
         required: false
-        default: "300"
+        default: "600"
 
 jobs:
   live-market-stress:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,7 +29,15 @@ jobs:
       - working-directory: tools/e4-builder
         run: npm install --omit=dev
       - name: Compile harness and hardened runtime
-        run: python -m compileall -q scripts/e4_live_market_stress.py scripts/e4_live_market_stress_v3.py src/memecoin_bot/e4_hardening.py src/memecoin_bot/e4_hardening_v2.py src/memecoin_bot/e4_hardening_v3.py
+        run: >-
+          python -m compileall -q
+          scripts/e4_live_market_stress.py
+          scripts/e4_live_market_stress_v3.py
+          scripts/e4_selection_forensics.py
+          src/memecoin_bot/e4_hardening.py
+          src/memecoin_bot/e4_hardening_v2.py
+          src/memecoin_bot/e4_hardening_v3.py
+          src/memecoin_bot/e4_hardening_v4.py
       - name: E4 regression and repeated lifecycle stress
         run: python -m unittest discover -s tests -p "test_e4*.py" -v
       - name: Capture live launches, benchmark execution and compare with E4
@@ -37,13 +45,18 @@ jobs:
           E4_SOL_USD_FALLBACK: "150"
         run: >-
           python scripts/e4_live_market_stress_v3.py
-          --capture-seconds "${{ github.event.inputs.capture_seconds || '300' }}"
-          --minimum-launches 20
-          --wallet-signatures 250
-          --builder-probes 24
-          --testnet-route-probes 5
-          --stress-iterations 10000
+          --capture-seconds "${{ github.event.inputs.capture_seconds || '600' }}"
+          --minimum-launches 50
+          --wallet-signatures 400
+          --builder-probes 60
+          --testnet-route-probes 8
+          --stress-iterations 50000
           --output artifacts/e4-live-market-stress.json
+      - name: Compare E4 selections with the complete captured launch universe
+        run: >-
+          python scripts/e4_selection_forensics.py
+          --events artifacts/e4-live-market-stress-live-events.jsonl
+          --output artifacts/e4-selection-forensics.json
       - name: Upload full E4 stress evidence
         uses: actions/upload-artifact@v4
         with:
@@ -52,5 +65,7 @@ jobs:
             artifacts/e4-live-market-stress.json
             artifacts/e4-live-market-stress.md
             artifacts/e4-live-market-stress-live-events.jsonl
+            artifacts/e4-selection-forensics.json
+            artifacts/e4-selection-forensics.md
           if-no-files-found: error
           retention-days: 30
