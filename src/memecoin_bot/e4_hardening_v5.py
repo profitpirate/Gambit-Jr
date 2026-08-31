@@ -4,6 +4,7 @@ import asyncio
 import logging
 import os
 import time
+from collections import OrderedDict
 from typing import Any
 
 from . import e4_hardening_v4
@@ -11,6 +12,65 @@ from . import e4_hardening_v4
 core = e4_hardening_v4.core
 final = e4_hardening_v4.final
 LOGGER = logging.getLogger("gambit.e4.hardening.v5")
+
+
+# V1.5 projects one economic Pump trade into more than one canonical analytical
+# event. The older dedupe registry was keyed only by mint, so a newly rebuilt
+# TokenState for the same mint could inherit another instance's signatures and
+# silently discard legitimate market events. Keep dedupe state per live object
+# instead. A bounded strong-reference LRU prevents object-id reuse while keeping
+# memory finite.
+_BASE_STATE_APPLY = e4_hardening_v4.hardening._previous_state_apply
+_STATE_DEDUPE_LIMIT = max(256, int(os.getenv("E4_STATE_DEDUPE_INSTANCES", "8192")))
+_STATE_DEDUPE: OrderedDict[
+    int,
+    tuple[core.TokenState, set[tuple[Any, ...]], list[tuple[Any, ...]]],
+] = OrderedDict()
+
+
+def _deduplicating_state_apply_v5(
+    self: core.TokenState,
+    event: core.Event,
+    wallet: str | None,
+) -> None:
+    if event.signature and event.kind in {
+        core.EventKind.BUY,
+        core.EventKind.SELL,
+        core.EventKind.PUMPSWAP_BUY,
+        core.EventKind.PUMPSWAP_SELL,
+    }:
+        identity = id(self)
+        cached = _STATE_DEDUPE.get(identity)
+        if cached is None or cached[0] is not self:
+            cached = (self, set(), [])
+            _STATE_DEDUPE[identity] = cached
+        else:
+            _STATE_DEDUPE.move_to_end(identity)
+        _, seen, order = cached
+        side = (
+            "BUY"
+            if event.kind in {core.EventKind.BUY, core.EventKind.PUMPSWAP_BUY}
+            else "SELL"
+        )
+        key = (
+            event.signature,
+            side,
+            event.trader,
+            round(event.sol_amount, 12),
+            round(event.token_amount, 6),
+        )
+        if key in seen:
+            return
+        seen.add(key)
+        order.append(key)
+        if len(order) > 2048:
+            seen.discard(order.pop(0))
+        while len(_STATE_DEDUPE) > _STATE_DEDUPE_LIMIT:
+            _STATE_DEDUPE.popitem(last=False)
+    _BASE_STATE_APPLY(self, event, wallet)
+
+
+core.TokenState.apply = _deduplicating_state_apply_v5
 
 
 # A separate lock per mint keeps event, guardian and post-fill catch-up decisions
