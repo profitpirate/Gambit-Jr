@@ -1,13 +1,18 @@
 {
   "name": "gambit-e4-builder",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
   "type": "module",
   "engines": {"node": ">=20"},
   "dependencies": {
-    "@solana/web3.js": "^1.98.4"
+    "@pump-fun/pump-sdk": "^1.36.0",
+    "@pump-fun/pump-swap-sdk": "^1.19.0",
+    "@solana/spl-token": "^0.4.13",
+    "@solana/web3.js": "^1.98.4",
+    "bn.js": "^5.2.2"
   },
   "scripts": {
-    "start": "node index.mjs"
+    "start": "node daemon.mjs",
+    "check": "node --check daemon.mjs"
   }
 }
