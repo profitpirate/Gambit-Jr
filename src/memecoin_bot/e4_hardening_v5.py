@@ -34,6 +34,24 @@ def _position_lock(engine: core.Engine, mint: str) -> asyncio.Lock:
     return locks.setdefault(mint, asyncio.Lock())
 
 
+def _policy(engine: core.Engine) -> core.E4Policy:
+    """Resolve the production policy for real and lightweight stress engines.
+
+    Several execution-lifecycle fixtures deliberately instantiate Engine without
+    running its normal constructor. Catch-up must remain usable there and after
+    partial restart reconstruction instead of crashing on a missing attribute.
+    """
+
+    policy = getattr(engine, "policy", None)
+    if policy is None:
+        policy = core.E4Policy(engine.settings)
+        try:
+            engine.policy = policy
+        except Exception:
+            pass
+    return policy
+
+
 async def _schedule_exit(
     engine: core.Engine,
     position: core.Position,
@@ -74,7 +92,19 @@ async def _evaluate_current_position(
     state = engine.tokens.get(position.mint)
     if state is None or position.mint not in engine.positions:
         return False
-    action, fraction, reason = engine.policy.exit(position, state)
+
+    # V4's duplicate-partial guard is keyed by position_id. Test/recovery
+    # fixtures can legitimately reconstruct a new object with that same stable
+    # ID. pending_exits plus the per-mint lock are the authoritative in-flight
+    # guards here, so discard only a stale pre-partial timestamp before a fresh
+    # evaluation. This does not permit a second live partial while one is in
+    # flight.
+    if not position.first_partial_done and position.mint not in engine.pending_exits:
+        cooldowns = getattr(e4_hardening_v4, "_partial_requested_ns", None)
+        if isinstance(cooldowns, dict):
+            cooldowns.pop(position.position_id, None)
+
+    action, fraction, reason = _policy(engine).exit(position, state)
     if not action.startswith("SELL"):
         return False
     return await _schedule_exit(
