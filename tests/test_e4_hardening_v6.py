@@ -91,6 +91,8 @@ class EntryModelTests(unittest.TestCase):
         self.assertIn("creator seed", reason)
 
     def test_explicit_prearmed_launch_can_act_on_tiny_public_flow(self) -> None:
+        from memecoin_bot import e4_hardening_v10
+
         now = time.time_ns()
         mint = "prearmed"
         creator = "known-creator"
@@ -99,6 +101,17 @@ class EntryModelTests(unittest.TestCase):
             "creator": creator,
             "metadata_host": "metadata.j7tracker.io",
         }
+        e4_hardening_v10.PIPELINES.register_authorized_intent(
+            {
+                "id": "test-prearmed-intent",
+                "creator": creator,
+                "mint": mint,
+                "issued_ns": now - 1_000_000,
+                "expires_ns": now + 60_000_000_000,
+                "authorized": True,
+                "source": "test",
+            }
+        )
         state = core.TokenState(mint)
         state.apply(event(1, core.EventKind.CREATE, mint, now, creator=creator, trader=creator, fdv=3_000), None)
         state.apply(event(2, core.EventKind.BUY, mint, now + 20_000_000, creator=creator, trader=creator, sol=0.05, price=1.05e-6, fdv=3_500), None)
