@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - codex/gambit-jr-v2-e4-300-live-certification
+      - codex/gambit-jr-v2-e4-builder-v4
     paths:
       - ".github/workflows/e4-v8-300-launch-certification.yml"
       - "scripts/e4_live_market_stress_v7.py"
