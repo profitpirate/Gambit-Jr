@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - codex/gambit-jr-v2-e4-stress-hardening
+      - codex/gambit-jr-v2-e4-v6-certification
   workflow_dispatch:
 
 jobs:
@@ -18,7 +19,7 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -e .
       - run: python -m pip install -r requirements-e4.txt
-      - name: Existing E4 regression and real-market rapid-path suite
+      - name: Existing E4 regression and V6 empirical suite
         run: python -m unittest discover -s tests -p "test_e4*.py" -v
       - name: Compile hardened runtime and live forensics
         run: >-
@@ -28,14 +29,15 @@ jobs:
           src/memecoin_bot/e4_hardening_v3.py
           src/memecoin_bot/e4_hardening_v4.py
           src/memecoin_bot/e4_hardening_v5.py
+          src/memecoin_bot/e4_hardening_v6.py
           src/memecoin_bot/e4_exec
           scripts/e4_selection_forensics.py
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
       - working-directory: tools/e4-builder
         run: npm install --omit=dev
       - working-directory: tools/e4-builder
         run: node --check daemon.mjs
       - name: Production container build
-        run: docker build -f Dockerfile.e4-exec -t gambit-jr-e4:stress .
+        run: docker build -f Dockerfile.e4-exec -t gambit-jr-e4:v6 .
