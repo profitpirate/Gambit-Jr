@@ -2,22 +2,22 @@
 
 Overall: **FAIL**
 
-- ✅ **compile** — 0.068s, code 0
-- ❌ **unit_and_regression** — 4.859s, code 1
-- ❌ **stress_single** — 0.268s, code 1
-- ❌ **stress_concurrent** — 0.233s, code 1
-- ❌ **stress_repeat_1** — 0.235s, code 1
-- ❌ **stress_repeat_2** — 0.237s, code 1
-- ❌ **stress_repeat_3** — 0.237s, code 1
-- ✅ **builder_syntax** — 0.025s, code 0
-- ✅ **builder_self_test_1** — 0.446s, code 0
-- ✅ **builder_self_test_2** — 0.449s, code 0
-- ✅ **builder_self_test_3** — 0.452s, code 0
-- ✅ **builder_self_test_4** — 0.438s, code 0
-- ✅ **builder_self_test_5** — 0.406s, code 0
-- ✅ **social_journal_e2e** — 0.21s, code 0
-- ❌ **runtime_services_lifecycle** — 0.233s, code 1
-- ✅ **production_container** — 53.067s, code 0
+- ✅ **compile** — 0.074s, code 0
+- ❌ **unit_and_regression** — 1.738s, code 1
+- ❌ **stress_single** — 0.256s, code 1
+- ❌ **stress_concurrent** — 0.251s, code 1
+- ❌ **stress_repeat_1** — 0.251s, code 1
+- ❌ **stress_repeat_2** — 0.254s, code 1
+- ❌ **stress_repeat_3** — 0.251s, code 1
+- ✅ **builder_syntax** — 0.024s, code 0
+- ✅ **builder_self_test_1** — 0.442s, code 0
+- ✅ **builder_self_test_2** — 0.444s, code 0
+- ✅ **builder_self_test_3** — 0.502s, code 0
+- ✅ **builder_self_test_4** — 0.442s, code 0
+- ✅ **builder_self_test_5** — 0.448s, code 0
+- ✅ **social_journal_e2e** — 0.215s, code 0
+- ❌ **runtime_services_lifecycle** — 0.246s, code 1
+- ✅ **production_container** — 48.179s, code 0
 
 ## Gates
 
