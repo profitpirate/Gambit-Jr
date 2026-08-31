@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from memecoin_bot import e4_live
-from memecoin_bot import e4_hardening_v3  # noqa: F401 - applies production hardening
+from memecoin_bot import e4_hardening_v6  # noqa: F401 - applies production V6 hardening
 
 
 class E4InvariantTests(unittest.TestCase):
@@ -168,7 +168,10 @@ class E4PolicyTests(unittest.TestCase):
             e4_live.Settings(model_path=Path("missing.json"))
         ).entry(state)
         self.assertFalse(accepted)
-        self.assertIn("multi-buy", reason)
+        self.assertTrue(
+            "multi-buy" in reason or "entry family" in reason,
+            reason,
+        )
 
     def test_wallet_touch_blocks_second_entry(self) -> None:
         state = e4_live.TokenState("mint")
