@@ -1,0 +1,38 @@
+name: E4 V10 direct CA social patch
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - scripts/e4_patch_v10_direct_ca_social.py
+      - .github/workflows/e4-v10-direct-ca-social-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-three-pipelines
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/e4_patch_v10_direct_ca_social.py
+      - run: python -m compileall -q src/memecoin_bot/e4_pipelines_v10.py
+      - name: Commit direct CA social path
+        run: |
+          if git diff --quiet -- src/memecoin_bot/e4_pipelines_v10.py; then
+            echo "No patch changes"
+            exit 0
+          fi
+          git config user.name "gambit-e4-v10"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/memecoin_bot/e4_pipelines_v10.py
+          git commit -m "feat(e4): enter guarded exact-CA social launches immediately"
+          git pull --rebase origin codex/e4-v10-three-pipelines
+          git push origin HEAD:codex/e4-v10-three-pipelines
