@@ -14,14 +14,17 @@ if grep -q 'vars(runtime.metrics)' src/memecoin_bot/e4_pipeline_runtime_v10.py; 
   python scripts/e4_patch_v10_runtime_faststream.py
 fi
 # V11 already contains the equivalent _state_apply_v10 observer on some snapshots.
-# Only run the legacy insertion patch when neither implementation is present.
 if ! grep -Eq 'def (_apply_v10|_state_apply_v10)' src/memecoin_bot/e4_hardening_v10.py; then
   python scripts/e4_patch_v10_state_e4_observer.py
 fi
 if grep -q 'created_ns = time.time_ns()' scripts/e4_v10_social_stream.py; then
   python scripts/e4_patch_v10_social_timestamp.py
 fi
-if ! grep -q 'part not in _GENERIC_SOCIAL_TERMS' src/memecoin_bot/e4_pipelines_v10.py; then
+# The legacy generic-terms patch targets an older n-gram implementation.  The
+# refactored NarrativeCache already rejects generic words through _STOPWORDS
+# (coin/token/crypto/solana/pump/launch/etc), so only patch the old shape.
+if grep -q 'for size in range(2, min(5, len(words) + 1))' src/memecoin_bot/e4_pipelines_v10.py \
+   && ! grep -q 'part not in _GENERIC_SOCIAL_TERMS' src/memecoin_bot/e4_pipelines_v10.py; then
   python scripts/e4_patch_v10_generic_terms.py
 fi
 if ! grep -q 'exact_ca_social_launch' src/memecoin_bot/e4_pipelines_v10.py; then
