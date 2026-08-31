@@ -1,0 +1,44 @@
+name: E4 V10 bootstrap
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-pipelines-staging
+    paths:
+      - ".github/workflows/e4-v10-bootstrap.yml"
+      - "v10-patch.tgz"
+
+permissions:
+  contents: write
+
+jobs:
+  install-v10:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-pipelines-staging
+          fetch-depth: 0
+      - name: Install V10 three-pipeline patch atomically
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s v10-patch.tgz
+          tar -xzf v10-patch.tgz -C "$GITHUB_WORKSPACE"
+          rm -f v10-patch.tgz .github/workflows/e4-v10-bootstrap.yml
+          python -m py_compile \
+            src/memecoin_bot/e4_pipelines_v10.py \
+            src/memecoin_bot/e4_discovery_v10.py \
+            src/memecoin_bot/e4_hardening_v10.py \
+            src/memecoin_bot/social/x_stream.py \
+            scripts/e4_v10_hotpath_benchmark.py \
+            scripts/e4_v10_concurrency_stress.py \
+            scripts/e4_v10_live_holdout.py \
+            tests/e4_v10_pipeline_checks.py \
+            tests/test_e4_hardening_v9.py
+          git config user.name "gambit-e4-v10"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "feat(e4): implement V10 three-pipeline sub-36ms architecture"
+          git push origin HEAD:codex/e4-v10-pipelines-staging
