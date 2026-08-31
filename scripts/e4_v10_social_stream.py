@@ -9,6 +9,7 @@ import os
 import socket
 import time
 from collections import Counter, deque
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, AsyncIterator, Mapping, Sequence
 
@@ -46,9 +47,27 @@ def chunks(values: Sequence[str], max_query_chars: int) -> list[list[str]]:
     return groups
 
 
-def authority(followers: int, configured_score: float = 0.0) -> float:
+def authority(followers: int, configured_score: float = 0.0, verified: bool = False) -> float:
     follower_component = min(1.0, max(0.0, math.log10(max(1, followers)) / 6.0))
-    return min(1.0, max(configured_score, follower_component))
+    # Verification is supporting evidence, not automatic maximum authority.
+    verification_bonus = 0.04 if verified else 0.0
+    return min(1.0, max(configured_score, follower_component + verification_bonus))
+
+
+def timestamp_ns(value: object) -> int:
+    if isinstance(value, (int, float)):
+        number = int(value)
+        return number if number > 10_000_000_000_000 else number * 1_000_000_000
+    text = str(value or "").strip()
+    if not text:
+        return time.time_ns()
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return int(parsed.timestamp() * 1_000_000_000)
+    except ValueError:
+        return time.time_ns()
 
 
 class NoveltyTracker:
@@ -186,7 +205,7 @@ async def stream(args: argparse.Namespace) -> int:
                             int(metrics.get(key) or 0)
                             for key in ("like_count", "retweet_count", "reply_count", "quote_count", "bookmark_count")
                         )
-                        created_ns = time.time_ns()
+                        created_ns = timestamp_ns(data.get("created_at"))
                         payload = {
                             "kind": "social_post",
                             "source": "x_filtered_stream",
@@ -195,7 +214,11 @@ async def stream(args: argparse.Namespace) -> int:
                             "text": text,
                             "created_ns": created_ns,
                             "followers": followers,
-                            "authority": authority(followers, 1.0 if user.get("verified") else 0.0),
+                            "authority": authority(
+                                followers,
+                                float(user.get("e4_authority_score") or 0.0),
+                                bool(user.get("verified")),
+                            ),
                             "novelty": novelty.score(text),
                             "engagement_velocity": min(1.0, engagements / 500.0),
                             "ttl_seconds": args.ttl_seconds,
