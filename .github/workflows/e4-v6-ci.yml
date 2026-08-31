@@ -1,0 +1,47 @@
+name: E4 V6 CI
+
+on:
+  push:
+    branches:
+      - codex/gambit-jr-v2-e4-v6-selection-speed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  v6-ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - name: Compile V6 Python runtime
+        run: >-
+          python -m compileall -q
+          src/memecoin_bot/e4_v6_state.py
+          src/memecoin_bot/e4_v6_policy.py
+          src/memecoin_bot/e4_v6_runtime.py
+          src/memecoin_bot/e4_hardening_v6.py
+          scripts/e4_live_market_stress_v3.py
+      - name: Validate local Pump builder syntax
+        run: |
+          node --check tools/e4-builder/fast.mjs
+          node --check tools/e4-builder/daemon.mjs
+      - name: Full E4 regression and V6 suite
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+      - name: Import production entrypoint
+        run: python -c "import memecoin_bot.e4_exec.__main__; import memecoin_bot.e4_hardening_v6"
