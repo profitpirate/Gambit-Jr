@@ -138,3 +138,12 @@ for await (const raw of input) {
     })}\n`);
   }
 }
+
+shuttingDown = true;
+childLines.close();
+child.stdin.end();
+if (!child.killed) child.kill("SIGTERM");
+await Promise.race([
+  once(child, "exit"),
+  new Promise((resolve) => setTimeout(resolve, 500)),
+]);
