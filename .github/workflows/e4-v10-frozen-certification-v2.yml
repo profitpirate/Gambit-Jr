@@ -1,0 +1,180 @@
+name: E4 V10 complete frozen certification v2
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-live-certification
+    paths:
+      - ".github/workflows/e4-v10-frozen-certification-v2.yml"
+      - "triggers/e4-v10-frozen-v2.txt"
+  workflow_dispatch:
+    inputs:
+      target_launches:
+        required: false
+        default: "1000"
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_V10_SERVICES_ENABLED: "false"
+  E4_REMOTE_BUILDER_FALLBACK: "false"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_HOLDOUT_PROGRESS_PATH: "reports/e4-v10-frozen-v2/progress.json"
+
+jobs:
+  complete-certification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 280
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-live-certification
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+
+      - name: Compile all production, pipeline, copy-exit and test code
+        run: |
+          python -m compileall -q src/memecoin_bot scripts tests
+          node --check tools/e4-builder/daemon-v2.mjs
+
+      - name: Full E4 regression and service E2E
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+
+      - name: Repeated high-pressure pipeline stress
+        run: |
+          mkdir -p reports/e4-v10-frozen-v2
+          for run in 1 2 3 4 5; do
+            python scripts/e4_v10_pipeline_stress.py \
+              --iterations 300000 \
+              --workers 16 \
+              --narrative-iterations 50000 \
+              --output "reports/e4-v10-frozen-v2/pipeline-stress-${run}.json"
+          done
+
+      - name: Fifty warm local Pump builder validations
+        working-directory: tools/e4-builder
+        run: |
+          for run in $(seq 1 50); do
+            E4_REMOTE_BUILDER_FALLBACK=false node daemon-v2.mjs --self-test >"/tmp/e4-builder-v10-${run}.log"
+          done
+          cat /tmp/e4-builder-v10-50.log
+
+      - name: Build and import complete V10 production image
+        run: |
+          docker build -f Dockerfile.e4-v10-complete -t gambit-jr-e4:v10-complete .
+          docker run --rm --entrypoint python \
+            -e E4_V10_SERVICES_ENABLED=false \
+            gambit-jr-e4:v10-complete \
+            -c "import memecoin_bot.e4_exec_v10_complete,memecoin_bot.e4_copy_exit_v10;print('PASS')"
+
+      - name: Capture 1000 fresh Pump launches and replay complete V10 hypothetically
+        id: holdout
+        env:
+          TARGET_LAUNCHES: ${{ github.event.inputs.target_launches || '1000' }}
+        shell: bash
+        run: |
+          set +e
+          python scripts/e4_v10_live_holdout_complete.py \
+            --target-launches "$TARGET_LAUNCHES" \
+            --capture-seconds 14400 \
+            --tail-seconds 360 \
+            --heartbeat-seconds 30 \
+            --minimum-launches "$TARGET_LAUNCHES" \
+            --wallet-signatures 1000 \
+            --builder-probes 500 \
+            --testnet-route-probes 0 \
+            --stress-iterations 250000 \
+            --output reports/e4-v10-frozen-v2/live-hypothesis.json
+          code=$?
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Extract canonical economic comparison
+        if: always()
+        shell: bash
+        run: |
+          if [ -s reports/e4-v10-frozen-v2/live-hypothesis.json ]; then
+            python scripts/e4_v10_extract_results_v2.py \
+              --input reports/e4-v10-frozen-v2/live-hypothesis.json \
+              --output reports/e4-v10-frozen-v2/canonical.json || true
+          fi
+
+      - name: Enforce repeated 36ms and correctness gates
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('reports/e4-v10-frozen-v2')
+          report=json.loads((root/'live-hypothesis.json').read_text())
+          speed=((report.get('e4_v10') or {}).get('speed_certification') or {})
+          assert speed.get('policy_budget_pass') is True,speed
+          assert speed.get('builder_budget_pass') is True,speed
+          assert speed.get('actual_chain_landing_measured') is False,speed
+          for path in sorted(root.glob('pipeline-stress-*.json')):
+              row=json.loads(path.read_text())
+              assert row['decision_correctness_failures']==0,row
+              assert row['decision_p99_ns']<=36_000_000,row
+              assert row['narrative']['p99_ns']<=36_000_000,row
+          PY
+
+      - name: Write concise final verdict
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('reports/e4-v10-frozen-v2')
+          live=json.loads((root/'live-hypothesis.json').read_text()) if (root/'live-hypothesis.json').exists() else {}
+          canonical=json.loads((root/'canonical.json').read_text()) if (root/'canonical.json').exists() else {}
+          speed=((live.get('e4_v10') or {}).get('speed_certification') or {})
+          stresses=[]
+          for p in sorted(root.glob('pipeline-stress-*.json')):
+              d=json.loads(p.read_text());stresses.append({'file':p.name,'decision_p95_ms':d.get('decision_p95_ns',0)/1e6,'decision_p99_ms':d.get('decision_p99_ns',0)/1e6,'narrative_p99_ms':(d.get('narrative') or {}).get('p99_ns',0)/1e6,'correctness_failures':d.get('decision_correctness_failures')})
+          verdict={'version':'e4-v10-complete-frozen-v2','live_launches':canonical.get('live_launches'),'gambit':canonical.get('gambit'),'same_window_actual_e4':canonical.get('actual_e4'),'historical_e4_net_benchmark':{'net_win_rate':0.6008,'profit_factor':4.92},'speed':speed,'pipeline_stress':stresses,'real_transactions_sent':False,'social_pipeline_status':'Injected-stream E2E passed; live X ingestion requires X_BEARER_TOKEN and was not used in this hypothesis.','authenticated_chain_landing_measured':False,'funded_live_certified':False}
+          (root/'VERDICT.json').write_text(json.dumps(verdict,indent=2))
+          g=verdict.get('gambit') or {};e=verdict.get('same_window_actual_e4') or {}
+          lines=['# Gambit E4 V10 complete frozen validation','',f"- Fresh real Pump launches: **{verdict.get('live_launches')}**",'- Funded/mainnet Gambit transactions sent: **0**',f"- Policy P95: **{speed.get('policy_pipeline_p95_ms')} ms**",f"- Builder P95: **{speed.get('builder_p95_ms')} ms**",f"- Gambit closed trades: **{g.get('closed_trades')}**",f"- Gambit net win rate: **{g.get('net_win_rate')}**",f"- Gambit net P&L: **{g.get('net_pnl_sol')} SOL**",f"- Gambit profit factor: **{g.get('profit_factor')}**",f"- Same-window E4 closed trades: **{e.get('closed_trades')}**",f"- Same-window E4 net win rate: **{e.get('net_win_rate')}**",'- Historical E4 net benchmark: **60.08%, PF 4.92**','', '## Repeated stress','']
+          lines.extend(f"- {r['file']}: decision P99 {r['decision_p99_ms']:.6f}ms; narrative P99 {r['narrative_p99_ms']:.6f}ms; failures {r['correctness_failures']}" for r in stresses)
+          lines.extend(['','## Limitations','',verdict['social_pipeline_status'],'','Authenticated regional route landing was not measured, so funded-live certification remains false.'])
+          (root/'VERDICT.md').write_text('\n'.join(lines)+'\n')
+          print(json.dumps(verdict,indent=2))
+          PY
+
+      - name: Persist frozen V2 evidence
+        if: always()
+        shell: bash
+        run: |
+          git config user.name "gambit-e4-frozen-v2"
+          git config user.email "actions@users.noreply.github.com"
+          git add reports/e4-v10-frozen-v2 || true
+          if ! git diff --cached --quiet; then
+            git commit -m "test(e4): persist complete frozen V10 validation [skip ci]"
+            git push origin HEAD:codex/e4-v10-live-certification
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v10-complete-frozen-v2-${{ github.run_id }}
+          path: reports/e4-v10-frozen-v2
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce holdout completion
+        if: always()
+        run: exit "${{ steps.holdout.outputs.code || '2' }}"
