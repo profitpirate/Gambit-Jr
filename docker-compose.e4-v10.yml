@@ -1,0 +1,68 @@
+services:
+  gambit-e4-v10:
+    build:
+      context: .
+      dockerfile: Dockerfile.e4-v10
+    image: gambit-jr-e4:v10
+    restart: unless-stopped
+    init: true
+    environment:
+      E4_LIVE: "${E4_LIVE:-false}"
+      E4_REMOTE_BUILDER_FALLBACK: "false"
+      E4_V10_SERVICES_ENABLED: "true"
+      E4_CREATOR_EXPECTANCY_PATH: /app/models/e4/e4-creator-expectancy.json
+      E4_DISCOVERED_CREATORS_PATH: /app/var/e4/e4-discovered-creators-live.json
+      E4_SOCIAL_SOURCES_PATH: /app/models/e4/e4-social-sources.json
+      E4_SOCIAL_SIGNAL_JOURNAL: /app/var/e4/social-stream.jsonl
+      E4_TEACHER_JOURNAL: /app/var/e4/e4-teacher-observations.jsonl
+      E4_LIVE_CREATOR_OVERLAY: /app/var/e4/e4-live-creator-overlay.json
+      E4_LAUNCH_INTENT_JOURNAL: /app/var/e4/launch-intents.jsonl
+      E4_LAUNCH_INTENT_SECRET: "${E4_LAUNCH_INTENT_SECRET:?set E4_LAUNCH_INTENT_SECRET}"
+      X_BEARER_TOKEN: "${X_BEARER_TOKEN:-}"
+      HELIUS_RPC_URL: "${HELIUS_RPC_URL:-}"
+      E4_LEARNER_RPC_URLS: "${E4_LEARNER_RPC_URLS:-https://solana-rpc.publicnode.com,https://api.mainnet-beta.solana.com}"
+      E4_TOKEN_HISTORY_URL_TEMPLATE: "${E4_TOKEN_HISTORY_URL_TEMPLATE:-}"
+      E4_ROUTE_URLS: "${E4_ROUTE_URLS:-}"
+      E4_PHANTOM_VAULT_ADDRESS: "${E4_PHANTOM_VAULT_ADDRESS:-}"
+      E4_OPERATING_FLOAT_SOL: "${E4_OPERATING_FLOAT_SOL:-0.5}"
+      E4_EXECUTION_RESERVE_SOL: "${E4_EXECUTION_RESERVE_SOL:-0.1}"
+      E4_KEYPAIR_PATH: /run/secrets/e4_keypair
+    command:
+      - python
+      - scripts/e4_v10_supervisor.py
+      - --social
+      - --learner
+    volumes:
+      - e4_state:/app/var/e4
+      - e4_data:/app/data
+      - ./models/e4:/app/models/e4:ro
+    secrets:
+      - e4_keypair
+    read_only: true
+    tmpfs:
+      - /tmp:size=256m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  # Deliberately separate opt-in live command. Starting the default service does
+  # not pass --live; both this profile and E4_LIVE=true are required.
+  gambit-e4-v10-live:
+    extends:
+      service: gambit-e4-v10
+    profiles: ["live"]
+    command:
+      - python
+      - scripts/e4_v10_supervisor.py
+      - --social
+      - --learner
+      - --live
+
+volumes:
+  e4_state:
+  e4_data:
+
+secrets:
+  e4_keypair:
+    file: "${E4_KEYPAIR_HOST_PATH:?set E4_KEYPAIR_HOST_PATH}"
