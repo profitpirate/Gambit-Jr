@@ -6,10 +6,10 @@ import importlib.util
 import sys
 from pathlib import Path
 
-# Apply every production hardening patch before loading the base harness. The
-# base module imports v2 for helper aliases; Python's module cache preserves the
-# v5 guardian, per-mint serialization, fill catch-up and receipt-clock patches.
-from memecoin_bot import e4_hardening_v5  # noqa: F401
+# Apply the exact production policy stack before loading the generic live-market
+# harness. V7 includes the V5 guardian/fill catch-up repairs, V6 evidence-backed
+# selection and relative sizing, plus V7 creator compatibility handling.
+from memecoin_bot import e4_hardening_v7  # noqa: F401
 
 
 def _load_base():
