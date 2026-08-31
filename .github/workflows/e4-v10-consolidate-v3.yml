@@ -1,0 +1,60 @@
+name: E4 V10 consolidate tested production source
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - ".github/workflows/e4-v10-consolidate-v3.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  consolidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-three-pipelines
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Apply exact final V10 source state
+        run: bash scripts/e4_v10_apply_all_patches_v2.sh
+      - name: Validate syntax before committing
+        run: |
+          python -m compileall -q \
+            src/memecoin_bot/e4_hardening_v10.py \
+            src/memecoin_bot/e4_pipelines_v10.py \
+            src/memecoin_bot/e4_pipeline_runtime_v10.py \
+            src/memecoin_bot/e4_exec \
+            scripts/e4_v10_social_stream.py \
+            scripts/e4_v10_discovery_worker.py \
+            scripts/e4_v10_discovery_loop.py
+          node --check tools/e4-builder/fast-preload-v4.mjs
+          node --check tools/e4-builder/race-proxy-v3.mjs
+      - name: Commit final implementation
+        run: |
+          if git diff --quiet; then
+            echo "Final V10 source already consolidated"
+            exit 0
+          fi
+          git config user.name "gambit-e4-v10"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "feat(e4): consolidate tested V10 three-pipeline production runtime"
+          for attempt in 1 2 3 4 5 6; do
+            if git pull --rebase origin codex/e4-v10-three-pipelines && git push origin HEAD:codex/e4-v10-three-pipelines; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 3))
+          done
+          exit 1
