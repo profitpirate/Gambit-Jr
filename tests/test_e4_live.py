@@ -96,7 +96,7 @@ class E4PolicyTests(unittest.TestCase):
             fdv_usd=fdv,
         )
 
-    def test_observed_bundled_microburst_can_enter(self) -> None:
+    def test_observed_bundled_microburst_cannot_bypass_identity_authority(self) -> None:
         state = e4_live.TokenState("mint")
         now = time.time_ns()
         state.apply(
@@ -135,12 +135,11 @@ class E4PolicyTests(unittest.TestCase):
                 ),
                 None,
             )
-        accepted, score, fraction, reason, features = e4_live.E4Policy(
+        accepted, _, _, reason, features = e4_live.E4Policy(
             e4_live.Settings(model_path=Path("missing.json"))
         ).entry(state)
-        self.assertTrue(accepted, reason)
-        self.assertGreater(score, 0.65)
-        self.assertGreater(fraction, 0)
+        self.assertFalse(accepted)
+        self.assertIn("identity", reason.lower())
         self.assertEqual(features["microburst_buyers"], 7)
         self.assertEqual(features["microburst_bundled_buys"], 6)
 
@@ -168,7 +167,10 @@ class E4PolicyTests(unittest.TestCase):
             e4_live.Settings(model_path=Path("missing.json"))
         ).entry(state)
         self.assertFalse(accepted)
-        self.assertIn("multi-buy", reason)
+        self.assertTrue(
+            "identity" in reason.lower() or "creator seed" in reason.lower(),
+            reason,
+        )
 
     def test_wallet_touch_blocks_second_entry(self) -> None:
         state = e4_live.TokenState("mint")

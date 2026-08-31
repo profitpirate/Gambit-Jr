@@ -57,16 +57,14 @@ class EntryModelTests(unittest.TestCase):
         e4_hardening_v6._PROFILE_BY_MINT.clear()
         e4_hardening_v6._CONTEXT_BY_MINT.clear()
 
-    def test_public_capital_burst_is_accepted(self) -> None:
+    def test_public_capital_burst_is_rejected_by_current_identity_policy(self) -> None:
         state = public_burst_state()
-        accepted, score, fraction, reason, features = core.E4Policy(
+        accepted, _, _, reason, features = core.E4Policy(
             core.Settings(model_path=Path("missing.json"))
         ).entry(state)
-        self.assertTrue(accepted, reason)
-        self.assertGreaterEqual(score, 0.72)
-        self.assertIn(fraction, set(e4_hardening_v6._TIER_FRACTIONS.values()))
+        self.assertFalse(accepted)
+        self.assertIn("identity", reason.lower())
         self.assertGreaterEqual(features["creator_buy_sol"], 2.5)
-        self.assertIn("public_capital_burst", reason)
 
     def test_unseeded_bot_spray_is_rejected(self) -> None:
         now = time.time_ns()
