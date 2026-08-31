@@ -1,0 +1,82 @@
+name: E4 V10 live result markers
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - ".github/workflows/e4-v10-live-result-markers.yml"
+      - "reports/e4-v10-live-hypothesis/latest.json"
+      - "reports/e4-v10-live-hypothesis/verdict.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  markers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-three-pipelines
+          fetch-depth: 0
+      - run: |
+          rm -rf reports/e4-v10-live-hypothesis/markers
+          mkdir -p reports/e4-v10-live-hypothesis/markers
+          python - <<'PY'
+          import json,math
+          from pathlib import Path
+          root=Path('reports/e4-v10-live-hypothesis')
+          data=json.loads((root/'latest.json').read_text())
+          out=root/'markers'
+          def safe(s): return ''.join(c if c.isalnum() or c in '-_' else '_' for c in str(s))
+          def mark(name,value='1'):
+              (out/safe(name)).write_text(str(value)+'\n')
+          e4=data.get('e4_v10') or {}
+          speed=e4.get('speed_certification') or {}
+          mark('PASS_POLICY_36MS' if speed.get('policy_budget_pass') else 'FAIL_POLICY_36MS')
+          mark('PASS_BUILDER_36MS' if speed.get('builder_budget_pass') else 'FAIL_BUILDER_36MS')
+          for key,value in speed.items():
+              if isinstance(value,(int,float)) and math.isfinite(float(value)):
+                  mark(f'speed__{key}__rounded_milli_{round(float(value)*1000)}',value)
+          index=e4.get('all_metrics_index') or {}
+          for path,value in index.items():
+              if not isinstance(value,(int,float)) or not math.isfinite(float(value)):
+                  continue
+              low=path.lower()
+              if any(term in low for term in ('win_rate','profit_factor','net_pnl','closed_positions','closed_trades','positions','trades','ending_balance','unique_launches','captured_launches')):
+                  mark(f'metric__{path}__rounded_1e6_{round(float(value)*1_000_000)}',value)
+          # Common recursive extraction independent of upstream key names.
+          def walk(value,path=''):
+              if isinstance(value,dict):
+                  for k,v in value.items():
+                      yield from walk(v,f'{path}.{k}' if path else str(k))
+              elif isinstance(value,list):
+                  for i,v in enumerate(value[:500]): yield from walk(v,f'{path}[{i}]')
+              else: yield path,value
+          numeric=list(walk(data))
+          win_rates=[]; profit_factors=[]; pnls=[]; closed=[]; launches=[]
+          for path,value in numeric:
+              try: number=float(value)
+              except (TypeError,ValueError): continue
+              if not math.isfinite(number): continue
+              low=path.lower()
+              if 'win_rate' in low and 0 <= number <= 1: win_rates.append((path,number))
+              if 'profit_factor' in low: profit_factors.append((path,number))
+              if any(term in low for term in ('net_pnl','net_p&l','pnl_sol')): pnls.append((path,number))
+              if any(term in low for term in ('closed_positions','closed_trades')): closed.append((path,number))
+              if any(term in low for term in ('unique_launches','captured_launches')): launches.append((path,number))
+          for group,rows in [('winrate',win_rates),('profitfactor',profit_factors),('pnl',pnls),('closed',closed),('launches',launches)]:
+              for i,(path,number) in enumerate(rows[:30]):
+                  mark(f'{group}_{i}__{path}__rounded_1e6_{round(number*1_000_000)}',number)
+          mark('REPORT_COMPLETE')
+          PY
+          git config user.name "gambit-e4-live-markers"
+          git config user.email "actions@users.noreply.github.com"
+          git add reports/e4-v10-live-hypothesis/markers
+          if ! git diff --cached --quiet; then
+            git commit -m "test(e4): persist V10 live result markers [skip ci]"
+            git pull --rebase origin codex/e4-v10-three-pipelines
+            git push origin HEAD:codex/e4-v10-three-pipelines
+          fi
