@@ -1,0 +1,77 @@
+name: E4 V8 live win-rate retest
+
+on:
+  push:
+    branches:
+      - codex/e4-v8-winrate-retest
+    paths:
+      - "scripts/e4_300_launch_holdout_v8.py"
+      - ".github/workflows/e4-v8-winrate-retest.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_HOLDOUT_PROGRESS_PATH: "artifacts/e4-v8-winrate-progress.json"
+
+jobs:
+  v8-winrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 125
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - name: Verify V8 and execution stack
+        run: |
+          python -m unittest discover -s tests -p "test_e4*.py" -v
+          python -m compileall -q src/memecoin_bot/e4_hardening_v8.py scripts/e4_300_launch_holdout_v8.py
+          E4_REMOTE_BUILDER_FALLBACK=false node tools/e4-builder/daemon-v2.mjs --self-test
+      - name: Capture 300 fresh real Pump launches and replay V8
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_300_launch_holdout_v8.py \
+            --target-launches 300 \
+            --capture-seconds 6600 \
+            --tail-seconds 240 \
+            --heartbeat-seconds 30 \
+            --minimum-launches 300 \
+            --wallet-signatures 1000 \
+            --builder-probes 100 \
+            --testnet-route-probes 0 \
+            --stress-iterations 100000 \
+            --output artifacts/e4-v8-winrate-holdout.json
+      - name: Selection forensics
+        if: always()
+        run: |
+          if [ -s artifacts/e4-v8-winrate-holdout-live-events.jsonl ]; then
+            python scripts/e4_selection_forensics.py \
+              --events artifacts/e4-v8-winrate-holdout-live-events.jsonl \
+              --output artifacts/e4-v8-selection-forensics.json
+          fi
+      - name: Upload V8 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e4-v8-winrate-retest-${{ github.run_id }}
+          path: |
+            artifacts/e4-v8-winrate-progress.json
+            artifacts/e4-v8-winrate-holdout.json
+            artifacts/e4-v8-winrate-holdout.md
+            artifacts/e4-v8-winrate-holdout-live-events.jsonl
+            artifacts/e4-v8-selection-forensics.json
+            artifacts/e4-v8-selection-forensics.md
+          if-no-files-found: warn
+          retention-days: 30
