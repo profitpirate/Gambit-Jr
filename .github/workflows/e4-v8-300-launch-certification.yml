@@ -12,6 +12,7 @@ on:
       - "src/memecoin_bot/e4_hardening_v5.py"
       - "src/memecoin_bot/e4_hardening_v6.py"
       - "src/memecoin_bot/e4_hardening_v7.py"
+      - "src/memecoin_bot/e4_exec/**"
       - "models/e4/e4-selection-v2.json"
       - "tools/e4-builder/**"
   workflow_dispatch:
@@ -39,7 +40,7 @@ env:
   E4_REMOTE_BUILDER_FALLBACK: "false"
   E4_MAX_RELATIVE_POSITION_FRACTION: "0.115"
   E4_RUNNER_EMERGENCY_HOLD_MS: "300000"
-  E4_BUILDER_COMMAND: "node tools/e4-builder/daemon-v2.mjs"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/daemon-v3.mjs"
 
 jobs:
   certify-exact-live-launches:
@@ -73,12 +74,15 @@ jobs:
       - name: Validate production local Pump builder
         working-directory: tools/e4-builder
         run: |
-          node --check daemon-v2.mjs
-          output=$(printf '{"request_id":"ping","action":"PING"}\n' | timeout 15s node daemon-v2.mjs)
+          node --check daemon-v3.mjs
+          output=$(printf '{"request_id":"ping","action":"PING"}\n' | timeout 15s node daemon-v3.mjs)
           echo "$output"
           echo "$output" | grep -q '"ready":true'
-          echo "$output" | grep -q '"builder_version":"local-v2"'
+          echo "$output" | grep -q '"builder_version":"local-v3"'
           echo "$output" | grep -q '"remote_fallback_enabled":false'
+          self_test=$(timeout 20s node daemon-v3.mjs --self-test)
+          echo "$self_test"
+          echo "$self_test" | grep -q '"builder_mode":"community-offline-pump-sdk-v3"'
       - name: Capture and replay exactly 300 real Pump launches
         env:
           E4_EXACT_LAUNCHES: "${{ github.event.inputs.exact_launches || '300' }}"
