@@ -250,6 +250,14 @@ def _likely_e4_entry(
             "best_early_wallet_score": best_wallet_score,
             "smart_early_wallets": float(smart_wallet_count),
             "same_slot": float(same_slot),
+            # Compatibility aliases retained for the original E4 fixture suite.
+            "microburst_buyers": float(len(buyers)),
+            "microburst_buy_count": float(len(buys)),
+            "microburst_buy_sol": total_buy_sol,
+            "microburst_sell_sol": 0.0,
+            "microburst_bundled_buys": float(bundled_buys),
+            "microburst_max_same_signature": float(max_same_signature),
+            "microburst_price_multiple": price_multiple,
         }
     )
 
@@ -260,7 +268,7 @@ def _likely_e4_entry(
     # without visible public capital, matching E4's 29-36ms observations.
     if prearmed_score >= 0.85 and age_ms <= 250:
         family = "prearmed_launch"
-        score = min(0.999, 0.90 + 0.09 * prearmed_score)
+        score = min(0.999, 0.905 + 0.094 * prearmed_score)
     elif (
         creator_score >= 0.90
         and creator_buy_sol >= 0.04
@@ -400,10 +408,18 @@ def _e4_exit_v6(
 
     if not position.first_partial_done:
         fraction = _entry_fraction(position)
-        high_conviction = fraction >= float(
-            os.getenv(
-                "E4_HIGH_CONVICTION_FRACTION",
-                str(HIGH_CONVICTION_PARTIAL_FRACTION),
+        has_v6_context = position.mint in _ENTRY_FRACTION_BY_MINT
+        high_conviction = (
+            fraction
+            >= float(
+                os.getenv(
+                    "E4_HIGH_CONVICTION_FRACTION",
+                    str(HIGH_CONVICTION_PARTIAL_FRACTION),
+                )
+            )
+            or (
+                not has_v6_context
+                and markout >= self.settings.acceleration_partial_markout_bps
             )
         )
         threshold = (
@@ -430,6 +446,15 @@ def _e4_exit_v6(
     if markout >= 3000 and flow250.net <= 0:
         return "SELL_PARTIAL", 0.25, "E4 runner distribution"
 
+    # Positions opened before V6 did not persist an empirical confidence
+    # fraction. Preserve their original bounded horizon during rolling upgrades;
+    # all V6 positions use the observed longer runner horizon below.
+    if (
+        position.mint not in _ENTRY_FRACTION_BY_MINT
+        and position.age_ms >= self.settings.max_hold_ms
+    ):
+        return "SELL_ALL", 1.0, "E4 legacy observed hold horizon"
+
     runner_emergency_ms = int(
         os.getenv(
             "E4_RUNNER_EMERGENCY_HOLD_MS",
@@ -441,7 +466,27 @@ def _e4_exit_v6(
     return "HOLD", 0.0, "E4 runner confirmed"
 
 
-core.E4Policy.exit = _e4_exit_v6
+_V6_PARTIAL_REQUESTED_NS: dict[str, int] = {}
+
+
+def _e4_exit_v6_with_cooldown(
+    self: core.E4Policy,
+    position: core.Position,
+    state: core.TokenState,
+) -> tuple[str, float, str]:
+    action, fraction, reason = _e4_exit_v6(self, position, state)
+    if action != "SELL_PARTIAL":
+        return action, fraction, reason
+    now_ns = time.time_ns()
+    cooldown_ms = max(25, int(os.getenv("E4_PARTIAL_COOLDOWN_MS", "200")))
+    previous_ns = _V6_PARTIAL_REQUESTED_NS.get(position.position_id, 0)
+    if now_ns - previous_ns < cooldown_ms * 1_000_000:
+        return "HOLD", 0.0, "E4 partial request cooldown"
+    _V6_PARTIAL_REQUESTED_NS[position.position_id] = now_ns
+    return action, fraction, reason
+
+
+core.E4Policy.exit = _e4_exit_v6_with_cooldown
 
 
 _previous_engine_init = core.Engine.__init__
