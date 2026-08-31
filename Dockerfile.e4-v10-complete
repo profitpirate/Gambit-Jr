@@ -1,0 +1,33 @@
+FROM node:22-bookworm-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    E4_BUILDER_COMMAND="node tools/e4-builder/daemon-v2.mjs" \
+    E4_REMOTE_BUILDER_FALLBACK=false \
+    E4_V10_SERVICES_ENABLED=true
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends python3 python3-pip python3-venv ca-certificates tini \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY . /app
+
+RUN python3 -m venv /opt/venv \
+    && /opt/venv/bin/pip install --upgrade pip \
+    && /opt/venv/bin/pip install -e . \
+    && /opt/venv/bin/pip install -r requirements-e4.txt \
+    && cd tools/e4-builder \
+    && npm install --omit=dev \
+    && node --check daemon-v2.mjs \
+    && E4_REMOTE_BUILDER_FALLBACK=false node daemon-v2.mjs --self-test
+
+ENV PATH="/opt/venv/bin:${PATH}"
+RUN useradd --create-home --uid 10001 gambit \
+    && mkdir -p /app/var/e4 /app/data /app/reports \
+    && chown -R gambit:gambit /app/var /app/data /app/reports
+USER gambit
+VOLUME ["/app/var/e4", "/app/data"]
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["python", "scripts/e4_v10_supervisor_complete.py", "--social", "--learner"]
