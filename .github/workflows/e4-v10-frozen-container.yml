@@ -1,0 +1,31 @@
+name: E4 V10 frozen production image
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-live-certification
+    paths:
+      - ".github/workflows/e4-v10-frozen-container.yml"
+      - "Dockerfile.e4-v10"
+      - "src/memecoin_bot/e4_exec/__main__.py"
+      - "src/memecoin_bot/e4_exec_v10.py"
+      - "src/memecoin_bot/e4_runtime_services_v10.py"
+      - "scripts/e4_v10_supervisor.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  production-image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f Dockerfile.e4-v10 -t gambit-jr-e4:v10 .
+      - name: Verify default command is non-live and imports all pipelines
+        run: |
+          docker run --rm --entrypoint python \
+            -e E4_V10_SERVICES_ENABLED=false \
+            gambit-jr-e4:v10 \
+            -c "import memecoin_bot.e4_exec_v10,memecoin_bot.e4_hardening_v10,memecoin_bot.e4_fast_execution_v10,memecoin_bot.e4_runtime_services_v10;print('PASS')"
