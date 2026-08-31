@@ -7,9 +7,11 @@ on:
       - ".github/workflows/e4-v11-finalize.yml"
       - "scripts/e4_v10_apply_all_patches.sh"
       - "scripts/e4_v10_apply_all_patches_v2.sh"
+      - "scripts/e4_v11_*.py"
       - "scripts/e4_patch_v10_*.py"
       - "scripts/e4_migrate_*v10.py"
       - "src/memecoin_bot/e4_*v10.py"
+      - "src/memecoin_bot/e4_*v11.py"
       - "src/memecoin_bot/e4_exec/**"
       - "tools/e4-builder/**"
       - "tests/test_e4*.py"
@@ -50,19 +52,15 @@ jobs:
         run: npm install --omit=dev
       - name: Consolidate V11 source migrations
         run: bash scripts/e4_v10_apply_all_patches_v2.sh
-      - name: V11 production wiring diagnostics
+      - name: V11 production wiring assertions
         run: |
-          for check in \
-            'e4_hardening_v10|src/memecoin_bot/e4_exec/__main__.py' \
-            'start_background_supervisor|src/memecoin_bot/e4_exec/__main__.py' \
-            'race-proxy-v3.mjs|src/memecoin_bot/e4_exec/__main__.py' \
-            'def finalize_stale_learning|src/memecoin_bot/e4_pipelines_v10.py' \
-            'exact_ca_social_launch|src/memecoin_bot/e4_pipelines_v10.py' \
-            'last_sell_signature|src/memecoin_bot/e4_pipelines_v10.py' \
-            'transaction_ws_urls|src/memecoin_bot/e4_pipeline_runtime_v10.py'; do
-            marker="${check%%|*}"; file="${check#*|}"
-            if grep -q "$marker" "$file"; then echo "PASS $marker"; else echo "MISSING $marker"; fi
-          done
+          grep -q 'e4_hardening_v10' src/memecoin_bot/e4_exec/__main__.py
+          grep -q 'start_background_supervisor' src/memecoin_bot/e4_exec/__main__.py
+          grep -q 'race-proxy-v3.mjs' src/memecoin_bot/e4_exec/__main__.py
+          grep -q 'def finalize_stale_learning' src/memecoin_bot/e4_pipeline_manager_v11.py
+          grep -q 'exact_ca_social_launch' src/memecoin_bot/e4_pipeline_manager_v11.py
+          grep -q 'last_sell_signature' src/memecoin_bot/e4_pipeline_manager_v11.py
+          grep -q 'transaction_ws_urls' src/memecoin_bot/e4_pipeline_runtime_v10.py
       - name: Full E4 regression suite
         run: python -m unittest discover -s tests -p 'test_e4*.py' -v
       - name: Compile and syntax audit
@@ -92,19 +90,34 @@ jobs:
       - name: Brutal pipeline stress — pass A
         run: |
           mkdir -p artifacts
-          python scripts/e4_v10_pipeline_stress.py --sequential 500000 --parallel 400000 --workers 32 --social 50000 --e4-copy 50000 --output artifacts/e4-v11-stress-a.json
+          python scripts/e4_v10_pipeline_stress.py --iterations 1000000 --workers 32 --narrative-iterations 100000 --output artifacts/e4-v11-stress-a.json
       - name: Brutal pipeline stress — pass B
         env:
           PYTHONHASHSEED: "913847"
         run: |
-          python scripts/e4_v10_pipeline_stress.py --sequential 500000 --parallel 400000 --workers 64 --social 50000 --e4-copy 50000 --output artifacts/e4-v11-stress-b.json
+          python scripts/e4_v10_pipeline_stress.py --iterations 1000000 --workers 64 --narrative-iterations 100000 --output artifacts/e4-v11-stress-b.json
       - name: Production container build
         run: docker build -f Dockerfile.e4-exec -t gambit-jr-e4:v11 .
       - name: Persist consolidated V11 implementation
         run: |
           git config user.name 'gambit-v11-finalizer'
           git config user.email 'actions@users.noreply.github.com'
-          git add src/memecoin_bot/e4_hardening_v10.py src/memecoin_bot/e4_pipelines_v10.py src/memecoin_bot/e4_pipeline_runtime_v10.py src/memecoin_bot/e4_exec/__main__.py tools/e4-builder/race-proxy-v3.mjs tools/e4-builder/fast-preload-v4.mjs tests/test_e4_hardening_v6.py tests/test_e4_live.py tests/test_e4_v10_direct_ca_social.py scripts/e4_v10_social_stream.py scripts/e4_v10_apply_all_patches.sh scripts/e4_v10_apply_all_patches_v2.sh || true
+          git add \
+            src/memecoin_bot/e4_hardening_v10.py \
+            src/memecoin_bot/e4_pipelines_v10.py \
+            src/memecoin_bot/e4_pipeline_manager_v11.py \
+            src/memecoin_bot/e4_pipeline_runtime_v10.py \
+            src/memecoin_bot/e4_exec/__main__.py \
+            tools/e4-builder/race-proxy-v3.mjs \
+            tools/e4-builder/fast-preload-v4.mjs \
+            tests/test_e4_hardening_v6.py \
+            tests/test_e4_live.py \
+            tests/test_e4_v10_direct_ca_social.py \
+            scripts/e4_v10_social_stream.py \
+            scripts/e4_v10_apply_all_patches.sh \
+            scripts/e4_v10_apply_all_patches_v2.sh \
+            scripts/e4_v11_wire_canonical_manager.py \
+            scripts/e4_v11_fix_manager_cycle.py || true
           if ! git diff --cached --quiet; then
             git commit -m 'feat(e4): consolidate V11 production hardening [skip ci]'
             git push origin HEAD:codex/e4-v11-final
@@ -115,9 +128,7 @@ jobs:
           name: e4-v11-hardening-${{ github.run_id }}
           path: |
             artifacts/e4-v11-stress-a.json
-            artifacts/e4-v11-stress-a.md
             artifacts/e4-v11-stress-b.json
-            artifacts/e4-v11-stress-b.md
             v11-npm-audit.json
           if-no-files-found: warn
           retention-days: 30
