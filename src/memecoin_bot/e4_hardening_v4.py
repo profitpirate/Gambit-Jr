@@ -175,7 +175,11 @@ final._guardian = _guardian_v4
 # ---------------------------------------------------------------------------
 
 _previous_exit = core.E4Policy.exit
-_partial_requested_ns: dict[str, int] = {}
+# Position IDs are persisted and may be reused by isolated tests or recovery
+# fixtures. Pairing the ID with the live object identity prevents one completed
+# position's cooldown from suppressing a distinct position that happens to reuse
+# the same persisted ID. Production position IDs are still unique UUIDs.
+_partial_requested_ns: dict[tuple[str, int], int] = {}
 
 
 def _exit_with_partial_cooldown(
@@ -184,15 +188,23 @@ def _exit_with_partial_cooldown(
     state: core.TokenState,
 ) -> tuple[str, float, str]:
     action, fraction, reason = _previous_exit(self, position, state)
+    key = (position.position_id, id(position))
+    if position.first_partial_done or position.status == core.PositionStatus.CLOSED:
+        _partial_requested_ns.pop(key, None)
     if action != "SELL_PARTIAL":
         return action, fraction, reason
 
     now_ns = time.time_ns()
     cooldown_ms = max(25, int(os.getenv("E4_PARTIAL_COOLDOWN_MS", "200")))
-    previous_ns = _partial_requested_ns.get(position.position_id, 0)
+    previous_ns = _partial_requested_ns.get(key, 0)
     if now_ns - previous_ns < cooldown_ms * 1_000_000:
         return "HOLD", 0.0, "E4 partial request cooldown"
-    _partial_requested_ns[position.position_id] = now_ns
+    _partial_requested_ns[key] = now_ns
+    if len(_partial_requested_ns) > 4096:
+        cutoff = now_ns - max(cooldown_ms * 4, 1_000) * 1_000_000
+        for old_key, requested_ns in tuple(_partial_requested_ns.items()):
+            if requested_ns < cutoff:
+                _partial_requested_ns.pop(old_key, None)
     return action, fraction, reason
 
 
