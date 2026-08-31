@@ -1,0 +1,38 @@
+name: E4 creator expectancy
+
+on:
+  push:
+    branches:
+      - codex/gambit-jr-v2-e4-stress-hardening
+    paths:
+      - "scripts/e4_creator_expectancy.py"
+      - ".github/workflows/e4-creator-expectancy.yml"
+  workflow_dispatch:
+
+jobs:
+  creator-expectancy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - name: Resolve loser creators and calculate W/L expectancy
+        env:
+          E4_RPC_URLS: ${{ secrets.HELIUS_RPC_URL || 'https://solana-rpc.publicnode.com,https://api.mainnet-beta.solana.com,https://solana-mainnet.api.onfinality.io/public' }}
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_creator_expectancy.py --rpc-urls "$E4_RPC_URLS" --output artifacts/e4-creator-expectancy.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-creator-expectancy-${{ github.run_id }}
+          path: |
+            artifacts/e4-creator-expectancy.json
+            artifacts/e4-creator-expectancy.md
+          if-no-files-found: warn
+          retention-days: 30
