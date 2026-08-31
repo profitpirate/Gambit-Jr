@@ -1,0 +1,79 @@
+name: E4 V10 speed benchmark
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - ".github/workflows/e4-v10-speed-benchmark.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
+  E4_BUILDER_PRELOAD: "tools/e4-builder/fast-preload-v4.mjs"
+  E4_HOLDOUT_PROGRESS_PATH: "artifacts/e4-v10-speed-progress.json"
+
+jobs:
+  speed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - name: Apply latest V10 patches and preload v4
+        run: |
+          bash scripts/e4_v10_apply_all_patches.sh
+          python scripts/e4_patch_v10_builder_preload_v4.py
+      - name: Unit and million-path latency precheck
+        run: |
+          python -m unittest discover -s tests -p "test_e4*.py" -v
+          mkdir -p artifacts
+          python scripts/e4_v10_pipeline_stress.py \
+            --sequential 500000 \
+            --parallel 300000 \
+            --workers 24 \
+            --social 50000 \
+            --e4-copy 50000 \
+            --output artifacts/e4-v10-speed-pipeline.json
+      - name: 1000 persistent-builder probes against live Pump state
+        run: |
+          python scripts/e4_300_launch_holdout_v10.py \
+            --target-launches 50 \
+            --capture-seconds 1800 \
+            --tail-seconds 90 \
+            --heartbeat-seconds 20 \
+            --minimum-launches 50 \
+            --wallet-signatures 300 \
+            --builder-probes 1000 \
+            --testnet-route-probes 0 \
+            --stress-iterations 25000 \
+            --output artifacts/e4-v10-speed-holdout.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v10-speed-${{ github.run_id }}
+          path: |
+            artifacts/e4-v10-speed-progress.json
+            artifacts/e4-v10-speed-pipeline.json
+            artifacts/e4-v10-speed-pipeline.md
+            artifacts/e4-v10-speed-holdout.json
+            artifacts/e4-v10-speed-holdout.md
+            artifacts/e4-v10-speed-holdout-live-events.jsonl
+          if-no-files-found: warn
+          retention-days: 30
