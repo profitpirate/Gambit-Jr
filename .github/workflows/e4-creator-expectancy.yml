@@ -9,12 +9,17 @@ on:
       - ".github/workflows/e4-creator-expectancy.yml"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   creator-expectancy:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: codex/gambit-jr-v2-e4-stress-hardening
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -27,6 +32,18 @@ jobs:
         run: |
           mkdir -p artifacts
           python scripts/e4_creator_expectancy.py --rpc-urls "$E4_RPC_URLS" --output artifacts/e4-creator-expectancy.json
+      - name: Persist full creator expectancy model
+        run: |
+          cp artifacts/e4-creator-expectancy.json models/e4/e4-creator-expectancy.json
+          git config user.name "gambit-e4-expectancy"
+          git config user.email "actions@users.noreply.github.com"
+          git add models/e4/e4-creator-expectancy.json
+          if git diff --cached --quiet; then
+            echo "Creator expectancy unchanged"
+            exit 0
+          fi
+          git commit -m "data(e4): refresh creator win loss expectancy"
+          git push origin HEAD:codex/gambit-jr-v2-e4-stress-hardening
       - uses: actions/upload-artifact@v4
         if: always()
         with:
