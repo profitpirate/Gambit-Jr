@@ -1,0 +1,72 @@
+name: E4 V10 persistent certification
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths-ignore:
+      - "reports/e4-v10-certification/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_V10_SERVICES_ENABLED: "false"
+  E4_REMOTE_BUILDER_FALLBACK: "false"
+
+jobs:
+  certify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-three-pipelines
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - name: Execute complete self-reporting certification
+        id: certification
+        shell: bash
+        run: |
+          set +e
+          python scripts/e4_v10_certify.py --output reports/e4-v10-certification/latest.json
+          code=$?
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Persist certification evidence on branch
+        if: always()
+        shell: bash
+        run: |
+          git config user.name "gambit-e4-certification"
+          git config user.email "actions@users.noreply.github.com"
+          git add reports/e4-v10-certification/latest.json reports/e4-v10-certification/latest.md reports/e4-v10-certification/run-artifacts || true
+          if git diff --cached --quiet; then
+            echo "Certification report unchanged"
+          else
+            git commit -m "test(e4): persist V10 certification evidence [skip ci]"
+            git pull --rebase origin codex/e4-v10-three-pipelines
+            git push origin HEAD:codex/e4-v10-three-pipelines
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v10-certification-${{ github.run_id }}
+          path: reports/e4-v10-certification
+          if-no-files-found: error
+          retention-days: 30
+      - name: Enforce certification result
+        if: always()
+        shell: bash
+        run: exit "${{ steps.certification.outputs.code || '2' }}"
