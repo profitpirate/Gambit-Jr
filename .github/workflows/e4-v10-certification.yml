@@ -1,0 +1,183 @@
+name: E4 V10 three-pipeline certification
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - "src/memecoin_bot/e4_hardening_v10.py"
+      - "src/memecoin_bot/e4_pipelines_v10.py"
+      - "src/memecoin_bot/e4_pipeline_runtime_v10.py"
+      - "src/memecoin_bot/e4_exec/__main__.py"
+      - "tools/e4-builder/fast-preload-v3.mjs"
+      - "tools/e4-builder/race-proxy-v3.mjs"
+      - "scripts/e4_300_launch_holdout_v10.py"
+      - "scripts/e4_v10_pipeline_stress.py"
+      - "scripts/e4_v10_certification.py"
+      - "tests/test_e4_pipelines_v10.py"
+      - ".github/workflows/e4-v10-certification.yml"
+  workflow_dispatch:
+    inputs:
+      target_launches:
+        description: Exact fresh Pump launch cohort
+        required: false
+        default: "300"
+      max_capture_seconds:
+        description: Hard live capture deadline
+        required: false
+        default: "7200"
+      tail_seconds:
+        description: Post-cohort observation period
+        required: false
+        default: "240"
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
+  E4_HOLDOUT_PROGRESS_PATH: "artifacts/e4-v10-live-progress.json"
+
+jobs:
+  mechanical-and-latency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - name: Apply semantic migration of obsolete V3/V6 assertions
+        run: python scripts/e4_migrate_legacy_policy_tests_v10.py
+      - name: Full E4 regression and V10 three-pipeline suite
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+      - name: Compile every production V10 component
+        run: |
+          python -m compileall -q \
+            src/memecoin_bot/e4_hardening_v10.py \
+            src/memecoin_bot/e4_pipelines_v10.py \
+            src/memecoin_bot/e4_pipeline_runtime_v10.py \
+            src/memecoin_bot/e4_exec \
+            scripts/e4_300_launch_holdout_v10.py \
+            scripts/e4_v10_pipeline_stress.py \
+            scripts/e4_v10_certification.py
+          node --check tools/e4-builder/fast-preload-v3.mjs
+          node --check tools/e4-builder/race-proxy-v3.mjs
+          node --check tools/e4-builder/daemon-v2.mjs
+      - name: Offline transaction-construction and raced-builder verification
+        working-directory: tools/e4-builder
+        run: |
+          E4_REMOTE_BUILDER_FALLBACK=false node daemon-v2.mjs --self-test
+          E4_REMOTE_BUILDER_FALLBACK=false node race-proxy-v3.mjs --self-test
+      - name: Million-path developer, E4-copy and social stress
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_v10_pipeline_stress.py \
+            --sequential 350000 \
+            --parallel 250000 \
+            --workers 16 \
+            --social 25000 \
+            --e4-copy 25000 \
+            --output artifacts/e4-v10-pipeline-stress.json
+      - name: Production container build
+        run: docker build -f Dockerfile.e4-exec -t gambit-jr-e4:v10 .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v10-mechanical-${{ github.run_id }}
+          path: |
+            artifacts/e4-v10-pipeline-stress.json
+            artifacts/e4-v10-pipeline-stress.md
+          if-no-files-found: warn
+          retention-days: 30
+
+  live-hypothesis:
+    runs-on: ubuntu-latest
+    needs: mechanical-and-latency
+    timeout-minutes: 135
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - name: Capture exact fresh Pump cohort and replay V10 hypothetically
+        env:
+          TARGET_LAUNCHES: ${{ github.event.inputs.target_launches || '300' }}
+          MAX_CAPTURE_SECONDS: ${{ github.event.inputs.max_capture_seconds || '7200' }}
+          TAIL_SECONDS: ${{ github.event.inputs.tail_seconds || '240' }}
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_300_launch_holdout_v10.py \
+            --target-launches "$TARGET_LAUNCHES" \
+            --capture-seconds "$MAX_CAPTURE_SECONDS" \
+            --tail-seconds "$TAIL_SECONDS" \
+            --heartbeat-seconds 30 \
+            --minimum-launches "$TARGET_LAUNCHES" \
+            --wallet-signatures 1200 \
+            --builder-probes 300 \
+            --testnet-route-probes 0 \
+            --stress-iterations 100000 \
+            --output artifacts/e4-v10-live-holdout.json
+      - name: Selected-versus-ignored forensics
+        if: always()
+        run: |
+          if [ -s artifacts/e4-v10-live-holdout-live-events.jsonl ]; then
+            python scripts/e4_selection_forensics.py \
+              --events artifacts/e4-v10-live-holdout-live-events.jsonl \
+              --output artifacts/e4-v10-selection-forensics.json
+          fi
+      - name: Download mechanical latency artifact
+        uses: actions/download-artifact@v4
+        with:
+          pattern: e4-v10-mechanical-*
+          path: downloaded-mechanical
+          merge-multiple: true
+      - name: Strict 36ms and win-rate certification report
+        if: always()
+        continue-on-error: true
+        run: |
+          PIPELINE_JSON=$(find downloaded-mechanical -name 'e4-v10-pipeline-stress.json' -print -quit)
+          if [ -z "$PIPELINE_JSON" ]; then
+            echo "pipeline stress artifact missing"
+            exit 2
+          fi
+          python scripts/e4_v10_certification.py \
+            --pipeline "$PIPELINE_JSON" \
+            --holdout artifacts/e4-v10-live-holdout.json \
+            --minimum-strategy-trades 20 \
+            --output artifacts/e4-v10-certification.json
+      - name: Upload full live and certification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e4-v10-live-certification-${{ github.run_id }}
+          path: |
+            artifacts/e4-v10-live-progress.json
+            artifacts/e4-v10-live-holdout.json
+            artifacts/e4-v10-live-holdout.md
+            artifacts/e4-v10-live-holdout-live-events.jsonl
+            artifacts/e4-v10-selection-forensics.json
+            artifacts/e4-v10-selection-forensics.md
+            artifacts/e4-v10-certification.json
+            artifacts/e4-v10-certification.md
+          if-no-files-found: warn
+          retention-days: 30
