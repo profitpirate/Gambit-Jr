@@ -1,0 +1,59 @@
+name: E4 V10 metric bands
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - ".github/workflows/e4-v10-metric-bands.yml"
+      - "reports/e4-v10-certification/latest.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bands:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-three-pipelines
+          fetch-depth: 0
+      - run: |
+          rm -rf reports/e4-v10-certification/bands
+          mkdir -p reports/e4-v10-certification/bands
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('reports/e4-v10-certification/latest.json').read_text())
+          out=Path('reports/e4-v10-certification/bands')
+          thresholds=[0.05,0.1,0.25,0.5,1,2,3,5,8,10,15,20,25,30,36]
+          def safe(s): return ''.join(c if c.isalnum() or c in '-_' else '_' for c in s)
+          for name,row in (d.get('stress_reports') or {}).items():
+              if not isinstance(row,dict): continue
+              for metric in ('decision_p50_ns','decision_p95_ns','decision_p99_ns','decision_max_ns'):
+                  value=row.get(metric)
+                  if value is None: continue
+                  ms=float(value)/1e6
+                  (out/f'{safe(name)}__{metric}__rounded_us_{round(ms*1000)}').write_text(f'{ms:.9f}\n')
+                  for threshold in thresholds:
+                      if ms <= threshold:
+                          (out/f'{safe(name)}__{metric}__LE_{str(threshold).replace(".","p")}ms').write_text('1\n')
+              narr=row.get('narrative') or {}
+              value=narr.get('p99_ns')
+              if value is not None:
+                  ms=float(value)/1e6
+                  (out/f'{safe(name)}__narrative_p99__rounded_us_{round(ms*1000)}').write_text(f'{ms:.9f}\n')
+                  for threshold in thresholds:
+                      if ms <= threshold:
+                          (out/f'{safe(name)}__narrative_p99__LE_{str(threshold).replace(".","p")}ms').write_text('1\n')
+          PY
+          git config user.name "gambit-e4-metrics"
+          git config user.email "actions@users.noreply.github.com"
+          git add reports/e4-v10-certification/bands
+          if ! git diff --cached --quiet; then
+            git commit -m "test(e4): persist V10 latency bands [skip ci]"
+            git pull --rebase origin codex/e4-v10-three-pipelines
+            git push origin HEAD:codex/e4-v10-three-pipelines
+          fi
