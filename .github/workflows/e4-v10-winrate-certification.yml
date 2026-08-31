@@ -1,0 +1,111 @@
+name: E4 V10 forward win-rate certification
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - ".github/workflows/e4-v10-winrate-certification.yml"
+      - "scripts/e4_winrate_certification_v10.py"
+  workflow_dispatch:
+    inputs:
+      target_launches:
+        description: Fresh Pump launches to capture
+        required: false
+        default: "3000"
+      maximum_capture_seconds:
+        description: Hard maximum capture duration
+        required: false
+        default: "14400"
+      minimum_closed_trades:
+        description: Minimum Gambit trades required before WR is reportable
+        required: false
+        default: "100"
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_HOLDOUT_PROGRESS_PATH: "artifacts/e4-v10-forward-progress.json"
+
+jobs:
+  forward-certification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install runtime
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+          python -m pip install -r requirements-e4.txt
+          cd tools/e4-builder
+          npm install --omit=dev
+
+      - name: Freeze and verify V10 before observing holdout
+        run: |
+          python -m compileall -q \
+            src/memecoin_bot/e4_hardening_v10.py \
+            scripts/e4_300_launch_holdout_v10.py \
+            scripts/e4_winrate_certification_v10.py
+          python -m unittest discover -s tests -p "test_e4*.py" -v
+          node --check tools/e4-builder/daemon-v2.mjs
+          node tools/e4-builder/daemon-v2.mjs --self-test
+
+      - name: Capture 3000 fresh launches with frozen V10
+        env:
+          TARGET_LAUNCHES: ${{ github.event.inputs.target_launches || '3000' }}
+          MAX_CAPTURE_SECONDS: ${{ github.event.inputs.maximum_capture_seconds || '14400' }}
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_300_launch_holdout_v10.py \
+            --target-launches "$TARGET_LAUNCHES" \
+            --capture-seconds "$MAX_CAPTURE_SECONDS" \
+            --tail-seconds 300 \
+            --heartbeat-seconds 30 \
+            --minimum-launches "$TARGET_LAUNCHES" \
+            --wallet-signatures 1000 \
+            --builder-probes 100 \
+            --testnet-route-probes 0 \
+            --stress-iterations 100000 \
+            --output artifacts/e4-v10-forward-holdout.json
+
+      - name: Certify 36ms hypothesis win rate
+        env:
+          MIN_CLOSED: ${{ github.event.inputs.minimum_closed_trades || '100' }}
+          TARGET_LAUNCHES: ${{ github.event.inputs.target_launches || '3000' }}
+        run: |
+          python scripts/e4_winrate_certification_v10.py \
+            --holdout-report artifacts/e4-v10-forward-holdout.json \
+            --events artifacts/e4-v10-forward-holdout-live-events.jsonl \
+            --latency-ms 36 \
+            --starting-balance-sol 1.2 \
+            --minimum-launches "$TARGET_LAUNCHES" \
+            --minimum-closed-trades "$MIN_CLOSED" \
+            --output artifacts/e4-v10-winrate-certification.json
+
+      - name: Upload complete forward evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e4-v10-forward-winrate-${{ github.run_id }}
+          path: |
+            artifacts/e4-v10-forward-progress.json
+            artifacts/e4-v10-forward-holdout.json
+            artifacts/e4-v10-forward-holdout.md
+            artifacts/e4-v10-forward-holdout-live-events.jsonl
+            artifacts/e4-v10-winrate-certification.json
+            artifacts/e4-v10-winrate-certification.md
+          if-no-files-found: warn
+          retention-days: 30
