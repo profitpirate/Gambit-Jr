@@ -4,6 +4,7 @@ import asyncio
 import base64
 import json
 import logging
+import os
 import time
 from typing import Any, Mapping
 
@@ -35,8 +36,6 @@ def _integer_text(value: Any) -> str | None:
     if value in (None, ""):
         return None
     try:
-        # Preserve already exact database strings. Floats are accepted only for
-        # integral values; raw reserve fields should normally arrive as strings.
         text = str(value)
         if text.isdigit():
             return text
@@ -57,7 +56,7 @@ def _extract_context(row: Mapping[str, Any], mint: str) -> dict[str, Any]:
                 merged.setdefault(str(nested_key), nested_value)
 
     previous = dict(_BUILD_CONTEXT_BY_MINT.get(mint, {}))
-    values = {
+    values: dict[str, Any] = {
         "token_program": _first(
             merged,
             "token_program",
@@ -80,14 +79,15 @@ def _extract_context(row: Mapping[str, Any], mint: str) -> dict[str, Any]:
             _first(merged, "token_total_supply", "total_supply", "base_supply")
         ),
         "creator": _first(merged, "creator", "creator_wallet", "deployer"),
-        "mayhem_mode": _bool_value(
-            _first(merged, "is_mayhem_mode", "mayhem_mode", "mayhem", default=False)
-        ) if False else None,
     }
-    # `_first` deliberately has no default argument; booleans are handled
-    # separately so a missing false value does not overwrite known context.
     mayhem = _first(merged, "is_mayhem_mode", "mayhem_mode", "mayhem")
-    cashback = _first(merged, "is_cashback_coin", "cashback", "cashback_coin")
+    cashback = _first(
+        merged,
+        "is_cashback_enabled",
+        "is_cashback_coin",
+        "cashback",
+        "cashback_coin",
+    )
     complete = _first(merged, "complete", "curve_complete")
     if mayhem is not None:
         values["mayhem_mode"] = _bool_value(mayhem)
@@ -187,9 +187,17 @@ async def _worker_prefetch(
     return await _worker_request(self, payload)
 
 
+async def _worker_warm(self: final.BuilderWorker) -> dict[str, Any]:
+    return await _worker_request(
+        self,
+        {"request_id": f"warm:{id(self)}", "action": "WARM", "side": "WARM"},
+    )
+
+
 final.BuilderWorker.request = _worker_request
 final.BuilderWorker.build = _worker_build
 final.BuilderWorker.prefetch = _worker_prefetch
+final.BuilderWorker.warm = _worker_warm
 
 
 async def _pool_build(
@@ -216,8 +224,18 @@ async def _pool_prefetch(
     )
 
 
+async def _pool_warm(self: final.BuilderPool) -> list[dict[str, Any]]:
+    return list(
+        await asyncio.gather(
+            *(worker.warm() for worker in self.workers),
+            return_exceptions=False,
+        )
+    )
+
+
 final.BuilderPool.build = _pool_build
 final.BuilderPool.prefetch = _pool_prefetch
+final.BuilderPool.warm = _pool_warm
 
 
 async def _prefetch_mint(engine: core.Engine, event: core.Event) -> None:
@@ -237,8 +255,6 @@ async def _prefetch_mint(engine: core.Engine, event: core.Event) -> None:
             }
         )
     except Exception as exc:
-        # Prefetch is an optimization only. A real trade may still build from
-        # the latest event hint or bounded on-demand RPC state.
         LOGGER.debug("E4 builder prefetch failed mint=%s: %s", mint, exc)
     finally:
         _PREFETCH_IN_FLIGHT.discard(mint)
@@ -248,8 +264,13 @@ _PREVIOUS_ON_EVENT = core.Engine.on_event
 
 
 async def _on_event_v7(self: core.Engine, event: core.Event) -> None:
+    # Exact reserve hints are attached to every build, so launch-time prefetch is
+    # normally unnecessary and could occupy both workers at the moment an order
+    # is admitted. Keep it as an explicit operator experiment only.
     if (
-        event.kind in {core.EventKind.CREATE, core.EventKind.BUY, core.EventKind.CURVE}
+        os.getenv("E4_PREFETCH_LAUNCH_STATE", "false").lower()
+        in {"1", "true", "yes", "on"}
+        and event.kind in {core.EventKind.CREATE, core.EventKind.BUY, core.EventKind.CURVE}
         and event.mint not in _PREFETCH_IN_FLIGHT
         and event.mint not in self.positions
         and event.mint not in self.pending_entries
@@ -260,3 +281,19 @@ async def _on_event_v7(self: core.Engine, event: core.Event) -> None:
 
 
 core.Engine.on_event = _on_event_v7
+
+
+_PREVIOUS_RUN = core.Engine.run
+
+
+async def _run_v7(self: core.Engine) -> None:
+    # Start both daemon workers and await Pump global state + a recent blockhash
+    # before consuming the first market event. This removes cold RPC work from
+    # the 29-36ms entry window.
+    warm = getattr(self.builder, "warm", None)
+    if warm is not None:
+        await warm()
+    await _PREVIOUS_RUN(self)
+
+
+core.Engine.run = _run_v7
