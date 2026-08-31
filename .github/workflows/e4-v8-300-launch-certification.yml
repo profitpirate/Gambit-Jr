@@ -77,8 +77,8 @@ jobs:
           output=$(printf '{"request_id":"ping","action":"PING"}\n' | timeout 15s node daemon-v2.mjs)
           echo "$output"
           echo "$output" | grep -q '"ready":true'
-          echo "$output" | grep -q '"local_enabled":true'
-          echo "$output" | grep -q '"remote_fallback":false'
+          echo "$output" | grep -q '"builder_version":"local-v2"'
+          echo "$output" | grep -q '"remote_fallback_enabled":false'
       - name: Capture and replay exactly 300 real Pump launches
         env:
           E4_EXACT_LAUNCHES: "${{ github.event.inputs.exact_launches || '300' }}"
