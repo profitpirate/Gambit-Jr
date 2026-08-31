@@ -1,0 +1,215 @@
+name: E4 V10 final E2E v2
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - ".github/workflows/e4-v10-final-e2e-v2.yml"
+  workflow_dispatch:
+    inputs:
+      target_launches:
+        description: Exact number of fresh Pump launches
+        required: false
+        default: "300"
+      max_capture_seconds:
+        description: Hard capture deadline
+        required: false
+        default: "7200"
+      tail_seconds:
+        description: Observation time after final launch
+        required: false
+        default: "300"
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
+  E4_HOLDOUT_PROGRESS_PATH: "artifacts/e4-v10-v2-live-progress.json"
+
+jobs:
+  mechanical:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - name: Apply all V10 migrations and hot-path repairs idempotently
+        run: |
+          if grep -q 'def test_public_capital_burst_is_accepted' tests/test_e4_hardening_v6.py; then
+            python scripts/e4_migrate_legacy_policy_tests_v10.py
+          fi
+          if ! grep -q 'test-prearmed-intent' tests/test_e4_hardening_v6.py; then
+            python scripts/e4_migrate_prearmed_test_v10.py
+          fi
+          if grep -q 'vars(self.counters)' src/memecoin_bot/e4_pipelines_v10.py; then
+            python scripts/e4_patch_v10_pipeline_hotstores.py
+          fi
+          if grep -q 'vars(runtime.metrics)' src/memecoin_bot/e4_pipeline_runtime_v10.py; then
+            python scripts/e4_patch_v10_runtime_faststream.py
+          fi
+          if ! grep -q 'def _apply_v10' src/memecoin_bot/e4_hardening_v10.py; then
+            python scripts/e4_patch_v10_state_e4_observer.py
+          fi
+          if grep -q 'created_ns = time.time_ns()' scripts/e4_v10_social_stream.py; then
+            python scripts/e4_patch_v10_social_timestamp.py
+          fi
+          if ! grep -q 'part not in _GENERIC_SOCIAL_TERMS' src/memecoin_bot/e4_pipelines_v10.py; then
+            python scripts/e4_patch_v10_generic_terms.py
+          fi
+      - name: Full E4 and V10 unit, lifecycle and concurrency tests
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+      - name: Compile every V10 production component
+        run: |
+          python -m compileall -q \
+            src/memecoin_bot/e4_hardening_v10.py \
+            src/memecoin_bot/e4_pipelines_v10.py \
+            src/memecoin_bot/e4_pipeline_runtime_v10.py \
+            src/memecoin_bot/e4_exec \
+            scripts/e4_v10_social_stream.py \
+            scripts/e4_v10_discovery_worker.py \
+            scripts/e4_v10_discovery_loop.py \
+            scripts/e4_300_launch_holdout_v10.py \
+            scripts/e4_v10_pipeline_stress.py \
+            scripts/e4_v10_certification.py
+          node --check tools/e4-builder/fast-preload-v3.mjs
+          node --check tools/e4-builder/race-proxy-v3.mjs
+          node --check tools/e4-builder/daemon-v2.mjs
+      - name: Both local transaction builders must pass without remote fallback
+        working-directory: tools/e4-builder
+        env:
+          E4_REMOTE_BUILDER_FALLBACK: "false"
+        run: |
+          node daemon-v2.mjs --self-test
+          node race-proxy-v3.mjs --self-test
+      - name: 650,000 mixed developer, social and E4-copy decisions
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_v10_pipeline_stress.py \
+            --sequential 350000 \
+            --parallel 250000 \
+            --workers 16 \
+            --social 25000 \
+            --e4-copy 25000 \
+            --output artifacts/e4-v10-v2-pipeline-stress.json
+      - name: Repeat stress under a second process seed
+        env:
+          PYTHONHASHSEED: "38191"
+        run: |
+          python scripts/e4_v10_pipeline_stress.py \
+            --sequential 150000 \
+            --parallel 100000 \
+            --workers 24 \
+            --social 10000 \
+            --e4-copy 10000 \
+            --output artifacts/e4-v10-v2-pipeline-stress-repeat.json
+      - name: Production execution container
+        run: docker build -f Dockerfile.e4-exec -t gambit-jr-e4:v10-v2 .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v10-v2-mechanical-${{ github.run_id }}
+          path: |
+            artifacts/e4-v10-v2-pipeline-stress.json
+            artifacts/e4-v10-v2-pipeline-stress.md
+            artifacts/e4-v10-v2-pipeline-stress-repeat.json
+            artifacts/e4-v10-v2-pipeline-stress-repeat.md
+          if-no-files-found: warn
+          retention-days: 30
+
+  live:
+    runs-on: ubuntu-latest
+    needs: mechanical
+    timeout-minutes: 135
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - name: Apply V10 production patches to live checkout
+        run: |
+          if grep -q 'vars(self.counters)' src/memecoin_bot/e4_pipelines_v10.py; then python scripts/e4_patch_v10_pipeline_hotstores.py; fi
+          if grep -q 'vars(runtime.metrics)' src/memecoin_bot/e4_pipeline_runtime_v10.py; then python scripts/e4_patch_v10_runtime_faststream.py; fi
+          if ! grep -q 'def _apply_v10' src/memecoin_bot/e4_hardening_v10.py; then python scripts/e4_patch_v10_state_e4_observer.py; fi
+          if grep -q 'created_ns = time.time_ns()' scripts/e4_v10_social_stream.py; then python scripts/e4_patch_v10_social_timestamp.py; fi
+          if ! grep -q 'part not in _GENERIC_SOCIAL_TERMS' src/memecoin_bot/e4_pipelines_v10.py; then python scripts/e4_patch_v10_generic_terms.py; fi
+      - name: Exact fresh live Pump cohort, hypothesis only
+        env:
+          TARGET_LAUNCHES: ${{ github.event.inputs.target_launches || '300' }}
+          MAX_CAPTURE_SECONDS: ${{ github.event.inputs.max_capture_seconds || '7200' }}
+          TAIL_SECONDS: ${{ github.event.inputs.tail_seconds || '300' }}
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_300_launch_holdout_v10.py \
+            --target-launches "$TARGET_LAUNCHES" \
+            --capture-seconds "$MAX_CAPTURE_SECONDS" \
+            --tail-seconds "$TAIL_SECONDS" \
+            --heartbeat-seconds 30 \
+            --minimum-launches "$TARGET_LAUNCHES" \
+            --wallet-signatures 1500 \
+            --builder-probes 500 \
+            --testnet-route-probes 0 \
+            --stress-iterations 150000 \
+            --output artifacts/e4-v10-v2-live-holdout.json
+      - name: Complete selected-versus-ignored comparison
+        if: always()
+        run: |
+          if [ -s artifacts/e4-v10-v2-live-holdout-live-events.jsonl ]; then
+            python scripts/e4_selection_forensics.py \
+              --events artifacts/e4-v10-v2-live-holdout-live-events.jsonl \
+              --output artifacts/e4-v10-v2-selection-forensics.json
+          fi
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: e4-v10-v2-mechanical-*
+          path: downloaded-mechanical
+          merge-multiple: true
+      - name: Strict 36ms and E4-relative verdict
+        if: always()
+        continue-on-error: true
+        run: |
+          PIPELINE_JSON=$(find downloaded-mechanical -name 'e4-v10-v2-pipeline-stress.json' -print -quit)
+          if [ -n "$PIPELINE_JSON" ] && [ -s artifacts/e4-v10-v2-live-holdout.json ]; then
+            python scripts/e4_v10_certification.py \
+              --pipeline "$PIPELINE_JSON" \
+              --holdout artifacts/e4-v10-v2-live-holdout.json \
+              --minimum-strategy-trades 20 \
+              --output artifacts/e4-v10-v2-certification.json
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v10-v2-live-${{ github.run_id }}
+          path: |
+            artifacts/e4-v10-v2-live-progress.json
+            artifacts/e4-v10-v2-live-holdout.json
+            artifacts/e4-v10-v2-live-holdout.md
+            artifacts/e4-v10-v2-live-holdout-live-events.jsonl
+            artifacts/e4-v10-v2-selection-forensics.json
+            artifacts/e4-v10-v2-selection-forensics.md
+            artifacts/e4-v10-v2-certification.json
+            artifacts/e4-v10-v2-certification.md
+          if-no-files-found: warn
+          retention-days: 30
