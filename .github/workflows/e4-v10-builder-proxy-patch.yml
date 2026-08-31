@@ -1,0 +1,43 @@
+name: E4 V10 builder proxy patch
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - scripts/e4_patch_v10_builder_proxy.py
+      - .github/workflows/e4-v10-builder-proxy-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-three-pipelines
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/e4_patch_v10_builder_proxy.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: |
+          node --check tools/e4-builder/race-proxy-v3.mjs
+          node --check tools/e4-builder/fast-preload-v3.mjs
+      - name: Commit builder proxy patch
+        run: |
+          if git diff --quiet -- tools/e4-builder/race-proxy-v3.mjs tools/e4-builder/fast-preload-v3.mjs; then
+            echo "No patch changes"
+            exit 0
+          fi
+          git config user.name "gambit-e4-v10"
+          git config user.email "actions@users.noreply.github.com"
+          git add tools/e4-builder/race-proxy-v3.mjs tools/e4-builder/fast-preload-v3.mjs
+          git commit -m "perf(e4): accept first valid builder and prewarm all blockhash modes"
+          git pull --rebase origin codex/e4-v10-three-pipelines
+          git push origin HEAD:codex/e4-v10-three-pipelines
