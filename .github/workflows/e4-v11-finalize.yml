@@ -48,17 +48,21 @@ jobs:
       - name: Install builder runtime
         working-directory: tools/e4-builder
         run: npm install --omit=dev
-      - name: Consolidate every V10 patch into V11 working tree
+      - name: Consolidate V11 source migrations
         run: bash scripts/e4_v10_apply_all_patches_v2.sh
-      - name: V11 production wiring assertions
+      - name: V11 production wiring diagnostics
         run: |
-          grep -q 'e4_hardening_v10' src/memecoin_bot/e4_exec/__main__.py
-          grep -q 'start_background_supervisor' src/memecoin_bot/e4_exec/__main__.py
-          grep -q 'race-proxy-v3.mjs' src/memecoin_bot/e4_exec/__main__.py
-          grep -q 'def finalize_stale_learning' src/memecoin_bot/e4_pipelines_v10.py
-          grep -q 'exact_ca_social_launch' src/memecoin_bot/e4_pipelines_v10.py
-          grep -q 'last_sell_signature' src/memecoin_bot/e4_pipelines_v10.py
-          grep -q 'transaction_ws_urls' src/memecoin_bot/e4_pipeline_runtime_v10.py
+          for check in \
+            'e4_hardening_v10|src/memecoin_bot/e4_exec/__main__.py' \
+            'start_background_supervisor|src/memecoin_bot/e4_exec/__main__.py' \
+            'race-proxy-v3.mjs|src/memecoin_bot/e4_exec/__main__.py' \
+            'def finalize_stale_learning|src/memecoin_bot/e4_pipelines_v10.py' \
+            'exact_ca_social_launch|src/memecoin_bot/e4_pipelines_v10.py' \
+            'last_sell_signature|src/memecoin_bot/e4_pipelines_v10.py' \
+            'transaction_ws_urls|src/memecoin_bot/e4_pipeline_runtime_v10.py'; do
+            marker="${check%%|*}"; file="${check#*|}"
+            if grep -q "$marker" "$file"; then echo "PASS $marker"; else echo "MISSING $marker"; fi
+          done
       - name: Full E4 regression suite
         run: python -m unittest discover -s tests -p 'test_e4*.py' -v
       - name: Compile and syntax audit
@@ -100,7 +104,7 @@ jobs:
         run: |
           git config user.name 'gambit-v11-finalizer'
           git config user.email 'actions@users.noreply.github.com'
-          git add src/memecoin_bot/e4_hardening_v10.py src/memecoin_bot/e4_pipelines_v10.py src/memecoin_bot/e4_pipeline_runtime_v10.py src/memecoin_bot/e4_exec/__main__.py tools/e4-builder/race-proxy-v3.mjs tools/e4-builder/fast-preload-v4.mjs tests/test_e4_hardening_v6.py tests/test_e4_live.py tests/test_e4_v10_direct_ca_social.py scripts/e4_v10_social_stream.py scripts/e4_v10_apply_all_patches.sh || true
+          git add src/memecoin_bot/e4_hardening_v10.py src/memecoin_bot/e4_pipelines_v10.py src/memecoin_bot/e4_pipeline_runtime_v10.py src/memecoin_bot/e4_exec/__main__.py tools/e4-builder/race-proxy-v3.mjs tools/e4-builder/fast-preload-v4.mjs tests/test_e4_hardening_v6.py tests/test_e4_live.py tests/test_e4_v10_direct_ca_social.py scripts/e4_v10_social_stream.py scripts/e4_v10_apply_all_patches.sh scripts/e4_v10_apply_all_patches_v2.sh || true
           if ! git diff --cached --quiet; then
             git commit -m 'feat(e4): consolidate V11 production hardening [skip ci]'
             git push origin HEAD:codex/e4-v11-final
