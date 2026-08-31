@@ -6,14 +6,14 @@ on:
       signatures:
         description: E4 wallet signatures to inspect
         required: false
-        default: "300"
+        default: "1000"
       positions:
         description: Unique E4 entries to enrich
         required: false
-        default: "30"
+        default: "120"
   push:
     branches:
-      - codex/gambit-jr-v2-e4-stress-hardening
+      - codex/gambit-jr-v2-e4-v6-certification
     paths:
       - "scripts/e4_creator_forensics.py"
       - ".github/workflows/e4-creator-forensics.yml"
@@ -21,10 +21,13 @@ on:
 permissions:
   contents: read
 
+env:
+  PYTHONUNBUFFERED: "1"
+
 jobs:
   creator-forensics:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -36,15 +39,15 @@ jobs:
         run: python -m py_compile scripts/e4_creator_forensics.py
       - name: Inspect creators, metadata sources and pre-entry public flow
         env:
-          SIGNATURES: ${{ github.event.inputs.signatures || '300' }}
-          POSITIONS: ${{ github.event.inputs.positions || '30' }}
+          SIGNATURES: ${{ github.event.inputs.signatures || '1000' }}
+          POSITIONS: ${{ github.event.inputs.positions || '120' }}
         run: >-
           python scripts/e4_creator_forensics.py
           --signatures "$SIGNATURES"
           --positions "$POSITIONS"
-          --before-limit 20
-          --concurrency 8
-          --timeout 5
+          --before-limit 25
+          --concurrency 12
+          --timeout 6
           --output artifacts/e4-creator-forensics.json
       - uses: actions/upload-artifact@v4
         if: always()
