@@ -1,0 +1,43 @@
+name: E4 V10 guarded copy-exit patch
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - scripts/e4_patch_v10_copy_exit.py
+      - .github/workflows/e4-v10-copy-exit-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-three-pipelines
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Ensure direct E4 state observer exists first
+        run: |
+          if ! grep -q 'def _apply_v10' src/memecoin_bot/e4_hardening_v10.py; then
+            python scripts/e4_patch_v10_state_e4_observer.py
+          fi
+      - run: python scripts/e4_patch_v10_copy_exit.py
+      - run: python -m compileall -q src/memecoin_bot/e4_pipelines_v10.py src/memecoin_bot/e4_pipeline_runtime_v10.py src/memecoin_bot/e4_hardening_v10.py
+      - name: Commit guarded copy exits
+        run: |
+          if git diff --quiet -- src/memecoin_bot/e4_pipelines_v10.py src/memecoin_bot/e4_pipeline_runtime_v10.py src/memecoin_bot/e4_hardening_v10.py; then
+            echo "No patch changes"
+            exit 0
+          fi
+          git config user.name "gambit-e4-v10"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/memecoin_bot/e4_pipelines_v10.py src/memecoin_bot/e4_pipeline_runtime_v10.py src/memecoin_bot/e4_hardening_v10.py
+          git commit -m "feat(e4): mirror source exits on guarded copy positions"
+          git pull --rebase origin codex/e4-v10-three-pipelines
+          git push origin HEAD:codex/e4-v10-three-pipelines
