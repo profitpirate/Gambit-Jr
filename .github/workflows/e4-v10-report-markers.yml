@@ -1,0 +1,57 @@
+name: E4 V10 report markers
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - ".github/workflows/e4-v10-report-markers.yml"
+      - "reports/e4-v10-certification/latest.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  markers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-three-pipelines
+          fetch-depth: 0
+      - name: Materialise machine-probeable markers
+        run: |
+          rm -rf reports/e4-v10-certification/markers
+          mkdir -p reports/e4-v10-certification/markers
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('reports/e4-v10-certification')
+          d=json.loads((root/'latest.json').read_text())
+          m=root/'markers'
+          def mark(name, value='1'):
+              (m/name).write_text(str(value)+'\n')
+          mark('PASS' if d.get('passed') else 'FAIL')
+          for step in d.get('steps',[]):
+              safe=''.join(c if c.isalnum() or c in '-_' else '_' for c in str(step.get('name')))
+              mark(('PASS_' if step.get('passed') else 'FAIL_')+safe)
+          for name,row in (d.get('stress_reports') or {}).items():
+              if not isinstance(row,dict): continue
+              prefix=''.join(c if c.isalnum() or c in '-_' else '_' for c in name)
+              for key in ('decision_p50_ns','decision_p95_ns','decision_p99_ns','decision_max_ns','decision_correctness_failures','operations_per_second'):
+                  if row.get(key) is not None: mark(f'{prefix}__{key}',row[key])
+              narrative=row.get('narrative') or {}
+              for key in ('p50_ns','p95_ns','p99_ns','max_ns','matches'):
+                  if narrative.get(key) is not None: mark(f'{prefix}__narrative_{key}',narrative[key])
+          for key,value in (d.get('gates') or {}).items():
+              mark(('PASS_GATE_' if value else 'FAIL_GATE_')+key)
+          PY
+          git config user.name "gambit-e4-markers"
+          git config user.email "actions@users.noreply.github.com"
+          git add reports/e4-v10-certification/markers
+          if ! git diff --cached --quiet; then
+            git commit -m "test(e4): persist V10 probe markers [skip ci]"
+            git pull --rebase origin codex/e4-v10-three-pipelines
+            git push origin HEAD:codex/e4-v10-three-pipelines
+          fi
