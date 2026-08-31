@@ -33,9 +33,12 @@ jobs:
           src/memecoin_bot/e4_hardening_v6.py
           src/memecoin_bot/e4_hardening_v7.py
           src/memecoin_bot/e4_hardening_v8.py
+          src/memecoin_bot/e4_hardening_v9.py
           src/memecoin_bot/e4_exec
           scripts/e4_selection_forensics.py
           scripts/e4_build_winner_creator_registry.py
+          scripts/e4_creator_expectancy.py
+          scripts/e4_identity_graph.py
           scripts/e4_300_launch_holdout_v8.py
       - uses: actions/setup-node@v4
         with:
