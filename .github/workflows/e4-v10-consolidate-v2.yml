@@ -1,0 +1,58 @@
+name: E4 V10 final source consolidation
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - ".github/workflows/e4-v10-consolidate-v2.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  consolidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-three-pipelines
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Apply every current V10 source repair
+        run: |
+          bash scripts/e4_v10_apply_all_patches.sh
+          python scripts/e4_patch_v10_builder_preload_v4.py
+      - name: Commit consolidated production implementation
+        run: |
+          if git diff --quiet; then
+            echo "V10 source is already consolidated"
+            exit 0
+          fi
+          git config user.name "gambit-e4-v10"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            src/memecoin_bot/e4_hardening_v10.py \
+            src/memecoin_bot/e4_pipelines_v10.py \
+            src/memecoin_bot/e4_pipeline_runtime_v10.py \
+            src/memecoin_bot/e4_exec/__main__.py \
+            tools/e4-builder/fast-preload-v3.mjs \
+            tools/e4-builder/fast-preload-v4.mjs \
+            tools/e4-builder/race-proxy-v3.mjs \
+            scripts/e4_v10_social_stream.py \
+            tests/test_e4_hardening_v6.py \
+            tests/test_e4_live.py \
+            tests/test_e4_v10_direct_ca_social.py || true
+          git commit -m "feat(e4): consolidate final three-pipeline V10 runtime"
+          for attempt in 1 2 3 4 5 6; do
+            if git pull --rebase origin codex/e4-v10-three-pipelines && git push origin HEAD:codex/e4-v10-three-pipelines; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 3))
+          done
+          exit 1
