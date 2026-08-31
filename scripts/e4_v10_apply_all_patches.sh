@@ -13,7 +13,9 @@ fi
 if grep -q 'vars(runtime.metrics)' src/memecoin_bot/e4_pipeline_runtime_v10.py; then
   python scripts/e4_patch_v10_runtime_faststream.py
 fi
-if ! grep -q 'def _apply_v10' src/memecoin_bot/e4_hardening_v10.py; then
+# V11 already contains the equivalent _state_apply_v10 observer on some snapshots.
+# Only run the legacy insertion patch when neither implementation is present.
+if ! grep -Eq 'def (_apply_v10|_state_apply_v10)' src/memecoin_bot/e4_hardening_v10.py; then
   python scripts/e4_patch_v10_state_e4_observer.py
 fi
 if grep -q 'created_ns = time.time_ns()' scripts/e4_v10_social_stream.py; then
