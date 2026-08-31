@@ -1,0 +1,38 @@
+name: E4 V10 direct state E4 observer patch
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - scripts/e4_patch_v10_state_e4_observer.py
+      - .github/workflows/e4-v10-state-e4-observer-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-three-pipelines
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/e4_patch_v10_state_e4_observer.py
+      - run: python -m compileall -q src/memecoin_bot/e4_hardening_v10.py
+      - name: Commit direct observer
+        run: |
+          if git diff --quiet -- src/memecoin_bot/e4_hardening_v10.py; then
+            echo "No patch changes"
+            exit 0
+          fi
+          git config user.name "gambit-e4-v10"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/memecoin_bot/e4_hardening_v10.py
+          git commit -m "feat(e4): observe E4 buys directly in token-state hot path"
+          git pull --rebase origin codex/e4-v10-three-pipelines
+          git push origin HEAD:codex/e4-v10-three-pipelines
