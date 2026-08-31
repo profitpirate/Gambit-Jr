@@ -1,0 +1,130 @@
+name: E4 V10 live-market hypothesis
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - ".github/workflows/e4-v10-live-hypothesis.yml"
+      - "triggers/e4-v10-live-hypothesis.txt"
+  workflow_dispatch:
+    inputs:
+      target_launches:
+        required: false
+        default: "500"
+      max_capture_seconds:
+        required: false
+        default: "9000"
+      tail_seconds:
+        required: false
+        default: "300"
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_V10_SERVICES_ENABLED: "false"
+  E4_REMOTE_BUILDER_FALLBACK: "false"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_HOLDOUT_PROGRESS_PATH: "reports/e4-v10-live-hypothesis/progress.json"
+
+jobs:
+  live-hypothesis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 170
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-three-pipelines
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - name: V10 preflight regression
+        run: |
+          python -m unittest discover -s tests -p "test_e4*.py" -v
+          python -m compileall -q scripts/e4_v10_live_holdout.py src/memecoin_bot/e4_hardening_v10.py src/memecoin_bot/e4_fast_execution_v10.py
+          node --check tools/e4-builder/daemon-v2.mjs
+          E4_REMOTE_BUILDER_FALLBACK=false node tools/e4-builder/daemon-v2.mjs --self-test
+      - name: Capture fresh real Pump launches and replay V10 hypothetically
+        id: holdout
+        env:
+          TARGET_LAUNCHES: ${{ github.event.inputs.target_launches || '500' }}
+          MAX_CAPTURE_SECONDS: ${{ github.event.inputs.max_capture_seconds || '9000' }}
+          TAIL_SECONDS: ${{ github.event.inputs.tail_seconds || '300' }}
+        shell: bash
+        run: |
+          mkdir -p reports/e4-v10-live-hypothesis
+          set +e
+          python scripts/e4_v10_live_holdout.py \
+            --target-launches "$TARGET_LAUNCHES" \
+            --capture-seconds "$MAX_CAPTURE_SECONDS" \
+            --tail-seconds "$TAIL_SECONDS" \
+            --heartbeat-seconds 30 \
+            --minimum-launches "$TARGET_LAUNCHES" \
+            --wallet-signatures 1000 \
+            --builder-probes 200 \
+            --testnet-route-probes 0 \
+            --stress-iterations 100000 \
+            --output reports/e4-v10-live-hypothesis/latest.json
+          code=$?
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Selected-versus-ignored forensics
+        if: always()
+        shell: bash
+        run: |
+          if [ -s reports/e4-v10-live-hypothesis/latest-live-events.jsonl ]; then
+            python scripts/e4_selection_forensics.py \
+              --events reports/e4-v10-live-hypothesis/latest-live-events.jsonl \
+              --output reports/e4-v10-live-hypothesis/selection-forensics.json || true
+          fi
+      - name: Write concise holdout verdict
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('reports/e4-v10-live-hypothesis')
+          report_path=root/'latest.json'
+          verdict={'available':report_path.exists(),'e4_net_benchmark':0.6008,'e4_profit_factor_benchmark':4.92}
+          if report_path.exists():
+              data=json.loads(report_path.read_text())
+              index=((data.get('e4_v10') or {}).get('all_metrics_index') or {})
+              speed=((data.get('e4_v10') or {}).get('speed_certification') or {})
+              relevant={k:v for k,v in index.items() if any(term in k.lower() for term in ('win_rate','profit_factor','net_pnl','closed_positions','trades'))}
+              verdict.update({'speed':speed,'metrics':relevant,'target_launches':500})
+          (root/'verdict.json').write_text(json.dumps(verdict,indent=2))
+          PY
+      - name: Persist immutable live-hypothesis evidence
+        if: always()
+        shell: bash
+        run: |
+          git config user.name "gambit-e4-live-hypothesis"
+          git config user.email "actions@users.noreply.github.com"
+          git add reports/e4-v10-live-hypothesis || true
+          if ! git diff --cached --quiet; then
+            git commit -m "test(e4): persist V10 live hypothesis evidence [skip ci]"
+            git pull --rebase origin codex/e4-v10-three-pipelines
+            git push origin HEAD:codex/e4-v10-three-pipelines
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v10-live-hypothesis-${{ github.run_id }}
+          path: reports/e4-v10-live-hypothesis
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Enforce holdout result
+        if: always()
+        run: exit "${{ steps.holdout.outputs.code || '2' }}"
