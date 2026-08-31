@@ -1,0 +1,68 @@
+name: E4 winning creator registry
+
+on:
+  push:
+    branches:
+      - codex/gambit-jr-v2-e4-stress-hardening
+    paths:
+      - "models/e4/winning-mints-*.tsv"
+      - "scripts/e4_build_winner_creator_registry.py"
+      - ".github/workflows/e4-winning-creator-registry.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-registry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/gambit-jr-v2-e4-stress-hardening
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - name: Resolve every historical winning mint to its Pump creator
+        env:
+          E4_REGISTRY_RPC_URLS: ${{ secrets.HELIUS_RPC_URL || 'https://solana-rpc.publicnode.com,https://api.mainnet-beta.solana.com,https://solana-mainnet.api.onfinality.io/public' }}
+        run: >-
+          python scripts/e4_build_winner_creator_registry.py
+          --inputs "models/e4/winning-mints-*.tsv"
+          --output models/e4/e4-winning-creators.json
+          --concurrency 8
+          --batch-size 20
+      - name: Validate generated registry
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('models/e4/e4-winning-creators.json')
+          d=json.loads(p.read_text())
+          assert d['input_winner_mints'] == 242, d
+          assert d['resolved_winner_mints'] > 0, d
+          assert d['unique_winning_creators'] > 0, d
+          print({k:d[k] for k in ('input_winner_mints','resolved_winner_mints','unresolved_winner_mints','unique_winning_creators')})
+          PY
+      - name: Commit creator registry
+        run: |
+          if git diff --quiet -- models/e4/e4-winning-creators.json; then
+            echo "Registry unchanged"
+            exit 0
+          fi
+          git config user.name "gambit-e4-registry"
+          git config user.email "actions@users.noreply.github.com"
+          git add models/e4/e4-winning-creators.json
+          git commit -m "data(e4): refresh winning creator registry"
+          git push origin HEAD:codex/gambit-jr-v2-e4-stress-hardening
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-winning-creator-registry-${{ github.run_id }}
+          path: models/e4/e4-winning-creators.json
+          if-no-files-found: warn
+          retention-days: 30
