@@ -1,11 +1,18 @@
 name: E4 V11 finalisation
 
-# V11 rerun 2: idempotent consolidation + brutal certification.
 on:
   push:
     branches: [codex/e4-v11-final]
     paths:
       - ".github/workflows/e4-v11-finalize.yml"
+      - "scripts/e4_v10_apply_all_patches.sh"
+      - "scripts/e4_v10_apply_all_patches_v2.sh"
+      - "scripts/e4_patch_v10_*.py"
+      - "scripts/e4_migrate_*v10.py"
+      - "src/memecoin_bot/e4_*v10.py"
+      - "src/memecoin_bot/e4_exec/**"
+      - "tools/e4-builder/**"
+      - "tests/test_e4*.py"
   workflow_dispatch:
 
 permissions:
