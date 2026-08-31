@@ -1,0 +1,39 @@
+name: E4 V10 social account allowlist
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - scripts/e4_build_social_account_list.py
+      - ".github/workflows/e4-v10-social-account-list.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-three-pipelines
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile existing tracked X/KOL/news sources
+        run: python scripts/e4_build_social_account_list.py --minimum 4
+      - name: Commit generated allowlist
+        run: |
+          if git diff --quiet -- models/e4/e4-social-accounts.txt models/e4/e4-social-accounts.report.json; then
+            echo "Social allowlist unchanged"
+            exit 0
+          fi
+          git config user.name "gambit-e4-v10"
+          git config user.email "actions@users.noreply.github.com"
+          git add models/e4/e4-social-accounts.txt models/e4/e4-social-accounts.report.json
+          git commit -m "data(e4): compile existing social/KOL stream allowlist"
+          git pull --rebase origin codex/e4-v10-three-pipelines
+          git push origin HEAD:codex/e4-v10-three-pipelines
