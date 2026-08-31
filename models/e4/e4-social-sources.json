@@ -1,0 +1,9 @@
+{
+  "version": "e4-social-sources-v1",
+  "handles": {},
+  "notes": [
+    "Populate only from cached/prelaunch evidence. Do not perform X/Telegram/website HTTP lookups in the E4 hot path.",
+    "A social signal can authorize the social-preannounced family only when it was observed before token creation and the source authority score is high enough.",
+    "J7 metadata by itself is supporting evidence, not advance-launch permission. An explicit deployer-authorized/prearmed flag is required for the J7 prearmed family."
+  ]
+}
