@@ -3,8 +3,10 @@ set -euo pipefail
 
 bash scripts/e4_v10_apply_all_patches.sh
 
-# These two migrations generate the canonical production entrypoint/builder
-# preload and are still deterministic against the current source tree.
+# V11 source-first consolidation. This migration is deterministic/idempotent and
+# the workflow commits the resulting canonical source when every gate passes.
+python scripts/e4_v11_wire_canonical_manager.py
+
 if [ -f scripts/e4_patch_v10_entrypoint.py ]; then
   python scripts/e4_patch_v10_entrypoint.py
 fi
@@ -15,6 +17,8 @@ fi
 python -m compileall -q \
   src/memecoin_bot/e4_hardening_v10.py \
   src/memecoin_bot/e4_pipelines_v10.py \
+  src/memecoin_bot/e4_pipeline_manager_v11.py \
+  src/memecoin_bot/e4_pipeline_singleton_v11.py \
   src/memecoin_bot/e4_pipeline_runtime_v10.py \
   src/memecoin_bot/e4_exec \
   scripts/e4_v10_social_stream.py \
