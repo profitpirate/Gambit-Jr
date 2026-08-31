@@ -28,14 +28,20 @@ jobs:
           src/memecoin_bot/e4_hardening_v3.py
           src/memecoin_bot/e4_hardening_v4.py
           src/memecoin_bot/e4_hardening_v5.py
+          src/memecoin_bot/e4_hardening_v6.py
+          src/memecoin_bot/e4_hardening_v7.py
           src/memecoin_bot/e4_exec
           scripts/e4_selection_forensics.py
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
       - working-directory: tools/e4-builder
         run: npm install --omit=dev
-      - working-directory: tools/e4-builder
-        run: node --check daemon.mjs
+      - name: Validate local Pump builder syntax and offline instruction construction
+        working-directory: tools/e4-builder
+        run: |
+          node --check daemon.mjs
+          node --check daemon-v2.mjs
+          E4_REMOTE_BUILDER_FALLBACK=false node daemon-v2.mjs --self-test
       - name: Production container build
         run: docker build -f Dockerfile.e4-exec -t gambit-jr-e4:stress .
