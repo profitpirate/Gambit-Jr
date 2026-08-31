@@ -1,0 +1,39 @@
+{
+  "version": "e4-selection-v2",
+  "evidence": {
+    "gross_closed_positions": 316,
+    "gross_win_rate": 0.7658,
+    "fully_cost_reconciled_positions": 258,
+    "net_win_rate": 0.6008,
+    "net_profit_factor": 4.92,
+    "observed_reentries": 0,
+    "observed_max_concurrent_positions": 2,
+    "modern_partial_boundary_accuracy": "308/308"
+  },
+  "relative_size_tiers": {
+    "probe": 0.0075,
+    "standard": 0.0125,
+    "strong": 0.0185,
+    "high": 0.03,
+    "elite": 0.05,
+    "exceptional": 0.1
+  },
+  "partial_families": {
+    "probe": 0.3,
+    "standard": 0.3,
+    "strong": 0.3,
+    "high": 0.2,
+    "elite": 0.2,
+    "exceptional": 0.2
+  },
+  "source_scores": {
+    "metadata.j7tracker.io": 0.7,
+    "j7tracker": 0.7
+  },
+  "creator_scores": {},
+  "notes": [
+    "Source scores are cached supporting evidence, not automatic permission to buy.",
+    "Tiny-flow entries require an explicit prearmed/authorized launch-intent flag or a separately maintained creator score.",
+    "The selected-versus-ignored model must be recalibrated on future live holdouts; these deterministic families are the current evidence-backed fallback."
+  ]
+}
