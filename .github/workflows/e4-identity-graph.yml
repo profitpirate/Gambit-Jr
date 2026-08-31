@@ -1,0 +1,69 @@
+name: E4 full identity graph
+
+on:
+  push:
+    branches:
+      - codex/gambit-jr-v2-e4-stress-hardening
+    paths:
+      - "scripts/e4_identity_graph.py"
+      - "models/e4/e4-losing-mints.json"
+      - ".github/workflows/e4-identity-graph.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  identity-graph:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - name: Validate identity graph code and target counts
+        run: |
+          python -m compileall -q scripts/e4_identity_graph.py scripts/e4_creator_forensics.py scripts/e4_build_winner_creator_registry.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          winners=json.loads(Path('models/e4/e4-winning-creators.json').read_text())
+          win_mints={m for row in winners['creators'].values() for m in row.get('winner_mints', [])}
+          losers=set(json.loads(Path('models/e4/e4-losing-mints.json').read_text()))
+          assert len(win_mints)==242, len(win_mints)
+          assert len(losers)==74, len(losers)
+          assert not (win_mints & losers), len(win_mints & losers)
+          print({'winners':len(win_mints),'losers':len(losers),'total':len(win_mints|losers)})
+          PY
+      - name: Reconstruct all E4 entries and build identity graph
+        env:
+          E4_GRAPH_RPC_URLS: ${{ secrets.HELIUS_RPC_URL || 'https://solana-rpc.publicnode.com,https://api.mainnet-beta.solana.com,https://solana-mainnet.api.onfinality.io/public' }}
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_identity_graph.py \
+            --rpc-urls "$E4_GRAPH_RPC_URLS" \
+            --max-signatures 12000 \
+            --before-limit 30 \
+            --rpc-concurrency 16 \
+            --tx-concurrency 24 \
+            --context-concurrency 12 \
+            --funder-concurrency 10 \
+            --metadata-concurrency 24 \
+            --output artifacts/e4-identity-graph.json
+      - name: Upload identity evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e4-identity-graph-${{ github.run_id }}
+          path: |
+            artifacts/e4-identity-graph.json
+            artifacts/e4-identity-graph.md
+          if-no-files-found: warn
+          retention-days: 30
