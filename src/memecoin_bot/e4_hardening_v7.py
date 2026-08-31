@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from . import e4_hardening_v6 as v6
 
 core = v6.core
@@ -44,6 +42,19 @@ def _entry_v7(
     state: core.TokenState,
 ) -> tuple[bool, float, float, str, dict[str, float]]:
     accepted, score, fraction, reason, features = _previous_entry(self, state)
+    features = dict(features)
+    # Retain the diagnostic names used by the earlier empirical microburst
+    # harness. V6 broadens the entry model, but existing telemetry and tests
+    # still consume these names.
+    if features:
+        features.setdefault("microburst_buyers", features.get("unique_buyers", 0.0))
+        features.setdefault("microburst_buy_count", features.get("buy_count", 0.0))
+        features.setdefault("microburst_buy_sol", features.get("buy_sol", 0.0))
+        features.setdefault("microburst_sell_sol", features.get("sell_sol", 0.0))
+        features.setdefault("microburst_unique_signatures", features.get("unique_signatures", 0.0))
+        features.setdefault("microburst_bundled_buys", features.get("bundled_buys", 0.0))
+        features.setdefault("microburst_max_same_signature", features.get("max_same_signature_buys", 0.0))
+        features.setdefault("microburst_price_multiple", features.get("price_multiple", 0.0))
     if not accepted and reason == "creator seed not observed":
         # Preserve the old diagnostic contract while making clear that V6 no
         # longer treats bundle structure as the only possible E4 entry family.
@@ -61,7 +72,6 @@ def _entry_v7(
             features=dict(features),
         )
         v6._PROFILE_BY_MINT[state.mint] = profile
-        features = dict(features)
         features.update(
             {
                 "e4_v6_score": score,
