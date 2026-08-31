@@ -1,6 +1,6 @@
 {
   "name": "gambit-e4-builder",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "private": true,
   "type": "module",
   "engines": {"node": ">=22"},
@@ -11,6 +11,7 @@
     "bn.js": "^5.2.2"
   },
   "scripts": {
-    "start": "node daemon.mjs"
+    "start": "node daemon.mjs",
+    "postinstall": "node patch-anchor-bn-import.mjs"
   }
 }
