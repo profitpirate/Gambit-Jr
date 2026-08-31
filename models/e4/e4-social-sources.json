@@ -1,9 +1,46 @@
 {
-  "version": "e4-social-sources-v1",
-  "handles": {},
+  "version": "e4-social-sources-v2",
+  "status": "candidate_watchlist_not_yet_winrate_validated",
+  "handles": {
+    "pumpdotfun": {"tier":"hot","category":"launchpad","authority":0.95,"mode":"narrative_and_platform_events"},
+    "a1lon9": {"tier":"hot","category":"pump_founder","authority":0.92,"mode":"narrative_origin"},
+    "blknoiz06": {"tier":"hot","category":"solana_kol","authority":0.95,"mode":"meme_narrative_and_creator_meta"},
+    "MustStopMurad": {"tier":"hot","category":"memecoin_kol","authority":0.90,"mode":"meme_thesis"},
+    "SolanaDali": {"tier":"hot","category":"solana_memecoin_trader","authority":0.82,"mode":"trench_narrative"},
+    "meechie": {"tier":"hot","category":"solana_memecoin_trader_deployer","authority":0.84,"mode":"trench_narrative_and_deploys"},
+    "Hashbergers": {"tier":"hot","category":"solana_memecoin_kol","authority":0.82,"mode":"trench_narrative"},
+    "deaborategod": {"tier":"hot","category":"onchain_degen","authority":0.80,"mode":"early_memecoin_discovery"},
+    "CryptoWizardd": {"tier":"hot","category":"deployer_analysis","authority":0.78,"mode":"deployer_and_bundle_intelligence"},
+    "SolJaborateeets": {"tier":"hot","category":"solana_meme_culture","authority":0.76,"mode":"viral_token_tracking"},
+    "lookonchain": {"tier":"hot","category":"onchain_intelligence","authority":0.90,"mode":"wallet_and_token_events"},
+    "goryxbt": {"tier":"hot","category":"observed_creator_social_fingerprint","authority":0.80,"mode":"known_dev_social"},
+    "0xGory": {"tier":"hot","category":"observed_creator_social_fingerprint","authority":0.80,"mode":"known_dev_social"},
+    "zankyosol": {"tier":"hot","category":"observed_creator_social_fingerprint","authority":0.78,"mode":"known_dev_social"},
+    "zankyonosol": {"tier":"hot","category":"observed_creator_social_fingerprint","authority":0.76,"mode":"known_dev_social"},
+    "ptsdpuppy": {"tier":"hot","category":"observed_creator_social_fingerprint","authority":0.74,"mode":"known_dev_social"},
+    "solOlympos": {"tier":"hot","category":"observed_creator_social_fingerprint","authority":0.76,"mode":"known_dev_social"},
+    "elonmusk": {"tier":"hot","category":"global_meme_originator","authority":0.99,"mode":"novel_phrase_only"},
+    "sama": {"tier":"hot","category":"ai_narrative_originator","authority":0.96,"mode":"novel_phrase_and_ai_events"},
+    "cz_binance": {"tier":"hot","category":"crypto_narrative_originator","authority":0.95,"mode":"novel_phrase_and_crypto_events"},
+    "realDonaldTrump": {"tier":"hot","category":"global_news_originator","authority":0.99,"mode":"novel_phrase_and_breaking_events"},
+    "WhiteHouse": {"tier":"hot","category":"official_news_source","authority":0.99,"mode":"breaking_event_narratives"},
+    "WatcherGuru": {"tier":"warm","category":"breaking_crypto_news","authority":0.82,"mode":"corroboration"},
+    "unusual_whales": {"tier":"warm","category":"breaking_finance_news","authority":0.84,"mode":"corroboration"},
+    "0xEthan": {"tier":"warm","category":"memecoin_caller","authority":0.72,"mode":"caller_signal"}
+  },
+  "rules": {
+    "automatic_buy_from_single_post": false,
+    "exact_ca_requires_known_account_and_chronology": true,
+    "generic_buzzword_alone_can_authorize": false,
+    "compromised_account_defense_required": true,
+    "hot_stream_target_accounts": "50-200 after causal validation",
+    "warm_stream_target_accounts": "1000-3000 after causal validation"
+  },
   "notes": [
-    "Populate only from cached/prelaunch evidence. Do not perform X/Telegram/website HTTP lookups in the E4 hot path.",
-    "A social signal can authorize the social-preannounced family only when it was observed before token creation and the source authority score is high enough.",
-    "J7 metadata by itself is supporting evidence, not advance-launch permission. An explicit deployer-authorized/prearmed flag is required for the J7 prearmed family."
+    "This is a reviewed seed list, not a proven alpha list. Each account must earn/lose authority from point-in-time outcomes.",
+    "Populate production streaming by stable X numeric account ID after resolving each handle through the official X API.",
+    "Do not perform X/Telegram/website HTTP lookups in the E4 hot path; posts are normalized into the in-memory narrative cache before launch decisions.",
+    "A social signal can authorize the social-preannounced family only when observed before token creation and after anti-compromise/corroboration gates.",
+    "J7 metadata by itself is supporting evidence, not advance-launch permission."
   ]
 }
