@@ -1,0 +1,44 @@
+name: E4 V10 builder preload v4
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - tools/e4-builder/fast-preload-v4.mjs
+      - scripts/e4_patch_v10_builder_preload_v4.py
+      - .github/workflows/e4-v10-builder-preload-v4.yml
+
+permissions:
+  contents: write
+
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-three-pipelines
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/e4_patch_v10_builder_preload_v4.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: |
+          node --check tools/e4-builder/fast-preload-v4.mjs
+          node --check tools/e4-builder/race-proxy-v3.mjs
+      - name: Commit preload activation
+        run: |
+          if git diff --quiet -- tools/e4-builder/race-proxy-v3.mjs; then
+            echo "Preload v4 already active"
+            exit 0
+          fi
+          git config user.name "gambit-e4-v10"
+          git config user.email "actions@users.noreply.github.com"
+          git add tools/e4-builder/race-proxy-v3.mjs tools/e4-builder/fast-preload-v4.mjs
+          git commit -m "perf(e4): cache blockhash and ALT calls inside warm builders"
+          git pull --rebase origin codex/e4-v10-three-pipelines
+          git push origin HEAD:codex/e4-v10-three-pipelines
