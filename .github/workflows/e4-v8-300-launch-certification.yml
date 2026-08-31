@@ -1,0 +1,114 @@
+name: E4 V8 exact 300 real-launch certification
+
+on:
+  push:
+    branches:
+      - codex/gambit-jr-v2-e4-300-live-certification
+    paths:
+      - ".github/workflows/e4-v8-300-launch-certification.yml"
+      - "scripts/e4_live_market_stress_v7.py"
+      - "scripts/e4_live_market_stress_v8.py"
+      - "scripts/e4_selection_forensics.py"
+      - "src/memecoin_bot/e4_hardening_v5.py"
+      - "src/memecoin_bot/e4_hardening_v6.py"
+      - "src/memecoin_bot/e4_hardening_v7.py"
+      - "models/e4/e4-selection-v2.json"
+      - "tools/e4-builder/**"
+  workflow_dispatch:
+    inputs:
+      capture_seconds:
+        description: Maximum live Pump capture duration
+        required: false
+        default: "1200"
+      exact_launches:
+        description: Exact number of newly observed live launches to test
+        required: false
+        default: "300"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e4-v8-300-live-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_LOCAL_PUMP_BUILDER: "true"
+  E4_REMOTE_BUILDER_FALLBACK: "false"
+  E4_MAX_RELATIVE_POSITION_FRACTION: "0.115"
+  E4_RUNNER_EMERGENCY_HOLD_MS: "300000"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/daemon-v2.mjs"
+
+jobs:
+  certify-exact-live-launches:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - name: V7 production regression gate
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+      - name: Compile certification and production runtime
+        run: >-
+          python -m compileall -q
+          scripts/e4_live_market_stress_v7.py
+          scripts/e4_live_market_stress_v8.py
+          scripts/e4_selection_forensics.py
+          src/memecoin_bot/e4_hardening_v5.py
+          src/memecoin_bot/e4_hardening_v6.py
+          src/memecoin_bot/e4_hardening_v7.py
+          src/memecoin_bot/e4_exec
+      - name: Validate production local Pump builder
+        working-directory: tools/e4-builder
+        run: |
+          node --check daemon-v2.mjs
+          output=$(printf '{"request_id":"ping","action":"PING"}\n' | timeout 15s node daemon-v2.mjs)
+          echo "$output"
+          echo "$output" | grep -q '"ready":true'
+          echo "$output" | grep -q '"local_enabled":true'
+          echo "$output" | grep -q '"remote_fallback":false'
+      - name: Capture and replay exactly 300 real Pump launches
+        env:
+          E4_EXACT_LAUNCHES: "${{ github.event.inputs.exact_launches || '300' }}"
+        run: >-
+          python scripts/e4_live_market_stress_v8.py
+          --capture-seconds "${{ github.event.inputs.capture_seconds || '1200' }}"
+          --minimum-launches "${{ github.event.inputs.exact_launches || '300' }}"
+          --wallet-signatures 1000
+          --builder-probes 120
+          --testnet-route-probes 0
+          --stress-iterations 100000
+          --output artifacts/e4-v8-300-launch-certification.json
+      - name: Selected-vs-ignored live forensics
+        if: always()
+        run: |
+          if [ -f artifacts/e4-v8-300-launch-certification-live-events.jsonl ]; then
+            python scripts/e4_selection_forensics.py \
+              --events artifacts/e4-v8-300-launch-certification-live-events.jsonl \
+              --output artifacts/e4-v8-selection-forensics.json
+          fi
+      - name: Upload complete evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e4-v8-300-launch-certification-${{ github.run_id }}
+          path: |
+            artifacts/e4-v8-300-launch-certification.json
+            artifacts/e4-v8-300-launch-certification.md
+            artifacts/e4-v8-300-launch-certification-live-events.jsonl
+            artifacts/e4-v8-selection-forensics.json
+            artifacts/e4-v8-selection-forensics.md
+          if-no-files-found: warn
+          retention-days: 30
