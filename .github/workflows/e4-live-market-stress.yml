@@ -1,9 +1,6 @@
 name: E4 live market stress
 
 on:
-  push:
-    branches:
-      - codex/gambit-jr-v2-e4-stress-hardening
   workflow_dispatch:
     inputs:
       capture_seconds:
@@ -38,6 +35,9 @@ jobs:
           src/memecoin_bot/e4_hardening_v2.py
           src/memecoin_bot/e4_hardening_v3.py
           src/memecoin_bot/e4_hardening_v4.py
+          src/memecoin_bot/e4_hardening_v5.py
+          src/memecoin_bot/e4_hardening_v6.py
+          src/memecoin_bot/e4_hardening_v7.py
       - name: E4 regression and repeated lifecycle stress
         run: python -m unittest discover -s tests -p "test_e4*.py" -v
       - name: Capture live launches, benchmark execution and compare with E4
