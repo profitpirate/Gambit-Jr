@@ -70,13 +70,23 @@ def position(
     )
 
 
+def clear_v6_state() -> None:
+    e4_hardening_v6.PREARMED_MINTS.clear()
+    e4_hardening_v6.CREATOR_PROFILES.clear()
+    e4_hardening_v6.WALLET_PROFILES.clear()
+    e4_hardening_v6._ENTRY_FRACTION_BY_MINT.clear()
+    e4_hardening_v6._ENTRY_FAMILY_BY_MINT.clear()
+    e4_hardening_v6._ENTRY_SCORE_BY_MINT.clear()
+    e4_hardening_v6._V6_PARTIAL_REQUESTED_NS.clear()
+
+
 class E4LikelyEntryTests(unittest.TestCase):
     def setUp(self) -> None:
-        e4_hardening_v6.PREARMED_MINTS.clear()
-        e4_hardening_v6.CREATOR_PROFILES.clear()
-        e4_hardening_v6.WALLET_PROFILES.clear()
-        e4_hardening_v6._ENTRY_FRACTION_BY_MINT.clear()
+        clear_v6_state()
         self.policy = core.E4Policy(core.Settings(model_path=Path("missing.json")))
+
+    def tearDown(self) -> None:
+        clear_v6_state()
 
     def test_public_capital_burst_is_an_entry_family(self) -> None:
         now = time.time_ns()
@@ -149,6 +159,12 @@ class E4LikelyEntryTests(unittest.TestCase):
 
 
 class E4RelativeSizingTests(unittest.TestCase):
+    def setUp(self) -> None:
+        clear_v6_state()
+
+    def tearDown(self) -> None:
+        clear_v6_state()
+
     def test_empirical_quantile_ladder_and_family_caps(self) -> None:
         self.assertEqual(e4_hardening_v6._relative_fraction(0.60, "seeded_acceleration"), 0.0075)
         self.assertEqual(e4_hardening_v6._relative_fraction(0.90, "public_capital_burst"), 0.025)
@@ -168,8 +184,11 @@ class E4RelativeSizingTests(unittest.TestCase):
 
 class E4ExitFamilyTests(unittest.TestCase):
     def setUp(self) -> None:
-        e4_hardening_v6._ENTRY_FRACTION_BY_MINT.clear()
+        clear_v6_state()
         self.policy = core.E4Policy(core.Settings(model_path=Path("missing.json")))
+
+    def tearDown(self) -> None:
+        clear_v6_state()
 
     def state_at(self, mint: str, price: float, at_ns: int) -> core.TokenState:
         state = core.TokenState(mint)
@@ -211,6 +230,7 @@ class E4ExitFamilyTests(unittest.TestCase):
             first_partial_done=True,
         )
         trade.max_price = 1.50
+        e4_hardening_v6._ENTRY_FRACTION_BY_MINT["runner"] = 0.04
         state = self.state_at("runner", 1.50, now)
 
         with patch.object(core.time, "time_ns", return_value=now):
@@ -227,6 +247,7 @@ class E4ExitFamilyTests(unittest.TestCase):
             first_partial_done=True,
         )
         trade.max_price = 1.50
+        e4_hardening_v6._ENTRY_FRACTION_BY_MINT["runner-old"] = 0.04
         state = self.state_at("runner-old", 1.50, now)
 
         with patch.object(core.time, "time_ns", return_value=now):
