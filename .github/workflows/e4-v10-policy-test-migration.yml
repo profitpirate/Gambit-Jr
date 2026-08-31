@@ -1,0 +1,36 @@
+name: E4 V10 policy test migration
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - scripts/e4_migrate_legacy_policy_tests_v10.py
+      - .github/workflows/e4-v10-policy-test-migration.yml
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-three-pipelines
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/e4_migrate_legacy_policy_tests_v10.py
+      - name: Commit migrated assertions
+        run: |
+          if git diff --quiet -- tests/test_e4_hardening_v6.py tests/test_e4_live.py; then
+            echo "No migration changes"
+            exit 0
+          fi
+          git config user.name "gambit-e4-v10"
+          git config user.email "actions@users.noreply.github.com"
+          git add tests/test_e4_hardening_v6.py tests/test_e4_live.py
+          git commit -m "test(e4): retire obsolete standalone public-flow entry assertions"
+          git push origin HEAD:codex/e4-v10-three-pipelines
