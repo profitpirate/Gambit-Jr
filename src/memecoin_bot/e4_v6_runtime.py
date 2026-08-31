@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextvars
 import json
 import os
 import time
@@ -36,6 +37,36 @@ def engine_init(self: Any, settings: Any) -> None:
 
 core.Engine.__init__ = engine_init
 
+# E4 spends aggressively to win entries but exits through very cheap fixed-tip
+# transactions. Keep the decision task-local so two simultaneous positions do
+# not contaminate each other's fee policy.
+_fee_side: contextvars.ContextVar[str] = contextvars.ContextVar("e4_fee_side", default="BUY")
+_previous_fee_bid = core.Engine.fee_bid
+
+
+def fee_bid(self: Any, amount: float, score: float, urgent: bool = False) -> tuple[float, float]:
+    side = _fee_side.get()
+    if side == "SELL":
+        # Observed exits: Helius/Jito/AsTZ commonly total ~0.000565 SOL;
+        # Nozomi uses the higher ~0.001 min-tip family. Urgent liquidation gets
+        # the latter without inheriting E4's extremely expensive buy bid.
+        priority = 0.00050 if urgent else 0.00030
+        tip = 0.00100 if urgent else 0.00020
+        return min(self.settings.max_priority_fee_sol, priority), min(self.settings.max_tip_sol, tip)
+    if side == "SWEEP":
+        return min(self.settings.max_priority_fee_sol, 0.00020), min(self.settings.max_tip_sol, 0.00020)
+    confidence = max(0.0, min(float(score), 1.0))
+    total = min(
+        self.settings.max_execution_cost_sol,
+        max(0.0, float(amount)) * (0.035 + 0.030 * confidence),
+    )
+    priority = min(self.settings.max_priority_fee_sol, total * 0.55)
+    tip = min(self.settings.max_tip_sol, max(0.0, total - priority))
+    return priority, tip
+
+
+core.Engine.fee_bid = fee_bid
+
 _previous_execute_buy = core.Engine.execute_buy
 
 
@@ -55,10 +86,27 @@ async def execute_buy(self: Any, state: Any, score: float, fraction: float, reas
             (state.mint, float(policy["score"]), str(policy["tier"]), float(policy["target_fraction"]),
              float(policy["first_partial_fraction"]), str(policy["family"]), int(policy["decided_ns"])),
         )
-    await _previous_execute_buy(self, state, score, min(float(policy["target_fraction"]), self.settings.max_position_fraction), reason)
+    token = _fee_side.set("BUY")
+    try:
+        await _previous_execute_buy(self, state, score, min(float(policy["target_fraction"]), self.settings.max_position_fraction), reason)
+    finally:
+        _fee_side.reset(token)
 
 
 core.Engine.execute_buy = execute_buy
+
+_previous_execute_sell = core.Engine.execute_sell
+
+
+async def execute_sell(self: Any, position: Any, fraction: float, reason: str) -> None:
+    token = _fee_side.set("SELL")
+    try:
+        await _previous_execute_sell(self, position, fraction, reason)
+    finally:
+        _fee_side.reset(token)
+
+
+core.Engine.execute_sell = execute_sell
 
 _previous_execute = core.Engine.execute
 
@@ -137,6 +185,79 @@ async def on_event(self: Any, event: Any) -> None:
 
 
 core.Engine.on_event = on_event
+
+# Existing rebroadcast waited for the slowest route response before checking
+# chain status and also suffixed route names before header lookup, which could
+# silently drop per-route authentication. Launch the exact same signed tx on
+# all configured routes, preserve base route names for headers, and check
+# confirmation as soon as the first route completes.
+async def fast_route_submit(self: Any, tx: str, signature: str):
+    rounds = max(1, min(8, int(os.getenv("E4_REBROADCAST_ROUNDS", "4"))))
+    interval = max(0.025, float(os.getenv("E4_REBROADCAST_INTERVAL_SECONDS", "0.12")))
+    poll = max(0.005, min(0.05, float(os.getenv("E4_ROUTE_STATUS_POLL_SECONDS", "0.015"))))
+    deadline = time.monotonic() + self.settings.confirmation_timeout_seconds
+    all_results: list[Any] = []
+    first_route = "NONE"
+    last_error: str | None = None
+    pending: set[asyncio.Task[Any]] = set()
+
+    async def harvest(wait_seconds: float) -> tuple[bool, int | None, str | None]:
+        nonlocal first_route, last_error, pending
+        if pending:
+            done, remaining = await asyncio.wait(
+                pending,
+                timeout=max(0.0, wait_seconds),
+                return_when=asyncio.FIRST_COMPLETED,
+            )
+            pending = set(remaining)
+            for task in done:
+                try:
+                    item = task.result()
+                except Exception as exc:
+                    last_error = str(exc)
+                    continue
+                all_results.append(item)
+                if item.accepted and first_route == "NONE":
+                    first_route = item.name
+                if item.error:
+                    last_error = item.error
+        status = getattr(self, "_status", None)
+        if status is not None:
+            confirmed, slot, error = await status(signature)
+            last_error = error or last_error
+            return confirmed, slot, error
+        return False, None, None
+
+    try:
+        for _round in range(rounds):
+            for index, (name, url) in enumerate(self.routes):
+                # Keep the original route name so `_headers(name)` still finds
+                # Helius/Nozomi/Jito credentials.
+                pending.add(asyncio.create_task(self._send(index, name, url, tx, signature)))
+            round_deadline = min(deadline, time.monotonic() + interval)
+            while time.monotonic() < round_deadline:
+                confirmed, slot, error = await harvest(min(poll, round_deadline - time.monotonic()))
+                if confirmed:
+                    return first_route, True, slot, None, all_results
+                if error and slot is not None:
+                    return first_route, False, slot, error, all_results
+            if time.monotonic() >= deadline:
+                break
+        while time.monotonic() < deadline:
+            confirmed, slot, error = await harvest(min(poll, deadline - time.monotonic()))
+            if confirmed:
+                return first_route, True, slot, None, all_results
+            if error and slot is not None:
+                return first_route, False, slot, error, all_results
+        return first_route, False, None, last_error or "confirmation timeout", all_results
+    finally:
+        for task in pending:
+            task.cancel()
+        if pending:
+            await asyncio.gather(*pending, return_exceptions=True)
+
+
+core.RouteSender.submit = fast_route_submit
 
 _previous_run = core.Engine.run
 
