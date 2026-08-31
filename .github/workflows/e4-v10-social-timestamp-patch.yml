@@ -1,0 +1,38 @@
+name: E4 V10 social chronology patch
+
+on:
+  push:
+    branches:
+      - codex/e4-v10-three-pipelines
+    paths:
+      - scripts/e4_patch_v10_social_timestamp.py
+      - .github/workflows/e4-v10-social-timestamp-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v10-three-pipelines
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/e4_patch_v10_social_timestamp.py
+      - run: python -m compileall -q scripts/e4_v10_social_stream.py
+      - name: Commit chronology patch
+        run: |
+          if git diff --quiet -- scripts/e4_v10_social_stream.py; then
+            echo "No patch changes"
+            exit 0
+          fi
+          git config user.name "gambit-e4-v10"
+          git config user.email "actions@users.noreply.github.com"
+          git add scripts/e4_v10_social_stream.py
+          git commit -m "fix(e4): use source X timestamp and conservative authority"
+          git pull --rebase origin codex/e4-v10-three-pipelines
+          git push origin HEAD:codex/e4-v10-three-pipelines
