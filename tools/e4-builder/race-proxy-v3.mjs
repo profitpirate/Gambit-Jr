@@ -1,14 +1,31 @@
 #!/usr/bin/env node
 import {spawn} from "node:child_process";
+import {existsSync} from "node:fs";
 import {createInterface} from "node:readline";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = path.resolve(here, "../..");
 const daemon = path.join(here, "daemon-v2.mjs");
-const preload = process.env.E4_BUILDER_PRELOAD
-  ? path.resolve(process.env.E4_BUILDER_PRELOAD)
-  : path.join(here, "fast-preload-v4.mjs");
+
+function resolvePreload(raw) {
+  if (!raw) return path.join(here, "fast-preload-v4.mjs");
+  if (path.isAbsolute(raw)) return raw;
+  const candidates = [
+    path.resolve(process.cwd(), raw),
+    path.resolve(repoRoot, raw),
+    path.resolve(here, raw),
+    path.resolve(here, path.basename(raw)),
+  ];
+  const found = candidates.find((candidate) => existsSync(candidate));
+  if (found) return found;
+  // Return the repo-root interpretation so the error, if any, is stable and
+  // meaningful instead of duplicating tools/e4-builder when cwd=here.
+  return path.resolve(repoRoot, raw);
+}
+
+const preload = resolvePreload(process.env.E4_BUILDER_PRELOAD);
 
 if (process.argv.includes("--self-test")) {
   const child = spawn(process.execPath, ["--import", preload, daemon, "--self-test"], {
