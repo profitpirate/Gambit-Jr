@@ -188,10 +188,14 @@ async def _worker_prefetch(
 
 
 async def _worker_warm(self: final.BuilderWorker) -> dict[str, Any]:
-    return await _worker_request(
+    result = await _worker_request(
         self,
-        {"request_id": f"warm:{id(self)}", "action": "WARM", "side": "WARM"},
+        {"request_id": f"warm:{id(self)}", "action": "PING", "side": "PING"},
     )
+    await asyncio.sleep(
+        max(0.05, float(os.getenv("E4_BUILDER_STARTUP_WARM_SECONDS", "0.75")))
+    )
+    return result
 
 
 final.BuilderWorker.request = _worker_request
@@ -264,9 +268,6 @@ _PREVIOUS_ON_EVENT = core.Engine.on_event
 
 
 async def _on_event_v7(self: core.Engine, event: core.Event) -> None:
-    # Exact reserve hints are attached to every build, so launch-time prefetch is
-    # normally unnecessary and could occupy both workers at the moment an order
-    # is admitted. Keep it as an explicit operator experiment only.
     if (
         os.getenv("E4_PREFETCH_LAUNCH_STATE", "false").lower()
         in {"1", "true", "yes", "on"}
@@ -287,9 +288,6 @@ _PREVIOUS_RUN = core.Engine.run
 
 
 async def _run_v7(self: core.Engine) -> None:
-    # Start both daemon workers and await Pump global state + a recent blockhash
-    # before consuming the first market event. This removes cold RPC work from
-    # the 29-36ms entry window.
     warm = getattr(self.builder, "warm", None)
     if warm is not None:
         await warm()
