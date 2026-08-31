@@ -1,0 +1,41 @@
+name: E4 recent creator recurrence
+
+on:
+  push:
+    branches:
+      - codex/gambit-jr-v2-e4-stress-hardening
+    paths:
+      - "models/e4/e4-fresh-recent-39.json"
+      - "scripts/e4_recent_creator_recurrence.py"
+      - ".github/workflows/e4-recent-creator-recurrence.yml"
+  workflow_dispatch:
+
+jobs:
+  recurrence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - name: Resolve later E4 creators and test recurrence
+        env:
+          E4_RPC_URLS: ${{ secrets.HELIUS_RPC_URL || 'https://solana-rpc.publicnode.com,https://api.mainnet-beta.solana.com,https://solana-mainnet.api.onfinality.io/public' }}
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_recent_creator_recurrence.py \
+            --rpc-urls "$E4_RPC_URLS" \
+            --output artifacts/e4-recent-creator-recurrence.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-recent-creator-recurrence-${{ github.run_id }}
+          path: |
+            artifacts/e4-recent-creator-recurrence.json
+            artifacts/e4-recent-creator-recurrence.md
+          if-no-files-found: warn
+          retention-days: 30
