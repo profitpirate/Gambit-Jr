@@ -74,7 +74,7 @@ jobs:
             scripts/e4_v12_forward_accumulate.py
           node --check tools/e4-builder/race-proxy-v3.mjs
           node --check tools/e4-builder/fast-preload-v4.mjs
-          (cd tools/e4-builder && npm run self-test)
+          E4_BUILDER_ALLOW_REMOTE_FALLBACK=false node tools/e4-builder/race-proxy-v3.mjs --self-test
 
       - name: Freeze V12 fingerprint
         run: |
