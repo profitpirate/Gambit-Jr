@@ -64,13 +64,17 @@ class CreatorExpectancyEntryTests(unittest.TestCase):
         self.assertFalse(accepted)
         self.assertIn("negative creator history", reason)
 
-    def test_single_prior_winner_gets_smaller_fast_path(self) -> None:
+    def test_single_prior_winner_is_watch_only_without_repeat_history(self) -> None:
+        # One historical E4 win is discovery evidence, not enough causal history
+        # to authorize an independent future entry. V11 requires >=3 observed
+        # trades and >=2 wins before this creator-history path can authorize.
         creator = "one-win"
         v9._EXPECTANCY_CREATORS[creator] = {"wins": 1, "losses": 0, "trades": 1, "gross_win_rate": 1.0}
-        accepted, _, fraction, reason, _ = self.policy.entry(seeded_state("one-win-mint", creator))
-        self.assertTrue(accepted, reason)
-        self.assertIn("prior_e4_winning_creator", reason)
-        self.assertLessEqual(fraction, 0.03)
+        accepted, score, fraction, reason, _ = self.policy.entry(seeded_state("one-win-mint", creator))
+        self.assertFalse(accepted)
+        self.assertEqual(score, 0.0)
+        self.assertEqual(fraction, 0.0)
+        self.assertIn("identity-only gate", reason)
 
     def test_unknown_creator_public_flow_has_no_authority(self) -> None:
         creator = "unknown"
