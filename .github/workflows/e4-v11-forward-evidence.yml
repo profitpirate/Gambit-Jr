@@ -1,0 +1,117 @@
+name: E4 V11 forward evidence batch
+
+on:
+  push:
+    branches:
+      - codex/e4-v11-final
+    paths:
+      - "models/e4/e4-v11-forward-trigger.txt"
+      - "src/memecoin_bot/e4_hardening_v10.py"
+      - "src/memecoin_bot/e4_pipelines_v10.py"
+      - "models/e4/e4-discovered-creators.json"
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_HOLDOUT_PROGRESS_PATH: "artifacts/e4-v11-forward-progress.json"
+
+concurrency:
+  group: e4-v11-forward-evidence
+  cancel-in-progress: false
+
+jobs:
+  forward-batch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v11-final
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - name: Verify repaired frozen V11 policy
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          h=Path('src/memecoin_bot/e4_hardening_v10.py').read_text()
+          r=Path('src/memecoin_bot/e4_pipelines_v10.py').read_text()
+          m=Path('scripts/e4_live_market_stress.py').read_text()
+          assert 'entry FDV above observed E4 envelope' in h
+          assert 'trades >= 3 and wins >= 2 and rate >= 0.60' in h
+          assert 'trades >= 3 and wins >= 2 and rate >= 0.60' in r
+          assert 'scenarios["36ms"]' in m
+          assert 'entry_price > max_price' in m
+          from scripts.e4_v11_forward_accumulate import fingerprint
+          fp=fingerprint()
+          evidence=Path('models/e4/e4-v11-forward-evidence.json')
+          if evidence.exists():
+              old=json.loads(evidence.read_text())
+              assert old['strategy_fingerprint']==fp, (old['strategy_fingerprint'], fp)
+          print('frozen fingerprint', fp)
+          PY
+      - name: Compile V11 market harness
+        run: |
+          python -m compileall -q \
+            scripts/e4_300_launch_holdout.py \
+            scripts/e4_live_market_stress.py \
+            scripts/e4_v11_forward_accumulate.py \
+            src/memecoin_bot/e4_hardening_v10.py
+      - name: Capture 3000 fresh Pump launches and replay frozen V11 at 36ms
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_300_launch_holdout.py \
+            --target-launches 3000 \
+            --capture-seconds 14400 \
+            --tail-seconds 300 \
+            --heartbeat-seconds 60 \
+            --minimum-launches 3000 \
+            --wallet-signatures 1000 \
+            --builder-probes 0 \
+            --testnet-route-probes 0 \
+            --stress-iterations 0 \
+            --output artifacts/e4-v11-forward-batch.json
+      - name: Accumulate only fresh 36ms evidence
+        run: |
+          python scripts/e4_v11_forward_accumulate.py \
+            --batch artifacts/e4-v11-forward-batch.json \
+            --batch-id "${GITHUB_RUN_ID}" \
+            --evidence models/e4/e4-v11-forward-evidence.json \
+            --markdown models/e4/e4-v11-forward-evidence.md
+      - name: Persist evidence only — strategy remains frozen
+        run: |
+          git config user.name 'gambit-v11-evidence'
+          git config user.email 'actions@users.noreply.github.com'
+          git add models/e4/e4-v11-forward-evidence.json models/e4/e4-v11-forward-evidence.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'data(e4): accumulate frozen V11 forward evidence [skip ci]'
+            git push origin HEAD:codex/e4-v11-final
+          fi
+      - name: Upload forward batch evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e4-v11-forward-batch-${{ github.run_id }}
+          path: |
+            artifacts/e4-v11-forward-progress.json
+            artifacts/e4-v11-forward-batch.json
+            artifacts/e4-v11-forward-batch.md
+            artifacts/e4-v11-forward-batch-live-events.jsonl
+            models/e4/e4-v11-forward-evidence.json
+            models/e4/e4-v11-forward-evidence.md
+          if-no-files-found: warn
+          retention-days: 30
