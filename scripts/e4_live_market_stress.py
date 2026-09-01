@@ -8,6 +8,7 @@ import json
 import math
 import os
 import random
+import shlex
 import statistics
 import subprocess
 import time
@@ -470,6 +471,8 @@ def simulate_token(events: Sequence[LiveEvent], settings: core.Settings, latency
     score = 0.0
     requested_fraction = 0.0
     entry_decision_ns = 0
+    decision_price_sol = 0.0
+    decision_fdv_usd = 0.0
     for index, event in enumerate(events):
         state.apply(event.to_core(), None)
         if event.kind not in {
@@ -484,6 +487,8 @@ def simulate_token(events: Sequence[LiveEvent], settings: core.Settings, latency
             score = candidate_score
             requested_fraction = fraction
             entry_decision_ns = event.received_ns
+            decision_price_sol = float(state.price_sol or event.price_sol or 0.0)
+            decision_fdv_usd = float(state.fdv_usd or event.fdv_usd or 0.0)
             break
     if entry_index is None:
         return None
@@ -497,6 +502,17 @@ def simulate_token(events: Sequence[LiveEvent], settings: core.Settings, latency
     fill_index, fill_event = fill
     entry_price = fill_event.price_sol
     if not entry_price or entry_price <= 0:
+        return None
+    # A simulated fill must respect the exact buy protection the real transaction carries.
+    # If the next observable trade is already outside the allowed price/FDV envelope,
+    # the correct counterfactual is a failed/missed entry, not an impossible bad fill.
+    max_price = decision_price_sol * (1.0 + settings.buy_slippage_bps / 10_000.0) if decision_price_sol > 0 else 0.0
+    if max_price > 0 and entry_price > max_price:
+        return None
+    fill_fdv = float(fill_event.fdv_usd or 0.0)
+    if fill_fdv > 0 and fill_fdv > settings.max_entry_fdv_usd:
+        return None
+    if decision_fdv_usd > 0 and decision_fdv_usd > settings.max_entry_fdv_usd:
         return None
     position = core.Position(
         position_id=f"sim:{events[0].mint}",
@@ -748,9 +764,11 @@ async def builder_benchmark(mints: Sequence[str], probes: int) -> dict[str, Any]
     except ImportError as exc:
         return {"available": False, "reason": f"solders unavailable: {exc}"}
     keypair = Keypair()
+    builder_command = tuple(shlex.split(os.getenv("E4_BUILDER_COMMAND", "node tools/e4-builder/race-proxy-v3.mjs")))
+    if not builder_command:
+        return {"available": False, "reason": "empty V11 builder command"}
     process = await asyncio.create_subprocess_exec(
-        "node",
-        "tools/e4-builder/daemon.mjs",
+        *builder_command,
         stdin=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
@@ -1261,7 +1279,7 @@ async def main_async(args: argparse.Namespace) -> int:
     route_task = asyncio.create_task(testnet_route_probe(args.testnet_route_probes))
     async with RpcPool(rpc_urls, timeout=10) as oracle_rpc:
         fresh_task = asyncio.create_task(fetch_e4_wallet_sample(oracle_rpc, args.wallet_signatures))
-        latencies = [250.0, 500.0, 1_000.0]
+        latencies = [36.0, 100.0, 250.0, 500.0, 1_000.0]
         scenarios: dict[str, Any] = {}
         for latency in latencies:
             candidates = [
@@ -1287,7 +1305,7 @@ async def main_async(args: argparse.Namespace) -> int:
         }
     builder, route = await asyncio.gather(builder_task, route_task)
 
-    primary_scenario = scenarios["500ms"]["balances"]["1.2"]
+    primary_scenario = scenarios["36ms"]["balances"]["1.2"]
     baseline_payload = json.loads(Path("models/e4/e4-observed-v1.json").read_text())
     baseline = baseline_payload["evidence"]
     comparisons = compare_metrics(primary_scenario, baseline, fresh)
@@ -1328,7 +1346,7 @@ async def main_async(args: argparse.Namespace) -> int:
         "actual_e4_observed_baseline": baseline_payload,
         "hypothetical_scenarios": scenarios,
         "primary_comparison_scenario": {
-            "latency_ms": 500,
+            "latency_ms": 36,
             "starting_balance_sol": 1.2,
             "results": primary_scenario,
         },
@@ -1356,7 +1374,7 @@ async def main_async(args: argparse.Namespace) -> int:
                 f"**Hypothesis only:** yes — zero mainnet transactions sent.",
                 f"**Live launches captured:** {capture['new_launches']}",
                 f"**Live trade events:** {capture['trade_events']}",
-                f"**Hypothetical closed positions (500ms / 1.2 SOL):** {primary_scenario['closed_positions']}",
+                f"**Hypothetical closed positions (36ms / 1.2 SOL):** {primary_scenario['closed_positions']}",
                 f"**Hypothetical net win rate:** {primary_scenario['net_win_rate']}",
                 f"**Hypothetical net P&L:** {primary_scenario['net_pnl_sol']} SOL",
                 f"**Fresh E4 closed positions reconstructed:** {fresh.get('closed_positions')}",

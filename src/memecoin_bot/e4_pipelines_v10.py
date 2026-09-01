@@ -278,7 +278,7 @@ def _tier_from_record(record: Mapping[str, Any], *, discovered: bool = False) ->
         return CreatorTier.NEGATIVE
     if trades >= 3 and wins >= 2 and rate >= 0.75:
         return CreatorTier.ELITE
-    if wins >= 1 and rate >= 0.50:
+    if trades >= 3 and wins >= 2 and rate >= 0.60:
         return CreatorTier.APPROVED
 
     max_peak = _finite(

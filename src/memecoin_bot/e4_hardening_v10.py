@@ -176,6 +176,10 @@ def _entry_v10(self: core.E4Policy, state: core.TokenState) -> tuple[bool, float
     launch_ns = int(context.get("create_received_ns") or getattr(state, "first_ns", 0) or getattr(state, "latest_ns", 0) or time.time_ns())
     now_ns = int(context.get("last_received_ns") or getattr(state, "latest_ns", 0) or time.time_ns())
     creator_seed = float(features.get("creator_buy_sol", 0.0) or 0.0)
+    current_fdv = float(getattr(state, "fdv_usd", 0.0) or 0.0)
+    features["entry_fdv_usd"] = current_fdv
+    if current_fdv > 0 and current_fdv > self.settings.max_entry_fdv_usd:
+        return False, 0.0, 0.0, "entry FDV above observed E4 envelope", features
 
     # A cooperating/prearmed launch is an explicit authority path and must be
     # evaluated before any historical negative record.
@@ -207,7 +211,7 @@ def _entry_v10(self: core.E4Policy, state: core.TokenState) -> tuple[bool, float
                 decision_reason = "proven_repeat_e4_creator identity fast path"
                 decision_ns = 0
                 decision_evidence = {"creator_tier": "ELITE"}
-            elif wins >= 1 and rate >= 0.50:
+            elif trades >= 3 and wins >= 2 and rate >= 0.60:
                 decision_family = "prior_e4_winning_creator"
                 decision_score = max(0.84, min(0.93, 0.82 + rate * 0.08))
                 decision_fraction = 0.0185
