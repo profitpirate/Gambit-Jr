@@ -985,3 +985,10 @@ def reset_runtime_for_tests(runtime: PipelineRuntime | None = None) -> PipelineR
             _RUNTIME.teacher.stop()
         _RUNTIME = runtime or PipelineRuntime()
         return _RUNTIME
+
+
+# V11_CANONICAL_PIPELINE_API
+# The V10 primitives above remain reusable and directly tested. V11 exposes one
+# canonical manager for production and compatibility with the earlier engine.
+from .e4_pipeline_manager_v11 import PipelineManager  # noqa: E402
+manager = PipelineManager()  # canonical same-process V11 authority
