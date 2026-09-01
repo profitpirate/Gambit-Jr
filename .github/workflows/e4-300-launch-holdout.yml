@@ -1,11 +1,11 @@
-name: E4 exact 300 live launch holdout
+name: E4 V11 exact 300 live launch final market test
 
 on:
   push:
     branches:
-      - codex/gambit-jr-v2-e4-stress-hardening
+      - codex/e4-v11-final
     paths:
-      - "scripts/e4_300_launch_holdout.py"
+      - "scripts/e4_300_launch_holdout_v11.py"
       - ".github/workflows/e4-300-launch-holdout.yml"
   workflow_dispatch:
     inputs:
@@ -28,10 +28,11 @@ permissions:
 env:
   PYTHONUNBUFFERED: "1"
   E4_SOL_USD_FALLBACK: "150"
-  E4_HOLDOUT_PROGRESS_PATH: "artifacts/e4-300-launch-progress.json"
+  E4_HOLDOUT_PROGRESS_PATH: "artifacts/e4-v11-300-launch-progress.json"
+  E4_PIPELINES_BACKGROUND: "false"
 
 jobs:
-  exact-300-live-launches:
+  exact-300-live-launches-v11:
     runs-on: ubuntu-latest
     timeout-minutes: 125
     steps:
@@ -47,27 +48,28 @@ jobs:
       - run: python -m pip install -r requirements-e4.txt
       - working-directory: tools/e4-builder
         run: npm install --omit=dev
-      - name: Verify production V7 policy and local Pump builder
+      - name: Verify persisted V11 policy and local Pump builder
         run: |
           python -m unittest discover -s tests -p "test_e4*.py" -v
           python -m compileall -q \
             scripts/e4_300_launch_holdout.py \
+            scripts/e4_300_launch_holdout_v11.py \
             scripts/e4_live_market_stress.py \
             scripts/e4_selection_forensics.py \
             scripts/e4_creator_forensics.py \
-            src/memecoin_bot/e4_hardening_v5.py \
-            src/memecoin_bot/e4_hardening_v6.py \
-            src/memecoin_bot/e4_hardening_v7.py
-          node --check tools/e4-builder/daemon-v2.mjs
+            src/memecoin_bot/e4_hardening_v10.py \
+            src/memecoin_bot/e4_pipelines_v10.py \
+            src/memecoin_bot/e4_pipeline_manager_v11.py
+          node --check tools/e4-builder/race-proxy-v3.mjs
           node tools/e4-builder/daemon-v2.mjs --self-test
-      - name: Capture exactly 300 real Pump launches and replay V7 hypothetically
+      - name: Capture exactly 300 real Pump launches and replay V11 hypothetically
         env:
           TARGET_LAUNCHES: ${{ github.event.inputs.target_launches || '300' }}
           MAX_CAPTURE_SECONDS: ${{ github.event.inputs.max_capture_seconds || '6600' }}
           TAIL_SECONDS: ${{ github.event.inputs.tail_seconds || '240' }}
         run: |
           mkdir -p artifacts
-          python scripts/e4_300_launch_holdout.py \
+          python scripts/e4_300_launch_holdout_v11.py \
             --target-launches "$TARGET_LAUNCHES" \
             --capture-seconds "$MAX_CAPTURE_SECONDS" \
             --tail-seconds "$TAIL_SECONDS" \
@@ -77,14 +79,14 @@ jobs:
             --builder-probes 100 \
             --testnet-route-probes 0 \
             --stress-iterations 100000 \
-            --output artifacts/e4-300-launch-holdout.json
-      - name: Compare Gambit selections against the complete captured cohort
+            --output artifacts/e4-v11-300-launch-holdout.json
+      - name: Compare V11 selections against the complete captured cohort
         if: always()
         run: |
-          if [ -s artifacts/e4-300-launch-holdout-live-events.jsonl ]; then
+          if [ -s artifacts/e4-v11-300-launch-holdout-live-events.jsonl ]; then
             python scripts/e4_selection_forensics.py \
-              --events artifacts/e4-300-launch-holdout-live-events.jsonl \
-              --output artifacts/e4-300-selection-forensics.json
+              --events artifacts/e4-v11-300-launch-holdout-live-events.jsonl \
+              --output artifacts/e4-v11-300-selection-forensics.json
           fi
       - name: Refresh actual E4 creator/source evidence
         if: always()
@@ -95,19 +97,19 @@ jobs:
             --before-limit 30 \
             --concurrency 10 \
             --timeout 5 \
-            --output artifacts/e4-300-creator-forensics.json || true
-      - name: Upload checkpoints and full holdout evidence
+            --output artifacts/e4-v11-300-creator-forensics.json || true
+      - name: Upload final V11 market evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: e4-exact-300-launch-holdout-${{ github.run_id }}
+          name: e4-v11-exact-300-launch-holdout-${{ github.run_id }}
           path: |
-            artifacts/e4-300-launch-progress.json
-            artifacts/e4-300-launch-holdout.json
-            artifacts/e4-300-launch-holdout.md
-            artifacts/e4-300-launch-holdout-live-events.jsonl
-            artifacts/e4-300-selection-forensics.json
-            artifacts/e4-300-selection-forensics.md
-            artifacts/e4-300-creator-forensics.json
+            artifacts/e4-v11-300-launch-progress.json
+            artifacts/e4-v11-300-launch-holdout.json
+            artifacts/e4-v11-300-launch-holdout.md
+            artifacts/e4-v11-300-launch-holdout-live-events.jsonl
+            artifacts/e4-v11-300-selection-forensics.json
+            artifacts/e4-v11-300-selection-forensics.md
+            artifacts/e4-v11-300-creator-forensics.json
           if-no-files-found: warn
           retention-days: 30
