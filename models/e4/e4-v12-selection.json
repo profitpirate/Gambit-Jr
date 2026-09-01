@@ -1,0 +1,51 @@
+{
+  "version": "e4-v12-selection-v1",
+  "status": "frozen_forward_test_candidate",
+  "rationale": "V12 separates creator authority from launch quality. Historical creator success permits evaluation but never auto-authorizes every future launch. Thresholds are frozen before forward evidence and may not change inside an evidence window.",
+  "limits": {
+    "max_entry_fdv_usd": 8500.0,
+    "elite_max_age_ms": 150.0,
+    "proven_max_age_ms": 180.0,
+    "social_max_age_ms": 180.0,
+    "prearmed_max_age_ms": 80.0,
+    "min_creator_seed_sol": 0.025
+  },
+  "history": {
+    "elite_min_trades": 5,
+    "elite_min_wins": 4,
+    "elite_min_win_rate": 0.80,
+    "proven_min_trades": 3,
+    "proven_min_wins": 2,
+    "proven_min_win_rate": 0.75,
+    "negative_min_trades": 3,
+    "negative_max_win_rate": 0.25,
+    "external_discovered_without_closed_history_can_auto_authorize": false
+  },
+  "launch_support": {
+    "elite_big_seed_sol": 0.35,
+    "proven_big_seed_sol": 0.75,
+    "elite_public_buyers": 1,
+    "elite_public_sol": 0.03,
+    "proven_public_buyers": 2,
+    "proven_public_sol": 0.10,
+    "fingerprint_match_counts_as_support": true
+  },
+  "quality": {
+    "elite_min_score": 0.65,
+    "proven_min_score": 0.70,
+    "weights": {
+      "history": 0.45,
+      "fdv_fit": 0.20,
+      "creator_seed": 0.15,
+      "public_confirmation": 0.15,
+      "creator_fingerprint": 0.05
+    }
+  },
+  "invariants": {
+    "reentry": false,
+    "max_concurrent_positions": 2,
+    "public_flow_alone_can_authorize": false,
+    "single_prior_win_can_authorize": false,
+    "creator_tier_alone_can_authorize": false
+  }
+}

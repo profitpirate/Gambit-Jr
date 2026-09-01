@@ -1,0 +1,131 @@
+name: E4 V12 selection certification
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-selection-reconstruction
+    paths:
+      - "models/e4/e4-v12-forward-trigger.txt"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
+  E4_BUILDER_PRELOAD: "tools/e4-builder/fast-preload-v4.mjs"
+  E4_HOLDOUT_PROGRESS_PATH: "artifacts/e4-v12-forward-progress.json"
+
+concurrency:
+  group: e4-v12-forward-evidence
+  cancel-in-progress: false
+
+jobs:
+  certify-v12:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-selection-reconstruction
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+
+      - name: Baseline E4 regression before V12 import
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+
+      - name: V12 selection reconstruction tests
+        run: python -m unittest discover -s tests -p "test_v12_selection.py" -v
+
+      - name: Prove production and holdout use V12
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          entry = Path('src/memecoin_bot/e4_exec/__main__.py').read_text()
+          wrapper = Path('scripts/e4_300_launch_holdout_v12.py').read_text()
+          workflow = Path('.github/workflows/e4-v12-selection-certification.yml').read_text()
+          assert 'e4_hardening_v12' in entry
+          assert 'e4_hardening_v12 as v12' in wrapper
+          assert 'e4_300_launch_holdout_v12.py' in workflow
+          assert 'e4_300_launch_holdout.py \\' not in workflow
+          print('V12 production + test harness wiring verified')
+          PY
+
+      - name: Compile and builder self-test
+        run: |
+          python -m compileall -q \
+            src/memecoin_bot/e4_hardening_v12.py \
+            src/memecoin_bot/e4_exec/__main__.py \
+            scripts/e4_300_launch_holdout_v12.py \
+            scripts/e4_v12_forward_accumulate.py
+          node --check tools/e4-builder/race-proxy-v3.mjs
+          node --check tools/e4-builder/fast-preload-v4.mjs
+          (cd tools/e4-builder && npm run self-test)
+
+      - name: Freeze V12 fingerprint
+        run: |
+          python - <<'PY'
+          from scripts.e4_v12_forward_accumulate import fingerprint
+          print('V12_FINGERPRINT', fingerprint())
+          PY
+
+      - name: Capture 3000 fresh Pump launches with exact V12 runtime and replay at 36ms
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_300_launch_holdout_v12.py \
+            --target-launches 3000 \
+            --capture-seconds 14400 \
+            --tail-seconds 300 \
+            --heartbeat-seconds 60 \
+            --minimum-launches 3000 \
+            --wallet-signatures 1000 \
+            --builder-probes 100 \
+            --testnet-route-probes 0 \
+            --stress-iterations 0 \
+            --output artifacts/e4-v12-forward-batch.json
+
+      - name: Accumulate only frozen V12 evidence
+        run: |
+          python scripts/e4_v12_forward_accumulate.py \
+            --batch artifacts/e4-v12-forward-batch.json \
+            --batch-id "${GITHUB_RUN_ID}" \
+            --evidence models/e4/e4-v12-forward-evidence.json \
+            --markdown models/e4/e4-v12-forward-evidence.md
+
+      - name: Persist V12 evidence only
+        run: |
+          git config user.name 'gambit-v12-evidence'
+          git config user.email 'actions@users.noreply.github.com'
+          git add models/e4/e4-v12-forward-evidence.json models/e4/e4-v12-forward-evidence.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'data(e4): accumulate frozen V12 forward evidence [skip ci]'
+            git push origin HEAD:codex/e4-v12-selection-reconstruction
+          fi
+
+      - name: Upload V12 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e4-v12-forward-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-forward-progress.json
+            artifacts/e4-v12-forward-batch.json
+            artifacts/e4-v12-forward-batch.md
+            artifacts/e4-v12-forward-batch-live-events.jsonl
+            models/e4/e4-v12-forward-evidence.json
+            models/e4/e4-v12-forward-evidence.md
+          if-no-files-found: warn
+          retention-days: 30
