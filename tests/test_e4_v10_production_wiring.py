@@ -5,9 +5,9 @@ from pathlib import Path
 
 
 class ProductionWiringTests(unittest.TestCase):
-    def test_entrypoint_loads_v10_and_pipeline_supervisor(self) -> None:
+    def test_entrypoint_loads_current_hardening_and_pipeline_supervisor(self) -> None:
         text = Path("src/memecoin_bot/e4_exec/__main__.py").read_text(encoding="utf-8")
-        self.assertIn("e4_hardening_v10", text)
+        self.assertIn("e4_hardening_v12", text)
         self.assertIn("start_background_supervisor", text)
         self.assertIn("race-proxy-v3.mjs", text)
 
@@ -20,6 +20,8 @@ class ProductionWiringTests(unittest.TestCase):
             "scripts/e4_v10_social_stream.py",
             "tools/e4-builder/race-proxy-v3.mjs",
             "tools/e4-builder/fast-preload-v3.mjs",
+            "src/memecoin_bot/e4_hardening_v12.py",
+            "models/e4/e4-v12-selection.json",
         )
         for path in required:
             self.assertTrue(Path(path).is_file(), path)
