@@ -4,7 +4,6 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import json
-import statistics
 import time
 from collections import Counter
 from pathlib import Path
@@ -18,8 +17,25 @@ core = v10.core
 def percentile(values: list[int], q: float) -> int | None:
     if not values:
         return None
-    values = sorted(values)
-    return values[min(len(values) - 1, int((len(values) - 1) * q))]
+    ordered = sorted(values)
+    return ordered[min(len(ordered) - 1, int((len(ordered) - 1) * q))]
+
+
+def pipeline_metrics_snapshot() -> dict[str, Any]:
+    """Best-effort telemetry export that must never invalidate a stress run."""
+    metrics = getattr(v10.PIPELINES, "metrics", None)
+    if metrics is None:
+        return {"available": False, "reason": "canonical_v11_manager_has_no_metrics_surface"}
+    snapshot = getattr(metrics, "snapshot", None)
+    if callable(snapshot):
+        try:
+            value = snapshot()
+            return dict(value) if isinstance(value, dict) else {"available": True, "value": value}
+        except Exception as exc:
+            return {"available": False, "reason": f"snapshot_error:{type(exc).__name__}:{exc}"}
+    if isinstance(metrics, dict):
+        return {"available": True, **metrics}
+    return {"available": False, "reason": f"unsupported_metrics_type:{type(metrics).__name__}"}
 
 
 def make_state(mint: str, creator: str, *, buyers: int = 0):
@@ -90,8 +106,6 @@ def choose_creators() -> tuple[str, str, str]:
     if not approved:
         approved = elite
     if not negative:
-        # The persisted 316-trade expectancy model should contain at least one
-        # 0W/4L creator; fail closed if the model was accidentally truncated.
         raise RuntimeError("creator model contains no NEGATIVE creator")
     return elite, approved, negative
 
@@ -147,7 +161,7 @@ def narrative_stress(iterations: int) -> dict[str, Any]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Stress all three E4 V10 decision pipelines")
+    parser = argparse.ArgumentParser(description="Stress all three E4 V11 decision pipelines")
     parser.add_argument("--iterations", type=int, default=200_000)
     parser.add_argument("--workers", type=int, default=16)
     parser.add_argument("--narrative-iterations", type=int, default=50_000)
@@ -164,14 +178,16 @@ def main() -> int:
             chunksize=128,
         ):
             results.append(result)
+
     elapsed_seconds = time.perf_counter() - started
     latencies = [row[0] for row in results]
     failures = [row for row in results if not row[2]]
     reasons = Counter(row[3].split(" decision_ns=", 1)[0] for row in results)
     narrative = narrative_stress(args.narrative_iterations)
+    p99 = percentile(latencies, 0.99)
 
     report = {
-        "version": "e4-v10-pipeline-stress-v1",
+        "version": "e4-v11-pipeline-stress-v2",
         "creator_registry_profiles": len(v10.PIPELINES.creators.snapshot.profiles),
         "iterations": args.iterations,
         "workers": args.workers,
@@ -179,10 +195,10 @@ def main() -> int:
         "operations_per_second": args.iterations / elapsed_seconds,
         "decision_p50_ns": percentile(latencies, 0.50),
         "decision_p95_ns": percentile(latencies, 0.95),
-        "decision_p99_ns": percentile(latencies, 0.99),
+        "decision_p99_ns": p99,
         "decision_max_ns": max(latencies, default=0),
         "decision_budget_ns": 36_000_000,
-        "decision_budget_pass": bool(latencies and percentile(latencies, 0.99) <= 36_000_000),
+        "decision_budget_pass": bool(latencies and p99 is not None and p99 <= 36_000_000),
         "decision_correctness_failures": len(failures),
         "sample_failures": [
             {"creator": row[1], "reason": row[3], "latency_ns": row[0]}
@@ -191,7 +207,7 @@ def main() -> int:
         "reason_distribution": dict(reasons),
         "narrative": narrative,
         "narrative_budget_pass": narrative["p99_ns"] is not None and narrative["p99_ns"] <= 36_000_000,
-        "pipeline_metrics": v10.PIPELINES.metrics.snapshot(),
+        "pipeline_metrics": pipeline_metrics_snapshot(),
         "selected_test_creators": {
             "elite": elite,
             "approved": approved,
@@ -200,14 +216,20 @@ def main() -> int:
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
-    print(json.dumps({
-        "decision_p95_ms": report["decision_p95_ns"] / 1e6,
-        "decision_p99_ms": report["decision_p99_ns"] / 1e6,
-        "decision_max_ms": report["decision_max_ns"] / 1e6,
-        "correctness_failures": len(failures),
-        "narrative_p99_ms": narrative["p99_ns"] / 1e6,
-        "ops_per_second": report["operations_per_second"],
-    }), flush=True)
+    print(
+        json.dumps(
+            {
+                "decision_p50_ms": report["decision_p50_ns"] / 1e6,
+                "decision_p95_ms": report["decision_p95_ns"] / 1e6,
+                "decision_p99_ms": report["decision_p99_ns"] / 1e6,
+                "decision_max_ms": report["decision_max_ns"] / 1e6,
+                "correctness_failures": len(failures),
+                "narrative_p99_ms": narrative["p99_ns"] / 1e6,
+                "ops_per_second": report["operations_per_second"],
+            }
+        ),
+        flush=True,
+    )
     return 0 if report["decision_budget_pass"] and report["narrative_budget_pass"] and not failures else 2
 
 
