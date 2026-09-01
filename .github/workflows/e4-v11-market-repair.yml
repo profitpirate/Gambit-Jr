@@ -1,11 +1,13 @@
 name: E4 V11 final market repairs
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - codex/e4-v11-final
     paths:
       - "scripts/e4_v11_market_repairs.py"
+      - "tests/test_e4_hardening_v9.py"
       - ".github/workflows/e4-v11-market-repair.yml"
 
 permissions:
@@ -59,12 +61,14 @@ jobs:
           h=Path('src/memecoin_bot/e4_hardening_v10.py').read_text()
           r=Path('src/memecoin_bot/e4_pipelines_v10.py').read_text()
           m=Path('scripts/e4_live_market_stress.py').read_text()
+          t=Path('tests/test_e4_hardening_v9.py').read_text()
           assert 'trades >= 3 and wins >= 2 and rate >= 0.60' in h
           assert 'trades >= 3 and wins >= 2 and rate >= 0.60' in r
           assert 'entry FDV above observed E4 envelope' in h
           assert 'scenarios["36ms"]' in m
           assert 'race-proxy-v3.mjs' in m
           assert 'entry_price > max_price' in m
+          assert 'single_prior_winner_is_watch_only' in t
           print('V11 market repair assertions passed')
           PY
       - name: Persist repaired source
