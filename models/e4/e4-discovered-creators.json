@@ -1,6 +1,6 @@
 {
-  "version": "e4-discovered-creators-v1",
-  "semantics": "Creators promoted from previously-unknown E4 entries after independent evidence that their earlier launches repeatedly reached profitable market-cap/price multiples and/or were tied to persistent CT/community sources. This is weaker than direct historical E4 expectancy and stronger than anonymous public flow.",
+  "version": "e4-discovered-creators-v2",
+  "semantics": "Creators promoted from previously-unknown E4 entries after independent evidence that their earlier launches repeatedly reached profitable market-cap/price multiples and/or were tied to persistent CT/community sources. Fresh E4 outcomes may update a creator for future launches only after the observed trade is closed; they are never back-applied to the launch that produced the evidence.",
   "creators": {
     "FnNQkCL2a1uwf65wzP9ujztZ4WfKcu5aMGdmWf1KYBBK": {
       "score": 0.92,
@@ -41,6 +41,30 @@
       "observed_prior_max_mc_usd": [12320, 29996, 8488, 9417],
       "social_handles": ["solOlympos"],
       "notes": "At least 15 launches are indexed for this creator; several share the same solOlympos X source and one prior launch reached ~30k max MC."
+    },
+    "FiwwHe2obYsFoxprUXRWdAgHxMfKwK7ca9YB3g8bmX13": {
+      "score": 0.95,
+      "tier": "elite",
+      "wins": 8,
+      "losses": 1,
+      "trades": 9,
+      "gross_win_rate": 0.8888888889,
+      "evidence": ["historical_e4_7w_1l", "fresh_e4_win_2026_09_01", "j7_metadata_recurrence"],
+      "fresh_e4_mint": "H54bbASjbWVdaKzRTHz5hbZtcgBFdMFesgZVUMjWpump",
+      "fresh_e4_net_pnl_sol": 3.286876858,
+      "notes": "Already an elite historical E4 creator. The fresh closed trade is another profitable observation and is applied only to future launches."
+    },
+    "EgJoaEBSZA3wjgpPq8am9YjkxJPLa2LpXwxaQyUzB2XY": {
+      "score": 0.82,
+      "tier": "approved",
+      "wins": 2,
+      "losses": 1,
+      "trades": 3,
+      "gross_win_rate": 0.6666666667,
+      "evidence": ["historical_e4_1w_1l", "fresh_e4_win_2026_09_01"],
+      "fresh_e4_mint": "CzsFNxuC497pRFKGv3dPvCMZ3moDc3MWJDFtozAopump",
+      "fresh_e4_net_pnl_sol": 1.245218502,
+      "notes": "Promoted only after the fresh trade closed profitably, bringing the observable record to 2W/1L. Standard-size authority only; not elite."
     }
   },
   "watchlist": {
