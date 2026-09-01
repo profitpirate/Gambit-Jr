@@ -59,8 +59,9 @@ jobs:
           workflow = Path('.github/workflows/e4-v12-selection-certification.yml').read_text()
           assert 'e4_hardening_v12' in entry
           assert 'e4_hardening_v12 as v12' in wrapper
-          assert 'e4_300_launch_holdout_v12.py' in workflow
-          assert 'e4_300_launch_holdout.py \\' not in workflow
+          assert 'python scripts/e4_300_launch_holdout_v12.py' in workflow
+          forbidden = 'python scripts/' + 'e4_300_launch_holdout.py'
+          assert forbidden not in workflow
           print('V12 production + test harness wiring verified')
           PY
 
