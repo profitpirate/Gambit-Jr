@@ -1,0 +1,114 @@
+name: E4 V11 resume from pass A
+
+on:
+  push:
+    branches: [codex/e4-v11-final]
+    paths:
+      - ".github/workflows/e4-v11-resume-pass-a.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
+  E4_BUILDER_PRELOAD: "tools/e4-builder/fast-preload-v4.mjs"
+
+jobs:
+  resume-pass-a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v11-final
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install runtime only
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+          python -m pip install -r requirements-e4.txt
+          cd tools/e4-builder
+          npm install --omit=dev
+      - name: Reconstruct the already-green consolidated V11 checkout
+        run: bash scripts/e4_v10_apply_all_patches_v2.sh
+      - name: Stress Pass A — 1,000,000 decisions / 32 workers
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_v10_pipeline_stress.py \
+            --iterations 1000000 \
+            --workers 32 \
+            --narrative-iterations 100000 \
+            --output artifacts/e4-v11-stress-a.json
+      - name: Stress Pass B — 1,000,000 decisions / 64 workers
+        env:
+          PYTHONHASHSEED: "913847"
+        run: |
+          python scripts/e4_v10_pipeline_stress.py \
+            --iterations 1000000 \
+            --workers 64 \
+            --narrative-iterations 100000 \
+            --output artifacts/e4-v11-stress-b.json
+      - name: Benchmark consistency gate
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('artifacts/e4-v11-stress-a.json').read_text())
+          b=json.loads(Path('artifacts/e4-v11-stress-b.json').read_text())
+          for name,row in [('A',a),('B',b)]:
+              assert row['decision_correctness_failures']==0, (name,row['decision_correctness_failures'])
+              assert row['decision_budget_pass'] is True, (name,row['decision_p99_ns'])
+              assert row['narrative_budget_pass'] is True, (name,row['narrative']['p99_ns'])
+              print(name, {
+                  'p50_ms': row['decision_p50_ns']/1e6,
+                  'p95_ms': row['decision_p95_ns']/1e6,
+                  'p99_ms': row['decision_p99_ns']/1e6,
+                  'max_ms': row['decision_max_ns']/1e6,
+                  'ops_per_second': row['operations_per_second'],
+                  'narrative_p99_ms': row['narrative']['p99_ns']/1e6,
+              })
+          PY
+      - name: Production container build
+        run: docker build -f Dockerfile.e4-exec -t gambit-jr-e4:v11 .
+      - name: Persist exact consolidated V11 source
+        run: |
+          git config user.name 'gambit-v11-finalizer'
+          git config user.email 'actions@users.noreply.github.com'
+          git add \
+            src/memecoin_bot/e4_hardening_v10.py \
+            src/memecoin_bot/e4_pipelines_v10.py \
+            src/memecoin_bot/e4_pipeline_manager_v11.py \
+            src/memecoin_bot/e4_pipeline_runtime_v10.py \
+            src/memecoin_bot/e4_exec/__main__.py \
+            tools/e4-builder/race-proxy-v3.mjs \
+            tools/e4-builder/fast-preload-v4.mjs \
+            tests/test_e4_hardening_v6.py \
+            tests/test_e4_live.py \
+            tests/test_e4_v10_direct_ca_social.py \
+            scripts/e4_v10_social_stream.py \
+            scripts/e4_v10_apply_all_patches.sh \
+            scripts/e4_v10_apply_all_patches_v2.sh \
+            scripts/e4_v11_wire_canonical_manager.py \
+            scripts/e4_v11_fix_manager_cycle.py || true
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat(e4): persist stress-certified V11 source [skip ci]'
+            git push origin HEAD:codex/e4-v11-final
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v11-resume-pass-a-${{ github.run_id }}
+          path: |
+            artifacts/e4-v11-stress-a.json
+            artifacts/e4-v11-stress-b.json
+          if-no-files-found: warn
+          retention-days: 30
