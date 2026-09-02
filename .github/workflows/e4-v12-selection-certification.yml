@@ -47,8 +47,10 @@ jobs:
       - name: Baseline E4 regression before V12 import
         run: python -m unittest discover -s tests -p "test_e4*.py" -v
 
-      - name: V12 selection reconstruction tests
-        run: python -m unittest discover -s tests -p "test_v12_selection.py" -v
+      - name: V12 selection and role-model gate tests
+        run: |
+          python -m unittest tests.test_v12_selection -v
+          python -m unittest tests.test_v12_role_model_gate -v
 
       - name: Prove production and holdout use V12
         run: |
@@ -71,7 +73,8 @@ jobs:
             src/memecoin_bot/e4_hardening_v12.py \
             src/memecoin_bot/e4_exec/__main__.py \
             scripts/e4_300_launch_holdout_v12.py \
-            scripts/e4_v12_forward_accumulate.py
+            scripts/e4_v12_forward_accumulate.py \
+            scripts/e4_v12_role_model_gate.py
           node --check tools/e4-builder/race-proxy-v3.mjs
           node --check tools/e4-builder/fast-preload-v4.mjs
           E4_BUILDER_ALLOW_REMOTE_FALLBACK=false node tools/e4-builder/race-proxy-v3.mjs --self-test
@@ -115,6 +118,11 @@ jobs:
             git commit -m 'data(e4): accumulate frozen V12 forward evidence [skip ci]'
             git push origin HEAD:codex/e4-v12-selection-reconstruction
           fi
+
+      - name: Enforce exact E4 role-model targets
+        run: |
+          python scripts/e4_v12_role_model_gate.py \
+            --evidence models/e4/e4-v12-forward-evidence.json
 
       - name: Upload V12 evidence
         if: always()
