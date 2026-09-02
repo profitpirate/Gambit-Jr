@@ -2,18 +2,18 @@
 
 **Classification:** INSUFFICIENT_EVIDENCE
 **Frozen strategy fingerprint:** `77611ad417ef5f941864ba98d5b418910c2e3bf562212ba54a0f56cd6568fce2`
-**Independent batches:** 9
-**Fresh launches:** 27000
+**Independent batches:** 10
+**Fresh launches:** 30000
 **Gambit closed:** 12
 **Gambit WR:** 8.33%
 **Gambit 95% CI:** 1.49% – 35.39%
 **Gambit P&L:** -0.046850 SOL
 **Gambit PF:** 0.030548130560891437
 **Gambit selection rate:** 0.04%
-**Same-window E4 closed:** 128
-**Same-window E4 WR:** 59.38%
-**Same-window E4 P&L:** -81.684909 SOL
-**Same-window E4 selection rate:** 0.47%
+**Same-window E4 closed:** 146
+**Same-window E4 WR:** 60.27%
+**Same-window E4 P&L:** -73.793161 SOL
+**Same-window E4 selection rate:** 0.49%
 **Historical E4 exact-net benchmark:** 60.08%, PF ~4.92
 **Evidence sufficient:** NO
 
