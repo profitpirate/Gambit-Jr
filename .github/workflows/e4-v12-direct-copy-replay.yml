@@ -5,6 +5,7 @@ on:
     branches:
       - codex/e4-v12-direct-copy-parameters
     paths:
+      - "src/memecoin_bot/e4_direct_copy_v12.py"
       - "scripts/e4_v12_direct_copy_replay.py"
       - ".github/workflows/e4-v12-direct-copy-replay.yml"
   workflow_dispatch:
