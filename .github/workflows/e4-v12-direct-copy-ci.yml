@@ -34,6 +34,9 @@ jobs:
       - run: python -m pip install -e .
       - run: python -m pip install -r requirements-e4.txt
 
+      - name: Print direct-copy policy fingerprint
+        run: python -c "import hashlib,pathlib; p=pathlib.Path('src/memecoin_bot/e4_direct_copy_v12.py'); print('E4_V12_DIRECT_COPY_SHA256=' + hashlib.sha256(p.read_bytes()).hexdigest())"
+
       - name: Existing E4 and V12 regression
         run: |
           python -m unittest discover -s tests -p "test_e4*.py" -v
