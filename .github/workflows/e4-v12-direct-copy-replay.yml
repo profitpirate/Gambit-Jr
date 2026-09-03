@@ -1,0 +1,67 @@
+name: E4 V12 direct-copy replay
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-direct-copy-parameters
+    paths:
+      - "src/memecoin_bot/e4_direct_copy_v12.py"
+      - "scripts/e4_v12_direct_copy_replay.py"
+      - ".github/workflows/e4-v12-direct-copy-replay.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  replay-two-live-windows:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+
+      - name: Download two independent live 3000-launch windows
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p window1 window2 artifacts
+          gh run download 33716649440 --repo profitpirate/Gambit-Jr --name e4-v12-forward-33716649440 --dir window1
+          gh run download 33704841852 --repo profitpirate/Gambit-Jr --name e4-v12-forward-33704841852 --dir window2
+
+      - name: Replay forced direct-copy V12 on window 1
+        run: |
+          python scripts/e4_v12_direct_copy_replay.py \
+            --batch window1/artifacts/e4-v12-forward-batch.json \
+            --events window1/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --source-run 33716649440 \
+            --latency-ms 36 \
+            --starting-balance-sol 1.2 \
+            --output artifacts/direct-copy-window-1.json
+
+      - name: Replay forced direct-copy V12 on window 2
+        run: |
+          python scripts/e4_v12_direct_copy_replay.py \
+            --batch window2/artifacts/e4-v12-forward-batch.json \
+            --events window2/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --source-run 33704841852 \
+            --latency-ms 36 \
+            --starting-balance-sol 1.2 \
+            --output artifacts/direct-copy-window-2.json
+
+      - name: Show both comparisons
+        run: |
+          cat artifacts/direct-copy-window-1.json
+          cat artifacts/direct-copy-window-2.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e4-v12-direct-copy-two-window-replay
+          path: artifacts/direct-copy-window-*.json
+          retention-days: 30
