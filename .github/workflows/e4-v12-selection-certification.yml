@@ -52,6 +52,7 @@ jobs:
           python -m unittest tests.test_v12_selection -v
           python -m unittest tests.test_v12_role_model_pipeline -v
           python -m unittest tests.test_v12_evidence_epoch -v
+          python -m unittest tests.test_v12_copy_only_evidence -v
 
       - name: Prove production and holdout use permanent V12 role-model wiring
         run: |
@@ -68,9 +69,11 @@ jobs:
           assert 'observe_market_event' in wrapper
           assert 'reset_role_model_replay' in wrapper
           assert 'python scripts/e4_300_launch_holdout_v12.py' in workflow
+          assert 'e4_v12_copy_timing_audit.py' in workflow
+          assert '--copy-audit artifacts/e4-v12-copy-audit.json' in workflow
           forbidden = 'python scripts/' + 'e4_300_launch_holdout.py'
           assert forbidden not in workflow
-          print('V12 production + role-model holdout wiring verified')
+          print('V12 production + role-model + copy-only evidence wiring verified')
           PY
 
       - name: Compile and builder self-test
@@ -80,6 +83,7 @@ jobs:
             src/memecoin_bot/e4_role_model_v12.py \
             src/memecoin_bot/e4_exec/__main__.py \
             scripts/e4_300_launch_holdout_v12.py \
+            scripts/e4_v12_copy_timing_audit.py \
             scripts/e4_v12_evidence_epoch.py \
             scripts/e4_v12_forward_accumulate.py
           node --check tools/e4-builder/race-proxy-v3.mjs
@@ -116,11 +120,21 @@ jobs:
             --stress-iterations 0 \
             --output artifacts/e4-v12-forward-batch.json
 
+      - name: Audit direct E4-copy cohort and exact fill timing
+        run: |
+          python scripts/e4_v12_copy_timing_audit.py \
+            --batch artifacts/e4-v12-forward-batch.json \
+            --events artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --source-run "${GITHUB_RUN_ID}" \
+            --latency-ms 36 \
+            --output artifacts/e4-v12-copy-audit.json
+
       - name: Accumulate only same-epoch V12 evidence
         run: |
           python scripts/e4_v12_forward_accumulate.py \
             --batch artifacts/e4-v12-forward-batch.json \
             --batch-id "${GITHUB_RUN_ID}" \
+            --copy-audit artifacts/e4-v12-copy-audit.json \
             --evidence models/e4/e4-v12-forward-evidence.json \
             --markdown models/e4/e4-v12-forward-evidence.md
 
@@ -134,7 +148,7 @@ jobs:
             models/e4/e4-v12-evidence-epoch.txt \
             models/e4/evidence-epochs
           if ! git diff --cached --quiet; then
-            git commit -m 'data(e4): accumulate V12 role-model pipeline evidence [skip ci]'
+            git commit -m 'data(e4): accumulate V12 copy-only evidence [skip ci]'
             git push origin HEAD:codex/e4-v12-selection-reconstruction
           fi
 
@@ -148,6 +162,7 @@ jobs:
             artifacts/e4-v12-forward-batch.json
             artifacts/e4-v12-forward-batch.md
             artifacts/e4-v12-forward-batch-live-events.jsonl
+            artifacts/e4-v12-copy-audit.json
             models/e4/e4-v12-forward-evidence.json
             models/e4/e4-v12-forward-evidence.md
             models/e4/evidence-epochs
