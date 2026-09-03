@@ -1,0 +1,56 @@
+name: E4 V12 copy-fidelity CI
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-exit-mirror-fastpath
+  pull_request:
+    branches:
+      - codex/e4-v12-selection-reconstruction
+    paths:
+      - "src/memecoin_bot/e4_copy_fidelity_v12.py"
+      - "src/memecoin_bot/e4_exec/__main__.py"
+      - "scripts/e4_300_launch_holdout_v12.py"
+      - "scripts/e4_v12_direct_copy_replay.py"
+      - "tests/test_v12_copy_fidelity.py"
+      - ".github/workflows/e4-v12-copy-fidelity-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fidelity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+
+      - name: Print V12 copy-fidelity fingerprint
+        run: python -c "import hashlib,pathlib; p=pathlib.Path('src/memecoin_bot/e4_copy_fidelity_v12.py'); print('E4_V12_COPY_FIDELITY_SHA256=' + hashlib.sha256(p.read_bytes()).hexdigest())"
+
+      - name: Inherited E4 and V12 regression
+        run: |
+          python -m unittest discover -s tests -p "test_e4*.py" -v
+          python -m unittest tests.test_v12_selection -v
+          python -m unittest tests.test_v12_role_model_pipeline -v
+          python -m unittest tests.test_v12_direct_copy -v
+          python -m unittest tests.test_v12_copy_only_evidence -v
+
+      - name: E4-authoritative exit and fast-fanout tests
+        run: python -m unittest tests.test_v12_copy_fidelity -v
+
+      - name: Compile and import permanent V12 production authority
+        run: |
+          python -m compileall -q \
+            src/memecoin_bot/e4_copy_fidelity_v12.py \
+            src/memecoin_bot/e4_exec/__main__.py \
+            scripts/e4_300_launch_holdout_v12.py \
+            scripts/e4_v12_direct_copy_replay.py
+          python -c "import memecoin_bot.e4_exec.__main__"
