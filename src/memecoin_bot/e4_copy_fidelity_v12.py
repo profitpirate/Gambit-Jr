@@ -7,7 +7,9 @@ import logging
 import math
 import os
 import time
+from dataclasses import replace
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any
 from urllib.parse import urlsplit, urlunsplit
 
@@ -55,6 +57,82 @@ def _integer(value: Any, default: int = 0) -> int:
         return int(value)
     except (TypeError, ValueError):
         return default
+
+
+# The older manager had a useful fallback for token-less wallet notifications:
+# first unknown sell ~=30%, second unknown sell ~=full exit. However, it also
+# marked any second sell >=50% of the *remaining* tokens as a full exit even
+# when exact token accounting was available. That collapses genuine 3-4 leg E4
+# exits into two legs. For token-accounted primary Pump events, remaining token
+# balance is authoritative and no heuristic completion is allowed.
+_PREVIOUS_OBSERVE_E4_EXIT = type(PIPELINES).observe_e4_exit
+
+
+def _observe_e4_exit_copy_fidelity_v12(
+    self: Any,
+    mint: str,
+    *,
+    token_amount: float = 0.0,
+    sell_fraction: float = 0.0,
+    fully_exited: bool = False,
+    observed_ns: int | None = None,
+    signature: str = "",
+):
+    key = str(mint)
+    existing = self._e4_entries.get(key)
+    if existing is None:
+        return None
+    if signature and existing.last_sell_signature == signature:
+        return existing
+
+    before = max(0.0, _finite(existing.remaining_tokens or existing.entry_tokens))
+    sold_tokens = max(0.0, _finite(token_amount))
+    fraction = min(1.0, max(0.0, _finite(sell_fraction)))
+    token_accounted = sold_tokens > 0 and before > 0
+
+    if fraction <= 0 and token_accounted:
+        fraction = min(1.0, sold_tokens / before)
+    if fraction <= 0 and not fully_exited:
+        # Keep the legacy fallback only when the upstream notification carries
+        # no token amount at all.
+        fraction = 0.30 if existing.sell_count == 0 else 1.0
+
+    remaining = (
+        max(0.0, before - sold_tokens)
+        if sold_tokens > 0
+        else before * (1.0 - fraction)
+    )
+    if token_accounted:
+        complete = bool(fully_exited or sold_tokens >= before * 0.995)
+    else:
+        complete = bool(fully_exited or fraction >= 0.985)
+    if existing.entry_tokens > 0 and remaining <= existing.entry_tokens * 1e-6:
+        complete = True
+
+    updated = replace(
+        existing,
+        remaining_tokens=0.0 if complete else remaining,
+        last_sell_fraction=fraction,
+        last_sell_ns=int(observed_ns or time.time_ns()),
+        last_sell_signature=signature,
+        sell_count=existing.sell_count + 1,
+        fully_exited=complete,
+        sold=True,
+    )
+    lock = getattr(self, "_lock", None)
+    if lock is None:
+        current = dict(self._e4_entries)
+        current[key] = updated
+        self._e4_entries = MappingProxyType(current)
+    else:
+        with lock:
+            current = dict(self._e4_entries)
+            current[key] = updated
+            self._e4_entries = MappingProxyType(current)
+    return updated
+
+
+type(PIPELINES).observe_e4_exit = _observe_e4_exit_copy_fidelity_v12
 
 
 _PREVIOUS_EXIT = core.E4Policy.exit
