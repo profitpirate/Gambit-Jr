@@ -14,7 +14,7 @@ from memecoin_bot import e4_hardening_v12 as v12
 from memecoin_bot import e4_role_model_v12 as role_model
 from memecoin_bot import e4_copy_fidelity_v12 as copy_fidelity
 
-E4_V12_COPY_FIDELITY_POLICY_SHA256 = "de2723591c5f0849a65db6cbd509258de57b6cb0e3ba9616e398938954522c4d"
+E4_V12_COPY_FIDELITY_POLICY_SHA256 = "162e1fb42a1d850a00072b36d700254578b2da96e90810baee1abe257fddf0e5"
 copy_fidelity.assert_policy_fingerprint(E4_V12_COPY_FIDELITY_POLICY_SHA256)
 
 
