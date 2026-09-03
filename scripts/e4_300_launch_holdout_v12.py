@@ -9,11 +9,14 @@ from pathlib import Path
 from memecoin_bot import e4_hardening_v12 as v12
 from memecoin_bot import e4_role_model_v12 as role_model
 from memecoin_bot import e4_direct_copy_v12 as direct_copy
+from memecoin_bot import e4_copy_fidelity_v12 as copy_fidelity
 
 E4_V12_ROLE_MODEL_POLICY_SHA256 = "f4d5959b25f607bc667073b672d66570bf29d8d2b2020811605808ce08e032df"
 E4_V12_DIRECT_COPY_POLICY_SHA256 = "ed3e29edef1484a46a16858c303b97d0155ecf88aa63a23d95e6839592ee2f5e"
+E4_V12_COPY_FIDELITY_POLICY_SHA256 = "de2723591c5f0849a65db6cbd509258de57b6cb0e3ba9616e398938954522c4d"
 role_model.assert_policy_fingerprint(E4_V12_ROLE_MODEL_POLICY_SHA256)
 direct_copy.assert_policy_fingerprint(E4_V12_DIRECT_COPY_POLICY_SHA256)
+copy_fidelity.assert_policy_fingerprint(E4_V12_COPY_FIDELITY_POLICY_SHA256)
 
 
 def load_holdout():
