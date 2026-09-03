@@ -8,7 +8,10 @@ import shutil
 from pathlib import Path
 from typing import Any, Mapping
 
-from e4_v12_forward_accumulate import FINGERPRINT_PATHS, fingerprint
+if __package__:
+    from .e4_v12_forward_accumulate import FINGERPRINT_PATHS, fingerprint
+else:
+    from e4_v12_forward_accumulate import FINGERPRINT_PATHS, fingerprint
 
 
 def _load(path: Path) -> Mapping[str, Any] | None:
