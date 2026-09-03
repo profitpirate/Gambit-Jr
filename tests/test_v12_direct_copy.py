@@ -10,16 +10,16 @@ from memecoin_bot import e4_direct_copy_v12 as direct
 
 
 class V12DirectCopyTests(unittest.TestCase):
-    def test_default_direct_copy_slippage_is_not_generic_eight_percent(self):
+    def test_default_direct_copy_slippage_uses_builder_ceiling(self):
         settings = SimpleNamespace(buy_slippage_bps=800)
         with patch.dict(os.environ, {"E4_DIRECT_COPY_SLIPPAGE_BPS": ""}, clear=False):
             os.environ.pop("E4_DIRECT_COPY_SLIPPAGE_BPS", None)
-            self.assertEqual(direct.direct_copy_slippage_bps(settings), 3000)
+            self.assertEqual(direct.direct_copy_slippage_bps(settings), 9000)
 
-    def test_direct_copy_slippage_is_bounded(self):
+    def test_direct_copy_slippage_is_bounded_by_builder(self):
         settings = SimpleNamespace(buy_slippage_bps=800)
-        with patch.dict(os.environ, {"E4_DIRECT_COPY_SLIPPAGE_BPS": "9000"}, clear=False):
-            self.assertEqual(direct.direct_copy_slippage_bps(settings), 5000)
+        with patch.dict(os.environ, {"E4_DIRECT_COPY_SLIPPAGE_BPS": "12000"}, clear=False):
+            self.assertEqual(direct.direct_copy_slippage_bps(settings), 9000)
 
     def test_exact_e4_sol_amount_is_used_when_wallet_can_support_it(self):
         amount, exact = direct.direct_copy_amount_sol(
@@ -29,12 +29,11 @@ class V12DirectCopyTests(unittest.TestCase):
             reserved_sol=0.0,
             priority_fee_sol=0.01,
             tip_sol=0.01,
-            max_position_sol=5.0,
         )
         self.assertEqual(amount, 3.0)
         self.assertTrue(exact)
 
-    def test_direct_copy_amount_is_capped_only_when_required(self):
+    def test_direct_copy_amount_uses_maximum_deployable_when_wallet_is_smaller(self):
         amount, exact = direct.direct_copy_amount_sol(
             3.0,
             balance_sol=1.2,
@@ -42,12 +41,11 @@ class V12DirectCopyTests(unittest.TestCase):
             reserved_sol=0.0,
             priority_fee_sol=0.01,
             tip_sol=0.01,
-            max_position_sol=5.0,
         )
         self.assertAlmostEqual(amount, 1.08)
         self.assertFalse(exact)
 
-    def test_absolute_position_ceiling_still_applies(self):
+    def test_direct_copy_bypasses_strategy_absolute_position_ceiling(self):
         amount, exact = direct.direct_copy_amount_sol(
             7.0,
             balance_sol=20.0,
@@ -55,10 +53,9 @@ class V12DirectCopyTests(unittest.TestCase):
             reserved_sol=0.0,
             priority_fee_sol=0.01,
             tip_sol=0.01,
-            max_position_sol=5.0,
         )
-        self.assertEqual(amount, 5.0)
-        self.assertFalse(exact)
+        self.assertEqual(amount, 7.0)
+        self.assertTrue(exact)
 
     def test_production_entrypoint_pins_direct_copy_module(self):
         digest = direct.policy_fingerprint()
