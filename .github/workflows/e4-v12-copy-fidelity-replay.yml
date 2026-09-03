@@ -1,0 +1,97 @@
+name: E4 V12 copy-fidelity replay
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-exit-mirror-fastpath
+    paths:
+      - ".github/workflows/e4-v12-copy-fidelity-replay.yml"
+      - "src/memecoin_bot/e4_copy_fidelity_v12.py"
+      - "scripts/e4_v12_direct_copy_replay.py"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+
+      - name: Download authoritative fresh 3000-launch sample
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source artifacts
+          gh run download 33741470396 \
+            --repo profitpirate/Gambit-Jr \
+            --name e4-v12-forward-33741470396 \
+            --dir source
+
+      - name: Replay current realistic sparse-event model at 36ms
+        run: |
+          python scripts/e4_v12_direct_copy_replay.py \
+            --batch source/artifacts/e4-v12-forward-batch.json \
+            --events source/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --source-run 33741470396 \
+            --latency-ms 36 \
+            --starting-balance-sol 1.2 \
+            --output artifacts/e4-v12-copy-fidelity-36ms.json
+
+      - name: Replay lower-latency sensitivity at 10ms and 0ms
+        run: |
+          python scripts/e4_v12_direct_copy_replay.py \
+            --batch source/artifacts/e4-v12-forward-batch.json \
+            --events source/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --source-run 33741470396 \
+            --latency-ms 10 \
+            --starting-balance-sol 1.2 \
+            --output artifacts/e4-v12-copy-fidelity-10ms.json
+          python scripts/e4_v12_direct_copy_replay.py \
+            --batch source/artifacts/e4-v12-forward-batch.json \
+            --events source/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --source-run 33741470396 \
+            --latency-ms 0 \
+            --starting-balance-sol 1.2 \
+            --output artifacts/e4-v12-copy-fidelity-0ms.json
+
+      - name: Summarize WR sensitivity
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for latency in (36, 10, 0):
+              data = json.loads(Path(f'artifacts/e4-v12-copy-fidelity-{latency}ms.json').read_text())
+              v = data['v12_direct_copy']
+              e = data['e4']
+              c = data['comparison']
+              print(json.dumps({
+                  'latency_ms': latency,
+                  'v12_closed': v['closed'],
+                  'v12_wins': v['wins'],
+                  'v12_wr': v['win_rate'],
+                  'v12_pnl_sol': v['net_pnl_sol'],
+                  'v12_pf': v['profit_factor'],
+                  'e4_closed': e['closed'],
+                  'e4_wins': e['wins'],
+                  'e4_wr': e['win_rate'],
+                  'trade_capture': c['e4_trade_capture'],
+                  'winner_capture': c['e4_winner_capture'],
+                  'both_won': c['both_won'],
+              }, sort_keys=True))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e4-v12-copy-fidelity-replay-${{ github.run_id }}
+          path: artifacts/e4-v12-copy-fidelity-*.json
+          retention-days: 30
