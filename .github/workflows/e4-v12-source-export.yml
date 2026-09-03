@@ -1,0 +1,28 @@
+name: E4 V12 convergence workspace export
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-pipeline-convergence
+    paths:
+      - ".github/workflows/e4-v12-source-export.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-pipeline-convergence
+      - name: Package source workspace
+        run: |
+          tar --exclude=.git -czf /tmp/gambit-v12-source.tar.gz .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gambit-v12-source-${{ github.run_id }}
+          path: /tmp/gambit-v12-source.tar.gz
+          retention-days: 2
