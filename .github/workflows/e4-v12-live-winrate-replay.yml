@@ -40,6 +40,7 @@ jobs:
           python scripts/e4_v12_replay_live_artifact.py \
             --batch source-artifact/artifacts/e4-v12-forward-batch.json \
             --events source-artifact/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --source-run 33704841852 \
             --latency-ms 36 \
             --starting-balance-sol 1.2 \
             --output artifacts/e4-v12-live-winrate-replay.json
