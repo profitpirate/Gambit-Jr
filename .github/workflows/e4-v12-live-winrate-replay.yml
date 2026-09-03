@@ -23,14 +23,14 @@ jobs:
       - run: python -m pip install -e .
       - run: python -m pip install -r requirements-e4.txt
 
-      - name: Download most recent completed live batch before V12 pipeline upgrade
+      - name: Download independent completed 3000-launch live batch
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p source-artifact
-          gh run download 33716649440 \
+          gh run download 33704841852 \
             --repo profitpirate/Gambit-Jr \
-            --name e4-v12-forward-33716649440 \
+            --name e4-v12-forward-33704841852 \
             --dir source-artifact
           test -f source-artifact/artifacts/e4-v12-forward-batch.json
           test -f source-artifact/artifacts/e4-v12-forward-batch-live-events.jsonl
@@ -49,6 +49,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: e4-v12-live-winrate-replay
+          name: e4-v12-live-winrate-replay-2
           path: artifacts/e4-v12-live-winrate-replay.json
           retention-days: 30
