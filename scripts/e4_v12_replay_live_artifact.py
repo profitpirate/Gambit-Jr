@@ -17,6 +17,7 @@ from memecoin_bot import e4_role_model_v12 as role_model
 from memecoin_bot.e4_pipelines_v10 import E4_WALLET
 
 E4_V12_ROLE_MODEL_POLICY_SHA256 = "f4d5959b25f607bc667073b672d66570bf29d8d2b2020811605808ce08e032df"
+V12_ROLE_MODEL_COMMIT = "77e4f7ae96af93b39874933e07a33c0fe7257705"
 role_model.assert_policy_fingerprint(E4_V12_ROLE_MODEL_POLICY_SHA256)
 
 
@@ -86,6 +87,7 @@ def main() -> int:
     parser.add_argument("--batch", required=True)
     parser.add_argument("--events", required=True)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--source-run", type=int, default=0)
     parser.add_argument("--latency-ms", type=float, default=36.0)
     parser.add_argument("--starting-balance-sol", type=float, default=1.2)
     args = parser.parse_args()
@@ -148,9 +150,9 @@ def main() -> int:
     e4_wr = sum(float(row.get("pnl_sol") or 0) > 0 for row in e4_rows) / len(e4_rows) if e4_rows else None
 
     comparison = {
-        "source_batch_run": 33716649440,
+        "source_batch_run": args.source_run or None,
         "source_commit": batch.get("commit"),
-        "replayed_commit": "77e4f7ae96af93b39874933e07a33c0fe7257705",
+        "replayed_commit": V12_ROLE_MODEL_COMMIT,
         "latency_ms": args.latency_ms,
         "starting_balance_sol": args.starting_balance_sol,
         "fresh_launches": int((batch.get("capture") or {}).get("unique_launches") or 0),
@@ -195,6 +197,7 @@ def main() -> int:
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(comparison, indent=2, sort_keys=True), encoding="utf-8")
     summary = {
+        "source_batch_run": comparison["source_batch_run"],
         "fresh_launches": comparison["fresh_launches"],
         "e4_closed": len(e4_rows),
         "e4_wr": pct(e4_wr),
