@@ -1,0 +1,54 @@
+name: E4 V12 live win-rate replay
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-live-winrate-replay
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  replay-live-window:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+
+      - name: Download most recent completed live batch before V12 pipeline upgrade
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source-artifact
+          gh run download 33716649440 \
+            --repo profitpirate/Gambit-Jr \
+            --name e4-v12-forward-33716649440 \
+            --dir source-artifact
+          test -f source-artifact/artifacts/e4-v12-forward-batch.json
+          test -f source-artifact/artifacts/e4-v12-forward-batch-live-events.jsonl
+
+      - name: Replay upgraded permanent V12 at 36ms over exact live events
+        run: |
+          python scripts/e4_v12_replay_live_artifact.py \
+            --batch source-artifact/artifacts/e4-v12-forward-batch.json \
+            --events source-artifact/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --latency-ms 36 \
+            --starting-balance-sol 1.2 \
+            --output artifacts/e4-v12-live-winrate-replay.json
+
+      - name: Show comparison
+        run: cat artifacts/e4-v12-live-winrate-replay.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e4-v12-live-winrate-replay
+          path: artifacts/e4-v12-live-winrate-replay.json
+          retention-days: 30
