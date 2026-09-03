@@ -12,6 +12,10 @@ from typing import Any, Mapping
 from memecoin_bot import e4_direct_copy_v12 as direct
 from memecoin_bot import e4_hardening_v12 as v12
 from memecoin_bot import e4_role_model_v12 as role_model
+from memecoin_bot import e4_copy_fidelity_v12 as copy_fidelity
+
+E4_V12_COPY_FIDELITY_POLICY_SHA256 = "de2723591c5f0849a65db6cbd509258de57b6cb0e3ba9616e398938954522c4d"
+copy_fidelity.assert_policy_fingerprint(E4_V12_COPY_FIDELITY_POLICY_SHA256)
 
 
 def load_base():
@@ -128,6 +132,7 @@ def main() -> int:
         "source_run": args.source_run,
         "fresh_launches": int((batch.get("capture") or {}).get("unique_launches") or 0),
         "latency_ms": args.latency_ms,
+        "copy_fidelity_policy_sha256": E4_V12_COPY_FIDELITY_POLICY_SHA256,
         "direct_copy_slippage_bps": direct.direct_copy_slippage_bps(settings),
         "e4": {
             "closed": len(e4_rows),
@@ -145,6 +150,7 @@ def main() -> int:
             "profit_factor": portfolio.get("profit_factor"),
             "ending_balance_sol": portfolio.get("ending_balance_sol"),
             "source_sizes_sol": source_sizes,
+            "positions": v12_rows,
         },
         "comparison": {
             "e4_trade_capture": len(v12_mints & e4_mints) / len(e4_mints) if e4_mints else None,
