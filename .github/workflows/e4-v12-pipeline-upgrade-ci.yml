@@ -1,0 +1,55 @@
+name: E4 V12 role-model pipeline CI
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-role-model-pipeline-upgrade
+  pull_request:
+    branches:
+      - codex/e4-v12-selection-reconstruction
+    paths:
+      - "src/memecoin_bot/e4_role_model_v12.py"
+      - "src/memecoin_bot/e4_exec/__main__.py"
+      - "scripts/e4_300_launch_holdout_v12.py"
+      - "scripts/e4_v12_evidence_epoch.py"
+      - "models/e4/e4-v12-selection.json"
+      - "tests/test_v12_role_model_pipeline.py"
+      - "tests/test_v12_evidence_epoch.py"
+      - ".github/workflows/e4-v12-*.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  v12-role-model-pipelines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+
+      - name: Existing E4 regression
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+
+      - name: Permanent V12 selection regression
+        run: python -m unittest tests.test_v12_selection -v
+
+      - name: Role-model pipeline and evidence-epoch tests
+        run: |
+          python -m unittest tests.test_v12_role_model_pipeline -v
+          python -m unittest tests.test_v12_evidence_epoch -v
+
+      - name: Compile and import production authority
+        run: |
+          python -m compileall -q \
+            src/memecoin_bot/e4_role_model_v12.py \
+            src/memecoin_bot/e4_exec/__main__.py \
+            scripts/e4_300_launch_holdout_v12.py \
+            scripts/e4_v12_evidence_epoch.py
+          python -c "import memecoin_bot.e4_exec.__main__"

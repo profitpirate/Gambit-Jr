@@ -47,10 +47,13 @@ jobs:
       - name: Baseline E4 regression before V12 import
         run: python -m unittest discover -s tests -p "test_e4*.py" -v
 
-      - name: V12 selection reconstruction tests
-        run: python -m unittest discover -s tests -p "test_v12_selection.py" -v
+      - name: V12 selection and role-model pipeline tests
+        run: |
+          python -m unittest tests.test_v12_selection -v
+          python -m unittest tests.test_v12_role_model_pipeline -v
+          python -m unittest tests.test_v12_evidence_epoch -v
 
-      - name: Prove production and holdout use V12
+      - name: Prove production and holdout use permanent V12 role-model wiring
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -58,23 +61,38 @@ jobs:
           wrapper = Path('scripts/e4_300_launch_holdout_v12.py').read_text()
           workflow = Path('.github/workflows/e4-v12-selection-certification.yml').read_text()
           assert 'e4_hardening_v12' in entry
+          assert 'e4_role_model_v12' in entry
+          assert 'start_runtime_services' in entry
+          assert 'start_background_supervisor' in entry
           assert 'e4_hardening_v12 as v12' in wrapper
+          assert 'observe_market_event' in wrapper
+          assert 'reset_role_model_replay' in wrapper
           assert 'python scripts/e4_300_launch_holdout_v12.py' in workflow
           forbidden = 'python scripts/' + 'e4_300_launch_holdout.py'
           assert forbidden not in workflow
-          print('V12 production + test harness wiring verified')
+          print('V12 production + role-model holdout wiring verified')
           PY
 
       - name: Compile and builder self-test
         run: |
           python -m compileall -q \
             src/memecoin_bot/e4_hardening_v12.py \
+            src/memecoin_bot/e4_role_model_v12.py \
             src/memecoin_bot/e4_exec/__main__.py \
             scripts/e4_300_launch_holdout_v12.py \
+            scripts/e4_v12_evidence_epoch.py \
             scripts/e4_v12_forward_accumulate.py
           node --check tools/e4-builder/race-proxy-v3.mjs
           node --check tools/e4-builder/fast-preload-v4.mjs
           E4_BUILDER_ALLOW_REMOTE_FALLBACK=false node tools/e4-builder/race-proxy-v3.mjs --self-test
+
+      - name: Prepare auditable V12 evidence epoch
+        run: |
+          python scripts/e4_v12_evidence_epoch.py \
+            --evidence models/e4/e4-v12-forward-evidence.json \
+            --markdown models/e4/e4-v12-forward-evidence.md \
+            --epoch models/e4/e4-v12-evidence-epoch.txt \
+            --archive-dir models/e4/evidence-epochs
 
       - name: Freeze V12 fingerprint
         run: |
@@ -98,7 +116,7 @@ jobs:
             --stress-iterations 0 \
             --output artifacts/e4-v12-forward-batch.json
 
-      - name: Accumulate only frozen V12 evidence
+      - name: Accumulate only same-epoch V12 evidence
         run: |
           python scripts/e4_v12_forward_accumulate.py \
             --batch artifacts/e4-v12-forward-batch.json \
@@ -106,13 +124,17 @@ jobs:
             --evidence models/e4/e4-v12-forward-evidence.json \
             --markdown models/e4/e4-v12-forward-evidence.md
 
-      - name: Persist V12 evidence only
+      - name: Persist V12 evidence and immutable epoch archive
         run: |
           git config user.name 'gambit-v12-evidence'
           git config user.email 'actions@users.noreply.github.com'
-          git add models/e4/e4-v12-forward-evidence.json models/e4/e4-v12-forward-evidence.md
+          git add \
+            models/e4/e4-v12-forward-evidence.json \
+            models/e4/e4-v12-forward-evidence.md \
+            models/e4/e4-v12-evidence-epoch.txt \
+            models/e4/evidence-epochs
           if ! git diff --cached --quiet; then
-            git commit -m 'data(e4): accumulate frozen V12 forward evidence [skip ci]'
+            git commit -m 'data(e4): accumulate V12 role-model pipeline evidence [skip ci]'
             git push origin HEAD:codex/e4-v12-selection-reconstruction
           fi
 
@@ -128,5 +150,6 @@ jobs:
             artifacts/e4-v12-forward-batch-live-events.jsonl
             models/e4/e4-v12-forward-evidence.json
             models/e4/e4-v12-forward-evidence.md
+            models/e4/evidence-epochs
           if-no-files-found: warn
           retention-days: 30

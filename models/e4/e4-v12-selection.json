@@ -1,13 +1,14 @@
 {
   "version": "e4-v12-selection-v1",
-  "status": "frozen_forward_test_candidate",
-  "rationale": "V12 separates creator authority from launch quality. Historical creator success permits evaluation but never auto-authorizes every future launch. Thresholds are frozen before forward evidence and may not change inside an evidence window.",
+  "status": "v12_role_model_pipeline_epoch_candidate",
+  "rationale": "V12 remains the permanent product version. Direct E4 wallet observation is the primary authority for first-seen creators; creator and social pipelines assist but do not replace the role model. Historical creator success permits evaluation but never auto-authorizes every future launch.",
   "limits": {
     "max_entry_fdv_usd": 8500.0,
-    "elite_max_age_ms": 150.0,
-    "proven_max_age_ms": 180.0,
-    "social_max_age_ms": 180.0,
+    "elite_max_age_ms": 400.0,
+    "proven_max_age_ms": 400.0,
+    "social_max_age_ms": 400.0,
     "prearmed_max_age_ms": 80.0,
+    "copy_max_age_ms": 500.0,
     "min_creator_seed_sol": 0.025
   },
   "history": {
@@ -20,6 +21,17 @@
     "negative_min_trades": 3,
     "negative_max_win_rate": 0.25,
     "external_discovered_without_closed_history_can_auto_authorize": false
+  },
+  "recent_e4_repeat": {
+    "max_age_ms": 400.0,
+    "max_profile_age_seconds": 86400.0,
+    "min_wins": 1,
+    "min_trades": 1,
+    "min_win_rate": 0.50,
+    "min_gross_pnl_sol": 0.0,
+    "min_creator_seed_sol": 1.0,
+    "min_entry_fdv_usd": 3000.0,
+    "max_entry_fdv_usd": 8500.0
   },
   "launch_support": {
     "elite_big_seed_sol": 0.35,
@@ -46,6 +58,8 @@
     "max_concurrent_positions": 2,
     "public_flow_alone_can_authorize": false,
     "single_prior_win_can_authorize": false,
-    "creator_tier_alone_can_authorize": false
+    "single_prior_win_plus_strong_current_launch_can_authorize": true,
+    "creator_tier_alone_can_authorize": false,
+    "direct_e4_buy_is_primary_authority": true
   }
 }
