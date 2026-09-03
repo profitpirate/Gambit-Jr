@@ -1,0 +1,96 @@
+name: E4 V12 copy-only audit
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-copy-only-certification
+    paths:
+      - ".github/workflows/e4-v12-copy-only-audit.yml"
+      - ".github/workflows/e4-v12-selection-certification.yml"
+      - "scripts/e4_v12_copy_timing_audit.py"
+      - "scripts/e4_v12_forward_accumulate.py"
+      - "tests/test_v12_copy_only_evidence.py"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  audit-latest-fresh-batch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+
+      - name: Copy-only evidence unit tests
+        run: python -m unittest tests.test_v12_copy_only_evidence -v
+
+      - name: Download authoritative fresh 3000-launch artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source artifacts
+          gh run download 33741470396 \
+            --repo profitpirate/Gambit-Jr \
+            --name e4-v12-forward-33741470396 \
+            --dir source
+
+      - name: Audit direct E4-copy timing and isolate cohorts
+        run: |
+          python scripts/e4_v12_copy_timing_audit.py \
+            --batch source/artifacts/e4-v12-forward-batch.json \
+            --events source/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --source-run 33741470396 \
+            --latency-ms 36 \
+            --output artifacts/e4-v12-copy-audit.json
+
+      - name: Backfill copy-only evidence without changing the V12 strategy epoch
+        run: |
+          cp models/e4/e4-v12-forward-evidence.json artifacts/e4-v12-forward-evidence.json
+          cp models/e4/e4-v12-forward-evidence.md artifacts/e4-v12-forward-evidence.md
+          python scripts/e4_v12_forward_accumulate.py \
+            --batch source/artifacts/e4-v12-forward-batch.json \
+            --batch-id 33741470396 \
+            --copy-audit artifacts/e4-v12-copy-audit.json \
+            --evidence artifacts/e4-v12-forward-evidence.json \
+            --markdown artifacts/e4-v12-forward-evidence.md
+
+      - name: Prove cohort separation is complete
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          audit = json.loads(Path('artifacts/e4-v12-copy-audit.json').read_text())
+          comparison = audit['comparison']
+          direct = audit['direct_copy_positions']
+          non_copy = audit['non_copy_positions']
+          assert len(direct) + len(non_copy) == audit['all_v12']['closed']
+          assert not comparison['extra_direct_copy_mints'], comparison['extra_direct_copy_mints']
+          assert comparison['direct_copy_closed_positions'] == len(direct)
+          assert comparison['non_copy_closed_positions'] == len(non_copy)
+          assert all(row['family'] == 'e4_confirmed_fast_copy' for row in audit['direct_copy_trades'])
+          print(json.dumps({
+              'direct_copy': audit['direct_copy'],
+              'non_copy': audit['non_copy'],
+              'e4': audit['e4'],
+              'timing': audit['timing'],
+              'comparison': comparison,
+              'non_copy_family_counts': audit['non_copy_family_counts'],
+          }, indent=2, sort_keys=True))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e4-v12-copy-only-audit-33741470396
+          path: |
+            artifacts/e4-v12-copy-audit.json
+            artifacts/e4-v12-forward-evidence.json
+            artifacts/e4-v12-forward-evidence.md
+          retention-days: 30
