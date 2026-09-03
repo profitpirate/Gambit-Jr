@@ -21,7 +21,10 @@ PIPELINES = role_model.PIPELINES
 LOGGER = logging.getLogger("gambit.e4.direct-copy.v12")
 
 DIRECT_COPY_FAMILY = role_model.ROLE_MODEL_FAMILY
-DEFAULT_DIRECT_COPY_SLIPPAGE_BPS = 3000
+# Pump's local builder itself clamps buy/sell slippage to 9,000 bps. A direct
+# E4 copy therefore uses that builder ceiling by default: once E4 authority is
+# observed, generic Gambit price-drift/slippage policy must not cancel the copy.
+DEFAULT_DIRECT_COPY_SLIPPAGE_BPS = 9000
 
 
 def policy_fingerprint() -> str:
@@ -47,18 +50,25 @@ def _finite(value: Any, default: float = 0.0) -> float:
 
 
 def direct_copy_slippage_bps(settings: Any) -> int:
-    """Use an E4-copy-specific tolerance instead of the generic 8% entry guard.
+    """Use the builder's direct-copy tolerance instead of generic entry slippage.
 
-    E4's private slippage setting is not observable. The default 30% ceiling is
-    therefore explicitly a Gambit V12 execution parameter, chosen to stop the
-    generic 8% guard from cancelling an already-authorized direct E4 copy.
+    E4's private slippage configuration is not observable. The 9,000-bps
+    default is therefore a V12 execution parameter, equal to the local Pump
+    builder's own ceiling. It exists so an already-recognized E4 entry is sent
+    rather than vetoed by Gambit's generic 8% entry protection.
     """
-    raw = os.getenv("E4_DIRECT_COPY_SLIPPAGE_BPS", str(DEFAULT_DIRECT_COPY_SLIPPAGE_BPS))
+    raw = os.getenv(
+        "E4_DIRECT_COPY_SLIPPAGE_BPS",
+        str(DEFAULT_DIRECT_COPY_SLIPPAGE_BPS),
+    )
     try:
         requested = int(raw)
     except (TypeError, ValueError):
         requested = DEFAULT_DIRECT_COPY_SLIPPAGE_BPS
-    return max(int(getattr(settings, "buy_slippage_bps", 0) or 0), min(5000, max(0, requested)))
+    return max(
+        int(getattr(settings, "buy_slippage_bps", 0) or 0),
+        min(9000, max(0, requested)),
+    )
 
 
 def direct_copy_amount_sol(
@@ -69,12 +79,14 @@ def direct_copy_amount_sol(
     reserved_sol: float,
     priority_fee_sol: float,
     tip_sol: float,
-    max_position_sol: float,
 ) -> tuple[float, bool]:
-    """Match E4's observed SOL stake when the wallet can support it.
+    """Match E4's observed SOL stake whenever the wallet can physically do so.
 
-    The only unavoidable deviations are available balance/reserve and the
-    configured absolute position ceiling. Fraction-based V12 sizing is not used.
+    Direct E4 authority deliberately bypasses Gambit's percentage ladder and
+    absolute strategy position ceiling. The only remaining size constraint is
+    actual deployable wallet balance after reserve, in-flight reservations and
+    transaction costs. If the wallet is smaller than E4's stake, V12 submits
+    the maximum physically deployable amount and records that it was not exact.
     """
     observed = max(0.0, _finite(observed_e4_sol))
     deployable = max(
@@ -85,15 +97,17 @@ def direct_copy_amount_sol(
         - max(0.0, _finite(priority_fee_sol))
         - max(0.0, _finite(tip_sol)),
     )
-    ceiling = max(0.0, _finite(max_position_sol))
-    amount = min(observed, deployable, ceiling if ceiling > 0 else observed)
+    amount = min(observed, deployable)
     exact = observed > 0 and abs(amount - observed) <= max(1e-9, observed * 1e-9)
     return max(0.0, amount), exact
 
 
 def _is_direct_copy(mint: str) -> bool:
     profile = v6._PROFILE_BY_MINT.get(str(mint))
-    return bool(profile is not None and str(getattr(profile, "family", "") or "") == DIRECT_COPY_FAMILY)
+    return bool(
+        profile is not None
+        and str(getattr(profile, "family", "") or "") == DIRECT_COPY_FAMILY
+    )
 
 
 def _record_copy_terms(
@@ -130,14 +144,19 @@ async def _execute_buy_direct_copy_v12(
 ) -> None:
     mint = str(state.mint)
     source = PIPELINES.e4_signal(mint)
-    if not _is_direct_copy(mint) or source is None or source.fully_exited:
+    if not _is_direct_copy(mint) or source is None:
         await _PREVIOUS_EXECUTE_BUY(self, state, score, fraction, reason)
         return
 
-    # If the E4 observer could not recover the source's absolute SOL amount,
-    # keep the proven V12 executor rather than inventing a size.
+    # Once the entry profile is DIRECT_COPY_FAMILY, E4 already authorized this
+    # mint. A later E4 partial/full exit must not retroactively cancel submission.
+    # The exit policy will mirror any already-observed E4 exit after our position
+    # lands, preserving the source lifecycle rather than silently missing entry.
     observed_sol = max(0.0, _finite(getattr(source, "entry_sol", 0.0)))
     if observed_sol <= 0:
+        # The source amount is part of the requested copy parameters. Do not
+        # invent a percentage stake; use the legacy executor only when the
+        # observer genuinely could not recover the E4 SOL leg.
         await _PREVIOUS_EXECUTE_BUY(self, state, score, fraction, reason)
         return
 
@@ -156,8 +175,6 @@ async def _execute_buy_direct_copy_v12(
             balance = await self.rpc.balance(self.signer.wallet)
 
         async with self.allocation_lock:
-            # Bid from the same notional E4 used instead of a percentage of our
-            # wallet. This preserves E4's observable stake parameter.
             priority, tip = self.fee_bid(observed_sol, score)
             amount, exact_amount = direct_copy_amount_sol(
                 observed_sol,
@@ -166,12 +183,11 @@ async def _execute_buy_direct_copy_v12(
                 reserved_sol=self.reserved_sol,
                 priority_fee_sol=priority,
                 tip_sol=tip,
-                max_position_sol=self.settings.max_position_sol,
             )
             if amount < self.settings.min_position_sol:
                 LOGGER.warning(
-                    "E4 V12 direct copy skipped only for insufficient deployable balance "
-                    "mint=%s observed_sol=%.9f available_sol=%.9f",
+                    "E4 V12 direct copy could not submit: insufficient deployable "
+                    "balance mint=%s observed_sol=%.9f available_sol=%.9f",
                     mint,
                     observed_sol,
                     balance,
@@ -238,6 +254,9 @@ async def _execute_buy_direct_copy_v12(
                 ),
                 "e4_copy_exact_amount": exact_amount,
                 "e4_copy_slippage_bps": slippage_bps,
+                "e4_source_already_exited": bool(
+                    getattr(source, "fully_exited", False)
+                ),
             },
         }
         self.store.order(request_id, mint, "BUY", amount, None, reason)
@@ -247,7 +266,7 @@ async def _execute_buy_direct_copy_v12(
             cache.apply_estimated_delta(-reserved)
         if not confirmed:
             LOGGER.error(
-                "E4 V12 direct-copy buy failed mint=%s source_signature=%s "
+                "E4 V12 direct-copy submission failed mint=%s source_signature=%s "
                 "copy_signature=%s error=%s",
                 mint,
                 getattr(source, "signature", ""),
@@ -323,7 +342,9 @@ def _account_keys(transaction: Mapping[str, Any]) -> list[str]:
     message = ((transaction.get("transaction") or {}).get("message") or {})
     result: list[str] = []
     for item in message.get("accountKeys") or []:
-        result.append(str(item.get("pubkey")) if isinstance(item, Mapping) else str(item))
+        result.append(
+            str(item.get("pubkey")) if isinstance(item, Mapping) else str(item)
+        )
     loaded = ((transaction.get("meta") or {}).get("loadedAddresses") or {})
     result.extend(str(item) for item in loaded.get("writable") or [])
     result.extend(str(item) for item in loaded.get("readonly") or [])
@@ -348,7 +369,8 @@ def _process_e4_transaction_direct_copy_v12(
         return
     sol_cost = max(
         0.0,
-        (float(pre[wallet_index]) - float(post[wallet_index])) / core.LAMPORTS_PER_SOL,
+        (float(pre[wallet_index]) - float(post[wallet_index]))
+        / core.LAMPORTS_PER_SOL,
     )
     if sol_cost <= 0:
         return
