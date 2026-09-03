@@ -108,6 +108,50 @@ class V12CopyFidelityTests(unittest.TestCase):
         self.assertEqual(action, "HOLD", reason)
         self.assertEqual(fraction, 0.0)
 
+    def test_token_accounted_multileg_exit_is_not_collapsed_after_second_sell(self):
+        mint = "mint-four-leg-source"
+        observed = time.time_ns()
+        self._install_direct(mint, self._source(mint, observed))
+
+        first = PIPELINES.observe_e4_exit(
+            mint,
+            token_amount=300.0,
+            observed_ns=observed + 1_000_000,
+            signature="sell-1",
+        )
+        self.assertFalse(first.fully_exited)
+        self.assertAlmostEqual(first.remaining_tokens, 700.0)
+
+        # This is 50% of the remaining position. The previous manager heuristic
+        # incorrectly declared a full exit here and erased later E4 sell legs.
+        second = PIPELINES.observe_e4_exit(
+            mint,
+            token_amount=350.0,
+            observed_ns=observed + 2_000_000,
+            signature="sell-2",
+        )
+        self.assertFalse(second.fully_exited)
+        self.assertAlmostEqual(second.remaining_tokens, 350.0)
+
+        third = PIPELINES.observe_e4_exit(
+            mint,
+            token_amount=200.0,
+            observed_ns=observed + 3_000_000,
+            signature="sell-3",
+        )
+        self.assertFalse(third.fully_exited)
+        self.assertAlmostEqual(third.remaining_tokens, 150.0)
+
+        fourth = PIPELINES.observe_e4_exit(
+            mint,
+            token_amount=150.0,
+            observed_ns=observed + 4_000_000,
+            signature="sell-4",
+        )
+        self.assertTrue(fourth.fully_exited)
+        self.assertEqual(fourth.remaining_tokens, 0.0)
+        self.assertEqual(fourth.sell_count, 4)
+
     def test_e4_full_exit_remains_authoritative(self):
         mint = "mint-full-copy"
         observed = time.time_ns()
@@ -156,6 +200,7 @@ class V12CopyFidelityTests(unittest.TestCase):
         self.assertIn(digest, entrypoint)
         self.assertIn(digest, holdout)
         self.assertIn(digest, replay)
+        self.assertIs(type(PIPELINES).observe_e4_exit, fidelity._observe_e4_exit_copy_fidelity_v12)
         self.assertIs(core.E4Policy.exit, fidelity._exit_copy_fidelity_v12)
         self.assertIs(core.RouteSender, fidelity.FastPersistentRouteSender)
 
