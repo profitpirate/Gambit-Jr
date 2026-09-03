@@ -11,7 +11,7 @@ from memecoin_bot import e4_role_model_v12 as role_model
 from memecoin_bot import e4_direct_copy_v12 as direct_copy
 
 E4_V12_ROLE_MODEL_POLICY_SHA256 = "f4d5959b25f607bc667073b672d66570bf29d8d2b2020811605808ce08e032df"
-E4_V12_DIRECT_COPY_POLICY_SHA256 = "7721bef97c992e1fff5dffb1b678e0bb779d3c62eddcec7b6ce53c20b51731cb"
+E4_V12_DIRECT_COPY_POLICY_SHA256 = "ed3e29edef1484a46a16858c303b97d0155ecf88aa63a23d95e6839592ee2f5e"
 role_model.assert_policy_fingerprint(E4_V12_ROLE_MODEL_POLICY_SHA256)
 direct_copy.assert_policy_fingerprint(E4_V12_DIRECT_COPY_POLICY_SHA256)
 
@@ -73,9 +73,9 @@ if __name__ == "__main__":
             return trade
 
         # The base harness applies generic 8% buy slippage to every family.
-        # Production V12 now uses the direct-copy tolerance after an E4 BUY has
-        # already authorized the mint. Retry only that family with the exact
-        # production direct-copy slippage; creator/social paths stay unchanged.
+        # Production V12 treats an observed E4 entry as hard authority, so retry
+        # only that direct-copy family at the local builder's direct-copy ceiling.
+        # Creator/social paths keep their ordinary execution rules.
         profile = v12.v6._PROFILE_BY_MINT.get(mint)
         if profile is None or str(getattr(profile, "family", "")) != direct_copy.DIRECT_COPY_FAMILY:
             return None
