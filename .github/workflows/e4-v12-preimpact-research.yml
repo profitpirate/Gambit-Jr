@@ -7,6 +7,7 @@ on:
     paths:
       - "scripts/e4_v12_preimpact_model.py"
       - "scripts/e4_v12_creator_preimpact_model.py"
+      - "scripts/e4_v12_drift_gate.py"
       - "tests/test_v12_preimpact_model.py"
       - ".github/workflows/e4-v12-preimpact-research.yml"
   workflow_dispatch:
@@ -64,8 +65,19 @@ jobs:
             --holdout samples/33822988156/artifacts/e4-v12-forward-batch.json:samples/33822988156/artifacts/e4-v12-forward-batch-live-events.jsonl \
             --output artifacts/e4-v12-creator-preimpact-model.json
 
+      - name: Learn causal post-E4 economic parity gate
+        run: |
+          python scripts/e4_v12_drift_gate.py \
+            --evidence models/e4/e4-v12-forward-evidence.json \
+            --train-batches 33741470396,33769636983,33781389703,33792881280 \
+            --holdout-batches 33810753028,33822988156 \
+            --output artifacts/e4-v12-drift-gate.json
+
       - uses: actions/upload-artifact@v4
         with:
           name: e4-v12-preimpact-${{ github.run_id }}
-          path: artifacts/e4-v12-*-preimpact-model.json
+          path: |
+            artifacts/e4-v12-preimpact-model.json
+            artifacts/e4-v12-creator-preimpact-model.json
+            artifacts/e4-v12-drift-gate.json
           retention-days: 30
