@@ -1,0 +1,50 @@
+name: E4 V12 full wallet history
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - "scripts/e4_v12_full_wallet_history.py"
+      - ".github/workflows/e4-v12-full-wallet-history.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  E4_PRIMARY_RPC_URL: ${{ secrets.E4_PRIMARY_RPC_URL }}
+  HELIUS_RPC_URL: ${{ secrets.HELIUS_RPC_URL }}
+
+jobs:
+  wallet-history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e . -r requirements-e4.txt
+      - name: Compile full-history auditor
+        run: python -m py_compile scripts/e4_v12_full_wallet_history.py
+
+      - name: Retrieve and classify every E4 signature available from archival RPC history
+        id: audit
+        continue-on-error: true
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_v12_full_wallet_history.py \
+            --max-pages 100 \
+            --max-transactions 0 \
+            --concurrency 8 \
+            --output artifacts/e4-v12-full-wallet-history.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-full-wallet-history-${{ github.run_id }}
+          path: artifacts/e4-v12-full-wallet-history.json
+          if-no-files-found: warn
+          retention-days: 30
