@@ -1,0 +1,58 @@
+name: E4 V12 exact-time matched controls
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - "scripts/e4_v12_timestamp_matched_controls.py"
+      - ".github/workflows/e4-v12-matched-controls.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  matched-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile causal analysis
+        run: python -m py_compile scripts/e4_v12_timestamp_matched_controls.py
+
+      - name: Download six frozen 3000-launch samples
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p samples artifacts
+          for run in 33741470396 33769636983 33781389703 33792881280 33810753028 33822988156; do
+            mkdir -p "samples/$run"
+            gh run download "$run" \
+              --repo profitpirate/Gambit-Jr \
+              --name "e4-v12-forward-$run" \
+              --dir "samples/$run"
+          done
+
+      - name: Compare every selected launch with ignored near-twins at the exact E4 timestamp
+        run: |
+          python scripts/e4_v12_timestamp_matched_controls.py \
+            --pair samples/33741470396/artifacts/e4-v12-forward-batch.json:samples/33741470396/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33769636983/artifacts/e4-v12-forward-batch.json:samples/33769636983/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33781389703/artifacts/e4-v12-forward-batch.json:samples/33781389703/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33792881280/artifacts/e4-v12-forward-batch.json:samples/33792881280/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33810753028/artifacts/e4-v12-forward-batch.json:samples/33810753028/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33822988156/artifacts/e4-v12-forward-batch.json:samples/33822988156/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --creator-history models/e4/e4-creator-expectancy.json \
+            --controls-per-trade 25 \
+            --output artifacts/e4-v12-exact-timestamp-matched-controls.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e4-v12-matched-controls-${{ github.run_id }}
+          path: artifacts/e4-v12-exact-timestamp-matched-controls.json
+          retention-days: 30
