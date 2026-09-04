@@ -1,0 +1,175 @@
+name: E4 V12 causal-entry fresh live WR confirmation
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-causal-entry-candidate
+    paths:
+      - "models/e4/e4-v12-causal-entry-trigger-v2.txt"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_V12_CAUSAL_ENTRY_ENABLED: "true"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
+  E4_BUILDER_PRELOAD: "tools/e4-builder/fast-preload-v4.mjs"
+  E4_HOLDOUT_PROGRESS_PATH: "artifacts/e4-v12-causal-fresh-progress.json"
+
+concurrency:
+  group: e4-v12-causal-fresh-live-v2
+  cancel-in-progress: false
+
+jobs:
+  fresh-live-wr-confirmation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-causal-entry-candidate
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+
+      - name: Verify frozen candidate and runtime tests
+        run: |
+          python -m unittest tests.test_v12_causal_entry_runtime -v
+          python -c "import memecoin_bot.e4_exec.__main__; import memecoin_bot.e4_causal_entry_v12 as m; assert m.RUNTIME.active"
+
+      - name: Capture 3000 brand-new Pump launches
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_300_launch_holdout_v12.py \
+            --target-launches 3000 \
+            --capture-seconds 14400 \
+            --tail-seconds 300 \
+            --heartbeat-seconds 60 \
+            --minimum-launches 3000 \
+            --wallet-signatures 1000 \
+            --builder-probes 0 \
+            --testnet-route-probes 0 \
+            --stress-iterations 0 \
+            --output artifacts/e4-v12-causal-fresh-batch.json
+
+      - name: Apply frozen entry rule globally before E4
+        id: selection
+        continue-on-error: true
+        run: |
+          python scripts/e4_v12_live_causal_choice_validate.py \
+            --events artifacts/e4-v12-causal-fresh-batch-live-events.jsonl \
+            --batch artifacts/e4-v12-causal-fresh-batch.json \
+            --model models/e4/e4-v12-causal-entry-model.json \
+            --state models/e4/e4-v12-causal-entry-state.json \
+            --minimum-intents 5 \
+            --output artifacts/e4-v12-causal-fresh-live-result.json
+
+      - name: Replay V12 fills, costs and E4 partial exits
+        if: always()
+        run: |
+          python scripts/e4_v12_causal_choice_pnl_replay.py \
+            --validation artifacts/e4-v12-causal-fresh-live-result.json \
+            --events artifacts/e4-v12-causal-fresh-batch-live-events.jsonl \
+            --latency-ms 36 \
+            --entry-fraction 0.0185 \
+            --starting-balance-sol 1.2 \
+            --pump-fee-bps 125 \
+            --confirmation-ms 1500 \
+            --output artifacts/e4-v12-causal-fresh-pnl.json
+
+      - name: Classify live selection and WR evidence
+        id: classify
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          selection_path=Path('artifacts/e4-v12-causal-fresh-live-result.json')
+          pnl_path=Path('artifacts/e4-v12-causal-fresh-pnl.json')
+          if not selection_path.exists() or not pnl_path.exists():
+              status='MISSING_REPORT'
+              payload={'status':status}
+          else:
+              selection=json.loads(selection_path.read_text())
+              pnl=json.loads(pnl_path.read_text())
+              metrics=selection.get('metrics') or {}
+              all_pnl=pnl.get('all_predictions') or {}
+              confirmed=pnl.get('e4_confirmed_predictions') or {}
+              selection_ok=selection.get('status') == 'FRESH_LIVE_CONFIRMED'
+              e4_subset_ok=(
+                  int(metrics.get('predicted_success_outcomes') or 0) >= 2
+                  and float(metrics.get('predicted_success_e4_win_rate') or 0) >= 0.60
+                  and float(metrics.get('predicted_success_e4_net_pnl_sol') or 0) > 0
+              )
+              execution_ok=(
+                  int(all_pnl.get('closed') or 0) >= 2
+                  and float(all_pnl.get('win_rate') or 0) >= 0.50
+                  and float(all_pnl.get('net_pnl_sol') or 0) > 0
+                  and float(all_pnl.get('profit_factor') or 0) >= 1.0
+              )
+              status='FRESH_LIVE_WR_CONFIRMED' if selection_ok and e4_subset_ok and execution_ok else 'FRESH_LIVE_WR_REJECTED'
+              payload={
+                  'status':status,
+                  'selection_status':selection.get('status'),
+                  'selection_metrics':metrics,
+                  'all_prediction_pnl':{key:all_pnl.get(key) for key in ('closed','wins','losses','win_rate','net_pnl_sol','profit_factor')},
+                  'confirmed_prediction_pnl':{key:confirmed.get(key) for key in ('closed','wins','losses','win_rate','net_pnl_sol','profit_factor')},
+                  'selection_ok':selection_ok,
+                  'e4_subset_ok':e4_subset_ok,
+                  'execution_ok':execution_ok,
+              }
+          Path('artifacts/e4-v12-causal-fresh-verdict.json').write_text(json.dumps(payload,indent=2,sort_keys=True))
+          Path('artifacts/e4-v12-causal-fresh-status.txt').write_text(status+'\n')
+          print(json.dumps(payload,indent=2,sort_keys=True))
+          PY
+
+      - name: Persist immutable fresh result
+        if: always()
+        run: |
+          status="$(cat artifacts/e4-v12-causal-fresh-status.txt 2>/dev/null || echo MISSING_REPORT)"
+          mkdir -p models/e4/evidence-epochs/causal-entry-v2
+          cp artifacts/e4-v12-causal-fresh-live-result.json \
+            "models/e4/evidence-epochs/causal-entry-v2/${GITHUB_RUN_ID}-selection.json" 2>/dev/null || true
+          cp artifacts/e4-v12-causal-fresh-pnl.json \
+            "models/e4/evidence-epochs/causal-entry-v2/${GITHUB_RUN_ID}-pnl.json" 2>/dev/null || true
+          cp artifacts/e4-v12-causal-fresh-verdict.json \
+            "models/e4/evidence-epochs/causal-entry-v2/${GITHUB_RUN_ID}-verdict.json" 2>/dev/null || true
+          git config user.name 'gambit-v12-evidence'
+          git config user.email 'actions@users.noreply.github.com'
+          git add models/e4/evidence-epochs/causal-entry-v2 || true
+          if ! git diff --cached --quiet; then
+            git commit -m "data(e4-v12): persist causal-entry WR ${status} [skip ci]"
+            git push origin HEAD:codex/e4-v12-causal-entry-candidate
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-causal-fresh-wr-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-causal-fresh-progress.json
+            artifacts/e4-v12-causal-fresh-batch.json
+            artifacts/e4-v12-causal-fresh-batch-live-events.jsonl
+            artifacts/e4-v12-causal-fresh-live-result.json
+            artifacts/e4-v12-causal-fresh-pnl.json
+            artifacts/e4-v12-causal-fresh-verdict.json
+            artifacts/e4-v12-causal-fresh-status.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Require genuinely fresh positive live WR
+        if: always()
+        run: test "$(cat artifacts/e4-v12-causal-fresh-status.txt)" = "FRESH_LIVE_WR_CONFIRMED"
