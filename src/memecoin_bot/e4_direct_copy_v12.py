@@ -21,9 +21,6 @@ PIPELINES = role_model.PIPELINES
 LOGGER = logging.getLogger("gambit.e4.direct-copy.v12")
 
 DIRECT_COPY_FAMILY = role_model.ROLE_MODEL_FAMILY
-# Pump's local builder itself clamps buy/sell slippage to 9,000 bps. A direct
-# E4 copy therefore uses that builder ceiling by default: once E4 authority is
-# observed, generic Gambit price-drift/slippage policy must not cancel the copy.
 DEFAULT_DIRECT_COPY_SLIPPAGE_BPS = 9000
 
 
@@ -50,12 +47,12 @@ def _finite(value: Any, default: float = 0.0) -> float:
 
 
 def direct_copy_slippage_bps(settings: Any) -> int:
-    """Use the builder's direct-copy tolerance instead of generic entry slippage.
+    """Return V12's direct-copy execution tolerance.
 
-    E4's private slippage configuration is not observable. The 9,000-bps
-    default is therefore a V12 execution parameter, equal to the local Pump
-    builder's own ceiling. It exists so an already-recognized E4 entry is sent
-    rather than vetoed by Gambit's generic 8% entry protection.
+    E4's private slippage setting is not observable. V12 therefore keeps the
+    local builder ceiling as a hard-copy tolerance. With the V12 exact-SOL
+    builder this percentage is applied to minimum token output; it no longer
+    shrinks the SOL input / economic position before the transaction is built.
     """
     raw = os.getenv(
         "E4_DIRECT_COPY_SLIPPAGE_BPS",
@@ -80,14 +77,7 @@ def direct_copy_amount_sol(
     priority_fee_sol: float,
     tip_sol: float,
 ) -> tuple[float, bool]:
-    """Match E4's observed SOL stake whenever the wallet can physically do so.
-
-    Direct E4 authority deliberately bypasses Gambit's percentage ladder and
-    absolute strategy position ceiling. The only remaining size constraint is
-    actual deployable wallet balance after reserve, in-flight reservations and
-    transaction costs. If the wallet is smaller than E4's stake, V12 submits
-    the maximum physically deployable amount and records that it was not exact.
-    """
+    """Match E4's observed SOL stake whenever the wallet can physically do so."""
     observed = max(0.0, _finite(observed_e4_sol))
     deployable = max(
         0.0,
@@ -148,15 +138,11 @@ async def _execute_buy_direct_copy_v12(
         await _PREVIOUS_EXECUTE_BUY(self, state, score, fraction, reason)
         return
 
-    # Once the entry profile is DIRECT_COPY_FAMILY, E4 already authorized this
-    # mint. A later E4 partial/full exit must not retroactively cancel submission.
-    # The exit policy will mirror any already-observed E4 exit after our position
-    # lands, preserving the source lifecycle rather than silently missing entry.
     observed_sol = max(0.0, _finite(getattr(source, "entry_sol", 0.0)))
     if observed_sol <= 0:
-        # The source amount is part of the requested copy parameters. Do not
-        # invent a percentage stake; use the legacy executor only when the
-        # observer genuinely could not recover the E4 SOL leg.
+        # Exact source stake is part of copy fidelity. Do not manufacture an
+        # absolute amount from a score when instruction/post-state accounting
+        # cannot recover E4's SOL leg.
         await _PREVIOUS_EXECUTE_BUY(self, state, score, fraction, reason)
         return
 
@@ -202,15 +188,22 @@ async def _execute_buy_direct_copy_v12(
 
         request_id = str(uuid.uuid4())
         context = v6._CONTEXT_BY_MINT.get(mint, {})
+        request_created_ns = time.time_ns()
+        preconfirm_seen_ns = int(context.get("v12_preconfirm_seen_ns") or 0)
+        preconfirm_dispatch_ns = int(context.get("v12_preconfirm_dispatch_ns") or 0)
         launch_received_ns = int(
             context.get("create_received_ns")
             or context.get("last_received_ns")
-            or time.time_ns()
+            or request_created_ns
         )
+        # Existing source/event clocks may be logical/replay timestamps. When a
+        # true pre-confirm signal exists, use the real dispatcher wall clock for
+        # build/sign/broadcast latency accounting instead.
         decision_completed_ns = int(
-            context.get("v10_decision_completed_ns")
+            preconfirm_dispatch_ns
+            or context.get("v10_decision_completed_ns")
             or context.get("v12_role_model_entry_ns")
-            or time.time_ns()
+            or request_created_ns
         )
         runtime.latency.begin(
             request_id,
@@ -228,6 +221,7 @@ async def _execute_buy_direct_copy_v12(
             exact_amount=exact_amount,
             source_signature=str(getattr(source, "signature", "") or ""),
         )
+        context["v12_direct_copy_request_created_ns"] = request_created_ns
 
         request = {
             "request_id": request_id,
@@ -254,9 +248,16 @@ async def _execute_buy_direct_copy_v12(
                 ),
                 "e4_copy_exact_amount": exact_amount,
                 "e4_copy_slippage_bps": slippage_bps,
-                "e4_source_already_exited": bool(
-                    getattr(source, "fully_exited", False)
+                "e4_source_already_exited": bool(getattr(source, "fully_exited", False)),
+                "e4_preconfirm_seen_ns": preconfirm_seen_ns,
+                "e4_preconfirm_dispatch_ns": preconfirm_dispatch_ns,
+                "e4_preconfirm_instruction_family": str(
+                    context.get("v12_preconfirm_instruction_family") or ""
                 ),
+                "e4_preconfirm_exact_spend": bool(
+                    context.get("v12_preconfirm_exact_spend", False)
+                ),
+                "e4_direct_copy_request_created_ns": request_created_ns,
             },
         }
         self.store.order(request_id, mint, "BUY", amount, None, reason)
@@ -312,12 +313,13 @@ async def _execute_buy_direct_copy_v12(
         v6._persist_profile(self, mint)
         LOGGER.info(
             "E4 V12 direct copy opened mint=%s e4_sol=%.9f submitted_sol=%.9f "
-            "exact_amount=%s slippage_bps=%d signature=%s",
+            "exact_amount=%s slippage_bps=%d preconfirm=%s signature=%s",
             mint,
             observed_sol,
             amount,
             exact_amount,
             slippage_bps,
+            bool(preconfirm_seen_ns),
             signature,
         )
     except Exception:
@@ -332,9 +334,6 @@ async def _execute_buy_direct_copy_v12(
 core.Engine.execute_buy = _execute_buy_direct_copy_v12
 
 
-# The background wallet observer originally recovered token deltas but not the
-# SOL leg. Enrich its E4Signal after parsing so direct copies can reproduce the
-# same observable source stake even when that observer beats the primary feed.
 _PREVIOUS_PROCESS_E4_TRANSACTION = pipeline_runtime.PipelineRuntime.process_e4_transaction
 
 
@@ -375,8 +374,6 @@ def _process_e4_transaction_direct_copy_v12(
     if sol_cost <= 0:
         return
 
-    # The original parser has already identified the changed mint and signal.
-    # Upgrade only matching same-signature BUY signals; do not alter exits.
     lock = getattr(PIPELINES, "_lock", None)
     if lock is None:
         current = dict(getattr(PIPELINES, "_e4_entries", {}))
