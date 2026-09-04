@@ -339,7 +339,7 @@ def add_relative_features(current: dict[str, Any], active: Sequence[dict[str, An
     seed_rank, seed_gap, max_seed = ranked("log_seed")
     identity_rank, identity_gap, max_identity = ranked("identity_strength")
     velocity_rank, velocity_gap, max_velocity = ranked("launch_velocity")
-    buyers = sorted((finite(row.get("unique_buyers")), str(row.get("mint") or "")) for row, _ in rows, reverse=True)
+    buyers = sorted(((finite(row.get("unique_buyers")), str(row.get("mint") or "")) for row, _ in rows), reverse=True)
     buyer_value = finite(current.get("unique_buyers"))
     buyer_rank = 1 + sum(value > buyer_value for value, _ in buyers)
     count = max(1, len(rows))
