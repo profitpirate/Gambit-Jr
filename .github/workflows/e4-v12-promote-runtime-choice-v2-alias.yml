@@ -1,0 +1,70 @@
+name: E4 V12 promote runtime-choice v2 thesis
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - "research/candidate-workflows/promotion-v2-trigger-*.txt"
+      - ".github/workflows/e4-v12-promote-runtime-choice-v2-alias.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  alias-confirmed-v2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-matched-controls
+          fetch-depth: 0
+
+      - name: Require strict deferred-intent-safe live holdout pass
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report_path=Path('docs/research/e4-v12-runtime-choice-v2-report.json')
+          model_path=Path('models/e4/research/e4-v12-runtime-choice-v2-model.json')
+          assert report_path.exists(), report_path
+          assert model_path.exists(), model_path
+          report=json.loads(report_path.read_text())
+          model=json.loads(model_path.read_text())
+          assert report.get('status') == 'LIVE_HOLDOUT_CONFIRMED', report.get('status')
+          assert report.get('safe_to_implement') is True
+          assert model.get('status') == 'LIVE_HOLDOUT_CONFIRMED'
+          assert model.get('version') == 'e4-v12-conditional-choice-ranker-v1'
+          assert report.get('causality',{}).get('controls','').startswith('launches created within')
+          forbidden={
+              'status_present','fresh_status_1s','fresh_status_5s','fresh_status_30s',
+              'fresh_status_120s','tweet_age_log','prior_handle_log','website_present',
+          }
+          features=set(model['ranker']['features'])
+          assert not features & forbidden, features & forbidden
+          print(json.dumps({
+              'status': report['status'],
+              'validation': report.get('validation'),
+              'walk_forward': report.get('walk_forward'),
+              'live_holdout': report.get('live_holdout'),
+          }, indent=2, sort_keys=True))
+          PY
+
+      - name: Promote v2 as canonical research candidate
+        run: |
+          cp docs/research/e4-v12-runtime-choice-v2-report.json \
+             docs/research/e4-v12-runtime-choice-report.json
+          cp models/e4/research/e4-v12-runtime-choice-v2-model.json \
+             models/e4/research/e4-v12-runtime-choice-model.json
+          git config user.name 'gambit-e4-research'
+          git config user.email 'actions@users.noreply.github.com'
+          git add \
+            docs/research/e4-v12-runtime-choice-report.json \
+            models/e4/research/e4-v12-runtime-choice-model.json
+          git commit -m 'research(e4-v12): promote deferred-intent-safe runtime choice thesis'
+          git push origin HEAD:codex/e4-v12-matched-controls
