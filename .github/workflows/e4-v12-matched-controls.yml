@@ -6,6 +6,7 @@ on:
       - codex/e4-v12-matched-controls
     paths:
       - "scripts/e4_v12_timestamp_matched_controls.py"
+      - "scripts/e4_v12_whitelist_launch_audit.py"
       - ".github/workflows/e4-v12-matched-controls.yml"
   workflow_dispatch:
 
@@ -22,8 +23,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Compile causal analysis
-        run: python -m py_compile scripts/e4_v12_timestamp_matched_controls.py
+      - name: Compile causal analyses
+        run: |
+          python -m py_compile scripts/e4_v12_timestamp_matched_controls.py
+          python -m py_compile scripts/e4_v12_whitelist_launch_audit.py
 
       - name: Download six frozen 3000-launch samples
         env:
@@ -51,8 +54,22 @@ jobs:
             --controls-per-trade 25 \
             --output artifacts/e4-v12-exact-timestamp-matched-controls.json
 
+      - name: Audit every whitelisted creator launch, including launches E4 ignored
+        run: |
+          python scripts/e4_v12_whitelist_launch_audit.py \
+            --events samples/33741470396/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --events samples/33769636983/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --events samples/33781389703/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --events samples/33792881280/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --events samples/33810753028/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --events samples/33822988156/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --history models/e4/e4-creator-expectancy.json \
+            --output artifacts/e4-v12-whitelist-launch-audit.json
+
       - uses: actions/upload-artifact@v4
         with:
           name: e4-v12-matched-controls-${{ github.run_id }}
-          path: artifacts/e4-v12-exact-timestamp-matched-controls.json
+          path: |
+            artifacts/e4-v12-exact-timestamp-matched-controls.json
+            artifacts/e4-v12-whitelist-launch-audit.json
           retention-days: 30
