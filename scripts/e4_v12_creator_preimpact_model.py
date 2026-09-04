@@ -2,14 +2,24 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import itertools
 import json
-from collections import defaultdict
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
-from scripts.e4_v12_preimpact_model import Launch, load_launches, finite
+_BASE_PATH = Path(__file__).with_name("e4_v12_preimpact_model.py")
+_SPEC = importlib.util.spec_from_file_location("e4_v12_preimpact_model_base", _BASE_PATH)
+if _SPEC is None or _SPEC.loader is None:
+    raise RuntimeError(f"unable to load {_BASE_PATH}")
+_BASE = importlib.util.module_from_spec(_SPEC)
+sys.modules[_SPEC.name] = _BASE
+_SPEC.loader.exec_module(_BASE)
+Launch = _BASE.Launch
+load_launches = _BASE.load_launches
+finite = _BASE.finite
 
 
 @dataclass(frozen=True)
@@ -25,7 +35,17 @@ class Rule:
     max_age_ms: float
 
     def as_dict(self) -> dict[str, Any]:
-        return self.__dict__.copy()
+        return {
+            "min_wins": self.min_wins,
+            "min_trades": self.min_trades,
+            "min_win_rate": self.min_win_rate,
+            "min_seed_sol": self.min_seed_sol,
+            "max_seed_sol": self.max_seed_sol,
+            "min_fdv": self.min_fdv,
+            "max_fdv": self.max_fdv,
+            "max_buy_rank": self.max_buy_rank,
+            "max_age_ms": self.max_age_ms,
+        }
 
 
 def candidate_snapshot(launch: Launch, rule: Rule) -> dict[str, Any] | None:
@@ -82,8 +102,7 @@ def evaluate_sequence(
         if snap is not None:
             candidates.append((launch, snap))
 
-        # Crucially, this launch's E4 outcome is learned only after the launch
-        # decision. It can influence future launches, never itself.
+        # This launch's E4 outcome is learned only after the launch decision.
         if update_history and launch.e4_buy_ns is not None and launch.creator:
             if launch.e4_won:
                 wins += 1
@@ -136,8 +155,6 @@ def rules():
 
 
 def objective(m: dict[str, Any]) -> tuple[float, float, float, float]:
-    # Require at least two genuinely prior-creator E4 opportunities before
-    # rewarding precision. Then prefer precision, then winner capture, then lead.
     valid = 1.0 if m["eligible_e4_entries"] >= 2 and m["true_e4_candidates"] >= 2 else 0.0
     return (
         valid,
