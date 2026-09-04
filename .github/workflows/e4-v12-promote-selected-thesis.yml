@@ -1,0 +1,87 @@
+name: E4 V12 promote globally selected thesis
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - "research/candidate-workflows/promote-selected-trigger-*.txt"
+      - ".github/workflows/e4-v12-promote-selected-thesis.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_PIPELINES_BACKGROUND: "false"
+
+jobs:
+  promote-selected:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-matched-controls
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+
+      - name: Wait for globally screened thesis selector
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          import time
+          from pathlib import Path
+
+          path='docs/research/e4-v12-conclusive-thesis-selector-v2.json'
+          for _ in range(1800):
+              subprocess.run(
+                  ['git','fetch','origin','codex/e4-v12-matched-controls'],
+                  check=True,
+                  stdout=subprocess.DEVNULL,
+              )
+              exists=subprocess.run(
+                  ['git','cat-file','-e',f'origin/codex/e4-v12-matched-controls:{path}'],
+                  stdout=subprocess.DEVNULL,
+                  stderr=subprocess.DEVNULL,
+              ).returncode==0
+              if not exists:
+                  time.sleep(10)
+                  continue
+              raw=subprocess.check_output(
+                  ['git','show',f'origin/codex/e4-v12-matched-controls:{path}'],
+                  text=True,
+              )
+              selector=json.loads(raw)
+              status=str(selector.get('status') or '')
+              selected=str(selector.get('selected_thesis') or '')
+              if status != 'SCREENING_CONFIRMED':
+                  raise SystemExit(f'no globally confirmed thesis: {status}')
+              if selected not in {'CONDITIONAL_CHOICE','SEQUENTIAL_HAZARD'}:
+                  raise SystemExit(f'unsupported selected thesis: {selected}')
+              Path('/tmp/selected-thesis').write_text(selected+'\n')
+              print(json.dumps(selector,indent=2,sort_keys=True))
+              break
+          else:
+              raise SystemExit('global thesis selector did not complete')
+          PY
+
+      - name: Refresh research branch and promote selected implementation
+        run: |
+          git fetch origin codex/e4-v12-matched-controls codex/e4-v12-selection-reconstruction codex/e4-v12-causal-entry-candidate
+          selected="$(cat /tmp/selected-thesis)"
+          if [ "$selected" = "CONDITIONAL_CHOICE" ]; then
+            python scripts/e4_v12_promote_causal_candidate_v4.py
+          elif [ "$selected" = "SEQUENTIAL_HAZARD" ]; then
+            python scripts/e4_v12_promote_sequential_candidate.py
+          else
+            echo "Unsupported selected thesis: $selected" >&2
+            exit 1
+          fi
