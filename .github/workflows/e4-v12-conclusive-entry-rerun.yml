@@ -1,0 +1,139 @@
+name: E4 V12 conclusive entry thesis rerun
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - "scripts/e4_v12_conclusive_entry_rerun.py"
+      - ".github/workflows/e4-v12-conclusive-entry-rerun.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  causal-multimode-rerun:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install aiohttp numpy scikit-learn
+      - name: Compile thesis rerun
+        run: python -m py_compile scripts/e4_v12_conclusive_entry_rerun.py
+
+      - name: Download ten chronological frozen 3000-launch samples
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p samples research-cache/attempts research-cache/metadata artifacts
+          for run in 33741470396 33769636983 33781389703 33792881280 33810753028 33822988156 33835575805 33852482054 33876345997 33897368379; do
+            mkdir -p "samples/$run"
+            gh run download "$run" \
+              --repo profitpirate/Gambit-Jr \
+              --name "e4-v12-forward-$run" \
+              --dir "samples/$run"
+          done
+
+      - name: Download successful and failed E4 intent labels
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 33883557623 --repo profitpirate/Gambit-Jr --dir research-cache/attempts/base
+          gh run download 33913332895 --repo profitpirate/Gambit-Jr --dir research-cache/attempts/latest || true
+
+      - name: Download immutable metadata caches
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 33889403746 --repo profitpirate/Gambit-Jr --dir research-cache/metadata/global
+          gh run download 33912828449 --repo profitpirate/Gambit-Jr --dir research-cache/metadata/latest
+
+      - name: Fit on earlier data and confirm only on newest live batch
+        id: thesis
+        continue-on-error: true
+        run: |
+          python scripts/e4_v12_conclusive_entry_rerun.py \
+            --pair samples/33741470396/artifacts/e4-v12-forward-batch.json:samples/33741470396/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33769636983/artifacts/e4-v12-forward-batch.json:samples/33769636983/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33781389703/artifacts/e4-v12-forward-batch.json:samples/33781389703/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33792881280/artifacts/e4-v12-forward-batch.json:samples/33792881280/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33810753028/artifacts/e4-v12-forward-batch.json:samples/33810753028/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33822988156/artifacts/e4-v12-forward-batch.json:samples/33822988156/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33835575805/artifacts/e4-v12-forward-batch.json:samples/33835575805/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33852482054/artifacts/e4-v12-forward-batch.json:samples/33852482054/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33876345997/artifacts/e4-v12-forward-batch.json:samples/33876345997/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33897368379/artifacts/e4-v12-forward-batch.json:samples/33897368379/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --attempts research-cache/attempts \
+            --metadata-cache research-cache/metadata \
+            --creator-history models/e4/e4-creator-expectancy.json \
+            --output artifacts/e4-v12-conclusive-entry-rerun.json \
+            --model-output artifacts/e4-v12-causal-multimode-entry.json
+
+      - name: Validate and classify thesis
+        id: classify
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report_path = Path('artifacts/e4-v12-conclusive-entry-rerun.json')
+          if not report_path.exists():
+              print('status=MISSING_REPORT')
+              with Path('artifacts/e4-v12-thesis-status.txt').open('w') as handle:
+                  handle.write('MISSING_REPORT\n')
+              raise SystemExit(1)
+          report = json.loads(report_path.read_text())
+          status = str(report.get('status') or 'UNKNOWN')
+          Path('artifacts/e4-v12-thesis-status.txt').write_text(status + '\n')
+          print('status=' + status)
+          print(json.dumps({
+              'gate': report.get('gate'),
+              'validation': report.get('validation'),
+              'walk_forward': report.get('walk_forward'),
+              'live_holdout': report.get('live_holdout'),
+          }, indent=2, sort_keys=True))
+          with Path('/tmp/thesis-status').open('w') as handle:
+              handle.write(status)
+          PY
+
+      - name: Persist only a live-confirmed research model
+        if: always()
+        run: |
+          status="$(cat artifacts/e4-v12-thesis-status.txt 2>/dev/null || echo MISSING_REPORT)"
+          mkdir -p docs/research models/e4/research
+          cp artifacts/e4-v12-conclusive-entry-rerun.json docs/research/e4-v12-conclusive-entry-rerun.json 2>/dev/null || true
+          cp artifacts/e4-v12-causal-multimode-entry.json models/e4/research/e4-v12-causal-multimode-entry.json 2>/dev/null || true
+          git config user.name 'gambit-e4-research'
+          git config user.email 'actions@users.noreply.github.com'
+          git add docs/research/e4-v12-conclusive-entry-rerun.json models/e4/research/e4-v12-causal-multimode-entry.json || true
+          if ! git diff --cached --quiet; then
+            git commit -m "research(e4-v12): persist multimode thesis result ${status} [skip ci]"
+            git push origin HEAD:codex/e4-v12-matched-controls
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-conclusive-entry-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-conclusive-entry-rerun.json
+            artifacts/e4-v12-causal-multimode-entry.json
+            artifacts/e4-v12-thesis-status.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce live confirmation
+        if: always()
+        run: |
+          test "$(cat artifacts/e4-v12-thesis-status.txt)" = "LIVE_HOLDOUT_CONFIRMED"
