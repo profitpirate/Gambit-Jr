@@ -1,0 +1,27 @@
+name: E4 V12 export research models
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - ".github/workflows/e4-v12-export-research-models.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e4-v12-research-models-${{ github.run_id }}
+          path: |
+            models/e4/e4-creator-expectancy.json
+            models/e4/e4-winning-creators.json
+            models/e4/e4-discovered-creators.json
+            models/e4/e4-v12-selection.json
+          retention-days: 30
