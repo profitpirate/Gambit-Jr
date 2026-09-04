@@ -7,6 +7,7 @@ on:
     paths:
       - "scripts/e4_v12_timestamp_matched_controls.py"
       - "scripts/e4_v12_whitelist_launch_audit.py"
+      - "scripts/e4_v12_identity_preimpact_model.py"
       - ".github/workflows/e4-v12-matched-controls.yml"
   workflow_dispatch:
 
@@ -17,7 +18,7 @@ permissions:
 jobs:
   matched-controls:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -27,6 +28,7 @@ jobs:
         run: |
           python -m py_compile scripts/e4_v12_timestamp_matched_controls.py
           python -m py_compile scripts/e4_v12_whitelist_launch_audit.py
+          python -m py_compile scripts/e4_v12_identity_preimpact_model.py
 
       - name: Download six frozen 3000-launch samples
         env:
@@ -66,10 +68,23 @@ jobs:
             --history models/e4/e4-creator-expectancy.json \
             --output artifacts/e4-v12-whitelist-launch-audit.json
 
+      - name: Learn causal creator/wallet-identity plus launch-flow gate
+        run: |
+          python scripts/e4_v12_identity_preimpact_model.py \
+            --train samples/33741470396/artifacts/e4-v12-forward-batch.json:samples/33741470396/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --train samples/33769636983/artifacts/e4-v12-forward-batch.json:samples/33769636983/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --train samples/33781389703/artifacts/e4-v12-forward-batch.json:samples/33781389703/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --train samples/33792881280/artifacts/e4-v12-forward-batch.json:samples/33792881280/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --holdout samples/33810753028/artifacts/e4-v12-forward-batch.json:samples/33810753028/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --holdout samples/33822988156/artifacts/e4-v12-forward-batch.json:samples/33822988156/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --history models/e4/e4-creator-expectancy.json \
+            --output artifacts/e4-v12-identity-preimpact-model.json
+
       - uses: actions/upload-artifact@v4
         with:
           name: e4-v12-matched-controls-${{ github.run_id }}
           path: |
             artifacts/e4-v12-exact-timestamp-matched-controls.json
             artifacts/e4-v12-whitelist-launch-audit.json
+            artifacts/e4-v12-identity-preimpact-model.json
           retention-days: 30
