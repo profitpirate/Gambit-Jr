@@ -1,0 +1,110 @@
+name: E4 V12 causal runtime screening replay
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - "src/memecoin_bot/e4_causal_entry_v12.py"
+      - "tests/test_v12_causal_entry_runtime.py"
+      - "scripts/e4_v12_live_causal_choice_validate.py"
+      - "docs/research/e4-v12-runtime-choice-report.json"
+      - "models/e4/research/e4-v12-runtime-choice-model.json"
+      - "models/e4/research/e4-v12-causal-runtime-state.json"
+      - ".github/workflows/e4-v12-causal-runtime-replay.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_V12_CAUSAL_ENTRY_ENABLED: "true"
+  E4_V12_CAUSAL_MODEL_PATH: "models/e4/research/e4-v12-runtime-choice-model.json"
+  E4_V12_CAUSAL_STATE_PATH: "models/e4/research/e4-v12-causal-runtime-state.json"
+  E4_PIPELINES_BACKGROUND: "false"
+
+jobs:
+  runtime-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-matched-controls
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+
+      - name: Enforce runtime-feasible model status
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('docs/research/e4-v12-runtime-choice-report.json').read_text())
+          model=json.loads(Path('models/e4/research/e4-v12-runtime-choice-model.json').read_text())
+          assert report['status']=='LIVE_HOLDOUT_CONFIRMED'
+          assert model['status']=='LIVE_HOLDOUT_CONFIRMED'
+          PY
+
+      - name: Production scorer tests
+        run: python -m unittest tests.test_v12_causal_entry_runtime -v
+
+      - name: Download screening holdout and failed-intent mapping
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p sample attempts artifacts
+          gh run download 33897368379 --repo profitpirate/Gambit-Jr --name e4-v12-forward-33897368379 --dir sample
+          gh run download 33913332895 --repo profitpirate/Gambit-Jr --dir attempts
+
+      - name: Replay production scorer globally in timestamp order
+        id: replay
+        continue-on-error: true
+        run: |
+          python scripts/e4_v12_live_causal_choice_validate.py \
+            --events sample/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --batch sample/artifacts/e4-v12-forward-batch.json \
+            --attempts attempts \
+            --model models/e4/research/e4-v12-runtime-choice-model.json \
+            --state models/e4/research/e4-v12-causal-runtime-state.json \
+            --minimum-intents 5 \
+            --output artifacts/e4-v12-causal-runtime-screening.json
+
+      - name: Persist screening replay
+        if: always()
+        run: |
+          status="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('artifacts/e4-v12-causal-runtime-screening.json')
+          print(json.loads(p.read_text()).get('status','MISSING_REPORT') if p.exists() else 'MISSING_REPORT')
+          PY
+          )"
+          echo "$status" > artifacts/e4-v12-causal-runtime-screening-status.txt
+          mkdir -p docs/research
+          cp artifacts/e4-v12-causal-runtime-screening.json docs/research/e4-v12-causal-runtime-screening.json 2>/dev/null || true
+          git config user.name 'gambit-e4-research'
+          git config user.email 'actions@users.noreply.github.com'
+          git add docs/research/e4-v12-causal-runtime-screening.json || true
+          if ! git diff --cached --quiet; then
+            git commit -m "research(e4-v12): persist runtime screening ${status} [skip ci]"
+            git push origin HEAD:codex/e4-v12-matched-controls
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-causal-runtime-screening-${{ github.run_id }}
+          path: artifacts/e4-v12-causal-runtime-screening*
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Require production scorer parity
+        if: always()
+        run: test "$(cat artifacts/e4-v12-causal-runtime-screening-status.txt)" = "FRESH_LIVE_CONFIRMED"
