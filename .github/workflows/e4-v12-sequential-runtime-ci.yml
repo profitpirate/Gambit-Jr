@@ -1,0 +1,32 @@
+name: E4 V12 sequential hazard runtime CI
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - "src/memecoin_bot/e4_sequential_hazard_v12.py"
+      - "tests/test_v12_sequential_hazard_runtime.py"
+      - ".github/workflows/e4-v12-sequential-runtime-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  E4_PIPELINES_BACKGROUND: "false"
+
+jobs:
+  sequential-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - run: python -m unittest tests.test_v12_sequential_hazard_runtime -v
+      - run: python -m compileall -q src/memecoin_bot/e4_sequential_hazard_v12.py tests/test_v12_sequential_hazard_runtime.py
