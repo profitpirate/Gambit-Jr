@@ -1,0 +1,166 @@
+name: E4 V12 merge fully confirmed thesis
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - "research/candidate-workflows/merge-confirmed-trigger-*.txt"
+      - ".github/workflows/e4-v12-merge-confirmed-thesis.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: write
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  REPO: profitpirate/Gambit-Jr
+  RESEARCH_BRANCH: codex/e4-v12-matched-controls
+  CANDIDATE_BRANCH: codex/e4-v12-causal-entry-candidate
+  AUTHORITATIVE_BRANCH: codex/e4-v12-selection-reconstruction
+
+jobs:
+  merge-confirmed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-matched-controls
+          fetch-depth: 0
+
+      - name: Wait for the exact open promotion PR
+        run: |
+          for attempt in $(seq 1 180); do
+            pr_json="$(gh pr list --repo "$REPO" --head "$CANDIDATE_BRANCH" --base "$AUTHORITATIVE_BRANCH" --state open --json number,title,headRefOid,baseRefName,headRefName)"
+            count="$(jq 'length' <<<"$pr_json")"
+            if [ "$count" -eq 1 ]; then
+              title="$(jq -r '.[0].title' <<<"$pr_json")"
+              if [ "$title" != "V12: promote causal sequential pre-intent E4 entry model" ]; then
+                echo "Unexpected PR title: $title" >&2
+                exit 1
+              fi
+              jq -r '.[0].number' <<<"$pr_json" > /tmp/pr-number
+              jq -r '.[0].headRefOid' <<<"$pr_json" > /tmp/pr-head
+              echo "$pr_json" | jq .
+              break
+            fi
+            if [ "$count" -gt 1 ]; then
+              echo "Multiple candidate PRs found" >&2
+              exit 1
+            fi
+            sleep 10
+          done
+          test -s /tmp/pr-number
+
+      - name: Verify selector, candidate provenance and immutable fresh verdict
+        run: |
+          git fetch origin "$RESEARCH_BRANCH" "$CANDIDATE_BRANCH" "$AUTHORITATIVE_BRANCH"
+          python - <<'PY'
+          import json
+          import subprocess
+
+          def read(ref, path):
+              return json.loads(subprocess.check_output(['git','show',f'{ref}:{path}'],text=True))
+
+          selector=read('origin/codex/e4-v12-matched-controls','docs/research/e4-v12-conclusive-thesis-selector-v2.json')
+          assert selector['status']=='SCREENING_CONFIRMED', selector['status']
+          assert selector['selected_thesis']=='SEQUENTIAL_HAZARD', selector['selected_thesis']
+          model=read('origin/codex/e4-v12-causal-entry-candidate','models/e4/e4-v12-sequential-entry-model.json')
+          assert model['status']=='LIVE_HOLDOUT_CONFIRMED'
+          assert model['version']=='e4-v12-sequential-hazard-v1'
+          state=read('origin/codex/e4-v12-causal-entry-candidate','models/e4/e4-v12-sequential-entry-state.json')
+          assert state['version']=='e4-v12-causal-runtime-state-v1'
+
+          names=subprocess.check_output([
+              'git','ls-tree','-r','--name-only','origin/codex/e4-v12-causal-entry-candidate',
+              'models/e4/evidence-epochs/sequential-entry'
+          ],text=True).splitlines()
+          verdict_names=sorted(name for name in names if name.endswith('-verdict.json'))
+          assert verdict_names, 'fresh sequential verdict missing'
+          verdict=read('origin/codex/e4-v12-causal-entry-candidate',verdict_names[-1])
+          assert verdict['status']=='FRESH_LIVE_WR_CONFIRMED', verdict
+          assert verdict['selection_ok'] is True
+          assert verdict['e4_subset_ok'] is True
+          assert verdict['economics_ok'] is True
+          print(json.dumps({
+              'selector':selector,
+              'model':{key:model.get(key) for key in ('version','status','horizon_ms','spec','gate','top_drivers')},
+              'state_coverage':state.get('coverage'),
+              'fresh_verdict_path':verdict_names[-1],
+              'fresh_verdict':verdict,
+          },indent=2,sort_keys=True))
+          PY
+
+      - name: Require successful CI and fresh-live runs from an ancestor of PR head
+        run: |
+          git fetch origin "$CANDIDATE_BRANCH"
+          pr_head="$(cat /tmp/pr-head)"
+          actual_head="$(git rev-parse "origin/$CANDIDATE_BRANCH")"
+          if ! git merge-base --is-ancestor "$pr_head" "$actual_head"; then
+            echo "PR head is not an ancestor of candidate head" >&2
+            exit 1
+          fi
+
+          check_workflow() {
+            workflow="$1"
+            label="$2"
+            for attempt in $(seq 1 180); do
+              runs="$(gh run list --repo "$REPO" --workflow "$workflow" --branch "$CANDIDATE_BRANCH" --limit 10 --json databaseId,status,conclusion,headSha,createdAt)"
+              selected="$(jq -c '[.[] | select(.status=="completed" and .conclusion=="success")][0] // empty' <<<"$runs")"
+              if [ -n "$selected" ]; then
+                sha="$(jq -r '.headSha' <<<"$selected")"
+                git fetch origin "$sha" || true
+                if git merge-base --is-ancestor "$sha" "$actual_head"; then
+                  echo "$label passed on ancestor $sha"
+                  echo "$selected" | jq .
+                  return 0
+                fi
+              fi
+              sleep 10
+            done
+            echo "$label did not produce a successful ancestor run" >&2
+            return 1
+          }
+
+          check_workflow e4-v12-sequential-entry-candidate-ci.yml "candidate CI"
+          check_workflow e4-v12-sequential-entry-fresh-live.yml "fresh 3000-launch WR"
+
+      - name: Merge the confirmed V12 thesis
+        run: |
+          pr="$(cat /tmp/pr-number)"
+          gh pr merge "$pr" --repo "$REPO" --squash \
+            --subject "feat(e4-v12): causal sequential pre-intent entry authority" \
+            --body "Promotes the globally selected, leak-free sequential hazard model after candidate regression and a brand-new 3,000-launch live WR confirmation. V12 remains the permanent version."
+
+      - name: Verify authoritative V12 contains the exact promoted authority
+        run: |
+          git fetch origin "$AUTHORITATIVE_BRANCH"
+          python - <<'PY'
+          import json
+          import subprocess
+
+          ref='origin/codex/e4-v12-selection-reconstruction'
+          def text(path):
+              return subprocess.check_output(['git','show',f'{ref}:{path}'],text=True)
+          model=json.loads(text('models/e4/e4-v12-sequential-entry-model.json'))
+          assert model['status']=='LIVE_HOLDOUT_CONFIRMED'
+          assert model['version']=='e4-v12-sequential-hazard-v1'
+          entry=text('src/memecoin_bot/e4_exec/__main__.py')
+          assert 'e4_sequential_hazard_v12' in entry
+          assert 'e4_copy_fidelity_v12' in entry
+          assert 'E4_V12_SEQUENTIAL_ENTRY_ENABLED' in entry
+          epoch=text('models/e4/e4-v12-evidence-epoch.txt').strip()
+          assert epoch.startswith('v12-sequential-preintent-hazard')
+          print(json.dumps({
+              'authoritative_head':subprocess.check_output(['git','rev-parse',ref],text=True).strip(),
+              'model_status':model['status'],
+              'model_version':model['version'],
+              'horizon_ms':model.get('horizon_ms'),
+              'spec':model.get('spec'),
+              'gate':model.get('gate'),
+              'epoch':epoch,
+          },indent=2,sort_keys=True))
+          PY
