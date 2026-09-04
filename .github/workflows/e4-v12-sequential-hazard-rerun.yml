@@ -1,0 +1,193 @@
+name: E4 V12 sequential causal hazard rerun
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - "scripts/e4_v12_sequential_hazard_search.py"
+      - "scripts/e4_v12_sequential_hazard_fast.py"
+      - ".github/workflows/e4-v12-sequential-hazard-rerun.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  search-horizon:
+    strategy:
+      fail-fast: false
+      matrix:
+        horizon: [100, 250, 500, 750]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-matched-controls
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install aiohttp numpy scikit-learn
+
+      - name: Repair and compile event-stage model
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('scripts/e4_v12_sequential_hazard_search.py')
+          text=path.read_text()
+          text=text.replace(
+              'buyers = sorted((finite(row.get("unique_buyers")), str(row.get("mint") or "")) for row, _ in rows, reverse=True)',
+              'buyers = sorted(((finite(row.get("unique_buyers")), str(row.get("mint") or "")) for row, _ in rows), reverse=True)',
+          )
+          path.write_text(text)
+          PY
+          python -m py_compile scripts/e4_v12_conclusive_entry_rerun.py
+          python -m py_compile scripts/e4_v12_sequential_hazard_search.py
+          python -m py_compile scripts/e4_v12_sequential_hazard_fast.py
+
+      - name: Download ten chronological frozen samples and failed intents
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p samples cache/attempts artifacts
+          for run in 33741470396 33769636983 33781389703 33792881280 33810753028 33822988156 33835575805 33852482054 33876345997 33897368379; do
+            mkdir -p "samples/$run"
+            gh run download "$run" --repo profitpirate/Gambit-Jr --name "e4-v12-forward-$run" --dir "samples/$run"
+          done
+          gh run download 33883557623 --repo profitpirate/Gambit-Jr --dir cache/attempts/base
+          gh run download 33913332895 --repo profitpirate/Gambit-Jr --dir cache/attempts/latest || true
+
+      - name: Learn earliest E4-intent hazard
+        id: hazard
+        continue-on-error: true
+        run: |
+          python scripts/e4_v12_sequential_hazard_fast.py \
+            --pair samples/33741470396/artifacts/e4-v12-forward-batch.json:samples/33741470396/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33769636983/artifacts/e4-v12-forward-batch.json:samples/33769636983/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33781389703/artifacts/e4-v12-forward-batch.json:samples/33781389703/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33792881280/artifacts/e4-v12-forward-batch.json:samples/33792881280/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33810753028/artifacts/e4-v12-forward-batch.json:samples/33810753028/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33822988156/artifacts/e4-v12-forward-batch.json:samples/33822988156/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33835575805/artifacts/e4-v12-forward-batch.json:samples/33835575805/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33852482054/artifacts/e4-v12-forward-batch.json:samples/33852482054/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33876345997/artifacts/e4-v12-forward-batch.json:samples/33876345997/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33897368379/artifacts/e4-v12-forward-batch.json:samples/33897368379/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --attempts cache/attempts \
+            --horizon-ms "${{ matrix.horizon }}" \
+            --output "artifacts/e4-v12-sequential-hazard-${{ matrix.horizon }}-report.json" \
+            --model-output "artifacts/e4-v12-sequential-hazard-${{ matrix.horizon }}-model.json"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-sequential-hazard-${{ matrix.horizon }}
+          path: artifacts/e4-v12-sequential-hazard-${{ matrix.horizon }}-*.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  select-horizon:
+    needs: search-horizon
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-matched-controls
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: e4-v12-sequential-hazard-*
+          path: artifacts/horizons
+          merge-multiple: true
+
+      - name: Select only a confirmed exportable horizon
+        run: |
+          python - <<'PY'
+          import json
+          import shutil
+          from pathlib import Path
+
+          root=Path('artifacts/horizons')
+          candidates=[]
+          for report_path in root.glob('*-report.json'):
+              report=json.loads(report_path.read_text())
+              stem=report_path.name.replace('-report.json','')
+              model_path=report_path.with_name(stem+'-model.json')
+              if not model_path.exists():
+                  continue
+              validation=report.get('validation') or {}
+              walk=report.get('walk_forward') or {}
+              live=report.get('live_holdout') or {}
+              score=(
+                  int(report.get('status')=='LIVE_HOLDOUT_CONFIRMED'),
+                  min(float(validation.get('precision') or 0),float(walk.get('precision') or 0),float(live.get('precision') or 0)),
+                  min(float(validation.get('recall') or 0),float(walk.get('recall') or 0),float(live.get('recall') or 0)),
+                  float(live.get('median_lead_ms') or 0),
+                  int(live.get('true') or 0),
+              )
+              candidates.append((score,report_path,model_path,report))
+          candidates.sort(key=lambda item:item[0],reverse=True)
+          if not candidates:
+              raise SystemExit('no sequential hazard report was produced')
+          score,report_path,model_path,report=candidates[0]
+          status='LIVE_HOLDOUT_CONFIRMED' if report.get('status')=='LIVE_HOLDOUT_CONFIRMED' else 'NOT_CONCLUSIVE'
+          summary={
+              'version':'e4-v12-sequential-hazard-selection-v1',
+              'status':status,
+              'selected_report':report_path.name,
+              'selected_model':model_path.name,
+              'score':list(score),
+              'coverage':report.get('coverage'),
+              'spec':report.get('spec'),
+              'gate':report.get('gate'),
+              'top_drivers':report.get('top_drivers'),
+              'validation':report.get('validation'),
+              'walk_forward':report.get('walk_forward'),
+              'live_holdout':report.get('live_holdout'),
+          }
+          Path('artifacts/e4-v12-sequential-hazard-selection.json').write_text(json.dumps(summary,indent=2,sort_keys=True))
+          shutil.copyfile(report_path,'artifacts/e4-v12-sequential-hazard-report.json')
+          shutil.copyfile(model_path,'artifacts/e4-v12-sequential-hazard-model.json')
+          Path('artifacts/e4-v12-sequential-hazard-status.txt').write_text(status+'\n')
+          print(json.dumps(summary,indent=2,sort_keys=True))
+          PY
+
+      - name: Persist selected sequential result
+        if: always()
+        run: |
+          mkdir -p docs/research models/e4/research
+          cp artifacts/e4-v12-sequential-hazard-selection.json docs/research/e4-v12-sequential-hazard-selection.json 2>/dev/null || true
+          cp artifacts/e4-v12-sequential-hazard-report.json docs/research/e4-v12-sequential-hazard-report.json 2>/dev/null || true
+          cp artifacts/e4-v12-sequential-hazard-model.json models/e4/research/e4-v12-sequential-hazard-model.json 2>/dev/null || true
+          git pull --rebase origin codex/e4-v12-matched-controls
+          git config user.name 'gambit-e4-research'
+          git config user.email 'actions@users.noreply.github.com'
+          git add docs/research/e4-v12-sequential-hazard-*.json models/e4/research/e4-v12-sequential-hazard-model.json || true
+          if ! git diff --cached --quiet; then
+            git commit -m "research(e4-v12): persist sequential hazard $(cat artifacts/e4-v12-sequential-hazard-status.txt) [skip ci]"
+            git push origin HEAD:codex/e4-v12-matched-controls
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-sequential-hazard-selected-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-sequential-hazard-selection.json
+            artifacts/e4-v12-sequential-hazard-report.json
+            artifacts/e4-v12-sequential-hazard-model.json
+            artifacts/e4-v12-sequential-hazard-status.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Require sequential causal holdout confirmation
+        if: always()
+        run: test "$(cat artifacts/e4-v12-sequential-hazard-status.txt)" = "LIVE_HOLDOUT_CONFIRMED"
