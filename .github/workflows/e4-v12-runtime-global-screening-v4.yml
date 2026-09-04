@@ -1,0 +1,210 @@
+name: E4 V12 causal runtime global screening v4
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - "research/candidate-workflows/global-screening-v4-trigger-*.txt"
+      - ".github/workflows/e4-v12-runtime-global-screening-v4.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_V12_CAUSAL_ENTRY_ENABLED: "true"
+  E4_PIPELINES_BACKGROUND: "false"
+
+jobs:
+  global-screening-v4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-matched-controls
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+
+      - name: Wait for immutable production-equivalent v3 result
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          import time
+          from pathlib import Path
+
+          paths=(
+              'docs/research/e4-v12-runtime-choice-v3-report.json',
+              'models/e4/research/e4-v12-runtime-choice-v3-model.json',
+          )
+          for _ in range(540):
+              subprocess.run(['git','fetch','origin','codex/e4-v12-matched-controls'],check=True,stdout=subprocess.DEVNULL)
+              available=all(subprocess.run(
+                  ['git','cat-file','-e',f'origin/codex/e4-v12-matched-controls:{path}'],
+                  stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+              ).returncode==0 for path in paths)
+              if not available:
+                  time.sleep(10)
+                  continue
+              report=json.loads(subprocess.check_output(
+                  ['git','show',f'origin/codex/e4-v12-matched-controls:{paths[0]}'],text=True,
+              ))
+              if report.get('status') != 'LIVE_HOLDOUT_CONFIRMED':
+                  raise SystemExit(f"v3 thesis rejected: {report.get('status')}")
+              if report.get('safe_to_implement') is not True:
+                  raise SystemExit('v3 thesis is not safe_to_implement')
+              for path in paths:
+                  destination=Path(path)
+                  destination.parent.mkdir(parents=True,exist_ok=True)
+                  destination.write_bytes(subprocess.check_output(
+                      ['git','show',f'origin/codex/e4-v12-matched-controls:{path}']
+                  ))
+              print(json.dumps({
+                  'status':report.get('status'),
+                  'validation':report.get('validation'),
+                  'walk_forward':report.get('walk_forward'),
+                  'live_holdout':report.get('live_holdout'),
+              },indent=2,sort_keys=True))
+              break
+          else:
+              raise SystemExit('v3 report/model did not arrive')
+          PY
+
+      - name: Download nine training windows plus untouched tenth window
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p samples cache/attempts artifacts
+          for run in 33741470396 33769636983 33781389703 33792881280 33810753028 33822988156 33835575805 33852482054 33876345997 33897368379; do
+            mkdir -p "samples/$run"
+            gh run download "$run" --repo profitpirate/Gambit-Jr --name "e4-v12-forward-$run" --dir "samples/$run"
+          done
+          gh run download 33883557623 --repo profitpirate/Gambit-Jr --dir cache/attempts/base
+          gh run download 33913332895 --repo profitpirate/Gambit-Jr --dir cache/attempts/tenth || true
+
+      - name: Build causal runtime memory using only the first nine windows
+        run: |
+          python scripts/e4_v12_export_causal_runtime_state.py \
+            --pair samples/33741470396/artifacts/e4-v12-forward-batch.json:samples/33741470396/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33769636983/artifacts/e4-v12-forward-batch.json:samples/33769636983/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33781389703/artifacts/e4-v12-forward-batch.json:samples/33781389703/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33792881280/artifacts/e4-v12-forward-batch.json:samples/33792881280/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33810753028/artifacts/e4-v12-forward-batch.json:samples/33810753028/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33822988156/artifacts/e4-v12-forward-batch.json:samples/33822988156/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33835575805/artifacts/e4-v12-forward-batch.json:samples/33835575805/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33852482054/artifacts/e4-v12-forward-batch.json:samples/33852482054/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33876345997/artifacts/e4-v12-forward-batch.json:samples/33876345997/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --attempts cache/attempts/base \
+            --output artifacts/e4-v12-screening-state-first-nine.json
+
+      - name: Apply the frozen scorer globally in chronological order
+        id: selection
+        continue-on-error: true
+        run: |
+          python scripts/e4_v12_live_causal_choice_validate.py \
+            --events samples/33897368379/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --batch samples/33897368379/artifacts/e4-v12-forward-batch.json \
+            --attempts cache/attempts/tenth \
+            --model models/e4/research/e4-v12-runtime-choice-v3-model.json \
+            --state artifacts/e4-v12-screening-state-first-nine.json \
+            --minimum-intents 5 \
+            --output artifacts/e4-v12-runtime-global-screening-v3-selection.json
+
+      - name: Replay V12 fills, costs and source partial exits
+        if: always()
+        run: |
+          python scripts/e4_v12_causal_choice_pnl_replay.py \
+            --validation artifacts/e4-v12-runtime-global-screening-v3-selection.json \
+            --events samples/33897368379/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --latency-ms 36 \
+            --entry-fraction 0.0185 \
+            --starting-balance-sol 1.2 \
+            --pump-fee-bps 125 \
+            --confirmation-ms 1500 \
+            --output artifacts/e4-v12-runtime-global-screening-v3-pnl.json
+
+      - name: Classify global runtime equivalence and economics
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          sp=Path('artifacts/e4-v12-runtime-global-screening-v3-selection.json')
+          pp=Path('artifacts/e4-v12-runtime-global-screening-v3-pnl.json')
+          if not sp.exists() or not pp.exists():
+              verdict={'status':'MISSING_REPORT'}
+          else:
+              selection=json.loads(sp.read_text())
+              pnl=json.loads(pp.read_text())
+              metrics=selection.get('metrics') or {}
+              all_pnl=pnl.get('all_predictions') or {}
+              confirmed=pnl.get('e4_confirmed_predictions') or {}
+              selection_ok=(
+                  selection.get('status') == 'FRESH_LIVE_CONFIRMED'
+                  and int(metrics.get('true') or 0) >= 2
+                  and float(metrics.get('precision') or 0) >= 0.50
+                  and float(metrics.get('recall') or 0) >= 0.10
+                  and bool(metrics.get('all_true_pre_intent'))
+              )
+              e4_subset_ok=(
+                  int(metrics.get('predicted_success_outcomes') or 0) >= 2
+                  and float(metrics.get('predicted_success_e4_win_rate') or 0) >= 0.60
+                  and float(metrics.get('predicted_success_e4_net_pnl_sol') or 0) > 0
+              )
+              economics_ok=(
+                  int(all_pnl.get('closed') or 0) >= 2
+                  and float(all_pnl.get('win_rate') or 0) >= 0.50
+                  and float(all_pnl.get('net_pnl_sol') or 0) > 0
+                  and float(all_pnl.get('profit_factor') or 0) >= 1.0
+              )
+              status='GLOBAL_SCREENING_CONFIRMED' if selection_ok and e4_subset_ok and economics_ok else 'GLOBAL_SCREENING_REJECTED'
+              verdict={
+                  'status':status,
+                  'selection_status':selection.get('status'),
+                  'selection_metrics':metrics,
+                  'all_prediction_pnl':{key:all_pnl.get(key) for key in ('closed','wins','losses','win_rate','net_pnl_sol','profit_factor')},
+                  'confirmed_prediction_pnl':{key:confirmed.get(key) for key in ('closed','wins','losses','win_rate','net_pnl_sol','profit_factor')},
+                  'selection_ok':selection_ok,
+                  'e4_subset_ok':e4_subset_ok,
+                  'economics_ok':economics_ok,
+              }
+          Path('artifacts/e4-v12-runtime-global-screening-v3-verdict.json').write_text(json.dumps(verdict,indent=2,sort_keys=True))
+          Path('artifacts/e4-v12-runtime-global-screening-v3-status.txt').write_text(verdict['status']+'\n')
+          print(json.dumps(verdict,indent=2,sort_keys=True))
+          PY
+
+      - name: Persist immutable global screening evidence
+        if: always()
+        run: |
+          mkdir -p docs/research
+          cp artifacts/e4-v12-runtime-global-screening-v3-selection.json docs/research/e4-v12-runtime-global-screening-v3-selection.json 2>/dev/null || true
+          cp artifacts/e4-v12-runtime-global-screening-v3-pnl.json docs/research/e4-v12-runtime-global-screening-v3-pnl.json 2>/dev/null || true
+          cp artifacts/e4-v12-runtime-global-screening-v3-verdict.json docs/research/e4-v12-runtime-global-screening-v3-verdict.json 2>/dev/null || true
+          git config user.name 'gambit-e4-research'
+          git config user.email 'actions@users.noreply.github.com'
+          git add docs/research/e4-v12-runtime-global-screening-v3-*.json || true
+          if ! git diff --cached --quiet; then
+            git commit -m "research(e4-v12): persist global screening $(cat artifacts/e4-v12-runtime-global-screening-v3-status.txt) [skip ci]"
+            git push origin HEAD:codex/e4-v12-matched-controls
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-runtime-global-screening-v4-${{ github.run_id }}
+          path: artifacts/e4-v12-runtime-global-screening-v3-*
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Require global runtime and WR confirmation
+        if: always()
+        run: test "$(cat artifacts/e4-v12-runtime-global-screening-v3-status.txt)" = "GLOBAL_SCREENING_CONFIRMED"
