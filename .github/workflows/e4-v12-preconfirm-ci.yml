@@ -34,6 +34,7 @@ jobs:
           import hashlib
           from pathlib import Path
           for path in (
+              'src/memecoin_bot/e4_direct_copy_v12.py',
               'src/memecoin_bot/e4_copy_fidelity_v12.py',
               'src/memecoin_bot/e4_preconfirm_v12.py',
           ):
@@ -53,15 +54,16 @@ jobs:
           python -m unittest tests.test_v12_preconfirm -v
           python -m unittest tests.test_v12_copy_fidelity -v
 
-      - name: Compile adaptation modules
+      - name: Compile adaptation modules and production import
         run: |
-          python -m compileall -q src/memecoin_bot/e4_copy_fidelity_v12.py src/memecoin_bot/e4_preconfirm_v12.py
+          python -m compileall -q src/memecoin_bot/e4_direct_copy_v12.py src/memecoin_bot/e4_copy_fidelity_v12.py src/memecoin_bot/e4_preconfirm_v12.py
+          python -m memecoin_bot.e4_exec status >/dev/null
 
       - name: Generic V12 local builder self-test
-        run: node tools/e4-builder/daemon-v12.mjs --self-test
+        run: node --import ./tools/e4-builder/exact-sol-preload-v12.mjs tools/e4-builder/daemon-v12.mjs --self-test
 
       - name: Exact-SOL direct-copy builder self-test
-        run: node tools/e4-builder/daemon-v12.mjs --self-test-direct-copy
+        run: node --import ./tools/e4-builder/exact-sol-preload-v12.mjs tools/e4-builder/daemon-v12.mjs --self-test-direct-copy
 
       - name: Builder race generic self-test
         run: node tools/e4-builder/race-proxy-v12.mjs --self-test
