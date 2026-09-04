@@ -1,0 +1,47 @@
+name: E4 V12 repair sequential hazard research
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - ".github/workflows/e4-v12-fix-sequential-hazard.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-matched-controls
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Repair generator syntax and compile
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('scripts/e4_v12_sequential_hazard_search.py')
+          text=path.read_text()
+          bad='buyers = sorted((finite(row.get("unique_buyers")), str(row.get("mint") or "")) for row, _ in rows, reverse=True)'
+          good='buyers = sorted(((finite(row.get("unique_buyers")), str(row.get("mint") or "")) for row, _ in rows), reverse=True)'
+          if bad in text:
+              text=text.replace(bad,good,1)
+              path.write_text(text)
+          PY
+          python -m py_compile scripts/e4_v12_sequential_hazard_search.py
+      - name: Persist repair
+        run: |
+          git config user.name 'gambit-e4-research'
+          git config user.email 'actions@users.noreply.github.com'
+          git add scripts/e4_v12_sequential_hazard_search.py
+          if ! git diff --cached --quiet; then
+            git commit -m 'fix(e4-v12): compile sequential hazard model [skip ci]'
+            git push origin HEAD:codex/e4-v12-matched-controls
+          fi
