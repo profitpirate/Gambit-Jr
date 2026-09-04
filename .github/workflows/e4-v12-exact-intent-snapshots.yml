@@ -1,0 +1,73 @@
+name: E4 V12 exact-order intent snapshots
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - "scripts/e4_v12_exact_intent_snapshots.py"
+      - ".github/workflows/e4-v12-exact-intent-snapshots.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+env:
+  E4_PRIMARY_RPC_URL: ${{ secrets.E4_PRIMARY_RPC_URL }}
+  HELIUS_RPC_URL: ${{ secrets.HELIUS_RPC_URL }}
+
+jobs:
+  exact-intents:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip aiohttp
+      - run: python -m py_compile scripts/e4_v12_exact_intent_snapshots.py
+      - name: Download twelve frozen launch samples and attempt map
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p samples source artifacts
+          for run in 33605109571 33627431540 33644544746 33656916992 33669514091 33681664773 33692043170 33704841852 33716649440 33741470396 33792881280 33822988156; do
+            mkdir -p "samples/$run"
+            gh run download "$run" \
+              --repo profitpirate/Gambit-Jr \
+              --name "e4-v12-forward-$run" \
+              --dir "samples/$run"
+          done
+          gh run download 33883557623 \
+            --repo profitpirate/Gambit-Jr \
+            --name e4-v12-attempt-mint-forensics-33883557623 \
+            --dir source
+      - name: Reconstruct every successful and failed E4 BUY at exact block order
+        continue-on-error: true
+        run: |
+          python scripts/e4_v12_exact_intent_snapshots.py \
+            --pair samples/33605109571/artifacts/e4-v12-forward-batch.json:samples/33605109571/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33627431540/artifacts/e4-v12-forward-batch.json:samples/33627431540/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33644544746/artifacts/e4-v12-forward-batch.json:samples/33644544746/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33656916992/artifacts/e4-v12-forward-batch.json:samples/33656916992/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33669514091/artifacts/e4-v12-forward-batch.json:samples/33669514091/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33681664773/artifacts/e4-v12-forward-batch.json:samples/33681664773/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33692043170/artifacts/e4-v12-forward-batch.json:samples/33692043170/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33704841852/artifacts/e4-v12-forward-batch.json:samples/33704841852/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33716649440/artifacts/e4-v12-forward-batch.json:samples/33716649440/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33741470396/artifacts/e4-v12-forward-batch.json:samples/33741470396/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33792881280/artifacts/e4-v12-forward-batch.json:samples/33792881280/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33822988156/artifacts/e4-v12-forward-batch.json:samples/33822988156/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --attempts source/e4-v12-attempt-mint-forensics.json \
+            --concurrency 10 \
+            --timeout 15 \
+            --output artifacts/e4-v12-exact-intent-snapshots.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-exact-intents-${{ github.run_id }}
+          path: artifacts/e4-v12-exact-intent-snapshots.json
+          if-no-files-found: warn
+          retention-days: 30
