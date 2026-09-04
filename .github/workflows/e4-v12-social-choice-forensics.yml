@@ -1,0 +1,70 @@
+name: E4 V12 social choice forensics
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - "scripts/e4_v12_social_choice_forensics.py"
+      - ".github/workflows/e4-v12-social-choice-forensics.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  social-choice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e . -r requirements-e4.txt
+      - run: python -m py_compile scripts/e4_v12_social_choice_forensics.py
+
+      - name: Download twelve frozen 3000-launch samples
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p samples artifacts
+          for run in \
+            33605109571 33627431540 33644544746 33656916992 \
+            33669514091 33681664773 33692043170 33704841852 \
+            33716649440 33741470396 33792881280 33822988156; do
+            mkdir -p "samples/$run"
+            gh run download "$run" \
+              --repo profitpirate/Gambit-Jr \
+              --name "e4-v12-forward-$run" \
+              --dir "samples/$run"
+          done
+
+      - name: Compare exact tweet age, source identity and metadata across selected and ignored launches
+        run: |
+          python scripts/e4_v12_social_choice_forensics.py \
+            --pair samples/33605109571/artifacts/e4-v12-forward-batch.json:samples/33605109571/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33627431540/artifacts/e4-v12-forward-batch.json:samples/33627431540/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33644544746/artifacts/e4-v12-forward-batch.json:samples/33644544746/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33656916992/artifacts/e4-v12-forward-batch.json:samples/33656916992/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33669514091/artifacts/e4-v12-forward-batch.json:samples/33669514091/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33681664773/artifacts/e4-v12-forward-batch.json:samples/33681664773/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33692043170/artifacts/e4-v12-forward-batch.json:samples/33692043170/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33704841852/artifacts/e4-v12-forward-batch.json:samples/33704841852/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33716649440/artifacts/e4-v12-forward-batch.json:samples/33716649440/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33741470396/artifacts/e4-v12-forward-batch.json:samples/33741470396/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33792881280/artifacts/e4-v12-forward-batch.json:samples/33792881280/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33822988156/artifacts/e4-v12-forward-batch.json:samples/33822988156/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --controls-per-entry 10 \
+            --train-max-run-index 7 \
+            --output artifacts/e4-v12-social-choice-forensics.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-social-choice-forensics-${{ github.run_id }}
+          path: artifacts/e4-v12-social-choice-forensics.json
+          if-no-files-found: warn
+          retention-days: 30
