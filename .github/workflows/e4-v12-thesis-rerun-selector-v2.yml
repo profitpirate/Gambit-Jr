@@ -1,0 +1,117 @@
+name: E4 V12 conclusive thesis selector v2
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - "research/candidate-workflows/final-selector-v2-trigger-*.txt"
+      - ".github/workflows/e4-v12-thesis-rerun-selector-v2.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  select-global-winner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-matched-controls
+          fetch-depth: 0
+
+      - name: Wait for both global causal verdicts
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          import time
+          from pathlib import Path
+
+          paths={
+              'conditional':'docs/research/e4-v12-runtime-global-screening-v3-verdict.json',
+              'sequential':'docs/research/e4-v12-sequential-global-verdict.json',
+          }
+          values={}
+          for _ in range(1440):
+              subprocess.run(['git','fetch','origin','codex/e4-v12-matched-controls'],check=True,stdout=subprocess.DEVNULL)
+              available=True
+              for path in paths.values():
+                  if subprocess.run(['git','cat-file','-e',f'origin/codex/e4-v12-matched-controls:{path}'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL).returncode!=0:
+                      available=False
+                      break
+              if available:
+                  for name,path in paths.items():
+                      values[name]=json.loads(subprocess.check_output(['git','show',f'origin/codex/e4-v12-matched-controls:{path}'],text=True))
+                  break
+              time.sleep(10)
+          else:
+              raise SystemExit('both global thesis verdicts were not produced')
+
+          def score(value):
+              selection=value.get('selection_metrics') or {}
+              pnl=value.get('all_prediction_pnl') or {}
+              confirmed=pnl if value.get('economics_ok') else {}
+              return (
+                  int(value.get('status')=='GLOBAL_SCREENING_CONFIRMED'),
+                  float(selection.get('precision') or 0),
+                  float(selection.get('recall') or 0),
+                  float(pnl.get('net_pnl_sol') or 0),
+                  float(pnl.get('profit_factor') or 0),
+                  int(selection.get('true') or 0),
+                  -int(selection.get('false_positives') or 0),
+              )
+
+          ranked=sorted(((score(value),name,value) for name,value in values.items()),reverse=True)
+          best_score,best_name,best=ranked[0]
+          status='SCREENING_CONFIRMED' if best.get('status')=='GLOBAL_SCREENING_CONFIRMED' else 'NOT_CONCLUSIVE'
+          selected='CONDITIONAL_CHOICE' if best_name=='conditional' and status=='SCREENING_CONFIRMED' else 'SEQUENTIAL_HAZARD' if best_name=='sequential' and status=='SCREENING_CONFIRMED' else None
+          summary={
+              'version':'e4-v12-conclusive-thesis-selector-v2',
+              'status':status,
+              'selected_thesis':selected,
+              'selection_basis':'global chronological pre-intent precision, recall, reserve-aware P&L and profit factor',
+              'conditional_choice':values['conditional'],
+              'sequential_hazard':values['sequential'],
+              'ranked_scores':[
+                  {'thesis':name,'score':list(item_score)}
+                  for item_score,name,_ in ranked
+              ],
+              'finish_condition':'The selected implementation must still pass a brand-new 3000-launch live WR batch.',
+          }
+          Path('artifacts').mkdir(exist_ok=True)
+          Path('artifacts/e4-v12-conclusive-thesis-selector-v2.json').write_text(json.dumps(summary,indent=2,sort_keys=True))
+          Path('artifacts/e4-v12-conclusive-thesis-selector-v2-status.txt').write_text(status+'\n')
+          print(json.dumps(summary,indent=2,sort_keys=True))
+          PY
+
+      - name: Persist global thesis selection
+        if: always()
+        run: |
+          mkdir -p docs/research
+          cp artifacts/e4-v12-conclusive-thesis-selector-v2.json docs/research/e4-v12-conclusive-thesis-selector-v2.json 2>/dev/null || true
+          git pull --rebase origin codex/e4-v12-matched-controls
+          git config user.name 'gambit-e4-research'
+          git config user.email 'actions@users.noreply.github.com'
+          git add docs/research/e4-v12-conclusive-thesis-selector-v2.json || true
+          if ! git diff --cached --quiet; then
+            git commit -m "research(e4-v12): select global causal thesis $(cat artifacts/e4-v12-conclusive-thesis-selector-v2-status.txt) [skip ci]"
+            git push origin HEAD:codex/e4-v12-matched-controls
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-conclusive-thesis-selector-v2-${{ github.run_id }}
+          path: artifacts/e4-v12-conclusive-thesis-selector-v2*
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Require globally confirmed winner
+        if: always()
+        run: test "$(cat artifacts/e4-v12-conclusive-thesis-selector-v2-status.txt)" = "SCREENING_CONFIRMED"
