@@ -1,0 +1,138 @@
+name: E4 V12 conclusive thesis selector
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - "research/candidate-workflows/final-selector-trigger-*.txt"
+      - ".github/workflows/e4-v12-thesis-rerun-selector.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  select:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-matched-controls
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Wait for conditional global screening and sequential hazard
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          import time
+          from pathlib import Path
+
+          conditional_report='docs/research/e4-v12-runtime-choice-v3-report.json'
+          conditional_global='docs/research/e4-v12-runtime-global-screening-v3-verdict.json'
+          sequential_selection='docs/research/e4-v12-sequential-hazard-selection.json'
+          required=(conditional_report,conditional_global,sequential_selection)
+          values={}
+          for _ in range(1080):
+              subprocess.run(['git','fetch','origin','codex/e4-v12-matched-controls'],check=True,stdout=subprocess.DEVNULL)
+              available=True
+              for path in required:
+                  result=subprocess.run(
+                      ['git','cat-file','-e',f'origin/codex/e4-v12-matched-controls:{path}'],
+                      stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+                  )
+                  if result.returncode != 0:
+                      available=False
+                      break
+              if available:
+                  for path in required:
+                      values[path]=json.loads(subprocess.check_output(
+                          ['git','show',f'origin/codex/e4-v12-matched-controls:{path}'],text=True,
+                      ))
+                  break
+              time.sleep(10)
+          else:
+              raise SystemExit('research branches did not produce all thesis reports')
+
+          conditional=values[conditional_report]
+          global_result=values[conditional_global]
+          sequential=values[sequential_selection]
+          conditional_ok=(
+              conditional.get('status')=='LIVE_HOLDOUT_CONFIRMED'
+              and conditional.get('safe_to_implement') is True
+              and global_result.get('status')=='GLOBAL_SCREENING_CONFIRMED'
+          )
+          sequential_ok=sequential.get('status')=='LIVE_HOLDOUT_CONFIRMED'
+          if conditional_ok:
+              selected='CONDITIONAL_CHOICE'
+              status='SCREENING_CONFIRMED'
+          elif sequential_ok:
+              selected='SEQUENTIAL_HAZARD'
+              status='SCREENING_CONFIRMED'
+          else:
+              selected=None
+              status='NOT_CONCLUSIVE'
+          summary={
+              'version':'e4-v12-conclusive-thesis-selector-v1',
+              'status':status,
+              'selected_thesis':selected,
+              'conditional_choice':{
+                  'offline_status':conditional.get('status'),
+                  'validation':conditional.get('validation'),
+                  'walk_forward':conditional.get('walk_forward'),
+                  'holdout':conditional.get('live_holdout'),
+                  'global_screening':global_result,
+                  'accepted':conditional_ok,
+              },
+              'sequential_hazard':{
+                  'status':sequential.get('status'),
+                  'coverage':sequential.get('coverage'),
+                  'spec':sequential.get('spec'),
+                  'gate':sequential.get('gate'),
+                  'top_drivers':sequential.get('top_drivers'),
+                  'validation':sequential.get('validation'),
+                  'walk_forward':sequential.get('walk_forward'),
+                  'holdout':sequential.get('live_holdout'),
+                  'accepted':sequential_ok,
+              },
+              'finish_condition':'Selected thesis must still pass a brand-new 3000-launch live selection and reserve-aware WR test after implementation.',
+          }
+          Path('artifacts').mkdir(exist_ok=True)
+          Path('artifacts/e4-v12-conclusive-thesis-selector.json').write_text(json.dumps(summary,indent=2,sort_keys=True))
+          Path('artifacts/e4-v12-conclusive-thesis-selector-status.txt').write_text(status+'\n')
+          print(json.dumps(summary,indent=2,sort_keys=True))
+          PY
+
+      - name: Persist selector result
+        if: always()
+        run: |
+          mkdir -p docs/research
+          cp artifacts/e4-v12-conclusive-thesis-selector.json docs/research/e4-v12-conclusive-thesis-selector.json 2>/dev/null || true
+          git pull --rebase origin codex/e4-v12-matched-controls
+          git config user.name 'gambit-e4-research'
+          git config user.email 'actions@users.noreply.github.com'
+          git add docs/research/e4-v12-conclusive-thesis-selector.json || true
+          if ! git diff --cached --quiet; then
+            git commit -m "research(e4-v12): select conclusive thesis $(cat artifacts/e4-v12-conclusive-thesis-selector-status.txt) [skip ci]"
+            git push origin HEAD:codex/e4-v12-matched-controls
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-conclusive-thesis-selector-${{ github.run_id }}
+          path: artifacts/e4-v12-conclusive-thesis-selector*
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Require a screening-confirmed thesis
+        if: always()
+        run: test "$(cat artifacts/e4-v12-conclusive-thesis-selector-status.txt)" = "SCREENING_CONFIRMED"
