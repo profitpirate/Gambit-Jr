@@ -1,0 +1,72 @@
+name: E4 V12 live 3 SOL win-rate replay
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-live-3sol-winrate
+    paths:
+      - "scripts/e4_v12_live_3sol_replay.py"
+      - ".github/workflows/e4-v12-live-3sol-winrate.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_SOL_USD_FALLBACK: "150"
+
+jobs:
+  replay-3sol:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-live-3sol-winrate
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e . -r requirements-e4.txt
+
+      - name: Verify exact V12 replay harness
+        run: |
+          python -m py_compile scripts/e4_v12_live_3sol_replay.py
+          python -m unittest tests.test_v12_selection -v
+          python -m unittest tests.test_v12_role_model_pipeline -v
+
+      - name: Download five newest completed 3000-launch live windows
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p samples artifacts
+          for run in 33835575805 33852482054 33876345997 33897368379 33911477030; do
+            mkdir -p "samples/$run"
+            gh run download "$run" \
+              --repo profitpirate/Gambit-Jr \
+              --name "e4-v12-forward-$run" \
+              --dir "samples/$run"
+          done
+
+      - name: Replay authoritative V12 with 3.0 SOL per live window
+        run: |
+          python scripts/e4_v12_live_3sol_replay.py \
+            --starting-balance-sol 3.0 \
+            --latency-ms 36 \
+            --pair 33835575805:samples/33835575805/artifacts/e4-v12-forward-batch.json:samples/33835575805/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair 33852482054:samples/33852482054/artifacts/e4-v12-forward-batch.json:samples/33852482054/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair 33876345997:samples/33876345997/artifacts/e4-v12-forward-batch.json:samples/33876345997/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair 33897368379:samples/33897368379/artifacts/e4-v12-forward-batch.json:samples/33897368379/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair 33911477030:samples/33911477030/artifacts/e4-v12-forward-batch.json:samples/33911477030/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --output artifacts/e4-v12-live-3sol-winrate.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-live-3sol-winrate-${{ github.run_id }}
+          path: artifacts/e4-v12-live-3sol-winrate.json
+          if-no-files-found: warn
+          retention-days: 30
