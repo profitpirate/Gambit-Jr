@@ -1,0 +1,180 @@
+name: E4 V12 promote causal-entry candidate
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - "docs/research/e4-v12-runtime-choice-report.json"
+      - "models/e4/research/e4-v12-runtime-choice-model.json"
+      - "models/e4/research/e4-v12-causal-runtime-state.json"
+      - "src/memecoin_bot/e4_causal_entry_v12.py"
+      - "tests/test_v12_causal_entry_runtime.py"
+      - "scripts/e4_v12_live_causal_choice_validate.py"
+      - "research/candidate-workflows/**"
+      - ".github/workflows/e4-v12-promote-causal-candidate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-matched-controls
+          fetch-depth: 0
+
+      - name: Enforce strict runtime-feasible confirmation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report_path=Path('docs/research/e4-v12-runtime-choice-report.json')
+          model_path=Path('models/e4/research/e4-v12-runtime-choice-model.json')
+          state_path=Path('models/e4/research/e4-v12-causal-runtime-state.json')
+          for path in (report_path, model_path, state_path):
+              assert path.exists(), f'missing {path}'
+          report=json.loads(report_path.read_text())
+          model=json.loads(model_path.read_text())
+          state=json.loads(state_path.read_text())
+          assert report.get('status') == 'LIVE_HOLDOUT_CONFIRMED', report.get('status')
+          assert report.get('safe_to_implement') is True
+          assert model.get('status') == 'LIVE_HOLDOUT_CONFIRMED'
+          assert model.get('version') == 'e4-v12-conditional-choice-ranker-v1'
+          assert state.get('version') == 'e4-v12-causal-runtime-state-v1'
+          forbidden={
+              'status_present','fresh_status_1s','fresh_status_5s','fresh_status_30s',
+              'fresh_status_120s','tweet_age_log','prior_handle_log','website_present',
+          }
+          features=set((model.get('ranker') or {}).get('features') or [])
+          assert not features & forbidden, features & forbidden
+          assert report['causality']['target'].startswith('state immediately before')
+          print(json.dumps({
+              'status': report['status'],
+              'live_holdout': report.get('live_holdout'),
+              'feature_count': len(features),
+              'state_coverage': state.get('coverage'),
+          }, indent=2, sort_keys=True))
+          PY
+
+      - name: Build candidate from current authoritative V12
+        run: |
+          git fetch origin codex/e4-v12-selection-reconstruction codex/e4-v12-matched-controls
+          git checkout -B codex/e4-v12-causal-entry-candidate origin/codex/e4-v12-selection-reconstruction
+          mkdir -p src/memecoin_bot tests scripts models/e4 .github/workflows
+          git show origin/codex/e4-v12-matched-controls:src/memecoin_bot/e4_causal_entry_v12.py > src/memecoin_bot/e4_causal_entry_v12.py
+          git show origin/codex/e4-v12-matched-controls:tests/test_v12_causal_entry_runtime.py > tests/test_v12_causal_entry_runtime.py
+          git show origin/codex/e4-v12-matched-controls:scripts/e4_v12_live_causal_choice_validate.py > scripts/e4_v12_live_causal_choice_validate.py
+          git show origin/codex/e4-v12-matched-controls:models/e4/research/e4-v12-runtime-choice-model.json > models/e4/e4-v12-causal-entry-model.json
+          git show origin/codex/e4-v12-matched-controls:models/e4/research/e4-v12-causal-runtime-state.json > models/e4/e4-v12-causal-entry-state.json
+          git show origin/codex/e4-v12-matched-controls:research/candidate-workflows/e4-v12-causal-entry-candidate-ci.yml > .github/workflows/e4-v12-causal-entry-candidate-ci.yml
+          git show origin/codex/e4-v12-matched-controls:research/candidate-workflows/e4-v12-causal-entry-fresh-live.yml > .github/workflows/e4-v12-causal-entry-fresh-live.yml
+
+      - name: Wire permanent V12 production and holdout imports
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          entry=Path('src/memecoin_bot/e4_exec/__main__.py')
+          text=entry.read_text()
+          if 'E4_V12_CAUSAL_ENTRY_ENABLED' not in text:
+              anchor='os.environ.setdefault(\n    "E4_BUILDER_COMMAND",\n    "node tools/e4-builder/race-proxy-v3.mjs",\n)\n'
+              replacement=anchor+'os.environ.setdefault("E4_V12_CAUSAL_ENTRY_ENABLED", "true")\n'
+              assert anchor in text
+              text=text.replace(anchor,replacement,1)
+          import_line='from memecoin_bot import e4_causal_entry_v12  # noqa: E402 - causal pre-impact choice authority\n'
+          if 'import e4_causal_entry_v12' not in text:
+              anchor='from memecoin_bot import e4_direct_copy_v12  # noqa: E402 - forced recognized-E4 execution\n'
+              assert anchor in text
+              text=text.replace(anchor,anchor+import_line,1)
+          entry.write_text(text)
+
+          holdout=Path('scripts/e4_300_launch_holdout_v12.py')
+          text=holdout.read_text()
+          if '\nimport os\n' not in text:
+              text=text.replace('import importlib.util\n','import importlib.util\nimport os\n',1)
+          marker='from pathlib import Path\n\n'
+          if 'E4_V12_CAUSAL_ENTRY_ENABLED' not in text:
+              assert marker in text
+              text=text.replace(marker,marker+'os.environ.setdefault("E4_V12_CAUSAL_ENTRY_ENABLED", "true")\n\n',1)
+          if 'import e4_causal_entry_v12' not in text:
+              anchor='from memecoin_bot import e4_direct_copy_v12 as direct_copy\n'
+              assert anchor in text
+              text=text.replace(anchor,anchor+'from memecoin_bot import e4_causal_entry_v12 as causal_entry  # noqa: F401\n',1)
+          holdout.write_text(text)
+
+          fingerprint=Path('scripts/e4_v12_forward_accumulate.py')
+          text=fingerprint.read_text()
+          additions=[
+              'src/memecoin_bot/e4_causal_entry_v12.py',
+              'models/e4/e4-v12-causal-entry-model.json',
+              'models/e4/e4-v12-causal-entry-state.json',
+          ]
+          start=text.index('FINGERPRINT_PATHS')
+          open_index=text.index('(',start)
+          close_index=text.index(')',open_index)
+          block=text[open_index+1:close_index]
+          missing=[value for value in additions if value not in block]
+          if missing:
+              insertion=''.join(f'    "{value}",\n' for value in missing)
+              text=text[:close_index]+insertion+text[close_index:]
+          fingerprint.write_text(text)
+
+          env=Path('.env.e4.example')
+          text=env.read_text()
+          if 'E4_V12_CAUSAL_ENTRY_ENABLED' not in text:
+              text += '''\n# V12 causal pre-impact choice authority. The model was frozen on chronological\n# E4 intent-vs-ignore data and excludes post-launch HTTP/social features.\nE4_V12_CAUSAL_ENTRY_ENABLED=true\nE4_V12_CAUSAL_MODEL_PATH=models/e4/e4-v12-causal-entry-model.json\nE4_V12_CAUSAL_STATE_PATH=models/e4/e4-v12-causal-entry-state.json\nE4_V12_CAUSAL_ENTRY_FRACTION=0.0185\nE4_V12_CAUSAL_CONFIRMATION_MS=1500\n'''
+              env.write_text(text)
+
+          Path('models/e4/e4-v12-causal-entry-trigger.txt').write_text(
+              'v12-causal-preimpact-choice-001\n'
+          )
+          Path('models/e4/e4-v12-evidence-epoch.txt').write_text(
+              'v12-causal-preimpact-choice-2026-09-04\n'
+          )
+          PY
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+
+      - name: Verify candidate before push
+        env:
+          E4_V12_CAUSAL_ENTRY_ENABLED: "true"
+          E4_PIPELINES_BACKGROUND: "false"
+        run: |
+          python -m unittest tests.test_v12_causal_entry_runtime -v
+          python -m unittest tests.test_v12_selection tests.test_v12_role_model_pipeline -v
+          python -m compileall -q src/memecoin_bot/e4_causal_entry_v12.py scripts/e4_v12_live_causal_choice_validate.py
+          python -c "import memecoin_bot.e4_exec.__main__; import memecoin_bot.e4_causal_entry_v12 as m; assert m.RUNTIME.active"
+
+      - name: Push candidate branch
+        run: |
+          git config user.name 'gambit-v12-causal-entry'
+          git config user.email 'actions@users.noreply.github.com'
+          git add \
+            src/memecoin_bot/e4_causal_entry_v12.py \
+            src/memecoin_bot/e4_exec/__main__.py \
+            tests/test_v12_causal_entry_runtime.py \
+            scripts/e4_300_launch_holdout_v12.py \
+            scripts/e4_v12_live_causal_choice_validate.py \
+            scripts/e4_v12_forward_accumulate.py \
+            models/e4/e4-v12-causal-entry-model.json \
+            models/e4/e4-v12-causal-entry-state.json \
+            models/e4/e4-v12-causal-entry-trigger.txt \
+            models/e4/e4-v12-evidence-epoch.txt \
+            .env.e4.example \
+            .github/workflows/e4-v12-causal-entry-candidate-ci.yml \
+            .github/workflows/e4-v12-causal-entry-fresh-live.yml
+          git commit -m 'feat(e4-v12): implement causal pre-impact choice authority'
+          git push --force-with-lease origin HEAD:codex/e4-v12-causal-entry-candidate
