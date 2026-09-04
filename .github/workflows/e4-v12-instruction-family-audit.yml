@@ -1,0 +1,39 @@
+name: E4 V12 instruction-family audit
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-preconfirm-adaptation
+    paths:
+      - "scripts/e4_v12_instruction_family_audit.py"
+      - "src/memecoin_bot/e4_preconfirm_v12.py"
+      - ".github/workflows/e4-v12-instruction-family-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+      - name: Audit most recent 30 captured direct E4 source transactions
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_v12_instruction_family_audit.py \
+            --limit 30 \
+            --concurrency 2 \
+            --output artifacts/e4-v12-instruction-family-audit.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e4-v12-instruction-family-${{ github.run_id }}
+          path: artifacts/e4-v12-instruction-family-audit.json
+          retention-days: 30
