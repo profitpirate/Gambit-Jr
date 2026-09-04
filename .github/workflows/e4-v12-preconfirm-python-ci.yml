@@ -1,0 +1,49 @@
+name: E4 V12 preconfirm Python gate
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-preconfirm-adaptation
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python-v12:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+
+      - name: Print adaptation fingerprints
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          for path in (
+              'src/memecoin_bot/e4_copy_fidelity_v12.py',
+              'src/memecoin_bot/e4_preconfirm_v12.py',
+          ):
+              print(f'{path}={hashlib.sha256(Path(path).read_bytes()).hexdigest()}')
+          PY
+
+      - name: Inherited E4 and permanent V12 regression
+        run: |
+          python -m unittest discover -s tests -p "test_e4*.py" -v
+          python -m unittest tests.test_v12_selection -v
+          python -m unittest tests.test_v12_role_model_pipeline -v
+          python -m unittest tests.test_v12_direct_copy -v
+          python -m unittest tests.test_v12_copy_only_evidence -v
+
+      - name: Adaptation tests
+        run: |
+          python -m unittest tests.test_v12_preconfirm -v
+          python -m unittest tests.test_v12_copy_fidelity -v
+          python -m compileall -q src/memecoin_bot/e4_copy_fidelity_v12.py src/memecoin_bot/e4_preconfirm_v12.py
