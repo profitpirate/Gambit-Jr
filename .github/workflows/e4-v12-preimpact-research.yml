@@ -6,6 +6,7 @@ on:
       - codex/e4-v12-preimpact-execution
     paths:
       - "scripts/e4_v12_preimpact_model.py"
+      - "scripts/e4_v12_creator_preimpact_model.py"
       - "tests/test_v12_preimpact_model.py"
       - ".github/workflows/e4-v12-preimpact-research.yml"
   workflow_dispatch:
@@ -41,7 +42,7 @@ jobs:
               --dir "samples/$run"
           done
 
-      - name: Learn on first four, judge on newest two
+      - name: Learn generic pre-impact shape on first four, judge on newest two
         run: |
           python scripts/e4_v12_preimpact_model.py \
             --train samples/33741470396/artifacts/e4-v12-forward-batch.json:samples/33741470396/artifacts/e4-v12-forward-batch-live-events.jsonl \
@@ -52,8 +53,19 @@ jobs:
             --holdout samples/33822988156/artifacts/e4-v12-forward-batch.json:samples/33822988156/artifacts/e4-v12-forward-batch-live-events.jsonl \
             --output artifacts/e4-v12-preimpact-model.json
 
+      - name: Learn causal repeat-E4 creator pre-impact gate
+        run: |
+          python scripts/e4_v12_creator_preimpact_model.py \
+            --train samples/33741470396/artifacts/e4-v12-forward-batch.json:samples/33741470396/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --train samples/33769636983/artifacts/e4-v12-forward-batch.json:samples/33769636983/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --train samples/33781389703/artifacts/e4-v12-forward-batch.json:samples/33781389703/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --train samples/33792881280/artifacts/e4-v12-forward-batch.json:samples/33792881280/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --holdout samples/33810753028/artifacts/e4-v12-forward-batch.json:samples/33810753028/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --holdout samples/33822988156/artifacts/e4-v12-forward-batch.json:samples/33822988156/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --output artifacts/e4-v12-creator-preimpact-model.json
+
       - uses: actions/upload-artifact@v4
         with:
           name: e4-v12-preimpact-${{ github.run_id }}
-          path: artifacts/e4-v12-preimpact-model.json
+          path: artifacts/e4-v12-*-preimpact-model.json
           retention-days: 30
