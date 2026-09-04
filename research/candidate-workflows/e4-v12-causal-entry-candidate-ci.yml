@@ -1,0 +1,67 @@
+name: E4 V12 causal-entry candidate CI
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-causal-entry-candidate
+  pull_request:
+    branches:
+      - codex/e4-v12-selection-reconstruction
+
+permissions:
+  contents: read
+
+env:
+  E4_V12_CAUSAL_ENTRY_ENABLED: "true"
+  E4_PIPELINES_BACKGROUND: "false"
+
+jobs:
+  candidate-ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt
+
+      - name: Verify causal model provenance and runtime feasibility
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          model=json.loads(Path('models/e4/e4-v12-causal-entry-model.json').read_text())
+          state=json.loads(Path('models/e4/e4-v12-causal-entry-state.json').read_text())
+          assert model['status'] == 'LIVE_HOLDOUT_CONFIRMED'
+          assert model['version'] == 'e4-v12-conditional-choice-ranker-v1'
+          assert state['version'] == 'e4-v12-causal-runtime-state-v1'
+          forbidden={
+              'status_present','fresh_status_1s','fresh_status_5s','fresh_status_30s',
+              'fresh_status_120s','tweet_age_log','prior_handle_log','website_present',
+          }
+          features=set(model['ranker']['features'])
+          assert not features & forbidden, features & forbidden
+          assert len(features)==len(model['ranker']['scale'])==len(model['ranker']['coefficient'])
+          print('causal model + state provenance verified')
+          PY
+
+      - name: Inherited E4 and V12 regression
+        run: |
+          python -m unittest discover -s tests -p "test_e4*.py" -v
+          python -m unittest tests.test_v12_selection -v
+          python -m unittest tests.test_v12_role_model_pipeline -v
+          python -m unittest tests.test_v12_evidence_epoch -v
+          python -m unittest tests.test_v12_copy_only_evidence -v
+          python -m unittest tests.test_v12_causal_entry_runtime -v
+
+      - name: Compile and import production authority
+        run: |
+          python -m compileall -q \
+            src/memecoin_bot/e4_causal_entry_v12.py \
+            src/memecoin_bot/e4_exec/__main__.py \
+            scripts/e4_300_launch_holdout_v12.py \
+            scripts/e4_v12_live_causal_choice_validate.py
+          python -c "import memecoin_bot.e4_exec.__main__; import memecoin_bot.e4_causal_entry_v12 as m; assert m.RUNTIME.active"
