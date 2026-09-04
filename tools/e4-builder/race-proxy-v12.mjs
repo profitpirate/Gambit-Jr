@@ -10,7 +10,7 @@ const repoRoot = path.resolve(here, "../..");
 const daemon = path.join(here, "daemon-v12.mjs");
 
 function resolvePreload(raw) {
-  if (!raw) return path.join(here, "fast-preload-v4.mjs");
+  if (!raw) return path.join(here, "exact-sol-preload-v12.mjs");
   if (path.isAbsolute(raw)) return raw;
   const candidates = [
     path.resolve(process.cwd(), raw),
