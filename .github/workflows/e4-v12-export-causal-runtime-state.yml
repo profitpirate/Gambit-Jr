@@ -1,0 +1,79 @@
+name: E4 V12 export causal runtime state
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - "scripts/e4_v12_export_causal_runtime_state.py"
+      - ".github/workflows/e4-v12-export-causal-runtime-state.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  export-state:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile exporter
+        run: |
+          python -m py_compile scripts/e4_v12_conclusive_entry_rerun.py
+          python -m py_compile scripts/e4_v12_export_causal_runtime_state.py
+
+      - name: Download ten chronological live samples and failed intentions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p samples cache/attempts artifacts
+          for run in 33741470396 33769636983 33781389703 33792881280 33810753028 33822988156 33835575805 33852482054 33876345997 33897368379; do
+            mkdir -p "samples/$run"
+            gh run download "$run" --repo profitpirate/Gambit-Jr --name "e4-v12-forward-$run" --dir "samples/$run"
+          done
+          gh run download 33883557623 --repo profitpirate/Gambit-Jr --dir cache/attempts/base
+          gh run download 33913332895 --repo profitpirate/Gambit-Jr --dir cache/attempts/latest || true
+
+      - name: Export runtime creator and first-buyer memory
+        run: |
+          python scripts/e4_v12_export_causal_runtime_state.py \
+            --pair samples/33741470396/artifacts/e4-v12-forward-batch.json:samples/33741470396/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33769636983/artifacts/e4-v12-forward-batch.json:samples/33769636983/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33781389703/artifacts/e4-v12-forward-batch.json:samples/33781389703/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33792881280/artifacts/e4-v12-forward-batch.json:samples/33792881280/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33810753028/artifacts/e4-v12-forward-batch.json:samples/33810753028/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33822988156/artifacts/e4-v12-forward-batch.json:samples/33822988156/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33835575805/artifacts/e4-v12-forward-batch.json:samples/33835575805/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33852482054/artifacts/e4-v12-forward-batch.json:samples/33852482054/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33876345997/artifacts/e4-v12-forward-batch.json:samples/33876345997/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --pair samples/33897368379/artifacts/e4-v12-forward-batch.json:samples/33897368379/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --attempts cache/attempts \
+            --output artifacts/e4-v12-causal-runtime-state.json
+
+      - name: Persist runtime state
+        run: |
+          mkdir -p models/e4/research
+          cp artifacts/e4-v12-causal-runtime-state.json models/e4/research/e4-v12-causal-runtime-state.json
+          git config user.name 'gambit-e4-research'
+          git config user.email 'actions@users.noreply.github.com'
+          git add models/e4/research/e4-v12-causal-runtime-state.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(e4-v12): persist causal runtime identity state [skip ci]'
+            git push origin HEAD:codex/e4-v12-matched-controls
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e4-v12-causal-runtime-state-${{ github.run_id }}
+          path: artifacts/e4-v12-causal-runtime-state.json
+          retention-days: 30
