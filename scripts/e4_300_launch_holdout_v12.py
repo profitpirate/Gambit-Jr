@@ -9,11 +9,17 @@ from pathlib import Path
 from memecoin_bot import e4_hardening_v12 as v12
 from memecoin_bot import e4_role_model_v12 as role_model
 from memecoin_bot import e4_direct_copy_v12 as direct_copy
+from memecoin_bot import e4_copy_fidelity_v12 as copy_fidelity
+from memecoin_bot import e4_preconfirm_v12 as preconfirm
 
 E4_V12_ROLE_MODEL_POLICY_SHA256 = "f4d5959b25f607bc667073b672d66570bf29d8d2b2020811605808ce08e032df"
-E4_V12_DIRECT_COPY_POLICY_SHA256 = "ed3e29edef1484a46a16858c303b97d0155ecf88aa63a23d95e6839592ee2f5e"
+E4_V12_DIRECT_COPY_POLICY_SHA256 = "b286da26c965420ce2146b396b76717cb79c681c1ea90e72120662d953a6bdc9"
+E4_V12_COPY_FIDELITY_POLICY_SHA256 = "f02f3bafd259fcfee918568397ebb83906681773a4958b5d58728ade500f0633"
+E4_V12_PRECONFIRM_POLICY_SHA256 = "3aef1c8ec287f529be4dd9314c383b748b818fe913e62639a3c0b52b29420961"
 role_model.assert_policy_fingerprint(E4_V12_ROLE_MODEL_POLICY_SHA256)
 direct_copy.assert_policy_fingerprint(E4_V12_DIRECT_COPY_POLICY_SHA256)
+copy_fidelity.assert_policy_fingerprint(E4_V12_COPY_FIDELITY_POLICY_SHA256)
+preconfirm.assert_policy_fingerprint(E4_V12_PRECONFIRM_POLICY_SHA256)
 
 
 def load_holdout():
@@ -39,7 +45,9 @@ if __name__ == "__main__":
             return None
         # Static creation metadata may be cached during capture. Economic and
         # E4-wallet signals are deliberately deferred until replay order so no
-        # future trade can leak into an earlier decision.
+        # future trade can leak into an earlier decision. Historical holdout
+        # data does not contain raw instruction bytes, so the preconfirm module
+        # is pinned here but cannot fabricate pre-E4 authority in replay.
         v12.v8.observe_context(event.mint, item)
         context = v12.v6._CONTEXT_BY_MINT.setdefault(event.mint, {})
         for key in ("creator", "name", "symbol", "uri", "token_program", "is_mayhem_mode"):
@@ -54,8 +62,6 @@ if __name__ == "__main__":
 
     def to_core_v12(self):
         event = previous_to_core(self)
-        # This is the exact point used by production Event.from_row: the market
-        # event becomes visible, the pipelines update, then policy.entry runs.
         role_model.observe_market_event(event)
         return event
 
@@ -72,10 +78,6 @@ if __name__ == "__main__":
         if trade is not None:
             return trade
 
-        # The base harness applies generic 8% buy slippage to every family.
-        # Production V12 treats an observed E4 entry as hard authority, so retry
-        # only that direct-copy family at the local builder's direct-copy ceiling.
-        # Creator/social paths keep their ordinary execution rules.
         profile = v12.v6._PROFILE_BY_MINT.get(mint)
         if profile is None or str(getattr(profile, "family", "")) != direct_copy.DIRECT_COPY_FAMILY:
             return None
