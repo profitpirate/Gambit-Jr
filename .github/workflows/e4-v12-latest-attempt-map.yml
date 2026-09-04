@@ -1,0 +1,66 @@
+name: E4 V12 newest live attempt map
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-matched-controls
+    paths:
+      - ".github/workflows/e4-v12-latest-attempt-map.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+env:
+  E4_PRIMARY_RPC_URL: ${{ secrets.E4_PRIMARY_RPC_URL }}
+  HELIUS_RPC_URL: ${{ secrets.HELIUS_RPC_URL }}
+
+jobs:
+  latest-attempts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e . -r requirements-e4.txt
+      - run: |
+          python -m py_compile scripts/e4_v12_full_wallet_history.py
+          python -m py_compile scripts/e4_v12_attempt_mint_forensics.py
+      - name: Download newest completed live 3000-launch sample
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source artifacts
+          gh run download 33897368379 \
+            --repo profitpirate/Gambit-Jr \
+            --name e4-v12-forward-33897368379 \
+            --dir source
+      - name: Retrieve newest E4 wallet transactions
+        continue-on-error: true
+        run: |
+          python scripts/e4_v12_full_wallet_history.py \
+            --max-pages 8 \
+            --max-transactions 6000 \
+            --concurrency 12 \
+            --output artifacts/e4-v12-latest-wallet-history.json
+      - name: Map every successful and failed E4 buy to a captured mint
+        run: |
+          python scripts/e4_v12_attempt_mint_forensics.py \
+            --full-history artifacts/e4-v12-latest-wallet-history.json \
+            --pair source/artifacts/e4-v12-forward-batch.json:source/artifacts/e4-v12-forward-batch-live-events.jsonl \
+            --concurrency 10 \
+            --timeout 12 \
+            --output artifacts/e4-v12-latest-attempt-mint-forensics.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-latest-attempt-map-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-latest-wallet-history.json
+            artifacts/e4-v12-latest-attempt-mint-forensics.json
+          if-no-files-found: warn
+          retention-days: 30
