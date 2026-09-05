@@ -1,0 +1,83 @@
+name: E4 V12 sub-10ms repair CI
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-sub10ms-entry-research-20260905
+    paths:
+      - "scripts/e4_v12_*.py"
+      - "src/memecoin_bot/e4_*_v12.py"
+      - "src/memecoin_bot/e4_exec_sub10ms/**"
+      - "tools/e4-builder/strict-race-proxy-v12.mjs"
+      - "tests/test_v12_*.py"
+      - ".github/workflows/e4-v12-sub10ms-repair-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/strict-race-proxy-v12.mjs"
+  E4_BUILDER_PRELOAD: "${{ github.workspace }}/tools/e4-builder/fast-preload-v4.mjs"
+  E4_V12_BUY_SLIPPAGE_BPS: "800"
+  E4_V12_MAX_OUTPUT_SHORTFALL_BPS: "800"
+
+concurrency:
+  group: e4-v12-sub10ms-repair-ci
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt scikit-learn joblib
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+
+      - name: Compile all repaired V12 modules
+        run: |
+          python -m compileall -q scripts src/memecoin_bot tests
+          node --check tools/e4-builder/strict-race-proxy-v12.mjs
+          E4_BUILDER_ALLOW_REMOTE_FALLBACK=false node tools/e4-builder/race-proxy-v3.mjs --self-test
+
+      - name: Targeted repaired-path tests
+        run: |
+          python -m unittest tests.test_v12_true_latency_replay -v
+          python -m unittest tests.test_v12_tight_output -v
+          python -m unittest tests.test_v12_strict_output_deferred -v
+          python -m unittest tests.test_v12_independent_exit_replay -v
+
+      - name: Full inherited E4 regressions
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+
+      - name: Exact guarded hot-path benchmark
+        run: |
+          mkdir -p artifacts
+          python -m scripts.e4_v12_hotpath_benchmark_v3 \
+            --iterations 750 \
+            --warmup 75 \
+            --maximum-p95-ms 10 \
+            --output artifacts/e4-v12-hotpath.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-sub10ms-repair-ci-${{ github.run_id }}
+          path: artifacts/e4-v12-hotpath.json
+          if-no-files-found: warn
+          retention-days: 30
