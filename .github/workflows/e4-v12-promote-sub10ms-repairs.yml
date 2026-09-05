@@ -1,0 +1,176 @@
+name: E4 V12 promote proven sub-10ms repairs
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-sub10ms-entry-research-20260905
+    paths:
+      - "research/e4-v12-promote-sub10ms-repairs-trigger*.txt"
+      - ".github/workflows/e4-v12-promote-sub10ms-repairs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  RESEARCH_BRANCH: codex/e4-v12-sub10ms-entry-research-20260905
+  AUTHORITATIVE_BRANCH: codex/e4-v12-selection-reconstruction
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/strict-race-proxy-v12.mjs"
+  E4_BUILDER_PRELOAD: "${{ github.workspace }}/authoritative/tools/e4-builder/fast-preload-v4.mjs"
+  E4_V12_BUY_SLIPPAGE_BPS: "800"
+  E4_V12_MAX_OUTPUT_SHORTFALL_BPS: "800"
+
+concurrency:
+  group: e4-v12-promote-sub10ms-repairs
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          fetch-depth: 0
+
+      - name: Create clean authoritative worktree and copy only repair files
+        run: |
+          git fetch origin "$RESEARCH_BRANCH" "$AUTHORITATIVE_BRANCH"
+          git worktree add authoritative "origin/$AUTHORITATIVE_BRANCH"
+          files=(
+            src/memecoin_bot/e4_tight_output_v12.py
+            src/memecoin_bot/e4_strict_output_v12.py
+            src/memecoin_bot/e4_strict_output_deferred_v12.py
+            src/memecoin_bot/e4_transport_v12.py
+            src/memecoin_bot/e4_transport_epoch_v12.py
+            tools/e4-builder/strict-race-proxy-v12.mjs
+            scripts/e4_v12_hotpath_benchmark.py
+            scripts/e4_v12_hotpath_benchmark_v3.py
+            scripts/e4_v12_end_to_end_latency_benchmark.py
+            tests/test_v12_tight_output.py
+            tests/test_v12_strict_output_deferred.py
+            tests/test_v12_transport.py
+            tests/test_v12_transport_epoch.py
+          )
+          for file in "${files[@]}"; do
+            git -C authoritative checkout "origin/$RESEARCH_BRANCH" -- "$file"
+          done
+
+      - name: Wire strict output and warmed simultaneous routing into permanent V12
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path=Path('authoritative/src/memecoin_bot/e4_exec/__main__.py')
+          text=path.read_text(encoding='utf-8')
+          text=text.replace(
+              'node tools/e4-builder/race-proxy-v3.mjs',
+              'node tools/e4-builder/strict-race-proxy-v12.mjs',
+          )
+          anchor='from memecoin_bot import e4_direct_copy_v12  # noqa: E402 - forced recognized-E4 execution\n'
+          imports=(
+              'from memecoin_bot import e4_tight_output_v12  # noqa: E402,F401 - bounded V12 buy protection\n'
+              'from memecoin_bot import e4_strict_output_v12  # noqa: E402,F401 - decision/output fidelity\n'
+              'from memecoin_bot import e4_strict_output_deferred_v12  # noqa: E402,F401 - post-enrichment guard\n'
+              'from memecoin_bot import e4_transport_epoch_v12  # noqa: E402,F401 - warm simultaneous fanout\n'
+          )
+          if imports not in text:
+              if anchor not in text:
+                  raise SystemExit('V12 entrypoint import anchor missing')
+              text=text.replace(anchor, anchor+imports)
+          path.write_text(text,encoding='utf-8')
+          PY
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e authoritative
+      - run: python -m pip install -r authoritative/requirements-e4.txt
+      - working-directory: authoritative/tools/e4-builder
+        run: npm install --omit=dev
+
+      - name: Compile the exact authoritative repair candidate
+        working-directory: authoritative
+        run: |
+          python -m compileall -q \
+            src/memecoin_bot/e4_tight_output_v12.py \
+            src/memecoin_bot/e4_strict_output_v12.py \
+            src/memecoin_bot/e4_strict_output_deferred_v12.py \
+            src/memecoin_bot/e4_transport_v12.py \
+            src/memecoin_bot/e4_transport_epoch_v12.py \
+            src/memecoin_bot/e4_exec/__main__.py \
+            scripts/e4_v12_hotpath_benchmark.py \
+            scripts/e4_v12_hotpath_benchmark_v3.py \
+            scripts/e4_v12_end_to_end_latency_benchmark.py
+          node --check tools/e4-builder/strict-race-proxy-v12.mjs
+          E4_BUILDER_ALLOW_REMOTE_FALLBACK=false node tools/e4-builder/race-proxy-v3.mjs --self-test
+
+      - name: Targeted strict-output and transport regressions
+        working-directory: authoritative
+        run: |
+          python -m unittest tests.test_v12_tight_output -v
+          python -m unittest tests.test_v12_strict_output_deferred -v
+          python -m unittest tests.test_v12_transport -v
+          python -m unittest tests.test_v12_transport_epoch -v
+
+      - name: Full inherited E4 regression
+        working-directory: authoritative
+        run: python -m unittest discover -s tests -p "test_e4*.py" -v
+
+      - name: Require guarded build-sign-dispatch below 10ms p95
+        working-directory: authoritative
+        run: |
+          mkdir -p artifacts
+          python -m scripts.e4_v12_end_to_end_latency_benchmark \
+            --iterations 1500 \
+            --warmup 150 \
+            --maximum-p95-ms 10 \
+            --output artifacts/e4-v12-end-to-end-latency.json
+          test "$(jq -r '.passed' artifacts/e4-v12-end-to-end-latency.json)" = true
+
+      - name: Prove permanent V12 imports the repaired path
+        working-directory: authoritative
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text=Path('src/memecoin_bot/e4_exec/__main__.py').read_text()
+          assert 'strict-race-proxy-v12.mjs' in text
+          assert 'e4_tight_output_v12' in text
+          assert 'e4_strict_output_deferred_v12' in text
+          assert 'e4_transport_epoch_v12' in text
+          assert 'e4-v12-sequential' not in text.lower()
+          print('Permanent V12 repair wiring verified')
+          PY
+
+      - name: Commit only after every repair gate passes
+        working-directory: authoritative
+        run: |
+          git config user.name 'gambit-v12-repair'
+          git config user.email 'actions@users.noreply.github.com'
+          printf '%s\n' 'v12-sub10ms-strict-output-warm-fanout' > models/e4/e4-v12-evidence-epoch.txt
+          git add \
+            src/memecoin_bot/e4_exec/__main__.py \
+            src/memecoin_bot/e4_tight_output_v12.py \
+            src/memecoin_bot/e4_strict_output_v12.py \
+            src/memecoin_bot/e4_strict_output_deferred_v12.py \
+            src/memecoin_bot/e4_transport_v12.py \
+            src/memecoin_bot/e4_transport_epoch_v12.py \
+            tools/e4-builder/strict-race-proxy-v12.mjs \
+            scripts/e4_v12_hotpath_benchmark.py \
+            scripts/e4_v12_hotpath_benchmark_v3.py \
+            scripts/e4_v12_end_to_end_latency_benchmark.py \
+            tests/test_v12_tight_output.py \
+            tests/test_v12_strict_output_deferred.py \
+            tests/test_v12_transport.py \
+            tests/test_v12_transport_epoch.py \
+            models/e4/e4-v12-evidence-epoch.txt
+          git commit -m 'fix(e4-v12): strict output and warmed sub-10ms fanout'
+          git push origin HEAD:"$AUTHORITATIVE_BRANCH"
