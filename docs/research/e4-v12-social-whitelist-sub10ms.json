@@ -1,0 +1,42 @@
+{
+  "build_ms": {
+    "count": 300,
+    "max": 28.455328,
+    "median": 9.483889000000001,
+    "p95": 18.836923,
+    "p99": 22.623659
+  },
+  "errors": [],
+  "output_shortfall_bps": 600,
+  "probes": 300,
+  "quote_to_route_ack_ms": {
+    "count": 300,
+    "max": 38.097252,
+    "median": 10.6484505,
+    "p95": 20.217389,
+    "p99": 24.020085
+  },
+  "route_receipts": {
+    "a": 351,
+    "b": 351
+  },
+  "sign_ms": {
+    "count": 300,
+    "max": 2.870466,
+    "median": 0.1680935,
+    "p95": 0.199001,
+    "p99": 0.29483
+  },
+  "stderr_tail": "",
+  "sub10ms_p95_pass": false,
+  "target": "decision-ready quote -> built -> signed -> all warm route requests acknowledged",
+  "version": "e4-v12-sub10ms-hot-path-v1",
+  "warm_local_route_ms": {
+    "count": 300,
+    "max": 9.385245,
+    "median": 0.9666815,
+    "p95": 1.243941,
+    "p99": 1.830826
+  },
+  "warmup": 50
+}
