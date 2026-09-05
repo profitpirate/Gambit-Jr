@@ -1,0 +1,355 @@
+name: E4 V12 golden multi-thesis v4
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-sub10ms-entry-research-20260905
+    paths:
+      - "scripts/e4_v12_reactive_output_guard_search.py"
+      - "scripts/e4_v12_reactive_output_guard_apply.py"
+      - ".github/workflows/e4-v12-golden-multithesis-v4.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  GH_TOKEN: ${{ github.token }}
+  REPO: profitpirate/Gambit-Jr
+  RESEARCH_BRANCH: codex/e4-v12-sub10ms-entry-research-20260905
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
+  E4_BUILDER_PRELOAD: "tools/e4-builder/fast-preload-v4.mjs"
+  E4_BUILDER_WORKERS: "2"
+  E4_BUILDER_RACE_CHILDREN: "4"
+  E4_BALANCE_CACHE_MAX_STALENESS_MS: "5000"
+  E4_DIRECT_COPY_MAX_OUTPUT_SHORTFALL_BPS: "600"
+
+concurrency:
+  group: e4-v12-golden-sub10ms-v2
+  cancel-in-progress: true
+
+jobs:
+  historical:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    outputs:
+      speed_outcome: ${{ steps.speed.outcome }}
+      selector_outcome: ${{ steps.selector.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt scikit-learn joblib
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+
+      - name: Compile and regression-test all repairs
+        run: |
+          python -m compileall -q \
+            src/memecoin_bot/e4_sub10ms_repairs_v12.py \
+            scripts/e4_v12_true_latency_replay.py \
+            scripts/e4_v12_golden_thesis_search_v2.py \
+            scripts/e4_v12_golden_thesis_search_v3.py \
+            scripts/e4_v12_golden_thesis_search_v4.py \
+            scripts/e4_v12_reactive_output_guard_search.py \
+            scripts/e4_v12_reactive_output_guard_apply.py \
+            scripts/e4_v12_sub10ms_benchmark.py
+          python -m unittest tests.test_e4_v12_true_latency_replay -v
+          python -m unittest discover -s tests -p "test_e4*.py" -v
+          python - <<'PY'
+          from pathlib import Path
+          text=Path('scripts/e4_v12_true_latency_replay.py').read_text()
+          assert 'hypothetical_scenarios' not in text
+          assert 'BuyExactSolIn minimum-token floor' in text
+          entry=Path('src/memecoin_bot/e4_exec/__main__.py').read_text()
+          assert 'e4_sub10ms_repairs_v12' in entry
+          PY
+
+      - name: Enforce repaired internal hot path
+        id: speed
+        continue-on-error: true
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_v12_sub10ms_benchmark.py \
+            --warmup 50 --probes 300 \
+            --output artifacts/e4-v12-sub10ms-benchmark.json
+
+      - name: Download ten chronological 3000-launch windows
+        run: |
+          mkdir -p historical
+          for run_id in \
+            33792881280 33810753028 33822988156 33835575805 33852482054 \
+            33876345997 33897368379 33911477030 33920757002 33931301493
+          do
+            mkdir -p "historical/$run_id"
+            gh run download "$run_id" --repo "$REPO" \
+              --name "e4-v12-forward-$run_id" --dir "historical/$run_id"
+          done
+          PAIRS=()
+          for run_id in \
+            33792881280 33810753028 33822988156 33835575805 33852482054 \
+            33876345997 33897368379 33911477030 33920757002 33931301493
+          do
+            batch="$(find "historical/$run_id" -name 'e4-v12-forward-batch.json' -print -quit)"
+            events="$(find "historical/$run_id" -name 'e4-v12-forward-batch-live-events.jsonl' -print -quit)"
+            test -s "$batch"; test -s "$events"
+            printf '%s\0%s\0%s\0' "$run_id" "$batch" "$events" >> /tmp/pairs.bin
+          done
+
+      - name: Search pre-impact profitable-intent thesis
+        id: preimpact
+        continue-on-error: true
+        run: |
+          PAIRS=()
+          while IFS= read -r -d '' run_id && IFS= read -r -d '' batch && IFS= read -r -d '' events; do
+            PAIRS+=(--pair "$run_id=$batch:$events")
+          done < /tmp/pairs.bin
+          python scripts/e4_v12_golden_thesis_search_v4.py \
+            --mode search "${PAIRS[@]}" \
+            --horizon-ms 1500 --minimum-lead-ms 12 \
+            --latencies-ms 0,1,2,5,10 \
+            --model-output artifacts/e4-v12-golden-preimpact-model.joblib \
+            --output artifacts/e4-v12-golden-preimpact.json
+
+      - name: Search E4-confirmed strict-output thesis
+        id: reactive
+        continue-on-error: true
+        run: |
+          PAIRS=()
+          while IFS= read -r -d '' run_id && IFS= read -r -d '' batch && IFS= read -r -d '' events; do
+            PAIRS+=(--pair "$run_id=$batch:$events")
+          done < /tmp/pairs.bin
+          python scripts/e4_v12_reactive_output_guard_search.py \
+            "${PAIRS[@]}" \
+            --latencies-ms 0,1,2,5,10 \
+            --output artifacts/e4-v12-golden-reactive.json
+
+      - name: Select only a fully historical-confirmed thesis
+        id: selector
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          candidates=[]
+          def score_grid(grid):
+              rows=list((grid or {}).values())
+              if not rows:return (0,0,0,0)
+              return (
+                  min(float(r.get('win_rate') or 0) for r in rows),
+                  min(float(r.get('wilson_low') or 0) for r in rows),
+                  min(float(r.get('profit_factor') or 0) for r in rows),
+                  sum(float(r.get('net_pnl_sol') or 0) for r in rows),
+              )
+          p=Path('artifacts/e4-v12-golden-preimpact.json')
+          if p.exists():
+              doc=json.loads(p.read_text())
+              if doc.get('status')=='HISTORICAL_GOLDEN_CONFIRMED':
+                  candidates.append((score_grid(doc.get('historical_holdout_economics')), 'PREIMPACT', p.name, doc))
+          p=Path('artifacts/e4-v12-golden-reactive.json')
+          if p.exists():
+              doc=json.loads(p.read_text())
+              if doc.get('status')=='HISTORICAL_GOLDEN_CONFIRMED':
+                  candidates.append((score_grid(doc.get('historical_holdout')), 'REACTIVE_OUTPUT_GUARD', p.name, doc))
+          candidates.sort(key=lambda row:row[0],reverse=True)
+          selected={
+              'version':'e4-v12-golden-selector-v4',
+              'status':'HISTORICAL_GOLDEN_CONFIRMED' if candidates else 'NOT_CONCLUSIVE',
+              'selected_family':candidates[0][1] if candidates else None,
+              'selected_report':candidates[0][2] if candidates else None,
+              'score':list(candidates[0][0]) if candidates else None,
+              'qualified_families':[row[1] for row in candidates],
+          }
+          Path('artifacts/e4-v12-golden-selector.json').write_text(json.dumps(selected,indent=2,sort_keys=True))
+          print(json.dumps(selected,indent=2,sort_keys=True))
+          if not candidates: raise SystemExit(1)
+          PY
+
+      - name: Persist truthful multi-thesis status
+        if: always()
+        env:
+          SPEED_OUTCOME: ${{ steps.speed.outcome }}
+          PREIMPACT_OUTCOME: ${{ steps.preimpact.outcome }}
+          REACTIVE_OUTCOME: ${{ steps.reactive.outcome }}
+          SELECTOR_OUTCOME: ${{ steps.selector.outcome }}
+          RUN_ID: ${{ github.run_id }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          mkdir -p docs/research models/e4/research
+          python - <<'PY'
+          import json,os,shutil
+          from pathlib import Path
+          def read(name):
+              p=Path('artifacts')/name
+              return json.loads(p.read_text()) if p.exists() else {}
+          speed=read('e4-v12-sub10ms-benchmark.json')
+          pre=read('e4-v12-golden-preimpact.json')
+          reactive=read('e4-v12-golden-reactive.json')
+          selector=read('e4-v12-golden-selector.json')
+          status={
+              'version':'e4-v12-golden-multithesis-status-v4',
+              'workflow_run':os.environ['RUN_ID'],
+              'head_sha':os.environ['HEAD_SHA'],
+              'steps':{
+                  'speed':os.environ.get('SPEED_OUTCOME'),
+                  'preimpact':os.environ.get('PREIMPACT_OUTCOME'),
+                  'reactive':os.environ.get('REACTIVE_OUTCOME'),
+                  'selector':os.environ.get('SELECTOR_OUTCOME'),
+              },
+              'sub10ms_pass':bool(speed.get('sub10ms_p95_pass')),
+              'quote_to_route_ack_ms':speed.get('quote_to_route_ack_ms'),
+              'preimpact_status':pre.get('status','NOT_PRODUCED'),
+              'reactive_status':reactive.get('status','NOT_PRODUCED'),
+              'selector':selector,
+              'ready_for_fresh_live':bool(speed.get('sub10ms_p95_pass') and selector.get('status')=='HISTORICAL_GOLDEN_CONFIRMED'),
+          }
+          Path('docs/research/e4-v12-golden-current-status.json').write_text(json.dumps(status,indent=2,sort_keys=True))
+          for source,target in (
+              ('e4-v12-sub10ms-benchmark.json','e4-v12-sub10ms-benchmark.json'),
+              ('e4-v12-golden-preimpact.json','e4-v12-golden-preimpact.json'),
+              ('e4-v12-golden-reactive.json','e4-v12-golden-reactive.json'),
+              ('e4-v12-golden-selector.json','e4-v12-golden-selector.json'),
+          ):
+              p=Path('artifacts')/source
+              if p.exists():shutil.copyfile(p,Path('docs/research')/target)
+          model=Path('artifacts/e4-v12-golden-preimpact-model.joblib')
+          if model.exists() and pre.get('status')=='HISTORICAL_GOLDEN_CONFIRMED':
+              shutil.copyfile(model,'models/e4/research/e4-v12-golden-preimpact-model.joblib')
+          print(json.dumps(status,indent=2,sort_keys=True))
+          PY
+          git config user.name 'gambit-v12-golden-research'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin "$RESEARCH_BRANCH"
+          git add docs/research models/e4/research 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(e4-v12): persist multi-thesis qualification [skip ci]'
+            git push origin HEAD:"$RESEARCH_BRANCH"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-golden-multithesis-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-sub10ms-benchmark.json
+            artifacts/e4-v12-golden-preimpact.json
+            artifacts/e4-v12-golden-preimpact-model.joblib
+            artifacts/e4-v12-golden-reactive.json
+            artifacts/e4-v12-golden-selector.json
+            docs/research/e4-v12-golden-current-status.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  untouched-live:
+    needs: historical
+    if: needs.historical.outputs.speed_outcome == 'success' && needs.historical.outputs.selector_outcome == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt scikit-learn joblib
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - uses: actions/download-artifact@v4
+        with:
+          name: e4-v12-golden-multithesis-${{ github.run_id }}
+          path: frozen
+
+      - name: Rehydrate historical state
+        run: |
+          mkdir -p historical
+          for run_id in \
+            33792881280 33810753028 33822988156 33835575805 33852482054 \
+            33876345997 33897368379 33911477030 33920757002 33931301493
+          do
+            mkdir -p "historical/$run_id"
+            gh run download "$run_id" --repo "$REPO" \
+              --name "e4-v12-forward-$run_id" --dir "historical/$run_id"
+            batch="$(find "historical/$run_id" -name 'e4-v12-forward-batch.json' -print -quit)"
+            events="$(find "historical/$run_id" -name 'e4-v12-forward-batch-live-events.jsonl' -print -quit)"
+            printf '%s\0%s\0%s\0' "$run_id" "$batch" "$events" >> /tmp/pairs.bin
+          done
+
+      - name: Capture untouched 3000 live launches
+        run: |
+          mkdir -p live artifacts
+          export E4_HOLDOUT_PROGRESS_PATH=live/e4-v12-golden-progress.json
+          python scripts/e4_300_launch_holdout_v12_sub10ms.py \
+            --target-launches 3000 --capture-seconds 14400 --tail-seconds 300 \
+            --heartbeat-seconds 60 --minimum-launches 3000 \
+            --wallet-signatures 1200 --builder-probes 0 \
+            --testnet-route-probes 0 --stress-iterations 0 \
+            --output live/e4-v12-golden-live-batch.json
+
+      - name: Apply exact frozen winning family
+        run: |
+          PAIRS=()
+          while IFS= read -r -d '' run_id && IFS= read -r -d '' batch && IFS= read -r -d '' events; do
+            PAIRS+=(--pair "$run_id=$batch:$events")
+          done < /tmp/pairs.bin
+          family="$(python -c "import json;print(json.load(open('frozen/e4-v12-golden-selector.json'))['selected_family'])")"
+          if [ "$family" = PREIMPACT ]; then
+            python scripts/e4_v12_golden_thesis_search_v4.py \
+              --mode apply "${PAIRS[@]}" \
+              --pair "${GITHUB_RUN_ID}=live/e4-v12-golden-live-batch.json:live/e4-v12-golden-live-batch-live-events.jsonl" \
+              --minimum-live-trades 3 \
+              --model-input frozen/e4-v12-golden-preimpact-model.joblib \
+              --output artifacts/e4-v12-golden-fresh-live.json
+          elif [ "$family" = REACTIVE_OUTPUT_GUARD ]; then
+            python scripts/e4_v12_reactive_output_guard_apply.py \
+              "${PAIRS[@]}" \
+              --pair "${GITHUB_RUN_ID}=live/e4-v12-golden-live-batch.json:live/e4-v12-golden-live-batch-live-events.jsonl" \
+              --minimum-live-trades 3 --latencies-ms 0,1,2,5,10 \
+              --rule frozen/e4-v12-golden-reactive.json \
+              --output artifacts/e4-v12-golden-fresh-live.json
+          else
+            echo "Unknown selected family: $family" >&2
+            exit 1
+          fi
+
+      - name: Persist fresh-live confirmation
+        run: |
+          mkdir -p docs/research
+          cp artifacts/e4-v12-golden-fresh-live.json docs/research/e4-v12-golden-fresh-live.json
+          git config user.name 'gambit-v12-golden-research'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin "$RESEARCH_BRANCH"
+          git add docs/research/e4-v12-golden-fresh-live.json
+          git commit -m 'research(e4-v12): persist untouched live golden confirmation [skip ci]'
+          git push origin HEAD:"$RESEARCH_BRANCH"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-golden-fresh-live-${{ github.run_id }}
+          path: |
+            live/e4-v12-golden-progress.json
+            live/e4-v12-golden-live-batch.json
+            live/e4-v12-golden-live-batch-live-events.jsonl
+            artifacts/e4-v12-golden-fresh-live.json
+          if-no-files-found: warn
+          retention-days: 30
