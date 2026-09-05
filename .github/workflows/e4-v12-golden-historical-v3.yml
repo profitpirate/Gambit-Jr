@@ -1,0 +1,181 @@
+name: E4 V12 golden thesis historical v3
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-sub10ms-entry-research-20260905
+    paths:
+      - "scripts/e4_v12_golden_thesis_search_v4.py"
+      - ".github/workflows/e4-v12-golden-historical-v3.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  GH_TOKEN: ${{ github.token }}
+  REPO: profitpirate/Gambit-Jr
+  RESEARCH_BRANCH: codex/e4-v12-sub10ms-entry-research-20260905
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
+  E4_BUILDER_PRELOAD: "tools/e4-builder/fast-preload-v4.mjs"
+  E4_BUILDER_WORKERS: "2"
+  E4_BUILDER_RACE_CHILDREN: "4"
+  E4_BALANCE_CACHE_MAX_STALENESS_MS: "5000"
+  E4_DIRECT_COPY_MAX_OUTPUT_SHORTFALL_BPS: "600"
+
+concurrency:
+  group: e4-v12-golden-sub10ms-v2
+  cancel-in-progress: true
+
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt scikit-learn joblib
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+
+      - name: Repair regression gate
+        run: |
+          python -m compileall -q \
+            src/memecoin_bot/e4_sub10ms_repairs_v12.py \
+            scripts/e4_v12_true_latency_replay.py \
+            scripts/e4_v12_golden_thesis_search_v2.py \
+            scripts/e4_v12_golden_thesis_search_v3.py \
+            scripts/e4_v12_golden_thesis_search_v4.py \
+            scripts/e4_v12_sub10ms_benchmark.py
+          python -m unittest tests.test_e4_v12_true_latency_replay -v
+          python -m unittest discover -s tests -p "test_e4*.py" -v
+          python - <<'PY'
+          from pathlib import Path
+          entry=Path('src/memecoin_bot/e4_exec/__main__.py').read_text()
+          assert 'e4_sub10ms_repairs_v12' in entry
+          assert 'E4_DIRECT_COPY_MAX_OUTPUT_SHORTFALL_BPS' in entry
+          replay=Path('scripts/e4_v12_true_latency_replay.py').read_text()
+          assert 'hypothetical_scenarios' not in replay
+          assert 'BuyExactSolIn minimum-token floor' in replay
+          PY
+
+      - name: Benchmark repaired internal hot path
+        id: speed
+        continue-on-error: true
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_v12_sub10ms_benchmark.py \
+            --warmup 50 --probes 300 \
+            --output artifacts/e4-v12-sub10ms-benchmark.json
+
+      - name: Download chronological launch evidence
+        run: |
+          mkdir -p historical
+          for run_id in \
+            33792881280 33810753028 33822988156 33835575805 33852482054 \
+            33876345997 33897368379 33911477030 33920757002 33931301493
+          do
+            mkdir -p "historical/$run_id"
+            gh run download "$run_id" --repo "$REPO" \
+              --name "e4-v12-forward-$run_id" --dir "historical/$run_id"
+          done
+
+      - name: Search chronological profitable-intent thesis
+        id: thesis
+        continue-on-error: true
+        run: |
+          PAIRS=()
+          for run_id in \
+            33792881280 33810753028 33822988156 33835575805 33852482054 \
+            33876345997 33897368379 33911477030 33920757002 33931301493
+          do
+            batch="$(find "historical/$run_id" -name 'e4-v12-forward-batch.json' -print -quit)"
+            events="$(find "historical/$run_id" -name 'e4-v12-forward-batch-live-events.jsonl' -print -quit)"
+            test -s "$batch"; test -s "$events"
+            PAIRS+=(--pair "$run_id=$batch:$events")
+          done
+          python scripts/e4_v12_golden_thesis_search_v4.py \
+            --mode search "${PAIRS[@]}" \
+            --horizon-ms 1500 --minimum-lead-ms 12 \
+            --latencies-ms 0,1,2,5,10 \
+            --model-output artifacts/e4-v12-golden-model.joblib \
+            --output artifacts/e4-v12-golden-historical.json
+
+      - name: Persist truthful qualification status
+        if: always()
+        env:
+          SPEED_OUTCOME: ${{ steps.speed.outcome }}
+          THESIS_OUTCOME: ${{ steps.thesis.outcome }}
+          RUN_ID: ${{ github.run_id }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          mkdir -p docs/research models/e4/research
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          speed={}
+          thesis={}
+          p=Path('artifacts/e4-v12-sub10ms-benchmark.json')
+          if p.exists(): speed=json.loads(p.read_text())
+          p=Path('artifacts/e4-v12-golden-historical.json')
+          if p.exists(): thesis=json.loads(p.read_text())
+          status={
+            'version':'e4-v12-golden-qualification-status-v3',
+            'workflow_run':os.environ['RUN_ID'],
+            'head_sha':os.environ['HEAD_SHA'],
+            'speed_step':os.environ.get('SPEED_OUTCOME'),
+            'thesis_step':os.environ.get('THESIS_OUTCOME'),
+            'sub10ms_pass':bool(speed.get('sub10ms_p95_pass')),
+            'quote_to_route_ack_ms':speed.get('quote_to_route_ack_ms'),
+            'thesis_status':thesis.get('status','NOT_PRODUCED'),
+            'validation_selection':thesis.get('validation_selection'),
+            'validation_economics':thesis.get('validation_economics'),
+            'historical_holdout_selection':thesis.get('historical_holdout_selection'),
+            'historical_holdout_economics':thesis.get('historical_holdout_economics'),
+            'ready_for_fresh_live':bool(speed.get('sub10ms_p95_pass') and thesis.get('status')=='HISTORICAL_GOLDEN_CONFIRMED'),
+          }
+          Path('docs/research/e4-v12-golden-current-status.json').write_text(json.dumps(status,indent=2,sort_keys=True))
+          if speed: Path('docs/research/e4-v12-sub10ms-benchmark.json').write_text(json.dumps(speed,indent=2,sort_keys=True))
+          if thesis: Path('docs/research/e4-v12-golden-historical.json').write_text(json.dumps(thesis,indent=2,sort_keys=True))
+          model=Path('artifacts/e4-v12-golden-model.joblib')
+          if model.exists() and thesis.get('status')=='HISTORICAL_GOLDEN_CONFIRMED':
+              Path('models/e4/research/e4-v12-golden-model.joblib').write_bytes(model.read_bytes())
+          print(json.dumps(status,indent=2,sort_keys=True))
+          PY
+          git config user.name 'gambit-v12-golden-research'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin "$RESEARCH_BRANCH"
+          git add docs/research/e4-v12-golden-current-status.json \
+            docs/research/e4-v12-sub10ms-benchmark.json \
+            docs/research/e4-v12-golden-historical.json \
+            models/e4/research/e4-v12-golden-model.joblib 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(e4-v12): persist golden qualification status [skip ci]'
+            git push origin HEAD:"$RESEARCH_BRANCH"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-golden-historical-v3-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-sub10ms-benchmark.json
+            artifacts/e4-v12-golden-historical.json
+            artifacts/e4-v12-golden-model.joblib
+            docs/research/e4-v12-golden-current-status.json
+          if-no-files-found: warn
+          retention-days: 30
