@@ -1,0 +1,73 @@
+name: E4 V12 golden success sentinel
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-sub10ms-entry-research-20260905
+    paths:
+      - "docs/research/e4-v12-*-fresh-live.json"
+      - ".github/workflows/e4-v12-golden-success-sentinel.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: e4-v12-golden-success-sentinel
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          fetch-depth: 0
+      - name: Require an untouched live high-WR proof at every tested latency
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          candidates=[]
+          for path in sorted(Path('docs/research').glob('e4-v12-*-fresh-live.json')):
+              try:
+                  doc=json.loads(path.read_text())
+              except Exception:
+                  continue
+              if doc.get('status')!='FRESH_LIVE_GOLDEN_CONFIRMED':
+                  continue
+              economics=doc.get('economics') or {}
+              required={'0.0','1.0','2.0','5.0','10.0'}
+              normal={str(float(key)):value for key,value in economics.items()}
+              if not required.issubset(normal):
+                  continue
+              rows=[normal[key] for key in sorted(required,key=float)]
+              if not all(
+                  int(row.get('closed') or 0)>=3
+                  and float(row.get('win_rate') or 0)>=0.65
+                  and float(row.get('net_pnl_sol') or 0)>0
+                  and float(row.get('profit_factor') or 0)>=1.25
+                  for row in rows
+              ):
+                  continue
+              candidates.append((path,doc))
+          if not candidates:
+              raise SystemExit('no qualifying untouched-live golden proof')
+          path,doc=candidates[-1]
+          Path('/tmp/winner.txt').write_text(str(path)+'\n')
+          Path('/tmp/winner.json').write_text(json.dumps(doc,indent=2,sort_keys=True))
+          print(path)
+          PY
+      - name: Commit success sentinel
+        run: |
+          printf 'FOUND\n' > research/e4-v12-golden-sentinel.txt
+          cp /tmp/winner.json docs/research/e4-v12-golden-winning-proof.json
+          git config user.name 'gambit-v12-golden-proof'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin codex/e4-v12-sub10ms-entry-research-20260905
+          git add research/e4-v12-golden-sentinel.txt docs/research/e4-v12-golden-winning-proof.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(e4-v12): golden thesis met untouched live 0-10ms gates [skip ci]'
+            git push origin HEAD:codex/e4-v12-sub10ms-entry-research-20260905
+          fi
