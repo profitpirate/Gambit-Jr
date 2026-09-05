@@ -1,0 +1,438 @@
+name: E4 V12 golden thesis master
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-sub10ms-entry-research-20260905
+    paths:
+      - ".github/workflows/e4-v12-golden-master.yml"
+      - "research/e4-v12-golden-master-trigger*.txt"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  GH_TOKEN: ${{ github.token }}
+  REPO: profitpirate/Gambit-Jr
+  SOURCE_BRANCH: codex/e4-v12-selection-reconstruction
+  RESEARCH_BRANCH: codex/e4-v12-sub10ms-entry-research-20260905
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/strict-race-proxy-v12.mjs"
+  E4_BUILDER_PRELOAD: "${{ github.workspace }}/tools/e4-builder/fast-preload-v4.mjs"
+  E4_V12_BUY_SLIPPAGE_BPS: "800"
+  E4_V12_MAX_OUTPUT_SHORTFALL_BPS: "800"
+
+concurrency:
+  group: e4-v12-golden-master
+  cancel-in-progress: true
+
+jobs:
+  candidate:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: failed-100
+            type: failed_preimpact
+            horizon: 100
+          - id: failed-500
+            type: failed_preimpact
+            horizon: 500
+          - id: failed-1000
+            type: failed_preimpact
+            horizon: 1000
+          - id: cluster-100
+            type: clustered_preimpact
+            horizon: 100
+          - id: cluster-500
+            type: clustered_preimpact
+            horizon: 500
+          - id: cluster-1000
+            type: clustered_preimpact
+            horizon: 1000
+          - id: reactive-lattice
+            type: reactive_lattice
+            horizon: 0
+          - id: reactive-independent
+            type: reactive_independent
+            horizon: 0
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt scikit-learn joblib
+
+      - name: Download ten chronological immutable live windows
+        run: |
+          mkdir -p historical artifacts
+          gh run list --repo "$REPO" \
+            --workflow e4-v12-selection-certification.yml \
+            --branch "$SOURCE_BRANCH" \
+            --status success \
+            --limit 18 \
+            --json databaseId,createdAt \
+            --jq 'sort_by(.createdAt) | .[-10:] | .[].databaseId' > /tmp/run_ids
+          test "$(wc -l < /tmp/run_ids)" -eq 10
+          while read -r run_id; do
+            mkdir -p "historical/$run_id"
+            gh run download "$run_id" --repo "$REPO" --name "e4-v12-forward-$run_id" --dir "historical/$run_id"
+            batch="$(find "historical/$run_id" -name 'e4-v12-forward-batch.json' -print -quit)"
+            events="$(find "historical/$run_id" -name 'e4-v12-forward-batch-live-events.jsonl' -print -quit)"
+            test -s "$batch"; test -s "$events"
+            printf '%s\t%s\t%s\n' "$run_id" "$batch" "$events" >> /tmp/pairs.tsv
+          done < /tmp/run_ids
+
+      - name: Build failed-intent registry when required
+        if: matrix.type == 'failed_preimpact'
+        run: |
+          git fetch origin codex/e4-v12-matched-controls
+          git worktree add matched origin/codex/e4-v12-matched-controls
+          python -m scripts.e4_v12_failed_intent_registry \
+            --source matched/docs \
+            --source matched/models \
+            --source matched/research \
+            --output artifacts/failed-intents.json
+          test "$(jq -r '.attempt_count // 0' artifacts/failed-intents.json)" -gt 0
+          echo "E4_FAILED_INTENT_REGISTRY=$GITHUB_WORKSPACE/artifacts/failed-intents.json" >> "$GITHUB_ENV"
+
+      - name: Search frozen candidate
+        continue-on-error: true
+        env:
+          CANDIDATE_TYPE: ${{ matrix.type }}
+          HORIZON_MS: ${{ matrix.horizon }}
+        run: |
+          args=()
+          while IFS=$'\t' read -r run_id batch events; do args+=(--pair "$batch:$events"); done < /tmp/pairs.tsv
+          case "$CANDIDATE_TYPE" in
+            failed_preimpact)
+              python -m scripts.e4_v12_preimpact_lattice_failed \
+                --mode search "${args[@]}" --horizon-ms "$HORIZON_MS" \
+                --latencies 0,1,2,5,10 --starting-balance-sol 3 \
+                --minimum-win-rate 0.65 --minimum-profit-factor 1.25 \
+                --output artifacts/report.json --model-output artifacts/model.json \
+                --predictions-output artifacts/holdout-predictions.json
+              ;;
+            clustered_preimpact)
+              python -m scripts.e4_v12_preimpact_lattice_clustered \
+                --mode search "${args[@]}" --horizon-ms "$HORIZON_MS" \
+                --latencies 0,1,2,5,10 --starting-balance-sol 3 \
+                --minimum-win-rate 0.65 --minimum-profit-factor 1.25 \
+                --output artifacts/report.json --model-output artifacts/model.json \
+                --predictions-output artifacts/holdout-predictions.json
+              ;;
+            reactive_lattice)
+              python -m scripts.e4_v12_reactive_lattice_registry_v3 \
+                --mode search "${args[@]}" --latencies 0,1,2,5,10 \
+                --starting-balance-sol 3 --minimum-win-rate 0.65 \
+                --minimum-profit-factor 1.25 --output artifacts/report.json \
+                --model-output artifacts/model.json \
+                --predictions-output artifacts/holdout-predictions.json
+              ;;
+            reactive_independent)
+              python -m scripts.e4_v12_reactive_independent_golden \
+                --mode search "${args[@]}" --latencies 0,1,2,5,10 \
+                --starting-balance-sol 3 --minimum-win-rate 0.65 \
+                --minimum-profit-factor 1.25 --policy-candidates 420 \
+                --retained-policies 32 --output artifacts/report.json \
+                --model-output artifacts/model.joblib \
+                --predictions-output artifacts/holdout-predictions.json
+              ;;
+            *) echo "unknown candidate type $CANDIDATE_TYPE" >&2; exit 2;;
+          esac
+
+      - name: Standardize candidate status
+        if: always()
+        env:
+          CANDIDATE_ID: ${{ matrix.id }}
+          CANDIDATE_TYPE: ${{ matrix.type }}
+          HORIZON_MS: ${{ matrix.horizon }}
+        run: |
+          status=NOT_CONCLUSIVE
+          if [ -s artifacts/report.json ]; then status="$(jq -r '.status // "NOT_CONCLUSIVE"' artifacts/report.json)"; fi
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          status='NOT_CONCLUSIVE'
+          if Path('artifacts/report.json').exists():
+              try: status=json.loads(Path('artifacts/report.json').read_text()).get('status','NOT_CONCLUSIVE')
+              except Exception: pass
+          payload={
+              'version':'e4-v12-golden-master-candidate-v1',
+              'id':os.environ['CANDIDATE_ID'],
+              'type':os.environ['CANDIDATE_TYPE'],
+              'horizon_ms':float(os.environ['HORIZON_MS']),
+              'status':status,
+          }
+          Path('artifacts/candidate.json').write_text(json.dumps(payload,indent=2,sort_keys=True))
+          Path('artifacts/status.txt').write_text(status+'\n')
+          print(json.dumps(payload,indent=2,sort_keys=True))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-master-candidate-${{ matrix.id }}-${{ github.run_id }}
+          path: |
+            artifacts/candidate.json
+            artifacts/status.txt
+            artifacts/report.json
+            artifacts/model.json
+            artifacts/model.joblib
+            artifacts/holdout-predictions.json
+            artifacts/failed-intents.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  select:
+    needs: candidate
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      status: ${{ steps.choose.outputs.status }}
+      type: ${{ steps.choose.outputs.type }}
+      id: ${{ steps.choose.outputs.id }}
+      horizon: ${{ steps.choose.outputs.horizon }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: e4-v12-master-candidate-*-${{ github.run_id }}
+          path: candidates
+
+      - name: Choose strongest historical candidate without touching live data
+        id: choose
+        run: |
+          python - <<'PY'
+          import json, math, shutil
+          from pathlib import Path
+
+          choices=[]
+          for meta_path in Path('candidates').rglob('candidate.json'):
+              root=meta_path.parent
+              meta=json.loads(meta_path.read_text())
+              report_path=root/'report.json'
+              if meta.get('status')!='HISTORICAL_HOLDOUT_CONFIRMED' or not report_path.exists():
+                  continue
+              report=json.loads(report_path.read_text())
+              blocks=report.get('holdout') or {}
+              if not isinstance(blocks,dict) or not blocks:
+                  continue
+              values=[block for block in blocks.values() if isinstance(block,dict) and ('win_rate' in block or 'trades' in block)]
+              if not values:
+                  continue
+              score=(
+                  min(float(block.get('win_rate') or 0) for block in values),
+                  min(float(block.get('wilson_low') or 0) for block in values),
+                  min(float(block.get('profit_factor') or 0) for block in values),
+                  sum(float(block.get('net_pnl_sol') or 0) for block in values),
+                  min(int(block.get('trades') or 0) for block in values),
+              )
+              choices.append((score,meta,root,report))
+          choices.sort(key=lambda item:item[0],reverse=True)
+          out=Path('selected'); out.mkdir()
+          if not choices:
+              selected={'version':'e4-v12-golden-master-selection-v1','status':'NOT_CONCLUSIVE','type':'none','id':'none','horizon_ms':0}
+          else:
+              score,meta,root,report=choices[0]
+              selected={'version':'e4-v12-golden-master-selection-v1','status':'HISTORICAL_HOLDOUT_CONFIRMED','type':meta['type'],'id':meta['id'],'horizon_ms':meta['horizon_ms'],'score':list(score)}
+              shutil.copyfile(root/'report.json',out/'report.json')
+              for name in ('model.json','model.joblib','failed-intents.json'):
+                  source=root/name
+                  if source.exists(): shutil.copyfile(source,out/name)
+          (out/'selection.json').write_text(json.dumps(selected,indent=2,sort_keys=True))
+          (out/'status.txt').write_text(selected['status']+'\n')
+          (out/'type.txt').write_text(selected['type']+'\n')
+          (out/'id.txt').write_text(selected['id']+'\n')
+          (out/'horizon.txt').write_text(str(selected['horizon_ms'])+'\n')
+          print(json.dumps(selected,indent=2,sort_keys=True))
+          PY
+          echo "status=$(cat selected/status.txt)" >> "$GITHUB_OUTPUT"
+          echo "type=$(cat selected/type.txt)" >> "$GITHUB_OUTPUT"
+          echo "id=$(cat selected/id.txt)" >> "$GITHUB_OUTPUT"
+          echo "horizon=$(cat selected/horizon.txt)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e4-v12-master-selected-${{ github.run_id }}
+          path: selected
+          retention-days: 30
+
+  untouched-live:
+    needs: select
+    if: needs.select.outputs.status == 'HISTORICAL_HOLDOUT_CONFIRMED'
+    runs-on: ubuntu-latest
+    timeout-minutes: 480
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt scikit-learn joblib
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - uses: actions/download-artifact@v4
+        with:
+          name: e4-v12-master-selected-${{ github.run_id }}
+          path: selected
+
+      - name: Prove exact guarded receive-to-signed hot path below 10ms p95
+        run: |
+          python -m unittest tests.test_v12_true_latency_replay tests.test_v12_tight_output tests.test_v12_strict_output_deferred tests.test_v12_independent_exit_replay -v
+          mkdir -p artifacts
+          python -m scripts.e4_v12_hotpath_benchmark_v3 --iterations 1000 --warmup 100 --maximum-p95-ms 10 --output artifacts/hotpath.json
+
+      - name: Restore exact historical context
+        run: |
+          mkdir -p historical
+          gh run list --repo "$REPO" --workflow e4-v12-selection-certification.yml --branch "$SOURCE_BRANCH" --status success --limit 18 --json databaseId,createdAt --jq 'sort_by(.createdAt) | .[-10:] | .[].databaseId' > /tmp/run_ids
+          while read -r run_id; do
+            mkdir -p "historical/$run_id"
+            gh run download "$run_id" --repo "$REPO" --name "e4-v12-forward-$run_id" --dir "historical/$run_id"
+            batch="$(find "historical/$run_id" -name 'e4-v12-forward-batch.json' -print -quit)"
+            events="$(find "historical/$run_id" -name 'e4-v12-forward-batch-live-events.jsonl' -print -quit)"
+            printf '%s\t%s\t%s\n' "$run_id" "$batch" "$events" >> /tmp/history-pairs.tsv
+          done < /tmp/run_ids
+          if [ -s selected/failed-intents.json ]; then echo "E4_FAILED_INTENT_REGISTRY=$GITHUB_WORKSPACE/selected/failed-intents.json" >> "$GITHUB_ENV"; fi
+
+      - name: Capture brand-new untouched 3000-launch live window
+        run: |
+          export E4_HOLDOUT_PROGRESS_PATH=artifacts/live-progress.json
+          python scripts/e4_300_launch_holdout_v12.py \
+            --target-launches 3000 --capture-seconds 14400 --tail-seconds 300 \
+            --heartbeat-seconds 60 --minimum-launches 3000 --wallet-signatures 1500 \
+            --builder-probes 250 --testnet-route-probes 0 --stress-iterations 0 \
+            --output artifacts/live-batch.json
+
+      - name: Apply the single frozen historical winner
+        env:
+          SELECTED_TYPE: ${{ needs.select.outputs.type }}
+          SELECTED_HORIZON: ${{ needs.select.outputs.horizon }}
+        run: |
+          args=()
+          while IFS=$'\t' read -r run_id batch events; do args+=(--pair "$batch:$events"); done < /tmp/history-pairs.tsv
+          args+=(--pair "artifacts/live-batch.json:artifacts/live-batch-live-events.jsonl")
+          case "$SELECTED_TYPE" in
+            failed_preimpact)
+              python -m scripts.e4_v12_preimpact_lattice_failed --mode apply "${args[@]}" --horizon-ms "$SELECTED_HORIZON" --model-input selected/model.json --output artifacts/live-apply.json --model-output artifacts/live-unused.json --predictions-output artifacts/live-predictions.json
+              jq -r '.rule.guard_bps' selected/model.json > artifacts/live-guard.txt
+              ;;
+            clustered_preimpact)
+              python -m scripts.e4_v12_preimpact_lattice_clustered --mode apply "${args[@]}" --horizon-ms "$SELECTED_HORIZON" --model-input selected/model.json --output artifacts/live-apply.json --model-output artifacts/live-unused.json --predictions-output artifacts/live-predictions.json
+              jq -r '.rule.guard_bps' selected/model.json > artifacts/live-guard.txt
+              ;;
+            reactive_lattice)
+              python -m scripts.e4_v12_reactive_lattice_registry_v3 --mode apply "${args[@]}" --model-input selected/model.json --output artifacts/live-apply.json --model-output artifacts/live-unused.json --predictions-output artifacts/live-predictions.json
+              jq -r '.rule.guard_bps' selected/model.json > artifacts/live-guard.txt
+              ;;
+            reactive_independent)
+              python -m scripts.e4_v12_reactive_independent_golden --mode apply "${args[@]}" --model-input selected/model.joblib --output artifacts/live-apply.json --model-output artifacts/live-unused.joblib --predictions-output artifacts/live-predictions.json --policy-output artifacts/live-policy.json --guard-output artifacts/live-guard.txt
+              ;;
+            *) echo "unsupported selected type $SELECTED_TYPE" >&2; exit 2;;
+          esac
+
+      - name: Recalculate fresh economics independently at 0,1,2,5,10ms
+        env:
+          SELECTED_TYPE: ${{ needs.select.outputs.type }}
+        run: |
+          guard="$(cat artifacts/live-guard.txt)"
+          if [ "$SELECTED_TYPE" = reactive_independent ]; then
+            python -m scripts.e4_v12_independent_exit_replay_v2 \
+              --events artifacts/live-batch-live-events.jsonl \
+              --predictions artifacts/live-predictions.json \
+              --policy artifacts/live-policy.json \
+              --latencies 0,1,2,5,10 --starting-balance-sol 3 --reserve-sol 0.03 \
+              --fee-bps 125 --max-output-shortfall-bps "$guard" --max-concurrent 2 \
+              --output artifacts/live-economics.json
+          else
+            python -m scripts.e4_v12_true_latency_replay_v3 \
+              --batch artifacts/live-batch.json \
+              --events artifacts/live-batch-live-events.jsonl \
+              --predictions artifacts/live-predictions.json \
+              --latencies 0,1,2,5,10 --starting-balance-sol 3 --entry-fraction 0.0185 \
+              --fee-bps 125 --max-output-shortfall-bps "$guard" --confirmation-ms 1500 \
+              --max-concurrent 2 --output artifacts/live-economics.json
+          fi
+
+      - name: Enforce the untouched live golden gate
+        env:
+          SELECTED_TYPE: ${{ needs.select.outputs.type }}
+        run: |
+          python - <<'PY'
+          import json, math, os
+          from pathlib import Path
+          data=json.loads(Path('artifacts/live-economics.json').read_text())
+          rows={}; passed=True
+          independent=os.environ['SELECTED_TYPE']=='reactive_independent'
+          for latency,block in data['results'].items():
+              m=block['metrics'] if independent else block['all_predictions']
+              n=int(m.get('trades') if independent else m.get('closed') or 0)
+              w=int(m.get('wins') or 0); wr=float(m.get('win_rate') or 0); pnl=float(m.get('net_pnl_sol') or 0)
+              raw=m.get('profit_factor'); pf=float(raw) if raw is not None and math.isfinite(float(raw)) else (999.0 if pnl>0 and n>0 and w==n else 0.0)
+              if n:
+                  z=1.96; p=w/n; den=1+z*z/n; low=max(0.0,(p+z*z/(2*n)-z*math.sqrt((p*(1-p)+z*z/(4*n))/n))/den)
+              else: low=0.0
+              ok=n>=4 and wr>=0.65 and low>=0.30 and pnl>0 and pf>=1.25
+              rows[latency]={'trades':n,'wins':w,'win_rate':wr,'wilson_low':low,'net_pnl_sol':pnl,'profit_factor':pf,'passed':ok}; passed=passed and ok
+          selection=json.loads(Path('selected/selection.json').read_text())
+          verdict={'version':'e4-v12-golden-master-live-v1','status':'FOUND_LIVE_SUB10MS_GOLDEN_THESIS' if passed else 'NOT_CONCLUSIVE','selected':selection,'latencies':rows,'untouched_live':True,'starting_balance_sol':3.0,'no_live_tuning':True,'hotpath_p95_under_10ms_required':True}
+          Path('artifacts/live-verdict.json').write_text(json.dumps(verdict,indent=2,sort_keys=True)); Path('artifacts/live-status.txt').write_text(verdict['status']+'\n'); print(json.dumps(verdict,indent=2,sort_keys=True))
+          if not passed: raise SystemExit(1)
+          PY
+
+      - name: Persist only a fully live-confirmed golden thesis
+        if: success()
+        run: |
+          mkdir -p docs/research models/e4/research
+          cp selected/selection.json docs/research/e4-v12-golden-master-selection.json
+          cp selected/report.json docs/research/e4-v12-golden-master-report.json
+          cp artifacts/live-verdict.json docs/research/e4-v12-golden-master-live-verdict.json
+          cp selected/model.json models/e4/research/e4-v12-golden-master-model.json 2>/dev/null || true
+          cp selected/model.joblib models/e4/research/e4-v12-golden-master-model.joblib 2>/dev/null || true
+          git config user.name 'gambit-v12-research'
+          git config user.email 'actions@users.noreply.github.com'
+          git add docs/research/e4-v12-golden-master-selection.json docs/research/e4-v12-golden-master-report.json docs/research/e4-v12-golden-master-live-verdict.json models/e4/research/e4-v12-golden-master-model.*
+          if ! git diff --cached --quiet; then git commit -m 'research(e4-v12): persist untouched-live sub-10ms golden thesis [skip ci]'; git push origin HEAD:"$RESEARCH_BRANCH"; fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-golden-master-live-${{ github.run_id }}
+          path: |
+            artifacts/hotpath.json
+            artifacts/live-progress.json
+            artifacts/live-batch.json
+            artifacts/live-batch-live-events.jsonl
+            artifacts/live-predictions.json
+            artifacts/live-policy.json
+            artifacts/live-guard.txt
+            artifacts/live-economics.json
+            artifacts/live-verdict.json
+            artifacts/live-status.txt
+          if-no-files-found: warn
+          retention-days: 30
