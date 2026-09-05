@@ -1,0 +1,67 @@
+name: Gambit Jr lifetime effort audit
+
+on:
+  push:
+    branches:
+      - audit/gambit-jr-lifetime-hours-20260905
+    paths:
+      - ".github/workflows/gambit-jr-lifetime-effort-audit.yml"
+      - "scripts/gambit_jr_lifetime_effort_audit.py"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: gambit-jr-lifetime-effort-audit
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: audit/gambit-jr-lifetime-hours-20260905
+          fetch-depth: 0
+
+      - name: Fetch every repository branch
+        run: |
+          git fetch origin '+refs/heads/*:refs/remotes/origin/*' --prune
+          git branch -r
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Calculate lifetime effort and automation runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p artifacts docs/audit
+          python scripts/gambit_jr_lifetime_effort_audit.py \
+            --repo "$GITHUB_REPOSITORY" \
+            --json-output artifacts/gambit-jr-lifetime-effort.json \
+            --markdown-output artifacts/gambit-jr-lifetime-effort.md
+          cp artifacts/gambit-jr-lifetime-effort.json docs/audit/gambit-jr-lifetime-effort.json
+          cp artifacts/gambit-jr-lifetime-effort.md docs/audit/gambit-jr-lifetime-effort.md
+
+      - name: Persist the audit snapshot
+        run: |
+          git config user.name 'gambit-jr-audit'
+          git config user.email 'actions@users.noreply.github.com'
+          git add docs/audit/gambit-jr-lifetime-effort.json docs/audit/gambit-jr-lifetime-effort.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'docs(audit): persist Gambit Jr lifetime effort snapshot [skip ci] [lifetime-audit]'
+            git push origin HEAD:audit/gambit-jr-lifetime-hours-20260905
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gambit-jr-lifetime-effort-${{ github.run_id }}
+          path: artifacts/gambit-jr-lifetime-effort.*
+          if-no-files-found: warn
+          retention-days: 30
