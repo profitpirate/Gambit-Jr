@@ -1,0 +1,249 @@
+name: E4 V12 reactive lattice golden thesis
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-sub10ms-entry-research-20260905
+    paths:
+      - ".github/workflows/e4-v12-reactive-lattice-golden.yml"
+      - "scripts/e4_v12_reactive_lattice_search.py"
+      - "scripts/e4_v12_reactive_profit_model.py"
+      - "research/e4-v12-reactive-lattice-trigger*.txt"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  GH_TOKEN: ${{ github.token }}
+  REPO: profitpirate/Gambit-Jr
+  SOURCE_BRANCH: codex/e4-v12-selection-reconstruction
+  RESEARCH_BRANCH: codex/e4-v12-sub10ms-entry-research-20260905
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/strict-race-proxy-v12.mjs"
+  E4_BUILDER_PRELOAD: "${{ github.workspace }}/tools/e4-builder/fast-preload-v4.mjs"
+  E4_V12_BUY_SLIPPAGE_BPS: "800"
+  E4_V12_MAX_OUTPUT_SHORTFALL_BPS: "800"
+
+concurrency:
+  group: e4-v12-reactive-lattice-golden
+  cancel-in-progress: true
+
+jobs:
+  historical:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    outputs:
+      status: ${{ steps.status.outputs.status }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt scikit-learn joblib
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+
+      - name: Regress exact replay and strict execution
+        run: |
+          python -m unittest tests.test_v12_true_latency_replay -v
+          python -m unittest tests.test_v12_tight_output -v
+          python -m unittest tests.test_v12_strict_output_deferred -v
+          python -m unittest discover -s tests -p "test_e4*.py" -v
+          python -m compileall -q \
+            scripts/e4_v12_reactive_lattice_search.py \
+            scripts/e4_v12_reactive_profit_model.py \
+            scripts/e4_v12_true_latency_replay.py \
+            scripts/e4_v12_true_latency_replay_v2.py \
+            scripts/e4_v12_hotpath_benchmark_v3.py \
+            src/memecoin_bot/e4_tight_output_v12.py \
+            src/memecoin_bot/e4_strict_output_v12.py \
+            src/memecoin_bot/e4_strict_output_deferred_v12.py \
+            src/memecoin_bot/e4_exec_sub10ms/__main__.py
+          node --check tools/e4-builder/strict-race-proxy-v12.mjs
+          E4_BUILDER_ALLOW_REMOTE_FALLBACK=false node tools/e4-builder/race-proxy-v3.mjs --self-test
+          mkdir -p artifacts
+          python -m scripts.e4_v12_hotpath_benchmark_v3 --iterations 500 --warmup 50 --maximum-p95-ms 10 --output artifacts/hotpath.json
+
+      - name: Download ten chronological immutable live windows
+        run: |
+          mkdir -p historical
+          gh run list --repo "$REPO" --workflow e4-v12-selection-certification.yml --branch "$SOURCE_BRANCH" --status success --limit 16 --json databaseId,createdAt --jq 'sort_by(.createdAt) | .[-10:] | .[].databaseId' > /tmp/run_ids
+          test "$(wc -l < /tmp/run_ids)" -eq 10
+          while read -r run_id; do
+            mkdir -p "historical/$run_id"
+            gh run download "$run_id" --repo "$REPO" --name "e4-v12-forward-$run_id" --dir "historical/$run_id"
+            batch="$(find "historical/$run_id" -name 'e4-v12-forward-batch.json' -print -quit)"
+            events="$(find "historical/$run_id" -name 'e4-v12-forward-batch-live-events.jsonl' -print -quit)"
+            test -s "$batch"; test -s "$events"
+            printf '%s\t%s\t%s\n' "$run_id" "$batch" "$events" >> /tmp/pairs.tsv
+          done < /tmp/run_ids
+
+      - name: Freeze deterministic one/two-clause lattice
+        continue-on-error: true
+        run: |
+          args=()
+          while IFS=$'\t' read -r run_id batch events; do args+=(--pair "$batch:$events"); done < /tmp/pairs.tsv
+          python -m scripts.e4_v12_reactive_lattice_search \
+            --mode search "${args[@]}" \
+            --latencies 0,1,2,5,10 \
+            --starting-balance-sol 3 \
+            --minimum-win-rate 0.65 \
+            --minimum-profit-factor 1.25 \
+            --output artifacts/report.json \
+            --model-output artifacts/model.json \
+            --predictions-output artifacts/holdout-predictions.json
+
+      - name: Publish status
+        id: status
+        if: always()
+        run: |
+          status=NOT_CONCLUSIVE
+          if [ -s artifacts/report.json ]; then status="$(jq -r '.status // "NOT_CONCLUSIVE"' artifacts/report.json)"; fi
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          printf '%s\n' "$status" > artifacts/status.txt
+          echo "Reactive lattice thesis status: $status"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-reactive-lattice-historical-${{ github.run_id }}
+          path: |
+            artifacts/hotpath.json
+            artifacts/report.json
+            artifacts/model.json
+            artifacts/holdout-predictions.json
+            artifacts/status.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+  untouched-live:
+    needs: historical
+    if: needs.historical.outputs.status == 'HISTORICAL_HOLDOUT_CONFIRMED'
+    runs-on: ubuntu-latest
+    timeout-minutes: 480
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt scikit-learn joblib
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - uses: actions/download-artifact@v4
+        with:
+          name: e4-v12-reactive-lattice-historical-${{ github.run_id }}
+          path: artifacts
+
+      - name: Restore frozen causal history
+        run: |
+          mkdir -p historical
+          gh run list --repo "$REPO" --workflow e4-v12-selection-certification.yml --branch "$SOURCE_BRANCH" --status success --limit 16 --json databaseId,createdAt --jq 'sort_by(.createdAt) | .[-10:] | .[].databaseId' > /tmp/run_ids
+          while read -r run_id; do
+            mkdir -p "historical/$run_id"
+            gh run download "$run_id" --repo "$REPO" --name "e4-v12-forward-$run_id" --dir "historical/$run_id"
+            batch="$(find "historical/$run_id" -name 'e4-v12-forward-batch.json' -print -quit)"
+            events="$(find "historical/$run_id" -name 'e4-v12-forward-batch-live-events.jsonl' -print -quit)"
+            printf '%s\t%s\t%s\n' "$run_id" "$batch" "$events" >> /tmp/history-pairs.tsv
+          done < /tmp/run_ids
+
+      - name: Capture untouched 3000-launch live window
+        run: |
+          export E4_HOLDOUT_PROGRESS_PATH=artifacts/live-progress.json
+          python scripts/e4_300_launch_holdout_v12.py --target-launches 3000 --capture-seconds 14400 --tail-seconds 300 --heartbeat-seconds 60 --minimum-launches 3000 --wallet-signatures 1500 --builder-probes 250 --testnet-route-probes 0 --stress-iterations 0 --output artifacts/live-batch.json
+
+      - name: Apply frozen lattice without live tuning
+        run: |
+          args=()
+          while IFS=$'\t' read -r run_id batch events; do args+=(--pair "$batch:$events"); done < /tmp/history-pairs.tsv
+          args+=(--pair "artifacts/live-batch.json:artifacts/live-batch-live-events.jsonl")
+          python -m scripts.e4_v12_reactive_lattice_search \
+            --mode apply "${args[@]}" \
+            --model-input artifacts/model.json \
+            --output artifacts/live-apply.json \
+            --model-output artifacts/live-unused.json \
+            --predictions-output artifacts/live-predictions.json
+          jq -r '.rule.guard_bps' artifacts/model.json > artifacts/live-guard-bps.txt
+
+      - name: True 0-10ms fresh replay
+        run: |
+          guard="$(cat artifacts/live-guard-bps.txt)"
+          python -m scripts.e4_v12_true_latency_replay_v2 \
+            --batch artifacts/live-batch.json \
+            --events artifacts/live-batch-live-events.jsonl \
+            --predictions artifacts/live-predictions.json \
+            --latencies 0,1,2,5,10 \
+            --starting-balance-sol 3 \
+            --entry-fraction 0.0185 \
+            --fee-bps 125 \
+            --max-output-shortfall-bps "$guard" \
+            --confirmation-ms 1500 \
+            --max-concurrent 2 \
+            --output artifacts/live-economics.json
+
+      - name: Enforce untouched live golden gate
+        run: |
+          python - <<'PY'
+          import json, math
+          from pathlib import Path
+          data=json.loads(Path('artifacts/live-economics.json').read_text())
+          rows={}; passed=True
+          for latency,block in data['results'].items():
+              m=block['all_predictions']; n=int(m.get('closed') or 0); w=int(m.get('wins') or 0); wr=float(m.get('win_rate') or 0); pnl=float(m.get('net_pnl_sol') or 0)
+              raw=m.get('profit_factor'); pf=float(raw) if raw is not None and math.isfinite(float(raw)) else (999.0 if pnl>0 and n>0 and w==n else 0.0)
+              if n:
+                  z=1.96; p=w/n; den=1+z*z/n; low=max(0.0,(p+z*z/(2*n)-z*math.sqrt((p*(1-p)+z*z/(4*n))/n))/den)
+              else: low=0.0
+              ok=n>=4 and wr>=0.65 and low>=0.30 and pnl>0 and pf>=1.25
+              rows[latency]={'trades':n,'wins':w,'win_rate':wr,'wilson_low':low,'net_pnl_sol':pnl,'profit_factor':pf,'passed':ok}; passed=passed and ok
+          verdict={'version':'e4-v12-reactive-lattice-live-v1','status':'FOUND_LIVE_SUB10MS_GOLDEN_THESIS' if passed else 'NOT_CONCLUSIVE','latencies':rows,'untouched_live':True,'starting_balance_sol':3.0,'no_live_tuning':True}
+          Path('artifacts/live-verdict.json').write_text(json.dumps(verdict,indent=2,sort_keys=True)); Path('artifacts/live-status.txt').write_text(verdict['status']+'\n'); print(json.dumps(verdict,indent=2,sort_keys=True))
+          if not passed: raise SystemExit(1)
+          PY
+
+      - name: Persist only full live confirmation
+        if: success()
+        run: |
+          mkdir -p docs/research models/e4/research
+          cp artifacts/report.json docs/research/e4-v12-reactive-lattice-report.json
+          cp artifacts/model.json models/e4/research/e4-v12-reactive-lattice-model.json
+          cp artifacts/live-verdict.json docs/research/e4-v12-reactive-lattice-live-verdict.json
+          git config user.name 'gambit-v12-research'
+          git config user.email 'actions@users.noreply.github.com'
+          git add docs/research/e4-v12-reactive-lattice-report.json docs/research/e4-v12-reactive-lattice-live-verdict.json models/e4/research/e4-v12-reactive-lattice-model.json
+          if ! git diff --cached --quiet; then git commit -m 'research(e4-v12): persist live-confirmed reactive lattice [skip ci]'; git push origin HEAD:"$RESEARCH_BRANCH"; fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-reactive-lattice-live-${{ github.run_id }}
+          path: |
+            artifacts/live-progress.json
+            artifacts/live-batch.json
+            artifacts/live-batch-live-events.jsonl
+            artifacts/live-predictions.json
+            artifacts/live-guard-bps.txt
+            artifacts/live-economics.json
+            artifacts/live-verdict.json
+            artifacts/live-status.txt
+          if-no-files-found: warn
+          retention-days: 30
