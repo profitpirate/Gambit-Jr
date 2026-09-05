@@ -1,0 +1,110 @@
+name: E4 V12 prior intelligence cache
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-sub10ms-entry-research-20260905
+    paths:
+      - "scripts/e4_v12_extract_prior_intelligence.py"
+      - ".github/workflows/e4-v12-prior-intelligence-cache.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  REPO: profitpirate/Gambit-Jr
+  BRANCH: codex/e4-v12-sub10ms-entry-research-20260905
+
+concurrency:
+  group: e4-v12-prior-intelligence-cache
+  cancel-in-progress: true
+
+jobs:
+  consolidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile extractor
+        run: python -m py_compile scripts/e4_v12_extract_prior_intelligence.py
+
+      - name: Discover and download prior E4 research artifacts
+        run: |
+          mkdir -p cache/runs
+          git fetch origin codex/e4-v12-matched-controls codex/e4-v12-selection-reconstruction
+          workflows="$({
+            git ls-tree -r --name-only origin/codex/e4-v12-matched-controls .github/workflows
+            git ls-tree -r --name-only origin/codex/e4-v12-selection-reconstruction .github/workflows
+          } | sort -u | grep -Ei 'e4.*(wallet|attempt|intent|identity|creator|social|matched|forensic|registry|thesis)' | xargs -n1 basename | sort -u)"
+          printf '%s\n' "$workflows" > cache/workflows.txt
+          while read -r workflow; do
+            [ -n "$workflow" ] || continue
+            runs="$(gh run list --repo "$REPO" --workflow "$workflow" --status success \
+              --limit 3 --json databaseId,createdAt --jq 'sort_by(.createdAt) | reverse | .[].databaseId' 2>/dev/null || true)"
+            while read -r run_id; do
+              [ -n "$run_id" ] || continue
+              target="cache/runs/$run_id"
+              [ -d "$target" ] && continue
+              mkdir -p "$target"
+              gh run download "$run_id" --repo "$REPO" --dir "$target" || true
+            done <<<"$runs"
+          done <<<"$workflows"
+
+      - name: Include committed research files from both branches
+        run: |
+          mkdir -p cache/committed/matched cache/committed/authoritative
+          git archive origin/codex/e4-v12-matched-controls docs models research 2>/dev/null \
+            | tar -x -C cache/committed/matched 2>/dev/null || true
+          git archive origin/codex/e4-v12-selection-reconstruction docs models research 2>/dev/null \
+            | tar -x -C cache/committed/authoritative 2>/dev/null || true
+
+      - name: Consolidate identity, social and failed-attempt evidence
+        run: |
+          mkdir -p artifacts docs/research
+          python scripts/e4_v12_extract_prior_intelligence.py \
+            --input cache/runs \
+            --input cache/committed \
+            --output artifacts/e4-v12-prior-intelligence-cache.json
+          cp artifacts/e4-v12-prior-intelligence-cache.json \
+            docs/research/e4-v12-prior-intelligence-cache.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('artifacts/e4-v12-prior-intelligence-cache.json').read_text())
+          coverage=data.get('coverage') or {}
+          state='READY' if any(int(value or 0)>0 for value in coverage.values()) else 'EMPTY'
+          Path('research/e4-v12-prior-intelligence-state.txt').write_text(state+'\n')
+          print(json.dumps({'state':state,'coverage':coverage},indent=2,sort_keys=True))
+          PY
+
+      - name: Persist compact prior intelligence
+        run: |
+          git config user.name 'gambit-v12-intelligence-cache'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin "$BRANCH"
+          git add docs/research/e4-v12-prior-intelligence-cache.json \
+            research/e4-v12-prior-intelligence-state.txt
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(e4-v12): consolidate prior intelligence cache [skip ci]'
+            git push origin HEAD:"$BRANCH"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-prior-intelligence-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-prior-intelligence-cache.json
+            cache/workflows.txt
+            research/e4-v12-prior-intelligence-state.txt
+          if-no-files-found: warn
+          retention-days: 30
