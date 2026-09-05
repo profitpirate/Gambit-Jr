@@ -1,0 +1,289 @@
+name: E4 V12 social-whitelist golden
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-sub10ms-entry-research-20260905
+    paths:
+      - "scripts/e4_v12_social_whitelist_search.py"
+      - "scripts/e4_v12_social_whitelist_apply.py"
+      - ".github/workflows/e4-v12-social-whitelist-golden.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  PYTHONUNBUFFERED: "1"
+  GH_TOKEN: ${{ github.token }}
+  REPO: profitpirate/Gambit-Jr
+  RESEARCH_BRANCH: codex/e4-v12-sub10ms-entry-research-20260905
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
+  E4_BUILDER_PRELOAD: "tools/e4-builder/fast-preload-v4.mjs"
+  E4_BUILDER_WORKERS: "2"
+  E4_BUILDER_RACE_CHILDREN: "4"
+  E4_BALANCE_CACHE_MAX_STALENESS_MS: "5000"
+  E4_DIRECT_COPY_MAX_OUTPUT_SHORTFALL_BPS: "600"
+
+concurrency:
+  group: e4-v12-social-whitelist-golden
+  cancel-in-progress: true
+
+jobs:
+  historical:
+    runs-on: ubuntu-latest
+    timeout-minutes: 210
+    outputs:
+      speed: ${{ steps.speed.outcome }}
+      thesis: ${{ steps.thesis.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt scikit-learn joblib
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+
+      - name: Compile repaired social-whitelist path
+        run: |
+          python -m compileall -q \
+            src/memecoin_bot/e4_sub10ms_repairs_v12.py \
+            scripts/e4_v12_true_latency_replay.py \
+            scripts/e4_v12_golden_thesis_search_v2.py \
+            scripts/e4_v12_freeze_prior_registry.py \
+            scripts/e4_v12_prelaunch_social_search.py \
+            scripts/e4_v12_social_whitelist_search.py \
+            scripts/e4_v12_social_whitelist_apply.py \
+            scripts/e4_v12_sub10ms_benchmark.py
+          python -m unittest tests.test_e4_v12_true_latency_replay -v
+
+      - name: Enforce sub-10ms internal hot path
+        id: speed
+        continue-on-error: true
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_v12_sub10ms_benchmark.py \
+            --warmup 50 --probes 300 \
+            --output artifacts/e4-v12-social-whitelist-sub10ms.json
+
+      - name: Download chronological launch evidence
+        run: |
+          mkdir -p historical metadata-cache
+          : > /tmp/pairs.bin
+          for run_id in \
+            33792881280 33810753028 33822988156 33835575805 33852482054 \
+            33876345997 33897368379 33911477030 33920757002 33931301493
+          do
+            mkdir -p "historical/$run_id"
+            gh run download "$run_id" --repo "$REPO" \
+              --name "e4-v12-forward-$run_id" --dir "historical/$run_id"
+            batch="$(find "historical/$run_id" -name 'e4-v12-forward-batch.json' -print -quit)"
+            events="$(find "historical/$run_id" -name 'e4-v12-forward-batch-live-events.jsonl' -print -quit)"
+            test -s "$batch"; test -s "$events"
+            printf '%s\0%s\0%s\0' "$run_id" "$batch" "$events" >> /tmp/pairs.bin
+          done
+
+      - name: Freeze creator registry before first test window
+        run: |
+          first_batch="$(find historical/33792881280 -name 'e4-v12-forward-batch.json' -print -quit)"
+          python scripts/e4_v12_freeze_prior_registry.py \
+            --first-batch "$first_batch" \
+            --output artifacts/e4-v12-social-whitelist-prior.json
+
+      - name: Recover prior metadata caches
+        continue-on-error: true
+        run: |
+          git fetch origin codex/e4-v12-matched-controls
+          for workflow in $(git ls-tree -r --name-only origin/codex/e4-v12-matched-controls .github/workflows \
+              | grep -Ei 'social|matched|thesis|metadata' | xargs -n1 basename); do
+            run_id="$(gh run list --repo "$REPO" --workflow "$workflow" --status success \
+              --limit 1 --json databaseId --jq '.[0].databaseId // empty' 2>/dev/null || true)"
+            if [ -n "$run_id" ]; then
+              mkdir -p "metadata-cache/$run_id"
+              gh run download "$run_id" --repo "$REPO" --dir "metadata-cache/$run_id" || true
+            fi
+          done
+
+      - name: Search causal prior-whitelist plus prelaunch-social thesis
+        id: thesis
+        continue-on-error: true
+        run: |
+          PAIRS=()
+          while IFS= read -r -d '' run_id && IFS= read -r -d '' batch && IFS= read -r -d '' events; do
+            PAIRS+=(--pair "$run_id=$batch:$events")
+          done < /tmp/pairs.bin
+          python scripts/e4_v12_social_whitelist_search.py \
+            "${PAIRS[@]}" \
+            --prior-registry artifacts/e4-v12-social-whitelist-prior.json \
+            --metadata-cache metadata-cache \
+            --metadata-concurrency 128 --metadata-timeout-seconds 2.5 \
+            --metadata-output artifacts/e4-v12-social-whitelist-metadata.json \
+            --latencies-ms 0,1,2,5,10 \
+            --output artifacts/e4-v12-social-whitelist-historical.json
+
+      - name: Persist truthful social-whitelist status
+        if: always()
+        env:
+          SPEED: ${{ steps.speed.outcome }}
+          THESIS: ${{ steps.thesis.outcome }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          mkdir -p docs/research
+          python - <<'PY'
+          import json,os,shutil
+          from pathlib import Path
+          def read(name):
+              path=Path('artifacts')/name
+              return json.loads(path.read_text()) if path.exists() else {}
+          speed=read('e4-v12-social-whitelist-sub10ms.json')
+          thesis=read('e4-v12-social-whitelist-historical.json')
+          prior=read('e4-v12-social-whitelist-prior.json')
+          status={
+              'version':'e4-v12-social-whitelist-status-v1',
+              'workflow_run':os.environ['RUN_ID'],
+              'speed_step':os.environ.get('SPEED'),
+              'thesis_step':os.environ.get('THESIS'),
+              'sub10ms_pass':bool(speed.get('sub10ms_p95_pass')),
+              'quote_to_route_ack_ms':speed.get('quote_to_route_ack_ms'),
+              'prior_registry_ref':prior.get('causal_ref'),
+              'prior_creator_count':prior.get('creator_count'),
+              'thesis_status':thesis.get('status','NOT_PRODUCED'),
+              'ready_for_fresh_live':bool(speed.get('sub10ms_p95_pass') and thesis.get('status')=='HISTORICAL_GOLDEN_CONFIRMED'),
+          }
+          Path('docs/research/e4-v12-social-whitelist-current-status.json').write_text(json.dumps(status,indent=2,sort_keys=True))
+          for source,target in (
+              ('e4-v12-social-whitelist-sub10ms.json','e4-v12-social-whitelist-sub10ms.json'),
+              ('e4-v12-social-whitelist-historical.json','e4-v12-social-whitelist-historical.json'),
+              ('e4-v12-social-whitelist-prior.json','e4-v12-social-whitelist-prior.json'),
+              ('e4-v12-social-whitelist-metadata.json','e4-v12-social-whitelist-metadata.json'),
+          ):
+              path=Path('artifacts')/source
+              if path.exists():shutil.copyfile(path,Path('docs/research')/target)
+          print(json.dumps(status,indent=2,sort_keys=True))
+          PY
+          git config user.name 'gambit-v12-social-whitelist'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin "$RESEARCH_BRANCH"
+          git add docs/research/e4-v12-social-whitelist-*.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(e4-v12): persist social-whitelist qualification [skip ci]'
+            git push origin HEAD:"$RESEARCH_BRANCH"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-social-whitelist-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-social-whitelist-sub10ms.json
+            artifacts/e4-v12-social-whitelist-historical.json
+            artifacts/e4-v12-social-whitelist-prior.json
+            artifacts/e4-v12-social-whitelist-metadata.json
+            docs/research/e4-v12-social-whitelist-current-status.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  fresh-live:
+    needs: historical
+    if: needs.historical.outputs.speed == 'success' && needs.historical.outputs.thesis == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m pip install -r requirements-e4.txt scikit-learn joblib
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - uses: actions/download-artifact@v4
+        with:
+          name: e4-v12-social-whitelist-${{ github.run_id }}
+          path: frozen
+
+      - name: Rehydrate chronological launch state
+        run: |
+          mkdir -p historical
+          : > /tmp/pairs.bin
+          for run_id in \
+            33792881280 33810753028 33822988156 33835575805 33852482054 \
+            33876345997 33897368379 33911477030 33920757002 33931301493
+          do
+            mkdir -p "historical/$run_id"
+            gh run download "$run_id" --repo "$REPO" \
+              --name "e4-v12-forward-$run_id" --dir "historical/$run_id"
+            batch="$(find "historical/$run_id" -name 'e4-v12-forward-batch.json' -print -quit)"
+            events="$(find "historical/$run_id" -name 'e4-v12-forward-batch-live-events.jsonl' -print -quit)"
+            printf '%s\0%s\0%s\0' "$run_id" "$batch" "$events" >> /tmp/pairs.bin
+          done
+
+      - name: Capture untouched live launch window
+        run: |
+          mkdir -p live artifacts
+          export E4_HOLDOUT_PROGRESS_PATH=live/e4-v12-social-whitelist-progress.json
+          python scripts/e4_300_launch_holdout_v12_sub10ms.py \
+            --target-launches 3000 --capture-seconds 14400 --tail-seconds 300 \
+            --heartbeat-seconds 60 --minimum-launches 3000 \
+            --wallet-signatures 1200 --builder-probes 0 \
+            --testnet-route-probes 0 --stress-iterations 0 \
+            --output live/e4-v12-social-whitelist-live-batch.json
+
+      - name: Apply frozen social-whitelist thesis to untouched live launches
+        run: |
+          PAIRS=()
+          while IFS= read -r -d '' run_id && IFS= read -r -d '' batch && IFS= read -r -d '' events; do
+            PAIRS+=(--pair "$run_id=$batch:$events")
+          done < /tmp/pairs.bin
+          python scripts/e4_v12_social_whitelist_apply.py \
+            "${PAIRS[@]}" \
+            --pair "${GITHUB_RUN_ID}=live/e4-v12-social-whitelist-live-batch.json:live/e4-v12-social-whitelist-live-batch-live-events.jsonl" \
+            --rule frozen/e4-v12-social-whitelist-historical.json \
+            --prior-registry frozen/e4-v12-social-whitelist-prior.json \
+            --metadata-cache frozen/e4-v12-social-whitelist-metadata.json \
+            --metadata-output artifacts/e4-v12-social-whitelist-metadata-fresh.json \
+            --metadata-concurrency 128 --metadata-timeout-seconds 2.5 \
+            --latencies-ms 0,1,2,5,10 --minimum-live-trades 3 \
+            --output artifacts/e4-v12-social-whitelist-fresh-live.json
+
+      - name: Persist only passing fresh-live social-whitelist proof
+        run: |
+          mkdir -p docs/research
+          cp artifacts/e4-v12-social-whitelist-fresh-live.json docs/research/e4-v12-social-whitelist-fresh-live.json
+          git config user.name 'gambit-v12-social-whitelist'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin "$RESEARCH_BRANCH"
+          git add docs/research/e4-v12-social-whitelist-fresh-live.json
+          git commit -m 'research(e4-v12): persist fresh live social-whitelist proof [skip ci]'
+          git push origin HEAD:"$RESEARCH_BRANCH"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-social-whitelist-live-${{ github.run_id }}
+          path: |
+            live/e4-v12-social-whitelist-progress.json
+            live/e4-v12-social-whitelist-live-batch.json
+            live/e4-v12-social-whitelist-live-batch-live-events.jsonl
+            artifacts/e4-v12-social-whitelist-fresh-live.json
+          if-no-files-found: warn
+          retention-days: 30
