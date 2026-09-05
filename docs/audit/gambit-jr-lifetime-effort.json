@@ -1,0 +1,172 @@
+{
+  "combined_active_plus_cumulative_workflow_wall_hours_lower_bound": 346.429,
+  "estimated_active_research_and_development_hours": {
+    "central": 142.126,
+    "conservative": 78.821,
+    "upper": 229.516
+  },
+  "generated_at": "2026-09-05T21:01:34.123594+00:00",
+  "git_session_models": {
+    "central": {
+      "hours": 109.701,
+      "longest_session_hours": 8.103,
+      "max_gap_hours": 2.0,
+      "median_session_hours": 1.57,
+      "sessions": 44,
+      "terminal_hours_per_session": 1.0
+    },
+    "conservative": {
+      "hours": 66.801,
+      "longest_session_hours": 4.973,
+      "max_gap_hours": 1.0,
+      "median_session_hours": 0.508,
+      "sessions": 67,
+      "terminal_hours_per_session": 0.5
+    },
+    "upper": {
+      "hours": 164.086,
+      "longest_session_hours": 34.862,
+      "max_gap_hours": 4.0,
+      "median_session_hours": 6.654,
+      "sessions": 16,
+      "terminal_hours_per_session": 1.5
+    }
+  },
+  "github_actions": {
+    "conclusions": {
+      "cancelled": 26,
+      "failure": 474,
+      "in_progress": 1,
+      "success": 458
+    },
+    "cumulative_run_wall_hours": 204.303,
+    "distinct_workflow_names": 163,
+    "longest_run_hours": 5.21,
+    "median_run_minutes": 1.25,
+    "metric_note": "Cumulative workflow wall time is a lower-bound automation metric; multi-job workflows can consume more runner time than their wall duration.",
+    "non_overlapping_automation_coverage_hours": 89.551,
+    "p90_run_minutes": 28.5,
+    "runs_retrieved": 959,
+    "runs_with_duration": 959,
+    "top_workflows": [
+      [
+        "E4 stress hardening",
+        148
+      ],
+      [
+        "E4 live market stress",
+        86
+      ],
+      [
+        "E4 V10 three-pipeline E2E",
+        85
+      ],
+      [
+        "E4 V10 persistent certification",
+        83
+      ],
+      [
+        "E4 long oracle capture",
+        79
+      ],
+      [
+        "E4 V12 selection certification",
+        32
+      ],
+      [
+        "E4 engine",
+        28
+      ],
+      [
+        "E4 production",
+        21
+      ],
+      [
+        "E4 V12 direct-copy CI",
+        20
+      ],
+      [
+        "Discord brutal E2E v3",
+        20
+      ],
+      [
+        "E4 V12 promote causal-entry candidate",
+        17
+      ],
+      [
+        "V1.5 release gates",
+        17
+      ],
+      [
+        "E4 V12 role-model pipeline CI",
+        15
+      ],
+      [
+        "E4 V11 finalisation",
+        15
+      ],
+      [
+        "Pipeline reliability v2 retry",
+        14
+      ]
+    ],
+    "total_runs_reported": 959
+  },
+  "interpretation": {
+    "automation": "Do not describe cumulative workflow wall hours as human labour; it is unattended/automated validation and live-capture runtime.",
+    "recommended_number": "Use recommended_lifetime_active_hours for human/AI-guided research and bot-development effort.",
+    "uncertainty": "Commit-derived hours are an estimate. The conservative-to-upper range is more defensible than false minute-level precision."
+  },
+  "non_commit_adjustments": {
+    "central": {
+      "planning_research_review_multiplier": 1.25,
+      "pre_repository_hours": 5.0
+    },
+    "conservative": {
+      "planning_research_review_multiplier": 1.15,
+      "pre_repository_hours": 2.0
+    },
+    "upper": {
+      "planning_research_review_multiplier": 1.35,
+      "pre_repository_hours": 8.0
+    }
+  },
+  "recommended_lifetime_active_hours": 142,
+  "repository": "profitpirate/Gambit-Jr",
+  "repository_history": {
+    "active_user_commit_dates": 12,
+    "automation_authored_commits": 96,
+    "calendar_lifetime_days_between_commits": 16.241,
+    "calendar_lifetime_hours_between_commits": 389.791,
+    "commit_phase_counts": {
+      "E4 engine and execution": 282,
+      "Gambit Jr V1.x product": 21,
+      "General platform / Discord / infrastructure": 85,
+      "V10 / three pipelines": 95,
+      "V11": 30,
+      "V12 / golden-thesis / role-model": 385
+    },
+    "earliest_commit": "2026-08-20T11:52:59+00:00",
+    "latest_commit": "2026-09-05T17:40:28+00:00",
+    "other_authored_commits": 0,
+    "remote_branches": 56,
+    "unique_commits_all_branches": 898,
+    "user_authored_commits": 802,
+    "user_commits_by_date": {
+      "2026-08-20": 4,
+      "2026-08-21": 3,
+      "2026-08-27": 5,
+      "2026-08-28": 16,
+      "2026-08-29": 20,
+      "2026-08-30": 122,
+      "2026-08-31": 269,
+      "2026-09-01": 24,
+      "2026-09-02": 10,
+      "2026-09-03": 58,
+      "2026-09-04": 125,
+      "2026-09-05": 146
+    }
+  },
+  "scope": "all fetched repository branches and workflow runs",
+  "version": "gambit-jr-lifetime-effort-audit-v1"
+}
