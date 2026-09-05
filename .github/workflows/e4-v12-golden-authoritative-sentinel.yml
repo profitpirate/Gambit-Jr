@@ -1,0 +1,83 @@
+name: E4 V12 authoritative golden sentinel
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-sub10ms-entry-research-20260905
+    paths:
+      - "docs/research/e4-v12-*-fresh-live.json"
+      - "research/e4-v12-sub10ms-transport-state.txt"
+      - ".github/workflows/e4-v12-golden-authoritative-sentinel.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: e4-v12-golden-authoritative-sentinel
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          fetch-depth: 0
+      - name: Verify transport and untouched-live economics
+        id: verify
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          transport=Path('research/e4-v12-sub10ms-transport-state.txt')
+          transport_ok=transport.exists() and transport.read_text().strip()=='PASS'
+          candidates=[]
+          required={0.0,1.0,2.0,5.0,10.0}
+          for path in sorted(Path('docs/research').glob('e4-v12-*-fresh-live.json')):
+              try:
+                  doc=json.loads(path.read_text())
+              except Exception:
+                  continue
+              if doc.get('status')!='FRESH_LIVE_GOLDEN_CONFIRMED':
+                  continue
+              economics=doc.get('economics') or {}
+              normalized={float(key):value for key,value in economics.items()}
+              if not required.issubset(normalized):
+                  continue
+              rows=[normalized[key] for key in sorted(required)]
+              if not all(
+                  int(row.get('closed') or 0)>=3
+                  and float(row.get('win_rate') or 0)>=0.65
+                  and float(row.get('net_pnl_sol') or 0)>0
+                  and float(row.get('profit_factor') or 0)>=1.25
+                  for row in rows
+              ):
+                  continue
+              candidates.append((path,doc))
+          success=bool(transport_ok and candidates)
+          Path('/tmp/status').write_text('FOUND\n' if success else 'STILL_RESEARCHING\n')
+          detail={
+              'version':'e4-v12-authoritative-golden-proof-v1',
+              'status':'FOUND' if success else 'STILL_RESEARCHING',
+              'transport_ok':transport_ok,
+              'qualifying_fresh_proofs':[str(path) for path,_ in candidates],
+              'winning_proof':candidates[-1][1] if success else None,
+          }
+          Path('/tmp/detail.json').write_text(json.dumps(detail,indent=2,sort_keys=True))
+          print(json.dumps(detail,indent=2,sort_keys=True))
+          PY
+      - name: Persist authoritative sentinel
+        run: |
+          cp /tmp/status research/e4-v12-golden-authoritative-sentinel.txt
+          cp /tmp/detail.json docs/research/e4-v12-golden-authoritative-proof.json
+          git config user.name 'gambit-v12-authoritative-proof'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin codex/e4-v12-sub10ms-entry-research-20260905
+          git add research/e4-v12-golden-authoritative-sentinel.txt \
+            docs/research/e4-v12-golden-authoritative-proof.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(e4-v12): update authoritative golden proof [skip ci]'
+            git push origin HEAD:codex/e4-v12-sub10ms-entry-research-20260905
+          fi
