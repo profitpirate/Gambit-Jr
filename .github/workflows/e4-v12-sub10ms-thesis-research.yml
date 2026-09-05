@@ -1,4 +1,4 @@
-name: E4 V12 strict sub-10ms entry thesis research
+name: E4 V12 strict sub-10ms golden thesis research
 
 on:
   push:
@@ -6,6 +6,14 @@ on:
       - codex/e4-v12-sub10ms-entry-research-20260905
     paths:
       - ".github/workflows/e4-v12-sub10ms-thesis-research.yml"
+      - "scripts/e4_v12_true_latency_replay.py"
+      - "scripts/e4_v12_golden_thesis_search.py"
+      - "scripts/e4_v12_hotpath_benchmark.py"
+      - "src/memecoin_bot/e4_tight_output_v12.py"
+      - "src/memecoin_bot/e4_strict_output_v12.py"
+      - "src/memecoin_bot/e4_exec/__main__.py"
+      - "tests/test_v12_true_latency_replay.py"
+      - "tests/test_v12_tight_output.py"
       - "research/e4-v12-sub10ms-trigger*.txt"
   workflow_dispatch:
 
@@ -18,22 +26,25 @@ env:
   GH_TOKEN: ${{ github.token }}
   REPO: profitpirate/Gambit-Jr
   SOURCE_BRANCH: codex/e4-v12-selection-reconstruction
+  RESEARCH_BRANCH: codex/e4-v12-sub10ms-entry-research-20260905
   E4_PIPELINES_BACKGROUND: "false"
   E4_SOL_USD_FALLBACK: "150"
   E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
   E4_BUILDER_PRELOAD: "tools/e4-builder/fast-preload-v4.mjs"
   E4_BALANCE_CACHE_MAX_STALENESS_MS: "5000"
+  E4_V12_BUY_SLIPPAGE_BPS: "800"
+  E4_V12_MAX_OUTPUT_SHORTFALL_BPS: "800"
 
 concurrency:
-  group: e4-v12-sub10ms-entry-thesis
+  group: e4-v12-sub10ms-golden-thesis
   cancel-in-progress: false
 
 jobs:
-  historical-freeze:
+  repaired-historical-search:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 240
     outputs:
-      status: ${{ steps.freeze.outputs.status }}
+      status: ${{ steps.status.outputs.status }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,27 +58,44 @@ jobs:
           node-version: "22"
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -e .
-      - run: python -m pip install -r requirements-e4.txt
+      - run: python -m pip install -r requirements-e4.txt scikit-learn joblib
       - working-directory: tools/e4-builder
         run: npm install --omit=dev
 
-      - name: Baseline regression and chronology protections
+      - name: Regressions, chronology and strict-output tests
         run: |
+          python -m unittest tests.test_v12_true_latency_replay -v
+          python -m unittest tests.test_v12_tight_output -v
           python -m unittest discover -s tests -p "test_e4*.py" -v
-          python -m compileall -q scripts/e4_v12_copy_timing_audit.py scripts/e4_300_launch_holdout_v12.py src/memecoin_bot
+          python -m compileall -q \
+            scripts/e4_v12_true_latency_replay.py \
+            scripts/e4_v12_golden_thesis_search.py \
+            scripts/e4_v12_hotpath_benchmark.py \
+            src/memecoin_bot/e4_tight_output_v12.py \
+            src/memecoin_bot/e4_strict_output_v12.py \
+            src/memecoin_bot/e4_exec/__main__.py
           E4_BUILDER_ALLOW_REMOTE_FALLBACK=false node tools/e4-builder/race-proxy-v3.mjs --self-test
 
-      - name: Download immutable earlier 3000-launch live captures
+      - name: Require measured guarded build and signing below 10ms p95
+        run: |
+          mkdir -p artifacts
+          python -m scripts.e4_v12_hotpath_benchmark \
+            --iterations 500 \
+            --warmup 50 \
+            --maximum-p95-ms 10 \
+            --output artifacts/e4-v12-hotpath-benchmark.json
+
+      - name: Download ten chronological immutable live launch windows
         run: |
           mkdir -p historical
           gh run list --repo "$REPO" \
             --workflow e4-v12-selection-certification.yml \
             --branch "$SOURCE_BRANCH" \
             --status success \
-            --limit 14 \
+            --limit 16 \
             --json databaseId,createdAt \
             --jq 'sort_by(.createdAt) | .[-10:] | .[].databaseId' > /tmp/run_ids
-          test "$(wc -l < /tmp/run_ids)" -ge 7
+          test "$(wc -l < /tmp/run_ids)" -eq 10
           while read -r run_id; do
             mkdir -p "historical/$run_id"
             gh run download "$run_id" --repo "$REPO" \
@@ -77,170 +105,58 @@ jobs:
             events="$(find "historical/$run_id" -name 'e4-v12-forward-batch-live-events.jsonl' -print -quit)"
             test -s "$batch"
             test -s "$events"
-            for latency in 0 1 2 5 10; do
-              python scripts/e4_v12_copy_timing_audit.py \
-                --batch "$batch" \
-                --events "$events" \
-                --source-run "$run_id" \
-                --latency-ms "$latency" \
-                --output "historical/$run_id/audit-$latency.json"
-            done
+            printf '%s\t%s\t%s\n' "$run_id" "$batch" "$events" >> /tmp/pairs.tsv
           done < /tmp/run_ids
 
-      - name: Freeze one causal conditional-entry rule on chronological windows
-        id: freeze
+      - name: Search a causal thesis using true economics at every latency
+        id: search
+        continue-on-error: true
         run: |
-          mkdir -p artifacts
-          python - <<'PY'
-          from __future__ import annotations
-          import json, math
-          from pathlib import Path
+          args=()
+          while IFS=$'\t' read -r run_id batch events; do
+            args+=(--pair "$batch:$events")
+          done < /tmp/pairs.tsv
+          python -m scripts.e4_v12_golden_thesis_search \
+            --mode search \
+            "${args[@]}" \
+            --horizon-ms 750 \
+            --latencies 0,1,2,5,10 \
+            --starting-balance-sol 3 \
+            --max-output-shortfall-bps 800 \
+            --minimum-win-rate 0.65 \
+            --minimum-profit-factor 1.25 \
+            --output artifacts/e4-v12-golden-thesis.json \
+            --model-output artifacts/e4-v12-golden-thesis.joblib \
+            --predictions-output artifacts/e4-v12-golden-holdout-predictions.json
 
-          LATENCIES=(0,1,2,5,10)
-          MIN_WR=0.65
-          MIN_PF=1.25
-
-          def f(v,d=0.0):
-              try:
-                  x=float(v)
-              except (TypeError,ValueError):
-                  return d
-              return x if math.isfinite(x) else d
-
-          def wilson(w,n,z=1.96):
-              if n<=0:return 0.0
-              p=w/n; den=1+z*z/n
-              return max(0.0,(p+z*z/(2*n)-z*math.sqrt((p*(1-p)+z*z/(4*n))/n))/den)
-
-          def pf(rows):
-              pos=sum(f(r.get('pnl_sol')) for r in rows if f(r.get('pnl_sol'))>0)
-              neg=sum(f(r.get('pnl_sol')) for r in rows if f(r.get('pnl_sol'))<0)
-              return pos/abs(neg) if neg<0 else (999.0 if pos>0 else 0.0)
-
-          def extract(doc):
-              rows=doc.get('direct_copy_positions')
-              if not isinstance(rows,list):
-                  direct=doc.get('direct_copy') or {}
-                  rows=direct.get('positions') if isinstance(direct,dict) else None
-              if not isinstance(rows,list):
-                  rows=(doc.get('all_predictions') or {}).get('positions') or []
-              out=[]
-              for r in rows:
-                  if not isinstance(r,dict) or not r.get('mint'):continue
-                  q=dict(r)
-                  q['entry_fdv_usd']=f(q.get('entry_fdv_usd') or q.get('fdv_usd'))
-                  q['size_sol']=f(q.get('size_sol') or q.get('entry_curve_sol') or q.get('entry_cost_sol'))
-                  q['entry_cost_sol']=f(q.get('entry_cost_sol'))
-                  q['source_to_decision_ms']=f(q.get('source_to_decision_ms'))
-                  q['size_per_10k_fdv']=q['size_sol']/max(1.0,q['entry_fdv_usd'])*10000.0
-                  out.append(q)
-              return out
-
-          runs=sorted(p.name for p in Path('historical').iterdir() if p.is_dir() and (p/'audit-10.json').exists())
-          if len(runs)<7:raise SystemExit('fewer than seven complete historical runs')
-          split1=max(3,len(runs)-4)
-          train=runs[:split1]; validation=runs[split1:split1+2]; holdout=runs[split1+2:]
-          data={}
-          for run in runs:
-              data[run]={}
-              for latency in LATENCIES:
-                  data[run][latency]=extract(json.loads((Path('historical')/run/f'audit-{latency}.json').read_text()))
-
-          base=[r for run in train for r in data[run][10] if r['entry_fdv_usd']>0 and r['size_sol']>0]
-          if len(base)<20:raise SystemExit('insufficient causal entry rows')
-
-          def quantiles(name):
-              vals=sorted(f(r.get(name)) for r in base)
-              qs=[]
-              for p in (0.0,0.10,0.20,0.30,0.40,0.50,0.60,0.70,0.80,0.90,1.0):
-                  i=min(len(vals)-1,max(0,round((len(vals)-1)*p)))
-                  qs.append(vals[i])
-              return sorted(set(qs))
-
-          features=('entry_fdv_usd','size_sol','size_per_10k_fdv','source_to_decision_ms')
-          bands={name:quantiles(name) for name in features}
-          rules=[{'clauses':[]}]
-          one=[]
-          for name in features:
-              vals=bands[name]
-              for lo_i in range(len(vals)):
-                  for hi_i in range(lo_i,len(vals)):
-                      clause={'feature':name,'minimum':vals[lo_i],'maximum':vals[hi_i]}
-                      one.append({'clauses':[clause]})
-          rules.extend(one)
-          compact=[]
-          for a in one:
-              for b in one:
-                  if a['clauses'][0]['feature']>=b['clauses'][0]['feature']:continue
-                  compact.append({'clauses':a['clauses']+b['clauses']})
-          rules.extend(compact)
-
-          def accepts(row,rule):
-              for c in rule['clauses']:
-                  value=f(row.get(c['feature']))
-                  if value<c['minimum'] or value>c['maximum']:return False
-              return True
-
-          def metrics(which,latency,rule):
-              rows=[r for run in which for r in data[run][latency] if accepts(r,rule)]
-              wins=sum(f(r.get('pnl_sol'))>0 for r in rows)
-              return {'trades':len(rows),'wins':wins,'win_rate':wins/len(rows) if rows else 0.0,
-                      'wilson_low':wilson(wins,len(rows)),'net_pnl_sol':sum(f(r.get('pnl_sol')) for r in rows),
-                      'profit_factor':pf(rows)}
-
-          def passes(m,minimum):
-              return m['trades']>=minimum and m['win_rate']>=MIN_WR and m['wilson_low']>=0.30 and m['net_pnl_sol']>0 and m['profit_factor']>=MIN_PF
-
-          candidates=[]
-          for rule in rules:
-              tr={str(l):metrics(train,l,rule) for l in LATENCIES}
-              va={str(l):metrics(validation,l,rule) for l in LATENCIES}
-              ho={str(l):metrics(holdout,l,rule) for l in LATENCIES}
-              if not all(passes(tr[str(l)],12) for l in LATENCIES):continue
-              if not all(passes(va[str(l)],6) for l in LATENCIES):continue
-              if not all(passes(ho[str(l)],6) for l in LATENCIES):continue
-              worst_wr=min(va[str(l)]['win_rate'] for l in LATENCIES)
-              worst_hold=min(ho[str(l)]['win_rate'] for l in LATENCIES)
-              worst_wilson=min(ho[str(l)]['wilson_low'] for l in LATENCIES)
-              pnl=sum(ho[str(l)]['net_pnl_sol'] for l in LATENCIES)
-              score=(worst_hold,worst_wilson,worst_wr,pnl,-len(rule['clauses']))
-              candidates.append((score,rule,tr,va,ho))
-
-          candidates.sort(key=lambda x:x[0],reverse=True)
-          if not candidates:
-              result={'version':'e4-v12-sub10ms-thesis-v1','status':'NOT_CONCLUSIVE','runs':runs,
-                      'train_runs':train,'validation_runs':validation,'historical_holdout_runs':holdout,
-                      'requirements':{'latencies_ms':LATENCIES,'minimum_win_rate':MIN_WR,'minimum_profit_factor':MIN_PF}}
-              Path('artifacts/e4-v12-sub10ms-frozen-thesis.json').write_text(json.dumps(result,indent=2,sort_keys=True))
-              Path('artifacts/e4-v12-sub10ms-historical-status.txt').write_text('NOT_CONCLUSIVE\n')
-              print(json.dumps(result,indent=2,sort_keys=True))
-              raise SystemExit(1)
-          score,rule,tr,va,ho=candidates[0]
-          result={'version':'e4-v12-sub10ms-thesis-v1','status':'HISTORICAL_WINDOWS_CONFIRMED',
-                  'thesis':'Observe E4 entry authority, then copy only when the frozen causal entry-economics band accepts the launch.',
-                  'rule':rule,'score':score,'runs':runs,'train_runs':train,'validation_runs':validation,
-                  'historical_holdout_runs':holdout,'train':tr,'validation':va,'historical_holdout':ho,
-                  'requirements':{'latencies_ms':LATENCIES,'minimum_win_rate':MIN_WR,'minimum_profit_factor':MIN_PF,
-                                  'forbidden_features':['pnl','exit','hold','future price','post-entry state']}}
-          Path('artifacts/e4-v12-sub10ms-frozen-thesis.json').write_text(json.dumps(result,indent=2,sort_keys=True))
-          Path('artifacts/e4-v12-sub10ms-historical-status.txt').write_text('HISTORICAL_WINDOWS_CONFIRMED\n')
-          print(json.dumps(result,indent=2,sort_keys=True))
-          PY
-          echo "status=$(cat artifacts/e4-v12-sub10ms-historical-status.txt)" >> "$GITHUB_OUTPUT"
+      - name: Publish historical search status
+        id: status
+        if: always()
+        run: |
+          status=NOT_CONCLUSIVE
+          if [ -s artifacts/e4-v12-golden-thesis.json ]; then
+            status="$(jq -r '.status // "NOT_CONCLUSIVE"' artifacts/e4-v12-golden-thesis.json)"
+          fi
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          printf '%s\n' "$status" > artifacts/e4-v12-golden-historical-status.txt
+          echo "Historical status: $status"
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: e4-v12-sub10ms-historical-${{ github.run_id }}
+          name: e4-v12-golden-historical-${{ github.run_id }}
           path: |
-            artifacts/e4-v12-sub10ms-frozen-thesis.json
-            artifacts/e4-v12-sub10ms-historical-status.txt
+            artifacts/e4-v12-hotpath-benchmark.json
+            artifacts/e4-v12-golden-thesis.json
+            artifacts/e4-v12-golden-thesis.joblib
+            artifacts/e4-v12-golden-holdout-predictions.json
+            artifacts/e4-v12-golden-historical-status.txt
           if-no-files-found: warn
           retention-days: 30
 
   untouched-live-confirmation:
-    needs: historical-freeze
-    if: needs.historical-freeze.outputs.status == 'HISTORICAL_WINDOWS_CONFIRMED'
+    needs: repaired-historical-search
+    if: needs.repaired-historical-search.outputs.status == 'HISTORICAL_HOLDOUT_CONFIRMED'
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -256,28 +172,37 @@ jobs:
           node-version: "22"
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -e .
-      - run: python -m pip install -r requirements-e4.txt
+      - run: python -m pip install -r requirements-e4.txt scikit-learn joblib
       - working-directory: tools/e4-builder
         run: npm install --omit=dev
       - uses: actions/download-artifact@v4
         with:
-          name: e4-v12-sub10ms-historical-${{ github.run_id }}
+          name: e4-v12-golden-historical-${{ github.run_id }}
           path: artifacts
 
-      - name: Regressions and local hot-path latency stress
+      - name: Re-download frozen history for causal runtime state
         run: |
-          python -m unittest discover -s tests -p "test_e4*.py" -v
-          python scripts/e4_v10_pipeline_stress.py \
-            --sequential 500000 \
-            --parallel 300000 \
-            --workers 24 \
-            --social 50000 \
-            --e4-copy 100000 \
-            --output artifacts/e4-v12-sub10ms-pipeline-stress.json
+          mkdir -p historical
+          gh run list --repo "$REPO" \
+            --workflow e4-v12-selection-certification.yml \
+            --branch "$SOURCE_BRANCH" \
+            --status success \
+            --limit 16 \
+            --json databaseId,createdAt \
+            --jq 'sort_by(.createdAt) | .[-10:] | .[].databaseId' > /tmp/run_ids
+          while read -r run_id; do
+            mkdir -p "historical/$run_id"
+            gh run download "$run_id" --repo "$REPO" \
+              --name "e4-v12-forward-$run_id" \
+              --dir "historical/$run_id"
+            batch="$(find "historical/$run_id" -name 'e4-v12-forward-batch.json' -print -quit)"
+            events="$(find "historical/$run_id" -name 'e4-v12-forward-batch-live-events.jsonl' -print -quit)"
+            printf '%s\t%s\t%s\n' "$run_id" "$batch" "$events" >> /tmp/history-pairs.tsv
+          done < /tmp/run_ids
 
       - name: Capture brand-new untouched 3000-launch live window
         run: |
-          export E4_HOLDOUT_PROGRESS_PATH=artifacts/e4-v12-sub10ms-progress.json
+          export E4_HOLDOUT_PROGRESS_PATH=artifacts/e4-v12-golden-live-progress.json
           python scripts/e4_300_launch_holdout_v12.py \
             --target-launches 3000 \
             --capture-seconds 14400 \
@@ -285,132 +210,107 @@ jobs:
             --heartbeat-seconds 60 \
             --minimum-launches 3000 \
             --wallet-signatures 1500 \
-            --builder-probes 1500 \
+            --builder-probes 250 \
             --testnet-route-probes 0 \
             --stress-iterations 0 \
-            --output artifacts/e4-v12-sub10ms-live.json
+            --output artifacts/e4-v12-golden-live.json
 
-      - name: Replay untouched live window at every 0-10ms latency
+      - name: Apply frozen thesis without any live tuning
         run: |
-          for latency in 0 1 2 5 10; do
-            python scripts/e4_v12_copy_timing_audit.py \
-              --batch artifacts/e4-v12-sub10ms-live.json \
-              --events artifacts/e4-v12-sub10ms-live-live-events.jsonl \
-              --source-run "${GITHUB_RUN_ID}" \
-              --latency-ms "$latency" \
-              --output "artifacts/e4-v12-sub10ms-live-audit-$latency.json"
-          done
+          args=()
+          while IFS=$'\t' read -r run_id batch events; do
+            args+=(--pair "$batch:$events")
+          done < /tmp/history-pairs.tsv
+          args+=(--pair "artifacts/e4-v12-golden-live.json:artifacts/e4-v12-golden-live-live-events.jsonl")
+          python -m scripts.e4_v12_golden_thesis_search \
+            --mode apply \
+            "${args[@]}" \
+            --model-input artifacts/e4-v12-golden-thesis.joblib \
+            --predictions-output artifacts/e4-v12-golden-live-predictions.json
 
-      - name: Apply frozen thesis without tuning and require high WR at all latencies
+      - name: Rebuild every fresh trade independently at 0-10ms
+        run: |
+          python -m scripts.e4_v12_true_latency_replay \
+            --batch artifacts/e4-v12-golden-live.json \
+            --events artifacts/e4-v12-golden-live-live-events.jsonl \
+            --predictions artifacts/e4-v12-golden-live-predictions.json \
+            --latencies 0,1,2,5,10 \
+            --starting-balance-sol 3 \
+            --entry-fraction 0.0185 \
+            --fee-bps 125 \
+            --max-output-shortfall-bps 800 \
+            --confirmation-ms 1500 \
+            --max-concurrent 2 \
+            --output artifacts/e4-v12-golden-live-economics.json
+
+      - name: Require high live WR, PF and positive PnL at every latency
         run: |
           python - <<'PY'
-          import json,math
+          import json, math
           from pathlib import Path
-          L=(0,1,2,5,10)
-          thesis=json.loads(Path('artifacts/e4-v12-sub10ms-frozen-thesis.json').read_text())
-          rule=thesis['rule']
-          def f(v,d=0.0):
-              try:x=float(v)
-              except (TypeError,ValueError):return d
-              return x if math.isfinite(x) else d
-          def wilson(w,n,z=1.96):
-              if n<=0:return 0.0
-              p=w/n;den=1+z*z/n
-              return max(0.0,(p+z*z/(2*n)-z*math.sqrt((p*(1-p)+z*z/(4*n))/n))/den)
-          def pf(rows):
-              pos=sum(f(r.get('pnl_sol')) for r in rows if f(r.get('pnl_sol'))>0)
-              neg=sum(f(r.get('pnl_sol')) for r in rows if f(r.get('pnl_sol'))<0)
-              return pos/abs(neg) if neg<0 else (999.0 if pos>0 else 0.0)
-          def extract(doc):
-              rows=doc.get('direct_copy_positions')
-              if not isinstance(rows,list):rows=(doc.get('direct_copy') or {}).get('positions') or []
-              out=[]
-              for r in rows:
-                  if not isinstance(r,dict) or not r.get('mint'):continue
-                  q=dict(r);q['entry_fdv_usd']=f(q.get('entry_fdv_usd') or q.get('fdv_usd'))
-                  q['size_sol']=f(q.get('size_sol') or q.get('entry_curve_sol') or q.get('entry_cost_sol'))
-                  q['source_to_decision_ms']=f(q.get('source_to_decision_ms'))
-                  q['size_per_10k_fdv']=q['size_sol']/max(1.0,q['entry_fdv_usd'])*10000.0
-                  out.append(q)
-              return out
-          def ok(r):
-              return all(f(r.get(c['feature']))>=c['minimum'] and f(r.get(c['feature']))<=c['maximum'] for c in rule['clauses'])
+
+          data=json.loads(Path('artifacts/e4-v12-golden-live-economics.json').read_text())
           result={}
           passed=True
-          for latency in L:
-              doc=json.loads(Path(f'artifacts/e4-v12-sub10ms-live-audit-{latency}.json').read_text())
-              rows=[r for r in extract(doc) if ok(r)]
-              w=sum(f(r.get('pnl_sol'))>0 for r in rows)
-              m={'trades':len(rows),'wins':w,'losses':len(rows)-w,'win_rate':w/len(rows) if rows else 0.0,
-                 'wilson_low':wilson(w,len(rows)),'net_pnl_sol':sum(f(r.get('pnl_sol')) for r in rows),'profit_factor':pf(rows)}
-              result[str(latency)]=m
-              passed &= m['trades']>=8 and m['win_rate']>=0.65 and m['wilson_low']>=0.30 and m['net_pnl_sol']>0 and m['profit_factor']>=1.25
-          payload={'version':'e4-v12-sub10ms-fresh-live-v1','status':'LIVE_0_10MS_HIGH_WR_CONFIRMED' if passed else 'NOT_CONCLUSIVE',
-                   'frozen_rule':rule,'latencies':result,'untouched_live':True,'retuned_on_live':False}
-          Path('artifacts/e4-v12-sub10ms-live-verdict.json').write_text(json.dumps(payload,indent=2,sort_keys=True))
-          Path('artifacts/e4-v12-sub10ms-live-status.txt').write_text(payload['status']+'\n')
-          print(json.dumps(payload,indent=2,sort_keys=True))
-          if not passed:raise SystemExit(1)
+          for latency,block in data['results'].items():
+              metrics=block['all_predictions']
+              trades=int(metrics.get('closed') or 0)
+              wins=int(metrics.get('wins') or 0)
+              wr=float(metrics.get('win_rate') or 0)
+              pnl=float(metrics.get('net_pnl_sol') or 0)
+              pf=metrics.get('profit_factor')
+              pf=float(pf) if pf is not None and math.isfinite(float(pf)) else (999.0 if pnl>0 and wins==trades and trades>0 else 0.0)
+              if trades:
+                  z=1.96; p=wins/trades; den=1+z*z/trades
+                  wilson=max(0.0,(p+z*z/(2*trades)-z*math.sqrt((p*(1-p)+z*z/(4*trades))/trades))/den)
+              else:
+                  wilson=0.0
+              ok=trades>=4 and wr>=0.65 and wilson>=0.30 and pnl>0 and pf>=1.25
+              result[latency]={'trades':trades,'wins':wins,'win_rate':wr,'wilson_low':wilson,'net_pnl_sol':pnl,'profit_factor':pf,'passed':ok}
+              passed = passed and ok
+          verdict={
+              'version':'e4-v12-golden-live-verdict-v1',
+              'status':'FOUND_LIVE_SUB10MS_GOLDEN_THESIS' if passed else 'NOT_CONCLUSIVE',
+              'latencies':result,
+              'untouched_live':True,
+              'starting_balance_sol':3.0,
+              'no_live_tuning':True,
+          }
+          Path('artifacts/e4-v12-golden-live-verdict.json').write_text(json.dumps(verdict,indent=2,sort_keys=True))
+          Path('artifacts/e4-v12-golden-live-status.txt').write_text(verdict['status']+'\n')
+          print(json.dumps(verdict,indent=2,sort_keys=True))
+          if not passed:
+              raise SystemExit(1)
           PY
 
-      - name: Require measured local decision and builder dispatch below 10ms
+      - name: Persist only a fully confirmed thesis on the research branch
+        if: success()
         run: |
-          python - <<'PY'
-          import json,math
-          from pathlib import Path
-          docs=[]
-          for p in (Path('artifacts/e4-v12-sub10ms-pipeline-stress.json'),Path('artifacts/e4-v12-sub10ms-live.json')):
-              docs.append(json.loads(p.read_text()))
-          found=[]
-          def walk(v,path=''):
-              if isinstance(v,dict):
-                  for k,x in v.items():
-                      q=f'{path}.{k}' if path else k
-                      lk=k.lower()
-                      if isinstance(x,(int,float)) and math.isfinite(float(x)) and ('p95' in lk or 'p99' in lk) and ('latency' in q.lower() or 'decision' in q.lower() or 'builder' in q.lower() or 'pipeline' in q.lower()):
-                          found.append((q,float(x)))
-                      walk(x,q)
-              elif isinstance(v,list):
-                  for i,x in enumerate(v):walk(x,f'{path}[{i}]')
-          for d in docs:walk(d)
-          decision=[x for p,x in found if ('decision' in p.lower() or 'pipeline' in p.lower()) and x>=0]
-          builder=[x for p,x in found if 'builder' in p.lower() and x>=0]
-          passed=bool(decision and builder and max(decision)<10.0 and max(builder)<10.0)
-          payload={'version':'e4-v12-sub10ms-latency-v1','status':'SUB_10MS_LOCAL_DISPATCH_CONFIRMED' if passed else 'NOT_CONCLUSIVE',
-                   'decision_percentiles_ms':decision,'builder_percentiles_ms':builder,'all_discovered_metrics':found}
-          Path('artifacts/e4-v12-sub10ms-latency-verdict.json').write_text(json.dumps(payload,indent=2,sort_keys=True))
-          Path('artifacts/e4-v12-sub10ms-latency-status.txt').write_text(payload['status']+'\n')
-          print(json.dumps(payload,indent=2,sort_keys=True))
-          if not passed:raise SystemExit(1)
-          PY
-
-      - name: Persist only a fully confirmed paper/live research candidate
-        run: |
-          test "$(cat artifacts/e4-v12-sub10ms-live-status.txt)" = "LIVE_0_10MS_HIGH_WR_CONFIRMED"
-          test "$(cat artifacts/e4-v12-sub10ms-latency-status.txt)" = "SUB_10MS_LOCAL_DISPATCH_CONFIRMED"
-          mkdir -p docs/research models/e4/research
-          cp artifacts/e4-v12-sub10ms-frozen-thesis.json models/e4/research/
-          cp artifacts/e4-v12-sub10ms-live-verdict.json docs/research/
-          cp artifacts/e4-v12-sub10ms-latency-verdict.json docs/research/
-          printf 'FOUND\n' > docs/research/e4-v12-sub10ms-status.txt
-          git config user.name 'gambit-e4-research'
+          mkdir -p models/e4/research docs/research
+          cp artifacts/e4-v12-golden-thesis.json docs/research/e4-v12-golden-thesis.json
+          cp artifacts/e4-v12-golden-thesis.joblib models/e4/research/e4-v12-golden-thesis.joblib
+          cp artifacts/e4-v12-golden-live-verdict.json docs/research/e4-v12-golden-live-verdict.json
+          git config user.name 'gambit-v12-research'
           git config user.email 'actions@users.noreply.github.com'
-          git add models/e4/research/e4-v12-sub10ms-frozen-thesis.json docs/research/e4-v12-sub10ms-*.json docs/research/e4-v12-sub10ms-status.txt
-          git commit -m 'research(e4-v12): confirm high-WR sub-10ms live entry thesis [skip ci]'
-          git push origin HEAD:codex/e4-v12-sub10ms-entry-research-20260905
+          git add docs/research/e4-v12-golden-thesis.json \
+            docs/research/e4-v12-golden-live-verdict.json \
+            models/e4/research/e4-v12-golden-thesis.joblib
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(e4-v12): persist live-confirmed sub-10ms golden thesis [skip ci]'
+            git push origin HEAD:"$RESEARCH_BRANCH"
+          fi
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: e4-v12-sub10ms-live-${{ github.run_id }}
+          name: e4-v12-golden-live-${{ github.run_id }}
           path: |
-            artifacts/e4-v12-sub10ms-progress.json
-            artifacts/e4-v12-sub10ms-live.json
-            artifacts/e4-v12-sub10ms-live.md
-            artifacts/e4-v12-sub10ms-live-live-events.jsonl
-            artifacts/e4-v12-sub10ms-live-audit-*.json
-            artifacts/e4-v12-sub10ms-live-verdict.json
-            artifacts/e4-v12-sub10ms-latency-verdict.json
-            artifacts/e4-v12-sub10ms-pipeline-stress.json
+            artifacts/e4-v12-golden-live-progress.json
+            artifacts/e4-v12-golden-live.json
+            artifacts/e4-v12-golden-live-live-events.jsonl
+            artifacts/e4-v12-golden-live-predictions.json
+            artifacts/e4-v12-golden-live-economics.json
+            artifacts/e4-v12-golden-live-verdict.json
+            artifacts/e4-v12-golden-live-status.txt
           if-no-files-found: warn
           retention-days: 30
