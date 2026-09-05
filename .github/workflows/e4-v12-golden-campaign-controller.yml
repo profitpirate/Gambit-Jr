@@ -1,0 +1,134 @@
+name: E4 V12 golden campaign controller
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-sub10ms-entry-research-20260905
+    paths:
+      - ".github/workflows/e4-v12-golden-campaign-controller.yml"
+      - "research/e4-v12-campaign-trigger-*.txt"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  REPO: profitpirate/Gambit-Jr
+  BRANCH: codex/e4-v12-sub10ms-entry-research-20260905
+
+concurrency:
+  group: e4-v12-golden-campaign-controller
+  cancel-in-progress: true
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          fetch-depth: 0
+
+      - name: Wait for current qualification campaign to settle
+        run: |
+          workflows=(
+            e4-v12-recurrence-golden-v3.yml
+            e4-v12-buyer-cluster-golden.yml
+            e4-v12-prior-whitelist-golden.yml
+            e4-v12-reactive-confidence-golden.yml
+            e4-v12-prelaunch-social-golden.yml
+            e4-v12-golden-multithesis-v5.yml
+          )
+          mkdir -p /tmp/campaign
+          for attempt in $(seq 1 150); do
+            active=0
+            : > /tmp/campaign/runs.jsonl
+            for workflow in "${workflows[@]}"; do
+              row="$(gh run list --repo "$REPO" --workflow "$workflow" --branch "$BRANCH" --limit 1 \
+                --json databaseId,status,conclusion,createdAt,headSha,name 2>/dev/null \
+                --jq '.[0] // {}' || echo '{}')"
+              echo "$row" >> /tmp/campaign/runs.jsonl
+              status="$(jq -r '.status // "missing"' <<<"$row")"
+              if [ "$status" = queued ] || [ "$status" = in_progress ] || [ "$status" = waiting ]; then
+                active=$((active+1))
+              fi
+            done
+            echo "campaign poll $attempt active=$active"
+            cat /tmp/campaign/runs.jsonl | jq -s .
+            if [ "$active" -eq 0 ] && [ "$attempt" -ge 3 ]; then
+              break
+            fi
+            sleep 60
+          done
+
+      - name: Pull persisted outcomes and write compact campaign state
+        run: |
+          git fetch origin "$BRANCH"
+          git reset --hard "origin/$BRANCH"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          statuses={}
+          ready=[]
+          fresh=[]
+          for path in sorted(Path('docs/research').glob('e4-v12-*-current-status.json')):
+              try:
+                  doc=json.loads(path.read_text())
+              except Exception:
+                  continue
+              statuses[path.name]=doc
+              if doc.get('ready_for_fresh_live'):
+                  ready.append(path.name)
+          for path in sorted(Path('docs/research').glob('e4-v12-*-fresh-live.json')):
+              try:
+                  doc=json.loads(path.read_text())
+              except Exception:
+                  continue
+              fresh.append({'path':path.name,'status':doc.get('status')})
+
+          run_rows=[]
+          source=Path('/tmp/campaign/runs.jsonl')
+          if source.exists():
+              for line in source.read_text().splitlines():
+                  try: run_rows.append(json.loads(line))
+                  except Exception: pass
+
+          sentinel=Path('research/e4-v12-golden-sentinel.txt')
+          found=sentinel.exists() and sentinel.read_text().strip()=='FOUND'
+          active=sum(row.get('status') in {'queued','in_progress','waiting'} for row in run_rows)
+          if found:
+              state='FOUND'
+          elif active:
+              state='ACTIVE'
+          elif ready:
+              state='AWAITING_FRESH_LIVE'
+          else:
+              state='STILL_RESEARCHING'
+          payload={
+              'version':'e4-v12-golden-campaign-state-v1',
+              'state':state,
+              'found':found,
+              'active_runs':active,
+              'historical_candidates_ready_for_live':ready,
+              'fresh_results':fresh,
+              'latest_workflow_runs':run_rows,
+              'status_files':statuses,
+          }
+          Path('research/e4-v12-campaign-state.txt').write_text(state+'\n')
+          Path('docs/research/e4-v12-golden-campaign-state.json').write_text(json.dumps(payload,indent=2,sort_keys=True))
+          print(json.dumps(payload,indent=2,sort_keys=True))
+          PY
+
+      - name: Persist campaign state
+        run: |
+          git config user.name 'gambit-v12-campaign-controller'
+          git config user.email 'actions@users.noreply.github.com'
+          git add research/e4-v12-campaign-state.txt docs/research/e4-v12-golden-campaign-state.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(e4-v12): persist golden campaign state [skip ci]'
+            git push origin HEAD:"$BRANCH"
+          fi
