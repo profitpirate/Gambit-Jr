@@ -53,16 +53,16 @@ class TransportEpochTests(unittest.IsolatedAsyncioTestCase):
         after_epoch = time.time_ns()
         await sender.close()
 
-        self.assertTrue(result.success)
-        self.assertGreaterEqual(result.started_ns, before_epoch)
-        self.assertLessEqual(result.finished_ns, after_epoch)
-        self.assertGreaterEqual(result.finished_ns, result.started_ns)
+        self.assertTrue(result.accepted)
+        self.assertGreaterEqual(result.submitted_ns, before_epoch)
+        self.assertLessEqual(result.completed_ns, after_epoch)
+        self.assertGreaterEqual(result.completed_ns, result.submitted_ns)
         self.assertEqual(len(sender.telemetry), 1)
         self.assertGreaterEqual(sender.telemetry[0].elapsed_ms, 0.0)
         # Epoch nanoseconds are currently around 1e18; monotonic process time is
         # deliberately a different clock and must not leak into persistence.
-        self.assertGreater(result.started_ns, 1_000_000_000_000_000_000)
-        self.assertLess(sender.telemetry[0].started_ns, result.started_ns)
+        self.assertGreater(result.submitted_ns, 1_000_000_000_000_000_000)
+        self.assertLess(sender.telemetry[0].started_ns, result.submitted_ns)
 
 
 if __name__ == "__main__":
