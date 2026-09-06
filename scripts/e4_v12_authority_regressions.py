@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
@@ -41,6 +42,10 @@ def main() -> int:
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
 
+    environment = os.environ.copy()
+    environment.setdefault("PYTHONHASHSEED", "0")
+    environment.setdefault("E4_PIPELINES_BACKGROUND", "false")
+
     started = time.perf_counter()
     rows: list[dict[str, Any]] = []
     for module in AUTHORITY_MODULES:
@@ -51,6 +56,7 @@ def main() -> int:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             check=False,
+            env=environment,
         )
         elapsed = time.perf_counter() - module_started
         row = {
@@ -66,11 +72,13 @@ def main() -> int:
 
     failed = [row for row in rows if not row["passed"]]
     report = {
-        "version": "e4-v12-isolated-authority-regressions-v1",
+        "version": "e4-v12-isolated-authority-regressions-v2",
         "modules": len(rows),
         "passed_modules": len(rows) - len(failed),
         "failed_modules": len(failed),
         "failed": [row["module"] for row in failed],
+        "pythonhashseed": environment["PYTHONHASHSEED"],
+        "pipelines_background": environment["E4_PIPELINES_BACKGROUND"],
         "elapsed_seconds": round(time.perf_counter() - started, 6),
         "results": rows,
     }
