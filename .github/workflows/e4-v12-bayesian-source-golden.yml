@@ -8,6 +8,7 @@ on:
       - ".github/workflows/e4-v12-bayesian-source-golden.yml"
       - "scripts/e4_v12_bayesian_source_golden.py"
       - "scripts/e4_v12_reactive_profit_clustered.py"
+      - "tests/test_v12_true_latency_replay.py"
       - "research/e4-v12-bayesian-source-trigger*.txt"
   workflow_dispatch:
 
@@ -57,6 +58,7 @@ jobs:
 
       - name: Regress exact output, exits and transport
         run: |
+          mkdir -p artifacts
           python -m unittest tests.test_v12_true_latency_replay -v
           python -m unittest tests.test_v12_tight_output -v
           python -m unittest tests.test_v12_strict_output_deferred -v
@@ -75,7 +77,6 @@ jobs:
             scripts/e4_v12_end_to_end_latency_benchmark.py
           node --check tools/e4-builder/strict-race-proxy-v12.mjs
           E4_BUILDER_ALLOW_REMOTE_FALLBACK=false node tools/e4-builder/race-proxy-v3.mjs --self-test
-          mkdir -p artifacts
           python -m scripts.e4_v12_end_to_end_latency_benchmark \
             --iterations 1000 \
             --warmup 100 \
@@ -117,6 +118,7 @@ jobs:
         id: status
         if: always()
         run: |
+          mkdir -p artifacts
           status=NOT_CONCLUSIVE
           if [ -s artifacts/report.json ]; then status="$(jq -r '.status // "NOT_CONCLUSIVE"' artifacts/report.json)"; fi
           echo "status=$status" >> "$GITHUB_OUTPUT"
