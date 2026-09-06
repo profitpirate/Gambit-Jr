@@ -126,7 +126,7 @@ async def transport_benchmark(iterations: int, warmup: int) -> dict[str, Any]:
                 )
             )
             new_receipts = receipts[before_count:]
-            if not all(result.success for result in results) or len(new_receipts) < len(routes):
+            if not all(result.accepted for result in results) or len(new_receipts) < len(routes):
                 raise RuntimeError("warmed fanout did not reach every loopback route")
             receipt_times = [timestamp for _, timestamp in new_receipts]
             first_ms = max(0.0, (min(receipt_times) - started_ns) / 1_000_000.0)
@@ -160,7 +160,7 @@ def main() -> int:
     dispatch_p95 = finite(dispatch.get("first_socket_receipt_p95_ms"))
     combined_upper_bound = prebroadcast_p95 + dispatch_p95
     result = {
-        "version": "e4-v12-end-to-end-latency-benchmark-v1",
+        "version": "e4-v12-end-to-end-latency-benchmark-v2",
         "scope": "guarded request -> local build/sign -> warmed loopback socket receipt",
         "does_not_claim": "mainnet landing latency",
         "prebroadcast": prebroadcast,
