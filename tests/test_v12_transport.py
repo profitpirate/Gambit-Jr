@@ -19,7 +19,6 @@ class TransportV12Tests(unittest.IsolatedAsyncioTestCase):
             if request.method == "POST":
                 payload = await request.json()
                 self.received.append((request.path, time.perf_counter_ns(), payload))
-                params = payload.get("params") or []
                 signature = "S" * 88
                 return web.json_response({"jsonrpc": "2.0", "id": 1, "result": signature})
             return web.json_response({"ok": True})
@@ -60,7 +59,7 @@ class TransportV12Tests(unittest.IsolatedAsyncioTestCase):
         )
         await sender.close()
         self.assertGreaterEqual(len(results), 2)
-        self.assertTrue(all(result.success for result in results))
+        self.assertTrue(all(result.accepted for result in results))
         posts = [row for row in self.received if row[2].get("method") == "sendTransaction"]
         self.assertEqual(len(posts), len(routes))
         self.assertTrue(all((row[2].get("params") or [None])[0] == "signed-base64" for row in posts))
@@ -72,7 +71,7 @@ class TransportV12Tests(unittest.IsolatedAsyncioTestCase):
         name, url = sender.routes[0]
         result = await sender._send(99, name, url, "signed-base64", "S" * 88)
         await sender.close()
-        self.assertTrue(result.success)
+        self.assertTrue(result.accepted)
         self.assertEqual(len(sender.telemetry), 1)
         self.assertTrue(sender.telemetry[0].success)
         self.assertGreaterEqual(sender.telemetry[0].elapsed_ms, 0.0)
