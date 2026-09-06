@@ -56,13 +56,23 @@ _BaseSender = repairs.FastPersistentRouteSender
 class FinalPersistentRouteSender(_BaseSender):
     """Drop-in sender preserving the legacy `_session()` API.
 
-    Every route receives the exact same signed transaction immediately.  The
+    Every route receives the exact same signed transaction immediately. The
     class deliberately keeps `_session()` callable because existing benchmark,
     engine and cleanup code use that interface.
     """
 
     def __init__(self, settings: Any, rpc: Any) -> None:
         super().__init__(settings, rpc)
+        # An older RouteSender ancestor stored a session/None directly in the
+        # instance attribute `_session`, shadowing this class's method. Remove
+        # only that instance-level value so normal method resolution is
+        # restored. Retain an actual inherited ClientSession for safe cleanup.
+        shadowed_session = self.__dict__.pop("_session", None)
+        self._shadowed_parent_session: aiohttp.ClientSession | None = (
+            shadowed_session
+            if isinstance(shadowed_session, aiohttp.ClientSession)
+            else None
+        )
         # The parent may maintain its own `_http_session`; final V12 uses a
         # separate explicit field so it never shadows the `_session()` method.
         self._final_http_session: aiohttp.ClientSession | None = None
@@ -268,6 +278,9 @@ class FinalPersistentRouteSender(_BaseSender):
         if self._final_http_session is not None:
             await self._final_http_session.close()
             self._final_http_session = None
+        if self._shadowed_parent_session is not None and not self._shadowed_parent_session.closed:
+            await self._shadowed_parent_session.close()
+            self._shadowed_parent_session = None
         parent_close = getattr(super(), "close", None)
         if callable(parent_close):
             value = parent_close()
