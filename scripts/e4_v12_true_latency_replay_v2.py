@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Any, Mapping, Sequence
 
 from scripts import e4_v12_true_latency_replay as base
+from scripts import e4_v12_true_latency_compat  # noqa: F401 - installs migrated API bridge
 
 _ORIGINAL_SIMULATE_POSITION = base.simulate_position
 
@@ -45,9 +46,7 @@ def simulate_position(
     return position, status
 
 
-# All callers imported by the thesis search hold the same module object. Patch
-# the economic primitive once so historical search, holdout and CLI execution
-# share identical reactive output semantics.
+# Retained modules resolve this function through the shared base module.
 base.simulate_position = simulate_position
 
 
