@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import time
 import unittest
+from pathlib import Path
 from types import MappingProxyType, SimpleNamespace
 from unittest.mock import patch
 
@@ -68,7 +69,12 @@ class Sub10msRepairTests(unittest.TestCase):
         return state
 
     def policy(self):
-        return core.E4Policy(SimpleNamespace(model_path=None))
+        # E4Policy expects a Path-like model location and safely treats a
+        # non-existent file as an empty model. Passing None exercised neither
+        # production behaviour nor the V12 exit repair.
+        return core.E4Policy(
+            SimpleNamespace(model_path=Path("/tmp/gambit-v12-test-model-does-not-exist.json"))
+        )
 
     def install(self, mint: str, source: E4Signal) -> None:
         PIPELINES._e4_entries = MappingProxyType({mint: source})
