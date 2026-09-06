@@ -57,26 +57,10 @@ jobs:
           node --check tools/e4-builder/strict-race-proxy-v12.mjs
           E4_BUILDER_ALLOW_REMOTE_FALLBACK=false node tools/e4-builder/race-proxy-v3.mjs --self-test
 
-      - name: Current V12 authority regressions
+      - name: Current V12 authority regressions in isolated interpreters
         run: |
-          python -m unittest -v \
-            tests.test_v12_true_latency_replay \
-            tests.test_v12_tight_output \
-            tests.test_v12_strict_output_deferred \
-            tests.test_v12_independent_exit_replay \
-            tests.test_v12_transport \
-            tests.test_v12_transport_epoch \
-            tests.test_e4_final \
-            tests.test_e4_hardening_v4 \
-            tests.test_e4_hardening_v5 \
-            tests.test_e4_production \
-            tests.test_e4_stress_hardening \
-            tests.test_e4_v10_direct_ca_social \
-            tests.test_e4_v10_learning_finalizer \
-            tests.test_e4_v10_production_wiring \
-            tests.test_e4_v12_sub10ms_repairs \
-            tests.test_e4_v12_true_latency_replay \
-            tests.test_e4_v12_sub10ms_transport_final
+          python scripts/e4_v12_authority_regressions.py \
+            --output artifacts/e4-v12-authority-regressions.json
 
       - name: Superseded V6-V10 contract audit
         if: always()
@@ -104,6 +88,7 @@ jobs:
         with:
           name: e4-v12-sub10ms-repair-ci-${{ github.run_id }}
           path: |
+            artifacts/e4-v12-authority-regressions.json
             artifacts/e4-v12-hotpath.json
             artifacts/legacy-e4-regressions.log
             artifacts/legacy-e4-regressions-status.txt
