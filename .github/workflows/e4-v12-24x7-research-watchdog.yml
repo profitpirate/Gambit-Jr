@@ -1,0 +1,77 @@
+name: E4 V12 24x7 research watchdog
+
+on:
+  schedule:
+    - cron: "3,13,23,33,43,53 * * * *"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/e4-v12-24x7-research-watchdog.yml"
+      - "scripts/e4_v12_24x7_watchdog.py"
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: e4-v12-24x7-research-watchdog
+  cancel-in-progress: true
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      E4_WATCHDOG_MAX_DISPATCHES: "6"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Inspect and self-heal every research lane
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_v12_24x7_watchdog.py \
+            --repo "$GITHUB_REPOSITORY" \
+            --max-dispatches "$E4_WATCHDOG_MAX_DISPATCHES" \
+            --output artifacts/e4-v12-watchdog-status.json
+      - name: Publish readable status
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          path=Path("artifacts/e4-v12-watchdog-status.json")
+          if not path.exists():
+              raise SystemExit("watchdog status was not generated")
+          data=json.loads(path.read_text())
+          lines=[
+              "# E4 V12 24×7 watchdog", "",
+              f"- State: **{data.get('state')}**",
+              f"- Checked: `{data.get('checked_at')}`",
+              f"- Golden thesis found: **{data.get('found')}**",
+              f"- Dispatches this tick: **{data.get('dispatches', 0)}**",
+              f"- Healthy/cooling lanes: **{data.get('active_or_healthy', 0)}**", "",
+              "| Lane | Decision | Latest | Reason |",
+              "|---|---|---|---|",
+          ]
+          for row in data.get("actions", []):
+              latest=f"{row.get('latest_status') or '-'} / {row.get('latest_conclusion') or '-'}"
+              reason=str(row.get("reason") or "").replace("|", "/")
+              lines.append(f"| `{row.get('workflow')}` | **{row.get('decision')}** | {latest} | {reason} |")
+          Path("artifacts/e4-v12-watchdog-status.md").write_text("\n".join(lines)+"\n")
+          with open(Path(os.environ["GITHUB_STEP_SUMMARY"]), "a", encoding="utf-8") as handle:
+              handle.write("\n".join(lines)+"\n")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-watchdog-${{ github.run_id }}
+          path: artifacts/e4-v12-watchdog-status.*
+          if-no-files-found: warn
+          retention-days: 14

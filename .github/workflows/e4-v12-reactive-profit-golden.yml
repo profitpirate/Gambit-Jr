@@ -1,0 +1,15 @@
+name: E4 V12 reactive-profit golden
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  default-branch-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "This file registers workflow_dispatch on the default branch."
+          echo "Select the research branch to execute its full workflow definition."
