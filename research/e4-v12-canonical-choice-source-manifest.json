@@ -1,0 +1,175 @@
+{
+  "version": "e4-v12-canonical-choice-source-manifest-v1",
+  "repository": "profitpirate/Gambit-Jr",
+  "source_branch": "codex/e4-v12-sub10ms-entry-research-20260905",
+  "source_head": "d3c05bdaf788d60f5ccf7d1dc0d8c0ccbc1ef8ac",
+  "chronology": "received_ns is authoritative; slot, transaction index, event index, and signature break exact receipt-time ties only",
+  "choice_window_ms": 1500,
+  "window_boundaries_ms": [100, 250, 500, 750, 1000, 1500],
+  "splits": {
+    "train": [
+      "33605109571",
+      "33627431540",
+      "33644544746",
+      "33656916992",
+      "33669514091",
+      "33681664773",
+      "33692043170",
+      "33704841852"
+    ],
+    "validation": ["33716649440", "33741470396"],
+    "holdout": ["33792881280", "33822988156"]
+  },
+  "captures": [
+    {
+      "run_id": "33605109571",
+      "artifact_name": "e4-v12-forward-33605109571",
+      "workflow": "e4-v12-selection-certification.yml",
+      "batch_bytes": 1052726,
+      "batch_sha256": "424d180cda8076c0ec2d1e6716bc537dda99edbd6d5f2613744a3c8d201b18c6",
+      "events_bytes": 222757994,
+      "events_sha256": "1bfe30a7a7e2bc159616c2f68a2ee6410a9ec4b26d28eedcd0609b6b35e1dded"
+    },
+    {
+      "run_id": "33627431540",
+      "artifact_name": "e4-v12-forward-33627431540",
+      "workflow": "e4-v12-selection-certification.yml",
+      "batch_bytes": 1031043,
+      "batch_sha256": "35d2cd12a58e2c593b8b50161281152ea81765b9b6b05a14ab0f824697337bea",
+      "events_bytes": 231223821,
+      "events_sha256": "54e96699d70b53357c0f7249f228fa4af83ed43f15b7a5455988ac12cbeef9f5"
+    },
+    {
+      "run_id": "33644544746",
+      "artifact_name": "e4-v12-forward-33644544746",
+      "workflow": "e4-v12-selection-certification.yml",
+      "batch_bytes": 1001918,
+      "batch_sha256": "150c6a1bca9e5d3c0fa2690fdbb7f120e0206e1cd512e3fe7d27a45bf993fbcf",
+      "events_bytes": 250192798,
+      "events_sha256": "2552e11c1d6a36aebc882f3e997ae24ddd85db378e3c75a3997aaf2a664d0553"
+    },
+    {
+      "run_id": "33656916992",
+      "artifact_name": "e4-v12-forward-33656916992",
+      "workflow": "e4-v12-selection-certification.yml",
+      "batch_bytes": 1014682,
+      "batch_sha256": "d80632fd36a4e65a5690e5470b98f96d660ebae44f85510ee76267b4a5f0d3d8",
+      "events_bytes": 265608599,
+      "events_sha256": "5549961baff426b65700294a7692c7b7d164beae60078596fb2c72018039a70c"
+    },
+    {
+      "run_id": "33669514091",
+      "artifact_name": "e4-v12-forward-33669514091",
+      "workflow": "e4-v12-selection-certification.yml",
+      "batch_bytes": 996602,
+      "batch_sha256": "c9bc2d16111cb194af422ff9421505c95513403d095ff7d8f12cfe6f6b1a6841",
+      "events_bytes": 232358357,
+      "events_sha256": "9b8f0ab72e51c649622378ede0fc7cbeb1c120263fb4da3b44b289e23673ec2f"
+    },
+    {
+      "run_id": "33681664773",
+      "artifact_name": "e4-v12-forward-33681664773",
+      "workflow": "e4-v12-selection-certification.yml",
+      "batch_bytes": 1009376,
+      "batch_sha256": "094f59d775a55f9eee58e59c7b8c3f6d2dd25e171b92a4d4fa3342f1132a9a36",
+      "events_bytes": 260012590,
+      "events_sha256": "d70c12f8bed120d5fe0389e06f1be0a655201380b7235a0f93a73600a8f626c2"
+    },
+    {
+      "run_id": "33692043170",
+      "artifact_name": "e4-v12-forward-33692043170",
+      "workflow": "e4-v12-selection-certification.yml",
+      "batch_bytes": 997567,
+      "batch_sha256": "9a0cd6929c589732de0b52a50e741ceae01c527c10a1ffafba73562cd297e2df",
+      "events_bytes": 237249455,
+      "events_sha256": "f8e5d3ef5120aaa6abfd29c83437a87fbc7636276935c3901af7cd1818d0cceb"
+    },
+    {
+      "run_id": "33704841852",
+      "artifact_name": "e4-v12-forward-33704841852",
+      "workflow": "e4-v12-selection-certification.yml",
+      "batch_bytes": 996528,
+      "batch_sha256": "caa187d5aabcef48b87926e313b3578df354d75b6617a0861d98450f4e7d292c",
+      "events_bytes": 251655504,
+      "events_sha256": "b09a14c770216b8bbaf4f5a44bd295b14cb01d675b188378419ddd9037886f7a"
+    },
+    {
+      "run_id": "33716649440",
+      "artifact_name": "e4-v12-forward-33716649440",
+      "workflow": "e4-v12-selection-certification.yml",
+      "batch_bytes": 997816,
+      "batch_sha256": "74f802cfe017da3dfa431448ff819160ce0ddcf6007fb9ec29631520b973a4a4",
+      "events_bytes": 258974162,
+      "events_sha256": "6c865406cb400819488ba0a7657ebfd51f0d1c5d84cfb2a5de0999dfb4503f70"
+    },
+    {
+      "run_id": "33741470396",
+      "artifact_name": "e4-v12-forward-33741470396",
+      "workflow": "e4-v12-selection-certification.yml",
+      "batch_bytes": 1080701,
+      "batch_sha256": "038808152d7a4973cfc316714fb99f09db87dc6a668374cb6a0889e97ca1dec1",
+      "events_bytes": 217425812,
+      "events_sha256": "99d52116113a13660e41e41a52c77fe4b5cb6b8a671c440f57f06ebc8ac4f713"
+    },
+    {
+      "run_id": "33792881280",
+      "artifact_name": "e4-v12-forward-33792881280",
+      "workflow": "e4-v12-selection-certification.yml",
+      "batch_bytes": 1072963,
+      "batch_sha256": "83170248459ba8e950c0d0a19b56c73b7481fddc56b92403637578256af05b96",
+      "events_bytes": 259911452,
+      "events_sha256": "d5b33d6515bf74036e5ed9d41b90eff7f2ff2bc7a44768c76e4486736c3f76d6"
+    },
+    {
+      "run_id": "33822988156",
+      "artifact_name": "e4-v12-forward-33822988156",
+      "workflow": "e4-v12-selection-certification.yml",
+      "batch_bytes": 1074472,
+      "batch_sha256": "e28ace8beb57f54d3c4422025d215be4cab589079e6ef22e13efb1459fd8cafc",
+      "events_bytes": 258310771,
+      "events_sha256": "07850498561b4f2c81e498dd8a3ec5a37aa5db17ef6983ac623d31a338251a26"
+    }
+  ],
+  "research_artifacts": {
+    "failed_attempts": {
+      "run_id": "33883557623",
+      "artifact_name": "e4-v12-attempt-mint-forensics-33883557623",
+      "filename": "e4-v12-attempt-mint-forensics.json",
+      "bytes": 2368480,
+      "sha256": "8679123cccd24f05a95a4e727a7faeb4501562faf8598de346b5eae69d42a599"
+    },
+    "bundle_metadata": {
+      "run_id": "33876511129",
+      "artifact_name": "e4-v12-bundle-metadata-forensics-33876511129",
+      "filename": "e4-v12-bundle-metadata-forensics.json",
+      "bytes": 2121615,
+      "sha256": "4584e62d9be675e960b6836b73e1692fea90ff8167cb97c0781254dbb5acd34a"
+    },
+    "wallet_history": {
+      "run_id": "33876680669",
+      "artifact_name": "e4-v12-full-wallet-history-33876680669",
+      "filename": "e4-v12-full-wallet-history.json",
+      "bytes": 22306417,
+      "sha256": "6830ff9fdd515df518f52d5a30e9c889c807db17cbc1d27054d6e1f6da83f7b1"
+    },
+    "social_choice": {
+      "run_id": "33877632753",
+      "artifact_name": "e4-v12-social-choice-forensics-33877632753",
+      "filename": "e4-v12-social-choice-forensics.json",
+      "bytes": 1296474,
+      "sha256": "6e56029fd6b25ab1c772c4bd84c3cefaca5270b97f492cbe4026f508092187b0"
+    },
+    "global_attempt": {
+      "run_id": "33889403746",
+      "artifact_name": "e4-v12-global-attempt-intent-33889403746",
+      "filename": "e4-v12-global-attempt-intent.json",
+      "bytes": 18206038,
+      "sha256": "17557cad0f84e2d10e4c13fc87955e0d1e911c90c1fc067e690afb5f635ed3ce"
+    },
+    "causal_prior_registry": {
+      "filename": "docs/research/e4-v12-causal-prior-registry.json",
+      "bytes": 41349,
+      "sha256": "997c87aff155d07f72ea639f8aa4f7b112ff68784329d61a661a0e26433f54ea"
+    }
+  }
+}

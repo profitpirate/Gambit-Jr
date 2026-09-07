@@ -1,0 +1,3680 @@
+{
+  "coverage_percentages": {
+    "audited_resolved_wallet_selection_percent": 100.0,
+    "captured_selection_percent": 100.0,
+    "resolved_wallet_selection_clean_sample_percent": 45.09803921568628
+  },
+  "decision_groups": {
+    "alternatives": 174,
+    "maximum_candidates": 5,
+    "median_alternatives": 0.0,
+    "minimum_candidates": 1,
+    "rows": 496,
+    "selected_fill_rejected": 206,
+    "selected_landed": 116,
+    "total": 322
+  },
+  "exclusion_reason_counts": {
+    "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL": 127,
+    "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE": 265
+  },
+  "exclusion_reason_counts_by_selection": {
+    "FAILED_ATTEMPT": {
+      "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL": 79,
+      "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE": 164
+    },
+    "SUCCESSFUL_BUY": {
+      "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL": 48,
+      "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE": 101
+    }
+  },
+  "exclusions": [
+    {
+      "block_time": 1788494302,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "26Ps1RNGEXQ8F1BmLggo7dd8pXTSDHfTK4qK4QMhDdwatG3YjSjRArpUFFeSwUHYYsyWRk42onRVR9VmjXwh4ETX",
+      "slot": 444148092,
+      "transaction_index": 894
+    },
+    {
+      "block_time": 1788523373,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2DAbVLeMRtQYPow2bsFonNwQDb16YtEtwujNAbChoTKLrogQKS1vTEDyiQTzhaYPge3MVeCgBoRtW7ciPLSGUZXr",
+      "slot": 444240382,
+      "transaction_index": 921
+    },
+    {
+      "block_time": 1788513158,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2FRfmTU9NithqPQZpVkT33Q9ZZVG8PNyHh3j3LSUUX8TsH7WJRvxvTT8dmPTveAK7vegctcT9VCCQjc584aCUGKL",
+      "slot": 444207941,
+      "transaction_index": 312
+    },
+    {
+      "block_time": 1788527315,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2PDyr4FqQtgFSD57EnAbBdz4qNzpKSL3acoYjHVtcph5dxiXfk7gGN7UekG4xgz1cn5g3CHP3kHMRkWfYX3T8QNE",
+      "slot": 444252865,
+      "transaction_index": 1213
+    },
+    {
+      "block_time": 1788502908,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2csMejMT56GXBNf1gE5W1wW8NNuSBxUPRfdQJGKF3cC94RnWiMenBwg5ZQDgionmZFXFa6ucpyieGUgKMsTGm1Le",
+      "slot": 444175431,
+      "transaction_index": 53
+    },
+    {
+      "block_time": 1788500124,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2hBo7j7z58YPgMvbTW2DrARHFtk9YeQQsQo9ip8NwKjN6AMKmWEYRsVu4gBwFwTGBBpHXkSYrE8gmHTpkW1jDQM5",
+      "slot": 444166585,
+      "transaction_index": 557
+    },
+    {
+      "block_time": 1788320884,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2k7Jdk1CKx4iGMzLsggHGdeLnZgCSmY41f2AN2iNLk5t9N6AAYVzvGYxKLYrQnQJVbvbMRdRVQvMX1pXnaYTVfeq",
+      "slot": 443597498,
+      "transaction_index": 966
+    },
+    {
+      "block_time": 1788327608,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2m9dyrUp1wbCwkwE7syJSF3eSjhoLwTEGqmmst2f23HxeAwk6ZPiJJyezRRk9RV31KsdkPnD7GrQEwNt7zxkNgun",
+      "slot": 443618919,
+      "transaction_index": 658
+    },
+    {
+      "block_time": 1788493537,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2nKrerwNXUK7SCZHjPjAPEbtDCnrEZYzVmymhwTW94TiWcWs6UMgC5A5iSCXydP7ekQoogb9kxd8wZrhhyepDGqT",
+      "slot": 444145660,
+      "transaction_index": 128
+    },
+    {
+      "block_time": 1788325075,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2o1ZxnNipcmZjUsdupyG3fdxyKHDsmsrdYnfChG4bMt57uTvm4BjJoKmXPVxgW84a5tqrAaH9pqQjS8FeERDRos4",
+      "slot": 443610833,
+      "transaction_index": 71
+    },
+    {
+      "block_time": 1788504959,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2o8E2VFNPm3S2AQKmFhLeUWTsVuQKHM72zsokqXTEXKgnmgRfoeQq4UJViUtRCg4uuPHEB2WDu9reHxqrfpbE1Lp",
+      "slot": 444181936,
+      "transaction_index": 1044
+    },
+    {
+      "block_time": 1788493808,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2qziykyX7GJvAfkHKAyYHfSnkHt1YuaT8u39bu17MfcCLZBsfDVrG77Z3QUykiCF3wLBMSGToNuSHKKUeLb5dGVp",
+      "slot": 444146528,
+      "transaction_index": 591
+    },
+    {
+      "block_time": 1788327164,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2sTUFg3Qu5bKQJYR92Ez9anJBfoPZbiZHtDaYP3L2gsR38HB425wut6bkYUcF2Y5dsHYMVdDJ9AgtKAHEyh5gMBR",
+      "slot": 443617504,
+      "transaction_index": 1434
+    },
+    {
+      "block_time": 1788501094,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2skVdLxZDmcLGkP7fsxzbZNuGuNmj3CFHR2fXZrmbpCvBnnaVBoPsGX3T5PQZhjMCgG8oP84uaAuMC3vUp5oHzbu",
+      "slot": 444169654,
+      "transaction_index": 524
+    },
+    {
+      "block_time": 1788518575,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2tKYg9FszspzzciiBdFNnm5ZDGQeEaXRb3Z4Mt9Yj2FxKnjQkimKWDRhpB7Mo6uMVxLzJhZwBuFh5Nmxh1kBD3wk",
+      "slot": 444225110,
+      "transaction_index": 141
+    },
+    {
+      "block_time": 1788332991,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "323idsEVJrDaD8WaRUGt8Em95yRcTPqced8PcQ9orJaeArbqaV9pUzDE7DwLHvr54sXDVu8SP1jP1HtocscUtPBc",
+      "slot": 443636055,
+      "transaction_index": 1027
+    },
+    {
+      "block_time": 1788334368,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "33qJhYGRpk2ka3d1dW63wxjxoxipRtG5iRdtQWeyg9fZJmzggwWatHy1ZcdphADYqyYbzMZT4bESLe5iM1hHTaZH",
+      "slot": 443640422,
+      "transaction_index": 1072
+    },
+    {
+      "block_time": 1788327428,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3AiXF2ocA1P9Jvcj2QfaL6nr6Gmjn6Aux2hYyD4NT7RCva9mqnAEAoZPqAhcWNVpiQ3m3hWWHfCwKRXTwxxviTGd",
+      "slot": 443618345,
+      "transaction_index": 14
+    },
+    {
+      "block_time": 1788497292,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3Cwr3F1JrHgZoPvqTVY4NErS6fc8pDjfnQahzN4f36J1LWTwUa9VJsCF4kgJ2K2rqk4SyYAVLRCkpJBBmrXhyttJ",
+      "slot": 444157567,
+      "transaction_index": 325
+    },
+    {
+      "block_time": 1788324712,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3ExFFCzJv1QLm6crsLrirzsCkvCNfFhuQFRYeL1hXxEvZs2v7U31n6boVdm9tSLy6GQwEX28EtiNJz48XGUzNGo8",
+      "slot": 443609685,
+      "transaction_index": 387
+    },
+    {
+      "block_time": 1788325582,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3G42kQZRjozjd7ZyJuEeQNWSzWXMjGjKe73ttK2Y4mKPisN6rJdAnVmfKoBDcqKzDeKbHX4pK4WFZVVh8GeNVUvg",
+      "slot": 443612459,
+      "transaction_index": 1008
+    },
+    {
+      "block_time": 1788519540,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3JLZ6dbxhuKjUf6vVWP6Pt8gKEDdEugNEkLmoTK6NEL7EQAEMDebPHX2bP4eMNguFYg781FgJHGjBVp3jhdhpMg6",
+      "slot": 444228174,
+      "transaction_index": 253
+    },
+    {
+      "block_time": 1788512132,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3KaDwZg42b6j8ECvdLL3sDWtL6KsUrjTZWPbEgRvDZrHkuWGXGXSc4X7jdasyLzwFQP1XkQF5G3n1ZCE519u15w3",
+      "slot": 444204680,
+      "transaction_index": 892
+    },
+    {
+      "block_time": 1788331889,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3MxrcoqwozB6Ekc1EfLefw89qKrtpmzTPSiUouyaycVU2uh96rAH6VrPADea3jVkdp1uPkZjzp4bjjJ7nMk2SqgK",
+      "slot": 443632548,
+      "transaction_index": 1218
+    },
+    {
+      "block_time": 1788513206,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3SrorgcZ1XLpqKSAU6GkU8n6Lm9hTdFqQYgetvTZemUsb2W8Uuvy61f4HcvRFTZ6mjkPPPgGEtxiPNqkbV1r9SAh",
+      "slot": 444208093,
+      "transaction_index": 120
+    },
+    {
+      "block_time": 1788511852,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3TXzBpxRCN9P8cjSju6hDXZoWcK2aMzUZHpk7pKwZVzsFaL68ogq86Mdzm73c7KDcGncGRxXekGxWXpCyYoF68XX",
+      "slot": 444203796,
+      "transaction_index": 497
+    },
+    {
+      "block_time": 1788512806,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3YvZpVt5nhiwkahJgKhwKfwydY2YjDEEw2i22zwQht8Lu8HM7Spiy9ob5h2iRb8S9J2V72JpzdJsphba33BrRnPg",
+      "slot": 444206824,
+      "transaction_index": 642
+    },
+    {
+      "block_time": 1788497758,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3Zt9sU5bZK1G5Rny2tKhnLYARjN51ZMjmz3QQ9vrr1FioBEU5PQTDJnuq9RPmQBCpRtPTpfKtBwHayo8wRSVGw4B",
+      "slot": 444159056,
+      "transaction_index": 203
+    },
+    {
+      "block_time": 1788496288,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3mq7LVBequiAnedhWp74oYc55ovTfRy5ywPrs31ARjh2mfCo91gaLa97iiqwdpDqLNMDQoc2fi6yAzxnAEUeFRGe",
+      "slot": 444154388,
+      "transaction_index": 866
+    },
+    {
+      "block_time": 1788499231,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3nNJ3hhkmph8LxkqoemUzy5FwyCSjSD6DumiWUveAZQHSaB4r3qZDv134Zg7ouzPvKfuEGcdwCitj9bPK9W69h49",
+      "slot": 444163743,
+      "transaction_index": 1119
+    },
+    {
+      "block_time": 1788518477,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3nh4DDAkWXa7xLHhsKmr914rrHWZU3CM9KC2YBg1FiASyJnHnRb881nGNwmMTdmRb5X1ZoPrhGTiwQ4Zuas9uVkt",
+      "slot": 444224797,
+      "transaction_index": 558
+    },
+    {
+      "block_time": 1788323245,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3ntCqfCtGUYuMc2gQsrKhNn66mhvQnqpYkS7LjhDdftwqgC32ZR4T5x36dttn54QaGdrzPF3K6sD5MX4SB5inwQb",
+      "slot": 443605014,
+      "transaction_index": 139
+    },
+    {
+      "block_time": 1788515607,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3qLTrWJBDCNqyYr1roU6BhiwJApfqD6275RckLASKGb4wi3nmxqzPjPcbfBcCdzCJakQLnHJNFfEYb6T16cWySX6",
+      "slot": 444215691,
+      "transaction_index": 664
+    },
+    {
+      "block_time": 1788515679,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3zFqtFQCpyj596zegkm9XX4qzo5LgRZzUHYMZTheQ8SU2vjN97YciRXxn7ha7kqgv5knmaEg1qMUzwz2y6tkHjyY",
+      "slot": 444215922,
+      "transaction_index": 293
+    },
+    {
+      "block_time": 1788322016,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "41d19idonyF2qZjCrjAaRj15rg3HdoixUELc44mHpLGtBifnnK86rBR8TUBd8yrcMpAPB5xZiscPJxQB5LKcpe2M",
+      "slot": 443601096,
+      "transaction_index": 256
+    },
+    {
+      "block_time": 1788324167,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "45SJkomA58knF4htj5uM7a4coCJ6TAgTsLmKLBLK1wPgQKSM9mkkiTcUwJYgLXhdLHFmXwf6bVzCKiwFVvHaHX9h",
+      "slot": 443607946,
+      "transaction_index": 329
+    },
+    {
+      "block_time": 1788332251,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "468T55VDBrndzMGVibwEJAEBzFWS9sWwiyCNADnwc6m1jsqXV9Cqo8sNf8zcMNWkHuEuiu2ENZwDjn9EL3KmRBXN",
+      "slot": 443633697,
+      "transaction_index": 974
+    },
+    {
+      "block_time": 1788522702,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4EL9aGZPfc3PJYvgUE784JWXsdk3uQDsBBR9m3Bp1aWmiCQ6gn6UJtruKX8BLFp8a2ZXDzL9a9LQyPeTAGF2Gqbd",
+      "slot": 444238250,
+      "transaction_index": 150
+    },
+    {
+      "block_time": 1788327543,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4J3khxLrYzntpxu1DL7BAkFHWLSwas1wECV5CbD1v6dZRHwDJCrzbJTSbf8gC9skABJ6ep3j5zsqGn3vVhV85vX",
+      "slot": 443618711,
+      "transaction_index": 1060
+    },
+    {
+      "block_time": 1788503312,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4JjEgRa2GusYPJnxLZjsJ5VsRDzyy2W5WNjqUNRWxxYHAiQyBAe4mysU2eFM9SSX8dFpJ2GDaWTEESAGP5xxtubz",
+      "slot": 444176720,
+      "transaction_index": 652
+    },
+    {
+      "block_time": 1788333019,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4SiwGE5kTXthpdEUw22eKnNwuyN4cWsaZRLbZcgA4ywgHV1kbWhFZU5neyGXeMsxKR1JA5YqeDs2XtZJy1v6PMnj",
+      "slot": 443636141,
+      "transaction_index": 366
+    },
+    {
+      "block_time": 1788522748,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4XPjVeNX9ErVAXEwVTx3LLfocGLxN5FMvtVchvBPTGJs2wefsbhd3FMKySAYQ5A4DvTAgadohL1dE3XCKpQsJyrk",
+      "slot": 444238397,
+      "transaction_index": 539
+    },
+    {
+      "block_time": 1788320836,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4YCh9g9Uj2RTywcqTxtDaTKy7aKGtgLytKP4MWPWQaoVEYZUZ3d1dByFRC7wJeagLKrbZr1nJxGb4dEDKVh3x6W7",
+      "slot": 443597342,
+      "transaction_index": 1045
+    },
+    {
+      "block_time": 1788319826,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4YQ2RfRF4TeyJgFSgTbchCFNJ6wve4Ep3Brz28SbZZoSLy1p9Dcq7EvQnc7ew1WMeJQQY8Z9pgrmAyj3Pt8VQ9Bq",
+      "slot": 443594146,
+      "transaction_index": 456
+    },
+    {
+      "block_time": 1788333350,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4aSJK5AdjQZFUs6BbhrhdFkg2meM5xStJyC43GukRBV33WrQaoCMfrT2S2yZWyzvgZgXZWY7hZmWXFLyjSZv8hHW",
+      "slot": 443637194,
+      "transaction_index": 478
+    },
+    {
+      "block_time": 1788506063,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4b81fwG1YTBa3Qiv3FtqJEofPHRVUZvrtVQZYyDJCQtauGYGc4yYZQdRGpq1bUwcQYEKG8cJQqpgNw5GqoVXZyUj",
+      "slot": 444185431,
+      "transaction_index": 485
+    },
+    {
+      "block_time": 1788329652,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4b9NkVaWRaSzrZZoDPPWYGKQ5cwfetoquVg4LmBSFK5E1F481W9fpfUWKJuqSEj6ynk2eUFiMGYLzmY1X4x3xKp7",
+      "slot": 443625408,
+      "transaction_index": 1233
+    },
+    {
+      "block_time": 1788328222,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4kTb2iZkW19wbLYgKnMBzBeL8v2CYsz9oAXXXmfgYpsjBD1tfngcfb2V7SUpneckqR9U8rupyNrn3tL74TvSYU8W",
+      "slot": 443620855,
+      "transaction_index": 676
+    },
+    {
+      "block_time": 1788328033,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4rVjaafsA6bDAHCDa7McrwT92gw5czJpaWTyWK2JD8rr2h9FCbGXbqdhQgMj7hh1GAmgmf4GcmrhpaKpJpm6jsVG",
+      "slot": 443620258,
+      "transaction_index": 182
+    },
+    {
+      "block_time": 1788523245,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4rX2MG64a8eDBMwVjCBszzM28KKrZQbGhN29EqzcKY7D8neR1ARVbvDpL8t5mfQ5yqYM2x5keqXEK94ntx7GRZpn",
+      "slot": 444239982,
+      "transaction_index": 183
+    },
+    {
+      "block_time": 1788499025,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4tBTVYiE4TtXtJFn1NtTNsGLXm3D3KcviG8u1PDRTjSeUbL1peU111eKD6qSPo7ygZd3CsGWDDMbsu5xdVeBDS9D",
+      "slot": 444163084,
+      "transaction_index": 301
+    },
+    {
+      "block_time": 1788334975,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4xf1LkZEUDwikZTNkAoqywdJqLHzBtwxQwX8Sc35RoQTPkJQmk8bWc8bpb9XLs4rdXxTY3hKo3XPnn8BGwjnbhJt",
+      "slot": 443642354,
+      "transaction_index": 197
+    },
+    {
+      "block_time": 1788518160,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4y4vDddmZ2Hr9Y3XCCx5cC5CNXvLgfDqqJNvsMRC1FU7eSy3jY5mX79aGYhpct8uXAxX25apmH1QWT6L3GUT4DGx",
+      "slot": 444223789,
+      "transaction_index": 845
+    },
+    {
+      "block_time": 1788513905,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "51kAcBUFYhaQdH2YSyUZSuoBhjZEGR95SuincMXx1sKJS5wf1G9t5gQZwUw81QA5bFknUJsiMTDbtMvikG9C3Asn",
+      "slot": 444210307,
+      "transaction_index": 502
+    },
+    {
+      "block_time": 1788516165,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "52qQcNYGRoWQnd9TatjPfgzLf6FwPpzjSNorUCwQ5oRK9aMwxaMyysxTVZ2uzae81hNLiWaZVFDLwUiEbAERu3HS",
+      "slot": 444217461,
+      "transaction_index": 1096
+    },
+    {
+      "block_time": 1788323043,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "57nV2KgRChk2NkA8mNCzZ96yu32p8jM542nzZuL6MscDBPbeS9RoHLECw78d9tNM85AdFJocj1SVhacv71dJuxxk",
+      "slot": 443604369,
+      "transaction_index": 272
+    },
+    {
+      "block_time": 1788526048,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "58H7pvGsqsMYax699VHfSKevq4QsKt8NrYVLWrU4Zi7GP6CHxtHECWLtASbD2DSwSJe9vfSxgauK2vjCWJYgJ3CB",
+      "slot": 444248852,
+      "transaction_index": 495
+    },
+    {
+      "block_time": 1788321188,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5CpmXurbwJxk5Jp5QoF9JLhdBQr8nUs6Pu5R2kMxxiFa6unWXeCgcQBGtCNM5R1ZJuabEvXmaBknTh1ctwRzUkKe",
+      "slot": 443598462,
+      "transaction_index": 290
+    },
+    {
+      "block_time": 1788496357,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5JfywyeDLYREXfGdfJBS9d8kRdxnSrJt4PFq21AjQy114hxSXkdrMStpw3SwrTP4E6tUcjfQ5VmixabTz38VUu7A",
+      "slot": 444154610,
+      "transaction_index": 372
+    },
+    {
+      "block_time": 1788333447,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5LAqM1PX3HWLko4L5vaJvrwHUf8LYa4m3T4x2cAxXVwZUgdJD6QtSyeNmSJEVJWUv88xRn8hsUSyWKuWyKNrBrNh",
+      "slot": 443637505,
+      "transaction_index": 848
+    },
+    {
+      "block_time": 1788519956,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5MPHdvvoiPnAdP2WMiRFoWzJHFt8vTtoF6KQrkSgnvssAk8xVD2wvvpzCaTC6LBAhQBvG3AYNaL8vzmvB9TqkLLK",
+      "slot": 444229504,
+      "transaction_index": 703
+    },
+    {
+      "block_time": 1788493098,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5Mkq8onMqiQ87Lq3ThcuChESKmDFks2RDPYpKycKJwL5q8akDuwpY8m8SQArPXUuMb6GuTMSxKmhuqA4RPgRemMg",
+      "slot": 444144259,
+      "transaction_index": 171
+    },
+    {
+      "block_time": 1788502186,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5RsJesCkfptWZLzjqrzqCNL46DCToxHyzgEsnvozaRPesPkRASX64ce8A4xpF73nmaoq4ifQnYD6EXoU6fngsmoH",
+      "slot": 444173132,
+      "transaction_index": 779
+    },
+    {
+      "block_time": 1788516577,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5UHHzqCBtGYisL7HJS2FQyh19VapPcHS4k2a8ZseTrC2Tmbzx8LPzBgx2PqcXt7CXLnt8NJdRMhAjHxQMzgG5Fbo",
+      "slot": 444218772,
+      "transaction_index": 1118
+    },
+    {
+      "block_time": 1788320511,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5nEjrwJReiS1QkaPFrfp7N96hZpXdMHKhhjYw4SVEkZYefNBKfMv9cXu3Q3KbU4CWGdyfng6htnJKFfNs87gmz6P",
+      "slot": 443596307,
+      "transaction_index": 859
+    },
+    {
+      "block_time": 1788320500,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5qBjQ4uNBKVTuJ8KQisx1x9rMJekhTDjxXKnkgKeYEZQE7bqKTx8o1Ukgbufyxuacz9FPVEj34QPg1AHz4MAthr6",
+      "slot": 443596276,
+      "transaction_index": 304
+    },
+    {
+      "block_time": 1788323601,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "64ZEcuw3v972MgJiLwkMHYxW1QRsETfZH7RNWqDhRHixpiFNYEisiBCksGmE2TKwjRnbbM12nEC7PaXbzz5ETQWR",
+      "slot": 443606150,
+      "transaction_index": 670
+    },
+    {
+      "block_time": 1788508664,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "8bwirdcLqjwLxLn1CwVP4yjYxyixERGrAvZRvYVAVQ3g4cxHMKAv6Y1DbjPZacEEUmXX3MphGWAgQpWUp2fyaLR",
+      "slot": 444193686,
+      "transaction_index": 721
+    },
+    {
+      "block_time": 1788524773,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "AcAwzkWHE5XhQdXG3uktYA8vtMozEWEgauUtbX1AJnzUMnQRskcxkrtrEeqkLsti94UrSqoUhuz1ua8y2svLMG9",
+      "slot": 444244823,
+      "transaction_index": 288
+    },
+    {
+      "block_time": 1788519371,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "MhVQwK8opTtnmrZGEab5bE7mavjtPywoK88mmm7vK57YvbFnS1XEMZszJKX4fMWQFXJvKjCD8Yu6QQrwkcfub63",
+      "slot": 444227639,
+      "transaction_index": 14
+    },
+    {
+      "block_time": 1788514966,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "RLwfKNrKwDikfW5fsYYExfsDbCR78HDWUKup6GXr55e45VfSwruwHroSYwTFXv3TwrnEU3Td9RVi6kj3WiPm5dn",
+      "slot": 444213667,
+      "transaction_index": 28
+    },
+    {
+      "block_time": 1788521949,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "Xbq2sEutGpAibQw3QFh8wj7Fqj7zhE1NMLdnT2mQrdfYRQtaYzRs59CWNv1sQ623v2vsYswYucTaMCD8TwZmSbm",
+      "slot": 444235846,
+      "transaction_index": 800
+    },
+    {
+      "block_time": 1788509915,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "Xs3Za4Fv3EdvKnktwjzTPNAFBCe1F6rpmgRF1JYv9AmWVUnQ8XhaSWUHjzmzRQpCRffQDCgoHx8qSJsrowVAbFn",
+      "slot": 444197667,
+      "transaction_index": 220
+    },
+    {
+      "block_time": 1788501232,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "caTfddRwPvUFro4gzhxFYf6fwQ3hfuxyVEvnaxroUBFZK5BocF5PQZL5iGxfuz65NaiWfo4HTSSsCYY8uuCTMBq",
+      "slot": 444170090,
+      "transaction_index": 826
+    },
+    {
+      "block_time": 1788522512,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "dRTU17dTvDiCGr7Uhiwa8wdvMrzRQa2xZ7SDcqeSVsZv66W7fReC5HaypXCTcv8XLBKEhyLcgueA3rSJFpL8fXy",
+      "slot": 444237640,
+      "transaction_index": 466
+    },
+    {
+      "block_time": 1788334229,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "eZL4VLSqcZJZ4XUFSPSbjmnNTWa9gnWL9xuNbFRhUEpFc5S9uu4aGrFe8w9nMy8FsryEdcwtbuBAKZFGPZqfLnw",
+      "slot": 443639977,
+      "transaction_index": 768
+    },
+    {
+      "block_time": 1788527267,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "i8kJL7ZtXDdeEu7qkVNJ7brsqKLfSSzVTodghEZmZosKn8UQmN7UB4DzHvn7TP8BTv65Ap5C4szqpAJcpZU4D5F",
+      "slot": 444252714,
+      "transaction_index": 816
+    },
+    {
+      "block_time": 1788501724,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "n9u9xbpPf1AoDXHK9CHcensGwBKbFpAiGJzjxeptgAz629SCb1xJZj49N6ywDSwN25wpxUynGKHBAWxjACzgptF",
+      "slot": 444171659,
+      "transaction_index": 861
+    },
+    {
+      "block_time": 1788324688,
+      "mint": "",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "z4Q3gsmkG3RhpMpnsuNCVJdLqtTiY9FNnqvLiTE8ctLGHkJpNmvpp6oRfPnQhQfp87pHwpNvNEB3KXoorzhcD3F",
+      "slot": 443609608,
+      "transaction_index": 1584
+    },
+    {
+      "block_time": 1788454651,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "1caS1b9Vyvtu8nKjMDVMitmTeZch6xLGYA1vmf673Dc3Pfj9QKWWcKGK9RRq8PRiP49cDpyDQrd3dwcFiJFRjxc",
+      "slot": 444022422,
+      "transaction_index": 1235
+    },
+    {
+      "block_time": 1788381130,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "223bTk833WYgiXnKYHvQoSSHe12f3wic7DqueZFU5K5wDQcb5dC9e6aJGc2C3sg5hbATgmM2g2zXHfctveoRpMyv",
+      "slot": 443788885,
+      "transaction_index": 1021
+    },
+    {
+      "block_time": 1788467948,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "22skWE79sThWoPETwWoTvfkUe8aaoL4CyBvrmAsXxhqrFHa4QueK2mZW2U5nPXxqKmSdoJh8nMyJBVxYHHx8EZjm",
+      "slot": 444064520,
+      "transaction_index": 644
+    },
+    {
+      "block_time": 1788453783,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "26CFbmfTbnmxMqQiZnHGtg75FKVkC3CQbwFVKuhYW1rQPceFXVLvUqZFgNrGNeUMScCbVR3rL9TcGSU8K1tzGEeB",
+      "slot": 444019672,
+      "transaction_index": 1025
+    },
+    {
+      "block_time": 1788381290,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "28cNCwU66aPcMTaNL6d33ANdfx3JBpmatrCbCpb2yNeGDESqeKT8j4GRUievmnDae4MD6aqyxoRDk848D2uhW25v",
+      "slot": 443789400,
+      "transaction_index": 302
+    },
+    {
+      "block_time": 1788478000,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2AZ9wCD6iED6MLSrsaGsU3ALnTj14gU8mzM8mm8XZntuSGthcpNNy6Rh4jZFYuBQMveAmqgPPogacjrJX3ZrTthf",
+      "slot": 444096376,
+      "transaction_index": 1060
+    },
+    {
+      "block_time": 1788458277,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2CSPDihZLpXAMwT8oAzdHJRX2rhh1tgxCGvi8BQG1tVWrty3tVKB1rPshCnLDi3o6CPkwdsxnHnCj3nV9xEzHzYC",
+      "slot": 444033897,
+      "transaction_index": 1098
+    },
+    {
+      "block_time": 1788452142,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2CucUGKN9kPCH9owsgdvyczEsrNDcgCMDiJNE6pAYcTncQPv576W6wZ898e5dfyNWCs7ocQLEUFzb8GAsc6oL4kf",
+      "slot": 444014472,
+      "transaction_index": 461
+    },
+    {
+      "block_time": 1788452961,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2DTjPmAUSspNK3teHeYniKa9pUC4haEdgmgHfZyMyurNZm7N5KGzT65khkBD6KQaKnBzxGQXQTyih8TNSkFpSJ8y",
+      "slot": 444017063,
+      "transaction_index": 858
+    },
+    {
+      "block_time": 1788460683,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2Dcc2UGHExLERNJxMP3pAF6NxEa7ry8veAMxdpnhH8G3mmzpvHXu5Ebsry8SWr5VS8gW5aJwBJDpFZ35iUYTaigB",
+      "slot": 444041533,
+      "transaction_index": 178
+    },
+    {
+      "block_time": 1788480277,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2Fm4GvicRtTauTevGricEaqVZ8Rv5YzMUpQZbbHpqU7YJTmpLmcSiyaM4Xd6FRCg4G7MZEjMZv5xU4Q2efG1qaVq",
+      "slot": 444103601,
+      "transaction_index": 0
+    },
+    {
+      "block_time": 1788481817,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2L1tyWJxX6SALQ5zzYQZmwzy8kFt562NWRceX337Adh8HSaKF2qxXPsADJtaQN1TyhxutPCd7t7CYAikNPdHMvky",
+      "slot": 444108495,
+      "transaction_index": 820
+    },
+    {
+      "block_time": 1788469611,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2LcqtNWHCptf3Ck2Ngm2CiuWVz4ME7CZ9nZnH2vEofK7D4zypyCwJ4MzdeLzx84Befoz7AkhE6kQ2pbSv6eELZNd",
+      "slot": 444069763,
+      "transaction_index": 583
+    },
+    {
+      "block_time": 1788477968,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2MWoYh3A5LSAqDJdZyEzmgY4yyYwxqCCSzvxmEGC2KY674mbiVThqGdwPUQZEiNskkPZCvQsoWhcPWWmjSSpT3bj",
+      "slot": 444096273,
+      "transaction_index": 1058
+    },
+    {
+      "block_time": 1788433505,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2Q4ZvcqydJV1fusGteCxWVQXxRRTQGDZiEREWrMngeBrpW2fmoC8apcwDg8GSXTMyUkFKKL8AkC8Zd1mUMZ7mMeT",
+      "slot": 443955343,
+      "transaction_index": 647
+    },
+    {
+      "block_time": 1788389007,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2QVLF2iuYTp3LWs6SyKdj6JnSoXdYD5e9WyH27bh2x4X7uTxqVCcSfuvntRJXyB1NqahSoxmr1KKJwZnDxhuzDBp",
+      "slot": 443813896,
+      "transaction_index": 295
+    },
+    {
+      "block_time": 1788477216,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2RHmdggyrn2vwmg6LUpqKSRC8CJSW8g6Fpt9B7WYyTVKQnLaa8jzR5TBzdq5Cgbi7YgHrGpv6Hs9BMQ3UHHYDeC8",
+      "slot": 444093889,
+      "transaction_index": 746
+    },
+    {
+      "block_time": 1788367177,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2Rd6T3urKJ7mb4T3Wyamnr81EkeWn6BNtXGDYe3Xaedd27JXMDk9cgUQFvgpYrXScppjwiennf1KY1TCey9yVWjN",
+      "slot": 443744598,
+      "transaction_index": 1304
+    },
+    {
+      "block_time": 1788350207,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2S1B5J7iM2hgWaaMHPfhC9E6LCK2ntxxXeBFS7MgyiTC3Gq4Cgwmyzyz4p7TTmsuFiTgvENtaNzzAXdhzkoFWcWZ",
+      "slot": 443690769,
+      "transaction_index": 120
+    },
+    {
+      "block_time": 1788389248,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2TLwjKUsiGRQ8SL1Nb4DRYnowNFs9TJ18s7uy3qKyPKtoJ3qrBazZ8er6FFV92iLpYgddi6AN2aw6dL4V5amB3Wx",
+      "slot": 443814660,
+      "transaction_index": 221
+    },
+    {
+      "block_time": 1788454303,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2Ubfyf3JKaRx51ysfGNwKVSczm9D6bL9TUsjecvkCCKtD5zMxWsRiM1DkpD3eGkMRatYJY4hU3AnSjqYqwbSye8s",
+      "slot": 444021316,
+      "transaction_index": 111
+    },
+    {
+      "block_time": 1788480064,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2VhmmUnLTi9sL9ZoXLDhGwJPdahedbQJ82fWaBu3xyTFVYbcdd1yZxrFQtQ6d3dgxG45rk9g4ssqd9Ley3qhqnYi",
+      "slot": 444102925,
+      "transaction_index": 310
+    },
+    {
+      "block_time": 1788470167,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2WGnwMjVExmv3brmpF5uJY6CJvhG4qZCFt2S18uXFVovjPF1jsQgcdcLvfPQ995PK9y25g7omDQtDW2NgyPiXXdf",
+      "slot": 444071531,
+      "transaction_index": 96
+    },
+    {
+      "block_time": 1788424145,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2Xon5K6a8LzqKBERALHjGipWQ65pXaRSaiFPobNY8CEqvbW8rvw6tdrm1ULc1JVy1N6qtoj3AmdEKnRKeMe67Zap",
+      "slot": 443925593,
+      "transaction_index": 833
+    },
+    {
+      "block_time": 1788443353,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2YbE4eUrfvFwCMgaED1CsbjXPdcW3CCiGxvYKFkm4uagWr1mHxheU8hrZjpygcM3enmRvmd2V7ajtnmbCANZEAbf",
+      "slot": 443986636,
+      "transaction_index": 798
+    },
+    {
+      "block_time": 1788397241,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2ZzK89Y88sUq9rSqEFgf4Lj1jevjALmU2TqYXZRdjg6tSEjEYvqD4MVjspqSEMRjgftWj4requbdMNsSykEbVN8Q",
+      "slot": 443840033,
+      "transaction_index": 744
+    },
+    {
+      "block_time": 1788425810,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2bBJ1pCsmv49mDoXfnLcfkmURN1ckHHJFoFbE2Q4UQKFGyezWBYjs7B141tndRBtYsEwfFGfxcb99TmCYCC4m9WX",
+      "slot": 443930871,
+      "transaction_index": 395
+    },
+    {
+      "block_time": 1788477864,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2beTwF7B9Q2b3bM2TwpckgwDny9mYarDwYNBPUBfzvNr8nNmyLRLmjNzb18PMsWdeo9jWMfAN7Wqz2rDdMRHjEMV",
+      "slot": 444095945,
+      "transaction_index": 997
+    },
+    {
+      "block_time": 1788454226,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2c7LV53xqA7Ep9xzr2tP3iYquX72rgQaYP2nG69GRTeyrXkjswumXverrvi28TqNRmvwN5kEo3wpaaAMC4gLuJtf",
+      "slot": 444021072,
+      "transaction_index": 773
+    },
+    {
+      "block_time": 1788370230,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2cZF5cmSCXEpqYHq9uu5hU2TvFUEtrK4i5W66mkfEmYetTDM3mduNzkVQhGu5F3vC9J6T5ezKGqh8GJJujJtg3Fi",
+      "slot": 443754267,
+      "transaction_index": 72
+    },
+    {
+      "block_time": 1788443296,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2cu827VVTbwiL8HDw4ZkfR3KhyBNRznW4hvRjw9CLbJLF5gj2dZSR945MMKxHv1fT8dBPjeY2oqoAZs7vjJHPjJw",
+      "slot": 443986456,
+      "transaction_index": 1194
+    },
+    {
+      "block_time": 1788474002,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2dBa4Pa4EzBCF1YAnNg6vfKwwZab2nVGGfb8igYkHoEypAudpDEqH7P4e8dhwq89Cc5ULwoUvvr65hhp8m8yBG5M",
+      "slot": 444083676,
+      "transaction_index": 184
+    },
+    {
+      "block_time": 1788423967,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2mzvAbAknGJcBrby3NJ1KLVbfeeMxuDV4sUBdn3CGPCxBgdU9abswPHGDeGCcW2Fmx3z5Xp4kkL98WigESmDEGkY",
+      "slot": 443925028,
+      "transaction_index": 1424
+    },
+    {
+      "block_time": 1788474961,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2ojY2KbPUj8bDL5QvjchWtpbGH2DW67Gpo5QF3guXszVX3uSgwEhKDgrPLLCaMbgwt4ydgUvKSxxsE9wTkSiuJGf",
+      "slot": 444086712,
+      "transaction_index": 988
+    },
+    {
+      "block_time": 1788397595,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2rTstEhsg4qr97FocjmDgt2NaaEjA69xiH943ZENNzG3VoMt58bvP9N9p6sfJJFjQunw9XSWp1dNtQCXhVVcVvC5",
+      "slot": 443841165,
+      "transaction_index": 42
+    },
+    {
+      "block_time": 1788448650,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2t8tN5uWFZA6HdepiutvUr9mDoz8bB4fseyXhsMRP52VA32bbHCkKvQkrr4ovdZv1NQCTA87iqivU8tK6GqyL9ms",
+      "slot": 444003424,
+      "transaction_index": 80
+    },
+    {
+      "block_time": 1788347982,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2ty8fe5mx89H6BWmLoqUMFtcSzjc8EpjGnwfRTxUVHMxYFGXraLjXEh4gD3WbtWyrybzfobpxfXW2ajoxu1GgbyC",
+      "slot": 443683699,
+      "transaction_index": 904
+    },
+    {
+      "block_time": 1788457073,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2uDN1PbtU1BDHDYrSCwtxXke8169XdAfLwDFdmdKYVtrhkrErvtC6uUamnTjW2WVqaUWH1fv13DCGZZiSJFsbcvc",
+      "slot": 444030104,
+      "transaction_index": 52
+    },
+    {
+      "block_time": 1788422647,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2xEToQnUkSwQihgH7YAo5a1pGj2Q4GDjeErkfgPKJioZvYDvLjYMo5u5fdLcDgcVPUGjhFLYWWcD65V6Zf1PbkX4",
+      "slot": 443920843,
+      "transaction_index": 311
+    },
+    {
+      "block_time": 1788381448,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2z7DPsYXmxWJfD7djJDRek4Viggm4P8jrRackvP6WjTWEh1bLewRPTFLU4XTX5qDjhiijyn1QDTigXFKZkKup45U",
+      "slot": 443789908,
+      "transaction_index": 187
+    },
+    {
+      "block_time": 1788461017,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2zv5KvPGv4eeU99fsa3kERW1BK2UsC6wS7JpaMZfAjBK8z7ukAk2vLSBkULZZMXwa8PTnnZVWuTnG6PD8jMpQCZm",
+      "slot": 444042589,
+      "transaction_index": 122
+    },
+    {
+      "block_time": 1788381459,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "2zvZpt2wTAVS7SY7WHcXvfFD5XwdbKKG91boA2HoKeNTSDHvfLQvGzZEY4ksiiapF1A7rdZoXbUCpjxExyWti8Hv",
+      "slot": 443789942,
+      "transaction_index": 964
+    },
+    {
+      "block_time": 1788382046,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "353QMrkU28wRZxCZc4y1cnD6k7c9YBHh6UikXaRnkC7FpvzHgN8nGT5jraNxNjGRJw12ZrxDj1bikzPxW2Xu77x6",
+      "slot": 443791821,
+      "transaction_index": 850
+    },
+    {
+      "block_time": 1788429461,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "36RZ7n9n1bQTSXbknuPTfeAz1cyyWRA6QiZYSZ7SbSCkR4GPHDezPSDuzrySNBFZELXjtrgYwbcTrpPX7q6G5QPg",
+      "slot": 443942491,
+      "transaction_index": 531
+    },
+    {
+      "block_time": 1788360302,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "37AhfDLy5Xn6nZdikuDcumRdYe1xLSXCzRiioX5UbmhP2Lotrqh5j4oSZTUk7nVJFDH1a4bgpss623pVPGtY6C1b",
+      "slot": 443722849,
+      "transaction_index": 42
+    },
+    {
+      "block_time": 1788451453,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "39ZwyzVR6qXHo6QowDBjvYk5aT37xhRrmZbA94vnJYFcxiYH3qyX7jdQH2TtHXxbEYRYtJ5BX4kEnXddxN8mF71c",
+      "slot": 444012295,
+      "transaction_index": 870
+    },
+    {
+      "block_time": 1788381055,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3AR8L4t7DGY2F7izhbSaXEAWq2dTnHed3uMPwmgwLVVW24ZhX6fagruCbPFTBWHYSjwdXvnppM3uMiPMkMJnY6aG",
+      "slot": 443788648,
+      "transaction_index": 320
+    },
+    {
+      "block_time": 1788428653,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3AZ9vKbQDB1ApWyPVyQ1hcCpFEPU6CoEsPFSSwQbkfPQLXdZ6YkK6xQ5zPnwozxxogFqS3AtkdsRfE2EY9fLMbjs",
+      "slot": 443939922,
+      "transaction_index": 283
+    },
+    {
+      "block_time": 1788452483,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3BMC6VAfkutFMtF4XpxjMCrB4PwimAjKLinUBtcjsoqe1JH64uRBdAXAyGiqiVzRjPPqSCqqvW9Zu5uEzLFcpVod",
+      "slot": 444015549,
+      "transaction_index": 1014
+    },
+    {
+      "block_time": 1788398286,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3BSuBTKXFKDunksm867YAaaherMJznU933LBmEWsXEkG3NuGdZxtHaWYFS4X9WhgBoEjzhqBN1vkJpos9Lztz9LW",
+      "slot": 443843369,
+      "transaction_index": 2
+    },
+    {
+      "block_time": 1788360341,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3BavnWNQNrHHBLP2QUCFDm36Mgh8mMLRQR4EV6yAZ7PedvxtnxJuq7aX2wX7rFmiWAX8Ma3KuDsnTcwvrZg5mAMw",
+      "slot": 443722972,
+      "transaction_index": 150
+    },
+    {
+      "block_time": 1788461150,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3BhHLG18Gj8WxrcqbTSbepbfqpLC1YutKPQtxGaZJsxpJU3L4Ub9uqj8yq2GSXhobMyvFQFvaZv2jQefWATU5SS",
+      "slot": 444043010,
+      "transaction_index": 117
+    },
+    {
+      "block_time": 1788426792,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3D6LUJinW6hiXZztVJhZxqLHbA2mxAYJFQ9w9i82MRxybkbnyc3Y1T4eRq46JRQ3UhWn1LEqDj5icWoXXb66obcv",
+      "slot": 443933997,
+      "transaction_index": 80
+    },
+    {
+      "block_time": 1788399283,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3USVbs9V4xDQKSUyPbsEWbLn1vrDJNvLhQy1juZ9UGNzihqPNgKoyz3HfgPb19z17gn5AKR8WgaJXtDm8tbMRbk9",
+      "slot": 443846543,
+      "transaction_index": 998
+    },
+    {
+      "block_time": 1788398336,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3UzsPZbZYbPj7YavNXaWFSxyCnp5EKGRPcbrTpQtuW3E8ZbiKUGk78TpCMypdXAgwC9tcyefcLXEYj3tbHg2iBHc",
+      "slot": 443843530,
+      "transaction_index": 836
+    },
+    {
+      "block_time": 1788428623,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3VEXpzwLCBRKzrTW9DnHz27CxVNRGTfEhZK2JorHmucsBeNDvjfSrVAfuJTg2Hzw2zHqWbKKxNM2JgNK4ovG7Gbs",
+      "slot": 443939826,
+      "transaction_index": 143
+    },
+    {
+      "block_time": 1788473478,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3VMMgUDw8t9qQxkmRUTjuoiyFv6oSdmxECzacba6GBrHT1EMAYwQTLPFF3jD3QYGoLsjwmQmnxfzAHMMiSVsw8vz",
+      "slot": 444082018,
+      "transaction_index": 1137
+    },
+    {
+      "block_time": 1788458281,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3VRhMFX38uYxaGqRFDfqtHJEyKx6xQfsRQbXtfm2kXbJgqbB19YbNnt6SF48zEe88s5W6x6SEr2n5VtMvjbuiW5g",
+      "slot": 444033910,
+      "transaction_index": 498
+    },
+    {
+      "block_time": 1788422555,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3Vka9eQYu26jWv2NaDz2Sz3xiEXUFfCQ5tUF3pKnfa4PWE8CSY8vr92AfVxfQSsTD79JYjAmMQT4EX2BB3ym28WD",
+      "slot": 443920551,
+      "transaction_index": 611
+    },
+    {
+      "block_time": 1788481119,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3WMDBKxNDCrpdAG6tCvZrKiD1efSt3RJFdLaxB3iriWKJRPb1W2HAWEbx6muVsq5aZpBbA7eBTBSAM4wFQruhSaf",
+      "slot": 444106282,
+      "transaction_index": 652
+    },
+    {
+      "block_time": 1788481073,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3YKZay21shuyGZHRXYe2hiF2YX2DwQiYjyJLe7uGAJa5tTjvdwtw4rhqmBGmRNNRWK3FPSosvraaei1ixiRFsUkK",
+      "slot": 444106136,
+      "transaction_index": 789
+    },
+    {
+      "block_time": 1788473261,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3YeaGJAB1vV2Q4ynxFxypR6meWta7qkWLk8Qybg36ZcEzXXGWAFvua2pLbVGYK7ZpFZ5y4EDpQhzUog97bfsFvP4",
+      "slot": 444081331,
+      "transaction_index": 154
+    },
+    {
+      "block_time": 1788348083,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3Z51J313TMUT3jF2LiZpPuQHzMS2k42q9sJzJg8BuD3pqCRm8Mt8vPXhYhrW2YRbosu6M8ueYNUgz1rspoyUosU5",
+      "slot": 443684016,
+      "transaction_index": 753
+    },
+    {
+      "block_time": 1788477341,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3gEbftUW1y1o7Q45BGU99ANPShMUKs4pkHxguVKt3ud6VviBma6gCceDyw9BLo8aaBPuF9Tt8op73WJh9py3tFUU",
+      "slot": 444094286,
+      "transaction_index": 107
+    },
+    {
+      "block_time": 1788459901,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3gNMWMtL8SSMauQpgXAE7HJX22xmyfF5CbFiu675Y8tHkYsZXi3vMqTnd5pjdrio91GuWQAAzuw2jtAsamqGaS52",
+      "slot": 444039049,
+      "transaction_index": 351
+    },
+    {
+      "block_time": 1788426610,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3jBqGmKrLo28658uUACbbs8Fb8KKJv8A1uYwGwDXENAsTBxdo7KnSBSMmJsg9wgNytVFafHcgdeVzHYJWLZd3hRd",
+      "slot": 443933422,
+      "transaction_index": 0
+    },
+    {
+      "block_time": 1788366879,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3kPEG83MKmMU365AKP9cFZ5yeinH8vXiKwPsiJXx6vyEzu6Y7AA5NrjQqDmvRgQTjBAweuDTdAxwDjk4xECCmFuV",
+      "slot": 443743659,
+      "transaction_index": 104
+    },
+    {
+      "block_time": 1788446197,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3krjgT7SegZgmuJm4iQJpsBn2wEWvP5xZqDvkMPfXM6UJ2oK6CbaAf8kreZS3V4HF4kD3v4Zh8PQAFi4qY4RNgAX",
+      "slot": 443995669,
+      "transaction_index": 238
+    },
+    {
+      "block_time": 1788428086,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3maBPUcoJhbfWzUUkB5t1TATQeccPgDPApsX7XXyAagFrrewtUSk7RG9vEAZVpm2rFUp6APXBdNbgX7wxJQomLVV",
+      "slot": 443938114,
+      "transaction_index": 31
+    },
+    {
+      "block_time": 1788422557,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3nDvXnxCbR1sTYP3yjwbL58SjXochxDqz72eZUNA7NoVvRZFgee1bKAz2qLL3mv3DCqXLtAT2iBgFXWTjW5aFTnr",
+      "slot": 443920559,
+      "transaction_index": 529
+    },
+    {
+      "block_time": 1788459625,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3norFGV4s2BDQdgNMX9hVmuoAyUxg1RgQadqEziVVNFePFXogSVTsfeZwAabBdF3fJEFcUGDBPdgGWfTxsyscjRL",
+      "slot": 444038176,
+      "transaction_index": 448
+    },
+    {
+      "block_time": 1788430863,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3oDbMfFrnNazfboNbnAJVovTRXXfdPtQW2QUrB5xusEHwhM1Kywm4Rdrfmf4WUQbuT1FW4cXGt7yRA5iJcWiPtsb",
+      "slot": 443946944,
+      "transaction_index": 279
+    },
+    {
+      "block_time": 1788471430,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3oKs2MTvJAkZu3omNrjxHUg7v7wY6cP5Wktmw9hXiczggmiCzUzsEfRNfsXhfzq7S6iuXZfxEjmJNwhTM7iKNh4z",
+      "slot": 444075528,
+      "transaction_index": 107
+    },
+    {
+      "block_time": 1788481263,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3ocFTT4KbcnYbRARa1K8kGmdHJ1xytiCmY8322zumaM6NghcDocWKYzbAjXxVTKEtfcwbyMV73Sk7s2Yb3v2EKDB",
+      "slot": 444106739,
+      "transaction_index": 894
+    },
+    {
+      "block_time": 1788451039,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3prB6SitdiYYBeepw3VNscQ2D87gadwptndUGCTHgh6hLB9X3FtFGHVfSt2R2vo3J7f15RFqxytKv1gNqbndN8z1",
+      "slot": 444010988,
+      "transaction_index": 426
+    },
+    {
+      "block_time": 1788480646,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3uYuRK6D33ZhgFsWBSrmGhxPLgXg6wCaPctWGwLX2YkdfTcZWFXRbVGZEY15exLaVLKipHGDHur7JSMbTsnDLrfn",
+      "slot": 444104782,
+      "transaction_index": 21
+    },
+    {
+      "block_time": 1788423408,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3wHPgsVTDSdPttPxr6ohH9Srygxu4RKvuwe44xY1ypEQfxmxhpBcvzEi9NYxzbjkdCk4jzEuj47g4Q7A7gU1MpS5",
+      "slot": 443923263,
+      "transaction_index": 91
+    },
+    {
+      "block_time": 1788468108,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3yqN3Ef5ta6ygA5bmeehXAFaapTazg6uS3CW5RBY4P7prFMcrCyvZKKD4ZjoxmS33jpgbCXhs48oEr5KVsU9JR6",
+      "slot": 444065024,
+      "transaction_index": 1
+    },
+    {
+      "block_time": 1788452243,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3z7y7iu1m5WVAW1K2WrbcpivCNv6tjyWxusisSxtyPLCQo2KHbzT1gMzSDRMt76eZ5EK2Q2QmcfuZVMSQLFNjoHM",
+      "slot": 444014788,
+      "transaction_index": 144
+    },
+    {
+      "block_time": 1788429482,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "3zJcbR4UpQBZtUWPDozZF2gHTjdSUc9sQPtpYuEgKngBsf6QHdoysHqf2y1wR5uqdbTLsjcPjDMjKcnpYfEc382x",
+      "slot": 443942558,
+      "transaction_index": 808
+    },
+    {
+      "block_time": 1788450018,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "42aLb6EFHNw7MqvG5yCTEJ1Pa4j1JAMUqHvVwfL9oTmbD4cRJQLQMu9HzErRpUvsejDVNfgFpzqHjuYr7js2QPVw",
+      "slot": 444007766,
+      "transaction_index": 60
+    },
+    {
+      "block_time": 1788449325,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "43imFg5aecCeYPdLH6gC5XssWRnJmUAAG5ZJhKAn77U9ifH4wv5FG8LSa2B7rmWXoWG8mHpiAYaNnPLj8HsUgjxf",
+      "slot": 444005566,
+      "transaction_index": 113
+    },
+    {
+      "block_time": 1788482680,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "45gGr4Lgo1tWgUhRT4LEAZ2JCk1ft3PqmFAhBjMniZ6SQxbTxKjTfez3X8oLVuBUnJ3fUuoB5akvQouL9u9pFkDW",
+      "slot": 444111244,
+      "transaction_index": 1327
+    },
+    {
+      "block_time": 1788374214,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "46CS2f5Up4QkK2CfTk1rqccZMwLpGuLi9b4i8PhVxfwUvi1U2WtQZhSk4vTxbW2rSVCStKAAXCaygcsZuWCg8YcG",
+      "slot": 443766897,
+      "transaction_index": 475
+    },
+    {
+      "block_time": 1788398027,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "48mUTuz5kmzGkcSWQc8k1g5VpZF9PnR5PoQH9SwFaxovusQcAzPiPTDtSrcsHgU71gYGBueJfiFrm8uVMpeboMY4",
+      "slot": 443842546,
+      "transaction_index": 734
+    },
+    {
+      "block_time": 1788422738,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4AppxyZWFY26q83d4hJnjVsgbgrGB5hckogQuzLS452qgUp4utA3Sc2uhs7qrmf9t6R8EXN6kBF4QQc9EBBzM8Tr",
+      "slot": 443921137,
+      "transaction_index": 29
+    },
+    {
+      "block_time": 1788451694,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4Ehab8zgnzp3LLxXr4GJ5ZZZxEcbWoeB4N7vK9ZVtghQrgPRWGKW7qGzLpoFjTBa5zMjGw4kEZuKRPLsYWQHrRSy",
+      "slot": 444013062,
+      "transaction_index": 206
+    },
+    {
+      "block_time": 1788423554,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4Ei3AtKwMstEDsAAWHWiktXsmFhzmGEJJWTPcjLrEdbjbYmzHqiBsoNaBEMWbJ8HxUiH3429psph5v1kuj6aLDfM",
+      "slot": 443923721,
+      "transaction_index": 215
+    },
+    {
+      "block_time": 1788448210,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4GTh7p5QrCYML5kCf3UgsY6ZhjDaVfwGpe9NrZnsoFCdZxhzGiEE9uZDPCvPp1Gp2dL8TNHb2ejPek8k1prAiZAn",
+      "slot": 444002035,
+      "transaction_index": 364
+    },
+    {
+      "block_time": 1788450622,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4LXyVhgYQ7EiMakr7yxouZGtcnX1aA7Jd7GRmfF9kaS6S4MvyDtpqCmBGBDb737k2J7NBwVidBiJALNhLoMZc4WL",
+      "slot": 444009670,
+      "transaction_index": 780
+    },
+    {
+      "block_time": 1788397337,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4PUCFyeBXWkb8ySfvbPGzgqxGzPgHGu6akBySAQbmnkmjmRZaTtrGgy9ZumbmoVyWAQf8JFzp7Gp3PtfRtaRBd7q",
+      "slot": 443840340,
+      "transaction_index": 1217
+    },
+    {
+      "block_time": 1788398693,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4QXbR16JeWfHQUtx9zompSEWswcYieZTZfUsWbKETnvNtZDpbn8zanyFCyP3ctvPZrpWMzGLJA3vfXtfWiTw94EH",
+      "slot": 443844671,
+      "transaction_index": 274
+    },
+    {
+      "block_time": 1788426115,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4TxgzvL83qKLHZn5Mrh7oFDHCAXAsRUAScT78FzK7L1iPpXaSW1KZHiuRvhJqQfobqqSCJ8y8Y4HaQfwPH3KTBYe",
+      "slot": 443931840,
+      "transaction_index": 760
+    },
+    {
+      "block_time": 1788429726,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4VHAeeK4DhpdMSDcKdXiwFNpvWQooiFLixrj4WNVp8FnohhSfFXZYYVaLiQ2SHVqDJpSzt7Y5DD4i99zYkMrXG2p",
+      "slot": 443943334,
+      "transaction_index": 829
+    },
+    {
+      "block_time": 1788427929,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4ViKrj7sGwu8GDuX5fJ3ncCXrs4t9akvPZTjeaEexmY2BFhwe7WpWowKs5GAg6Tk5b9UhAw91dMY56DcTD79hGie",
+      "slot": 443937616,
+      "transaction_index": 1473
+    },
+    {
+      "block_time": 1788475805,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4W6PHZG6ozMsqjqQNVEVNyoG4jVtn6zpzVnoVZTingLa7StpbpNpjsNBLsoRTR9Nk4wkXjMqRWiVxRt7vU35Kixy",
+      "slot": 444089398,
+      "transaction_index": 748
+    },
+    {
+      "block_time": 1788348036,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4XwKBJftHnBAtx6bUUoeBc4tcJSMLBJVN3VKSqEjZ9cEtkhhC6EgShK4ijVeFEA3drwPeFxEXbLVuum6Pf8fAJgd",
+      "slot": 443683869,
+      "transaction_index": 765
+    },
+    {
+      "block_time": 1788455527,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4aFLJR1fPm3jG6KdsXVaxddEhwLLq6xSV19FgjFBcWCizxZUrvubDFnh5zAjHDiBr5gK4umj1PCN8sMWSfxBaaUY",
+      "slot": 444025198,
+      "transaction_index": 241
+    },
+    {
+      "block_time": 1788422594,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4dsKQRyDd9jK8sRk64TKDBopGrq3wxqgKNWZ9WRHQkrZTYtsz7M6eFbDrHiPEeETBAK9jGE1SQnLPUGY3NazBzqb",
+      "slot": 443920678,
+      "transaction_index": 368
+    },
+    {
+      "block_time": 1788434247,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4eFQXZvbi6sNfF2eXusHqxVgAkbdmdbnchD1mZeRz2aXpgoeq3wAPrsUBsPQKQEnG2BvGJUzocbTRRai5v1Knfhq",
+      "slot": 443957696,
+      "transaction_index": 1000
+    },
+    {
+      "block_time": 1788458259,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4eRRUtDv2MztZMDVZdVWQotPLNetRAdMKFiTsgob2N84gaagGEbjB5EwbMYHBwYAXYs5aiLSp8eD5haybt8bdeqE",
+      "slot": 444033840,
+      "transaction_index": 1323
+    },
+    {
+      "block_time": 1788447910,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4iSVc8ND8qgd2bNsHaMSMwiU9ndLsQXshvebQbDdztQwofY6GcyLSZgA5phr6cequ5L5geTPmvT69br2ccWkYsvN",
+      "slot": 444001089,
+      "transaction_index": 1155
+    },
+    {
+      "block_time": 1788449629,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4j8FguYw6cvkeTVVKqVWiGPiq58FSvJWqpmVpv4PhN5BLSe14vABsasCh9d9NuzSi7ADdmTouUPgGn88d5d2konT",
+      "slot": 444006532,
+      "transaction_index": 1020
+    },
+    {
+      "block_time": 1788374772,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4kzz7PivwuryW4fL5NRX45Bg2gWLkhEzbC5JCjGbSPyVcSmXPc7ezhhoTULKT6wYyLVrkDVJG8UpdYRv3QR5p8Mr",
+      "slot": 443768678,
+      "transaction_index": 429
+    },
+    {
+      "block_time": 1788431505,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4oPLZ3NfKxqwYVQVzR5Sy4n7DmQZSHoTQMoAqmjCrmVDvuAet7eXuciySgSGv3U8pWBVbATuywofuCZYi1WWTBPb",
+      "slot": 443948987,
+      "transaction_index": 819
+    },
+    {
+      "block_time": 1788460755,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4sMCCKMDN788AuvtrqKwU4d33ErKfuuPDNvPqLqonTK3SiJ7mcPjUipfikxHb2H2kn1KgVpJf8VQSzP18R5gS1td",
+      "slot": 444041757,
+      "transaction_index": 528
+    },
+    {
+      "block_time": 1788473815,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4tDz621FRkNPw7grPeA8sRgicTcwbXZsTqM4gNES1r76DXYyCoW4ggRvP1ptzRwBPworNzy89sAGqfqYycggBXtg",
+      "slot": 444083088,
+      "transaction_index": 964
+    },
+    {
+      "block_time": 1788429451,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4tNfTSqgqzB4ieMjHDeZobJojmxS9jVEJEU1x5xpwkhXtYdn2XinBeqbChLjPqUNbiqaCQ5VknAU2qecS78ynCW9",
+      "slot": 443942457,
+      "transaction_index": 345
+    },
+    {
+      "block_time": 1788455508,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4z5W3fhmuNCD52vbXyDezXwmczA6bPYf7cdJ2vyKwJvyKhUQShAsFzvCp1Y8xXr2HVzNFMhv4gE4ro19Gzeczkgo",
+      "slot": 444025138,
+      "transaction_index": 512
+    },
+    {
+      "block_time": 1788446408,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "4zhywNDbt3hunXJSHUcawc46nTmer9qERmajRVBmzRm4QntACq3MVwE6FC7mhHiXqjosF4hZoJsve9FEHSURkKAW",
+      "slot": 443996341,
+      "transaction_index": 675
+    },
+    {
+      "block_time": 1788457335,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "516Zqbwnc9gsCjyWjT1sMqhhM91TWJRhEg2rh4zbpytibERrjW79Q63eK2V7jPk35SfEcKpdCHivShQ64sKWWWL9",
+      "slot": 444030935,
+      "transaction_index": 391
+    },
+    {
+      "block_time": 1788479679,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "54vKAxfa9ds7EtXEv1GRoJJCSKKcjRunmXnL5XhY2Rc3YfrXEKkAcKuh8KRtBmdZPf7Mq4mQHQPCto3fNrRtfnpq",
+      "slot": 444101703,
+      "transaction_index": 338
+    },
+    {
+      "block_time": 1788449581,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "559BAakypUHGVv2TcM3YBX4VhYu6wTa35H88zCRmC6LvZTFFSvqV9ogQMDBRHSQr8ChnCxZVjUgPsoM9XpGQNYHr",
+      "slot": 444006381,
+      "transaction_index": 1769
+    },
+    {
+      "block_time": 1788397242,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5A4oEwb9jYGdyaYdhgu6bW3DJzniYfeNPtrW5q28Z9dBoP4dCamBPNh4EZ3jvFaXCWTvSKHMxtddc4pf9iBe9e4M",
+      "slot": 443840037,
+      "transaction_index": 920
+    },
+    {
+      "block_time": 1788480294,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5AMyuX7aBHnAmVbmQ47TGUGZTSFxvdK22AM1guVtFUKVs1chGf2uVGfXwQQDyEuqEJNc6Ed4nuWHMTuLHmLsoF9P",
+      "slot": 444103655,
+      "transaction_index": 1197
+    },
+    {
+      "block_time": 1788427942,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5Ab8dT1L7UT9pdFmgsTGx4RGC9qJr7wqwW4vaLBgXL6CsbrsePXdUeViYqtQ6z7QniFVGspXxtGzygG8HGV9mk77",
+      "slot": 443937659,
+      "transaction_index": 598
+    },
+    {
+      "block_time": 1788476624,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5B5HKBNz9Q2djDFFMGNWCLW1K5ePog9h3d321c7QoUsQ99Y1pVWPYwrTD7BrZwP3fLcuNPWRBc22Urm7t4Abf6V6",
+      "slot": 444091999,
+      "transaction_index": 296
+    },
+    {
+      "block_time": 1788478907,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5BhpP1VXJisX2pbvM5oRTAR3FKeitKSa2hgvzBGzvC713TYsTMtqrvWTJq5csoCtgVFm5a9iUWgaSvGCZKJ6B6BB",
+      "slot": 444099248,
+      "transaction_index": 793
+    },
+    {
+      "block_time": 1788474898,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5JGQ8ft9dgepGdfei7dE2rJWsSe5wYxgUe217STPkqMnihNB4fj51an652dLMwrjzqRp9rcfex52oZeM854y9WbV",
+      "slot": 444086513,
+      "transaction_index": 687
+    },
+    {
+      "block_time": 1788358738,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5P2YZeQWLJyqwSMnRCrA2nMpqvPG4iRzAyn3NA8mAQ2URshTrtsGtDkfP3e6kMem3PT2wj5pDAjn8D1JkyRthAyg",
+      "slot": 443717872,
+      "transaction_index": 855
+    },
+    {
+      "block_time": 1788453373,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5S8tTLVJUsDQFC8g814ZFq2Dvssdxg2HWVZTsnTSnvPS4ARASp5pLpBaH32aCrJY122RFuWmDR2kxjWjDoCBSjn3",
+      "slot": 444018369,
+      "transaction_index": 1303
+    },
+    {
+      "block_time": 1788431825,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5SUzm1wkEDDKartfX5GXwb9wUJHQg4EBzjEE2kLkG1tFh3CCP5vW4rWXESGeD38zNtzfXE3BgjjRA6SRfkUNUpw7",
+      "slot": 443949998,
+      "transaction_index": 822
+    },
+    {
+      "block_time": 1788481122,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5UhqciMo14m7JgCuv64zGckFJ2fG2G29SSne5UCVojMn3BB71eLejZq8fvAgLQ8XMNoPKBJSHPRB43hhcM8H2Bok",
+      "slot": 444106291,
+      "transaction_index": 513
+    },
+    {
+      "block_time": 1788448489,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5YTjqvwhsCSb5MbKUeFLYHNyDZS4uXsVXwUCNamWvDaX8ecsrRoTaEhzBrMK8S2mZ5FZAdqpX5FkHxa4uv8nVbsN",
+      "slot": 444002915,
+      "transaction_index": 359
+    },
+    {
+      "block_time": 1788477731,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5ZzZFeqVgHeyiRJ36e8uyp3U8jczQALK3sFiPnX27yXykciXGr8d8jiWtjQ9u6gHdpyPAyunmWZUTGGpaxXymuFr",
+      "slot": 444095517,
+      "transaction_index": 19
+    },
+    {
+      "block_time": 1788367114,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5aEADDtaZzscZ1G4uKyzg4ykguryHA7PbPLmGMHxUaVEopGxv1eaXx7vwYZ539DGKdberVQ8S4Z5N37FZ2ApnMe2",
+      "slot": 443744403,
+      "transaction_index": 120
+    },
+    {
+      "block_time": 1788447012,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5aVr5eu7TmzxjBGHKTZsyoPktHwEocqaUE7KY5PHuy9ZGzKVtHbbWUwvwGHQRm8SAfuUYk33c3RGbFps4dMiLkoA",
+      "slot": 443998247,
+      "transaction_index": 2003
+    },
+    {
+      "block_time": 1788471160,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5amZ2ZqbUY9vj2vQ8QkthvRi76UfRH8goFijh9RGGNcPpXfPyW4FKLWNmFHJttoKLC1FTHYt1aqdEsYf2PKnCW6B",
+      "slot": 444074674,
+      "transaction_index": 628
+    },
+    {
+      "block_time": 1788446685,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5gbPsHtCh8Bc9gXaPs3Ydbdu6TZHUv8BTN9rwUzkNhEDCYjFfqmW5B4hAbaM8aUWF5XL4jQsjCt3SQmNkFHBBqvH",
+      "slot": 443997213,
+      "transaction_index": 258
+    },
+    {
+      "block_time": 1788374709,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5iaAcpCBP4iTTvGaLrQvzZH8Prp3rPNVJekfuk9698rZxwmoMLa1ZjhGARosJM9hzFvLSCXdApwQ1kTMZczeuc2S",
+      "slot": 443768473,
+      "transaction_index": 177
+    },
+    {
+      "block_time": 1788388790,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5k6BNnALghieNJvaUkcMhwcrYDgdmUTbva4QcZTh4z8zR5J6z46LDbGVMP6EoAtasJUgm5votfq8nKm5Py7eqXKn",
+      "slot": 443813210,
+      "transaction_index": 477
+    },
+    {
+      "block_time": 1788477778,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5nAExHevFTkz3FWNWddBFoCXw37iJ2uPuUEZdq9gDnuDAbkVbW4ozJDpoSmCqPrKgxoWJyXUn7vaTu9cYEyMVqkc",
+      "slot": 444095667,
+      "transaction_index": 906
+    },
+    {
+      "block_time": 1788477183,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5nihGtvhMwHtL8MdgDJ6Fb6cy27jsfEpm1gPmuYcsfLamKQTEmY4pkvN4bbHWz6swX3VHKsQYyXSbUTmTsmjSqHV",
+      "slot": 444093784,
+      "transaction_index": 655
+    },
+    {
+      "block_time": 1788479981,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5oqT1dqwQg6SQGsiTckJmaJsiw6UyizcakfRXa3q7pNkwhWKZ8mpcHdCZyQHHfuPV81bYfvkr5eBfWBensSne4sB",
+      "slot": 444102662,
+      "transaction_index": 361
+    },
+    {
+      "block_time": 1788373862,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5roycy3WNjZcgCN2etuQPQzpmLJ1rb43zKr5RK2NRT4WChEUMe6exfeBjmosg988J574AXuNJEMCTqDRSud8THBA",
+      "slot": 443765788,
+      "transaction_index": 1208
+    },
+    {
+      "block_time": 1788453179,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5xEw4wwCsJpUb1ag8ZLvkhzsWTKzKyZxhn8VN2BRuELip7n8z6T8CFRzMXDfcz9Ri6C1Lvaaf14eZodq8kdB8JKY",
+      "slot": 444017754,
+      "transaction_index": 687
+    },
+    {
+      "block_time": 1788430904,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "5xUCTrzYA8NbfjDvcFRLuwCErhXs6s3akQp87Jx9NMHDcwVCFDzPJK1iiMc1RM1MdUWALak8KPoPJbEWHLUZkNSP",
+      "slot": 443947073,
+      "transaction_index": 136
+    },
+    {
+      "block_time": 1788444839,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "645ibS91ouEqU1zz4hVFhWtXYrvSWYxZvQ16oR2DRdUALbofgmyqSemVE4RcYEbpbUfmYBBFNK5n7X3REpRywkbN",
+      "slot": 443991380,
+      "transaction_index": 684
+    },
+    {
+      "block_time": 1788448848,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "64JFvMW6a6J3TZbMNxnYq1CS6TdfPSsuBNvnzKWutwcTrbSyVKkV6sBb1arffcPdNs2HEU2gN1pWb4qZwcLT7GWb",
+      "slot": 444004050,
+      "transaction_index": 612
+    },
+    {
+      "block_time": 1788452267,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "67K8bENKoqmfNuhsGkT22pH2Lw1KBBethVuAMv8yy9sRhk2YCShrUtLuwx6wqjjzkKywXL7a4itFqSMuRw9y4S5h",
+      "slot": 444014864,
+      "transaction_index": 617
+    },
+    {
+      "block_time": 1788431704,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "7Dd1b9rnxgcsmWoVpQfMjTdjgwtBmP7maQTRZuEPxeRheJ3KQ4YjNw5k7p7jsHXjryTD48SCRZL5Axeyj9UTsDE",
+      "slot": 443949618,
+      "transaction_index": 456
+    },
+    {
+      "block_time": 1788458514,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "9NzDp1YqHT6gMMdMfp3DoW3aVZM2ZWMCPnDMyn4Zpwr7ahKiPwPb78kBhad5cc7MpeHBExgphUwn7eKLuXuw9qV",
+      "slot": 444034646,
+      "transaction_index": 754
+    },
+    {
+      "block_time": 1788449973,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "AfRdCECwb7QaPfNXDcGJwGyxAtKLSw93CjLVy41yFSnz8pfBX2gZSsesAXzXnF7F79jdvT8JNw6qtTB7y3pTHxF",
+      "slot": 444007625,
+      "transaction_index": 447
+    },
+    {
+      "block_time": 1788452924,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "CPfgV39txAnBQ3doM45wwnSk85u9XSUYMonDZPVEfVDYrVpwMdKPuQNwuHSVVBrMYkQg35SGxFJbc94jtKYpS29",
+      "slot": 444016945,
+      "transaction_index": 357
+    },
+    {
+      "block_time": 1788479153,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "FegTJS4bJvwKXw6JZ6NkPnxcg7DPQS7xfiWJSc9ymuRLwAhqLmDbDMFe4YFdvwLUukdGCvt2FyDnnqT6YvLcaV9",
+      "slot": 444100034,
+      "transaction_index": 819
+    },
+    {
+      "block_time": 1788408884,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "Hkh5HzjT7ZffGP9cnuCTZZtQNgcJSH2xNiJ1vyzPqKiGmk3dRithHwE9RxAt8DMraHuefqDVc3MowoZbs2iM9qs",
+      "slot": 443877079,
+      "transaction_index": 32
+    },
+    {
+      "block_time": 1788388170,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "LunAexLbK1M6mAXMsYad4HkvBS4ASTjBFdWusm12i2AcdRNTZyLXzLC66KwekaFjEZGycJSPmbXyHgRBdxxLkUM",
+      "slot": 443811238,
+      "transaction_index": 373
+    },
+    {
+      "block_time": 1788425024,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "ZfRCC6xYYzdfu2QTRFyUF6gimEVaAi4a8BokVFxWzckQSFxwc3p9vqxF9zuCvNjnrtNyb9FDNZwqaNdQKxzsofz",
+      "slot": 443928377,
+      "transaction_index": 574
+    },
+    {
+      "block_time": 1788482464,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "c39chkt5fGARwsi9snsREMjG7yUdBq8XBxSfajpyFij1mWmLWJvgcC7NP9DAg5VTWJdKLG4ZbNPZL6FTYG67fBL",
+      "slot": 444110555,
+      "transaction_index": 309
+    },
+    {
+      "block_time": 1788409682,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "cuDcn1atqkp27Bk7KWKW6UTUYTbbuZRFRaSq9m5cC2mqwR1kXXUwyLoNBJS631wGkj5n2UUyJ21LikvQqXn3Xwn",
+      "slot": 443879624,
+      "transaction_index": 987
+    },
+    {
+      "block_time": 1788479959,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "d9za1fZQpBYei3SP2SHLh5cgNjzNcy9cj81Z9a2FTaDLtk7RZgqatDw8fbNRCoXfxMrA1nophzyzaMk4zskvvGo",
+      "slot": 444102595,
+      "transaction_index": 730
+    },
+    {
+      "block_time": 1788433634,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "eQMF93qP2MSFugDpmaYQLCeVrXeewX2HTk8zrLASsTHGhyMCAW4DEHgzuFYHAa6r3YihNnyujim53TMz3WWywjv",
+      "slot": 443955746,
+      "transaction_index": 868
+    },
+    {
+      "block_time": 1788397820,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "hYBo7V8ujggbVFJjW2X8p2qnkZmQJcwJRSEmg5w1fHFadDXwYdN64nBzy2mR7kXhDvjJ5NU8Rsr4BisJWNgrQg1",
+      "slot": 443841888,
+      "transaction_index": 461
+    },
+    {
+      "block_time": 1788446362,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "j7pufu8wPnJQR3YDuqHHRNQ5PbZEwvF7THR1empMB83bQVTwqMaY5Bsd8PxrxxdUNZViKbLaHfAg8U9mdpoSAMK",
+      "slot": 443996196,
+      "transaction_index": 432
+    },
+    {
+      "block_time": 1788430383,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "kKVxdeFMzKMziU7SfCW6qRWPvkpv6QqvBUysZv9mN7wHSjVHnYrCUcXLa4bsuRVQGN2ngBUKaNVaTSADX5JztT3",
+      "slot": 443945416,
+      "transaction_index": 1053
+    },
+    {
+      "block_time": 1788423718,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "nUz39uBNHgbj3RhSD8Dd2nquqyGF7ZMM6m3w6roydHFBRHBrnzEcev1yhjCHbgRgt1fLCdXTxdViXre3EYtxA2g",
+      "slot": 443924241,
+      "transaction_index": 1142
+    },
+    {
+      "block_time": 1788381928,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "pGXezk3zzG12c1BNzjMKbeB2ggBgHEr8amN5hbwrfH2XJSecAGFWyskfa2Ms8BWfTiuJtxGeYMNjiZ5jCJixcxZ",
+      "slot": 443791442,
+      "transaction_index": 365
+    },
+    {
+      "block_time": 1788396763,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "pMnWdSF6HwBJ7CpBpUASXW4f6iMUrsjMVA9pCR8zqLATRyFGd4tWDbq2pmtWkPS5dFk4QknAVPnhja2HdEhwUUF",
+      "slot": 443838511,
+      "transaction_index": 586
+    },
+    {
+      "block_time": 1788424574,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "ppGKjrsU2KR5evmfapWGLrmwso6WfZp9mv8Ve9aZNVvJ3vGLfstpHJ4uFEu9oeMYV9zpdMK5jAyKVGmXS5ELGVL",
+      "slot": 443926949,
+      "transaction_index": 995
+    },
+    {
+      "block_time": 1788476726,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "seUqabNfaus5WFN1tyjsq83M3dSrRxH5qdaMvjootA5QjqHjA6H8nftW8XfboXQcbBcwEQ4qiLUHL99AtzLd1QX",
+      "slot": 444092323,
+      "transaction_index": 1077
+    },
+    {
+      "block_time": 1788367441,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "tTHK4GABNLjWYYmS3DuJau5izDvvyD8SbgJQJmQkNxB9zv9uhEjvkxVobzsjpj41wkXsTnQw2UwchJzpfSC2saD",
+      "slot": 443745435,
+      "transaction_index": 246
+    },
+    {
+      "block_time": 1788471963,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "xg9XVtJWcepZKtThBVyRBadr2mn91UNHpXCpcS58kfPfiXFNRGR9SgvEfi2ut2P3Q7S1MbH5RNwo2mTpW2yJWny",
+      "slot": 444077214,
+      "transaction_index": 454
+    },
+    {
+      "block_time": 1788456522,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "xsVvMrNxF8yRM8ZdL2jfuZJgpDaMb3QFkZJD9gKsR7RLoGs3V3PcT6Eh5T3DE864WqogxxdRG5EFbJRhQDmqhbr",
+      "slot": 444028357,
+      "transaction_index": 99
+    },
+    {
+      "block_time": 1788451773,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "FAILED_ATTEMPT",
+      "signature": "xwuWSJBSrFrysBTHTD1yt297xShnf6QrzvukxXesctrvBrB9ZfpAAzVamUYsDcnfiSVGtirwnDWKkmjMsT3dvqq",
+      "slot": 444013308,
+      "transaction_index": 847
+    },
+    {
+      "block_time": 1788507184,
+      "mint": "6wPFmGh1KRKosPKPw3LxLB19F63CmxuBzAuN2kE8pump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "1cxm3eGe3SAfUBby5RkN1LZNgT15U7v2ZAoifKRGAMZT4JjuLfaupmws5nvxSQ7dv7CXZqRpY1hS3wVogBimrCs",
+      "slot": 444188990,
+      "transaction_index": 143
+    },
+    {
+      "block_time": 1788331562,
+      "mint": "5nbJqQBvYB5ZgFY6EfjCY3Z9zWaame6chNkpktqMpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "28prSetk7ftsXjhxga46SfHDwQPM5ixXdXZcPZjWVpgkqJHdtt56oZUwxXzMcT2QcrDdNh38s4cmP21d52f1p46X",
+      "slot": 443631509,
+      "transaction_index": 479
+    },
+    {
+      "block_time": 1788513081,
+      "mint": "J69PpJTkj9Cz4ihkTmfhQ1SmgWpScNMTTYKvTJsmpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2U2bLGcAeoUdAVMyszF4Eakiw97SiP38X8KX4qZWxLovydc5g9sBA25rX2R7c7kCvG8qfCAX6QLbdTmE3bG6L9Wp",
+      "slot": 444207697,
+      "transaction_index": 969
+    },
+    {
+      "block_time": 1788493457,
+      "mint": "35WYm2z9GQmzefQR3uFh3fPb6h5iHZVCxeXN1k9Cpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2YHDUdoFNXVDX3bBMrwWMvXvsh2eJUjWFPQKGNPJgewGFNHGVWBXXtvDsxyXuRAj18d52wqj5B1BV8jmqQjknmEm",
+      "slot": 444145406,
+      "transaction_index": 375
+    },
+    {
+      "block_time": 1788510833,
+      "mint": "AjEpsYjvLbWuqg2FmLvdKnvpTGYbjBSHWitCXp7gpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2jQqWSsoANS8rQTArWYRQjTBZqMB7gUk7UHx4GLBFBJNbGX42UmdxVftG9fPg69aEDNJ9rrhnG85vsaFjxuzH8HT",
+      "slot": 444200575,
+      "transaction_index": 79
+    },
+    {
+      "block_time": 1788497017,
+      "mint": "3PtbSuzLgkbKqB8s5CViawMEFGuAmGC87qAW5ERtpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2ujoZi1qSNcs5TTxraGmhyZbKwrmMtZU3QR4XAUbZez8quqKnTueeE3t4Uz1LiQNqohQeq9PvxafWxynce12JsLx",
+      "slot": 444156697,
+      "transaction_index": 78
+    },
+    {
+      "block_time": 1788521370,
+      "mint": "H9bqY6vLK8FmHYkxbf7f5zSVH71xverDAH7F6pphAJpT",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2wgoPEdq8soqtJfp2bWyWW6HPVngGEsmE9cs6isBn2mM4P5cRHooSwndpWizTqMaedKWTpG1xqGbmG5TN3ESDqD4",
+      "slot": 444234004,
+      "transaction_index": 893
+    },
+    {
+      "block_time": 1788499783,
+      "mint": "CWt6grsSV78khG8ugsPUHQ235Et6BRoAquCe8NrJb4YD",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "335cjYmDL8E1rY88FBMfCPGwuLVGAjANBgxz4jAYkeyipZsqVh3SDeSaUWvDkmNLipRSMXHHvu8j56VAnBqSh2EZ",
+      "slot": 444165494,
+      "transaction_index": 937
+    },
+    {
+      "block_time": 1788513593,
+      "mint": "5DDvri2Xn12MeWSswFu5C3J5Xp6MFqptKrUmA7gqpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3GBDvATanEbCruHdS74gr9V6mvWzrPKkx4iV8HT6zFcNLiAczCAb9awQxBaZh8bNyWtxkTk6gxk2d31xxDzfUuzH",
+      "slot": 444209313,
+      "transaction_index": 903
+    },
+    {
+      "block_time": 1788517666,
+      "mint": "ghZSXKu7JSp3bhxoKbYUBSf35w2kGoCWV6Sq3PQpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3HBvKT2en6zfC3UkTz7QAJ3rxYjfFWTqAKV1Zw6FwTuRqWL1eFeWdABQaGmHqZ8wi75zJorzGWJUe66etqFwWpUj",
+      "slot": 444222226,
+      "transaction_index": 407
+    },
+    {
+      "block_time": 1788331873,
+      "mint": "FCgiwrqpjJ1oEYE58bWJNeS3DtmqjFJcytZfLJLcpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3MPT2T3MuwNCZahGdX8HUMHp6NxfdHKUqfJ9s6uom8MSMYoR6tvoFhDSjwyP7DNDrRsv5Q1VyVHctivM8WLEz2C8",
+      "slot": 443632496,
+      "transaction_index": 964
+    },
+    {
+      "block_time": 1788328587,
+      "mint": "ALTrVNQrcxipJxkh3XuFGZXqY9LFFxjXm4r8pqi1pump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3RV88p73p1ZrthryRZ6NQ7bh4UQv2ukeFgGzSkuHYQ52zi76wGjoq3jwVtqZ96f29kLq9BGuKGt1ZaMqGt7FK6HB",
+      "slot": 443622014,
+      "transaction_index": 264
+    },
+    {
+      "block_time": 1788319784,
+      "mint": "DUdHApo3GYSqm7Tj7pfUvYvEzy9Ct78UkmpdtHUgpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3ZAUMcD2zTY1zNDLm5ewUGbxve7qrHDXQ4RMM2RArGHnE9vuajRrPcRQP2JYF3xCuoV9EgXomDYU9fsZBAXVS9Ax",
+      "slot": 443594015,
+      "transaction_index": 982
+    },
+    {
+      "block_time": 1788514184,
+      "mint": "GLRGgpetTFGoetoD2A2CmTVCJTrnqfyxMGqPWFMcpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3bbFEjsoPzjqC7Pw3AA2t5aVJACnYEjH2F4aGdjmhBhvDYVj9xHA3eAWaqkStDqcaoGTuxR52zxyj1HxV7ceGsNo",
+      "slot": 444211187,
+      "transaction_index": 146
+    },
+    {
+      "block_time": 1788493241,
+      "mint": "49ffj688oCAw8B1Tg2cwW7NTGFwMB6j5a5cViJMRpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3byvhSSwvanWupd5zAbcxmSsA3bYndGTPSWw7dPy7c41Tqhuz5LSunu6i9fvmuWP5qKJppoyf2Wu1qojwLvnFpGc",
+      "slot": 444144715,
+      "transaction_index": 968
+    },
+    {
+      "block_time": 1788505971,
+      "mint": "3eXDKRQf6SJeEhBHa4ZShYBfXRHNuf6zjKQA2sqRpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3gkY2feGaZbqaM9NE4KMfXTNjUkQkhKsbZPzDi9mqd8VeVCUagdEmjzcUXT9GdyVyDRmVbUWVbq9462wsCWiExph",
+      "slot": 444185140,
+      "transaction_index": 706
+    },
+    {
+      "block_time": 1788328319,
+      "mint": "7sEHfZ8Lgmy78Ptpmm3STh2HgjYm4fLPkdGUdfiZpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3tEDkdSyC2R4PvqH8J2iaF4X74XA7UrT4D17wddhv98adhSZ3z6wmVv5rSrSNSsQ7AvbnN9GB9TWAevxdP56ngYv",
+      "slot": 443621170,
+      "transaction_index": 350
+    },
+    {
+      "block_time": 1788326423,
+      "mint": "BP6vw9JJyBKLfURimVxepqjsFbWzEgXTrEejeBEfpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3v1TTygSRsckAfFDcX68qgudfYA12jiUT5AE4KX72bU15AD5tx9tUyEmyVhHpaxZ99RkvXUUX7cNaHQd7XihSv16",
+      "slot": 443615135,
+      "transaction_index": 987
+    },
+    {
+      "block_time": 1788328368,
+      "mint": "E85HyNsDcqeXsYFUUoVrgeN5i3DNzeVawi9BBY3zpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "48uPJViQAYHDrRVo6VR4ejGbqv4VnU88eszU9GeWTbwP5PZzThLFNVwXHSg5HYKbEFFhmXQYWiSNT5wAPZaqewqp",
+      "slot": 443621322,
+      "transaction_index": 836
+    },
+    {
+      "block_time": 1788501698,
+      "mint": "FKrjsuYb6zHgLSdgenQwordFfKT6H2x1rTGMJGjdpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4KRic8mJ2js8am4WDyf9MT5x7gibHxBMjfJxP2VoaGhMNFfJdRoqtcscqCu8sMRNVhqK2SsAvYn7M6DosKyMMpsy",
+      "slot": 444171577,
+      "transaction_index": 146
+    },
+    {
+      "block_time": 1788512845,
+      "mint": "GwEkodgVHdg9sRgir51LZqvqxtUBt7JS3FhuJzvpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4LAog5KXUyYpzR3nKYqj4KvqFymeeGZs5P995UD9RMrp7YgoWWaK3gTBJBKE9Ye5W6h3zm55jdWSznj3pRgF6mLA",
+      "slot": 444206948,
+      "transaction_index": 1433
+    },
+    {
+      "block_time": 1788510771,
+      "mint": "6bEoCVaofJ3wUV61sHUaSAf6osaDf6eRoTd7qFi1pump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4NKSzm3FpfiwefMJu7tUra5qHUagFoM3zJhVx722w3aZ7a91hxX3EGuBd7u8MV6PwcZNHqTZnYwwvrdtPuBHhv1D",
+      "slot": 444200377,
+      "transaction_index": 166
+    },
+    {
+      "block_time": 1788502000,
+      "mint": "t1C2qjSyMG5DVZknaq9fzkckdMSXfBPkNiLDaZapump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4SdwVnPvb5o5GuHLWgBzraURGh2z4YZsMWqZDRTcbtHb11QV2grEdd2wHVTCyGbNtPbj244BMDG7Vd9y7gKwqgap",
+      "slot": 444172546,
+      "transaction_index": 676
+    },
+    {
+      "block_time": 1788325949,
+      "mint": "8Be2JimwEBvpJ9xzmX9ewRyW9Hke3JeX46HmdJinpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4Yjyy8uqqnjdo61ocTzVSfu2p7Hw65dm6paah7MraLrpkyiCiUv8Jwj8Qu3gwoeb8yZDjz1PYWNjKKWHtZW5vAey",
+      "slot": 443613620,
+      "transaction_index": 94
+    },
+    {
+      "block_time": 1788509025,
+      "mint": "6R8Z3E9ZUnUy1Z4SRoNNcMhnkiSqgPUMxAvRf1Agpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4ZKo3d8qAmpvrAitMbEm8ogtXpfxx1p3kfkfDcSxxc6iPNygZBoxoTsghdSFgvsoNXdSv1pMnD2W3Lmv52DcJn1R",
+      "slot": 444194835,
+      "transaction_index": 8
+    },
+    {
+      "block_time": 1788517099,
+      "mint": "EqpJRxYKWBMuNHKpo7NCGeFNXYdQLzZx9T88GsHDbonk",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4bfhDuXrwi8TRCQ3BXUCr6uKXE4Mu2RmoWJZbLbqP4XC7g4wkiZgit4S5jZbQJcnj5arWgJt7Y4EAjNaYy192rJZ",
+      "slot": 444220426,
+      "transaction_index": 310
+    },
+    {
+      "block_time": 1788494202,
+      "mint": "HF2M2dAb5UEiiDXcCjuyXqgpNstjAsdb4bb2PQdtpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4gjER9w46y3JmyEiHAyseVaSS9efxKx1pbvRas4kaHFFSgH5TcFESytpFMSVedXPieJCXpU8rBDtzLVWqnWC1XpK",
+      "slot": 444147768,
+      "transaction_index": 1158
+    },
+    {
+      "block_time": 1788515976,
+      "mint": "5znjMTjbP1rXjwoDr5pq2YeaVnyA2fPBJf8VvzT4pump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4rrEmoNbexG1UAerzj5Z4AaDjMzVJDiRgDedYuN8bF82A9izbXkZrFnn7ABzU7JhKsyDJFhK1QZ1utx4DN3EBUsA",
+      "slot": 444216868,
+      "transaction_index": 1204
+    },
+    {
+      "block_time": 1788495575,
+      "mint": "6LwSXMiU2un9EyS65TpJUfaQEiuBKejMHr7wAB6qpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "597jNg88yqqh14fUM4P3ocAdtxicT5GxHkfWiRmb1LB5MKKe7YDcFuzeRaXMphV6RkFVWSpyLMDenxCYoFin48xh",
+      "slot": 444152138,
+      "transaction_index": 305
+    },
+    {
+      "block_time": 1788496108,
+      "mint": "EVcWrhY2TKGncrC3KsqYmZwLeUqF2fxekJRMjadPWygV",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5UYqTmjXDGYSiZyV7j5cD8U1VXGHd65uyJ8mQtufPxWeicBTfg2WihoRKUg97K1kqexUTmnC7vKqPb59XxF24VPS",
+      "slot": 444153819,
+      "transaction_index": 805
+    },
+    {
+      "block_time": 1788330724,
+      "mint": "9GjUVupC9dPrUis7RB7rLgtmvYLLWXADYHb7JXJbpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5dJwFRhsP1vDng5xfdH9jKPUzHxhHLRMj9GvbCV7KndtyVLST3QkP69EmAtJF6hfYRpD5WLLMX8u2Ln1C888Xb7b",
+      "slot": 443628835,
+      "transaction_index": 750
+    },
+    {
+      "block_time": 1788323512,
+      "mint": "DNJrMSuyARoSVqGN7ZFrZgBTfyah24ng5QAWrjgopump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5jQEELFSTR69gFdAHbK34UHt2KeqWzkN6ZwPGYc98cPzXNmeCKntQkL8gVpqWbGiKhxWLK2rQVNhRAqzgYsFtazU",
+      "slot": 443605869,
+      "transaction_index": 401
+    },
+    {
+      "block_time": 1788509500,
+      "mint": "DTZz8iK4RSxTcTGiDihxwKQXhLvBFmu4hWMtqKPCpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5pxJcKTeYSSyNUz2vHCN9GEVAjyUX7Ctc1Jc82yev3gQDYKKva1fhgbU3LuR3k1DdtVmaPgd4GUwgmvAdShhaeyx",
+      "slot": 444196342,
+      "transaction_index": 708
+    },
+    {
+      "block_time": 1788333720,
+      "mint": "45EAN26XVq18pqQySq2jd2HmNFRfu3Xe7HvJ3y39pump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "63SWgDZutfC8byP5uU5LfJuQ3Pw8L2PPHDrgbfqzuknbYkhN1YgGU21JRCRdiGkKGXnNQGtZB66u4jS5snzKS2EH",
+      "slot": 443638374,
+      "transaction_index": 499
+    },
+    {
+      "block_time": 1788503726,
+      "mint": "BGBXbdrW1R7hLL7iXzUMW9VfgXTHwGbkcVGu3ZoVpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "65VHQXK18zK365Ehv2bdpSEyvcSeXh4ttdv3oMp276D61qvw7swsP1d6WHseTJAZVpPG5Mm6SxGubrvMa58WxckW",
+      "slot": 444178032,
+      "transaction_index": 1046
+    },
+    {
+      "block_time": 1788334265,
+      "mint": "EVDUZZuiB3bUACLMorMZXcWrsNmzeCQgn31StLVEbonk",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "AADLPSuTLm8fbhW6dqgJqC4buC7jAgbzzRoNPr7aWLkDrx7omPN95ibswm4wp4pfAZDMJ1MtJ6aTP6oPwbjpQvC",
+      "slot": 443640094,
+      "transaction_index": 521
+    },
+    {
+      "block_time": 1788494303,
+      "mint": "i24sPHUcnoQExk2q9uPMohZTdZPEYAmra5FPSNBpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "AoB3nzd6AzXDJhs3LQ21NoQuh5wCmQffyAmwWBpbhHVTQerxWMakPwYNyVtPxdCLztJw89sGG4fDyMK58YQGu4U",
+      "slot": 444148096,
+      "transaction_index": 689
+    },
+    {
+      "block_time": 1788494490,
+      "mint": "7mnPhQ5HXJnHAiSff6me2Uad8DZk6j5RY885R9g8mNvX",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "BuckewLb3AKUpo4BjRgVif3MsHzVnN622Mx7c2xx1DtjaFHtjoawCka8QvaKVXDHqDbqWiAqzFFR9VyYg1mLvoh",
+      "slot": 444148688,
+      "transaction_index": 881
+    },
+    {
+      "block_time": 1788500023,
+      "mint": "9m9G8qcwZp62NdantLVcN6y1tBTc7Dd6r7gsZTwtpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "HhHAtcWrpE5oPKoqg3Rz2br8TgiYoDnojjSfTQbA3Ls7ca1EF1etztCM9wDcQ2gRw9KR8YAfdmYFEXQMua3GPuE",
+      "slot": 444166263,
+      "transaction_index": 329
+    },
+    {
+      "block_time": 1788507713,
+      "mint": "9pNgFm1537TqMSfP6X9edxELRxxNFUiGMmVPi2VFpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "TENLknjQ7mJGxMgWxvLLiPhhokVshsHUGZ832iNC4NEkD1hwjAk7Dx1ubkZfKnRBuUm6BRTfEYHsBkrmcCcG3tG",
+      "slot": 444190658,
+      "transaction_index": 337
+    },
+    {
+      "block_time": 1788493601,
+      "mint": "geVE9nb8YjPx6eJhfAc4KQscpV57XkMSzPN3CsLpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "TFbG1oGDLUjaAHcw4Pmzva3z3k6fjRebNH4wHw5YdxXmwSmpxNAodtM7iUjWsSH7hRtTqzYjtqt1s5iovHGrkrB",
+      "slot": 444145862,
+      "transaction_index": 284
+    },
+    {
+      "block_time": 1788510695,
+      "mint": "GpAEgMmJTrkGzwGcR3MhbfB8Ew1yVeoC9paNfS93pump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "Y24Q2ejuPjRKn9CxmGN2PTVPQyLVXCEZp45JJD6W6GWZuHpiKR8SbhA6WDPrUfySoQ74BwdGS3YFfvD9FTBQAft",
+      "slot": 444200134,
+      "transaction_index": 0
+    },
+    {
+      "block_time": 1788331665,
+      "mint": "4pU4p3HESJP7ekNbHdP8KSUM9mzCSCAVeEKg5d2tpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "YNa7X6fbPsrGdNnG6YVtbv23jRWB6Dji47kVLMfEjGoBjfcj31shsGZVuhwqJV7ZcjnqDJNK3KD9LoZCf7AqQNt",
+      "slot": 443631832,
+      "transaction_index": 880
+    },
+    {
+      "block_time": 1788498097,
+      "mint": "FA5yZSfK3AVqmpWPtmMPKUXQSrrYyi2V1mToKwuHpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "czA5W8ifPzDLc58x6tPtuWR5qYba6jKDGKPcEoG3KxfgiqpNT5XuKCCPW7krwiQjb9kJATbg3nja34JBmvt8tR6",
+      "slot": 444160140,
+      "transaction_index": 88
+    },
+    {
+      "block_time": 1788498201,
+      "mint": "4YJM5WSDLXxzA3ZxxCZAVjgmhBh1svi5bh2RmLqFpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "npFgEXiC7rvsFCFvVKCCCjNHWSKAY3PM5n1Y9mGE1XZQjGkz7VsparEPKTMVFakSGfeiGS7e4Tz5vCVENi8vM5u",
+      "slot": 444160474,
+      "transaction_index": 227
+    },
+    {
+      "block_time": 1788519104,
+      "mint": "HbEDJkxdkEf8SLkkYyAXx5aiy3X96YGCyJYX3kQmpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "paQ1V4u8nAvov8N3332VD4wEfdTXQhn43k5npeYSWkc9bp6hiFu6DYuQSwk6QY8HTqj8wRCmYM2zjE9BoAr88Ww",
+      "slot": 444226789,
+      "transaction_index": 744
+    },
+    {
+      "block_time": 1788325394,
+      "mint": "42YYqVKTxZijgb3Zrde3jYDAN13EoDQ8TvLUicSNpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "tpQ6C6zjULTTx7aiGskMsxximjcz7pfJNJwBZbLQ76x9xGRP4wUzRcDGFNsUr2LbGwKcyxhKMq4q4QpEHZjFCUK",
+      "slot": 443611851,
+      "transaction_index": 127
+    },
+    {
+      "block_time": 1788320894,
+      "mint": "Fm1Y8atcXYW3TvakkQnnLrt5rQkE8XJpTrwjUCLhpump",
+      "reason_code": "OUTSIDE_AUTHORITATIVE_CAPTURE_INTERVAL",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "zDVgiBpqxbfk47XX3zGZHxkDiohJW8g1um69p2teTxnvFu8zuXiNZFEJhVTTRxKszWw4cFRuUPF8ViftK4X6g5a",
+      "slot": 443597528,
+      "transaction_index": 649
+    },
+    {
+      "block_time": 1788359707,
+      "mint": "3QYPg1XLg6tCbBYrKBDhhLMNAUNhYwUcwAJ3crhfpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "121PW9Aa7Qp6fZddE5rxspVXm2wpTPryiCwDRibh6GiCntJZPZBV976Q7N4S9THdbmdTn3tbAzZ8i9n8jDTMaYmE",
+      "slot": 443720957,
+      "transaction_index": 694
+    },
+    {
+      "block_time": 1788474806,
+      "mint": "4xa7jHf6jjGVRin6GSYmSPLfaRdNY7b89zsku47Kpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2B92LCr4aTY7k68xGQnXdX8FnssUczJGBp2kxHGYkJ7VyBpJ1MCHhvPbyA8kDxefL8bHLKc7DFB6ExLNfsqP8D79",
+      "slot": 444086227,
+      "transaction_index": 547
+    },
+    {
+      "block_time": 1788474352,
+      "mint": "EJsnfq8stgRxDDced8Kegv1YBssCFCox6ckCerH1pump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2CwVKLLg2LfpPUiWV7E9DZd6sWpLqenrb8wQfwLRTEC1WVH66fUqReABQS9123j8cM9xhB9CNTS6wenMLxhEGKt",
+      "slot": 444084794,
+      "transaction_index": 210
+    },
+    {
+      "block_time": 1788471620,
+      "mint": "F1DsmFcEzwCL5x8hb3Y9qEVJtJt862rgmJubTo7Tpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2FAagpEG3P3j3ewrTPRbgtiUqGF878UtpDzFQpxLSG8MksnPWkvayT1nFBxamZUBsizgPaMszF6HWvs2LjUEShND",
+      "slot": 444076122,
+      "transaction_index": 153
+    },
+    {
+      "block_time": 1788472839,
+      "mint": "8WMNqyktBhY39qBguJm255HAFcffAEHZpZiLW16wpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2FeNJsGizX7KCfVvvrGN2EQWcFQh1EBMr2ox6co8kkVYq7bbZbVgpEHoaKPHs9JjsP3GvpSenFG2GBp2fEYckcaN",
+      "slot": 444079989,
+      "transaction_index": 334
+    },
+    {
+      "block_time": 1788459641,
+      "mint": "HDFF66PqzYzmy8pZmrb8rZE1SbVSqz3cgJS1okhSpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2GEpX9fsTZywZdGMQqddj2HRvunuVsAjHKgqJXQAEG1XaeXFp9TJnGysWUjMDB2j4FJdZWJ7P2dC5rLDMEbsyk3d",
+      "slot": 444038229,
+      "transaction_index": 983
+    },
+    {
+      "block_time": 1788427513,
+      "mint": "AxfjuEJRw8wXMyEK2LEE5iSWuywVBFJ1uo6R4Q6apump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2TqGYwkvUbtJoPcp8pbjHq9YXAa2MP81jh73eoiDrfPZDw5tjQAdUvojDDEpXNeWTtKnd2UvBXyKLYDPm4ifzZkV",
+      "slot": 443936280,
+      "transaction_index": 1058
+    },
+    {
+      "block_time": 1788388792,
+      "mint": "5PntZAEaNrCKpaHC334b9pATnUELsYE2WRyhdBYMpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2XiGuu3jaVLvBprEUR1Yhr1XoVXUyYk4NKtt9MdPKxa2Y7AHf2FMPcPYZNtDnbVFAVspxDvPTYrQKrvofyqe9KNk",
+      "slot": 443813217,
+      "transaction_index": 389
+    },
+    {
+      "block_time": 1788471156,
+      "mint": "3AQPh2hx3mh43zb5Wrr3B38DA8zcyvaUnMjdsBnrpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2ZdeyVvbEVWH4eu2iWoKSuAAitbJtF4C2w8yCWB1e2MLVW94xef6Ss9NWkE7bL3TNT4vyjAjVQ7mFhd9MpMjrsVe",
+      "slot": 444074659,
+      "transaction_index": 1062
+    },
+    {
+      "block_time": 1788434219,
+      "mint": "AnuiEaMy1z42NNUTWxAxLjV8NYdynF9pov1cZTpJpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2eEvaxsKeWEeKoNeSnUWdjFh2s6EEFPrxk5oUNWwHHkYn2Bxu3QTP3hS1s6MUA2wD7erdBE8CauaDUzE1EyjNK6w",
+      "slot": 443957608,
+      "transaction_index": 752
+    },
+    {
+      "block_time": 1788423809,
+      "mint": "GxhsMzq3Rj9UnPjcwkkR4YzeV3FonoRrYZZLvH6qpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2eomgpaMddfiRpQQzHGhapKfaGRqkK9yhi4yLgQEp3TqehQEQrHcLzYgADWRhgGU8u4BE3RmtUR9JxS4mYtfZbQF",
+      "slot": 443924526,
+      "transaction_index": 942
+    },
+    {
+      "block_time": 1788469485,
+      "mint": "85YSkNqAodQD919YSjvodKr2jThkkoSZ8k1859q6pump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2gPJytX4HCqFTkNCLHGre6aWP66JqyZ1ph1czqQ3fz5s64adoqEHEn1Dst8ZyfP6biV2Egx6rmnBbERTRt7rjUcf",
+      "slot": 444069367,
+      "transaction_index": 382
+    },
+    {
+      "block_time": 1788427445,
+      "mint": "9wtSHfrJk9Bv2o9PNAp2UmjBgB5FAWqXU3776LvFpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2hm45uG33dBQDFN7d1rE578hVRypY9QYaS8Cc3TzyidZx6ZnCfwKK7NjAgBgG2QjcdGPMKgdmXaUVJk7oiBLUwej",
+      "slot": 443936065,
+      "transaction_index": 506
+    },
+    {
+      "block_time": 1788480674,
+      "mint": "HQHvsKEMRzLsQSjETxgEtKdDuFcYQhztRnR59HJhpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2i7KyqTyQu1YCX7qDgDFfz6yPqLWuhifGtVKnXfix8X5ADDCFfAZaYmLw97j1jX8H5DniMnN4nTsSL8K9SCChfMQ",
+      "slot": 444104873,
+      "transaction_index": 1102
+    },
+    {
+      "block_time": 1788455360,
+      "mint": "Hb5ZBFqWEFLxorimUjrjyqZD9RpyiAg579tEKeUnpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2nCFYzuGi6mLAwbQ6XQB5nZxaiibSkunzrEByTgQnAQYD5ngsvTTSCHzB86b2ohM3FoVSR5b91QKNMbroHx4uywy",
+      "slot": 444024666,
+      "transaction_index": 102
+    },
+    {
+      "block_time": 1788359789,
+      "mint": "2PpXrcFqcLZBVB8PGcwEWHRndaYTqvwj23b5ujw6pump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2qSM6owXFcYfvgkYAxtyQ432Y4JHSfKcc1tYK3hiA55kcCdzXS5hDSU353tAWGD6g3oBzssXZRu55fHxC9VpGsHU",
+      "slot": 443721216,
+      "transaction_index": 158
+    },
+    {
+      "block_time": 1788471025,
+      "mint": "FiyAJwAKRUwdhMmfeUsHnv8cqgLUA61ZQ1t8x5hnpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2s4nX8L22ZrG5kRrnEx5D5THkrLL577FYE6zGTdp5TrunTJZNkjdXUig9E8QyFfz22m2jTHzUmnXSV9vnBdJApv",
+      "slot": 444074252,
+      "transaction_index": 1111
+    },
+    {
+      "block_time": 1788423185,
+      "mint": "7pyENnNENQ4SoCtLHexyjREtjVssjvXB9xc7ApDLpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2uDghLgBM8wqBmhLv33xygKp95gs75zrvCVcCWtXvXuP4ThR3PhpK9AcqeVDaiu9rBLkfJazkjLnm2M2TvKtVCii",
+      "slot": 443922558,
+      "transaction_index": 287
+    },
+    {
+      "block_time": 1788397595,
+      "mint": "4QWiJ5Dn8ukgokn8suMvJT1pr55SLDM98JNBmx4vpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2vxPAsQEzitESCXvrJGpHvxMLXYAs9v19gJkBUieBCAWQRh96sd2dLFJQHoG7qzji1t4wewQhwoUjFkmMysdsiz5",
+      "slot": 443841167,
+      "transaction_index": 364
+    },
+    {
+      "block_time": 1788388729,
+      "mint": "BG8o75xZDTPfggSSmEgwNGHKM1oBkfKCqpQpoo5Ypump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2wXkjsukDMHmQjeDkBidjvYMVeMz9kXKNPWePqwuXrVGJG49s3N9kmCMXyYQHWNHBULXgYgsC5BSSEY7YtJuuVNM",
+      "slot": 443813020,
+      "transaction_index": 408
+    },
+    {
+      "block_time": 1788374055,
+      "mint": "FFhZtmPrYaATQ6FGPE5pGxHpZJSyT3pra6ySR5ypump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "2yYXmwYMftDhVrbou93NNpfLVqRUDe2Dg4ATvLXhwkdJEZfx8MnhhD2nBihnt1pfsiu98uV9iye5HDtK1onDhFZq",
+      "slot": 443766395,
+      "transaction_index": 396
+    },
+    {
+      "block_time": 1788447847,
+      "mint": "C4gY32XosgdJg71vUUJynhUPReEcPDoZ8tm4ZVkxpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "32xsTii67ueL73R7Cn9cW9ySUjU4mNZPaFCm8WuQWf35tE886Z6zcgp8k63Lwj5hKJHsdwf4sdgdNicYheak1BEY",
+      "slot": 444000892,
+      "transaction_index": 768
+    },
+    {
+      "block_time": 1788380929,
+      "mint": "DweY6yX12iQ1xHexTCiXkenKWrroqmkFhviEfopspump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "34nAPLCe6vejy7kFGmiUgpKWEg7ETs9RN3rsSeGXWyF9S5YRYAPggLNr1x7uj3rbsR7Ln8jN68Mderqwh8Vs9NLZ",
+      "slot": 443788251,
+      "transaction_index": 623
+    },
+    {
+      "block_time": 1788431322,
+      "mint": "4s5bc1GTy2w1QTBd2XzS4SA4PxqGLkcSVBxKfxDkpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "36edyei4GkYoqJi9wn6eZMt7PHgZuEBjQTxi8zWJPgS3ShW2GQYTccdQbEfvRs7ZvjNaYYtVPpRhwc9CoKr1h3iV",
+      "slot": 443948403,
+      "transaction_index": 749
+    },
+    {
+      "block_time": 1788381613,
+      "mint": "FxWsmk2byG5sAkntCEi5im2hMXnmWVXEgt54QmV7pump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3AkWNH3bZywY33Cw5a3RGXSk8Cd9rV4gCiCEc515Z1YYWPyURozkcV5W3vDAjULp5oKqGUoWBsgWePFbueEUMPSR",
+      "slot": 443790435,
+      "transaction_index": 42
+    },
+    {
+      "block_time": 1788473376,
+      "mint": "6x6jVjKZj5MYtN8BrW5GxwHLBMaouFvpbD7KPqiqpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3EJQ98x87UM1T6SMvSM7pAVjXbJ9B9zRon7nXgyYrssXuKTVkD2RdrBSVSjfdDAsmZtXEdqQyoYRFcTHLJQ8sHZk",
+      "slot": 444081696,
+      "transaction_index": 650
+    },
+    {
+      "block_time": 1788458826,
+      "mint": "5HTAViH8YeaRqxXxLBZMXzRovQhoB4eAUJpvo1EZpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3LWxJjGNVXF8CwZUzFNabJARdCw1odQfD5vssbKae15VWC8KWBSr6bk3vsKVW4JM7Rfhyx1F5Sfv3WPDdJF4sxwK",
+      "slot": 444035636,
+      "transaction_index": 295
+    },
+    {
+      "block_time": 1788374794,
+      "mint": "C3EXaB9Bx14gwjCQW9PQb2qM5dXo1dTaekd3Jpdpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3R2Hff7VnJBbMLgwgS14WqccpCk1R4tBBNre9oznKRmuqXVqMQZTvWVY6L4SSCNjNE73Nry6MsAuWmYF3ANjbtoX",
+      "slot": 443768751,
+      "transaction_index": 877
+    },
+    {
+      "block_time": 1788427703,
+      "mint": "3jRVGy6jLqyv1DPJVvXFcaMxdLEDpytwphGurpC4pump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3cEFCVBwCNu5UGpejKVAfnEVX4rjNSjejkfKaitsJVLEyz4P68XxgH48PkCxDWN3eaMjjGXghEYivQx27NAPp4Y6",
+      "slot": 443936897,
+      "transaction_index": 903
+    },
+    {
+      "block_time": 1788459295,
+      "mint": "6siRXrYPyERgg9hQ3W3mgDx3oSKHjCN26BU29HaRJKoF",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3dSimSjQk7N86eJCDnfDMpjNdPMN1E4kyq8ufjFtf9t2uGrzutQJxKXtgeu9v8zEoAZKFhgvezf32qWtvhV4h1MP",
+      "slot": 444037126,
+      "transaction_index": 731
+    },
+    {
+      "block_time": 1788396363,
+      "mint": "E2biFo9RHmzdpSk2yzHU1Z29BViqZ5y9AuYZjKbqUffT",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3eKpXxivdmfZJpnw7zkzSXrJdG5pFWqeQzMG24HHWk9RdWLgGjq5aEAQjxg5JyGm3QrhYRcjYMkoDsQ3PCXGKBLL",
+      "slot": 443837231,
+      "transaction_index": 1056
+    },
+    {
+      "block_time": 1788480635,
+      "mint": "4Cqk166Dr947bqsnLW7sUndQQMmfhyZyTm5vMkxhpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3gDgpAJHS8BDYJa98rK323915FVW9xxMF7tLMUfhyeLuepfLwkEgdqzxhqayc3N7MkP6qZ6My6KZRD9UpbAjsWXH",
+      "slot": 444104747,
+      "transaction_index": 419
+    },
+    {
+      "block_time": 1788448036,
+      "mint": "6JaEJQCDz2TKoWbK9fk1pn9PTVtUehP2o89sGaHTpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3gHxFRr7GftZnbLgTRV6232i6WWbVHLazEzVB1FTVhLRDzQ8mRmxBGDiVGKiTHgdBEAn3RKeMXr3dY54rqpMPr7w",
+      "slot": 444001484,
+      "transaction_index": 1513
+    },
+    {
+      "block_time": 1788467867,
+      "mint": "6GTeFpuU3Py2g7svX2WPJL6Re15RqT5xufqKqu4cpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3gK2jEokKBrWXvBMn1J7SzJ6Y98oYv8dYCaWQJnt1FxntBwxWs7e2VieG8o6q9bQkxKkDEFweFmgdPkXVk2MazdF",
+      "slot": 444064266,
+      "transaction_index": 379
+    },
+    {
+      "block_time": 1788473851,
+      "mint": "oo7pSuxJt92X6nKEn687zLyWZLp77GsLekg8tjFpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3nxVxWP5XGCoMo4ZEaETNrAsgchmhA2F3Dy8m3cYoUzvw6NyfZRgjNbJmC9zvs9bCxMpkBiprP2PjUtfDwt8b75e",
+      "slot": 444083197,
+      "transaction_index": 656
+    },
+    {
+      "block_time": 1788370241,
+      "mint": "2XF9HGgorMDuHvCPkR8RnJizDVCE9gvQ9CndXNZcpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3rzb1zqPE22654LWyzYoi62ruo7H9tvgLHrf7rHyrDMmHZerggP4kLy6JmACbVJEVjsommX1pTpwFbARTS76GXrM",
+      "slot": 443754301,
+      "transaction_index": 1095
+    },
+    {
+      "block_time": 1788477033,
+      "mint": "GQjsLVQwy4kDPFEsnjLBYWtmuQkWniUeYtsYxuT4pump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3uitCgcCx6rfeNk2urM62Qbi21rxD7F5mKkzpS1S49r9ZXiYWYtLSkQDDDKV3hw56XT5Ycz5ZPeBSoVGER3qucUQ",
+      "slot": 444093304,
+      "transaction_index": 525
+    },
+    {
+      "block_time": 1788449198,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "3ySqpTDb3SujHRqyCTLm6gY5pSrdcM2WyaiPEA6rpCqpvcEp3XDYLMMWRsu8sUWQ9X6wDgwVWC17TSGjcpTstPZK",
+      "slot": 444005160,
+      "transaction_index": 304
+    },
+    {
+      "block_time": 1788473066,
+      "mint": "7d214asucx82VoWthsuFNzQRDXmKN3zCC1MUzF9ypump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "418f8B5rfpupmSDpZuRcV6viVSJgr9ivQW9JtadabbT7AdTx6j8xvZqzsjMRRfc4W5oTzcT4vSj2hgxoDkF4hHSo",
+      "slot": 444080708,
+      "transaction_index": 35
+    },
+    {
+      "block_time": 1788475814,
+      "mint": "B5S5UQdJhzZvB6gTpr8h2UFDADbCf4is1hyY5jLapump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "41Fn6wK1dkGWLANtrTmvbTgvxgLzszVux2oSJLszeFmPFDrDDpsxzQQBAq6dvvcfAHDBzh7Dq8mGpPZb4FE6a5NP",
+      "slot": 444089426,
+      "transaction_index": 509
+    },
+    {
+      "block_time": 1788449196,
+      "mint": "5C9dUn2hDzJVXPELZCRmUdhKSS3VTe1X3HekP4Apump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "42HZEnPYbxgpEBePCbzXDqUUkjrux8z4yGLsfR1m7PpZNmqzTngEnCXPW8pFYuvH56iGj1DyR14d949S95bzrTqG",
+      "slot": 444005153,
+      "transaction_index": 303
+    },
+    {
+      "block_time": 1788474958,
+      "mint": "CJehJcx2n2cKJ7hdFa4Hc1AJQs3GpZWW7YrkGwAPpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "44CuF5R3ofqE8PJccCWAAp8rqwvtdMr3wpBCMZbj8B7HdjxkBvPmnpZzUzJqzFgzhQp1XjAapLYyfbcEsDEnao7S",
+      "slot": 444086702,
+      "transaction_index": 552
+    },
+    {
+      "block_time": 1788482483,
+      "mint": "7u7zKM1ncKqssHLEJ9GEFWVztmSamj5Lb1TJZ6G4pump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4A69xcWSoe1BrwnE647mQhPiKatTTCyAnWXLcrP8dCaRnr3h6H9tUJgT8jYBA5NBsm1xFdoPzSGDEjeGkYHtAzn2",
+      "slot": 444110616,
+      "transaction_index": 172
+    },
+    {
+      "block_time": 1788459176,
+      "mint": "EViNjEuqSVBqMWPF8AeXeLa862YsDwUvn8Tkydonpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4HyZtUMd2GyXgNdEaTRhfJs5WDEjBLrgtfTTpYabu6DCKo4NqPvJbzez6KQWxaXCzJPFYtRnL4XSbFt4Wwfg9aDv",
+      "slot": 444036748,
+      "transaction_index": 828
+    },
+    {
+      "block_time": 1788399273,
+      "mint": "BvSqhuQrzA9TG98h6CJN4XCo12EXeuoi4GTedAU4pump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4MfgMvMzDiVhoD3iAY4iSkTf9jgovE5JPScCnfvVxUJ4QZKY66LG7GmCG29AVHMzXY9Tt7v74PQDB1TarBD7jdeg",
+      "slot": 443846509,
+      "transaction_index": 135
+    },
+    {
+      "block_time": 1788458905,
+      "mint": "AmWCcDf6tG7zB3VPeDVjeXL5N567fXAiHcTKw3xXpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4N91QU4PwBFWBZ7fxncxRphjAW8tqBwdqWCVVmwQMYgEE3yhJJcKoTgUESkfwMrxUFpRE3rB4Jyii3ay8VtQf35S",
+      "slot": 444035887,
+      "transaction_index": 244
+    },
+    {
+      "block_time": 1788374031,
+      "mint": "CirhZMvUVVbask4xUaGX4HfCkNwX7qensBaRiHGfpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4S3f7siEKHcJwcW5WxSKCTxhkJ9MffLLpzraW1vTnUixJzyz1XEyBuBUZSPZrdf6tiBCdgzCHSaomskSnf59H55D",
+      "slot": 443766322,
+      "transaction_index": 53
+    },
+    {
+      "block_time": 1788473339,
+      "mint": "EQrgbQMA9cNKUdoZBGfG7oA4UxVAaxErPVvBucUgpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4SMqMUycSLcf9Mb77kqTLhh6ieov7Btjg5ujZkkuF6EKnTBA4EFd5nhH1L6hgW2Ng9uwzoDLgSFXrDaWJFzoodKn",
+      "slot": 444081575,
+      "transaction_index": 403
+    },
+    {
+      "block_time": 1788428346,
+      "mint": "C7qmMjYreMXuF6rrKP8HRnTjnJEZvuWKKLp25mLmpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4SSVZFwCrePuZ7yJNkoaabzuPjEVAoCaSYaBzBL97mhA2hjhaDbgcUZBs2vYBKzdPvQedsS9nT52JachhvNfUasV",
+      "slot": 443938942,
+      "transaction_index": 1143
+    },
+    {
+      "block_time": 1788450791,
+      "mint": "Gh8PeTNnrMF2hSKNrVCG2qV6xAwMTq2hr8EM2CrVpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4TKH89hTBU8u6CyNiabR4XMBNzHhTgVkMyLUhwB7KQ8cqSg2W5M9FpZSBapauPodzCWu7ikJVywEdJQQe1k5UzKU",
+      "slot": 444010203,
+      "transaction_index": 339
+    },
+    {
+      "block_time": 1788449527,
+      "mint": "H9ofC5xgVKMLsyEpX22mCVQtrfjfiMmhqDvZmDDPpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4aKTJkMJ6iEiwzHPzfdUBGrsGB9QcrYGfboZRBJLHguAYrd2Tyv6Ct9puGSmjhWtA5ssDF9fdL3u44wzoJTtaKS4",
+      "slot": 444006209,
+      "transaction_index": 951
+    },
+    {
+      "block_time": 1788475548,
+      "mint": "BxQbBNfoV2q7wuPk9Y95x5DVBuK4KeQdnf4SnGodpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4aynYGMb7T9WpSGRHfpBjaFm3gRdb4cjq1Ajv5YMPpkdo6Pw7NPc34EQMBsFgPS2aBdgdJkUpAXzCjZ36iC5XdQv",
+      "slot": 444088583,
+      "transaction_index": 386
+    },
+    {
+      "block_time": 1788428160,
+      "mint": "9YBf6N6xKbEBy9mpYDCcRhqw8of2DmM8vu6To9tSpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4ghrKFM2gJ1CnbWGHH2SbGCJ2gh7EgtRX7wGUh7yFowUCo5UNz5z2QznAEGH5FoMx7thXjseU8ji8soTrC25nuVx",
+      "slot": 443938351,
+      "transaction_index": 86
+    },
+    {
+      "block_time": 1788398118,
+      "mint": "BtxqhPSnQx4aJugrMH32RATKq7rrLwyqbpF87onYpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4ioQZbN5r2LjikY7Svv9sNh39jgpNLUnUwteLxk74tKCNk2Bg3sAsqq5yLG1kcpfQiUa5dcoW7HnVgKFhPgYWnZX",
+      "slot": 443842833,
+      "transaction_index": 213
+    },
+    {
+      "block_time": 1788444973,
+      "mint": "Dmc8s58KoVtuZVwqwadru275RxpH4UNMkzFAe9v4pump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4miSAtUoH76nr6J8YT6L5sRfspmoHS6QhG8ZpYvDgQmVimoVK5hVDAe8Aq4n88UffBZUwh73ymFsAWacVmFtjuAf",
+      "slot": 443991807,
+      "transaction_index": 391
+    },
+    {
+      "block_time": 1788478750,
+      "mint": "9BwRUeZRoUjFiRETXesJfr3JeqLKbwiA6o1jrpXhpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4opVALg4pQyukLec4DQ7CBUf6h3KFCwJWNFgYQr8ZsaUQg4LTs8v8bRmEVzWH4ca2zMqeXEfvnyeKg6Y2A9R4Agq",
+      "slot": 444098754,
+      "transaction_index": 299
+    },
+    {
+      "block_time": 1788430750,
+      "mint": "69LWjs6zDsnL4J63x61ZQ4twMDWvi2Jefkqo73ZHpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4osQ1bdDivedccsueaRzTyRRcmyYNayAuZRTUFYTPdzgRvFV1dbPgS8iTV11Z4UEzEsaFmbSkrpsoaYtfSzTrEEY",
+      "slot": 443946581,
+      "transaction_index": 42
+    },
+    {
+      "block_time": 1788423198,
+      "mint": "wVK2EdREdsZvbpSdiBWXdm6wLGY3b3zr4p83g5rpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4rUUNhUv9bTUTB3nMwoiyEMUc31phLzDDqjoV7RaPviVaG7dKkkSEqyr4mauddZB3kZcCf1Tra8WiJ7oWHvbB84E",
+      "slot": 443922598,
+      "transaction_index": 13
+    },
+    {
+      "block_time": 1788430527,
+      "mint": "XhKjwneYqmTzCZW8Ru7fwBJMEBRhspw1kcHhnFppump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4t2gduzQGFTSA5CbXjVkzCmNAhf6EkQaEcXDjke23P2HixExfmWDUoTchfK7oi4JZz4Y5rV8hqKg4fa3p7HKJKMj",
+      "slot": 443945873,
+      "transaction_index": 492
+    },
+    {
+      "block_time": 1788447996,
+      "mint": "GjJmSEyH7KhHeJDggqf4iLgiaz5fsArRBCfZpNE4pump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4vcvzhok3coFXg16aZLMBDLhgsVhyqn5LJcGDDEk9cF94gq6GWLDLfbs9EiWyyCxevn8rAY6wed5jPucan1ZHavf",
+      "slot": 444001357,
+      "transaction_index": 419
+    },
+    {
+      "block_time": 1788480595,
+      "mint": "4sVnv5gmo4TQKav4espPrTWzc54z4YG4L5NHsXpypump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "4vkPnknFWjZgjS8mbevmtjGr7cXqFvxJuQL7Rdw37WHYndpAkqGZCbAfAAxkszjCeaYLzgZmpoF6bm2opTsBrgPB",
+      "slot": 444104619,
+      "transaction_index": 668
+    },
+    {
+      "block_time": 1788478363,
+      "mint": "CrdWCWP8iayVnQqoPCg1WjRfyL4A3fHRod9mLt49pump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "56w3tUW3eUS1Mie4caLo8uzYx1yzgUqELB38SPY21dGXedkXWRHguM1JSArmvxv2syL86kY7uYsQgzatMj8Kmrrh",
+      "slot": 444097530,
+      "transaction_index": 327
+    },
+    {
+      "block_time": 1788451267,
+      "mint": "GF8EWdG3XK1hsbTp15UorBzZTfXFf854DnB8AhUopump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5AKafYynypz39xJYQHywKKYRvCGw9hsNxdmXjXgBCgFGYVK3uSoznCKjmDGLFa2qXtvp9tN8qk6igoTHq6gx3fi8",
+      "slot": 444011707,
+      "transaction_index": 1031
+    },
+    {
+      "block_time": 1788381700,
+      "mint": "Gx6LwxKn1je57GsJhcTQyTc6q659VoanLodxR6dVpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5AsvNjdFGmgbGpjdJMeYmFTTALsDFMC434E7TRSFf2NzbeamjLdEpNPBxQa6D8TLqrFpVJy1ZLQT8zWBVgzMnZyu",
+      "slot": 443790714,
+      "transaction_index": 1118
+    },
+    {
+      "block_time": 1788399860,
+      "mint": "CyT1Z77Yxdxh4XiFWuYgJVP6aWZbx5Yi6H3q6N9pump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5BzZ51uK7GN3cfqDKLH5QzCkKdHLEhFw2h9g4YDmSVWg4gt2ffoy3eD6DJCXWG2uT7rdSXAf43aEZKFeZTo8aGEf",
+      "slot": 443848393,
+      "transaction_index": 629
+    },
+    {
+      "block_time": 1788424124,
+      "mint": "Br6PoeoydwGfY1Hy8jjFrYomxiGkwk91F4R1x75Qpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5Ewuyux1ejA7w5BYHibxfL6F5ozDSwBDeTSwuEteEeuAV6apsyaH7YWgsRLQFr4tMi9zUsz8ANDFBtxTkWyf8Lzz",
+      "slot": 443925525,
+      "transaction_index": 273
+    },
+    {
+      "block_time": 1788460312,
+      "mint": "GhicoGfqz5nxk1jYnSfbi5aD129bbDsi5dLU6fDspump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5HK82H7iE9bdYL2YWKvhrLQTprdEjqegd4B22T3zwsBzB3SrzXkB7qkFzZ5mAsxq44rBMLt2FQkMFuPiPfZWK9SZ",
+      "slot": 444040352,
+      "transaction_index": 578
+    },
+    {
+      "block_time": 1788348311,
+      "mint": "AxBZrBxXzy15qmXPrugAKXxPvVwWAR3XUdVsD3sApump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5J3XixF9w6vtQF3AWnCr57vVfxw3hBmAe3qXq9m1L82WGrvHxPy2kmhdyg5n7xAUAZPE81c3rkJ6QK8mjbfExjC1",
+      "slot": 443684742,
+      "transaction_index": 219
+    },
+    {
+      "block_time": 1788452403,
+      "mint": "J1N1WqBvY3oxp6Yr9Vh5DmEVrh1i8USUw3Vty5HgMgn6",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5JFibbBEv5ihbCZvuCFzJNHVq2Q99Yrx7vDuau2UfN8zEgkmNaQTjy5QijwpDtCRevmYYWWdq6XGpEXp6D3bc9W3",
+      "slot": 444015294,
+      "transaction_index": 1330
+    },
+    {
+      "block_time": 1788422260,
+      "mint": "EopDzai523aHdASbGsQJThyWFCKb9jtGKuXyG2QHpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5S6BgbLENGPDv6Sta7pWQmWK6qNZprkC8nSdZDS7vvEosvwFcim5FSWPJpACazGGEG8im2HSGF9x3Ubv2UDtqeV7",
+      "slot": 443919611,
+      "transaction_index": 969
+    },
+    {
+      "block_time": 1788367459,
+      "mint": "C8judraEusNfk4HVyjfnJqmspdR35QPqGSZ2Rxripump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5SKUxxNwPn65uKaQ8kN9oZ1YDEMZFLiLuU7ap9aKp13dRGVRQdh4UyKP3XX886dyCdnhmzN7oDdqefFYs5Li1N8E",
+      "slot": 443745492,
+      "transaction_index": 1697
+    },
+    {
+      "block_time": 1788424494,
+      "mint": "6HFUjiUFVMwjvAfNjAxZUGsQUBEWKu15Jor1hjaDpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5Zi3SbrtbrKSwzS3afTMx6x4vvznR4MDvQgZq6RNTWpNXeoBruNz3pfvY9BBFt4p1czQjbGsmFteeSKjwdEMBzJt",
+      "slot": 443926696,
+      "transaction_index": 336
+    },
+    {
+      "block_time": 1788446931,
+      "mint": "EYuAx4xURs8r4h56SxRTKwSf8dUQjqVKAw3RkZc1pump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5d3WMQHNwD4881zQ7yNoGKtMtu88Rccop6DWs4HE33qjtsgY355FVd1k44SXG6FRLsdSrjDPDkua6Rm4vNCc9cgy",
+      "slot": 443997993,
+      "transaction_index": 987
+    },
+    {
+      "block_time": 1788446920,
+      "mint": "WDJk9KAZqfyqMttJjVD8sJnJNbCkWt9yyu4Kzrspump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5dAFHzFkWMz236bJmNg2KNnFk36ua6ZbrMzmnoAM9unX7g4M9DBGNrZKA9NApJwhc3vikve58PQuffmwqv5PBmYa",
+      "slot": 443997960,
+      "transaction_index": 394
+    },
+    {
+      "block_time": 1788468329,
+      "mint": "kfFdGECnL8K56qexwJgaqkW1x4T9vZcGuvC7rCZpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5fYkEQneYuwMu7afCgRPHLYDhxww26dNUgpCNk85HBTTmpimYRWrk4eSqpLTksgMVRaff93PiuWZrAzQhRXwD9ue",
+      "slot": 444065724,
+      "transaction_index": 970
+    },
+    {
+      "block_time": 1788389798,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5hNeQQSfQnBYxHbQXA8g8G9BamWvLnbXnHqZpP8uWgY2aCHCViJ97ZQsv9Ljiaf8AjZrBgx8CpKEqeGpdorSgLxW",
+      "slot": 443816392,
+      "transaction_index": 221
+    },
+    {
+      "block_time": 1788459228,
+      "mint": "EDUBrnbhLfZmcKUGJg3Zi8hN5PtnDBqV8tk4mU8Jpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5tZEDFCqBiuXLwUfegRQwKqFzodB5nBh5garmEo8iypJVjnBYzVriP59A8VnKHRhFuj7JACTHXyR23QvG51BKS3b",
+      "slot": 444036914,
+      "transaction_index": 766
+    },
+    {
+      "block_time": 1788399333,
+      "mint": "GyUQtsMqc9E6Dn3unZTtdo57yfYKSyPcNEVMoKKU1eVN",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "5zKxTJ64me5gf8JkdkKPYmQgjweRCGPaFFpKAJEBSF9MGkNbYwhqRNPLDW48fcH3BMjmtnLS7fRWE7Ezy4zZX7zq",
+      "slot": 443846706,
+      "transaction_index": 970
+    },
+    {
+      "block_time": 1788454045,
+      "mint": "6cHPEmzd35yFG9hvwdwDCwXJrGjsLFRuVZXkyQMFpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "63itS2xvLsc4u7adZcZzJM8vYf2eKCbBXaDCzDJp472mPr4Eigxcruo1tmeTnRBi32Jq8iPGK3xv4M2PRtsQ2mFS",
+      "slot": 444020508,
+      "transaction_index": 431
+    },
+    {
+      "block_time": 1788397543,
+      "mint": "FsGtnsFVBBdckkhAQ3CpaxSgwMdigYkYAvcCTksv72Sf",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "63kxtHbxrxLd5tNqJuaiR3s4oGfWnQLFSt5YT6DAb99J6KmCF26rZgf4PLUKm8FiJn96KGT4TN79VeUnNZLTy35J",
+      "slot": 443840997,
+      "transaction_index": 275
+    },
+    {
+      "block_time": 1788454447,
+      "mint": "Ewm9gmUbxWGC5azjSNSDinCW7ZjG573nBfnfyuy7pump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "64CBEXsxCqTALt32Gfc19WiHXQ7tKtCXGEW5akw76DoZUVm8cw5PDJpApCDECw5PneNMcUzUGCHCPTCwaPH4xsw3",
+      "slot": 444021774,
+      "transaction_index": 1135
+    },
+    {
+      "block_time": 1788367245,
+      "mint": "54gMw1f5X2DMmkaUb6V5PMZZoBxQYN1W6yq9LtKwpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "66gsjbki33Mgc2fxAvGWNFrTyAP4eAec7k1bF7chPovSDiZ5Dgu6NH67xK3gaXzZiAGwjo2ZnVkvovfg7MwyLYsR",
+      "slot": 443744814,
+      "transaction_index": 175
+    },
+    {
+      "block_time": 1788468821,
+      "mint": "3HvEGkMBPX4WPQAFZ7kVZeX8vBnw1Nx7CYPoKNBSpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "6KhH3MnY2FzPMPBNXxQ8paiCbt9uQYF6HEx7F8TFLZqnsB6B77PBVYLr3jsisGxdUfgC9G6Yu4URpBEeeeRcY4n",
+      "slot": 444067272,
+      "transaction_index": 1034
+    },
+    {
+      "block_time": 1788473685,
+      "mint": "4wYcdCpY7MtEzhayGYHpAKN5jhRkQUQwTbtAQgudpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "7THXsd7BJjotwuSAT86KqhQNX9tWZGhJhuAdtEMnsjMkYgrSJ3foW1q1jqWuaWSzN3xn8pjnwLDufUWpH233BJr",
+      "slot": 444082672,
+      "transaction_index": 1458
+    },
+    {
+      "block_time": 1788481751,
+      "mint": "4vd435TgNRFpqfEyqGEuwq2vGpWenpb3bEa74n9Ppump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "7joWYJptGD1y8rANCEM82CyJbzKoEGzdPCYFHYoUkjNzp8X2E65JWb8FjVLn26iCqzeS5kDEWtp7sN8CoAYLWnz",
+      "slot": 444108285,
+      "transaction_index": 817
+    },
+    {
+      "block_time": 1788373649,
+      "mint": "2LXtRNjFUdkMZCrWxGvW8XX5gEcTzsd9Rd4wecAxpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "9FTfwaepc2EFScHqEKkojdSMMCPoHx6gkZdzz82rKwFA5Msx1CQM82iaqsvBT7pghSMyjjddMCJK6RVKM8UADJ7",
+      "slot": 443765114,
+      "transaction_index": 140
+    },
+    {
+      "block_time": 1788467865,
+      "mint": "",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "A4eeTpngtUXW9yXiQWyYSCMUKjpeUzhLLfyioz1mDoPmYarQHMgYbADHMoELMh6rPwZJKSbijEWmirZaXEN6e8A",
+      "slot": 444064260,
+      "transaction_index": 405
+    },
+    {
+      "block_time": 1788448261,
+      "mint": "JCkDUdMDKU9DRYfu3hWoVzLWcJueEuWHTuA4HjCbpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "FzyHo2WSH8ASpHRMSJP6mnAZgvgCdjzKJXmaaJCubonCNxCLYTmmCQvqPuUfxSYcTwyQDbe3rP89Z96cJFoGwfW",
+      "slot": 444002195,
+      "transaction_index": 160
+    },
+    {
+      "block_time": 1788481917,
+      "mint": "9Qa7D2digdw3swDvefgM9FqGMv6htFz2Jr5DKz8Ypump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "HquNuAfbj1wS4AYs6enFhYpuF3bpyZUM42GxJSKuVXcSw14E8R7PZ3kndSUXrBFyc5VH4CvXqLkaACpHvnyJo14",
+      "slot": 444108804,
+      "transaction_index": 1046
+    },
+    {
+      "block_time": 1788478478,
+      "mint": "GbiraNu3qotRyjxEhXAW5JiB3dQBUWjvUNEND51Upump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "Jfnsmv7L9aSFhEYEoS4tQbhN1Cv2NtSKuakYt9U2rYPy59yvDx3ya1dgKRZRFLWSduWpCt1PF6vJ97Zd3YmVub2",
+      "slot": 444097900,
+      "transaction_index": 189
+    },
+    {
+      "block_time": 1788482381,
+      "mint": "JCXwuXRfSkWnsvywkbTmLT7cL6pksMNLLRGcjERcpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "LGwsY8NMRMSh28EA4BJNA85dwbxgoVNxXtp8tHHMwEnfn4j8dkX7HCybRy48CKcV7S8AYwPbuCzERTWC1nY4WqK",
+      "slot": 444110289,
+      "transaction_index": 108
+    },
+    {
+      "block_time": 1788374295,
+      "mint": "GRAFPCBQs4c9Nnh2z261fC1vDWmjD44yQp8TNhftpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "MtfjNCaW1SQK6VEw6o7BKXjQrXx3TmFBsJ7Y2qMNse5GKq8M2DF11rGiLoMGfEmSEFxqA8YQXRgDgZdd2zfTc4e",
+      "slot": 443767156,
+      "transaction_index": 60
+    },
+    {
+      "block_time": 1788472568,
+      "mint": "2nE3xgwUT6TXGZvebnzdeUvWMnPVvc9GmftsRwhrpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "QQQXwcwB2gGmHEnHs3NUQPNHqx6PsZsCXDVr4LtqRGcCoDad3W7LYLAZjCH16Kr7JFhRosQNUPuTEBANP1wZKhM",
+      "slot": 444079127,
+      "transaction_index": 426
+    },
+    {
+      "block_time": 1788472452,
+      "mint": "9K8NUiTsU7iqPzTNDXaDHZReSJ3ZazCAdEZvtgdLpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "TAhAq3qEsmhhcEdFXGdFAxXtvy6PzwBVw5TfVrhxQxAoWj6aZVepb2y5EGz2YdhMeXeDD3ete3LNXCGvCehLcdZ",
+      "slot": 444078758,
+      "transaction_index": 394
+    },
+    {
+      "block_time": 1788398815,
+      "mint": "FJbwyJoPzAmTSuBVdEPpi6ygXBaMQHkyaUHBXNo7pump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "bb4CNWKyHYkBidJcwNdEuwmyszbm5ZtDAnUnrrfVvEsTapvyPkQJZ1cQ9oz1GX68iyQL76XMTzMDH14rMdECtUp",
+      "slot": 443845057,
+      "transaction_index": 848
+    },
+    {
+      "block_time": 1788467862,
+      "mint": "GggpNnxBQh8BmLRd7YdLXSwPBJbEdn2RQCs78qGrpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "bvHydYXfQqA3hZ4ghfGizZdQ4NRubPF1xtLWQh2WzJAg21gujuSmJjKc1G7KVbg4BfEXzwQDN1Hbh1GbTmqihJh",
+      "slot": 444064250,
+      "transaction_index": 888
+    },
+    {
+      "block_time": 1788423495,
+      "mint": "8RpwYfNG8JNUCDoYyaVWMZwjAokY1s8pQreg4yzTpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "cZBSDy1ddU9i6B4T2Kx9Qmzu2UmE6mTkqBzBtpC4HDcWBtg1GWryap3wBWt8coyvY6Dz31YydacmWMoLXR9kSdX",
+      "slot": 443923535,
+      "transaction_index": 576
+    },
+    {
+      "block_time": 1788461032,
+      "mint": "B3xU49SW3khA7m5Lgata2fmPxZeQRuaJbCruPsVDpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "gEAFTWLQcuQWPauHueYYrBzvuwDcfBnXatqzAEJTND6sbsqER2CBDuUxKtzyfYvGr3xMjPaw4qFexXqDEsWnK1Z",
+      "slot": 444042637,
+      "transaction_index": 750
+    },
+    {
+      "block_time": 1788474133,
+      "mint": "ChrUWMHYqKn9EUM9x5S7ViAMDdwaYZscUsPVtU4hpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "j2qKypF9eP6kyhF47C37AgXRsJjAtuA4N1ZNExXayxU4GdnuzKZ9kzvChK4G5YtpwMTEzPb5UEihwDYTDmWRx6Z",
+      "slot": 444084095,
+      "transaction_index": 591
+    },
+    {
+      "block_time": 1788478049,
+      "mint": "GLJ1AcwgTkHv81ytDrrg82haw36o2tycFCMGTfm5Yhm8",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "qbK66PRC4FSzD14pz1BpmjRZQYsP73o1PGCiEcRGydqMgQAxWccqPKvSDkZxCChNpKckpk1Cw13dYp8xiZQ43zr",
+      "slot": 444096532,
+      "transaction_index": 872
+    },
+    {
+      "block_time": 1788473360,
+      "mint": "7f8fyKUShrVxyC8EDZCUWvrB65fqdLNWxA95YXYUpump",
+      "reason_code": "TARGET_LAUNCH_OUTSIDE_AUTHORITATIVE_CAPTURE",
+      "selection_kind": "SUCCESSFUL_BUY",
+      "signature": "t5fZoiUjp7no1uJvoobUphfU6ft59qAxQRoe67cUed2rPBHRYN3fU3Zf1EcJwQB8brzggMoeFghacvaHtGP13dT",
+      "slot": 444081645,
+      "transaction_index": 266
+    }
+  ],
+  "failed_attempts": {
+    "authoritative_mapped": 371,
+    "discovered_in_resolved_wallet_history": 449,
+    "excluded": 243,
+    "included": 206
+  },
+  "field_coverage": {
+    "causal_creator_history_rows": 66,
+    "causal_social_rows": 158,
+    "decision_received_ns": 496,
+    "first_buyer_history_rows": 159,
+    "funder_history_rows": 0,
+    "metadata_observation_rows": 496,
+    "missing_candidate_transaction_index_rows": 399,
+    "missing_decision_transaction_index_groups": 0,
+    "missing_reserve_state_rows": 0,
+    "reserve_state_rows": 496
+  },
+  "integrity": {
+    "ambiguous_labels": 0,
+    "deterministic_group_ids": true,
+    "every_exclusion_has_reason": true,
+    "future_leakage_violations": 0,
+    "missing_chosen_rows": 0,
+    "no_model_trained": true,
+    "status": "PASS",
+    "violations": []
+  },
+  "launch_labels": {
+    "selected_fill_rejected": 206,
+    "selected_landed": 116,
+    "total": 36000,
+    "true_ignore": 35678
+  },
+  "outputs": {
+    "jsonl": {
+      "bytes": 2963159,
+      "path": "artifacts\\e4-v12-canonical-choice-sets.jsonl",
+      "sha256": "f64b040f18366bd01dd07adbd4a930446dd91df3e691af88c18b09d3a0b075b4"
+    },
+    "parquet": {
+      "bytes": 259565,
+      "path": "artifacts\\e4-v12-canonical-choice-sets.parquet",
+      "sha256": "853e61de326c38516dbf12872a95a86babd7dcc11f1be04503d940450b816bfe"
+    }
+  },
+  "quality": {
+    "duplicate_source_events": 0,
+    "reserve_reproduction_count": 116,
+    "reserve_reproduction_median_error_bps": 3.107553103731675e-06,
+    "reserve_reproduction_within_500_bps": 116,
+    "same_receipt_unordered_alternatives": 0,
+    "source_parse_errors": 0
+  },
+  "remaining_evidence_gaps": [
+    "164 mapped failed attempts and 101 in-interval landed buys target launches outside the frozen 36,000-launch corpus; they are explicitly excluded.",
+    "The full wallet ledger has 23,025 unresolved transaction details; these cannot be silently asserted to be entry attempts.",
+    "Capture JSONLs do not carry transaction indexes for most launch events; exact receipt-time ties without independent block order are conservatively omitted.",
+    "No causal funding-wallet registry exists in the audited artifacts, so funder fields remain unavailable.",
+    "Social and website fields are exposed only when the launch-time URI is content-addressed; mutable post-hoc metadata is not used as a causal feature."
+  ],
+  "source_manifest": "research\\e4-v12-canonical-choice-source-manifest.json",
+  "source_manifest_sha256": "d005f33b2dc80c326ab87fc7b1546ac132a1bcc80a470d30d751b2cf94af63df",
+  "sources": {
+    "capture_run_ids": [
+      "33605109571",
+      "33627431540",
+      "33644544746",
+      "33656916992",
+      "33669514091",
+      "33681664773",
+      "33692043170",
+      "33704841852",
+      "33716649440",
+      "33741470396",
+      "33792881280",
+      "33822988156"
+    ],
+    "capture_runs": 12,
+    "captured_events": 3399396,
+    "captured_launches": 36000,
+    "research_artifact_run_ids": {
+      "bundle_metadata": "33876511129",
+      "failed_attempts": "33883557623",
+      "global_attempt": "33889403746",
+      "social_choice": "33877632753",
+      "wallet_history": "33876680669"
+    }
+  },
+  "splits": {
+    "holdout": {
+      "maximum_received_ns": 1788493003609372295,
+      "minimum_received_ns": 1788461476198152078,
+      "runs": 2
+    },
+    "train": {
+      "maximum_received_ns": 1788408986074128014,
+      "minimum_received_ns": 1788335135902296985,
+      "runs": 8
+    },
+    "validation": {
+      "maximum_received_ns": 1788443048929607544,
+      "minimum_received_ns": 1788411202405964732,
+      "runs": 2
+    }
+  },
+  "successful_buys": {
+    "discovered_in_resolved_wallet_history": 265,
+    "excluded": 149,
+    "included": 116
+  },
+  "version": "e4-v12-choice-set-coverage-v1",
+  "wallet_history_counts": {
+    "discovered_failed_attempt": 243,
+    "discovered_successful_buy": 149,
+    "excluded_failed_attempt": 243,
+    "excluded_successful_buy": 149,
+    "included": 322
+  }
+}
