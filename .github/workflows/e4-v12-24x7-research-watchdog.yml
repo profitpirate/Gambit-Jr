@@ -10,10 +10,12 @@ on:
     paths:
       - ".github/workflows/e4-v12-24x7-research-watchdog.yml"
       - "scripts/e4_v12_24x7_watchdog.py"
+      - "scripts/e4_v12_experiment_registry.py"
+      - "tests/test_e4_v12_experiment_registry.py"
 
 permissions:
   actions: write
-  contents: read
+  contents: write
 
 concurrency:
   group: e4-v12-24x7-research-watchdog
@@ -33,12 +35,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Validate registry and watchdog contracts
+        run: python -m unittest discover -s tests -p 'test_e4_v12_experiment_registry.py' -v
       - name: Inspect and self-heal every research lane
         run: |
           mkdir -p artifacts
           python scripts/e4_v12_24x7_watchdog.py \
             --repo "$GITHUB_REPOSITORY" \
             --max-dispatches "$E4_WATCHDOG_MAX_DISPATCHES" \
+            --registry artifacts/e4-v12-experiment-registry.json \
+            --leaderboard-json artifacts/e4-v12-experiment-leaderboard.json \
+            --leaderboard-markdown artifacts/e4-v12-experiment-leaderboard.md \
             --output artifacts/e4-v12-watchdog-status.json
       - name: Publish readable status
         if: always()
@@ -56,22 +63,40 @@ jobs:
               f"- Checked: `{data.get('checked_at')}`",
               f"- Golden thesis found: **{data.get('found')}**",
               f"- Dispatches this tick: **{data.get('dispatches', 0)}**",
+              f"- Novel scientific dispatches: **{data.get('novel_scientific_dispatches', 0)}**",
+              f"- Duplicate experiments retired: **{data.get('duplicates_retired', 0)}**",
               f"- Healthy/cooling lanes: **{data.get('active_or_healthy', 0)}**", "",
-              "| Lane | Decision | Latest | Reason |",
-              "|---|---|---|---|",
+              "| Lane | Experiment | Decision | Latest | Reason |",
+              "|---|---|---|---|---|",
           ]
           for row in data.get("actions", []):
               latest=f"{row.get('latest_status') or '-'} / {row.get('latest_conclusion') or '-'}"
               reason=str(row.get("reason") or "").replace("|", "/")
-              lines.append(f"| `{row.get('workflow')}` | **{row.get('decision')}** | {latest} | {reason} |")
+              experiment=str(row.get("experiment_id") or "-")[:18]
+              lines.append(f"| `{row.get('workflow')}` | `{experiment}` | **{row.get('decision')}** | {latest} | {reason} |")
           Path("artifacts/e4-v12-watchdog-status.md").write_text("\n".join(lines)+"\n")
           with open(Path(os.environ["GITHUB_STEP_SUMMARY"]), "a", encoding="utf-8") as handle:
               handle.write("\n".join(lines)+"\n")
           PY
+      - name: Persist unique registry and holdout-first leaderboard
+        run: |
+          git config user.name 'gambit-v12-novelty-watchdog'
+          git config user.email 'actions@users.noreply.github.com'
+          git add \
+            artifacts/e4-v12-experiment-registry.json \
+            artifacts/e4-v12-experiment-leaderboard.json \
+            artifacts/e4-v12-experiment-leaderboard.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(e4-v12): update unique experiment registry [skip ci]'
+            git push origin HEAD:main
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: e4-v12-watchdog-${{ github.run_id }}
-          path: artifacts/e4-v12-watchdog-status.*
+          path: |
+            artifacts/e4-v12-watchdog-status.*
+            artifacts/e4-v12-experiment-registry.json
+            artifacts/e4-v12-experiment-leaderboard.*
           if-no-files-found: warn
           retention-days: 14
