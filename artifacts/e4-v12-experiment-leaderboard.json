@@ -2,6 +2,21 @@
   "ranking_policy": "chronological_holdout_first",
   "rows": [
     {
+      "dataset": "rolling-runs:34201101121,34186192299,34175839320,34167878699,34159449923,34150939561,34138377553,34123647690,34099929487,34084120627,34073802862,34063856134,33931301493,33920757002,33911477030,33897368379,33876345997,33852482054,33835575805",
+      "drawdown": null,
+      "experiment_id": "e4x-072758a034cbd5f79592e4875aad3d6102baf420e281eb86f8a739e64ef512c0",
+      "failure_reason": "NO_TRAIN_SURVIVOR",
+      "has_chronological_holdout": false,
+      "holdout_wr": null,
+      "latency_coverage": null,
+      "live_status": null,
+      "next_required_change": "change features, model family, parameters, or evidence",
+      "pnl": null,
+      "profit_factor": null,
+      "rank": 1,
+      "thesis_family": "reactive-independent"
+    },
+    {
       "dataset": "rolling-runs:34201101121,34186192299,34175839320,34167878699,34159449923,34150939561,34138377553,34123647690,34099929487,34084120627,34073802862,34063856134,33931301493,33920757002,33911477030,33897368379,33876345997,33852482054,33835575805,33822988156",
       "drawdown": null,
       "experiment_id": "e4x-193c1237f6f6ed02e0b22a0fc1ef3fb7d6e4ab59e69d3410ed96244a1f32a8a3",
@@ -13,7 +28,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 1,
+      "rank": 2,
       "thesis_family": "failed-aware-preimpact-v3"
     },
     {
@@ -28,7 +43,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 2,
+      "rank": 3,
       "thesis_family": "social"
     },
     {
@@ -43,7 +58,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 3,
+      "rank": 4,
       "thesis_family": "social"
     },
     {
@@ -58,7 +73,7 @@
       "next_required_change": "change source or transport latency assumptions/code",
       "pnl": null,
       "profit_factor": null,
-      "rank": 4,
+      "rank": 5,
       "thesis_family": "social-whitelist"
     },
     {
@@ -73,8 +88,23 @@
       "next_required_change": "change source or transport latency assumptions/code",
       "pnl": null,
       "profit_factor": null,
-      "rank": 5,
+      "rank": 6,
       "thesis_family": "prior-whitelist"
+    },
+    {
+      "dataset": "rolling-runs:34201101121,34186192299,34175839320,34167878699,34159449923,34150939561,34138377553,34123647690,34099929487,34084120627,34073802862,34063856134,33931301493,33920757002,33911477030,33897368379,33876345997,33852482054,33835575805",
+      "drawdown": null,
+      "experiment_id": "e4x-35ffa62d5950ce663f7934202f9a051f5e11498ad0fc59c2f12401a51788423a",
+      "failure_reason": null,
+      "has_chronological_holdout": false,
+      "holdout_wr": null,
+      "latency_coverage": null,
+      "live_status": null,
+      "next_required_change": null,
+      "pnl": null,
+      "profit_factor": null,
+      "rank": 7,
+      "thesis_family": "parallel-master"
     },
     {
       "dataset": "rolling-runs:34201101121,34186192299,34175839320,34167878699,34159449923,34150939561,34138377553,34123647690,34099929487,34084120627,34073802862,34063856134,33931301493,33920757002,33911477030,33897368379,33876345997,33852482054,33835575805,33822988156",
@@ -88,7 +118,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 6,
+      "rank": 8,
       "thesis_family": "reactive-lattice"
     },
     {
@@ -103,8 +133,38 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 7,
+      "rank": 9,
       "thesis_family": "reactive-independent"
+    },
+    {
+      "dataset": "rolling-runs:34201101121,34186192299,34175839320,34167878699,34159449923,34150939561,34138377553,34123647690,34099929487,34084120627,34073802862,34063856134,33931301493,33920757002,33911477030,33897368379,33876345997,33852482054,33835575805",
+      "drawdown": null,
+      "experiment_id": "e4x-4fb0ea432bf9a882aa73ed3d94e573f6a7cf10e6711d7361ededa3ecdb715b2b",
+      "failure_reason": "HOLDOUT_COLLAPSE",
+      "has_chronological_holdout": false,
+      "holdout_wr": null,
+      "latency_coverage": null,
+      "live_status": null,
+      "next_required_change": "change the thesis or add a genuinely new evidence epoch",
+      "pnl": null,
+      "profit_factor": null,
+      "rank": 10,
+      "thesis_family": "reactive-profit"
+    },
+    {
+      "dataset": "rolling-runs:34201101121,34186192299,34175839320,34167878699,34159449923,34150939561,34138377553,34123647690,34099929487,34084120627,34073802862,34063856134,33931301493,33920757002,33911477030,33897368379,33876345997,33852482054,33835575805",
+      "drawdown": null,
+      "experiment_id": "e4x-4fb237ee54b83fcd73ecd5fe4f5ebca55505c19b9b244e892a7e3967667ce6b0",
+      "failure_reason": null,
+      "has_chronological_holdout": false,
+      "holdout_wr": null,
+      "latency_coverage": null,
+      "live_status": null,
+      "next_required_change": null,
+      "pnl": null,
+      "profit_factor": null,
+      "rank": 11,
+      "thesis_family": "failed-aware-preimpact-v3"
     },
     {
       "dataset": "frozen-runs:33792881280,33810753028,33822988156,33835575805,33852482054,33876345997,33897368379,33911477030,33920757002,33931301493",
@@ -118,7 +178,7 @@
       "next_required_change": "change source or transport latency assumptions/code",
       "pnl": null,
       "profit_factor": null,
-      "rank": 8,
+      "rank": 12,
       "thesis_family": "buyer-cluster"
     },
     {
@@ -133,7 +193,22 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 9,
+      "rank": 13,
+      "thesis_family": "reactive-lattice"
+    },
+    {
+      "dataset": "rolling-runs:34201101121,34186192299,34175839320,34167878699,34159449923,34150939561,34138377553,34123647690,34099929487,34084120627,34073802862,34063856134,33931301493,33920757002,33911477030,33897368379,33876345997,33852482054,33835575805",
+      "drawdown": null,
+      "experiment_id": "e4x-6d99247f0da1458462b529e12985216086d5c74e44a9962492ced66408262931",
+      "failure_reason": "NO_TRAIN_SURVIVOR",
+      "has_chronological_holdout": false,
+      "holdout_wr": null,
+      "latency_coverage": null,
+      "live_status": null,
+      "next_required_change": "change features, model family, parameters, or evidence",
+      "pnl": null,
+      "profit_factor": null,
+      "rank": 14,
       "thesis_family": "reactive-lattice"
     },
     {
@@ -148,7 +223,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 10,
+      "rank": 15,
       "thesis_family": "reactive-profit"
     },
     {
@@ -163,7 +238,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 11,
+      "rank": 16,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -178,7 +253,7 @@
       "next_required_change": "change source or transport latency assumptions/code",
       "pnl": null,
       "profit_factor": null,
-      "rank": 12,
+      "rank": 17,
       "thesis_family": "multi-thesis-v5"
     },
     {
@@ -193,7 +268,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 13,
+      "rank": 18,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -208,7 +283,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 14,
+      "rank": 19,
       "thesis_family": "market-only"
     },
     {
@@ -223,7 +298,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 15,
+      "rank": 20,
       "thesis_family": "market-only"
     },
     {
@@ -238,7 +313,7 @@
       "next_required_change": "change source or transport latency assumptions/code",
       "pnl": null,
       "profit_factor": null,
-      "rank": 16,
+      "rank": 21,
       "thesis_family": "reactive-confidence"
     },
     {
@@ -253,8 +328,23 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 17,
+      "rank": 22,
       "thesis_family": "parallel-master"
+    },
+    {
+      "dataset": "rolling-runs:34201101121,34186192299,34175839320,34167878699,34159449923,34150939561,34138377553,34123647690,34099929487,34084120627,34073802862,34063856134,33931301493,33920757002,33911477030,33897368379,33876345997,33852482054,33835575805",
+      "drawdown": null,
+      "experiment_id": "e4x-c0184847e78a2be65eb394e74bd60243a6ebb49f8e5e220dfb2830c91a1bf77e",
+      "failure_reason": "NO_TRAIN_SURVIVOR",
+      "has_chronological_holdout": false,
+      "holdout_wr": null,
+      "latency_coverage": null,
+      "live_status": null,
+      "next_required_change": "change features, model family, parameters, or evidence",
+      "pnl": null,
+      "profit_factor": null,
+      "rank": 23,
+      "thesis_family": "market-only"
     },
     {
       "dataset": "rolling-runs:34201101121,34186192299,34175839320,34167878699,34159449923,34150939561,34138377553,34123647690,34099929487,34084120627,34073802862,34063856134,33931301493,33920757002,33911477030,33897368379,33876345997,33852482054,33835575805,33822988156",
@@ -268,7 +358,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 18,
+      "rank": 24,
       "thesis_family": "reactive-independent"
     },
     {
@@ -283,8 +373,38 @@
       "next_required_change": "change source or transport latency assumptions/code",
       "pnl": null,
       "profit_factor": null,
-      "rank": 19,
+      "rank": 25,
       "thesis_family": "prelaunch-social"
+    },
+    {
+      "dataset": "rolling-runs:34201101121,34186192299,34175839320,34167878699,34159449923,34150939561,34138377553,34123647690,34099929487,34084120627,34073802862,34063856134,33931301493,33920757002,33911477030,33897368379,33876345997,33852482054,33835575805",
+      "drawdown": null,
+      "experiment_id": "e4x-cb11fdeb7fb57d2e2ac60261123c9ba199ed064b5a74afc6943bcec142fef7dc",
+      "failure_reason": "HOLDOUT_COLLAPSE",
+      "has_chronological_holdout": false,
+      "holdout_wr": null,
+      "latency_coverage": null,
+      "live_status": null,
+      "next_required_change": "change the thesis or add a genuinely new evidence epoch",
+      "pnl": null,
+      "profit_factor": null,
+      "rank": 26,
+      "thesis_family": "social"
+    },
+    {
+      "dataset": "rolling-runs:34201101121,34186192299,34175839320,34167878699,34159449923,34150939561,34138377553,34123647690,34099929487,34084120627,34073802862,34063856134,33931301493,33920757002,33911477030,33897368379,33876345997,33852482054,33835575805",
+      "drawdown": null,
+      "experiment_id": "e4x-d444998c35d281f6effcaa2cee831ca72d60890337b4eb5ca53f059ddd0daab8",
+      "failure_reason": "HOLDOUT_COLLAPSE",
+      "has_chronological_holdout": false,
+      "holdout_wr": null,
+      "latency_coverage": null,
+      "live_status": null,
+      "next_required_change": "change the thesis or add a genuinely new evidence epoch",
+      "pnl": null,
+      "profit_factor": null,
+      "rank": 27,
+      "thesis_family": "bayesian-source-confidence"
     },
     {
       "dataset": "frozen-runs:33792881280,33810753028,33822988156,33835575805,33852482054,33876345997,33897368379,33911477030,33920757002,33931301493",
@@ -298,7 +418,7 @@
       "next_required_change": "change source or transport latency assumptions/code",
       "pnl": null,
       "profit_factor": null,
-      "rank": 20,
+      "rank": 28,
       "thesis_family": "recurrence-shape-v3"
     },
     {
@@ -313,7 +433,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 21,
+      "rank": 29,
       "thesis_family": "reactive-profit"
     },
     {
@@ -328,7 +448,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 22,
+      "rank": 30,
       "thesis_family": "parallel-master"
     }
   ],
