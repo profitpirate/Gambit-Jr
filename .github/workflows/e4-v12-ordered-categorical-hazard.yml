@@ -1,0 +1,140 @@
+name: E4 V12 ordered categorical identity hazard
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-golden-profit-hazard-v1
+    paths:
+      - ".github/workflows/e4-v12-ordered-categorical-hazard.yml"
+      - "scripts/e4_v12_ordered_categorical_hazard.py"
+      - "research/e4-v12-ordered-cat-trigger*.txt"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: e4-v12-ordered-categorical-hazard-v1
+  cancel-in-progress: true
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONUNBUFFERED: "1"
+  CORPUS_RUN_ID: "34262315056"
+  CORPUS_ARTIFACT: "e4-v12-allout-launch-corpus-34262315056"
+
+jobs:
+  train:
+    name: ${{ matrix.mode }}-depth-${{ matrix.depth }}-seed-${{ matrix.seed }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      max-parallel: 9
+      matrix:
+        mode: [intent, profit, multitask]
+        depth: [5, 6, 7]
+        seed: [617]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-golden-profit-hazard-v1
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy scikit-learn catboost
+      - name: Download immutable launch corpus
+        run: |
+          mkdir -p corpus artifacts
+          gh run download "$CORPUS_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$CORPUS_ARTIFACT" --dir corpus
+          corpus_file="$(find corpus -name 'e4-v12-allout-launch-corpus.jsonl.gz' -print -quit)"
+          test -s "$corpus_file"
+          echo "CORPUS_FILE=$corpus_file" >> "$GITHUB_ENV"
+      - name: Compile ordered categorical research
+        run: |
+          python -m compileall -q \
+            scripts/e4_v12_allout_profit_hazard.py \
+            scripts/e4_v12_allout_profit_hazard_stream.py \
+            scripts/e4_v12_allout_profit_hazard_strict.py \
+            scripts/e4_v12_ordered_categorical_hazard.py
+      - name: Run frozen ordered-categorical experiment
+        run: |
+          python -m scripts.e4_v12_ordered_categorical_hazard \
+            --corpus "$CORPUS_FILE" \
+            --mode "${{ matrix.mode }}" \
+            --depth "${{ matrix.depth }}" \
+            --seed "${{ matrix.seed }}" \
+            --output "artifacts/${{ matrix.mode }}-${{ matrix.depth }}-${{ matrix.seed }}.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-ordered-cat-${{ matrix.mode }}-${{ matrix.depth }}-${{ matrix.seed }}-${{ github.run_id }}
+          path: artifacts/${{ matrix.mode }}-${{ matrix.depth }}-${{ matrix.seed }}.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  select:
+    needs: train
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-golden-profit-hazard-v1
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: e4-v12-ordered-cat-*-${{ github.run_id }}
+          path: reports
+          merge-multiple: true
+      - name: Select strict categorical candidate
+        run: |
+          mkdir -p artifacts docs/research
+          python - <<'PY'
+          import json,math
+          from pathlib import Path
+          def f(x,d=0.0):
+              try:
+                  y=float(x); return y if math.isfinite(y) else d
+              except Exception: return d
+          rows=[]
+          for path in Path('reports').rglob('*.json'):
+              try: row=json.loads(path.read_text())
+              except Exception: continue
+              if row.get('version')=='e4-v12-ordered-categorical-hazard-v1': rows.append(row)
+          if not rows: raise SystemExit('no ordered-categorical reports')
+          def key(row):
+              h=((row.get('winner') or {}).get('holdout') or {})
+              return (1 if row.get('status')=='HISTORICAL_CANDIDATE' else 0,f(h.get('minimum_win_rate')),f(h.get('minimum_wilson_lower')),min(20,f(h.get('minimum_profit_factor'))),f(h.get('minimum_net_pnl_sol'),-999),-f(h.get('maximum_drawdown_fraction'),1),f(h.get('minimum_trades')))
+          rows.sort(key=key,reverse=True)
+          finalists=[row for row in rows if row.get('status')=='HISTORICAL_CANDIDATE']
+          result={'version':'e4-v12-ordered-categorical-tournament-v1','status':'HISTORICAL_CANDIDATE_FOUND' if finalists else 'NOT_CONCLUSIVE','experiments':len(rows),'historical_candidates':len(finalists),'winner':finalists[0] if finalists else rows[0],'leaderboard':[{'experiment_id':r.get('experiment_id'),'mode':r.get('mode'),'depth':r.get('depth'),'status':r.get('status'),'unseen_holdout_fraction':r.get('unseen_holdout_fraction'),'policy':((r.get('winner') or {}).get('policy')),'failed_requirements':((r.get('winner') or {}).get('failed_requirements') or []),'holdout':{k:v for k,v in (((r.get('winner') or {}).get('holdout') or {}).items()) if k!='latencies'}} for r in rows],'production_paths_changed':0}
+          Path('artifacts/e4-v12-ordered-categorical-tournament.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
+          Path('artifacts/e4-v12-ordered-categorical-status.txt').write_text(result['status']+'\n')
+          Path('docs/research/e4-v12-ordered-categorical-tournament.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
+          Path('docs/research/e4-v12-ordered-categorical-status.txt').write_text(result['status']+'\n')
+          print(json.dumps({'status':result['status'],'experiments':len(rows),'historical_candidates':len(finalists)},indent=2))
+          PY
+      - name: Persist ordered-categorical result
+        run: |
+          git config user.name 'gambit-v12-ordered-categorical'
+          git config user.email 'actions@users.noreply.github.com'
+          git add docs/research/e4-v12-ordered-categorical-*
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(e4-v12): persist ordered categorical result [skip ci]'
+            git push origin HEAD:codex/e4-v12-golden-profit-hazard-v1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-ordered-categorical-summary-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-ordered-categorical-tournament.json
+            artifacts/e4-v12-ordered-categorical-status.txt
+            reports/**/*.json
+          if-no-files-found: warn
+          retention-days: 30
