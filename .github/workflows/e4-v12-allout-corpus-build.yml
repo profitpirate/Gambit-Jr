@@ -1,0 +1,96 @@
+name: E4 V12 all-out 66k launch corpus
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-golden-allout-v1
+    paths:
+      - ".github/workflows/e4-v12-allout-corpus-build.yml"
+      - "scripts/e4_v12_allout_launch_corpus.py"
+      - "scripts/e4_v12_allout_launch_corpus_stream.py"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: e4-v12-allout-corpus-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-golden-allout-v1
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install research dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pandas pyarrow
+
+      - name: Compile corpus builders
+        run: |
+          python -m compileall -q \
+            scripts/e4_v12_allout_launch_corpus.py \
+            scripts/e4_v12_allout_launch_corpus_stream.py
+
+      - name: Restore all 22 immutable capture artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p .tmp-allout/runs artifacts/allout
+          jq -r '.captures[] | [.run_id,.artifact_name] | @tsv' \
+            artifacts/e4-v12-riskset-source-manifest.json > /tmp/allout-captures.tsv
+          test "$(wc -l < /tmp/allout-captures.tsv)" -eq 22
+          while IFS=$'\t' read -r run_id artifact_name; do
+            echo "Restoring $run_id / $artifact_name"
+            mkdir -p ".tmp-allout/runs/$run_id"
+            gh run download "$run_id" \
+              --repo "$GITHUB_REPOSITORY" \
+              --name "$artifact_name" \
+              --dir ".tmp-allout/runs/$run_id"
+            test -s "$(find ".tmp-allout/runs/$run_id" -name 'e4-v12-forward-batch.json' -print -quit)"
+            test -s "$(find ".tmp-allout/runs/$run_id" -name 'e4-v12-forward-batch-live-events.jsonl' -print -quit)"
+          done < /tmp/allout-captures.tsv
+          df -h .
+
+      - name: Build full causal launch and market-outcome corpus
+        run: |
+          python -m scripts.e4_v12_allout_launch_corpus_stream \
+            --manifest artifacts/e4-v12-riskset-source-manifest.json \
+            --v2-jsonl artifacts/e4-v12-canonical-choice-risksets-v2.jsonl \
+            --source-root .tmp-allout/runs \
+            --output-dir artifacts/allout
+
+      - name: Verify output integrity
+        run: |
+          set -euo pipefail
+          test -s artifacts/allout/e4-v12-allout-launch-corpus.jsonl.gz
+          test -s artifacts/allout/e4-v12-allout-selected-outcomes.jsonl
+          test -s artifacts/allout/e4-v12-allout-launch-corpus-summary.json
+          test "$(jq -r '.rows' artifacts/allout/e4-v12-allout-launch-corpus-summary.json)" -eq 66000
+          test "$(jq -r '.selection_labels.SELECTED_LANDED' artifacts/allout/e4-v12-allout-launch-corpus-summary.json)" -eq 215
+          test "$(jq -r '.selection_labels.SELECTED_FILL_REJECTED' artifacts/allout/e4-v12-allout-launch-corpus-summary.json)" -eq 283
+          sha256sum artifacts/allout/* > artifacts/allout/e4-v12-allout-output-sha256.txt
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-allout-launch-corpus-${{ github.run_id }}
+          path: |
+            artifacts/allout/e4-v12-allout-launch-corpus.jsonl.gz
+            artifacts/allout/e4-v12-allout-selected-outcomes.jsonl
+            artifacts/allout/e4-v12-allout-launch-corpus-summary.json
+            artifacts/allout/e4-v12-allout-output-sha256.txt
+          if-no-files-found: warn
+          retention-days: 14
