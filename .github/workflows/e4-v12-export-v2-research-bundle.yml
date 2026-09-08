@@ -1,0 +1,64 @@
+name: E4 V12 export canonical V2 research bundle
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-golden-allout-v1
+    paths:
+      - ".github/workflows/e4-v12-export-v2-research-bundle.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-golden-allout-v1
+          fetch-depth: 1
+
+      - name: Verify required V2 research files
+        run: |
+          set -euo pipefail
+          required=(
+            artifacts/e4-v12-canonical-choice-risksets-v2.jsonl
+            artifacts/e4-v12-canonical-choice-risksets-v2.parquet
+            artifacts/e4-v12-choice-riskset-v2-coverage.json
+            artifacts/e4-v12-choice-riskset-v2-report.md
+            artifacts/e4-v12-entry-age-forensics.json
+            artifacts/e4-v12-selection-backfill.json
+            artifacts/e4-v12-selection-exclusions-v2.jsonl
+            artifacts/e4-v12-causal-entity-graph.json
+            artifacts/e4-v12-hard-negative-audit.json
+            artifacts/e4-v12-riskset-source-manifest.json
+            artifacts/e4-v12-feature-causality-audit.json
+            artifacts/e4-v12-v1-immutability-audit.json
+          )
+          for file in "${required[@]}"; do
+            test -s "$file" || { echo "missing $file" >&2; exit 1; }
+          done
+          sha256sum "${required[@]}" > artifacts/e4-v12-v2-export-sha256.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e4-v12-canonical-v2-research-bundle-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-canonical-choice-risksets-v2.jsonl
+            artifacts/e4-v12-canonical-choice-risksets-v2.parquet
+            artifacts/e4-v12-choice-riskset-v2-coverage.json
+            artifacts/e4-v12-choice-riskset-v2-report.md
+            artifacts/e4-v12-entry-age-forensics.json
+            artifacts/e4-v12-selection-backfill.json
+            artifacts/e4-v12-selection-exclusions-v2.jsonl
+            artifacts/e4-v12-causal-entity-graph.json
+            artifacts/e4-v12-hard-negative-audit.json
+            artifacts/e4-v12-riskset-source-manifest.json
+            artifacts/e4-v12-feature-causality-audit.json
+            artifacts/e4-v12-v1-immutability-audit.json
+            artifacts/e4-v12-v2-export-sha256.txt
+          if-no-files-found: error
+          retention-days: 7
