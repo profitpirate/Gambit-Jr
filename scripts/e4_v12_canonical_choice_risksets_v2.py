@@ -1149,6 +1149,22 @@ RANK_SPECS = {
     "executable_output": ("executable_token_output_0_1_sol", "high"),
     "estimated_impact": ("estimated_price_impact_bps", "low"),
 }
+HARD_NEGATIVE_CATEGORIES = (
+    "SAME_SLOT_ALTERNATIVE",
+    "SAME_TRANSACTION_ALTERNATIVE",
+    "NEAREST_TIME_ALTERNATIVE",
+    "MATCHED_FDV_ALTERNATIVE",
+    "MATCHED_SEED_ALTERNATIVE",
+    "MATCHED_FLOW_ALTERNATIVE",
+    "MATCHED_IDENTITY_ALTERNATIVE",
+    "MATCHED_CREATOR_HISTORY_ALTERNATIVE",
+    "MATCHED_BUYER_CLUSTER_ALTERNATIVE",
+    "MATCHED_SOCIAL_ALTERNATIVE",
+    "MATCHED_TOPOLOGY_ALTERNATIVE",
+    "TOP_MARKET_ALTERNATIVE",
+    "ACTIVE_EXECUTABLE_ALTERNATIVE",
+    "RANDOM_ELIGIBLE_CONTROL",
+)
 
 
 def add_derived_features(groups: Sequence[Sequence[dict[str, Any]]]) -> None:
@@ -1540,7 +1556,9 @@ def add_hard_negatives(
         "validation_used_to_fit": False,
         "holdout_used_to_fit": False,
         "training_iqr_scales": scales,
-        "category_counts": dict(sorted(counts.items())),
+        "category_counts": {
+            category: counts[category] for category in HARD_NEGATIVE_CATEGORIES
+        },
     }
 
 
