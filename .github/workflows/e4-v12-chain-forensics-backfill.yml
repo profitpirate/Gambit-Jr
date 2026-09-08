@@ -1,0 +1,105 @@
+name: E4 V12 causal chain-forensics backfill
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-chain-forensics-backfill-v1
+    paths:
+      - ".github/workflows/e4-v12-chain-forensics-backfill.yml"
+      - "scripts/e4_v12_chain_forensics_backfill.py"
+      - "research/e4-v12-chain-forensics-trigger*.txt"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: e4-v12-chain-forensics-backfill-v1
+  cancel-in-progress: true
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      PYTHONUNBUFFERED: "1"
+      SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL || secrets.HELIUS_RPC_URL || secrets.QUICKNODE_RPC_URL }}
+      HELIUS_API_KEY: ${{ secrets.HELIUS_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-chain-forensics-backfill-v1
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install research dependency
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install aiohttp
+
+      - name: Compile and verify immutable V2 input
+        run: |
+          python -m compileall -q scripts/e4_v12_chain_forensics_backfill.py
+          test -s artifacts/e4-v12-canonical-choice-risksets-v2.jsonl
+          test "$(wc -l < artifacts/e4-v12-canonical-choice-risksets-v2.jsonl)" -eq 12927
+
+      - name: Backfill exact decision-slot ordering and prelaunch funders
+        run: |
+          mkdir -p artifacts docs/research
+          python -m scripts.e4_v12_chain_forensics_backfill \
+            --input artifacts/e4-v12-canonical-choice-risksets-v2.jsonl \
+            --output artifacts/e4-v12-chain-forensics-backfill.json \
+            --concurrency 6 \
+            --funder-concurrency 4 \
+            --requests-per-second 6 \
+            --max-creators 1500
+
+      - name: Validate causal relationships and write compact status
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('artifacts/e4-v12-chain-forensics-backfill.json')
+          data=json.loads(p.read_text())
+          relationships=data['funders']['relationships']
+          assert all(row['funding_age_ms'] > 0 for row in relationships)
+          assert data['causality']['post_decision_funding_relationships_included'] == 0
+          status={
+              'version':'e4-v12-chain-forensics-status-v1',
+              'decision_slots_resolved':data['block_order']['decision_slots_resolved'],
+              'selected_transaction_indexes_resolved':data['block_order']['selected_transaction_indexes_resolved'],
+              'same_slot_alternative_indexes_resolved':data['block_order']['same_slot_alternative_indexes_resolved'],
+              'creators_requested':data['funders']['creators_requested'],
+              'creators_resolved':data['funders']['creators_resolved'],
+              'unique_funders':data['funders']['unique_funders'],
+              'recurring_funders':len(data['funders']['recurring_funders']),
+              'post_decision_relationships':0,
+              'production_paths_changed':0,
+          }
+          Path('artifacts/e4-v12-chain-forensics-status.json').write_text(json.dumps(status,indent=2,sort_keys=True)+'\n')
+          Path('docs/research/e4-v12-chain-forensics-status.json').write_text(json.dumps(status,indent=2,sort_keys=True)+'\n')
+          print(json.dumps(status,indent=2,sort_keys=True))
+          PY
+
+      - name: Persist compact forensic status only
+        run: |
+          git config user.name 'gambit-v12-chain-forensics'
+          git config user.email 'actions@users.noreply.github.com'
+          git add docs/research/e4-v12-chain-forensics-status.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(e4-v12): persist causal chain-forensics status [skip ci]'
+            git push origin HEAD:codex/e4-v12-chain-forensics-backfill-v1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-chain-forensics-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-chain-forensics-backfill.json
+            artifacts/e4-v12-chain-forensics-status.json
+          if-no-files-found: warn
+          retention-days: 30
