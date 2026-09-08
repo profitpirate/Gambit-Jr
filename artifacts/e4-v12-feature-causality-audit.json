@@ -1,0 +1,1595 @@
+{
+  "emitted_column_contracts": [
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "bundle_shape",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "buy_count",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "buy_sell_imbalance",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "buyer_cluster_history_available",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "buyer_cluster_recurrence",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "buyer_concentration",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "buyer_funding_relationships_json",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "buyer_prior_e4_selection_count",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "buyer_prior_execution_counts",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "buys_per_second",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "candidate_age_ms",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "candidate_create_event_index",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "candidate_create_signature",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "candidate_create_slot",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "candidate_create_transaction_index",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "candidate_exclusion_reason",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "candidate_exclusions_by_reason_json",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "candidate_mint",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "candidate_state_ns",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "candidates_dominated",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "candidates_dominating",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "capture_start_ns",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "cashback_enabled",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "chosen_mint",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "create_transaction_buy_count",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "create_transaction_event_count",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_address",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_buyer_pair_recurrence",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_funder_recurrence",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_history_available",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_history_feature_ns",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_history_losses",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_history_trades",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_history_win_rate",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_history_wins",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_prior_e4_selection_count_v2",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_prior_failed_fill_count",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_prior_landed_count",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_prior_launch_count",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_prior_losing_count",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_prior_profit_factor",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_prior_profitable_count",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_prior_win_rate",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_seed_percentage",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "creator_seed_sol",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "cumulative_outside_sol",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "decision_event_index",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "decision_group_id",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "decision_ns",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "decision_ns_lower_bound",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "decision_ns_upper_bound",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "decision_signature",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "decision_slot",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "decision_time_is_lower_bound",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "decision_time_quality",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "decision_time_source",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "direct_ca_publication",
+      "missing_value_reason_field": "missing_reasons.social or missing_reasons.metadata",
+      "provenance": "social_choice research artifact + CREATE URI",
+      "source_event": "content-addressed launch metadata in pinned social source",
+      "source_timestamp_field": "social_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "distinct_buy_signatures",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "economically_executable",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "eligible_candidate_reasons",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "entity_history_feature_ns",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "entity_last_seen_before_decision_ns",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "estimated_curve_deterioration_bps",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "estimated_price_impact_bps",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "executable_token_output_0_1_sol",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "execution_outcome",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "failure_code",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "failure_message",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "failure_program",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "fdv_ratio_to_nearest_matched_alternative",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "fdv_usd",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "feature_causality_contract",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "feature_max_event_ns",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "fee_payer_recurrence",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "first_buyer_cluster",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "first_buyer_history_available",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "first_buyer_identities_json",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "funder_cluster_identity",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "funder_history_available",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "funder_prior_creator_count",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "funder_prior_e4_selection_count",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "funder_prior_launch_count",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "funding_age_ms",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "funding_amount_sol",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "funding_wallet",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "funding_wallet_history_available",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "group_age_policy_ms",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "group_eligibility_counts",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "hard_negative_categories_json",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "instruction_ordering",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "known_e4_associated_buyer_count",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "landed_successfully",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "launch_global_selection_label",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "launch_received_ns",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "max_buys_in_one_transaction",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "mayhem_mode",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "metadata_content_addressed",
+      "missing_value_reason_field": "missing_reasons.social or missing_reasons.metadata",
+      "provenance": "social_choice research artifact + CREATE URI",
+      "source_event": "content-addressed launch metadata in pinned social source",
+      "source_timestamp_field": "social_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "metadata_history_available",
+      "missing_value_reason_field": "missing_reasons.social or missing_reasons.metadata",
+      "provenance": "social_choice research artifact + CREATE URI",
+      "source_event": "content-addressed launch metadata in pinned social source",
+      "source_timestamp_field": "social_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "metadata_name",
+      "missing_value_reason_field": "missing_reasons.social or missing_reasons.metadata",
+      "provenance": "social_choice research artifact + CREATE URI",
+      "source_event": "content-addressed launch metadata in pinned social source",
+      "source_timestamp_field": "social_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "metadata_observation_available",
+      "missing_value_reason_field": "missing_reasons.social or missing_reasons.metadata",
+      "provenance": "social_choice research artifact + CREATE URI",
+      "source_event": "content-addressed launch metadata in pinned social source",
+      "source_timestamp_field": "social_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "metadata_symbol",
+      "missing_value_reason_field": "missing_reasons.social or missing_reasons.metadata",
+      "provenance": "social_choice research artifact + CREATE URI",
+      "source_event": "content-addressed launch metadata in pinned social source",
+      "source_timestamp_field": "social_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "metadata_uri",
+      "missing_value_reason_field": "missing_reasons.social or missing_reasons.metadata",
+      "provenance": "social_choice research artifact + CREATE URI",
+      "source_event": "content-addressed launch metadata in pinned social source",
+      "source_timestamp_field": "social_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "metadata_uri_host",
+      "missing_value_reason_field": "missing_reasons.social or missing_reasons.metadata",
+      "provenance": "social_choice research artifact + CREATE URI",
+      "source_event": "content-addressed launch metadata in pinned social source",
+      "source_timestamp_field": "social_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "missing_reasons",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "nearest_matched_candidate_mint",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "observed_landing_ns",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "observed_source_sol",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "observed_source_tokens",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "opportunity_pool_left_truncated",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "output_guard_rejected",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "permanently_invalid",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "pool",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "predecision_window_features",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "prelaunch_announcement",
+      "missing_value_reason_field": "missing_reasons.social or missing_reasons.metadata",
+      "provenance": "social_choice research artifact + CREATE URI",
+      "source_event": "content-addressed launch metadata in pinned social source",
+      "source_timestamp_field": "social_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "price_multiple_from_create",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "price_sol",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "prior_whitelist_membership",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "prior_whitelist_tier",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "public_buy_sol",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "real_token_reserve",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "relative_features",
+      "missing_value_reason_field": null,
+      "provenance": "V2 in-group calculation",
+      "source_event": "eligible members of the same decision group",
+      "source_timestamp_field": "decision_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "repeated_early_buyer_count",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "reserve_reproduction_error_bps",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "reserve_state_ns",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "reserve_valid",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "riskset_eligible",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "route",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "route_eligible",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "same_slot_alternative",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "same_slot_buyer_count",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "same_transaction_alternative",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "same_transaction_buyer_count",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "schema_version",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "selected_by_e4",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "selection_label",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "sell_count",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "signer_count",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "social_account",
+      "missing_value_reason_field": "missing_reasons.social or missing_reasons.metadata",
+      "provenance": "social_choice research artifact + CREATE URI",
+      "source_event": "content-addressed launch metadata in pinned social source",
+      "source_timestamp_field": "social_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "social_authority_prior_selection_count",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "social_available_before_decision",
+      "missing_value_reason_field": "missing_reasons.social or missing_reasons.metadata",
+      "provenance": "social_choice research artifact + CREATE URI",
+      "source_event": "content-addressed launch metadata in pinned social source",
+      "source_timestamp_field": "social_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "social_evidence_policy",
+      "missing_value_reason_field": "missing_reasons.social or missing_reasons.metadata",
+      "provenance": "social_choice research artifact + CREATE URI",
+      "source_event": "content-addressed launch metadata in pinned social source",
+      "source_timestamp_field": "social_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "social_feature_ns",
+      "missing_value_reason_field": "missing_reasons.social or missing_reasons.metadata",
+      "provenance": "social_choice research artifact + CREATE URI",
+      "source_event": "content-addressed launch metadata in pinned social source",
+      "source_timestamp_field": "social_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "social_history_available",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "social_post_existed_before_launch",
+      "missing_value_reason_field": "missing_reasons.social or missing_reasons.metadata",
+      "provenance": "social_choice research artifact + CREATE URI",
+      "source_event": "content-addressed launch metadata in pinned social source",
+      "source_timestamp_field": "social_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "social_post_timestamp_ns",
+      "missing_value_reason_field": "missing_reasons.social or missing_reasons.metadata",
+      "provenance": "social_choice research artifact + CREATE URI",
+      "source_event": "content-addressed launch metadata in pinned social source",
+      "source_timestamp_field": "social_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "source_artifact_name",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "source_output_floor",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "source_priority_fee",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "source_row_event_identity",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "source_run_id",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "source_tip",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "source_transaction_failed",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "source_transaction_index",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "source_transaction_slot",
+      "missing_value_reason_field": "missing_reasons.tip when applicable",
+      "provenance": "pinned E4 wallet and exact-event artifacts",
+      "source_event": "selected wallet transaction or observed capture event",
+      "source_timestamp_field": "decision_ns/observed_landing_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "split",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "time_since_previous_e4_selection_ms",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "time_since_previous_launch_ms",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "token_program",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "topology_score",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "transaction_count",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "unique_buyers",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "unique_buyers_per_second",
+      "missing_value_reason_field": "missing_reasons.funder when applicable",
+      "provenance": "V2 causal entity graph + frozen prior registry",
+      "source_event": "strictly prior launch and E4 association ledger",
+      "source_timestamp_field": "entity_history_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "virtual_sol_reserve",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "virtual_token_reserve",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "website_available_before_decision",
+      "missing_value_reason_field": "missing_reasons.social or missing_reasons.metadata",
+      "provenance": "social_choice research artifact + CREATE URI",
+      "source_event": "content-addressed launch metadata in pinned social source",
+      "source_timestamp_field": "social_feature_ns"
+    },
+    {
+      "causal_validity_rule": "source timestamp is null or <= decision_ns",
+      "decision_timestamp_field": "decision_ns",
+      "feature_name": "whitelist_feature_ns",
+      "missing_value_reason_field": "missing_reasons.reserve or missing_reasons.transaction_index",
+      "provenance": "pinned exact live-event capture",
+      "source_event": "CREATE or last causally visible candidate event",
+      "source_timestamp_field": "launch_received_ns/feature_max_event_ns"
+    }
+  ],
+  "entity_last_seen_value_order": [
+    "creator",
+    "first_buyer",
+    "buyer_cluster",
+    "social_account",
+    "creator_buyer_pair",
+    "funder"
+  ],
+  "feature_contract": {
+    "creator_and_entity": {
+      "missing_reason_fields": [
+        "funder_history_missing_reason"
+      ],
+      "source": "strictly prior launch and E4 selection ledger",
+      "timestamp_field": "entity_history_feature_ns"
+    },
+    "market_and_curve": {
+      "missing_reason_fields": [
+        "reserve_missing_reason"
+      ],
+      "source": "last causally visible exact-capture event",
+      "timestamp_field": "feature_max_event_ns/candidate_state_ns"
+    },
+    "relative_features": {
+      "missing_reason_fields": [],
+      "source": "members of the same eligible decision group only",
+      "timestamp_field": "decision_ns"
+    },
+    "social_and_metadata": {
+      "missing_reason_fields": [
+        "social_history_missing_reason",
+        "metadata_history_missing_reason"
+      ],
+      "source": "content-addressed metadata observed in pinned source",
+      "timestamp_field": "social_feature_ns"
+    }
+  },
+  "future_leakage_violations": 0,
+  "group_eligibility_count_order": [
+    "total_active_launches",
+    "route_eligible_launches",
+    "reserve_valid_launches",
+    "economically_executable_launches",
+    "final_included_candidates"
+  ],
+  "missing_reason_codes": {
+    "CREATOR_FUNDING_SOURCE_ABSENT": "the pinned evidence has no creator funding transaction/account history",
+    "METADATA_NOT_OBSERVED": "metadata was not observed in a pinned source",
+    "NO_IMMUTABLE_PREDECISION_PROOF": "social evidence lacked immutable pre-decision timestamp proof",
+    "NO_PREDECISION_RESERVE": "no reserve observation existed by decision_ns",
+    "SOURCE_FIELD_ABSENT": "the pinned source did not expose the field"
+  },
+  "per_row_contract_field": "feature_causality_contract",
+  "predecision_window_value_order": [
+    "buy_count",
+    "buy_sol",
+    "unique_buyers"
+  ],
+  "rank_directions": {
+    "buyer_cluster": "high",
+    "buyer_count": "high",
+    "buyer_velocity": "high",
+    "creator_history": "high",
+    "creator_seed": "high",
+    "estimated_impact": "low",
+    "executable_output": "high",
+    "fdv": "low",
+    "funder_history": "high",
+    "identity_history": "high",
+    "launch_age": "low",
+    "outside_sol": "high",
+    "same_slot_flow": "high",
+    "social_authority": "high",
+    "topology": "high"
+  },
+  "relative_feature_value_order": [
+    "rank",
+    "percentile",
+    "distance_from_group_leader",
+    "ratio_to_group_median"
+  ],
+  "row_count": 12927,
+  "timestamp_field_violations": {
+    "candidate_state_ns": 0,
+    "capture_start_ns": 0,
+    "creator_history_feature_ns": 0,
+    "entity_history_feature_ns": 0,
+    "entity_last_seen_before_decision_ns": 0,
+    "feature_max_event_ns": 0,
+    "launch_received_ns": 0,
+    "observed_landing_ns": 0,
+    "reserve_state_ns": 0,
+    "social_feature_ns": 0,
+    "social_post_timestamp_ns": 0,
+    "whitelist_feature_ns": 0
+  },
+  "version": "e4-v12-feature-causality-audit-v2"
+}

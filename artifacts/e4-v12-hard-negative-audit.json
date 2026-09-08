@@ -1,0 +1,32 @@
+{
+  "category_counts": {
+    "ACTIVE_EXECUTABLE_ALTERNATIVE": 12429,
+    "MATCHED_BUYER_CLUSTER_ALTERNATIVE": 497,
+    "MATCHED_CREATOR_HISTORY_ALTERNATIVE": 497,
+    "MATCHED_FDV_ALTERNATIVE": 497,
+    "MATCHED_FLOW_ALTERNATIVE": 497,
+    "MATCHED_IDENTITY_ALTERNATIVE": 497,
+    "MATCHED_SEED_ALTERNATIVE": 497,
+    "MATCHED_SOCIAL_ALTERNATIVE": 497,
+    "MATCHED_TOPOLOGY_ALTERNATIVE": 497,
+    "NEAREST_TIME_ALTERNATIVE": 497,
+    "RANDOM_ELIGIBLE_CONTROL": 497,
+    "SAME_SLOT_ALTERNATIVE": 34,
+    "TOP_MARKET_ALTERNATIVE": 497
+  },
+  "holdout_used_to_fit": false,
+  "selection_policy": "causal decision-time fields only; no outcome fields loaded",
+  "similarity_scale_fit_split": "train",
+  "training_iqr_scales": {
+    "buyer_cluster_recurrence": 1e-09,
+    "candidate_age_ms": 30658.233189500006,
+    "creator_prior_e4_selection_count_v2": 1e-09,
+    "creator_seed_sol": 1.965407127,
+    "fdv_usd": 407.21071249404395,
+    "public_buy_sol": 3.432,
+    "topology_score": 1.0,
+    "unique_buyers": 6.0
+  },
+  "validation_used_to_fit": false,
+  "version": "e4-v12-hard-negative-audit-v2"
+}
