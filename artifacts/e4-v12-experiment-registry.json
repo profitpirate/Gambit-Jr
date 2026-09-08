@@ -5147,6 +5147,336 @@
       "wilson_lower_bound": null,
       "workflow": "e4-v12-reactive-profit-golden.yml",
       "wr": null
+    },
+    {
+      "chronological_holdout_metrics": null,
+      "created_timestamp": "2026-09-08T13:52:02.411508Z",
+      "dataset_source_manifest": {
+        "policy": "rolling-successful-evidence-risk-set",
+        "runs": [
+          {
+            "created_at": "2026-09-08T07:47:24Z",
+            "head_sha": "2b55ff1535a4ce3cc77cda507657acb4589589b9",
+            "run_id": 34201101121,
+            "updated_at": "2026-09-08T11:11:37Z"
+          },
+          {
+            "created_at": "2026-09-08T04:12:49Z",
+            "head_sha": "657ab3e8b3f2414f3863499c3e0b1eab1410ff52",
+            "run_id": 34186192299,
+            "updated_at": "2026-09-08T07:46:32Z"
+          },
+          {
+            "created_at": "2026-09-08T01:11:52Z",
+            "head_sha": "cb25c4fc4ad7a2f5c2caaf9021ca0a1add445459",
+            "run_id": 34175839320,
+            "updated_at": "2026-09-08T04:03:23Z"
+          },
+          {
+            "created_at": "2026-09-07T22:47:46Z",
+            "head_sha": "378f61062edb66bcd25d614b5231b0bc6a409184",
+            "run_id": 34167878699,
+            "updated_at": "2026-09-08T01:09:56Z"
+          },
+          {
+            "created_at": "2026-09-07T20:27:01Z",
+            "head_sha": "5e737e61feb30705889c9cd1bbc86a86f00c604c",
+            "run_id": 34159449923,
+            "updated_at": "2026-09-07T22:41:53Z"
+          },
+          {
+            "created_at": "2026-09-07T18:16:02Z",
+            "head_sha": "7863004d057ed1f2a3abc714fa9c0ec103a20e1e",
+            "run_id": 34150939561,
+            "updated_at": "2026-09-07T20:13:53Z"
+          },
+          {
+            "created_at": "2026-09-07T15:27:09Z",
+            "head_sha": "b78b75d5fe30bd231e9767105744863c72f068ae",
+            "run_id": 34138377553,
+            "updated_at": "2026-09-07T18:02:37Z"
+          },
+          {
+            "created_at": "2026-09-07T12:45:53Z",
+            "head_sha": "b2942d4a8fdbd7d5ce52cbb61ee39006c88b9032",
+            "run_id": 34123647690,
+            "updated_at": "2026-09-07T15:22:35Z"
+          },
+          {
+            "created_at": "2026-09-07T08:18:46Z",
+            "head_sha": "17459f6a2c7a5092abfc7dcc0fb9ce6028e21069",
+            "run_id": 34099929487,
+            "updated_at": "2026-09-07T12:24:44Z"
+          },
+          {
+            "created_at": "2026-09-07T04:42:47Z",
+            "head_sha": "5e19667318b55446c0d13b9e7a846b28ada28d8c",
+            "run_id": 34084120627,
+            "updated_at": "2026-09-07T08:15:37Z"
+          },
+          {
+            "created_at": "2026-09-07T01:40:57Z",
+            "head_sha": "dc79919a847186eafa912f415de71938f5ad2b68",
+            "run_id": 34073802862,
+            "updated_at": "2026-09-07T04:41:47Z"
+          },
+          {
+            "created_at": "2026-09-06T22:23:02Z",
+            "head_sha": "b2bf74e9153e671615035a6f6e63eacbbe970dfb",
+            "run_id": 34063856134,
+            "updated_at": "2026-09-07T01:34:56Z"
+          },
+          {
+            "created_at": "2026-09-04T23:56:26Z",
+            "head_sha": "3d7b391f238593d0050368439d3fc5a60e37d9a7",
+            "run_id": 33931301493,
+            "updated_at": "2026-09-05T03:13:18Z"
+          },
+          {
+            "created_at": "2026-09-04T21:22:01Z",
+            "head_sha": "c074486be7382dec9e788204897d84422e45c4a4",
+            "run_id": 33920757002,
+            "updated_at": "2026-09-04T23:35:02Z"
+          },
+          {
+            "created_at": "2026-09-04T19:30:05Z",
+            "head_sha": "2a5c180dd8fcf87271909802372196b53a14b502",
+            "run_id": 33911477030,
+            "updated_at": "2026-09-04T21:09:52Z"
+          },
+          {
+            "created_at": "2026-09-04T16:50:35Z",
+            "head_sha": "6c9a01460202e9f94d6a69d4733b6721aa319c5d",
+            "run_id": 33897368379,
+            "updated_at": "2026-09-04T19:06:32Z"
+          },
+          {
+            "created_at": "2026-09-04T13:07:41Z",
+            "head_sha": "7ffd5214058087cdcc8f811c5030d543b695f371",
+            "run_id": 33876345997,
+            "updated_at": "2026-09-04T15:24:17Z"
+          },
+          {
+            "created_at": "2026-09-04T08:14:29Z",
+            "head_sha": "50b0e9c37719b524546722078473b78bf6a20892",
+            "run_id": 33852482054,
+            "updated_at": "2026-09-04T12:12:40Z"
+          },
+          {
+            "created_at": "2026-09-04T04:06:23Z",
+            "head_sha": "cfe7e94aa783c0fcc5668660d7ada3d983eae2d8",
+            "run_id": 33835575805,
+            "updated_at": "2026-09-04T07:51:00Z"
+          },
+          {
+            "created_at": "2026-09-04T00:44:13Z",
+            "head_sha": "883bf2be9055a05d417c89e3ba7fb2d47a266b2d",
+            "run_id": 33822988156,
+            "updated_at": "2026-09-04T03:43:43Z"
+          }
+        ],
+        "source_ref": "codex/e4-v12-selection-reconstruction"
+      },
+      "dataset_version": "rolling-runs:34201101121,34186192299,34175839320,34167878699,34159449923,34150939561,34138377553,34123647690,34099929487,34084120627,34073802862,34063856134,33931301493,33920757002,33911477030,33897368379,33876345997,33852482054,33835575805,33822988156",
+      "dispatch_attempts": 1,
+      "drawdown": null,
+      "duplicate_suppression_count": 0,
+      "evidence_epoch": "v12-direct-e4-parameter-copy-2026-09-03",
+      "exact_artifact_paths": [
+        "codex/e4-v12-sub10ms-entry-research-20260905:.github/workflows/e4-v12-golden-master.yml"
+      ],
+      "experiment_id": "e4x-ec0854fd324c929e29da08df5f213e69e254dbd4fc4201e087daae3eb121e501",
+      "failure_classification": null,
+      "identity": {
+        "bankroll": {
+          "definition_committed_by": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "starting_balance_sol": 3.0
+        },
+        "candidate_risk_set_policy": "frozen chronological launch risk sets",
+        "causal_horizon": "0/1/2/5/10ms causal execution replay",
+        "chronological_split": {
+          "definition_committed_by": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "policy": "strict chronological train/validation/untouched-holdout"
+        },
+        "dataset_source_manifest_fingerprint": "9bcb6dd14f1adc40580f12e99881caf1da0cca7b564191de835233d175c6d994",
+        "evidence_epoch": "v12-direct-e4-parameter-copy-2026-09-03",
+        "execution_policy": {
+          "definition_committed_by": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "policy": "paper replay only; immutable V12 execution semantics"
+        },
+        "exit_policy": {
+          "definition_committed_by": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "policy": "workflow-defined causal exit policy"
+        },
+        "feature_set_fingerprint": "b5c59830d9b09093381981319491438da1b7e885627f6ae200f49a7aa8ae0d90",
+        "fee_model": {
+          "definition_committed_by": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "policy": "workflow-defined Solana fees and priority fees"
+        },
+        "full_parameters": {
+          "workflow_definition_sha256": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "workflow_parameter_contract": [
+            "PYTHONUNBUFFERED: \"1\"",
+            "GH_TOKEN: ${{ github.token }}",
+            "REPO: profitpirate/Gambit-Jr",
+            "SOURCE_BRANCH: codex/e4-v12-selection-reconstruction",
+            "RESEARCH_BRANCH: codex/e4-v12-sub10ms-entry-research-20260905",
+            "E4_PIPELINES_BACKGROUND: \"false\"",
+            "E4_SOL_USD_FALLBACK: \"150\"",
+            "E4_BUILDER_COMMAND: \"node tools/e4-builder/strict-race-proxy-v12.mjs\"",
+            "E4_BUILDER_PRELOAD: \"${{ github.workspace }}/tools/e4-builder/fast-preload-v4.mjs\"",
+            "E4_V12_BUY_SLIPPAGE_BPS: \"800\"",
+            "E4_V12_MAX_OUTPUT_SHORTFALL_BPS: \"800\"",
+            "matrix:",
+            "include:",
+            "- id: failed-100",
+            "type: failed_preimpact",
+            "horizon: 100",
+            "- id: failed-500",
+            "type: failed_preimpact",
+            "horizon: 500",
+            "- id: failed-1000",
+            "type: failed_preimpact",
+            "horizon: 1000",
+            "- id: cluster-100",
+            "type: clustered_preimpact",
+            "horizon: 100",
+            "- id: cluster-500",
+            "type: clustered_preimpact",
+            "horizon: 500",
+            "- id: cluster-1000",
+            "type: clustered_preimpact",
+            "horizon: 1000",
+            "- id: reactive-lattice",
+            "type: reactive_lattice",
+            "horizon: 0",
+            "- id: reactive-independent",
+            "type: reactive_independent",
+            "horizon: 0",
+            "- run: python -m pip install --upgrade pip",
+            "gh run list --repo \"$REPO\" \\",
+            "--workflow e4-v12-selection-certification.yml \\",
+            "--branch \"$SOURCE_BRANCH\" \\",
+            "--status success \\",
+            "--limit 18 \\",
+            "--json databaseId,createdAt \\",
+            "--jq 'sort_by(.createdAt) | .[-10:] | .[].databaseId' > /tmp/run_ids",
+            "gh run download \"$run_id\" --repo \"$REPO\" --name \"e4-v12-forward-$run_id\" --dir \"historical/$run_id\"",
+            "--source matched/docs \\",
+            "--source matched/models \\",
+            "--source matched/research \\",
+            "--output artifacts/failed-intents.json",
+            "CANDIDATE_TYPE: ${{ matrix.type }}",
+            "HORIZON_MS: ${{ matrix.horizon }}",
+            "while IFS=$'\\t' read -r run_id batch events; do args+=(--pair \"$batch:$events\"); done < /tmp/pairs.tsv",
+            "--mode search \"${args[@]}\" --horizon-ms \"$HORIZON_MS\" \\",
+            "--latencies 0,1,2,5,10 --starting-balance-sol 3 \\",
+            "--minimum-win-rate 0.65 --minimum-profit-factor 1.25 \\",
+            "--output artifacts/report.json --model-output artifacts/model.json \\",
+            "--predictions-output artifacts/holdout-predictions.json",
+            "--mode search \"${args[@]}\" --horizon-ms \"$HORIZON_MS\" \\",
+            "--latencies 0,1,2,5,10 --starting-balance-sol 3 \\",
+            "--minimum-win-rate 0.65 --minimum-profit-factor 1.25 \\",
+            "--output artifacts/report.json --model-output artifacts/model.json \\",
+            "--predictions-output artifacts/holdout-predictions.json",
+            "--mode search \"${args[@]}\" --latencies 0,1,2,5,10 \\",
+            "--starting-balance-sol 3 --minimum-win-rate 0.65 \\",
+            "--minimum-profit-factor 1.25 --output artifacts/report.json \\",
+            "--model-output artifacts/model.json \\",
+            "--predictions-output artifacts/holdout-predictions.json",
+            "--mode search \"${args[@]}\" --latencies 0,1,2,5,10 \\",
+            "--starting-balance-sol 3 --minimum-win-rate 0.65 \\",
+            "--minimum-profit-factor 1.25 --policy-candidates 420 \\",
+            "--retained-policies 32 --output artifacts/report.json \\",
+            "--model-output artifacts/model.joblib \\",
+            "--predictions-output artifacts/holdout-predictions.json",
+            "CANDIDATE_ID: ${{ matrix.id }}",
+            "CANDIDATE_TYPE: ${{ matrix.type }}",
+            "HORIZON_MS: ${{ matrix.horizon }}",
+            "type: ${{ steps.choose.outputs.type }}",
+            "horizon: ${{ steps.choose.outputs.horizon }}",
+            "- run: python -m pip install --upgrade pip",
+            "run: npm install --omit=dev",
+            "python -m scripts.e4_v12_hotpath_benchmark_v3 --iterations 1000 --warmup 100 --maximum-p95-ms 10 --output artifacts/hotpath.json",
+            "gh run list --repo \"$REPO\" --workflow e4-v12-selection-certification.yml --branch \"$SOURCE_BRANCH\" --status success --limit 18 --json databaseId,createdAt --jq 'sort_by(.createdAt) | .[-10:] | .[].databaseId' > /tmp/run_ids",
+            "gh run download \"$run_id\" --repo \"$REPO\" --name \"e4-v12-forward-$run_id\" --dir \"historical/$run_id\"",
+            "--target-launches 3000 --capture-seconds 14400 --tail-seconds 300 \\",
+            "--heartbeat-seconds 60 --minimum-launches 3000 --wallet-signatures 1500 \\",
+            "--builder-probes 250 --testnet-route-probes 0 --stress-iterations 0 \\",
+            "--output artifacts/live-batch.json",
+            "SELECTED_TYPE: ${{ needs.select.outputs.type }}",
+            "SELECTED_HORIZON: ${{ needs.select.outputs.horizon }}",
+            "while IFS=$'\\t' read -r run_id batch events; do args+=(--pair \"$batch:$events\"); done < /tmp/history-pairs.tsv",
+            "args+=(--pair \"artifacts/live-batch.json:artifacts/live-batch-live-events.jsonl\")",
+            "python -m scripts.e4_v12_preimpact_lattice_failed --mode apply \"${args[@]}\" --horizon-ms \"$SELECTED_HORIZON\" --model-input selected/model.json --output artifacts/live-apply.json --model-output artifacts/live-unused.json --predictions-output artifacts/live-predictions.json",
+            "python -m scripts.e4_v12_preimpact_lattice_clustered --mode apply \"${args[@]}\" --horizon-ms \"$SELECTED_HORIZON\" --model-input selected/model.json --output artifacts/live-apply.json --model-output artifacts/live-unused.json --predictions-output artifacts/live-predictions.json",
+            "python -m scripts.e4_v12_reactive_lattice_registry_v3 --mode apply \"${args[@]}\" --model-input selected/model.json --output artifacts/live-apply.json --model-output artifacts/live-unused.json --predictions-output artifacts/live-predictions.json",
+            "python -m scripts.e4_v12_reactive_independent_golden --mode apply \"${args[@]}\" --model-input selected/model.joblib --output artifacts/live-apply.json --model-output artifacts/live-unused.joblib --predictions-output artifacts/live-predictions.json --policy-output artifacts/live-policy.json --guard-output artifacts/live-guard.txt",
+            "SELECTED_TYPE: ${{ needs.select.outputs.type }}",
+            "--events artifacts/live-batch-live-events.jsonl \\",
+            "--predictions artifacts/live-predictions.json \\",
+            "--policy artifacts/live-policy.json \\",
+            "--latencies 0,1,2,5,10 --starting-balance-sol 3 --reserve-sol 0.03 \\",
+            "--fee-bps 125 --max-output-shortfall-bps \"$guard\" --max-concurrent 2 \\",
+            "--output artifacts/live-economics.json",
+            "--batch artifacts/live-batch.json \\",
+            "--events artifacts/live-batch-live-events.jsonl \\",
+            "--predictions artifacts/live-predictions.json \\",
+            "--latencies 0,1,2,5,10 --starting-balance-sol 3 --entry-fraction 0.0185 \\",
+            "--fee-bps 125 --max-output-shortfall-bps \"$guard\" --confirmation-ms 1500 \\",
+            "--max-concurrent 2 --output artifacts/live-economics.json",
+            "SELECTED_TYPE: ${{ needs.select.outputs.type }}",
+            "if ! git diff --cached --quiet; then git commit -m 'research(e4-v12): persist untouched-live sub-10ms golden thesis [skip ci]'; git push origin HEAD:\"$RESEARCH_BRANCH\"; fi"
+          ]
+        },
+        "latency_assumptions": {
+          "definition_committed_by": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "replay_ms": [
+            0,
+            1,
+            2,
+            5,
+            10
+          ]
+        },
+        "model_family": "multi-family tournament",
+        "output_guard": {
+          "definition_committed_by": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "policy": "V12 bounded output deterioration guard"
+        },
+        "position_sizing": {
+          "definition_committed_by": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "policy": "workflow-defined bounded position sizing"
+        },
+        "source_code_fingerprint": "cde7de9f56034e95ba8c18f41d4161225ecffa0d017bec8a994e252c19421359",
+        "thesis_family_identifier": "parallel-master"
+      },
+      "last_duplicate_failure_classification": null,
+      "latency_results": null,
+      "latest_run_id": null,
+      "latest_run_url": null,
+      "live_metrics": null,
+      "live_status": null,
+      "material_change_required_before_rerun": null,
+      "pnl": null,
+      "profit_factor": null,
+      "reason_for_retirement": null,
+      "recall": null,
+      "ref": "codex/e4-v12-sub10ms-entry-research-20260905",
+      "retired": false,
+      "retry_not_before": null,
+      "selection_precision": null,
+      "source_commit": "d3c05bdaf788d60f5ccf7d1dc0d8c0ccbc1ef8ac",
+      "state": "DISPATCHED",
+      "suppressed_duplicate_run_ids": [],
+      "thesis_family": "parallel-master",
+      "trade_count": null,
+      "train_metrics": null,
+      "updated_timestamp": "2026-09-08T13:52:02.411508Z",
+      "validation_metrics": null,
+      "wilson_lower_bound": null,
+      "workflow": "e4-v12-golden-master.yml",
+      "wr": null
     }
   ],
   "version": "e4-v12-experiment-registry-v1"
