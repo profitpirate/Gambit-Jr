@@ -1,0 +1,166 @@
+name: E4 V12 all-out autonomous profit hazard v2
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-golden-profit-hazard-v1
+    paths:
+      - ".github/workflows/e4-v12-allout-profit-hazard-v2.yml"
+      - "scripts/e4_v12_allout_profit_hazard_strict.py"
+      - "research/e4-v12-allout-profit-v2-trigger*.txt"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: e4-v12-allout-autonomous-profit-hazard-v2
+  cancel-in-progress: true
+
+env:
+  PYTHONUNBUFFERED: "1"
+  GH_TOKEN: ${{ github.token }}
+  CORPUS_RUN_ID: "34262315056"
+  CORPUS_ARTIFACT: "e4-v12-allout-launch-corpus-34262315056"
+
+jobs:
+  tournament:
+    name: strict-${{ matrix.lane }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        lane:
+          - rules
+          - intent-logistic
+          - intent-hgb
+          - intent-extra
+          - intent-forest
+          - intent-xgb
+          - intent-cat
+          - intent-hgb-identity
+          - profit-logistic
+          - profit-hgb
+          - profit-extra
+          - profit-forest
+          - profit-xgb
+          - profit-cat
+          - profit-hgb-identity
+          - utility-extra
+          - utility-hgb
+          - multitask
+          - multitask-identity
+          - pu-bagging
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-golden-profit-hazard-v1
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install lane dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install numpy scikit-learn
+          case "${{ matrix.lane }}" in
+            *xgb*) python -m pip install xgboost ;;
+            *cat*) python -m pip install catboost ;;
+          esac
+      - name: Download immutable 66k corpus
+        run: |
+          mkdir -p corpus artifacts
+          gh run download "$CORPUS_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "$CORPUS_ARTIFACT" \
+            --dir corpus
+          corpus_file="$(find corpus -name 'e4-v12-allout-launch-corpus.jsonl.gz' -print -quit)"
+          test -s "$corpus_file"
+          echo "CORPUS_FILE=$corpus_file" >> "$GITHUB_ENV"
+      - name: Compile strict research lane
+        run: |
+          python -m compileall -q \
+            scripts/e4_v12_allout_profit_hazard.py \
+            scripts/e4_v12_allout_profit_hazard_stream.py \
+            scripts/e4_v12_allout_profit_hazard_strict.py \
+            scripts/e4_v12_allout_tournament_select.py
+      - name: Run strict frozen autonomous experiment
+        run: |
+          python -m scripts.e4_v12_allout_profit_hazard_strict \
+            --corpus "$CORPUS_FILE" \
+            --lane "${{ matrix.lane }}" \
+            --horizon-ms 0 \
+            --seed 51204 \
+            --output "artifacts/${{ matrix.lane }}.json"
+          python - <<'PY'
+          import json,sys
+          from pathlib import Path
+          path=next(Path('artifacts').glob('*.json'))
+          data=json.loads(path.read_text())
+          winner=data.get('winner') or {}
+          holdout=winner.get('holdout') or {}
+          for block in (holdout.get('latencies') or {}).values():
+              assert block.get('chronology') == 'stake locked at entry; proceeds settled at exit'
+              assert block.get('open_positions_at_end') == 0
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-allout-hazard-v2-${{ matrix.lane }}-${{ github.run_id }}
+          path: artifacts/${{ matrix.lane }}.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  select:
+    name: strict historical selector v2
+    needs: tournament
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-golden-profit-hazard-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: e4-v12-allout-hazard-v2-*-${{ github.run_id }}
+          path: lane-results
+          merge-multiple: true
+      - name: Select only strict historical candidates
+        run: |
+          mkdir -p artifacts docs/research
+          python -m scripts.e4_v12_allout_tournament_select \
+            --input lane-results \
+            --output artifacts/e4-v12-allout-profit-hazard-v2-tournament.json \
+            --status-output artifacts/e4-v12-allout-profit-hazard-v2-status.txt
+          cp artifacts/e4-v12-allout-profit-hazard-v2-tournament.json \
+            docs/research/e4-v12-allout-profit-hazard-v2-tournament.json
+          cp artifacts/e4-v12-allout-profit-hazard-v2-status.txt \
+            docs/research/e4-v12-allout-profit-hazard-v2-status.txt
+      - name: Persist strict result
+        run: |
+          git config user.name 'gambit-v12-allout-strict'
+          git config user.email 'actions@users.noreply.github.com'
+          git add docs/research/e4-v12-allout-profit-hazard-v2-*
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(e4-v12): persist strict profit-hazard v2 [skip ci]'
+            git push origin HEAD:codex/e4-v12-golden-profit-hazard-v1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-allout-profit-hazard-v2-summary-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-allout-profit-hazard-v2-tournament.json
+            artifacts/e4-v12-allout-profit-hazard-v2-status.txt
+            lane-results/**/*.json
+          if-no-files-found: warn
+          retention-days: 30
