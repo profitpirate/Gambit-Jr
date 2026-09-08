@@ -1,0 +1,172 @@
+name: E4 V12 symbolic DNF formula tournament
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-golden-profit-hazard-v1
+    paths:
+      - ".github/workflows/e4-v12-symbolic-dnf-tournament.yml"
+      - "scripts/e4_v12_symbolic_dnf_search.py"
+      - "research/e4-v12-symbolic-dnf-trigger*.txt"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: e4-v12-symbolic-dnf-tournament
+  cancel-in-progress: true
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONUNBUFFERED: "1"
+  CORPUS_RUN_ID: "34262315056"
+  CORPUS_ARTIFACT: "e4-v12-allout-launch-corpus-34262315056"
+
+jobs:
+  evolve:
+    name: seed-${{ matrix.seed }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        seed: [1103, 2207, 3301, 4409, 5501, 6607, 7703, 8807]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-golden-profit-hazard-v1
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy scikit-learn
+      - name: Download immutable launch corpus
+        run: |
+          mkdir -p corpus artifacts
+          gh run download "$CORPUS_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "$CORPUS_ARTIFACT" \
+            --dir corpus
+          corpus_file="$(find corpus -name 'e4-v12-allout-launch-corpus.jsonl.gz' -print -quit)"
+          test -s "$corpus_file"
+          echo "CORPUS_FILE=$corpus_file" >> "$GITHUB_ENV"
+      - name: Compile symbolic research lane
+        run: |
+          python -m compileall -q \
+            scripts/e4_v12_allout_profit_hazard.py \
+            scripts/e4_v12_allout_profit_hazard_stream.py \
+            scripts/e4_v12_symbolic_dnf_search.py
+      - name: Evolve transparent multi-mode formulae
+        run: |
+          python -m scripts.e4_v12_symbolic_dnf_search \
+            --corpus "$CORPUS_FILE" \
+            --seed "${{ matrix.seed }}" \
+            --population 256 \
+            --generations 160 \
+            --output "artifacts/symbolic-${{ matrix.seed }}.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-symbolic-${{ matrix.seed }}-${{ github.run_id }}
+          path: artifacts/symbolic-${{ matrix.seed }}.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  select:
+    needs: evolve
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-golden-profit-hazard-v1
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: e4-v12-symbolic-*-${{ github.run_id }}
+          path: reports
+          merge-multiple: true
+      - name: Select without weakening the historical gate
+        run: |
+          mkdir -p artifacts docs/research
+          python - <<'PY'
+          import json, math
+          from pathlib import Path
+
+          def f(value, default=0.0):
+              try:
+                  result=float(value)
+                  return result if math.isfinite(result) else default
+              except Exception:
+                  return default
+
+          rows=[]
+          for path in sorted(Path('reports').rglob('*.json')):
+              try: row=json.loads(path.read_text())
+              except Exception: continue
+              if row.get('version')=='e4-v12-symbolic-dnf-v1': rows.append(row)
+          if not rows: raise SystemExit('no symbolic reports')
+          def key(row):
+              h=((row.get('winner') or {}).get('holdout') or {})
+              return (
+                  1 if row.get('status')=='HISTORICAL_CANDIDATE' else 0,
+                  f(h.get('minimum_win_rate')),
+                  f(h.get('minimum_wilson_lower')),
+                  min(20,f(h.get('minimum_profit_factor'))),
+                  f(h.get('minimum_net_pnl_sol'),-999),
+                  -f(h.get('maximum_drawdown_fraction'),1),
+                  f(h.get('minimum_trades')),
+              )
+          rows.sort(key=key, reverse=True)
+          finalists=[row for row in rows if row.get('status')=='HISTORICAL_CANDIDATE']
+          winner=finalists[0] if finalists else rows[0]
+          result={
+              'version':'e4-v12-symbolic-dnf-tournament-v1',
+              'status':'HISTORICAL_CANDIDATE_FOUND' if finalists else 'NOT_CONCLUSIVE',
+              'experiments':len(rows),
+              'historical_candidates':len(finalists),
+              'winner':winner,
+              'leaderboard':[
+                  {
+                      'seed':row.get('seed'),
+                      'experiment_id':row.get('experiment_id'),
+                      'status':row.get('status'),
+                      'formula':((row.get('winner') or {}).get('formula')),
+                      'policy':((row.get('winner') or {}).get('policy')),
+                      'failed_requirements':((row.get('winner') or {}).get('failed_requirements') or []),
+                      'holdout':{k:v for k,v in (((row.get('winner') or {}).get('holdout') or {}).items()) if k!='latencies'},
+                  }
+                  for row in rows
+              ],
+              'production_paths_changed':0,
+          }
+          Path('artifacts/e4-v12-symbolic-dnf-tournament.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
+          Path('artifacts/e4-v12-symbolic-dnf-status.txt').write_text(result['status']+'\n')
+          Path('docs/research/e4-v12-symbolic-dnf-tournament.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
+          Path('docs/research/e4-v12-symbolic-dnf-status.txt').write_text(result['status']+'\n')
+          print(json.dumps({'status':result['status'],'experiments':len(rows),'historical_candidates':len(finalists)},indent=2))
+          PY
+      - name: Persist transparent-formula result
+        run: |
+          git config user.name 'gambit-v12-symbolic-research'
+          git config user.email 'actions@users.noreply.github.com'
+          git add docs/research/e4-v12-symbolic-dnf-*.json docs/research/e4-v12-symbolic-dnf-*.txt
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(e4-v12): persist symbolic DNF tournament [skip ci]'
+            git push origin HEAD:codex/e4-v12-golden-profit-hazard-v1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-symbolic-dnf-summary-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-symbolic-dnf-tournament.json
+            artifacts/e4-v12-symbolic-dnf-status.txt
+            reports/**/*.json
+          if-no-files-found: warn
+          retention-days: 30
