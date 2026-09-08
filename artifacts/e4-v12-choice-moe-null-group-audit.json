@@ -1,0 +1,51 @@
+{
+  "candidate_features_causal": true,
+  "contamination_exclusions": {
+    "CAPTURE_WARMUP": 632,
+    "KNOWN_SELECTION": 1327,
+    "OUTSIDE_FULLY_MONITORED_INTERVAL": 22
+  },
+  "groups": 1190,
+  "groups_by_activity_band": {
+    "high": 359,
+    "low": 439,
+    "medium": 392
+  },
+  "groups_by_split": {
+    "holdout": 533,
+    "train": 427,
+    "validation": 230
+  },
+  "interval_inventory": {
+    "known_selection_intervals": 498,
+    "unresolved_wallet_intervals": 0
+  },
+  "known_selection_overlap": 0,
+  "null_group_weight": "one equal-weight observation per decision group",
+  "outside_option_rows": 1190,
+  "sampling_policy": {
+    "active_horizon_ms": 60000,
+    "activity_cutpoints": [
+      1.0,
+      2.0
+    ],
+    "activity_window_ms": 1000,
+    "event_clock": "CREATE receipt after all same-receipt events",
+    "exclusion_margin_ms": 2000,
+    "fit_split": "train",
+    "hash_sampling_seed": "sha256(run,timestamp,mint,signature,event_index)",
+    "holdout_used_to_fit": false,
+    "sampling_probabilities_by_activity_band": {
+      "high": 0.049647769204964776,
+      "low": 0.010607037912993621,
+      "medium": 0.023744585271939674
+    },
+    "target_null_to_positive_train_ratio": 2.0,
+    "validation_used_to_fit": false
+  },
+  "selected_coin_rows": 0,
+  "status": "PASS",
+  "unresolved_wallet_activity_excluded": 0,
+  "validation_or_holdout_influenced_policy": false,
+  "version": "e4-v12-choice-moe-v1"
+}

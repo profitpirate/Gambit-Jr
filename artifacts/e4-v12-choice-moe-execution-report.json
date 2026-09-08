@@ -1,0 +1,151 @@
+{
+  "fee_and_output_policy": {
+    "base_transaction_fee_sol": 5e-06,
+    "creator_fee_bps": 50.0,
+    "priority_fee_policy": "median causal E4 training order",
+    "priority_fee_sol": 0.087,
+    "protocol_fee_bps": 125.0,
+    "rejected_submission_cost": "priority fee + tip + base transaction fee",
+    "tip_sol": 0.001
+  },
+  "fit": {
+    "failed_fill": 143,
+    "fit_split": "train",
+    "landed": 79,
+    "policy_priority_fee_sol": 0.087,
+    "selected_events": 222,
+    "threshold": 0.16
+  },
+  "metrics": {
+    "holdout": {
+      "accept_precision": 1.0,
+      "accept_recall": 0.9619047619047619,
+      "accuracy": 0.9771428571428571,
+      "actions": [
+        "ACCEPT",
+        "REJECT_OUTPUT_DETERIORATION",
+        "REJECT_UNCERTAIN_QUOTE",
+        "REJECT_INSUFFICIENT_BALANCE",
+        "REJECT_ROUTE_FAILURE"
+      ],
+      "events": 175,
+      "failed_or_rejected": 70,
+      "landed": 105,
+      "latency_output_guard": {
+        "0": {
+          "events": 175,
+          "independently_recalculated": true,
+          "output_guard_acceptance_rate": 1.0
+        },
+        "1": {
+          "events": 175,
+          "independently_recalculated": true,
+          "output_guard_acceptance_rate": 1.0
+        },
+        "10": {
+          "events": 175,
+          "independently_recalculated": true,
+          "output_guard_acceptance_rate": 1.0
+        },
+        "2": {
+          "events": 175,
+          "independently_recalculated": true,
+          "output_guard_acceptance_rate": 1.0
+        },
+        "5": {
+          "events": 175,
+          "independently_recalculated": true,
+          "output_guard_acceptance_rate": 1.0
+        }
+      },
+      "roc_auc": 0.9786394557823129
+    },
+    "train": {
+      "accept_precision": 0.9294117647058824,
+      "accept_recall": 1.0,
+      "accuracy": 0.972972972972973,
+      "actions": [
+        "ACCEPT",
+        "REJECT_OUTPUT_DETERIORATION",
+        "REJECT_UNCERTAIN_QUOTE",
+        "REJECT_INSUFFICIENT_BALANCE",
+        "REJECT_ROUTE_FAILURE"
+      ],
+      "events": 222,
+      "failed_or_rejected": 143,
+      "landed": 79,
+      "latency_output_guard": {
+        "0": {
+          "events": 222,
+          "independently_recalculated": true,
+          "output_guard_acceptance_rate": 1.0
+        },
+        "1": {
+          "events": 222,
+          "independently_recalculated": true,
+          "output_guard_acceptance_rate": 1.0
+        },
+        "10": {
+          "events": 222,
+          "independently_recalculated": true,
+          "output_guard_acceptance_rate": 1.0
+        },
+        "2": {
+          "events": 222,
+          "independently_recalculated": true,
+          "output_guard_acceptance_rate": 1.0
+        },
+        "5": {
+          "events": 222,
+          "independently_recalculated": true,
+          "output_guard_acceptance_rate": 1.0
+        }
+      },
+      "roc_auc": 0.9972559086483137
+    },
+    "validation": {
+      "accept_precision": 0.96875,
+      "accept_recall": 1.0,
+      "accuracy": 0.9900990099009901,
+      "actions": [
+        "ACCEPT",
+        "REJECT_OUTPUT_DETERIORATION",
+        "REJECT_UNCERTAIN_QUOTE",
+        "REJECT_INSUFFICIENT_BALANCE",
+        "REJECT_ROUTE_FAILURE"
+      ],
+      "events": 101,
+      "failed_or_rejected": 70,
+      "landed": 31,
+      "latency_output_guard": {
+        "0": {
+          "events": 101,
+          "independently_recalculated": true,
+          "output_guard_acceptance_rate": 1.0
+        },
+        "1": {
+          "events": 101,
+          "independently_recalculated": true,
+          "output_guard_acceptance_rate": 1.0
+        },
+        "10": {
+          "events": 101,
+          "independently_recalculated": true,
+          "output_guard_acceptance_rate": 1.0
+        },
+        "2": {
+          "events": 101,
+          "independently_recalculated": true,
+          "output_guard_acceptance_rate": 1.0
+        },
+        "5": {
+          "events": 101,
+          "independently_recalculated": true,
+          "output_guard_acceptance_rate": 1.0
+        }
+      },
+      "roc_auc": 0.9999999999999999
+    }
+  },
+  "version": "e4-v12-choice-moe-v1"
+}

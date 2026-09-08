@@ -1,0 +1,43 @@
+{
+  "experiment_id": "e4x-6515dc29ea3b5610844c6cd7247d9bc2ca10c90f9c6eb71fc9cf5a0717ff6e2f",
+  "failed_requirements": [
+    "win_rate_at_least_65_percent",
+    "wilson_lower_bound_at_least_45_percent",
+    "net_pnl_positive",
+    "profit_factor_at_least_1_25",
+    "maximum_drawdown_at_most_15_percent",
+    "expectancy_positive",
+    "every_latency_pnl_positive",
+    "every_latency_profit_factor_at_least_1_25",
+    "every_latency_win_rate_at_least_65_percent",
+    "materially_beats_youngest_baseline",
+    "materially_beats_strongest_non_moe"
+  ],
+  "failure_classification": "FALSE_POSITIVE_OVERLOAD",
+  "final_status": "NOT_CONCLUSIVE",
+  "historical_qualification_passed": false,
+  "live_confirmation_authorised": false,
+  "production_paths_changed": 0,
+  "production_promotion_authorised": false,
+  "requirements": {
+    "at_least_20_closed_trades": true,
+    "at_least_two_capture_windows": true,
+    "every_latency_pnl_positive": false,
+    "every_latency_profit_factor_at_least_1_25": false,
+    "every_latency_win_rate_at_least_65_percent": false,
+    "expectancy_positive": false,
+    "largest_winner_at_most_50_percent": true,
+    "matched_age_above_chance": true,
+    "materially_beats_strongest_non_moe": false,
+    "materially_beats_youngest_baseline": false,
+    "maximum_drawdown_at_most_15_percent": false,
+    "net_pnl_positive": false,
+    "profit_factor_at_least_1_25": false,
+    "wilson_lower_bound_at_least_45_percent": false,
+    "win_rate_at_least_65_percent": false,
+    "zero_integrity_or_leakage_failures": true
+  },
+  "status": "NOT_CONCLUSIVE",
+  "untouched_live_windows_captured": 0,
+  "version": "e4-v12-choice-moe-v1"
+}

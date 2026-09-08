@@ -1,0 +1,354 @@
+{
+  "fit": {
+    "all_calibration_and_threshold_fitting_split": "train",
+    "hazard": {
+      "exact_positive_groups": 79,
+      "fit_split": "train",
+      "lower_bound_positive_groups_excluded_from_exact_hazard_fit": 143,
+      "null_groups": 427,
+      "threshold": 0.15
+    },
+    "utility": {
+      "fit_split": "train",
+      "formula": "P(trade) * P(top conditional choice) * P(executable)",
+      "holdout_used_to_fit": false,
+      "negative_fit_examples": 427,
+      "positive_fit_examples": 79,
+      "threshold": 0.0646927374301676,
+      "validation_used_to_fit": false
+    }
+  },
+  "holdout": {
+    "abstention_rate": 0.8361581920903954,
+    "bins": [
+      {
+        "count": 619,
+        "lower": 0.0,
+        "mean_confidence": 0.010581543184019826,
+        "observed_trade_rate": 0.14054927302100162,
+        "upper": 0.1
+      },
+      {
+        "count": 20,
+        "lower": 0.1,
+        "mean_confidence": 0.14192258015554493,
+        "observed_trade_rate": 0.95,
+        "upper": 0.2
+      },
+      {
+        "count": 8,
+        "lower": 0.2,
+        "mean_confidence": 0.22830458036814189,
+        "observed_trade_rate": 1.0,
+        "upper": 0.30000000000000004
+      },
+      {
+        "count": 14,
+        "lower": 0.30000000000000004,
+        "mean_confidence": 0.34504694488682636,
+        "observed_trade_rate": 1.0,
+        "upper": 0.4
+      },
+      {
+        "count": 20,
+        "lower": 0.4,
+        "mean_confidence": 0.45005200521675776,
+        "observed_trade_rate": 1.0,
+        "upper": 0.5
+      },
+      {
+        "count": 14,
+        "lower": 0.5,
+        "mean_confidence": 0.5530402921799439,
+        "observed_trade_rate": 1.0,
+        "upper": 0.6
+      },
+      {
+        "count": 10,
+        "lower": 0.6000000000000001,
+        "mean_confidence": 0.641252312564137,
+        "observed_trade_rate": 1.0,
+        "upper": 0.7000000000000001
+      },
+      {
+        "count": 3,
+        "lower": 0.7000000000000001,
+        "mean_confidence": 0.7212982991649386,
+        "observed_trade_rate": 1.0,
+        "upper": 0.8
+      }
+    ],
+    "brier_score": 0.16012976933489384,
+    "confidence_coverage_curve": [
+      {
+        "coverage": 0.20056497175141244,
+        "selection_precision": 0.9929577464788732,
+        "threshold": 0.05
+      },
+      {
+        "coverage": 0.12570621468926554,
+        "selection_precision": 0.9887640449438202,
+        "threshold": 0.1
+      },
+      {
+        "coverage": 0.1059322033898305,
+        "selection_precision": 0.9866666666666667,
+        "threshold": 0.15
+      },
+      {
+        "coverage": 0.09745762711864407,
+        "selection_precision": 1.0,
+        "threshold": 0.2
+      },
+      {
+        "coverage": 0.08757062146892655,
+        "selection_precision": 1.0,
+        "threshold": 0.25
+      },
+      {
+        "coverage": 0.08615819209039548,
+        "selection_precision": 1.0,
+        "threshold": 0.3
+      },
+      {
+        "coverage": 0.0748587570621469,
+        "selection_precision": 1.0,
+        "threshold": 0.35
+      },
+      {
+        "coverage": 0.06638418079096045,
+        "selection_precision": 1.0,
+        "threshold": 0.39999999999999997
+      },
+      {
+        "coverage": 0.05367231638418079,
+        "selection_precision": 1.0,
+        "threshold": 0.44999999999999996
+      },
+      {
+        "coverage": 0.038135593220338986,
+        "selection_precision": 1.0,
+        "threshold": 0.49999999999999994
+      },
+      {
+        "coverage": 0.031073446327683617,
+        "selection_precision": 1.0,
+        "threshold": 0.5499999999999999
+      },
+      {
+        "coverage": 0.018361581920903956,
+        "selection_precision": 1.0,
+        "threshold": 0.6
+      },
+      {
+        "coverage": 0.00847457627118644,
+        "selection_precision": 1.0,
+        "threshold": 0.65
+      },
+      {
+        "coverage": 0.00423728813559322,
+        "selection_precision": 1.0,
+        "threshold": 0.7
+      },
+      {
+        "coverage": 0.0,
+        "selection_precision": null,
+        "threshold": 0.75
+      },
+      {
+        "coverage": 0.0,
+        "selection_precision": null,
+        "threshold": 0.7999999999999999
+      },
+      {
+        "coverage": 0.0,
+        "selection_precision": null,
+        "threshold": 0.85
+      },
+      {
+        "coverage": 0.0,
+        "selection_precision": null,
+        "threshold": 0.9
+      },
+      {
+        "coverage": 0.0,
+        "selection_precision": null,
+        "threshold": 0.95
+      }
+    ],
+    "expected_calibration_error": 0.1887492331590813,
+    "frozen_utility_threshold": 0.0646927374301676,
+    "groups": 708,
+    "split": "holdout"
+  },
+  "validation": {
+    "abstention_rate": 0.8670694864048338,
+    "bins": [
+      {
+        "count": 302,
+        "lower": 0.0,
+        "mean_confidence": 0.01316072697601208,
+        "observed_trade_rate": 0.23841059602649006,
+        "upper": 0.1
+      },
+      {
+        "count": 4,
+        "lower": 0.1,
+        "mean_confidence": 0.12400556219655552,
+        "observed_trade_rate": 1.0,
+        "upper": 0.2
+      },
+      {
+        "count": 3,
+        "lower": 0.2,
+        "mean_confidence": 0.2597176569424869,
+        "observed_trade_rate": 1.0,
+        "upper": 0.30000000000000004
+      },
+      {
+        "count": 6,
+        "lower": 0.30000000000000004,
+        "mean_confidence": 0.35843281560570855,
+        "observed_trade_rate": 1.0,
+        "upper": 0.4
+      },
+      {
+        "count": 5,
+        "lower": 0.4,
+        "mean_confidence": 0.44940973010075835,
+        "observed_trade_rate": 1.0,
+        "upper": 0.5
+      },
+      {
+        "count": 3,
+        "lower": 0.5,
+        "mean_confidence": 0.5773838889275075,
+        "observed_trade_rate": 1.0,
+        "upper": 0.6
+      },
+      {
+        "count": 6,
+        "lower": 0.6000000000000001,
+        "mean_confidence": 0.6375778179181899,
+        "observed_trade_rate": 1.0,
+        "upper": 0.7000000000000001
+      },
+      {
+        "count": 1,
+        "lower": 0.7000000000000001,
+        "mean_confidence": 0.7950621355468912,
+        "observed_trade_rate": 1.0,
+        "upper": 0.8
+      },
+      {
+        "count": 1,
+        "lower": 0.8,
+        "mean_confidence": 0.80431710195746,
+        "observed_trade_rate": 1.0,
+        "upper": 0.9
+      }
+    ],
+    "brier_score": 0.2286513123841266,
+    "confidence_coverage_curve": [
+      {
+        "coverage": 0.1691842900302115,
+        "selection_precision": 1.0,
+        "threshold": 0.05
+      },
+      {
+        "coverage": 0.08761329305135952,
+        "selection_precision": 1.0,
+        "threshold": 0.1
+      },
+      {
+        "coverage": 0.07854984894259819,
+        "selection_precision": 1.0,
+        "threshold": 0.15
+      },
+      {
+        "coverage": 0.0755287009063444,
+        "selection_precision": 1.0,
+        "threshold": 0.2
+      },
+      {
+        "coverage": 0.07250755287009064,
+        "selection_precision": 1.0,
+        "threshold": 0.25
+      },
+      {
+        "coverage": 0.06646525679758308,
+        "selection_precision": 1.0,
+        "threshold": 0.3
+      },
+      {
+        "coverage": 0.06042296072507553,
+        "selection_precision": 1.0,
+        "threshold": 0.35
+      },
+      {
+        "coverage": 0.04833836858006042,
+        "selection_precision": 1.0,
+        "threshold": 0.39999999999999997
+      },
+      {
+        "coverage": 0.03927492447129909,
+        "selection_precision": 1.0,
+        "threshold": 0.44999999999999996
+      },
+      {
+        "coverage": 0.03323262839879154,
+        "selection_precision": 1.0,
+        "threshold": 0.49999999999999994
+      },
+      {
+        "coverage": 0.030211480362537766,
+        "selection_precision": 1.0,
+        "threshold": 0.5499999999999999
+      },
+      {
+        "coverage": 0.02416918429003021,
+        "selection_precision": 1.0,
+        "threshold": 0.6
+      },
+      {
+        "coverage": 0.012084592145015106,
+        "selection_precision": 1.0,
+        "threshold": 0.65
+      },
+      {
+        "coverage": 0.006042296072507553,
+        "selection_precision": 1.0,
+        "threshold": 0.7
+      },
+      {
+        "coverage": 0.006042296072507553,
+        "selection_precision": 1.0,
+        "threshold": 0.75
+      },
+      {
+        "coverage": 0.0030211480362537764,
+        "selection_precision": 1.0,
+        "threshold": 0.7999999999999999
+      },
+      {
+        "coverage": 0.0,
+        "selection_precision": null,
+        "threshold": 0.85
+      },
+      {
+        "coverage": 0.0,
+        "selection_precision": null,
+        "threshold": 0.9
+      },
+      {
+        "coverage": 0.0,
+        "selection_precision": null,
+        "threshold": 0.95
+      }
+    ],
+    "expected_calibration_error": 0.25436749811992926,
+    "frozen_utility_threshold": 0.0646927374301676,
+    "groups": 331,
+    "split": "validation"
+  }
+}

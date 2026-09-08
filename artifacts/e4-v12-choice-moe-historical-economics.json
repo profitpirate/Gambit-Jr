@@ -1,0 +1,432 @@
+{
+  "exit_policy": {
+    "final_flatten": "last causally observed reserve in each capture window",
+    "initial_stop_multiple": 0.85,
+    "liquidity_emergency": "complete/migration event",
+    "maximum_holding_ms": 30000,
+    "partial_take_fraction": 0.5,
+    "partial_take_multiple": 1.2,
+    "second_take_multiple": 1.5,
+    "trailing_drawdown_fraction": 0.15,
+    "uses_e4_future_sells": false
+  },
+  "fee_model": {
+    "base_transaction_fee_sol": 5e-06,
+    "creator_fee_bps": 50.0,
+    "priority_fee_policy": "median causal E4 training order",
+    "priority_fee_sol": 0.087,
+    "protocol_fee_bps": 125.0,
+    "rejected_submission_cost": "priority fee + tip + base transaction fee",
+    "tip_sol": 0.001
+  },
+  "latencies": {
+    "0": {
+      "average_loss_sol": -0.08585291142943233,
+      "average_win_sol": 0.0,
+      "by_capture_window": {
+        "33792881280": {
+          "pnl_sol": -0.36923710148811745,
+          "trades": 4
+        },
+        "33810753028": {
+          "pnl_sol": -0.24857040863512236,
+          "trades": 3
+        },
+        "33822988156": {
+          "pnl_sol": -0.41892384856086695,
+          "trades": 5
+        },
+        "33835575805": {
+          "pnl_sol": -0.15957468129132357,
+          "trades": 2
+        },
+        "33852482054": {
+          "pnl_sol": -0.08967485411602394,
+          "trades": 1
+        },
+        "33876345997": {
+          "pnl_sol": -0.49860592706902007,
+          "trades": 6
+        },
+        "33897368379": {
+          "pnl_sol": -0.5302333832920029,
+          "trades": 6
+        },
+        "33911477030": {
+          "pnl_sol": -0.08340276492402338,
+          "trades": 1
+        },
+        "33920757002": {
+          "pnl_sol": -0.08272557083960252,
+          "trades": 1
+        },
+        "33931301493": {
+          "pnl_sol": -0.4380504483845959,
+          "trades": 5
+        }
+      },
+      "by_expert": {
+        "cold_start_generalist": {
+          "pnl_sol": -2.9189989886006993,
+          "trades": 34
+        }
+      },
+      "capture_windows_traded": 10,
+      "closed_trade_ledger_hash": "434a659b01b49fb7ca142e395fbf5673aa8612a80586a608ab0a45c6735b688e",
+      "ending_bankroll_sol": 0.08100101139930141,
+      "expectancy_sol": -0.08585291142943233,
+      "false_positive_trades": 33,
+      "fees_paid_sol": 3.028877885635436,
+      "independently_recalculated": true,
+      "largest_winner_contribution": 0.0,
+      "latency_ms": 0,
+      "losses": 34,
+      "maximum_drawdown_fraction_of_start": 0.9729996628668994,
+      "maximum_drawdown_sol": 2.9189989886006984,
+      "missed_e4_selections": 174,
+      "net_pnl_sol": -2.9189989886006984,
+      "payoff_ratio": 0.0,
+      "primary_exit_uses_e4_future_sells": false,
+      "profit_factor": 0.0,
+      "rejected_entries": 0,
+      "rejected_submission_costs_sol": 0.0,
+      "rejections_by_reason": {},
+      "return_fraction": -0.9729996628668995,
+      "trades": 34,
+      "wilson_95_lower_bound": 0.0,
+      "win_rate": 0.0,
+      "wins": 0
+    },
+    "1": {
+      "average_loss_sol": -0.08672751011075519,
+      "average_win_sol": 0.0,
+      "by_capture_window": {
+        "33792881280": {
+          "pnl_sol": -0.3039614550553002,
+          "trades": 3
+        },
+        "33810753028": {
+          "pnl_sol": -0.25244137582052345,
+          "trades": 3
+        },
+        "33822988156": {
+          "pnl_sol": -0.4178595397921028,
+          "trades": 5
+        },
+        "33835575805": {
+          "pnl_sol": -0.15979478300758554,
+          "trades": 2
+        },
+        "33852482054": {
+          "pnl_sol": -0.08964405035644796,
+          "trades": 1
+        },
+        "33876345997": {
+          "pnl_sol": -0.5031998621230437,
+          "trades": 6
+        },
+        "33897368379": {
+          "pnl_sol": -0.5301881523825565,
+          "trades": 6
+        },
+        "33911477030": {
+          "pnl_sol": -0.0836057230919477,
+          "trades": 1
+        },
+        "33920757002": {
+          "pnl_sol": -0.08299259643281748,
+          "trades": 1
+        },
+        "33931301493": {
+          "pnl_sol": -0.4383202955925963,
+          "trades": 5
+        }
+      },
+      "by_expert": {
+        "cold_start_generalist": {
+          "pnl_sol": -2.8620078336549213,
+          "trades": 33
+        }
+      },
+      "capture_windows_traded": 10,
+      "closed_trade_ledger_hash": "30210064699bbd3433686ebc1be524bccb5664b505a11e60a6fa20825325306b",
+      "ending_bankroll_sol": 0.049987166345077924,
+      "expectancy_sol": -0.08672751011075519,
+      "false_positive_trades": 32,
+      "fees_paid_sol": 3.025983228156851,
+      "independently_recalculated": true,
+      "largest_winner_contribution": 0.0,
+      "latency_ms": 1,
+      "losses": 33,
+      "maximum_drawdown_fraction_of_start": 0.9833376112183073,
+      "maximum_drawdown_sol": 2.950012833654922,
+      "missed_e4_selections": 174,
+      "net_pnl_sol": -2.950012833654922,
+      "payoff_ratio": 0.0,
+      "primary_exit_uses_e4_future_sells": false,
+      "profit_factor": 0.0,
+      "rejected_entries": 1,
+      "rejected_submission_costs_sol": 0.088005,
+      "rejections_by_reason": {
+        "REJECT_OUTPUT_DETERIORATION": 1
+      },
+      "return_fraction": -0.9833376112183073,
+      "trades": 33,
+      "wilson_95_lower_bound": 0.0,
+      "win_rate": 0.0,
+      "wins": 0
+    },
+    "10": {
+      "average_loss_sol": -0.0865132512880728,
+      "average_win_sol": 0.0,
+      "by_capture_window": {
+        "33792881280": {
+          "pnl_sol": -0.2935742725696234,
+          "trades": 3
+        },
+        "33810753028": {
+          "pnl_sol": -0.2523959978080919,
+          "trades": 3
+        },
+        "33822988156": {
+          "pnl_sol": -0.41709010927930484,
+          "trades": 5
+        },
+        "33835575805": {
+          "pnl_sol": -0.07477901439308518,
+          "trades": 1
+        },
+        "33852482054": {
+          "pnl_sol": -0.08965385107802666,
+          "trades": 1
+        },
+        "33876345997": {
+          "pnl_sol": -0.4203363266512898,
+          "trades": 5
+        },
+        "33897368379": {
+          "pnl_sol": -0.5302651796851416,
+          "trades": 6
+        },
+        "33911477030": {
+          "pnl_sol": -0.08359592746417843,
+          "trades": 1
+        },
+        "33920757002": {
+          "pnl_sol": -0.08296636038528293,
+          "trades": 1
+        },
+        "33931301493": {
+          "pnl_sol": -0.3507404993281592,
+          "trades": 4
+        }
+      },
+      "by_expert": {
+        "cold_start_generalist": {
+          "pnl_sol": -2.595397538642184,
+          "trades": 30
+        }
+      },
+      "capture_windows_traded": 10,
+      "closed_trade_ledger_hash": "8f50ff324ab04df32a50b4ed25a2b4318256106c0b481c67000f2315a0280b21",
+      "ending_bankroll_sol": 0.052582461357816884,
+      "expectancy_sol": -0.0865132512880728,
+      "false_positive_trades": 29,
+      "fees_paid_sol": 3.0235938290309603,
+      "independently_recalculated": true,
+      "largest_winner_contribution": 0.0,
+      "latency_ms": 10,
+      "losses": 30,
+      "maximum_drawdown_fraction_of_start": 0.9824725128807277,
+      "maximum_drawdown_sol": 2.947417538642183,
+      "missed_e4_selections": 174,
+      "net_pnl_sol": -2.947417538642183,
+      "payoff_ratio": 0.0,
+      "primary_exit_uses_e4_future_sells": false,
+      "profit_factor": 0.0,
+      "rejected_entries": 4,
+      "rejected_submission_costs_sol": 0.35202,
+      "rejections_by_reason": {
+        "REJECT_OUTPUT_DETERIORATION": 4
+      },
+      "return_fraction": -0.9824725128807277,
+      "trades": 30,
+      "wilson_95_lower_bound": -1.2302421700937121e-17,
+      "win_rate": 0.0,
+      "wins": 0
+    },
+    "2": {
+      "average_loss_sol": -0.08672973501136051,
+      "average_win_sol": 0.0,
+      "by_capture_window": {
+        "33792881280": {
+          "pnl_sol": -0.3039614550553002,
+          "trades": 3
+        },
+        "33810753028": {
+          "pnl_sol": -0.25244137582052345,
+          "trades": 3
+        },
+        "33822988156": {
+          "pnl_sol": -0.4178595397921028,
+          "trades": 5
+        },
+        "33835575805": {
+          "pnl_sol": -0.15979478300758554,
+          "trades": 2
+        },
+        "33852482054": {
+          "pnl_sol": -0.08964405035644796,
+          "trades": 1
+        },
+        "33876345997": {
+          "pnl_sol": -0.5031998621230437,
+          "trades": 6
+        },
+        "33897368379": {
+          "pnl_sol": -0.5302603548175199,
+          "trades": 6
+        },
+        "33911477030": {
+          "pnl_sol": -0.0836062071826473,
+          "trades": 1
+        },
+        "33920757002": {
+          "pnl_sol": -0.08299323332435939,
+          "trades": 1
+        },
+        "33931301493": {
+          "pnl_sol": -0.4383203938953671,
+          "trades": 5
+        }
+      },
+      "by_expert": {
+        "cold_start_generalist": {
+          "pnl_sol": -2.862081255374897,
+          "trades": 33
+        }
+      },
+      "capture_windows_traded": 10,
+      "closed_trade_ledger_hash": "bfb556343488899e7039daf1381bbb8b4ad40e9f743fd36d626fbe6c24074e72",
+      "ending_bankroll_sol": 0.04991374462510238,
+      "expectancy_sol": -0.08672973501136051,
+      "false_positive_trades": 32,
+      "fees_paid_sol": 3.0259815351581585,
+      "independently_recalculated": true,
+      "largest_winner_contribution": 0.0,
+      "latency_ms": 2,
+      "losses": 33,
+      "maximum_drawdown_fraction_of_start": 0.9833620851249658,
+      "maximum_drawdown_sol": 2.9500862553748974,
+      "missed_e4_selections": 174,
+      "net_pnl_sol": -2.9500862553748974,
+      "payoff_ratio": 0.0,
+      "primary_exit_uses_e4_future_sells": false,
+      "profit_factor": 0.0,
+      "rejected_entries": 1,
+      "rejected_submission_costs_sol": 0.088005,
+      "rejections_by_reason": {
+        "REJECT_OUTPUT_DETERIORATION": 1
+      },
+      "return_fraction": -0.9833620851249659,
+      "trades": 33,
+      "wilson_95_lower_bound": 0.0,
+      "win_rate": 0.0,
+      "wins": 0
+    },
+    "5": {
+      "average_loss_sol": -0.08687209340252099,
+      "average_win_sol": 0.0,
+      "by_capture_window": {
+        "33792881280": {
+          "pnl_sol": -0.2935742725696234,
+          "trades": 3
+        },
+        "33810753028": {
+          "pnl_sol": -0.2523959978080919,
+          "trades": 3
+        },
+        "33822988156": {
+          "pnl_sol": -0.3429001911927517,
+          "trades": 4
+        },
+        "33835575805": {
+          "pnl_sol": -0.07487665856459785,
+          "trades": 1
+        },
+        "33852482054": {
+          "pnl_sol": -0.08963726015565407,
+          "trades": 1
+        },
+        "33876345997": {
+          "pnl_sol": -0.41829186267609325,
+          "trades": 5
+        },
+        "33897368379": {
+          "pnl_sol": -0.5302465109259866,
+          "trades": 6
+        },
+        "33911477030": {
+          "pnl_sol": -0.08367508116153037,
+          "trades": 1
+        },
+        "33920757002": {
+          "pnl_sol": -0.0830707381012884,
+          "trades": 1
+        },
+        "33931301493": {
+          "pnl_sol": -0.35062213551749083,
+          "trades": 4
+        }
+      },
+      "by_expert": {
+        "cold_start_generalist": {
+          "pnl_sol": -2.5192907086731084,
+          "trades": 29
+        }
+      },
+      "capture_windows_traded": 10,
+      "closed_trade_ledger_hash": "44a78d1b53f9b8a5dc87dde57b2dacb69d3629b09112b990f0ee44db79ee99c4",
+      "ending_bankroll_sol": 0.04068429132689144,
+      "expectancy_sol": -0.08687209340252099,
+      "false_positive_trades": 28,
+      "fees_paid_sol": 3.0217755408632554,
+      "independently_recalculated": true,
+      "largest_winner_contribution": 0.0,
+      "latency_ms": 5,
+      "losses": 29,
+      "maximum_drawdown_fraction_of_start": 0.9864385695577029,
+      "maximum_drawdown_sol": 2.959315708673109,
+      "missed_e4_selections": 174,
+      "net_pnl_sol": -2.959315708673109,
+      "payoff_ratio": 0.0,
+      "primary_exit_uses_e4_future_sells": false,
+      "profit_factor": 0.0,
+      "rejected_entries": 5,
+      "rejected_submission_costs_sol": 0.440025,
+      "rejections_by_reason": {
+        "REJECT_OUTPUT_DETERIORATION": 5
+      },
+      "return_fraction": -0.9864385695577028,
+      "trades": 29,
+      "wilson_95_lower_bound": 0.0,
+      "win_rate": 0.0,
+      "wins": 0
+    }
+  },
+  "maximum_concurrent_positions": 2,
+  "output_guard": {
+    "minimum_quote_fraction": 0.85
+  },
+  "position_fraction": 0.0185,
+  "replay_audit": {
+    "accepted_by_joint_heads": 34,
+    "eligible_clock_policy": "one decision after each distinct CREATE receipt timestamp",
+    "eligible_create_clocks": 30000,
+    "full_event_stream_processed": true,
+    "intentions": 29718,
+    "warmup_clocks_excluded": 282
+  },
+  "starting_bankroll_sol": 3.0,
+  "version": "e4-v12-choice-moe-v1"
+}

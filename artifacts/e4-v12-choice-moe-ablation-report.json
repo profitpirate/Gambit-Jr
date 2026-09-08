@@ -1,0 +1,706 @@
+{
+  "conclusions": {
+    "funder_ablation_omitted_reason": "funder coverage is zero; no funder expert exists",
+    "performance_collapses_without_candidate_age": false,
+    "raw_identity_features_present_in_general_model": false
+  },
+  "method": "regularised pairwise-linear controlled feature-family ablations",
+  "results": {
+    "age_only": {
+      "feature_count": 1,
+      "holdout": {
+        "brier_score": 0.003227846363569341,
+        "by_capture_window": {
+          "33792881280": {
+            "groups": 26,
+            "top_1_accuracy": 1.0
+          },
+          "33810753028": {
+            "groups": 34,
+            "top_1_accuracy": 1.0
+          },
+          "33822988156": {
+            "groups": 24,
+            "top_1_accuracy": 1.0
+          },
+          "33835575805": {
+            "groups": 13,
+            "top_1_accuracy": 1.0
+          },
+          "33852482054": {
+            "groups": 11,
+            "top_1_accuracy": 1.0
+          },
+          "33876345997": {
+            "groups": 9,
+            "top_1_accuracy": 0.8888888888888888
+          },
+          "33897368379": {
+            "groups": 37,
+            "top_1_accuracy": 1.0
+          },
+          "33911477030": {
+            "groups": 4,
+            "top_1_accuracy": 1.0
+          },
+          "33920757002": {
+            "groups": 7,
+            "top_1_accuracy": 1.0
+          },
+          "33931301493": {
+            "groups": 10,
+            "top_1_accuracy": 0.9
+          }
+        },
+        "groups": 175,
+        "listwise_cross_entropy": 0.2267559002934515,
+        "mean_reciprocal_rank": 0.9942857142857143,
+        "ndcg": 0.9957820543265309,
+        "pairwise_accuracy": 0.99950884086444,
+        "pairwise_auc": 0.9998372158293574,
+        "top_1_accuracy": 0.9885714285714285,
+        "top_2_recall": 1.0,
+        "top_3_recall": 1.0
+      },
+      "top1_delta_from_frozen_model": 0.005714285714285672
+    },
+    "buyer_only": {
+      "feature_count": 6,
+      "holdout": {
+        "brier_score": 0.03228089616582674,
+        "by_capture_window": {
+          "33792881280": {
+            "groups": 26,
+            "top_1_accuracy": 0.15384615384615385
+          },
+          "33810753028": {
+            "groups": 34,
+            "top_1_accuracy": 0.14705882352941177
+          },
+          "33822988156": {
+            "groups": 24,
+            "top_1_accuracy": 0.375
+          },
+          "33835575805": {
+            "groups": 13,
+            "top_1_accuracy": 0.6153846153846154
+          },
+          "33852482054": {
+            "groups": 11,
+            "top_1_accuracy": 0.5454545454545454
+          },
+          "33876345997": {
+            "groups": 9,
+            "top_1_accuracy": 0.3333333333333333
+          },
+          "33897368379": {
+            "groups": 37,
+            "top_1_accuracy": 0.24324324324324326
+          },
+          "33911477030": {
+            "groups": 4,
+            "top_1_accuracy": 0.5
+          },
+          "33920757002": {
+            "groups": 7,
+            "top_1_accuracy": 0.14285714285714285
+          },
+          "33931301493": {
+            "groups": 10,
+            "top_1_accuracy": 0.5
+          }
+        },
+        "groups": 175,
+        "listwise_cross_entropy": 2.1609658686131166,
+        "mean_reciprocal_rank": 0.4781477973940159,
+        "ndcg": 0.5988438654443443,
+        "pairwise_accuracy": 0.862475442043222,
+        "pairwise_auc": 0.8759795116474881,
+        "top_1_accuracy": 0.29714285714285715,
+        "top_2_recall": 0.44,
+        "top_3_recall": 0.5542857142857143
+      },
+      "top1_delta_from_frozen_model": -0.6857142857142857
+    },
+    "creator_only": {
+      "feature_count": 7,
+      "holdout": {
+        "brier_score": 0.020413303467076094,
+        "by_capture_window": {
+          "33792881280": {
+            "groups": 26,
+            "top_1_accuracy": 0.5769230769230769
+          },
+          "33810753028": {
+            "groups": 34,
+            "top_1_accuracy": 0.5588235294117647
+          },
+          "33822988156": {
+            "groups": 24,
+            "top_1_accuracy": 0.9166666666666666
+          },
+          "33835575805": {
+            "groups": 13,
+            "top_1_accuracy": 0.8461538461538461
+          },
+          "33852482054": {
+            "groups": 11,
+            "top_1_accuracy": 1.0
+          },
+          "33876345997": {
+            "groups": 9,
+            "top_1_accuracy": 0.8888888888888888
+          },
+          "33897368379": {
+            "groups": 37,
+            "top_1_accuracy": 0.8108108108108109
+          },
+          "33911477030": {
+            "groups": 4,
+            "top_1_accuracy": 1.0
+          },
+          "33920757002": {
+            "groups": 7,
+            "top_1_accuracy": 0.5714285714285714
+          },
+          "33931301493": {
+            "groups": 10,
+            "top_1_accuracy": 0.7
+          }
+        },
+        "groups": 175,
+        "listwise_cross_entropy": 2.437363818143932,
+        "mean_reciprocal_rank": 0.8390270681699252,
+        "ndcg": 0.8775439243010753,
+        "pairwise_accuracy": 0.956041257367387,
+        "pairwise_auc": 0.9109268874543923,
+        "top_1_accuracy": 0.7485714285714286,
+        "top_2_recall": 0.8742857142857143,
+        "top_3_recall": 0.9257142857142857
+      },
+      "top1_delta_from_frozen_model": -0.23428571428571432
+    },
+    "flow_only": {
+      "feature_count": 10,
+      "holdout": {
+        "brier_score": 0.0241946260448962,
+        "by_capture_window": {
+          "33792881280": {
+            "groups": 26,
+            "top_1_accuracy": 0.6153846153846154
+          },
+          "33810753028": {
+            "groups": 34,
+            "top_1_accuracy": 0.5588235294117647
+          },
+          "33822988156": {
+            "groups": 24,
+            "top_1_accuracy": 0.7083333333333334
+          },
+          "33835575805": {
+            "groups": 13,
+            "top_1_accuracy": 0.6923076923076923
+          },
+          "33852482054": {
+            "groups": 11,
+            "top_1_accuracy": 0.7272727272727273
+          },
+          "33876345997": {
+            "groups": 9,
+            "top_1_accuracy": 0.7777777777777778
+          },
+          "33897368379": {
+            "groups": 37,
+            "top_1_accuracy": 0.7837837837837838
+          },
+          "33911477030": {
+            "groups": 4,
+            "top_1_accuracy": 0.5
+          },
+          "33920757002": {
+            "groups": 7,
+            "top_1_accuracy": 0.7142857142857143
+          },
+          "33931301493": {
+            "groups": 10,
+            "top_1_accuracy": 0.6
+          }
+        },
+        "groups": 175,
+        "listwise_cross_entropy": 1.4763339143022616,
+        "mean_reciprocal_rank": 0.7976855921855922,
+        "ndcg": 0.8473484602788351,
+        "pairwise_accuracy": 0.9614440078585462,
+        "pairwise_auc": 0.9554097670502386,
+        "top_1_accuracy": 0.6742857142857143,
+        "top_2_recall": 0.8457142857142858,
+        "top_3_recall": 0.9085714285714286
+      },
+      "top1_delta_from_frozen_model": -0.3085714285714286
+    },
+    "remove_all_recency": {
+      "feature_count": 45,
+      "holdout": {
+        "brier_score": 0.008601206068763027,
+        "by_capture_window": {
+          "33792881280": {
+            "groups": 26,
+            "top_1_accuracy": 0.9230769230769231
+          },
+          "33810753028": {
+            "groups": 34,
+            "top_1_accuracy": 0.8529411764705882
+          },
+          "33822988156": {
+            "groups": 24,
+            "top_1_accuracy": 1.0
+          },
+          "33835575805": {
+            "groups": 13,
+            "top_1_accuracy": 1.0
+          },
+          "33852482054": {
+            "groups": 11,
+            "top_1_accuracy": 0.9090909090909091
+          },
+          "33876345997": {
+            "groups": 9,
+            "top_1_accuracy": 1.0
+          },
+          "33897368379": {
+            "groups": 37,
+            "top_1_accuracy": 0.8918918918918919
+          },
+          "33911477030": {
+            "groups": 4,
+            "top_1_accuracy": 1.0
+          },
+          "33920757002": {
+            "groups": 7,
+            "top_1_accuracy": 0.42857142857142855
+          },
+          "33931301493": {
+            "groups": 10,
+            "top_1_accuracy": 0.9
+          }
+        },
+        "groups": 175,
+        "listwise_cross_entropy": 0.5770207398736119,
+        "mean_reciprocal_rank": 0.940047619047619,
+        "ndcg": 0.9548595820031696,
+        "pairwise_accuracy": 0.9901768172888016,
+        "pairwise_auc": 0.986237721021611,
+        "top_1_accuracy": 0.9028571428571428,
+        "top_2_recall": 0.9542857142857143,
+        "top_3_recall": 0.9771428571428571
+      },
+      "top1_delta_from_frozen_model": -0.08000000000000007
+    },
+    "remove_buyer_cluster": {
+      "feature_count": 42,
+      "holdout": {
+        "brier_score": 0.0030236014614092527,
+        "by_capture_window": {
+          "33792881280": {
+            "groups": 26,
+            "top_1_accuracy": 0.9615384615384616
+          },
+          "33810753028": {
+            "groups": 34,
+            "top_1_accuracy": 0.9705882352941176
+          },
+          "33822988156": {
+            "groups": 24,
+            "top_1_accuracy": 1.0
+          },
+          "33835575805": {
+            "groups": 13,
+            "top_1_accuracy": 1.0
+          },
+          "33852482054": {
+            "groups": 11,
+            "top_1_accuracy": 1.0
+          },
+          "33876345997": {
+            "groups": 9,
+            "top_1_accuracy": 1.0
+          },
+          "33897368379": {
+            "groups": 37,
+            "top_1_accuracy": 0.918918918918919
+          },
+          "33911477030": {
+            "groups": 4,
+            "top_1_accuracy": 1.0
+          },
+          "33920757002": {
+            "groups": 7,
+            "top_1_accuracy": 1.0
+          },
+          "33931301493": {
+            "groups": 10,
+            "top_1_accuracy": 0.9
+          }
+        },
+        "groups": 175,
+        "listwise_cross_entropy": 0.18746748045250725,
+        "mean_reciprocal_rank": 0.9828571428571429,
+        "ndcg": 0.9873461629795928,
+        "pairwise_accuracy": 0.9985265225933202,
+        "pairwise_auc": 0.9981083356721864,
+        "top_1_accuracy": 0.9657142857142857,
+        "top_2_recall": 1.0,
+        "top_3_recall": 1.0
+      },
+      "top1_delta_from_frozen_model": -0.017142857142857126
+    },
+    "remove_candidate_age": {
+      "feature_count": 47,
+      "holdout": {
+        "brier_score": 0.0042177086547018116,
+        "by_capture_window": {
+          "33792881280": {
+            "groups": 26,
+            "top_1_accuracy": 1.0
+          },
+          "33810753028": {
+            "groups": 34,
+            "top_1_accuracy": 0.9117647058823529
+          },
+          "33822988156": {
+            "groups": 24,
+            "top_1_accuracy": 1.0
+          },
+          "33835575805": {
+            "groups": 13,
+            "top_1_accuracy": 1.0
+          },
+          "33852482054": {
+            "groups": 11,
+            "top_1_accuracy": 1.0
+          },
+          "33876345997": {
+            "groups": 9,
+            "top_1_accuracy": 1.0
+          },
+          "33897368379": {
+            "groups": 37,
+            "top_1_accuracy": 0.918918918918919
+          },
+          "33911477030": {
+            "groups": 4,
+            "top_1_accuracy": 1.0
+          },
+          "33920757002": {
+            "groups": 7,
+            "top_1_accuracy": 0.8571428571428571
+          },
+          "33931301493": {
+            "groups": 10,
+            "top_1_accuracy": 1.0
+          }
+        },
+        "groups": 175,
+        "listwise_cross_entropy": 0.27481735025703835,
+        "mean_reciprocal_rank": 0.9779591836734693,
+        "ndcg": 0.983536639170069,
+        "pairwise_accuracy": 0.9970530451866405,
+        "pairwise_auc": 0.9954448498456357,
+        "top_1_accuracy": 0.96,
+        "top_2_recall": 0.9942857142857143,
+        "top_3_recall": 0.9942857142857143
+      },
+      "top1_delta_from_frozen_model": -0.02285714285714291
+    },
+    "remove_creator": {
+      "feature_count": 41,
+      "holdout": {
+        "brier_score": 0.002331725111814215,
+        "by_capture_window": {
+          "33792881280": {
+            "groups": 26,
+            "top_1_accuracy": 1.0
+          },
+          "33810753028": {
+            "groups": 34,
+            "top_1_accuracy": 1.0
+          },
+          "33822988156": {
+            "groups": 24,
+            "top_1_accuracy": 1.0
+          },
+          "33835575805": {
+            "groups": 13,
+            "top_1_accuracy": 1.0
+          },
+          "33852482054": {
+            "groups": 11,
+            "top_1_accuracy": 1.0
+          },
+          "33876345997": {
+            "groups": 9,
+            "top_1_accuracy": 1.0
+          },
+          "33897368379": {
+            "groups": 37,
+            "top_1_accuracy": 0.972972972972973
+          },
+          "33911477030": {
+            "groups": 4,
+            "top_1_accuracy": 1.0
+          },
+          "33920757002": {
+            "groups": 7,
+            "top_1_accuracy": 1.0
+          },
+          "33931301493": {
+            "groups": 10,
+            "top_1_accuracy": 0.9
+          }
+        },
+        "groups": 175,
+        "listwise_cross_entropy": 0.16118156330856218,
+        "mean_reciprocal_rank": 0.9942857142857143,
+        "ndcg": 0.9957820543265309,
+        "pairwise_accuracy": 0.99950884086444,
+        "pairwise_auc": 0.9999242211619422,
+        "top_1_accuracy": 0.9885714285714285,
+        "top_2_recall": 1.0,
+        "top_3_recall": 1.0
+      },
+      "top1_delta_from_frozen_model": 0.005714285714285672
+    },
+    "remove_market_flow": {
+      "feature_count": 38,
+      "holdout": {
+        "brier_score": 0.003395886408349799,
+        "by_capture_window": {
+          "33792881280": {
+            "groups": 26,
+            "top_1_accuracy": 0.9230769230769231
+          },
+          "33810753028": {
+            "groups": 34,
+            "top_1_accuracy": 0.9705882352941176
+          },
+          "33822988156": {
+            "groups": 24,
+            "top_1_accuracy": 1.0
+          },
+          "33835575805": {
+            "groups": 13,
+            "top_1_accuracy": 1.0
+          },
+          "33852482054": {
+            "groups": 11,
+            "top_1_accuracy": 1.0
+          },
+          "33876345997": {
+            "groups": 9,
+            "top_1_accuracy": 1.0
+          },
+          "33897368379": {
+            "groups": 37,
+            "top_1_accuracy": 0.918918918918919
+          },
+          "33911477030": {
+            "groups": 4,
+            "top_1_accuracy": 1.0
+          },
+          "33920757002": {
+            "groups": 7,
+            "top_1_accuracy": 1.0
+          },
+          "33931301493": {
+            "groups": 10,
+            "top_1_accuracy": 0.9
+          }
+        },
+        "groups": 175,
+        "listwise_cross_entropy": 0.20355480852892346,
+        "mean_reciprocal_rank": 0.98,
+        "ndcg": 0.9852371901428584,
+        "pairwise_accuracy": 0.9982809430255403,
+        "pairwise_auc": 0.9977855739545327,
+        "top_1_accuracy": 0.96,
+        "top_2_recall": 1.0,
+        "top_3_recall": 1.0
+      },
+      "top1_delta_from_frozen_model": -0.02285714285714291
+    },
+    "remove_raw_identities": {
+      "feature_count": 48,
+      "holdout": {
+        "brier_score": 0.003250662057871159,
+        "by_capture_window": {
+          "33792881280": {
+            "groups": 26,
+            "top_1_accuracy": 0.9615384615384616
+          },
+          "33810753028": {
+            "groups": 34,
+            "top_1_accuracy": 0.9705882352941176
+          },
+          "33822988156": {
+            "groups": 24,
+            "top_1_accuracy": 1.0
+          },
+          "33835575805": {
+            "groups": 13,
+            "top_1_accuracy": 1.0
+          },
+          "33852482054": {
+            "groups": 11,
+            "top_1_accuracy": 1.0
+          },
+          "33876345997": {
+            "groups": 9,
+            "top_1_accuracy": 1.0
+          },
+          "33897368379": {
+            "groups": 37,
+            "top_1_accuracy": 0.918918918918919
+          },
+          "33911477030": {
+            "groups": 4,
+            "top_1_accuracy": 1.0
+          },
+          "33920757002": {
+            "groups": 7,
+            "top_1_accuracy": 1.0
+          },
+          "33931301493": {
+            "groups": 10,
+            "top_1_accuracy": 0.9
+          }
+        },
+        "groups": 175,
+        "listwise_cross_entropy": 0.20150681812783644,
+        "mean_reciprocal_rank": 0.9828571428571429,
+        "ndcg": 0.9873461629795928,
+        "pairwise_accuracy": 0.9985265225933202,
+        "pairwise_auc": 0.9974150996351389,
+        "top_1_accuracy": 0.9657142857142857,
+        "top_2_recall": 1.0,
+        "top_3_recall": 1.0
+      },
+      "top1_delta_from_frozen_model": -0.017142857142857126
+    },
+    "remove_social": {
+      "feature_count": 44,
+      "holdout": {
+        "brier_score": 0.0033984306884213295,
+        "by_capture_window": {
+          "33792881280": {
+            "groups": 26,
+            "top_1_accuracy": 0.9230769230769231
+          },
+          "33810753028": {
+            "groups": 34,
+            "top_1_accuracy": 0.9705882352941176
+          },
+          "33822988156": {
+            "groups": 24,
+            "top_1_accuracy": 1.0
+          },
+          "33835575805": {
+            "groups": 13,
+            "top_1_accuracy": 1.0
+          },
+          "33852482054": {
+            "groups": 11,
+            "top_1_accuracy": 1.0
+          },
+          "33876345997": {
+            "groups": 9,
+            "top_1_accuracy": 1.0
+          },
+          "33897368379": {
+            "groups": 37,
+            "top_1_accuracy": 0.918918918918919
+          },
+          "33911477030": {
+            "groups": 4,
+            "top_1_accuracy": 1.0
+          },
+          "33920757002": {
+            "groups": 7,
+            "top_1_accuracy": 1.0
+          },
+          "33931301493": {
+            "groups": 10,
+            "top_1_accuracy": 0.9
+          }
+        },
+        "groups": 175,
+        "listwise_cross_entropy": 0.20783139607470455,
+        "mean_reciprocal_rank": 0.98,
+        "ndcg": 0.9852371901428584,
+        "pairwise_accuracy": 0.9982809430255403,
+        "pairwise_auc": 0.9970025259612687,
+        "top_1_accuracy": 0.96,
+        "top_2_recall": 1.0,
+        "top_3_recall": 1.0
+      },
+      "top1_delta_from_frozen_model": -0.02285714285714291
+    },
+    "remove_topology": {
+      "feature_count": 43,
+      "holdout": {
+        "brier_score": 0.0031929020233189788,
+        "by_capture_window": {
+          "33792881280": {
+            "groups": 26,
+            "top_1_accuracy": 0.9615384615384616
+          },
+          "33810753028": {
+            "groups": 34,
+            "top_1_accuracy": 0.9705882352941176
+          },
+          "33822988156": {
+            "groups": 24,
+            "top_1_accuracy": 1.0
+          },
+          "33835575805": {
+            "groups": 13,
+            "top_1_accuracy": 1.0
+          },
+          "33852482054": {
+            "groups": 11,
+            "top_1_accuracy": 1.0
+          },
+          "33876345997": {
+            "groups": 9,
+            "top_1_accuracy": 1.0
+          },
+          "33897368379": {
+            "groups": 37,
+            "top_1_accuracy": 0.918918918918919
+          },
+          "33911477030": {
+            "groups": 4,
+            "top_1_accuracy": 1.0
+          },
+          "33920757002": {
+            "groups": 7,
+            "top_1_accuracy": 1.0
+          },
+          "33931301493": {
+            "groups": 10,
+            "top_1_accuracy": 0.9
+          }
+        },
+        "groups": 175,
+        "listwise_cross_entropy": 0.19761975482219046,
+        "mean_reciprocal_rank": 0.9828571428571429,
+        "ndcg": 0.9873461629795928,
+        "pairwise_accuracy": 0.9985265225933202,
+        "pairwise_auc": 0.9976690990738142,
+        "top_1_accuracy": 0.9657142857142857,
+        "top_2_recall": 1.0,
+        "top_3_recall": 1.0
+      },
+      "top1_delta_from_frozen_model": -0.017142857142857126
+    }
+  }
+}
