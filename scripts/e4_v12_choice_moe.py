@@ -2580,6 +2580,7 @@ def simulate_latency(
         "rejected_submission_costs_sol": rejected_costs,
         "fees_paid_sol": fees_paid,
         "false_positive_trades": false_positive_trades,
+        "false_entries_per_1000_captured_launches": false_positive_trades / 30_000 * 1_000,
         "missed_e4_selections": missed,
         "largest_winner_contribution": max(profits, default=0.0) / gross_profit
         if gross_profit
@@ -3157,10 +3158,10 @@ def main() -> None:
         "model_comparison": comparison,
         "holdout": holdout_selection,
         "hazard": hazard_by_split,
-        "false_entries_per_1000_captured_launches": hazard_by_split["holdout"][
+        "sampled_null_false_entries_per_1000_null_groups": hazard_by_split["holdout"][
             "false_positive_entries"
         ]
-        / 30_000
+        / max(hazard_by_split["holdout"]["null_groups"], 1)
         * 1_000,
         "failed_fill_sensitivity": failed_fill_sensitivity(groups, scorer),
     }

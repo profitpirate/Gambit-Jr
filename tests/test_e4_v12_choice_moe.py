@@ -244,6 +244,7 @@ def test_primary_economics_never_use_future_e4_exits(outputs) -> None:
 def test_false_positives_fees_and_rejections_are_counted(outputs) -> None:
     rows = outputs["economics"]["latencies"].values()
     assert all("false_positive_trades" in row for row in rows)
+    assert all("false_entries_per_1000_captured_launches" in row for row in rows)
     assert all(row["fees_paid_sol"] > 0 for row in rows)
     assert all("rejected_submission_costs_sol" in row for row in rows)
 
