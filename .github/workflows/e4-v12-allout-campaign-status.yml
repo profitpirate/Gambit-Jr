@@ -1,0 +1,117 @@
+name: E4 V12 all-out campaign status audit
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-golden-profit-hazard-v1
+    paths:
+      - ".github/workflows/e4-v12-allout-campaign-status.yml"
+      - "research/e4-v12-allout-status-trigger*.txt"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: e4-v12-allout-campaign-status
+  cancel-in-progress: true
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RESEARCH_BRANCH: codex/e4-v12-golden-profit-hazard-v1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-golden-profit-hazard-v1
+          fetch-depth: 1
+      - name: Build compact campaign status
+        run: |
+          mkdir -p artifacts docs/research
+          python - <<'PY'
+          import json, os, subprocess
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          workflows=[
+            'e4-v12-allout-profit-hazard.yml',
+            'e4-v12-allout-profit-hazard-v2.yml',
+            'e4-v12-symbolic-dnf-tournament.yml',
+            'e4-v12-symbolic-dnf-tournament-v2.yml',
+            'e4-v12-temporal-point-process.yml',
+            'e4-v12-adaptive-exit-router.yml',
+            'e4-v12-selective-ensemble.yml',
+            'e4-v12-optuna-profit-search.yml',
+            'e4-v12-narrative-text-hazard.yml',
+            'e4-v12-ordered-categorical-hazard.yml',
+          ]
+          branch=os.environ['RESEARCH_BRANCH']
+          rows=[]
+          for workflow in workflows:
+              result=subprocess.run(
+                  ['gh','run','list','--repo',os.environ['GITHUB_REPOSITORY'],
+                   '--workflow',workflow,'--branch',branch,'--limit','1',
+                   '--json','databaseId,status,conclusion,createdAt,updatedAt,headSha,name'],
+                  text=True,capture_output=True,
+              )
+              if result.returncode:
+                  rows.append({'workflow':workflow,'error':result.stderr.strip()[:500]})
+                  continue
+              data=json.loads(result.stdout or '[]')
+              if not data:
+                  rows.append({'workflow':workflow,'status':'no_run'})
+                  continue
+              run=data[0]
+              rows.append({
+                  'workflow':workflow,
+                  'run_id':run.get('databaseId'),
+                  'status':run.get('status'),
+                  'conclusion':run.get('conclusion'),
+                  'created_at':run.get('createdAt'),
+                  'updated_at':run.get('updatedAt'),
+                  'head_sha':run.get('headSha'),
+                  'name':run.get('name'),
+              })
+          active=sum(row.get('status') in {'queued','in_progress','waiting','pending'} for row in rows)
+          successful=sum(row.get('conclusion')=='success' for row in rows)
+          failed=sum(row.get('conclusion') in {'failure','cancelled','timed_out','action_required'} for row in rows)
+          report={
+              'version':'e4-v12-allout-campaign-status-v1',
+              'checked_at':datetime.now(timezone.utc).isoformat(),
+              'branch':branch,
+              'workflows':rows,
+              'summary':{
+                  'declared_workflows':len(workflows),
+                  'active_or_queued':active,
+                  'completed_success':successful,
+                  'completed_failure':failed,
+                  'no_run':sum(row.get('status')=='no_run' for row in rows),
+              },
+              'golden_thesis_claimed':False,
+              'production_paths_changed':0,
+          }
+          text=json.dumps(report,indent=2,sort_keys=True)+'\n'
+          Path('artifacts/e4-v12-allout-campaign-status.json').write_text(text)
+          Path('docs/research/e4-v12-allout-campaign-status.json').write_text(text)
+          print(text)
+          PY
+      - name: Persist compact status
+        run: |
+          git config user.name 'gambit-v12-allout-status'
+          git config user.email 'actions@users.noreply.github.com'
+          git add docs/research/e4-v12-allout-campaign-status.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'ops(e4-v12): update all-out campaign status [skip ci]'
+            git push origin HEAD:codex/e4-v12-golden-profit-hazard-v1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-allout-campaign-status-${{ github.run_id }}
+          path: artifacts/e4-v12-allout-campaign-status.json
+          if-no-files-found: error
+          retention-days: 7
