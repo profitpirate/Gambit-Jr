@@ -1,0 +1,774 @@
+{
+  "errors": [],
+  "historical_candidates": 0,
+  "interpretation": "A historical candidate is a discovery result only. It must be frozen and tested on new post-freeze live windows before any golden-thesis claim.",
+  "lane_reports_discovered": 20,
+  "leaderboard": [
+    {
+      "experiment_id": "e4x-allout-840d3672e788209fbbc43c4507de2baa6ea478a72253668ee06794b2eeefb41a",
+      "failed_requirements": [
+        "at_least_20_trades",
+        "wilson_lower_at_least_45_percent"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.00746778900732314,
+        "maximum_largest_winner_profit_share": 0.18332598040412315,
+        "minimum_capture_windows": 4,
+        "minimum_expectancy_sol": 0.012213126959668199,
+        "minimum_net_pnl_sol": 0.183196904395023,
+        "minimum_profit_factor": 7.3945418987138405,
+        "minimum_trades": 15,
+        "minimum_wilson_lower": 0.4171312515121298,
+        "minimum_win_rate": 0.6666666666666666
+      },
+      "lane": "intent-extra",
+      "policy": "hold_2000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.9783764652924583,
+      "validation": {
+        "maximum_drawdown_fraction": 0.004154675387484844,
+        "maximum_largest_winner_profit_share": 0.24519542224041938,
+        "minimum_capture_windows": 3,
+        "minimum_expectancy_sol": 0.017987612225819516,
+        "minimum_net_pnl_sol": 0.17987612225819527,
+        "minimum_profit_factor": 16.630878889028075,
+        "minimum_trades": 10,
+        "minimum_wilson_lower": 0.5958436145024277,
+        "minimum_win_rate": 0.9
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-47f111d378d6ad23946728a3d70f0947a884885952ff11da8c5ad3986221bfda",
+      "failed_requirements": [
+        "win_rate_at_least_65_percent"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.015762059057980764,
+        "maximum_largest_winner_profit_share": 0.10633736898798614,
+        "minimum_capture_windows": 10,
+        "minimum_expectancy_sol": 0.0019303708354396155,
+        "minimum_net_pnl_sol": 0.1293348459744541,
+        "minimum_profit_factor": 1.601826618803988,
+        "minimum_trades": 67,
+        "minimum_wilson_lower": 0.5221828769475225,
+        "minimum_win_rate": 0.6417910447761194
+      },
+      "lane": "utility-hgb",
+      "policy": "tp110_sl90",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.0019340051837365762,
+      "validation": {
+        "maximum_drawdown_fraction": 0.0,
+        "maximum_largest_winner_profit_share": 0.2290511628776344,
+        "minimum_capture_windows": 3,
+        "minimum_expectancy_sol": 0.006462533757178217,
+        "minimum_net_pnl_sol": 0.05170027005742561,
+        "minimum_profit_factor": 999.0,
+        "minimum_trades": 8,
+        "minimum_wilson_lower": 0.6755843804891231,
+        "minimum_win_rate": 1.0
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-bdb0bd5d19ab27e5caad07bd3f706f1423f78d539e6afa39c97a79e83daf57fd",
+      "failed_requirements": [
+        "win_rate_at_least_65_percent"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.014547133791647368,
+        "maximum_largest_winner_profit_share": 0.213125938771099,
+        "minimum_capture_windows": 9,
+        "minimum_expectancy_sol": 0.013179058661457063,
+        "minimum_net_pnl_sol": 0.500804229135368,
+        "minimum_profit_factor": 4.580758478051104,
+        "minimum_trades": 38,
+        "minimum_wilson_lower": 0.4728367282426011,
+        "minimum_win_rate": 0.631578947368421
+      },
+      "lane": "utility-extra",
+      "policy": "hold_5000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.005411396533477684,
+      "validation": {
+        "maximum_drawdown_fraction": 0.004269829333357992,
+        "maximum_largest_winner_profit_share": 0.41570580066293444,
+        "minimum_capture_windows": 3,
+        "minimum_expectancy_sol": 0.011685675500265039,
+        "minimum_net_pnl_sol": 0.09348540400212002,
+        "minimum_profit_factor": 5.226663193513674,
+        "minimum_trades": 8,
+        "minimum_wilson_lower": 0.40926987910258916,
+        "minimum_win_rate": 0.75
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-39ce5ca25172190202d0995b9357638e49e6c9341567295e96ccabe9394c5cf6",
+      "failed_requirements": [
+        "at_least_20_trades",
+        "win_rate_at_least_65_percent",
+        "wilson_lower_at_least_45_percent"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.011311505463237932,
+        "maximum_largest_winner_profit_share": 0.2964051210401853,
+        "minimum_capture_windows": 7,
+        "minimum_expectancy_sol": 0.009794782649047139,
+        "minimum_net_pnl_sol": 0.14692173973570544,
+        "minimum_profit_factor": 3.569855822755263,
+        "minimum_trades": 15,
+        "minimum_wilson_lower": 0.357464427565077,
+        "minimum_win_rate": 0.6
+      },
+      "lane": "intent-cat",
+      "policy": "hold_3000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.9948041291419231,
+      "validation": {
+        "maximum_drawdown_fraction": 0.0037439763832387615,
+        "maximum_largest_winner_profit_share": 0.23766953553395326,
+        "minimum_capture_windows": 4,
+        "minimum_expectancy_sol": 0.019168261136647356,
+        "minimum_net_pnl_sol": 0.19168261136647358,
+        "minimum_profit_factor": 17.633693560918644,
+        "minimum_trades": 10,
+        "minimum_wilson_lower": 0.5958436145024277,
+        "minimum_win_rate": 0.9
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-fe51ce0d957a50dc5d5f5d9407c3899bad7511842068d970aa1c1547e262c0dd",
+      "failed_requirements": [
+        "at_least_20_trades",
+        "win_rate_at_least_65_percent",
+        "wilson_lower_at_least_45_percent"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.0011183218910043472,
+        "maximum_largest_winner_profit_share": 0.44091286491135645,
+        "minimum_capture_windows": 5,
+        "minimum_expectancy_sol": 0.001175288417638623,
+        "minimum_net_pnl_sol": 0.01175288417638587,
+        "minimum_profit_factor": 2.872672454705006,
+        "minimum_trades": 10,
+        "minimum_wilson_lower": 0.3126695474501863,
+        "minimum_win_rate": 0.6
+      },
+      "lane": "profit-extra",
+      "policy": "hold_60000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.7536719298028935,
+      "validation": {
+        "maximum_drawdown_fraction": 0.0,
+        "maximum_largest_winner_profit_share": 0.2653673875133364,
+        "minimum_capture_windows": 3,
+        "minimum_expectancy_sol": 0.0035179963869069616,
+        "minimum_net_pnl_sol": 0.02814397109525535,
+        "minimum_profit_factor": 999.0,
+        "minimum_trades": 8,
+        "minimum_wilson_lower": 0.6755843804891231,
+        "minimum_win_rate": 1.0
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-df084fcffc0a078388266b60dd9cf1d29bfc88d9fabc78e5727960f61c26ec03",
+      "failed_requirements": [
+        "win_rate_at_least_65_percent",
+        "wilson_lower_at_least_45_percent"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.010325906567963694,
+        "maximum_largest_winner_profit_share": 0.11112295918704297,
+        "minimum_capture_windows": 10,
+        "minimum_expectancy_sol": 0.0076417491670313555,
+        "minimum_net_pnl_sol": 0.30566996668125324,
+        "minimum_profit_factor": 3.7308809301157257,
+        "minimum_trades": 40,
+        "minimum_wilson_lower": 0.4219480043605999,
+        "minimum_win_rate": 0.575
+      },
+      "lane": "pu-bagging",
+      "policy": "hold_2000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.9696977462456038,
+      "validation": {
+        "maximum_drawdown_fraction": 0.014522343196921503,
+        "maximum_largest_winner_profit_share": 0.22427625134794232,
+        "minimum_capture_windows": 4,
+        "minimum_expectancy_sol": 0.009797520041490248,
+        "minimum_net_pnl_sol": 0.23514048099576534,
+        "minimum_profit_factor": 4.2884547417686,
+        "minimum_trades": 24,
+        "minimum_wilson_lower": 0.5510017468789357,
+        "minimum_win_rate": 0.75
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-78dbf493b5e903ccfe53da45bd452e7800fefeb9b5f47642691351a87db94f15",
+      "failed_requirements": [
+        "win_rate_at_least_65_percent",
+        "wilson_lower_at_least_45_percent"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.029312301032929682,
+        "maximum_largest_winner_profit_share": 0.0665721346552862,
+        "minimum_capture_windows": 10,
+        "minimum_expectancy_sol": 0.00421199570471139,
+        "minimum_net_pnl_sol": 0.47595551463238905,
+        "minimum_profit_factor": 1.9739774342727407,
+        "minimum_trades": 113,
+        "minimum_wilson_lower": 0.43946105198257673,
+        "minimum_win_rate": 0.5309734513274337
+      },
+      "lane": "intent-hgb-identity",
+      "policy": "hold_5000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.9572459576251617,
+      "validation": {
+        "maximum_drawdown_fraction": 0.02672515969704601,
+        "maximum_largest_winner_profit_share": 0.15071437981104446,
+        "minimum_capture_windows": 4,
+        "minimum_expectancy_sol": 0.012689010376730071,
+        "minimum_net_pnl_sol": 0.5963834877063121,
+        "minimum_profit_factor": 3.8327195358121746,
+        "minimum_trades": 47,
+        "minimum_wilson_lower": 0.5167065950530297,
+        "minimum_win_rate": 0.6595744680851063
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-800b158246617156ed7f12a5c22a5f834d4c1e6bb3b74c2b68e2bce55c87e77b",
+      "failed_requirements": [
+        "win_rate_at_least_65_percent"
+      ],
+      "formula": [
+        [
+          "creator_prior_selection_count",
+          ">=",
+          1.0
+        ],
+        [
+          "fdv_0ms",
+          ">=",
+          3592.972900390625
+        ]
+      ],
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.010206855161435671,
+        "maximum_largest_winner_profit_share": 0.053057191232944896,
+        "minimum_capture_windows": 10,
+        "minimum_expectancy_sol": 0.004175945950830916,
+        "minimum_net_pnl_sol": 0.8811245956253235,
+        "minimum_profit_factor": 3.145506737683599,
+        "minimum_trades": 211,
+        "minimum_wilson_lower": 0.45882946878449915,
+        "minimum_win_rate": 0.5260663507109005
+      },
+      "lane": "rules",
+      "policy": "hold_1000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": null,
+      "validation": {
+        "maximum_drawdown_fraction": 0.011372771918311155,
+        "maximum_largest_winner_profit_share": 0.09765672935569696,
+        "minimum_capture_windows": 4,
+        "minimum_expectancy_sol": 0.005550922292634,
+        "minimum_net_pnl_sol": 0.4773793171665237,
+        "minimum_profit_factor": 3.040904307965299,
+        "minimum_trades": 86,
+        "minimum_wilson_lower": 0.46436012573217667,
+        "minimum_win_rate": 0.5697674418604651
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-64ed75c123a55368afbed90e5233c1791f762dd4a6a2dd18378ea9d7472b4674",
+      "failed_requirements": [
+        "win_rate_at_least_65_percent",
+        "wilson_lower_at_least_45_percent"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.013495580475806901,
+        "maximum_largest_winner_profit_share": 0.10769370092664539,
+        "minimum_capture_windows": 10,
+        "minimum_expectancy_sol": 0.005775272598738397,
+        "minimum_net_pnl_sol": 0.5833025324725791,
+        "minimum_profit_factor": 3.145848564381867,
+        "minimum_trades": 101,
+        "minimum_wilson_lower": 0.42824811910483207,
+        "minimum_win_rate": 0.5247524752475248
+      },
+      "lane": "intent-hgb",
+      "policy": "hold_1000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.9600429096857893,
+      "validation": {
+        "maximum_drawdown_fraction": 0.009649790772017752,
+        "maximum_largest_winner_profit_share": 0.10636147197089264,
+        "minimum_capture_windows": 4,
+        "minimum_expectancy_sol": 0.007758622498457592,
+        "minimum_net_pnl_sol": 0.488793217402828,
+        "minimum_profit_factor": 4.048821004124388,
+        "minimum_trades": 63,
+        "minimum_wilson_lower": 0.43319420640871287,
+        "minimum_win_rate": 0.5555555555555556
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-ca924781ecfedd0bef794772c94c8805aa7de70361e28f6e7e7d927ab26763b0",
+      "failed_requirements": [
+        "win_rate_at_least_65_percent",
+        "wilson_lower_at_least_45_percent"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.0030334937259056454,
+        "maximum_largest_winner_profit_share": 0.2648732506117431,
+        "minimum_capture_windows": 7,
+        "minimum_expectancy_sol": 0.0007792726992714565,
+        "minimum_net_pnl_sol": 0.01636472668470068,
+        "minimum_profit_factor": 1.8762633935811621,
+        "minimum_trades": 21,
+        "minimum_wilson_lower": 0.28343712296762946,
+        "minimum_win_rate": 0.47619047619047616
+      },
+      "lane": "profit-cat",
+      "policy": "hold_30000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.8573614179827267,
+      "validation": {
+        "maximum_drawdown_fraction": 0.0019025634764005212,
+        "maximum_largest_winner_profit_share": 0.1996890499291488,
+        "minimum_capture_windows": 4,
+        "minimum_expectancy_sol": 0.006966033465001699,
+        "minimum_net_pnl_sol": 0.1044905019750253,
+        "minimum_profit_factor": 15.093026912669176,
+        "minimum_trades": 15,
+        "minimum_wilson_lower": 0.6211750079348376,
+        "minimum_win_rate": 0.8666666666666667
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-7a7f9edd2189509b253e9df47111de802ad27ff3c645cd8d5244ef41b555ddae",
+      "failed_requirements": [
+        "win_rate_at_least_65_percent",
+        "wilson_lower_at_least_45_percent"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.007949773232994398,
+        "maximum_largest_winner_profit_share": 0.3361177166681315,
+        "minimum_capture_windows": 7,
+        "minimum_expectancy_sol": 0.0007118589002452574,
+        "minimum_net_pnl_sol": 0.01494903690514926,
+        "minimum_profit_factor": 1.4220005392040052,
+        "minimum_trades": 21,
+        "minimum_wilson_lower": 0.28343712296762946,
+        "minimum_win_rate": 0.47619047619047616
+      },
+      "lane": "profit-xgb",
+      "policy": "hold_30000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.8972077665925032,
+      "validation": {
+        "maximum_drawdown_fraction": 0.00018200151529466669,
+        "maximum_largest_winner_profit_share": 0.227320541618665,
+        "minimum_capture_windows": 3,
+        "minimum_expectancy_sol": 0.008112112016113657,
+        "minimum_net_pnl_sol": 0.09734534419336383,
+        "minimum_profit_factor": 174.18013879211802,
+        "minimum_trades": 12,
+        "minimum_wilson_lower": 0.6461140782014047,
+        "minimum_win_rate": 0.9166666666666666
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-3258cef1bdf6b1578cb7b319632fee897cccc0b60926a55fa375730149d2e9ad",
+      "failed_requirements": [
+        "win_rate_at_least_65_percent",
+        "wilson_lower_at_least_45_percent"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.008311542363512111,
+        "maximum_largest_winner_profit_share": 0.3326089019118338,
+        "minimum_capture_windows": 9,
+        "minimum_expectancy_sol": 0.00859473687621203,
+        "minimum_net_pnl_sol": 0.22346315878151213,
+        "minimum_profit_factor": 3.4219627573755833,
+        "minimum_trades": 26,
+        "minimum_wilson_lower": 0.28755582695234905,
+        "minimum_win_rate": 0.46153846153846156
+      },
+      "lane": "multitask",
+      "policy": "hold_2000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.8588689896419294,
+      "validation": {
+        "maximum_drawdown_fraction": 0.004309641066372771,
+        "maximum_largest_winner_profit_share": 0.21551176661444446,
+        "minimum_capture_windows": 4,
+        "minimum_expectancy_sol": 0.013965325502721582,
+        "minimum_net_pnl_sol": 0.20947988254082395,
+        "minimum_profit_factor": 17.62298522758586,
+        "minimum_trades": 15,
+        "minimum_wilson_lower": 0.5481406466534955,
+        "minimum_win_rate": 0.8
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-6ba66d653b616b2afeaafb2e276f12816c75b9824926e445bd993dba4e2acc74",
+      "failed_requirements": [
+        "at_least_20_trades",
+        "win_rate_at_least_65_percent",
+        "wilson_lower_at_least_45_percent"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.009959386494118167,
+        "maximum_largest_winner_profit_share": 0.40113126191001436,
+        "minimum_capture_windows": 8,
+        "minimum_expectancy_sol": 0.003195658086910411,
+        "minimum_net_pnl_sol": 0.05752184556438733,
+        "minimum_profit_factor": 1.8611638925478788,
+        "minimum_trades": 18,
+        "minimum_wilson_lower": 0.24559231101389123,
+        "minimum_win_rate": 0.4444444444444444
+      },
+      "lane": "multitask-identity",
+      "policy": "hold_2000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.8591421252959941,
+      "validation": {
+        "maximum_drawdown_fraction": 0.0,
+        "maximum_largest_winner_profit_share": 0.2139377757462075,
+        "minimum_capture_windows": 4,
+        "minimum_expectancy_sol": 0.018731854792278735,
+        "minimum_net_pnl_sol": 0.22478225750734504,
+        "minimum_profit_factor": 999.0,
+        "minimum_trades": 12,
+        "minimum_wilson_lower": 0.7574992425007574,
+        "minimum_win_rate": 1.0
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-79d63f458659f43d589cc0f6a96a4db9fded1df912fd10ec0cc943f4c398f324",
+      "failed_requirements": [
+        "win_rate_at_least_65_percent",
+        "wilson_lower_at_least_45_percent"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.007701235768516411,
+        "maximum_largest_winner_profit_share": 0.14549849071180904,
+        "minimum_capture_windows": 10,
+        "minimum_expectancy_sol": 0.0034375928931237973,
+        "minimum_net_pnl_sol": 0.11687815836620974,
+        "minimum_profit_factor": 2.0856870021413023,
+        "minimum_trades": 34,
+        "minimum_wilson_lower": 0.2888324021529675,
+        "minimum_win_rate": 0.4411764705882353
+      },
+      "lane": "intent-forest",
+      "policy": "hold_2000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.9146307727244329,
+      "validation": {
+        "maximum_drawdown_fraction": 0.007374304029064626,
+        "maximum_largest_winner_profit_share": 0.15172301316211237,
+        "minimum_capture_windows": 4,
+        "minimum_expectancy_sol": 0.01526600609187921,
+        "minimum_net_pnl_sol": 0.38165015229698085,
+        "minimum_profit_factor": 12.686681300112152,
+        "minimum_trades": 25,
+        "minimum_wilson_lower": 0.6534598601976184,
+        "minimum_win_rate": 0.84
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-ceded6afd1af19569616f86451f3e0cf0d0dbb4ed45c5a507945484277ed6ace",
+      "failed_requirements": [
+        "win_rate_at_least_65_percent",
+        "wilson_lower_at_least_45_percent",
+        "profit_factor_at_least_1_25",
+        "pnl_positive_every_latency",
+        "expectancy_positive_every_latency"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.007588449148420637,
+        "maximum_largest_winner_profit_share": 0.19671934750786452,
+        "minimum_capture_windows": 10,
+        "minimum_expectancy_sol": -5.849993157079273e-05,
+        "minimum_net_pnl_sol": -0.0021644974681187534,
+        "minimum_profit_factor": 0.9608985323179233,
+        "minimum_trades": 37,
+        "minimum_wilson_lower": 0.2634629583994014,
+        "minimum_win_rate": 0.40540540540540543
+      },
+      "lane": "profit-hgb",
+      "policy": "hold_30000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.8550717728114778,
+      "validation": {
+        "maximum_drawdown_fraction": 0.0036221313787257775,
+        "maximum_largest_winner_profit_share": 0.46179720867470736,
+        "minimum_capture_windows": 3,
+        "minimum_expectancy_sol": 0.012651167304758255,
+        "minimum_net_pnl_sol": 0.2530233460951652,
+        "minimum_profit_factor": 22.70361034467747,
+        "minimum_trades": 20,
+        "minimum_wilson_lower": 0.6989617935882066,
+        "minimum_win_rate": 0.9
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-079032ea70aa8196a7354bcaf4cc4b27c4e26e1b838f3dfa336c2c846a99e2f4",
+      "failed_requirements": [
+        "at_least_20_trades",
+        "win_rate_at_least_65_percent",
+        "wilson_lower_at_least_45_percent"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.009320342490261329,
+        "maximum_largest_winner_profit_share": 0.3567570119689809,
+        "minimum_capture_windows": 7,
+        "minimum_expectancy_sol": 0.004000670952000572,
+        "minimum_net_pnl_sol": 0.06401073523200917,
+        "minimum_profit_factor": 1.9723195595018999,
+        "minimum_trades": 16,
+        "minimum_wilson_lower": 0.18480982554752803,
+        "minimum_win_rate": 0.375
+      },
+      "lane": "intent-xgb",
+      "policy": "hold_2000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.9896029829978943,
+      "validation": {
+        "maximum_drawdown_fraction": 0.002953853322659116,
+        "maximum_largest_winner_profit_share": 0.15964312276041046,
+        "minimum_capture_windows": 4,
+        "minimum_expectancy_sol": 0.014556170187614303,
+        "minimum_net_pnl_sol": 0.2911234037522856,
+        "minimum_profit_factor": 22.540819169242035,
+        "minimum_trades": 20,
+        "minimum_wilson_lower": 0.6989617935882066,
+        "minimum_win_rate": 0.9
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-ac37d40f8e6a1c72e06b9dae6c8aa4466c2d07310acdfb32bf7746461bb27e9d",
+      "failed_requirements": [
+        "at_least_20_trades",
+        "win_rate_at_least_65_percent",
+        "wilson_lower_at_least_45_percent",
+        "profit_factor_at_least_1_25",
+        "pnl_positive_every_latency",
+        "expectancy_positive_every_latency",
+        "largest_winner_at_most_50_percent"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.006864857334865526,
+        "maximum_largest_winner_profit_share": 0.9055961365609724,
+        "minimum_capture_windows": 4,
+        "minimum_expectancy_sol": -0.0013583362007258887,
+        "minimum_net_pnl_sol": -0.00950835340508105,
+        "minimum_profit_factor": 0.5628394473389415,
+        "minimum_trades": 7,
+        "minimum_wilson_lower": 0.08221716570901552,
+        "minimum_win_rate": 0.2857142857142857
+      },
+      "lane": "profit-hgb-identity",
+      "policy": "tp150_sl80",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.884107536004043,
+      "validation": {
+        "maximum_drawdown_fraction": 0.0022392542155084635,
+        "maximum_largest_winner_profit_share": 0.4068163597367051,
+        "minimum_capture_windows": 3,
+        "minimum_expectancy_sol": 0.007831668091422784,
+        "minimum_net_pnl_sol": 0.06265334473138218,
+        "minimum_profit_factor": 10.172396446314169,
+        "minimum_trades": 8,
+        "minimum_wilson_lower": 0.5291051942301385,
+        "minimum_win_rate": 0.875
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-2cf5b5687bb6ff8d6bc9de851a370764fad492937ba0adb4cbfccf0fd6091637",
+      "failed_requirements": [
+        "win_rate_at_least_65_percent",
+        "wilson_lower_at_least_45_percent",
+        "profit_factor_at_least_1_25",
+        "pnl_positive_every_latency",
+        "expectancy_positive_every_latency"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.02603111379620909,
+        "maximum_largest_winner_profit_share": 0.3358176356133507,
+        "minimum_capture_windows": 7,
+        "minimum_expectancy_sol": -0.0014148260168988127,
+        "minimum_net_pnl_sol": -0.042444780506964985,
+        "minimum_profit_factor": 0.683087671237752,
+        "minimum_trades": 30,
+        "minimum_wilson_lower": 0.14182495553910618,
+        "minimum_win_rate": 0.26666666666666666
+      },
+      "lane": "profit-logistic",
+      "policy": "hold_1000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.93223366601907,
+      "validation": {
+        "maximum_drawdown_fraction": 0.0020996038745405288,
+        "maximum_largest_winner_profit_share": 0.3392808538222056,
+        "minimum_capture_windows": 4,
+        "minimum_expectancy_sol": 0.011056150879731068,
+        "minimum_net_pnl_sol": 0.08844920703784886,
+        "minimum_profit_factor": 14.61141608163118,
+        "minimum_trades": 8,
+        "minimum_wilson_lower": 0.5291051942301385,
+        "minimum_win_rate": 0.875
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-ff7a5547f1db2c6064765be08bf260389d870edbef119f2c422144b577a8e7f9",
+      "failed_requirements": [
+        "win_rate_at_least_65_percent",
+        "wilson_lower_at_least_45_percent",
+        "profit_factor_at_least_1_25",
+        "pnl_positive_every_latency",
+        "expectancy_positive_every_latency"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.007801847709631719,
+        "maximum_largest_winner_profit_share": 0.39558498553284227,
+        "minimum_capture_windows": 10,
+        "minimum_expectancy_sol": -0.0005470601073552417,
+        "minimum_net_pnl_sol": -0.019694163864788283,
+        "minimum_profit_factor": 0.5121330933771319,
+        "minimum_trades": 36,
+        "minimum_wilson_lower": 0.11716192974839595,
+        "minimum_win_rate": 0.2222222222222222
+      },
+      "lane": "profit-forest",
+      "policy": "tp200_sl80",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.7875559350139703,
+      "validation": {
+        "maximum_drawdown_fraction": 0.002239254215508432,
+        "maximum_largest_winner_profit_share": 0.13568335757717098,
+        "minimum_capture_windows": 4,
+        "minimum_expectancy_sol": 0.006949492553611317,
+        "minimum_net_pnl_sol": 0.20848477660834064,
+        "minimum_profit_factor": 12.195785405014329,
+        "minimum_trades": 30,
+        "minimum_wilson_lower": 0.6269395261897257,
+        "minimum_win_rate": 0.8
+      }
+    },
+    {
+      "experiment_id": "e4x-allout-8df36fd56201cc0570e07effb8e120d18435bde37d686dd98a809edd9a743651",
+      "failed_requirements": [
+        "win_rate_at_least_65_percent",
+        "wilson_lower_at_least_45_percent",
+        "profit_factor_at_least_1_25"
+      ],
+      "formula": null,
+      "historical_pass": false,
+      "holdout": {
+        "maximum_drawdown_fraction": 0.05901941934871182,
+        "maximum_largest_winner_profit_share": 0.2529838614622819,
+        "minimum_capture_windows": 10,
+        "minimum_expectancy_sol": 0.0004612116960614829,
+        "minimum_net_pnl_sol": 0.10285020822171198,
+        "minimum_profit_factor": 1.1715752329385758,
+        "minimum_trades": 223,
+        "minimum_wilson_lower": 0.17038437070577073,
+        "minimum_win_rate": 0.21973094170403587
+      },
+      "lane": "intent-logistic",
+      "policy": "hold_2000ms",
+      "status": "NOT_CONCLUSIVE",
+      "threshold": 0.9994596303575102,
+      "validation": {
+        "maximum_drawdown_fraction": 0.004154675387484849,
+        "maximum_largest_winner_profit_share": 0.18091612559609982,
+        "minimum_capture_windows": 3,
+        "minimum_expectancy_sol": 0.012226032150909713,
+        "minimum_net_pnl_sol": 0.24452064301819387,
+        "minimum_profit_factor": 13.949238086854015,
+        "minimum_trades": 20,
+        "minimum_wilson_lower": 0.4810232237710205,
+        "minimum_win_rate": 0.7
+      }
+    }
+  ],
+  "production_paths_changed": 0,
+  "status": "NOT_CONCLUSIVE",
+  "unique_experiments": 20,
+  "version": "e4-v12-allout-profit-hazard-tournament-v1",
+  "winner": {
+    "experiment_id": "e4x-allout-840d3672e788209fbbc43c4507de2baa6ea478a72253668ee06794b2eeefb41a",
+    "failed_requirements": [
+      "at_least_20_trades",
+      "wilson_lower_at_least_45_percent"
+    ],
+    "formula": null,
+    "historical_pass": false,
+    "holdout": {
+      "maximum_drawdown_fraction": 0.00746778900732314,
+      "maximum_largest_winner_profit_share": 0.18332598040412315,
+      "minimum_capture_windows": 4,
+      "minimum_expectancy_sol": 0.012213126959668199,
+      "minimum_net_pnl_sol": 0.183196904395023,
+      "minimum_profit_factor": 7.3945418987138405,
+      "minimum_trades": 15,
+      "minimum_wilson_lower": 0.4171312515121298,
+      "minimum_win_rate": 0.6666666666666666
+    },
+    "lane": "intent-extra",
+    "policy": "hold_2000ms",
+    "status": "NOT_CONCLUSIVE",
+    "threshold": 0.9783764652924583,
+    "validation": {
+      "maximum_drawdown_fraction": 0.004154675387484844,
+      "maximum_largest_winner_profit_share": 0.24519542224041938,
+      "minimum_capture_windows": 3,
+      "minimum_expectancy_sol": 0.017987612225819516,
+      "minimum_net_pnl_sol": 0.17987612225819527,
+      "minimum_profit_factor": 16.630878889028075,
+      "minimum_trades": 10,
+      "minimum_wilson_lower": 0.5958436145024277,
+      "minimum_win_rate": 0.9
+    }
+  }
+}
