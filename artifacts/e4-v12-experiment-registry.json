@@ -7913,13 +7913,14 @@
       "dataset_version": "rolling-runs:34281858070,34244224832,34201101121,34186192299,34175839320,34167878699,34159449923,34150939561,34138377553,34123647690,34099929487,34084120627,34073802862,34063856134,33931301493,33920757002,33911477030,33897368379,33876345997,33852482054",
       "dispatch_attempts": 1,
       "drawdown": null,
-      "duplicate_suppression_count": 0,
+      "duplicate_suppression_count": 1,
       "evidence_epoch": "v12-direct-e4-parameter-copy-2026-09-03",
       "exact_artifact_paths": [
+        "https://github.com/profitpirate/Gambit-Jr/actions/runs/34294586756",
         "codex/e4-v12-sub10ms-entry-research-20260905:.github/workflows/e4-v12-social-golden.yml"
       ],
       "experiment_id": "e4x-8155a41a1dce894f0dcfb2bf81e229a2ff0ddb58d812a7cc418924a837b1ce38",
-      "failure_classification": null,
+      "failure_classification": "HOLDOUT_COLLAPSE",
       "identity": {
         "bankroll": {
           "definition_committed_by": "8a53d5c5579e03dd5f49c0b8ef90411b818a5852319ca5bdd866c0d9b5f6a74a",
@@ -8025,28 +8026,30 @@
         "source_code_fingerprint": "9e4382f8ad34ca14bda26c480f024bdaa898faf992470035121d80bad2145ef0",
         "thesis_family_identifier": "social"
       },
-      "last_duplicate_failure_classification": null,
+      "last_duplicate_failure_classification": "DUPLICATE_EXPERIMENT",
       "latency_results": null,
-      "latest_run_id": null,
-      "latest_run_url": null,
+      "latest_run_id": 34294586756,
+      "latest_run_url": "https://github.com/profitpirate/Gambit-Jr/actions/runs/34294586756",
       "live_metrics": null,
       "live_status": null,
-      "material_change_required_before_rerun": null,
+      "material_change_required_before_rerun": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "reason_for_retirement": null,
+      "reason_for_retirement": "workflow completed without an untouched-live golden pass",
       "recall": null,
       "ref": "codex/e4-v12-sub10ms-entry-research-20260905",
-      "retired": false,
+      "retired": true,
       "retry_not_before": null,
       "selection_precision": null,
       "source_commit": "d3c05bdaf788d60f5ccf7d1dc0d8c0ccbc1ef8ac",
-      "state": "DISPATCHED",
-      "suppressed_duplicate_run_ids": [],
+      "state": "COMPLETED_FAILED",
+      "suppressed_duplicate_run_ids": [
+        34294586756
+      ],
       "thesis_family": "social",
       "trade_count": null,
       "train_metrics": null,
-      "updated_timestamp": "2026-09-09T00:20:26.612353Z",
+      "updated_timestamp": "2026-09-09T00:42:49.200605Z",
       "validation_metrics": null,
       "wilson_lower_bound": null,
       "workflow": "e4-v12-social-golden.yml",
@@ -14386,6 +14389,305 @@
       "validation_metrics": null,
       "wilson_lower_bound": null,
       "workflow": "e4-v12-reactive-lattice-golden.yml",
+      "wr": null
+    },
+    {
+      "chronological_holdout_metrics": null,
+      "created_timestamp": "2026-09-09T00:42:50.603985Z",
+      "dataset_source_manifest": {
+        "policy": "rolling-successful-evidence-risk-set",
+        "runs": [
+          {
+            "created_at": "2026-09-08T21:40:04Z",
+            "head_sha": "8d318ffd34ebb4195c3f3c224befc3b81741d079",
+            "run_id": 34281858070,
+            "updated_at": "2026-09-08T23:57:31Z"
+          },
+          {
+            "created_at": "2026-09-08T15:21:30Z",
+            "head_sha": "6fa42d38ed9651be5ed6d6afc1da4d6238407848",
+            "run_id": 34244224832,
+            "updated_at": "2026-09-08T17:35:57Z"
+          },
+          {
+            "created_at": "2026-09-08T07:47:24Z",
+            "head_sha": "2b55ff1535a4ce3cc77cda507657acb4589589b9",
+            "run_id": 34201101121,
+            "updated_at": "2026-09-08T11:11:37Z"
+          },
+          {
+            "created_at": "2026-09-08T04:12:49Z",
+            "head_sha": "657ab3e8b3f2414f3863499c3e0b1eab1410ff52",
+            "run_id": 34186192299,
+            "updated_at": "2026-09-08T07:46:32Z"
+          },
+          {
+            "created_at": "2026-09-08T01:11:52Z",
+            "head_sha": "cb25c4fc4ad7a2f5c2caaf9021ca0a1add445459",
+            "run_id": 34175839320,
+            "updated_at": "2026-09-08T04:03:23Z"
+          },
+          {
+            "created_at": "2026-09-07T22:47:46Z",
+            "head_sha": "378f61062edb66bcd25d614b5231b0bc6a409184",
+            "run_id": 34167878699,
+            "updated_at": "2026-09-08T01:09:56Z"
+          },
+          {
+            "created_at": "2026-09-07T20:27:01Z",
+            "head_sha": "5e737e61feb30705889c9cd1bbc86a86f00c604c",
+            "run_id": 34159449923,
+            "updated_at": "2026-09-07T22:41:53Z"
+          },
+          {
+            "created_at": "2026-09-07T18:16:02Z",
+            "head_sha": "7863004d057ed1f2a3abc714fa9c0ec103a20e1e",
+            "run_id": 34150939561,
+            "updated_at": "2026-09-07T20:13:53Z"
+          },
+          {
+            "created_at": "2026-09-07T15:27:09Z",
+            "head_sha": "b78b75d5fe30bd231e9767105744863c72f068ae",
+            "run_id": 34138377553,
+            "updated_at": "2026-09-07T18:02:37Z"
+          },
+          {
+            "created_at": "2026-09-07T12:45:53Z",
+            "head_sha": "b2942d4a8fdbd7d5ce52cbb61ee39006c88b9032",
+            "run_id": 34123647690,
+            "updated_at": "2026-09-07T15:22:35Z"
+          },
+          {
+            "created_at": "2026-09-07T08:18:46Z",
+            "head_sha": "17459f6a2c7a5092abfc7dcc0fb9ce6028e21069",
+            "run_id": 34099929487,
+            "updated_at": "2026-09-07T12:24:44Z"
+          },
+          {
+            "created_at": "2026-09-07T04:42:47Z",
+            "head_sha": "5e19667318b55446c0d13b9e7a846b28ada28d8c",
+            "run_id": 34084120627,
+            "updated_at": "2026-09-07T08:15:37Z"
+          },
+          {
+            "created_at": "2026-09-07T01:40:57Z",
+            "head_sha": "dc79919a847186eafa912f415de71938f5ad2b68",
+            "run_id": 34073802862,
+            "updated_at": "2026-09-07T04:41:47Z"
+          },
+          {
+            "created_at": "2026-09-06T22:23:02Z",
+            "head_sha": "b2bf74e9153e671615035a6f6e63eacbbe970dfb",
+            "run_id": 34063856134,
+            "updated_at": "2026-09-07T01:34:56Z"
+          },
+          {
+            "created_at": "2026-09-04T23:56:26Z",
+            "head_sha": "3d7b391f238593d0050368439d3fc5a60e37d9a7",
+            "run_id": 33931301493,
+            "updated_at": "2026-09-05T03:13:18Z"
+          },
+          {
+            "created_at": "2026-09-04T21:22:01Z",
+            "head_sha": "c074486be7382dec9e788204897d84422e45c4a4",
+            "run_id": 33920757002,
+            "updated_at": "2026-09-04T23:35:02Z"
+          },
+          {
+            "created_at": "2026-09-04T19:30:05Z",
+            "head_sha": "2a5c180dd8fcf87271909802372196b53a14b502",
+            "run_id": 33911477030,
+            "updated_at": "2026-09-04T21:09:52Z"
+          },
+          {
+            "created_at": "2026-09-04T16:50:35Z",
+            "head_sha": "6c9a01460202e9f94d6a69d4733b6721aa319c5d",
+            "run_id": 33897368379,
+            "updated_at": "2026-09-04T19:06:32Z"
+          },
+          {
+            "created_at": "2026-09-04T13:07:41Z",
+            "head_sha": "7ffd5214058087cdcc8f811c5030d543b695f371",
+            "run_id": 33876345997,
+            "updated_at": "2026-09-04T15:24:17Z"
+          },
+          {
+            "created_at": "2026-09-04T08:14:29Z",
+            "head_sha": "50b0e9c37719b524546722078473b78bf6a20892",
+            "run_id": 33852482054,
+            "updated_at": "2026-09-04T12:12:40Z"
+          }
+        ],
+        "source_ref": "codex/e4-v12-selection-reconstruction"
+      },
+      "dataset_version": "rolling-runs:34281858070,34244224832,34201101121,34186192299,34175839320,34167878699,34159449923,34150939561,34138377553,34123647690,34099929487,34084120627,34073802862,34063856134,33931301493,33920757002,33911477030,33897368379,33876345997,33852482054",
+      "dispatch_attempts": 1,
+      "drawdown": null,
+      "duplicate_suppression_count": 0,
+      "evidence_epoch": "v12-direct-e4-parameter-copy-2026-09-03",
+      "exact_artifact_paths": [
+        "codex/e4-v12-sub10ms-entry-research-20260905:.github/workflows/e4-v12-failed-aware-v3-golden.yml"
+      ],
+      "experiment_id": "e4x-fe3675a93896c74ade27bcd89db47bdb055f5f7f6169b7a1ed403806b040af9f",
+      "failure_classification": null,
+      "identity": {
+        "bankroll": {
+          "definition_committed_by": "17b18406a99feacb2e73dce6ab08fdb8f3a0a86437a3f27b24278cca69762844",
+          "starting_balance_sol": 3.0
+        },
+        "candidate_risk_set_policy": "frozen chronological launch risk sets",
+        "causal_horizon": "0/1/2/5/10ms causal execution replay",
+        "chronological_split": {
+          "definition_committed_by": "17b18406a99feacb2e73dce6ab08fdb8f3a0a86437a3f27b24278cca69762844",
+          "policy": "strict chronological train/validation/untouched-holdout"
+        },
+        "dataset_source_manifest_fingerprint": "ae9ffe3003a95a7cfc19c0a4326425e5a3ba48780361301fea1a62f59aee610d",
+        "evidence_epoch": "v12-direct-e4-parameter-copy-2026-09-03",
+        "execution_policy": {
+          "definition_committed_by": "17b18406a99feacb2e73dce6ab08fdb8f3a0a86437a3f27b24278cca69762844",
+          "policy": "paper replay only; immutable V12 execution semantics"
+        },
+        "exit_policy": {
+          "definition_committed_by": "17b18406a99feacb2e73dce6ab08fdb8f3a0a86437a3f27b24278cca69762844",
+          "policy": "workflow-defined causal exit policy"
+        },
+        "feature_set_fingerprint": "c92cbcad07f6ee9f761720952953af4edf75745705567360d01c5d1711c466f2",
+        "fee_model": {
+          "definition_committed_by": "17b18406a99feacb2e73dce6ab08fdb8f3a0a86437a3f27b24278cca69762844",
+          "policy": "workflow-defined Solana fees and priority fees"
+        },
+        "full_parameters": {
+          "workflow_definition_sha256": "17b18406a99feacb2e73dce6ab08fdb8f3a0a86437a3f27b24278cca69762844",
+          "workflow_parameter_contract": [
+            "PYTHONUNBUFFERED: \"1\"",
+            "GH_TOKEN: ${{ github.token }}",
+            "REPO: profitpirate/Gambit-Jr",
+            "SOURCE_BRANCH: codex/e4-v12-selection-reconstruction",
+            "RESEARCH_BRANCH: codex/e4-v12-sub10ms-entry-research-20260905",
+            "E4_PIPELINES_BACKGROUND: \"false\"",
+            "E4_SOL_USD_FALLBACK: \"150\"",
+            "E4_BUILDER_COMMAND: \"node tools/e4-builder/strict-race-proxy-v12.mjs\"",
+            "E4_BUILDER_PRELOAD: \"${{ github.workspace }}/tools/e4-builder/fast-preload-v4.mjs\"",
+            "E4_V12_BUY_SLIPPAGE_BPS: \"800\"",
+            "E4_V12_MAX_OUTPUT_SHORTFALL_BPS: \"800\"",
+            "horizon: ${{ steps.select.outputs.horizon }}",
+            "- run: python -m pip install --upgrade pip",
+            "run: npm install --omit=dev",
+            "node --check tools/e4-builder/strict-race-proxy-v12.mjs",
+            "E4_BUILDER_ALLOW_REMOTE_FALLBACK=false node tools/e4-builder/race-proxy-v3.mjs --self-test",
+            "--iterations 1000 \\",
+            "--warmup 100 \\",
+            "--maximum-p95-ms 10 \\",
+            "--output artifacts/e4-v12-end-to-end-latency.json",
+            "--source matched/docs \\",
+            "--source matched/models \\",
+            "--source matched/research \\",
+            "--output artifacts/e4-v12-failed-intents.json",
+            "gh run list --repo \"$REPO\" \\",
+            "--workflow e4-v12-selection-certification.yml \\",
+            "--branch \"$SOURCE_BRANCH\" \\",
+            "--status success \\",
+            "--limit 18 \\",
+            "--json databaseId,createdAt \\",
+            "--jq 'sort_by(.createdAt) | .[-10:] | .[].databaseId' > /tmp/run_ids",
+            "gh run download \"$run_id\" --repo \"$REPO\" \\",
+            "--name \"e4-v12-forward-$run_id\" \\",
+            "--dir \"historical/$run_id\"",
+            "while IFS=$'\\t' read -r run_id batch events; do args+=(--events \"$events\"); done < /tmp/pairs.tsv",
+            "--output artifacts/e4-v12-curve-unit-audit.json",
+            "while IFS=$'\\t' read -r run_id batch events; do args+=(--pair \"$batch:$events\"); done < /tmp/pairs.tsv",
+            "--mode search \\",
+            "--horizon-ms \"$horizon\" \\",
+            "--latencies 0,1,2,5,10 \\",
+            "--starting-balance-sol 3 \\",
+            "--minimum-win-rate 0.65 \\",
+            "--minimum-profit-factor 1.25 \\",
+            "--output \"artifacts/report-$horizon.json\" \\",
+            "--model-output \"artifacts/model-$horizon.json\" \\",
+            "--predictions-output \"artifacts/predictions-$horizon.json\" || true",
+            "- run: python -m pip install --upgrade pip",
+            "run: npm install --omit=dev",
+            "gh run list --repo \"$REPO\" --workflow e4-v12-selection-certification.yml --branch \"$SOURCE_BRANCH\" --status success --limit 18 --json databaseId,createdAt --jq 'sort_by(.createdAt) | .[-10:] | .[].databaseId' > /tmp/run_ids",
+            "gh run download \"$run_id\" --repo \"$REPO\" --name \"e4-v12-forward-$run_id\" --dir \"historical/$run_id\"",
+            "--target-launches 3000 \\",
+            "--capture-seconds 14400 \\",
+            "--tail-seconds 300 \\",
+            "--heartbeat-seconds 60 \\",
+            "--minimum-launches 3000 \\",
+            "--wallet-signatures 1500 \\",
+            "--builder-probes 250 \\",
+            "--testnet-route-probes 0 \\",
+            "--stress-iterations 0 \\",
+            "--output artifacts/live-batch.json",
+            "while IFS=$'\\t' read -r run_id batch events; do args+=(--pair \"$batch:$events\"); done < /tmp/history-pairs.tsv",
+            "args+=(--pair \"artifacts/live-batch.json:artifacts/live-batch-live-events.jsonl\")",
+            "--mode apply \\",
+            "--horizon-ms \"${{ needs.historical.outputs.horizon }}\" \\",
+            "--model-input artifacts/selected-model.json \\",
+            "--output artifacts/live-apply.json \\",
+            "--model-output artifacts/live-unused.json \\",
+            "--predictions-output artifacts/live-predictions.json",
+            "--batch artifacts/live-batch.json \\",
+            "--events artifacts/live-batch-live-events.jsonl \\",
+            "--predictions artifacts/live-predictions.json \\",
+            "--latencies 0,1,2,5,10 \\",
+            "--starting-balance-sol 3 \\",
+            "--entry-fraction 0.0185 \\",
+            "--fee-bps 125 \\",
+            "--max-output-shortfall-bps \"$(cat artifacts/live-guard-bps.txt)\" \\",
+            "--confirmation-ms 1500 \\",
+            "--max-concurrent 2 \\",
+            "--output artifacts/live-economics.json",
+            "if ! git diff --cached --quiet; then"
+          ]
+        },
+        "latency_assumptions": {
+          "definition_committed_by": "17b18406a99feacb2e73dce6ab08fdb8f3a0a86437a3f27b24278cca69762844",
+          "replay_ms": [
+            0,
+            1,
+            2,
+            5,
+            10
+          ]
+        },
+        "model_family": "failed-aware causal selector",
+        "output_guard": {
+          "definition_committed_by": "17b18406a99feacb2e73dce6ab08fdb8f3a0a86437a3f27b24278cca69762844",
+          "policy": "V12 bounded output deterioration guard"
+        },
+        "position_sizing": {
+          "definition_committed_by": "17b18406a99feacb2e73dce6ab08fdb8f3a0a86437a3f27b24278cca69762844",
+          "policy": "workflow-defined bounded position sizing"
+        },
+        "source_code_fingerprint": "f93a36410a4a736e7820f804929b83f4aca80684bfaefc220d927370f559eefa",
+        "thesis_family_identifier": "failed-aware-preimpact-v3"
+      },
+      "last_duplicate_failure_classification": null,
+      "latency_results": null,
+      "latest_run_id": null,
+      "latest_run_url": null,
+      "live_metrics": null,
+      "live_status": null,
+      "material_change_required_before_rerun": null,
+      "pnl": null,
+      "profit_factor": null,
+      "reason_for_retirement": null,
+      "recall": null,
+      "ref": "codex/e4-v12-sub10ms-entry-research-20260905",
+      "retired": false,
+      "retry_not_before": null,
+      "selection_precision": null,
+      "source_commit": "d3c05bdaf788d60f5ccf7d1dc0d8c0ccbc1ef8ac",
+      "state": "DISPATCHED",
+      "suppressed_duplicate_run_ids": [],
+      "thesis_family": "failed-aware-preimpact-v3",
+      "trade_count": null,
+      "train_metrics": null,
+      "updated_timestamp": "2026-09-09T00:42:50.603985Z",
+      "validation_metrics": null,
+      "wilson_lower_bound": null,
+      "workflow": "e4-v12-failed-aware-v3-golden.yml",
       "wr": null
     }
   ],
