@@ -579,6 +579,7 @@ def certify(root: Path, cache: Path, frozen_path: Path) -> dict[str, Any]:
         horizons=(horizon,),
         certification_policy_index=policy_index,
     )
+    holdout = with_causal_market_context(holdout)
     scores = score_family(models, holdout, str(candidate["model_family"]))
     economics = {
         str(latency): base.simulate_predictions(
