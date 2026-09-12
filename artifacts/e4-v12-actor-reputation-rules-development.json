@@ -1,0 +1,3998 @@
+{
+  "actor_audit_fingerprint": "f733d0c61c49d16519383ae7e05d59012974fbf503c16f6bd2d2af4ebe692e89",
+  "buyer_rules_evaluated": 432,
+  "creator_rules_evaluated": 120,
+  "experiment_id": "e4x-d965ad0ebb5d6f3f436507669b3ee9543f915eaa3d3d7e3cad5996be7460047c",
+  "identity": {
+    "bankroll": 3.0,
+    "candidate_risk_set_policy": "buyer|known=2|fraction=0.50|history=5|wr=0.60|pnl=0.010|positive=0.50",
+    "causal_horizon_ms": 250,
+    "chronological_split": {
+      "development_windows": [
+        "33605109571",
+        "33627431540",
+        "33644544746",
+        "33656916992",
+        "33669514091",
+        "33681664773",
+        "33692043170",
+        "33704841852",
+        "33716649440",
+        "33741470396",
+        "33769636983",
+        "33781389703",
+        "33792881280",
+        "33810753028",
+        "33822988156",
+        "33835575805",
+        "33852482054",
+        "33876345997",
+        "33897368379",
+        "33911477030",
+        "33920757002",
+        "33931301493",
+        "34063856134",
+        "34073802862",
+        "34084120627",
+        "34099929487",
+        "34123647690",
+        "34138377553"
+      ],
+      "future_holdout": "strictly later evidence still collecting",
+      "walk_forward_validation_windows": [
+        "34150939561",
+        "34159449923",
+        "34167878699",
+        "34175839320",
+        "34186192299",
+        "34201101121",
+        "34244224832",
+        "34281858070",
+        "34310065776",
+        "34348537141",
+        "34388016481",
+        "34425005585",
+        "34470147967",
+        "34512979177",
+        "34547229611",
+        "34586174670",
+        "34627236811",
+        "34660606300",
+        "34684115937",
+        "34709541936"
+      ]
+    },
+    "dataset_source_manifest_fingerprint": "5e5f64f8b363e778dc3930c7dce779091d48f5a7bbcacf6e1ab876d2cdce68ef",
+    "evidence_epoch": [
+      "33605109571",
+      "33627431540",
+      "33644544746",
+      "33656916992",
+      "33669514091",
+      "33681664773",
+      "33692043170",
+      "33704841852",
+      "33716649440",
+      "33741470396",
+      "33769636983",
+      "33781389703",
+      "33792881280",
+      "33810753028",
+      "33822988156",
+      "33835575805",
+      "33852482054",
+      "33876345997",
+      "33897368379",
+      "33911477030",
+      "33920757002",
+      "33931301493",
+      "34063856134",
+      "34073802862",
+      "34084120627",
+      "34099929487",
+      "34123647690",
+      "34138377553",
+      "34150939561",
+      "34159449923",
+      "34167878699",
+      "34175839320",
+      "34186192299",
+      "34201101121",
+      "34244224832",
+      "34281858070",
+      "34310065776",
+      "34348537141",
+      "34388016481",
+      "34425005585",
+      "34470147967",
+      "34512979177",
+      "34547229611",
+      "34586174670",
+      "34627236811",
+      "34660606300",
+      "34684115937",
+      "34709541936"
+    ],
+    "execution_policy": "paper replay; one entry per launch; no re-entry",
+    "exit_policy": {
+      "hold_ms": 60000,
+      "initial_stop": 0.7,
+      "protect_activate": 1.15,
+      "protection_floor": 1.06,
+      "take": 2.0,
+      "trail_activate": 1.25,
+      "trail_retrace": 0.25
+    },
+    "feature_set_fingerprint": "3a272d18e1aa124b8d4855947f5faae125ae15a50bd15fc0e93bba9b904779cc",
+    "fee_model": {
+      "base_fee_sol": 5e-06,
+      "priority_fee_sol": 0.001,
+      "protocol_and_creator_fee_bps": 175.0,
+      "tip_sol": 0.001
+    },
+    "full_parameters": {
+      "average_pnl_max_min": 0.01,
+      "bayesian_win_rate_max_min": 0.6,
+      "history_max_min": 5,
+      "known_buyers_min": 2,
+      "known_fraction_min": 0.5,
+      "positive_expectancy_fraction_min": 0.5
+    },
+    "latency_assumptions_ms": [
+      0,
+      1,
+      2,
+      5,
+      10
+    ],
+    "model_family": "deterministic point-in-time reputation rule",
+    "output_guard": "actor results delayed 60 seconds; no unresolved outcomes",
+    "position_sizing_fraction": 0.0185,
+    "source_code_fingerprint": "9d37e38bb4e9785e294229a76a584ba34eaca1cb828eeb035e73eb8865358ffc",
+    "thesis_family_identifier": "interpretable-point-in-time-actor-reputation-v7"
+  },
+  "live_confirmation_authorised": false,
+  "production_paths_changed": 0,
+  "production_promotion_authorised": false,
+  "ready_for_strictly_later_evidence": false,
+  "top_candidates": [
+    {
+      "candidate": "buyer|known=2|fraction=0.50|history=5|wr=0.60|pnl=0.010|positive=0.50",
+      "capture_windows": 19,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.17861303246806362,
+              "trades": 27,
+              "wins": 12
+            },
+            "34159449923": {
+              "pnl_sol": 0.054456098289687255,
+              "trades": 3,
+              "wins": 2
+            },
+            "34167878699": {
+              "pnl_sol": 0.2884622503694494,
+              "trades": 9,
+              "wins": 8
+            },
+            "34175839320": {
+              "pnl_sol": 0.018578476413345535,
+              "trades": 9,
+              "wins": 3
+            },
+            "34186192299": {
+              "pnl_sol": 0.08839034990342462,
+              "trades": 26,
+              "wins": 12
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.05848881091531932,
+          "ledger_hash": "10de563ac9e615205396d9d7b9249546edcf0d948548841b0be419a1748f8a4c",
+          "maximum_drawdown_fraction": 0.06100382540995245,
+          "net_pnl_sol": 0.6285002074439698,
+          "profit_factor": 1.9729528810664798,
+          "trades": 74,
+          "wilson_95_lower_bound": 0.38892400848268727,
+          "win_rate": 0.5,
+          "wins": 37
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.1336958362125739,
+              "trades": 23,
+              "wins": 14
+            },
+            "34244224832": {
+              "pnl_sol": 0.020239992511991586,
+              "trades": 18,
+              "wins": 4
+            },
+            "34281858070": {
+              "pnl_sol": 0.08731630941580845,
+              "trades": 12,
+              "wins": 4
+            },
+            "34310065776": {
+              "pnl_sol": -0.0374691840435285,
+              "trades": 10,
+              "wins": 3
+            },
+            "34348537141": {
+              "pnl_sol": 0.45986014100802347,
+              "trades": 17,
+              "wins": 11
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.13204542759508342,
+          "ledger_hash": "4fc24ea8ca5c524ee8dcb22a2ac49c40a86e982e6093ea73bf06a99c35fb9515",
+          "maximum_drawdown_fraction": 0.03628911596524024,
+          "net_pnl_sol": 0.6636430951048689,
+          "profit_factor": 2.253775501292077,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.34577510374379766,
+          "win_rate": 0.45,
+          "wins": 36
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.13621544031967314,
+              "trades": 11,
+              "wins": 5
+            },
+            "34425005585": {
+              "pnl_sol": 0.0012839677319947049,
+              "trades": 4,
+              "wins": 1
+            },
+            "34470147967": {
+              "pnl_sol": 0.1030491279059451,
+              "trades": 13,
+              "wins": 7
+            },
+            "34512979177": {
+              "pnl_sol": 0.0625609508934338,
+              "trades": 4,
+              "wins": 2
+            },
+            "34547229611": {
+              "pnl_sol": 0.07633994170844424,
+              "trades": 6,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.09892965575650316,
+          "ledger_hash": "6dd0b17332928fae90b3663375df192cd61be45713ccbb6fc1a6fdda4627015e",
+          "maximum_drawdown_fraction": 0.01775080687757476,
+          "net_pnl_sol": 0.3794494285594907,
+          "profit_factor": 3.1395680410449236,
+          "trades": 38,
+          "wilson_95_lower_bound": 0.3014616531155089,
+          "win_rate": 0.4473684210526316,
+          "wins": 17
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.07765329533169499,
+              "trades": 9,
+              "wins": 5
+            },
+            "34660606300": {
+              "pnl_sol": 0.04881389829686292,
+              "trades": 4,
+              "wins": 2
+            },
+            "34684115937": {
+              "pnl_sol": 0.1564070841704125,
+              "trades": 18,
+              "wins": 12
+            },
+            "34709541936": {
+              "pnl_sol": -0.0857786691370158,
+              "trades": 8,
+              "wins": 2
+            }
+          },
+          "capture_windows": 4,
+          "largest_winner_contribution": 0.1122837408660354,
+          "ledger_hash": "bb00465bfeab5c01e7da99efb44e87b0e58658b300c01c5f70f4c0ea3cde3197",
+          "maximum_drawdown_fraction": 0.029075891913103707,
+          "net_pnl_sol": 0.1970956086619533,
+          "profit_factor": 1.6176495169884404,
+          "trades": 39,
+          "wilson_95_lower_bound": 0.38569186821738816,
+          "win_rate": 0.5384615384615384,
+          "wins": 21
+        }
+      ],
+      "largest_winner_contribution": 0.04449310874435441,
+      "ledger_hash": "e68bdc5c90d8fe6c15eee4c7dce1513c368b7d7f72eb0e9b1809cf2b8fb2c44a",
+      "maximum_fold_drawdown_fraction": 0.06100382540995245,
+      "minimum_fold_profit_factor": 1.6176495169884404,
+      "minimum_fold_win_rate": 0.4473684210526316,
+      "net_pnl_sol": 1.8686883397702827,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 5,
+        "known_buyers_min": 2,
+        "known_fraction_min": 0.5,
+        "positive_expectancy_fraction_min": 0.5
+      },
+      "positive_capture_windows": 17,
+      "positive_folds": 4,
+      "profit_factor": 2.1178089601358687,
+      "rule_type": "buyer",
+      "trades": 231,
+      "wilson_95_lower_bound": 0.4169362012123895,
+      "win_rate": 0.4805194805194805,
+      "wins": 111
+    },
+    {
+      "candidate": "buyer|known=2|fraction=0.50|history=10|wr=0.60|pnl=0.010|positive=0.50",
+      "capture_windows": 19,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.12613945625604983,
+              "trades": 26,
+              "wins": 11
+            },
+            "34159449923": {
+              "pnl_sol": 0.053457112447413184,
+              "trades": 3,
+              "wins": 2
+            },
+            "34167878699": {
+              "pnl_sol": 0.2833795638419509,
+              "trades": 9,
+              "wins": 8
+            },
+            "34175839320": {
+              "pnl_sol": 0.017966849287632224,
+              "trades": 9,
+              "wins": 3
+            },
+            "34186192299": {
+              "pnl_sol": 0.08604362683105467,
+              "trades": 26,
+              "wins": 12
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.06077011900714413,
+          "ledger_hash": "9c4602cde5671b7e7852cbdd979b8fa075d287521d3818047a579ad12f0db9bb",
+          "maximum_drawdown_fraction": 0.06004041933725383,
+          "net_pnl_sol": 0.5669866086641018,
+          "profit_factor": 1.8880684077592158,
+          "trades": 73,
+          "wilson_95_lower_bound": 0.38170665864691183,
+          "win_rate": 0.4931506849315068,
+          "wins": 36
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.1336958362125739,
+              "trades": 23,
+              "wins": 14
+            },
+            "34244224832": {
+              "pnl_sol": 0.020239992511991586,
+              "trades": 18,
+              "wins": 4
+            },
+            "34281858070": {
+              "pnl_sol": 0.09188840388890665,
+              "trades": 11,
+              "wins": 4
+            },
+            "34310065776": {
+              "pnl_sol": -0.03749365219166658,
+              "trades": 10,
+              "wins": 3
+            },
+            "34348537141": {
+              "pnl_sol": 0.4605652657712843,
+              "trades": 17,
+              "wins": 11
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.13211008963177387,
+          "ledger_hash": "e26e5f0754cd63e4ad2a25ca2d56250a16c7927461e4686d061fc7837ccce885",
+          "maximum_drawdown_fraction": 0.03628911596524024,
+          "net_pnl_sol": 0.6688958461930894,
+          "profit_factor": 2.273588366355236,
+          "trades": 79,
+          "wilson_95_lower_bound": 0.35048276758066016,
+          "win_rate": 0.45569620253164556,
+          "wins": 36
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.13621544031967314,
+              "trades": 11,
+              "wins": 5
+            },
+            "34425005585": {
+              "pnl_sol": 0.0012839677319947049,
+              "trades": 4,
+              "wins": 1
+            },
+            "34470147967": {
+              "pnl_sol": 0.09997490275763674,
+              "trades": 11,
+              "wins": 6
+            },
+            "34512979177": {
+              "pnl_sol": 0.009308050679759539,
+              "trades": 2,
+              "wins": 1
+            },
+            "34547229611": {
+              "pnl_sol": 0.07483117716732007,
+              "trades": 6,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.1095670000142778,
+          "ledger_hash": "ea6964263d7d7e52778785267ded3b12c00dcfcda344191284d7975e23b2ba77",
+          "maximum_drawdown_fraction": 0.01775080687757476,
+          "net_pnl_sol": 0.3216135386563841,
+          "profit_factor": 2.8453836356858435,
+          "trades": 34,
+          "wilson_95_lower_bound": 0.2888324021529675,
+          "win_rate": 0.4411764705882353,
+          "wins": 15
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.07765329533169499,
+              "trades": 9,
+              "wins": 5
+            },
+            "34660606300": {
+              "pnl_sol": 0.020919629780449638,
+              "trades": 3,
+              "wins": 1
+            },
+            "34684115937": {
+              "pnl_sol": 0.14827753346458217,
+              "trades": 17,
+              "wins": 11
+            },
+            "34709541936": {
+              "pnl_sol": -0.051448309144977875,
+              "trades": 6,
+              "wins": 2
+            }
+          },
+          "capture_windows": 4,
+          "largest_winner_contribution": 0.11991236242418424,
+          "ledger_hash": "fb6790c59b920527d9a7974241f1b9214d83612c14552fcb27fd5693f3a537e7",
+          "maximum_drawdown_fraction": 0.02293943210430897,
+          "net_pnl_sol": 0.19540214943174883,
+          "profit_factor": 1.6893500870764466,
+          "trades": 35,
+          "wilson_95_lower_bound": 0.3818945134013752,
+          "win_rate": 0.5428571428571428,
+          "wins": 19
+        }
+      ],
+      "largest_winner_contribution": 0.04675140066716369,
+      "ledger_hash": "e472be064d29a165143a626ed868af709ddaaa9f0e8c20cab5b4ed8a59a40e6d",
+      "maximum_fold_drawdown_fraction": 0.06004041933725383,
+      "minimum_fold_profit_factor": 1.6893500870764466,
+      "minimum_fold_win_rate": 0.4411764705882353,
+      "net_pnl_sol": 1.752898142945324,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 10,
+        "known_buyers_min": 2,
+        "known_fraction_min": 0.5,
+        "positive_expectancy_fraction_min": 0.5
+      },
+      "positive_capture_windows": 17,
+      "positive_folds": 4,
+      "profit_factor": 2.081105949150184,
+      "rule_type": "buyer",
+      "trades": 221,
+      "wilson_95_lower_bound": 0.4146828579022791,
+      "win_rate": 0.4796380090497738,
+      "wins": 106
+    },
+    {
+      "candidate": "buyer|known=2|fraction=0.50|history=2|wr=0.60|pnl=0.010|positive=0.50",
+      "capture_windows": 20,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.1557858547118023,
+              "trades": 29,
+              "wins": 12
+            },
+            "34159449923": {
+              "pnl_sol": 0.054021517133917694,
+              "trades": 3,
+              "wins": 2
+            },
+            "34167878699": {
+              "pnl_sol": 0.2794245695036614,
+              "trades": 10,
+              "wins": 8
+            },
+            "34175839320": {
+              "pnl_sol": 0.018241099081817973,
+              "trades": 9,
+              "wins": 3
+            },
+            "34186192299": {
+              "pnl_sol": 0.08709588284219502,
+              "trades": 26,
+              "wins": 12
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.05842574636298711,
+          "ledger_hash": "522a84821301479958b97aa91b1a8a6065920073e1b4c966e09a9208ec543050",
+          "maximum_drawdown_fraction": 0.06047240462052036,
+          "net_pnl_sol": 0.5945689232733935,
+          "profit_factor": 1.888583671771183,
+          "trades": 77,
+          "wilson_95_lower_bound": 0.3725285050287548,
+          "win_rate": 0.4805194805194805,
+          "wins": 37
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.1336958362125739,
+              "trades": 23,
+              "wins": 14
+            },
+            "34244224832": {
+              "pnl_sol": -0.0013587991396672924,
+              "trades": 19,
+              "wins": 4
+            },
+            "34281858070": {
+              "pnl_sol": 0.08654818502750083,
+              "trades": 12,
+              "wins": 4
+            },
+            "34310065776": {
+              "pnl_sol": -0.037349484632617724,
+              "trades": 10,
+              "wins": 3
+            },
+            "34348537141": {
+              "pnl_sol": 0.45641063521361047,
+              "trades": 17,
+              "wins": 11
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.13174550845511843,
+          "ledger_hash": "ab36de32c1b64397c9dc6eaa6568072c15fbc26b46e825eed9568a72ae3df2ea",
+          "maximum_drawdown_fraction": 0.04339462990248707,
+          "net_pnl_sol": 0.6379463726813999,
+          "profit_factor": 2.1614689484382614,
+          "trades": 81,
+          "wilson_95_lower_bound": 0.3411937567641278,
+          "win_rate": 0.4444444444444444,
+          "wins": 36
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.11732133280347393,
+              "trades": 13,
+              "wins": 5
+            },
+            "34425005585": {
+              "pnl_sol": 0.0012927136585906898,
+              "trades": 5,
+              "wins": 2
+            },
+            "34470147967": {
+              "pnl_sol": 0.07841418336167214,
+              "trades": 14,
+              "wins": 7
+            },
+            "34512979177": {
+              "pnl_sol": 0.049664090795038696,
+              "trades": 6,
+              "wins": 3
+            },
+            "34547229611": {
+              "pnl_sol": 0.07482876535469035,
+              "trades": 6,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.09764138103754334,
+          "ledger_hash": "a74d7acef33c828e3cde1b7e6818fc60718c6194316aefa241ae9caf2c61cf4a",
+          "maximum_drawdown_fraction": 0.018815385785619625,
+          "net_pnl_sol": 0.32152108597346496,
+          "profit_factor": 2.382000098439764,
+          "trades": 44,
+          "wilson_95_lower_bound": 0.2968250416485458,
+          "win_rate": 0.4318181818181818,
+          "wins": 19
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.07765329533169499,
+              "trades": 9,
+              "wins": 5
+            },
+            "34627236811": {
+              "pnl_sol": 0.03784306626620175,
+              "trades": 2,
+              "wins": 1
+            },
+            "34660606300": {
+              "pnl_sol": 0.10403884910258693,
+              "trades": 5,
+              "wins": 3
+            },
+            "34684115937": {
+              "pnl_sol": 0.1561891462507255,
+              "trades": 19,
+              "wins": 12
+            },
+            "34709541936": {
+              "pnl_sol": -0.09989835660088886,
+              "trades": 9,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.09361587007064996,
+          "ledger_hash": "00cf35d8da70af34809d6411d090b3bdd9ad03ab828dce2d3e28fe23df05e9cc",
+          "maximum_drawdown_fraction": 0.03387581042484733,
+          "net_pnl_sol": 0.2758260003503201,
+          "profit_factor": 1.7632500757021154,
+          "trades": 44,
+          "wilson_95_lower_bound": 0.37935220136171693,
+          "win_rate": 0.5227272727272727,
+          "wins": 23
+        }
+      ],
+      "largest_winner_contribution": 0.042942654803637174,
+      "ledger_hash": "c3df017d0ffe765303e37c590fe9d5808ce29776ac7bda0c85fbcff02a766da9",
+      "maximum_fold_drawdown_fraction": 0.06047240462052036,
+      "minimum_fold_profit_factor": 1.7632500757021154,
+      "minimum_fold_win_rate": 0.4318181818181818,
+      "net_pnl_sol": 1.8298623822785784,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 2,
+        "known_buyers_min": 2,
+        "known_fraction_min": 0.5,
+        "positive_expectancy_fraction_min": 0.5
+      },
+      "positive_capture_windows": 17,
+      "positive_folds": 4,
+      "profit_factor": 2.0096290192370567,
+      "rule_type": "buyer",
+      "trades": 246,
+      "wilson_95_lower_bound": 0.40610868280095735,
+      "win_rate": 0.46747967479674796,
+      "wins": 115
+    },
+    {
+      "candidate": "buyer|known=2|fraction=0.50|history=5|wr=0.60|pnl=0.010|positive=0.00",
+      "capture_windows": 20,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.09643684050468482,
+              "trades": 33,
+              "wins": 13
+            },
+            "34159449923": {
+              "pnl_sol": 0.10508576825586535,
+              "trades": 7,
+              "wins": 5
+            },
+            "34167878699": {
+              "pnl_sol": 0.2763261811995221,
+              "trades": 13,
+              "wins": 8
+            },
+            "34175839320": {
+              "pnl_sol": 0.04740435786612366,
+              "trades": 16,
+              "wins": 4
+            },
+            "34186192299": {
+              "pnl_sol": 0.25195008105351663,
+              "trades": 31,
+              "wins": 17
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.04909097054576977,
+          "ledger_hash": "c17dfea072a4308ce6e8dbe1e12eab9821100bd19ba58fd2c2022d768c9d56f7",
+          "maximum_drawdown_fraction": 0.06333276399786492,
+          "net_pnl_sol": 0.777203228879713,
+          "profit_factor": 1.9658662992547358,
+          "trades": 100,
+          "wilson_95_lower_bound": 0.3751065198210374,
+          "win_rate": 0.47,
+          "wins": 47
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.06368701510148853,
+              "trades": 29,
+              "wins": 13
+            },
+            "34244224832": {
+              "pnl_sol": -0.008243443020889273,
+              "trades": 29,
+              "wins": 6
+            },
+            "34281858070": {
+              "pnl_sol": 0.11656745862356721,
+              "trades": 30,
+              "wins": 10
+            },
+            "34310065776": {
+              "pnl_sol": -0.08307842859253797,
+              "trades": 19,
+              "wins": 4
+            },
+            "34348537141": {
+              "pnl_sol": 0.3796955254868676,
+              "trades": 20,
+              "wins": 11
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.10808861115457223,
+          "ledger_hash": "ec407627cc954e22386ee08b743223c6e1a050c68fc40deb07e4693e61889666",
+          "maximum_drawdown_fraction": 0.043474274873346985,
+          "net_pnl_sol": 0.46862812759849737,
+          "profit_factor": 1.5131101325322347,
+          "trades": 127,
+          "wilson_95_lower_bound": 0.2693051585228686,
+          "win_rate": 0.3464566929133858,
+          "wins": 44
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.06157702231677656,
+              "trades": 17,
+              "wins": 5
+            },
+            "34425005585": {
+              "pnl_sol": 0.010550347335356553,
+              "trades": 9,
+              "wins": 3
+            },
+            "34470147967": {
+              "pnl_sol": 0.05994620981862931,
+              "trades": 15,
+              "wins": 7
+            },
+            "34512979177": {
+              "pnl_sol": 0.07230879686748536,
+              "trades": 11,
+              "wins": 5
+            },
+            "34547229611": {
+              "pnl_sol": 0.20033944956381075,
+              "trades": 13,
+              "wins": 6
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.06587149883681133,
+          "ledger_hash": "5c20c3428e78293f91b260f0c1d34246b8180cb761155ead21337bfbf79483bf",
+          "maximum_drawdown_fraction": 0.03441157788543044,
+          "net_pnl_sol": 0.40472182590205774,
+          "profit_factor": 1.8481063737981098,
+          "trades": 65,
+          "wilson_95_lower_bound": 0.28971847853161004,
+          "win_rate": 0.4,
+          "wins": 26
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.040547662764185866,
+              "trades": 13,
+              "wins": 6
+            },
+            "34627236811": {
+              "pnl_sol": 0.12243722145064302,
+              "trades": 16,
+              "wins": 6
+            },
+            "34660606300": {
+              "pnl_sol": 0.2810968468307531,
+              "trades": 16,
+              "wins": 9
+            },
+            "34684115937": {
+              "pnl_sol": 0.17686822547114103,
+              "trades": 25,
+              "wins": 13
+            },
+            "34709541936": {
+              "pnl_sol": -0.16233597377211978,
+              "trades": 11,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.057077690613760244,
+          "ledger_hash": "723328148ad8cb39378f650c4fdf35559d8bcff44e4de2db32841a3036aa27f7",
+          "maximum_drawdown_fraction": 0.06041876753061359,
+          "net_pnl_sol": 0.4586139827446001,
+          "profit_factor": 1.6817173958104856,
+          "trades": 81,
+          "wilson_95_lower_bound": 0.3411937567641278,
+          "win_rate": 0.4444444444444444,
+          "wins": 36
+        }
+      ],
+      "largest_winner_contribution": 0.030011875334316516,
+      "ledger_hash": "90942f1a1c0fb56a04bd6a3828169ef2652a36a4ba5ea1e93146c7921cd66005",
+      "maximum_fold_drawdown_fraction": 0.06333276399786492,
+      "minimum_fold_profit_factor": 1.5131101325322347,
+      "minimum_fold_win_rate": 0.3464566929133858,
+      "net_pnl_sol": 2.1091671651248682,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 5,
+        "known_buyers_min": 2,
+        "known_fraction_min": 0.5,
+        "positive_expectancy_fraction_min": 0.0
+      },
+      "positive_capture_windows": 17,
+      "positive_folds": 4,
+      "profit_factor": 1.7354348704401699,
+      "rule_type": "buyer",
+      "trades": 373,
+      "wilson_95_lower_bound": 0.3614327172013098,
+      "win_rate": 0.4101876675603217,
+      "wins": 153
+    },
+    {
+      "candidate": "buyer|known=1|fraction=0.50|history=5|wr=0.60|pnl=0.010|positive=0.00",
+      "capture_windows": 20,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.09643684050468482,
+              "trades": 33,
+              "wins": 13
+            },
+            "34159449923": {
+              "pnl_sol": 0.10508576825586535,
+              "trades": 7,
+              "wins": 5
+            },
+            "34167878699": {
+              "pnl_sol": 0.2763261811995221,
+              "trades": 13,
+              "wins": 8
+            },
+            "34175839320": {
+              "pnl_sol": 0.016407839488164606,
+              "trades": 18,
+              "wins": 5
+            },
+            "34186192299": {
+              "pnl_sol": 0.24917775685811044,
+              "trades": 31,
+              "wins": 17
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.04873211682881862,
+          "ledger_hash": "9eff0b2709d2810e931ba8567a8d7b7878c3d92a20360587e5d773293e0602bc",
+          "maximum_drawdown_fraction": 0.06280388731614783,
+          "net_pnl_sol": 0.743434386306348,
+          "profit_factor": 1.8897234885005703,
+          "trades": 102,
+          "wilson_95_lower_bound": 0.3765574986256038,
+          "win_rate": 0.47058823529411764,
+          "wins": 48
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.06368701510148853,
+              "trades": 29,
+              "wins": 13
+            },
+            "34244224832": {
+              "pnl_sol": -0.008243443020889273,
+              "trades": 29,
+              "wins": 6
+            },
+            "34281858070": {
+              "pnl_sol": 0.11656745862356721,
+              "trades": 30,
+              "wins": 10
+            },
+            "34310065776": {
+              "pnl_sol": -0.08307842859253797,
+              "trades": 19,
+              "wins": 4
+            },
+            "34348537141": {
+              "pnl_sol": 0.3796955254868676,
+              "trades": 20,
+              "wins": 11
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.10808861115457223,
+          "ledger_hash": "ec407627cc954e22386ee08b743223c6e1a050c68fc40deb07e4693e61889666",
+          "maximum_drawdown_fraction": 0.043474274873346985,
+          "net_pnl_sol": 0.46862812759849737,
+          "profit_factor": 1.5131101325322347,
+          "trades": 127,
+          "wilson_95_lower_bound": 0.2693051585228686,
+          "win_rate": 0.3464566929133858,
+          "wins": 44
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.06157702231677656,
+              "trades": 17,
+              "wins": 5
+            },
+            "34425005585": {
+              "pnl_sol": 0.010550347335356553,
+              "trades": 9,
+              "wins": 3
+            },
+            "34470147967": {
+              "pnl_sol": 0.05994620981862931,
+              "trades": 15,
+              "wins": 7
+            },
+            "34512979177": {
+              "pnl_sol": 0.07230879686748536,
+              "trades": 11,
+              "wins": 5
+            },
+            "34547229611": {
+              "pnl_sol": 0.20033944956381075,
+              "trades": 13,
+              "wins": 6
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.06587149883681133,
+          "ledger_hash": "5c20c3428e78293f91b260f0c1d34246b8180cb761155ead21337bfbf79483bf",
+          "maximum_drawdown_fraction": 0.03441157788543044,
+          "net_pnl_sol": 0.40472182590205774,
+          "profit_factor": 1.8481063737981098,
+          "trades": 65,
+          "wilson_95_lower_bound": 0.28971847853161004,
+          "win_rate": 0.4,
+          "wins": 26
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.040547662764185866,
+              "trades": 13,
+              "wins": 6
+            },
+            "34627236811": {
+              "pnl_sol": 0.12243722145064302,
+              "trades": 16,
+              "wins": 6
+            },
+            "34660606300": {
+              "pnl_sol": 0.2810968468307531,
+              "trades": 16,
+              "wins": 9
+            },
+            "34684115937": {
+              "pnl_sol": 0.17393042152327423,
+              "trades": 26,
+              "wins": 13
+            },
+            "34709541936": {
+              "pnl_sol": -0.16222189830363454,
+              "trades": 11,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.057080835495720246,
+          "ledger_hash": "fabeadbc2fb0d0d6eef97e8e6b31960ed569fc0c330d75fc4423d3b9dde3c000",
+          "maximum_drawdown_fraction": 0.061360010357073946,
+          "net_pnl_sol": 0.455790254265219,
+          "profit_factor": 1.674750323032952,
+          "trades": 82,
+          "wilson_95_lower_bound": 0.3367336357846038,
+          "win_rate": 0.43902439024390244,
+          "wins": 36
+        }
+      ],
+      "largest_winner_contribution": 0.0300295030502331,
+      "ledger_hash": "ed4266420125b6ece7021a917141a820c5fc89140b8cc29d62c37406ca95ad88",
+      "maximum_fold_drawdown_fraction": 0.06280388731614783,
+      "minimum_fold_profit_factor": 1.5131101325322347,
+      "minimum_fold_win_rate": 0.3464566929133858,
+      "net_pnl_sol": 2.072574594072122,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 5,
+        "known_buyers_min": 1,
+        "known_fraction_min": 0.5,
+        "positive_expectancy_fraction_min": 0.0
+      },
+      "positive_capture_windows": 17,
+      "positive_folds": 4,
+      "profit_factor": 1.7142894361396501,
+      "rule_type": "buyer",
+      "trades": 376,
+      "wilson_95_lower_bound": 0.36102627678211197,
+      "win_rate": 0.4095744680851064,
+      "wins": 154
+    },
+    {
+      "candidate": "buyer|known=2|fraction=0.50|history=10|wr=0.60|pnl=0.010|positive=0.00",
+      "capture_windows": 20,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.045334759940082354,
+              "trades": 32,
+              "wins": 12
+            },
+            "34159449923": {
+              "pnl_sol": 0.10311615582995678,
+              "trades": 7,
+              "wins": 5
+            },
+            "34167878699": {
+              "pnl_sol": 0.2712924772559945,
+              "trades": 13,
+              "wins": 8
+            },
+            "34175839320": {
+              "pnl_sol": 0.04607130271280621,
+              "trades": 16,
+              "wins": 4
+            },
+            "34186192299": {
+              "pnl_sol": 0.24663391435214782,
+              "trades": 31,
+              "wins": 17
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.05057495114852595,
+          "ledger_hash": "3c4120604171424cbcf0d4bdf2a9a111d9004621c9d1e0a545ca8695ace60a1a",
+          "maximum_drawdown_fraction": 0.06231859811887652,
+          "net_pnl_sol": 0.7124486100909873,
+          "profit_factor": 1.8948086820215737,
+          "trades": 99,
+          "wilson_95_lower_bound": 0.3695632983501778,
+          "win_rate": 0.46464646464646464,
+          "wins": 46
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.06368701510148853,
+              "trades": 29,
+              "wins": 13
+            },
+            "34244224832": {
+              "pnl_sol": -0.012005080846698366,
+              "trades": 28,
+              "wins": 5
+            },
+            "34281858070": {
+              "pnl_sol": 0.12089403369652087,
+              "trades": 29,
+              "wins": 10
+            },
+            "34310065776": {
+              "pnl_sol": -0.08308646176836532,
+              "trades": 19,
+              "wins": 4
+            },
+            "34348537141": {
+              "pnl_sol": 0.3797717587304776,
+              "trades": 20,
+              "wins": 11
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.1084010237272257,
+          "ledger_hash": "1334bec5882d81b36ff5b98154567e13c74c8b8d63caa3e92c6a6d8d63ca58b2",
+          "maximum_drawdown_fraction": 0.043474274873346985,
+          "net_pnl_sol": 0.46926126491342357,
+          "profit_factor": 1.516269017520022,
+          "trades": 125,
+          "wilson_95_lower_bound": 0.2664921552148129,
+          "win_rate": 0.344,
+          "wins": 43
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.06157702231677656,
+              "trades": 17,
+              "wins": 5
+            },
+            "34425005585": {
+              "pnl_sol": 0.010550347335356553,
+              "trades": 9,
+              "wins": 3
+            },
+            "34470147967": {
+              "pnl_sol": 0.05705629972305336,
+              "trades": 13,
+              "wins": 6
+            },
+            "34512979177": {
+              "pnl_sol": 0.020741835214749614,
+              "trades": 9,
+              "wins": 4
+            },
+            "34547229611": {
+              "pnl_sol": 0.1964747191244134,
+              "trades": 13,
+              "wins": 6
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.06962541249877259,
+          "ledger_hash": "9e1d393ad927a1709ff23c1f4e0982733c0fe876cc93ca72e57869268c467d8a",
+          "maximum_drawdown_fraction": 0.03441157788543044,
+          "net_pnl_sol": 0.346400223714348,
+          "profit_factor": 1.7320090890804896,
+          "trades": 61,
+          "wilson_95_lower_bound": 0.28068166862043625,
+          "win_rate": 0.39344262295081966,
+          "wins": 24
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.040547662764185866,
+              "trades": 13,
+              "wins": 6
+            },
+            "34627236811": {
+              "pnl_sol": 0.0612531788828847,
+              "trades": 15,
+              "wins": 5
+            },
+            "34660606300": {
+              "pnl_sol": 0.24469421332418384,
+              "trades": 15,
+              "wins": 8
+            },
+            "34684115937": {
+              "pnl_sol": 0.16528356605963196,
+              "trades": 23,
+              "wins": 12
+            },
+            "34709541936": {
+              "pnl_sol": -0.12275038781673131,
+              "trades": 9,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.06198975952732715,
+          "ledger_hash": "b9172fb431d5063afcc31ed4d9ac11330d4943efb32fbf09628fafd13bed8f3d",
+          "maximum_drawdown_fraction": 0.04777667969068178,
+          "net_pnl_sol": 0.3890282332141539,
+          "profit_factor": 1.624946484676008,
+          "trades": 75,
+          "wilson_95_lower_bound": 0.3333127597678485,
+          "win_rate": 0.44,
+          "wins": 33
+        }
+      ],
+      "largest_winner_contribution": 0.03166576080703904,
+      "ledger_hash": "33b90aacbd80036d87aa09418c345b23eb4472612422b032021853407c38ea63",
+      "maximum_fold_drawdown_fraction": 0.06231859811887652,
+      "minimum_fold_profit_factor": 1.516269017520022,
+      "minimum_fold_win_rate": 0.344,
+      "net_pnl_sol": 1.9171383319329127,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 10,
+        "known_buyers_min": 2,
+        "known_fraction_min": 0.5,
+        "positive_expectancy_fraction_min": 0.0
+      },
+      "positive_capture_windows": 17,
+      "positive_folds": 4,
+      "profit_factor": 1.6844804910133493,
+      "rule_type": "buyer",
+      "trades": 360,
+      "wilson_95_lower_bound": 0.35609061822291227,
+      "win_rate": 0.40555555555555556,
+      "wins": 146
+    },
+    {
+      "candidate": "buyer|known=1|fraction=0.50|history=10|wr=0.60|pnl=0.010|positive=0.00",
+      "capture_windows": 20,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.045334759940082354,
+              "trades": 32,
+              "wins": 12
+            },
+            "34159449923": {
+              "pnl_sol": 0.10311615582995678,
+              "trades": 7,
+              "wins": 5
+            },
+            "34167878699": {
+              "pnl_sol": 0.2712924772559945,
+              "trades": 13,
+              "wins": 8
+            },
+            "34175839320": {
+              "pnl_sol": 0.015527295559435349,
+              "trades": 18,
+              "wins": 5
+            },
+            "34186192299": {
+              "pnl_sol": 0.2439020626963126,
+              "trades": 31,
+              "wins": 17
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.0502083146840948,
+          "ledger_hash": "a2853b8f986aa49dabbabf88e3c4e013454a9c6238622c55fdffd9fe3e5a2bce",
+          "maximum_drawdown_fraction": 0.06179744238929915,
+          "net_pnl_sol": 0.6791727512817807,
+          "profit_factor": 1.8216274233784693,
+          "trades": 101,
+          "wilson_95_lower_bound": 0.3711275816192353,
+          "win_rate": 0.46534653465346537,
+          "wins": 47
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.06368701510148853,
+              "trades": 29,
+              "wins": 13
+            },
+            "34244224832": {
+              "pnl_sol": -0.012005080846698366,
+              "trades": 28,
+              "wins": 5
+            },
+            "34281858070": {
+              "pnl_sol": 0.12089403369652087,
+              "trades": 29,
+              "wins": 10
+            },
+            "34310065776": {
+              "pnl_sol": -0.08308646176836532,
+              "trades": 19,
+              "wins": 4
+            },
+            "34348537141": {
+              "pnl_sol": 0.3797717587304776,
+              "trades": 20,
+              "wins": 11
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.1084010237272257,
+          "ledger_hash": "1334bec5882d81b36ff5b98154567e13c74c8b8d63caa3e92c6a6d8d63ca58b2",
+          "maximum_drawdown_fraction": 0.043474274873346985,
+          "net_pnl_sol": 0.46926126491342357,
+          "profit_factor": 1.516269017520022,
+          "trades": 125,
+          "wilson_95_lower_bound": 0.2664921552148129,
+          "win_rate": 0.344,
+          "wins": 43
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.06157702231677656,
+              "trades": 17,
+              "wins": 5
+            },
+            "34425005585": {
+              "pnl_sol": 0.010550347335356553,
+              "trades": 9,
+              "wins": 3
+            },
+            "34470147967": {
+              "pnl_sol": 0.05705629972305336,
+              "trades": 13,
+              "wins": 6
+            },
+            "34512979177": {
+              "pnl_sol": 0.020741835214749614,
+              "trades": 9,
+              "wins": 4
+            },
+            "34547229611": {
+              "pnl_sol": 0.1964747191244134,
+              "trades": 13,
+              "wins": 6
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.06962541249877259,
+          "ledger_hash": "9e1d393ad927a1709ff23c1f4e0982733c0fe876cc93ca72e57869268c467d8a",
+          "maximum_drawdown_fraction": 0.03441157788543044,
+          "net_pnl_sol": 0.346400223714348,
+          "profit_factor": 1.7320090890804896,
+          "trades": 61,
+          "wilson_95_lower_bound": 0.28068166862043625,
+          "win_rate": 0.39344262295081966,
+          "wins": 24
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.040547662764185866,
+              "trades": 13,
+              "wins": 6
+            },
+            "34627236811": {
+              "pnl_sol": 0.0612531788828847,
+              "trades": 15,
+              "wins": 5
+            },
+            "34660606300": {
+              "pnl_sol": 0.24469421332418384,
+              "trades": 15,
+              "wins": 8
+            },
+            "34684115937": {
+              "pnl_sol": 0.16237372418096868,
+              "trades": 24,
+              "wins": 12
+            },
+            "34709541936": {
+              "pnl_sol": -0.12266348478156802,
+              "trades": 9,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.061993559498082614,
+          "ledger_hash": "3a3967e6956115a5446765f6c33650cbaae92e78fa57c4f59961afbabc3a292d",
+          "maximum_drawdown_fraction": 0.04871655159187164,
+          "net_pnl_sol": 0.38620529437065443,
+          "profit_factor": 1.6176721021288665,
+          "trades": 76,
+          "wilson_95_lower_bound": 0.3286075248319959,
+          "win_rate": 0.4342105263157895,
+          "wins": 33
+        }
+      ],
+      "largest_winner_contribution": 0.03168537868235623,
+      "ledger_hash": "da1cf0a700a05d905680f8483dc99bd1aafc2adc8cc790a81c918a278732d03b",
+      "maximum_fold_drawdown_fraction": 0.06179744238929915,
+      "minimum_fold_profit_factor": 1.516269017520022,
+      "minimum_fold_win_rate": 0.344,
+      "net_pnl_sol": 1.8810395342802066,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 10,
+        "known_buyers_min": 1,
+        "known_fraction_min": 0.5,
+        "positive_expectancy_fraction_min": 0.0
+      },
+      "positive_capture_windows": 17,
+      "positive_folds": 4,
+      "profit_factor": 1.6637298384512034,
+      "rule_type": "buyer",
+      "trades": 363,
+      "wilson_95_lower_bound": 0.3557103390727002,
+      "win_rate": 0.4049586776859504,
+      "wins": 147
+    },
+    {
+      "candidate": "buyer|known=2|fraction=0.50|history=3|wr=0.60|pnl=0.010|positive=0.00",
+      "capture_windows": 20,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.09643684050468482,
+              "trades": 33,
+              "wins": 13
+            },
+            "34159449923": {
+              "pnl_sol": 0.08228985722036028,
+              "trades": 8,
+              "wins": 5
+            },
+            "34167878699": {
+              "pnl_sol": 0.24759153101614179,
+              "trades": 14,
+              "wins": 8
+            },
+            "34175839320": {
+              "pnl_sol": 0.04622214272242269,
+              "trades": 16,
+              "wins": 4
+            },
+            "34186192299": {
+              "pnl_sol": 0.24723545783244713,
+              "trades": 31,
+              "wins": 17
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.048905142277363554,
+          "ledger_hash": "5b38d5a685e61ac946f95baf85c1107c72fe8309c6c1e16093e03ba650144df9",
+          "maximum_drawdown_fraction": 0.0624333546543121,
+          "net_pnl_sol": 0.7197758292960583,
+          "profit_factor": 1.853297350668521,
+          "trades": 102,
+          "wilson_95_lower_bound": 0.36723323391994317,
+          "win_rate": 0.46078431372549017,
+          "wins": 47
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.06368701510148853,
+              "trades": 29,
+              "wins": 13
+            },
+            "34244224832": {
+              "pnl_sol": -0.02932796733305687,
+              "trades": 30,
+              "wins": 6
+            },
+            "34281858070": {
+              "pnl_sol": 0.11533272454521107,
+              "trades": 30,
+              "wins": 10
+            },
+            "34310065776": {
+              "pnl_sol": -0.08276105789713234,
+              "trades": 19,
+              "wins": 4
+            },
+            "34348537141": {
+              "pnl_sol": 0.37668374060158993,
+              "trades": 20,
+              "wins": 11
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.10787819474829108,
+          "ledger_hash": "8d9c48a533be5a88cb89f5cafcce7629bbab0bd898b8032dd2d70436422d5be8",
+          "maximum_drawdown_fraction": 0.043474274873346985,
+          "net_pnl_sol": 0.44361445501809804,
+          "profit_factor": 1.4765262004168263,
+          "trades": 128,
+          "wilson_95_lower_bound": 0.2671002859293398,
+          "win_rate": 0.34375,
+          "wins": 44
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.05604363033260033,
+              "trades": 19,
+              "wins": 5
+            },
+            "34425005585": {
+              "pnl_sol": 0.010490865326268042,
+              "trades": 10,
+              "wins": 3
+            },
+            "34470147967": {
+              "pnl_sol": 0.05978186790284924,
+              "trades": 15,
+              "wins": 7
+            },
+            "34512979177": {
+              "pnl_sol": 0.07488722856492908,
+              "trades": 12,
+              "wins": 6
+            },
+            "34547229611": {
+              "pnl_sol": 0.200113855553203,
+              "trades": 13,
+              "wins": 6
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.06569592943476732,
+          "ledger_hash": "a09e0f006ae12ed519e9cdad6d71c970f24dad9e81fd542bfc37d6e34973483d",
+          "maximum_drawdown_fraction": 0.03436002549825501,
+          "net_pnl_sol": 0.401317447679848,
+          "profit_factor": 1.8325144310066286,
+          "trades": 69,
+          "wilson_95_lower_bound": 0.28481147647724914,
+          "win_rate": 0.391304347826087,
+          "wins": 27
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.09169336461536161,
+              "trades": 14,
+              "wins": 7
+            },
+            "34627236811": {
+              "pnl_sol": 0.1250450213526269,
+              "trades": 16,
+              "wins": 6
+            },
+            "34660606300": {
+              "pnl_sol": 0.2864451870151755,
+              "trades": 16,
+              "wins": 9
+            },
+            "34684115937": {
+              "pnl_sol": 0.17448268435411135,
+              "trades": 26,
+              "wins": 13
+            },
+            "34709541936": {
+              "pnl_sol": -0.17736103035500606,
+              "trades": 12,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.0546928083123457,
+          "ledger_hash": "af2f8f81a692195b545efb75d700a4f163fc4863993103f0ae624aa7d78fc7fe",
+          "maximum_drawdown_fraction": 0.06548384631885718,
+          "net_pnl_sol": 0.500305226982269,
+          "profit_factor": 1.7153564141727642,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.3392278217957345,
+          "win_rate": 0.44047619047619047,
+          "wins": 37
+        }
+      ],
+      "largest_winner_contribution": 0.029533292167851603,
+      "ledger_hash": "4dffc9fecfd5ae50f2609fe463717b31465e30143f0fe4fa50add8d76e4a57eb",
+      "maximum_fold_drawdown_fraction": 0.06548384631885718,
+      "minimum_fold_profit_factor": 1.4765262004168263,
+      "minimum_fold_win_rate": 0.34375,
+      "net_pnl_sol": 2.0650129589762733,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 3,
+        "known_buyers_min": 2,
+        "known_fraction_min": 0.5,
+        "positive_expectancy_fraction_min": 0.0
+      },
+      "positive_capture_windows": 17,
+      "positive_folds": 4,
+      "profit_factor": 1.6986094229851467,
+      "rule_type": "buyer",
+      "trades": 383,
+      "wilson_95_lower_bound": 0.35672401598430087,
+      "win_rate": 0.4046997389033943,
+      "wins": 155
+    },
+    {
+      "candidate": "buyer|known=1|fraction=0.50|history=3|wr=0.60|pnl=0.010|positive=0.00",
+      "capture_windows": 20,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.09643684050468482,
+              "trades": 33,
+              "wins": 13
+            },
+            "34159449923": {
+              "pnl_sol": 0.08228985722036028,
+              "trades": 8,
+              "wins": 5
+            },
+            "34167878699": {
+              "pnl_sol": 0.24759153101614179,
+              "trades": 14,
+              "wins": 8
+            },
+            "34175839320": {
+              "pnl_sol": 0.015626932288153324,
+              "trades": 18,
+              "wins": 5
+            },
+            "34186192299": {
+              "pnl_sol": 0.24449902656245057,
+              "trades": 31,
+              "wins": 17
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.04854753830625073,
+          "ledger_hash": "8e11aacc41c76439cb926162b2f64b9a732f94c6306fe4255e5ab2d03e0a5e8b",
+          "maximum_drawdown_fraction": 0.061911325271088856,
+          "net_pnl_sol": 0.6864441875917913,
+          "profit_factor": 1.7854094163916392,
+          "trades": 104,
+          "wilson_95_lower_bound": 0.3688084282037568,
+          "win_rate": 0.46153846153846156,
+          "wins": 48
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.06368701510148853,
+              "trades": 29,
+              "wins": 13
+            },
+            "34244224832": {
+              "pnl_sol": -0.02932796733305687,
+              "trades": 30,
+              "wins": 6
+            },
+            "34281858070": {
+              "pnl_sol": 0.11533272454521107,
+              "trades": 30,
+              "wins": 10
+            },
+            "34310065776": {
+              "pnl_sol": -0.08276105789713234,
+              "trades": 19,
+              "wins": 4
+            },
+            "34348537141": {
+              "pnl_sol": 0.37668374060158993,
+              "trades": 20,
+              "wins": 11
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.10787819474829108,
+          "ledger_hash": "8d9c48a533be5a88cb89f5cafcce7629bbab0bd898b8032dd2d70436422d5be8",
+          "maximum_drawdown_fraction": 0.043474274873346985,
+          "net_pnl_sol": 0.44361445501809804,
+          "profit_factor": 1.4765262004168263,
+          "trades": 128,
+          "wilson_95_lower_bound": 0.2671002859293398,
+          "win_rate": 0.34375,
+          "wins": 44
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.05604363033260033,
+              "trades": 19,
+              "wins": 5
+            },
+            "34425005585": {
+              "pnl_sol": 0.010490865326268042,
+              "trades": 10,
+              "wins": 3
+            },
+            "34470147967": {
+              "pnl_sol": 0.05978186790284924,
+              "trades": 15,
+              "wins": 7
+            },
+            "34512979177": {
+              "pnl_sol": 0.07488722856492908,
+              "trades": 12,
+              "wins": 6
+            },
+            "34547229611": {
+              "pnl_sol": 0.200113855553203,
+              "trades": 13,
+              "wins": 6
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.06569592943476732,
+          "ledger_hash": "a09e0f006ae12ed519e9cdad6d71c970f24dad9e81fd542bfc37d6e34973483d",
+          "maximum_drawdown_fraction": 0.03436002549825501,
+          "net_pnl_sol": 0.401317447679848,
+          "profit_factor": 1.8325144310066286,
+          "trades": 69,
+          "wilson_95_lower_bound": 0.28481147647724914,
+          "win_rate": 0.391304347826087,
+          "wins": 27
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.09169336461536161,
+              "trades": 14,
+              "wins": 7
+            },
+            "34627236811": {
+              "pnl_sol": 0.1250450213526269,
+              "trades": 16,
+              "wins": 6
+            },
+            "34660606300": {
+              "pnl_sol": 0.2864451870151755,
+              "trades": 16,
+              "wins": 9
+            },
+            "34684115937": {
+              "pnl_sol": 0.16678196676851342,
+              "trades": 28,
+              "wins": 13
+            },
+            "34709541936": {
+              "pnl_sol": -0.18552093262967795,
+              "trades": 13,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.05464509886835093,
+          "ledger_hash": "b193924742ea7ac73804b1c83e1f7c76492f36175e8a21d9e759239f51a92ffc",
+          "maximum_drawdown_fraction": 0.0691827680067812,
+          "net_pnl_sol": 0.4844446071219983,
+          "profit_factor": 1.6778348894158763,
+          "trades": 87,
+          "wilson_95_lower_bound": 0.32673072915584994,
+          "win_rate": 0.42528735632183906,
+          "wins": 37
+        }
+      ],
+      "largest_winner_contribution": 0.02955333192977374,
+      "ledger_hash": "d6e878e9218aed33eb9ee653470aa3201d98dd322ec2980e4ded390c34198279",
+      "maximum_fold_drawdown_fraction": 0.0691827680067812,
+      "minimum_fold_profit_factor": 1.4765262004168263,
+      "minimum_fold_win_rate": 0.34375,
+      "net_pnl_sol": 2.0158206974117356,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 3,
+        "known_buyers_min": 1,
+        "known_fraction_min": 0.5,
+        "positive_expectancy_fraction_min": 0.0
+      },
+      "positive_capture_windows": 17,
+      "positive_folds": 4,
+      "profit_factor": 1.6715645703998945,
+      "rule_type": "buyer",
+      "trades": 388,
+      "wilson_95_lower_bound": 0.35446409348180924,
+      "win_rate": 0.4020618556701031,
+      "wins": 156
+    },
+    {
+      "candidate": "buyer|known=2|fraction=0.50|history=2|wr=0.60|pnl=0.010|positive=0.00",
+      "capture_windows": 20,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.06701681254300296,
+              "trades": 37,
+              "wins": 13
+            },
+            "34159449923": {
+              "pnl_sol": 0.08135285403642409,
+              "trades": 8,
+              "wins": 5
+            },
+            "34167878699": {
+              "pnl_sol": 0.23824659184729133,
+              "trades": 15,
+              "wins": 8
+            },
+            "34175839320": {
+              "pnl_sol": 0.045311299342682375,
+              "trades": 16,
+              "wins": 4
+            },
+            "34186192299": {
+              "pnl_sol": 0.2436030535515829,
+              "trades": 31,
+              "wins": 17
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.04885008297260348,
+          "ledger_hash": "407c0a83124a27920936c31545ddaebc646f31fd7974a1aa8600e0d2fb2df35c",
+          "maximum_drawdown_fraction": 0.06174040037216081,
+          "net_pnl_sol": 0.6755306113209825,
+          "profit_factor": 1.7759660570634033,
+          "trades": 107,
+          "wilson_95_lower_bound": 0.34893941347275176,
+          "win_rate": 0.4392523364485981,
+          "wins": 47
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.06368701510148853,
+              "trades": 29,
+              "wins": 13
+            },
+            "34244224832": {
+              "pnl_sol": -0.03608469737801691,
+              "trades": 32,
+              "wins": 6
+            },
+            "34281858070": {
+              "pnl_sol": 0.11493704263552003,
+              "trades": 30,
+              "wins": 10
+            },
+            "34310065776": {
+              "pnl_sol": -0.08265935353419349,
+              "trades": 19,
+              "wins": 4
+            },
+            "34348537141": {
+              "pnl_sol": 0.37571858639075667,
+              "trades": 20,
+              "wins": 11
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.10780671735189229,
+          "ledger_hash": "71cdd55337020b9fedf7767f4bc18b6f1ecda4b703a7b384d4a3a295da83b73c",
+          "maximum_drawdown_fraction": 0.043474274873346985,
+          "net_pnl_sol": 0.4355985932155537,
+          "profit_factor": 1.465071311310631,
+          "trades": 130,
+          "wilson_95_lower_bound": 0.26279767664610515,
+          "win_rate": 0.3384615384615385,
+          "wins": 44
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.07012951636721891,
+              "trades": 21,
+              "wins": 6
+            },
+            "34425005585": {
+              "pnl_sol": 0.010633998684923294,
+              "trades": 10,
+              "wins": 4
+            },
+            "34470147967": {
+              "pnl_sol": 0.03688706381442213,
+              "trades": 16,
+              "wins": 7
+            },
+            "34512979177": {
+              "pnl_sol": 0.03329312020225035,
+              "trades": 14,
+              "wins": 6
+            },
+            "34547229611": {
+              "pnl_sol": 0.19654697900768275,
+              "trades": 13,
+              "wins": 6
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.06281679470953086,
+          "ledger_hash": "027eaa84597242f6218459ddbe3599229fe60c659e73acd834f07f060c66423b",
+          "maximum_drawdown_fraction": 0.03449474328496175,
+          "net_pnl_sol": 0.3474906780764955,
+          "profit_factor": 1.6191137547950367,
+          "trades": 74,
+          "wilson_95_lower_bound": 0.28864748449945055,
+          "win_rate": 0.3918918918918919,
+          "wins": 29
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.09169336461536161,
+              "trades": 14,
+              "wins": 7
+            },
+            "34627236811": {
+              "pnl_sol": 0.16486204135389085,
+              "trades": 18,
+              "wins": 7
+            },
+            "34660606300": {
+              "pnl_sol": 0.3519591543524371,
+              "trades": 17,
+              "wins": 10
+            },
+            "34684115937": {
+              "pnl_sol": 0.1813330409520776,
+              "trades": 26,
+              "wins": 13
+            },
+            "34709541936": {
+              "pnl_sol": -0.18204833115231162,
+              "trades": 12,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.05049483250429466,
+          "ledger_hash": "217ce5291c74852a8da5368a723f89ff006f5c6cfa2ef1cf600d1fe2457fdea0",
+          "maximum_drawdown_fraction": 0.06715848162106723,
+          "net_pnl_sol": 0.6077992701214554,
+          "profit_factor": 1.829944193937282,
+          "trades": 87,
+          "wilson_95_lower_bound": 0.348170047270701,
+          "win_rate": 0.4482758620689655,
+          "wins": 39
+        }
+      ],
+      "largest_winner_contribution": 0.028629537886192356,
+      "ledger_hash": "b35b18267687da7fcdfad777e210f6aaadcd350108c9db5e036ebcca158cea8b",
+      "maximum_fold_drawdown_fraction": 0.06715848162106723,
+      "minimum_fold_profit_factor": 1.465071311310631,
+      "minimum_fold_win_rate": 0.3384615384615385,
+      "net_pnl_sol": 2.066419152734487,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 2,
+        "known_buyers_min": 2,
+        "known_fraction_min": 0.5,
+        "positive_expectancy_fraction_min": 0.0
+      },
+      "positive_capture_windows": 17,
+      "positive_folds": 4,
+      "profit_factor": 1.6664141156033807,
+      "rule_type": "buyer",
+      "trades": 398,
+      "wilson_95_lower_bound": 0.3525588482507891,
+      "win_rate": 0.39949748743718594,
+      "wins": 159
+    },
+    {
+      "candidate": "buyer|known=1|fraction=0.50|history=2|wr=0.60|pnl=0.010|positive=0.00",
+      "capture_windows": 20,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.06701681254300296,
+              "trades": 37,
+              "wins": 13
+            },
+            "34159449923": {
+              "pnl_sol": 0.08135285403642409,
+              "trades": 8,
+              "wins": 5
+            },
+            "34167878699": {
+              "pnl_sol": 0.23824659184729133,
+              "trades": 15,
+              "wins": 8
+            },
+            "34175839320": {
+              "pnl_sol": 0.015025278556079602,
+              "trades": 18,
+              "wins": 5
+            },
+            "34186192299": {
+              "pnl_sol": 0.24089427615970066,
+              "trades": 31,
+              "wins": 17
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.048492957695639216,
+          "ledger_hash": "6b5eeaddfdee1cb11582ab0ee28f09a1935a3471555cb03aeb7d2cd39efeee18",
+          "maximum_drawdown_fraction": 0.061223646523205076,
+          "net_pnl_sol": 0.6425358131424965,
+          "profit_factor": 1.7133714812081942,
+          "trades": 109,
+          "wilson_95_lower_bound": 0.3507777944894326,
+          "win_rate": 0.44036697247706424,
+          "wins": 48
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.06368701510148853,
+              "trades": 29,
+              "wins": 13
+            },
+            "34244224832": {
+              "pnl_sol": -0.03608469737801691,
+              "trades": 32,
+              "wins": 6
+            },
+            "34281858070": {
+              "pnl_sol": 0.11493704263552003,
+              "trades": 30,
+              "wins": 10
+            },
+            "34310065776": {
+              "pnl_sol": -0.08265935353419349,
+              "trades": 19,
+              "wins": 4
+            },
+            "34348537141": {
+              "pnl_sol": 0.37571858639075667,
+              "trades": 20,
+              "wins": 11
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.10780671735189229,
+          "ledger_hash": "71cdd55337020b9fedf7767f4bc18b6f1ecda4b703a7b384d4a3a295da83b73c",
+          "maximum_drawdown_fraction": 0.043474274873346985,
+          "net_pnl_sol": 0.4355985932155537,
+          "profit_factor": 1.465071311310631,
+          "trades": 130,
+          "wilson_95_lower_bound": 0.26279767664610515,
+          "win_rate": 0.3384615384615385,
+          "wins": 44
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.07012951636721891,
+              "trades": 21,
+              "wins": 6
+            },
+            "34425005585": {
+              "pnl_sol": 0.010633998684923294,
+              "trades": 10,
+              "wins": 4
+            },
+            "34470147967": {
+              "pnl_sol": 0.03688706381442213,
+              "trades": 16,
+              "wins": 7
+            },
+            "34512979177": {
+              "pnl_sol": 0.03329312020225035,
+              "trades": 14,
+              "wins": 6
+            },
+            "34547229611": {
+              "pnl_sol": 0.19654697900768275,
+              "trades": 13,
+              "wins": 6
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.06281679470953086,
+          "ledger_hash": "027eaa84597242f6218459ddbe3599229fe60c659e73acd834f07f060c66423b",
+          "maximum_drawdown_fraction": 0.03449474328496175,
+          "net_pnl_sol": 0.3474906780764955,
+          "profit_factor": 1.6191137547950367,
+          "trades": 74,
+          "wilson_95_lower_bound": 0.28864748449945055,
+          "win_rate": 0.3918918918918919,
+          "wins": 29
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.09169336461536161,
+              "trades": 14,
+              "wins": 7
+            },
+            "34627236811": {
+              "pnl_sol": 0.16486204135389085,
+              "trades": 18,
+              "wins": 7
+            },
+            "34660606300": {
+              "pnl_sol": 0.3519591543524371,
+              "trades": 17,
+              "wins": 10
+            },
+            "34684115937": {
+              "pnl_sol": 0.173523831542432,
+              "trades": 28,
+              "wins": 13
+            },
+            "34709541936": {
+              "pnl_sol": -0.19040355380574134,
+              "trades": 13,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.050449655457988345,
+          "ledger_hash": "6a97e76c7f470b78eabe89b3516eb4add84b13f21ec52f6fec960aeb38229456",
+          "maximum_drawdown_fraction": 0.07093200117126901,
+          "net_pnl_sol": 0.5916348380583805,
+          "profit_factor": 1.7910109799523073,
+          "trades": 90,
+          "wilson_95_lower_bound": 0.3357640526326509,
+          "win_rate": 0.43333333333333335,
+          "wins": 39
+        }
+      ],
+      "largest_winner_contribution": 0.02864846212973311,
+      "ledger_hash": "39b62f951e022d95e8eed1421cc5fecb4d8b9adb7b5ade52c72913753e4a8fb3",
+      "maximum_fold_drawdown_fraction": 0.07093200117126901,
+      "minimum_fold_profit_factor": 1.465071311310631,
+      "minimum_fold_win_rate": 0.3384615384615385,
+      "net_pnl_sol": 2.017259922492926,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 2,
+        "known_buyers_min": 1,
+        "known_fraction_min": 0.5,
+        "positive_expectancy_fraction_min": 0.0
+      },
+      "positive_capture_windows": 17,
+      "positive_folds": 4,
+      "profit_factor": 1.641102272047071,
+      "rule_type": "buyer",
+      "trades": 403,
+      "wilson_95_lower_bound": 0.3504401259697861,
+      "win_rate": 0.3970223325062035,
+      "wins": 160
+    },
+    {
+      "candidate": "buyer|known=1|fraction=0.50|history=5|wr=0.60|pnl=0.010|positive=0.50",
+      "capture_windows": 19,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.17861303246806362,
+              "trades": 27,
+              "wins": 12
+            },
+            "34159449923": {
+              "pnl_sol": 0.054456098289687255,
+              "trades": 3,
+              "wins": 2
+            },
+            "34167878699": {
+              "pnl_sol": 0.2884622503694494,
+              "trades": 9,
+              "wins": 8
+            },
+            "34175839320": {
+              "pnl_sol": -0.01251446272676797,
+              "trades": 11,
+              "wins": 4
+            },
+            "34186192299": {
+              "pnl_sol": 0.08715711734220877,
+              "trades": 26,
+              "wins": 12
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.058012907269087914,
+          "ledger_hash": "774b34dcb60dffcd5a23d36df9e2c5f2679e7236b3180eee355a1911f31f8913",
+          "maximum_drawdown_fraction": 0.060497543372453645,
+          "net_pnl_sol": 0.5961740357426413,
+          "profit_factor": 1.8804987046047261,
+          "trades": 76,
+          "wilson_95_lower_bound": 0.3903240360982663,
+          "win_rate": 0.5,
+          "wins": 38
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.1336958362125739,
+              "trades": 23,
+              "wins": 14
+            },
+            "34244224832": {
+              "pnl_sol": 0.020239992511991586,
+              "trades": 18,
+              "wins": 4
+            },
+            "34281858070": {
+              "pnl_sol": 0.08731630941580845,
+              "trades": 12,
+              "wins": 4
+            },
+            "34310065776": {
+              "pnl_sol": -0.0374691840435285,
+              "trades": 10,
+              "wins": 3
+            },
+            "34348537141": {
+              "pnl_sol": 0.45986014100802347,
+              "trades": 17,
+              "wins": 11
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.13204542759508342,
+          "ledger_hash": "4fc24ea8ca5c524ee8dcb22a2ac49c40a86e982e6093ea73bf06a99c35fb9515",
+          "maximum_drawdown_fraction": 0.03628911596524024,
+          "net_pnl_sol": 0.6636430951048689,
+          "profit_factor": 2.253775501292077,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.34577510374379766,
+          "win_rate": 0.45,
+          "wins": 36
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.13621544031967314,
+              "trades": 11,
+              "wins": 5
+            },
+            "34425005585": {
+              "pnl_sol": 0.0012839677319947049,
+              "trades": 4,
+              "wins": 1
+            },
+            "34470147967": {
+              "pnl_sol": 0.1030491279059451,
+              "trades": 13,
+              "wins": 7
+            },
+            "34512979177": {
+              "pnl_sol": 0.0625609508934338,
+              "trades": 4,
+              "wins": 2
+            },
+            "34547229611": {
+              "pnl_sol": 0.07633994170844424,
+              "trades": 6,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.09892965575650316,
+          "ledger_hash": "6dd0b17332928fae90b3663375df192cd61be45713ccbb6fc1a6fdda4627015e",
+          "maximum_drawdown_fraction": 0.01775080687757476,
+          "net_pnl_sol": 0.3794494285594907,
+          "profit_factor": 3.1395680410449236,
+          "trades": 38,
+          "wilson_95_lower_bound": 0.3014616531155089,
+          "win_rate": 0.4473684210526316,
+          "wins": 17
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.07765329533169499,
+              "trades": 9,
+              "wins": 5
+            },
+            "34660606300": {
+              "pnl_sol": 0.04881389829686292,
+              "trades": 4,
+              "wins": 2
+            },
+            "34684115937": {
+              "pnl_sol": 0.15355472120492772,
+              "trades": 19,
+              "wins": 12
+            },
+            "34709541936": {
+              "pnl_sol": -0.0857179941677776,
+              "trades": 8,
+              "wins": 2
+            }
+          },
+          "capture_windows": 4,
+          "largest_winner_contribution": 0.11229697645241277,
+          "ledger_hash": "d618e8364c86cb1fc4ce4928981e8e03e025eb203efa8564db0117df02dd936f",
+          "maximum_drawdown_fraction": 0.029052356627480957,
+          "net_pnl_sol": 0.1943039206657069,
+          "profit_factor": 1.6037344049063627,
+          "trades": 40,
+          "wilson_95_lower_bound": 0.37497106853929735,
+          "win_rate": 0.525,
+          "wins": 21
+        }
+      ],
+      "largest_winner_contribution": 0.04450910134427674,
+      "ledger_hash": "3432b92078abab10ba9b8c0e2332320e5291d052343bf8ba0d3716de35050627",
+      "maximum_fold_drawdown_fraction": 0.060497543372453645,
+      "minimum_fold_profit_factor": 1.6037344049063627,
+      "minimum_fold_win_rate": 0.4473684210526316,
+      "net_pnl_sol": 1.8335704800727077,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 5,
+        "known_buyers_min": 1,
+        "known_fraction_min": 0.5,
+        "positive_expectancy_fraction_min": 0.5
+      },
+      "positive_capture_windows": 16,
+      "positive_folds": 4,
+      "profit_factor": 2.075037234713764,
+      "rule_type": "buyer",
+      "trades": 234,
+      "wilson_95_lower_bound": 0.4154896048793992,
+      "win_rate": 0.47863247863247865,
+      "wins": 112
+    },
+    {
+      "candidate": "buyer|known=1|fraction=0.50|history=10|wr=0.60|pnl=0.010|positive=0.50",
+      "capture_windows": 19,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.12613945625604983,
+              "trades": 26,
+              "wins": 11
+            },
+            "34159449923": {
+              "pnl_sol": 0.053457112447413184,
+              "trades": 3,
+              "wins": 2
+            },
+            "34167878699": {
+              "pnl_sol": 0.2833795638419509,
+              "trades": 9,
+              "wins": 8
+            },
+            "34175839320": {
+              "pnl_sol": -0.012675646167607017,
+              "trades": 11,
+              "wins": 4
+            },
+            "34186192299": {
+              "pnl_sol": 0.08482826012088221,
+              "trades": 26,
+              "wins": 12
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.06027855669986896,
+          "ledger_hash": "6c923f66d7e5d4ffcc30d982fe9be6235d7d963f7d738a4073b69c758c598932",
+          "maximum_drawdown_fraction": 0.05954147181211914,
+          "net_pnl_sol": 0.5351287464986902,
+          "profit_factor": 1.7998072779870486,
+          "trades": 75,
+          "wilson_95_lower_bound": 0.38329818473419525,
+          "win_rate": 0.49333333333333335,
+          "wins": 37
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.1336958362125739,
+              "trades": 23,
+              "wins": 14
+            },
+            "34244224832": {
+              "pnl_sol": 0.020239992511991586,
+              "trades": 18,
+              "wins": 4
+            },
+            "34281858070": {
+              "pnl_sol": 0.09188840388890665,
+              "trades": 11,
+              "wins": 4
+            },
+            "34310065776": {
+              "pnl_sol": -0.03749365219166658,
+              "trades": 10,
+              "wins": 3
+            },
+            "34348537141": {
+              "pnl_sol": 0.4605652657712843,
+              "trades": 17,
+              "wins": 11
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.13211008963177387,
+          "ledger_hash": "e26e5f0754cd63e4ad2a25ca2d56250a16c7927461e4686d061fc7837ccce885",
+          "maximum_drawdown_fraction": 0.03628911596524024,
+          "net_pnl_sol": 0.6688958461930894,
+          "profit_factor": 2.273588366355236,
+          "trades": 79,
+          "wilson_95_lower_bound": 0.35048276758066016,
+          "win_rate": 0.45569620253164556,
+          "wins": 36
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.13621544031967314,
+              "trades": 11,
+              "wins": 5
+            },
+            "34425005585": {
+              "pnl_sol": 0.0012839677319947049,
+              "trades": 4,
+              "wins": 1
+            },
+            "34470147967": {
+              "pnl_sol": 0.09997490275763674,
+              "trades": 11,
+              "wins": 6
+            },
+            "34512979177": {
+              "pnl_sol": 0.009308050679759539,
+              "trades": 2,
+              "wins": 1
+            },
+            "34547229611": {
+              "pnl_sol": 0.07483117716732007,
+              "trades": 6,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.1095670000142778,
+          "ledger_hash": "ea6964263d7d7e52778785267ded3b12c00dcfcda344191284d7975e23b2ba77",
+          "maximum_drawdown_fraction": 0.01775080687757476,
+          "net_pnl_sol": 0.3216135386563841,
+          "profit_factor": 2.8453836356858435,
+          "trades": 34,
+          "wilson_95_lower_bound": 0.2888324021529675,
+          "win_rate": 0.4411764705882353,
+          "wins": 15
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.07765329533169499,
+              "trades": 9,
+              "wins": 5
+            },
+            "34660606300": {
+              "pnl_sol": 0.020919629780449638,
+              "trades": 3,
+              "wins": 1
+            },
+            "34684115937": {
+              "pnl_sol": 0.14543439728487947,
+              "trades": 18,
+              "wins": 11
+            },
+            "34709541936": {
+              "pnl_sol": -0.05141378471123131,
+              "trades": 6,
+              "wins": 2
+            }
+          },
+          "capture_windows": 4,
+          "largest_winner_contribution": 0.11992761535322582,
+          "ledger_hash": "97a5f0a21218d24803a6477527a6f05e3f3d4d4b85517bafbcda0fdccf4b69b6",
+          "maximum_drawdown_fraction": 0.022920512572248548,
+          "net_pnl_sol": 0.19259353768579324,
+          "profit_factor": 1.6729187719857452,
+          "trades": 36,
+          "wilson_95_lower_bound": 0.3700567162693947,
+          "win_rate": 0.5277777777777778,
+          "wins": 19
+        }
+      ],
+      "largest_winner_contribution": 0.04676936250424629,
+      "ledger_hash": "5c10713d0a288b22caffca08d07c8a3a60949ca779437f632cdafd8d3b8d8b33",
+      "maximum_fold_drawdown_fraction": 0.05954147181211914,
+      "minimum_fold_profit_factor": 1.6729187719857452,
+      "minimum_fold_win_rate": 0.4411764705882353,
+      "net_pnl_sol": 1.718231669033957,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 10,
+        "known_buyers_min": 1,
+        "known_fraction_min": 0.5,
+        "positive_expectancy_fraction_min": 0.5
+      },
+      "positive_capture_windows": 16,
+      "positive_folds": 4,
+      "profit_factor": 2.0383544776198823,
+      "rule_type": "buyer",
+      "trades": 224,
+      "wilson_95_lower_bound": 0.4131939244572341,
+      "win_rate": 0.47767857142857145,
+      "wins": 107
+    },
+    {
+      "candidate": "buyer|known=2|fraction=0.50|history=3|wr=0.60|pnl=0.010|positive=0.50",
+      "capture_windows": 19,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.17861303246806362,
+              "trades": 27,
+              "wins": 12
+            },
+            "34159449923": {
+              "pnl_sol": 0.054456098289687255,
+              "trades": 3,
+              "wins": 2
+            },
+            "34167878699": {
+              "pnl_sol": 0.2884622503694494,
+              "trades": 9,
+              "wins": 8
+            },
+            "34175839320": {
+              "pnl_sol": 0.018578476413345535,
+              "trades": 9,
+              "wins": 3
+            },
+            "34186192299": {
+              "pnl_sol": 0.08839034990342462,
+              "trades": 26,
+              "wins": 12
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.05848881091531932,
+          "ledger_hash": "10de563ac9e615205396d9d7b9249546edcf0d948548841b0be419a1748f8a4c",
+          "maximum_drawdown_fraction": 0.06100382540995245,
+          "net_pnl_sol": 0.6285002074439698,
+          "profit_factor": 1.9729528810664798,
+          "trades": 74,
+          "wilson_95_lower_bound": 0.38892400848268727,
+          "win_rate": 0.5,
+          "wins": 37
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.1336958362125739,
+              "trades": 23,
+              "wins": 14
+            },
+            "34244224832": {
+              "pnl_sol": -0.0013587991396672924,
+              "trades": 19,
+              "wins": 4
+            },
+            "34281858070": {
+              "pnl_sol": 0.08654818502750083,
+              "trades": 12,
+              "wins": 4
+            },
+            "34310065776": {
+              "pnl_sol": -0.037349484632617724,
+              "trades": 10,
+              "wins": 3
+            },
+            "34348537141": {
+              "pnl_sol": 0.45641063521361047,
+              "trades": 17,
+              "wins": 11
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.13174550845511843,
+          "ledger_hash": "ab36de32c1b64397c9dc6eaa6568072c15fbc26b46e825eed9568a72ae3df2ea",
+          "maximum_drawdown_fraction": 0.04339462990248707,
+          "net_pnl_sol": 0.6379463726813999,
+          "profit_factor": 2.1614689484382614,
+          "trades": 81,
+          "wilson_95_lower_bound": 0.3411937567641278,
+          "win_rate": 0.4444444444444444,
+          "wins": 36
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.13477329498146523,
+              "trades": 12,
+              "wins": 5
+            },
+            "34425005585": {
+              "pnl_sol": 0.0013567809739464462,
+              "trades": 5,
+              "wins": 2
+            },
+            "34470147967": {
+              "pnl_sol": 0.10299258167211639,
+              "trades": 13,
+              "wins": 7
+            },
+            "34512979177": {
+              "pnl_sol": 0.06543674873245707,
+              "trades": 5,
+              "wins": 3
+            },
+            "34547229611": {
+              "pnl_sol": 0.07637877889618486,
+              "trades": 6,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.09847043937532785,
+          "ledger_hash": "eeb201fc07ac1db9a632e2610fc6555b0613e1789f14bb5f6996bd710c4153b5",
+          "maximum_drawdown_fraction": 0.01774387082660193,
+          "net_pnl_sol": 0.38093818525616996,
+          "profit_factor": 3.1315918225848236,
+          "trades": 41,
+          "wilson_95_lower_bound": 0.32055999118185885,
+          "win_rate": 0.4634146341463415,
+          "wins": 19
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.07765329533169499,
+              "trades": 9,
+              "wins": 5
+            },
+            "34660606300": {
+              "pnl_sol": 0.04881389829686292,
+              "trades": 4,
+              "wins": 2
+            },
+            "34684115937": {
+              "pnl_sol": 0.1505432399364755,
+              "trades": 19,
+              "wins": 12
+            },
+            "34709541936": {
+              "pnl_sol": -0.0975016975840022,
+              "trades": 9,
+              "wins": 2
+            }
+          },
+          "capture_windows": 4,
+          "largest_winner_contribution": 0.11226168084676628,
+          "ledger_hash": "7a9f78e0cafc4d57d342aa6e6d42f31dd3f3b590d1d34318e714440f06db7186",
+          "maximum_drawdown_fraction": 0.0329627141012702,
+          "net_pnl_sol": 0.17950873598103145,
+          "profit_factor": 1.534502853665292,
+          "trades": 41,
+          "wilson_95_lower_bound": 0.3648425931586519,
+          "win_rate": 0.5121951219512195,
+          "wins": 21
+        }
+      ],
+      "largest_winner_contribution": 0.044224815138404996,
+      "ledger_hash": "f7060f10381e9002bbae62a52ae479c5b3b84b57257a8afeeb7110b1e346edc7",
+      "maximum_fold_drawdown_fraction": 0.06100382540995245,
+      "minimum_fold_profit_factor": 1.534502853665292,
+      "minimum_fold_win_rate": 0.4444444444444444,
+      "net_pnl_sol": 1.8268935013625711,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 3,
+        "known_buyers_min": 2,
+        "known_fraction_min": 0.5,
+        "positive_expectancy_fraction_min": 0.5
+      },
+      "positive_capture_windows": 16,
+      "positive_folds": 4,
+      "profit_factor": 2.0684942402687483,
+      "rule_type": "buyer",
+      "trades": 237,
+      "wilson_95_lower_bound": 0.41408227624951593,
+      "win_rate": 0.4767932489451477,
+      "wins": 113
+    },
+    {
+      "candidate": "buyer|known=2|fraction=0.00|history=2|wr=0.60|pnl=0.010|positive=0.50",
+      "capture_windows": 20,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.2051014686771656,
+              "trades": 32,
+              "wins": 14
+            },
+            "34159449923": {
+              "pnl_sol": 0.03813880204757957,
+              "trades": 6,
+              "wins": 3
+            },
+            "34167878699": {
+              "pnl_sol": 0.4101840013637555,
+              "trades": 12,
+              "wins": 10
+            },
+            "34175839320": {
+              "pnl_sol": -0.031614141120982285,
+              "trades": 12,
+              "wins": 4
+            },
+            "34186192299": {
+              "pnl_sol": 0.09163081028564661,
+              "trades": 26,
+              "wins": 12
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.050605414735907836,
+          "ledger_hash": "5faec438f64ba968afae92ae16abc97498b62c1f8e03f72e70450ee1b2804816",
+          "maximum_drawdown_fraction": 0.06233413968832998,
+          "net_pnl_sol": 0.7134409412531628,
+          "profit_factor": 1.89773498123198,
+          "trades": 88,
+          "wilson_95_lower_bound": 0.38687686309205005,
+          "win_rate": 0.48863636363636365,
+          "wins": 43
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.1336958362125739,
+              "trades": 23,
+              "wins": 14
+            },
+            "34244224832": {
+              "pnl_sol": -0.024631524955950487,
+              "trades": 20,
+              "wins": 4
+            },
+            "34281858070": {
+              "pnl_sol": 0.08572053001002627,
+              "trades": 12,
+              "wins": 4
+            },
+            "34310065776": {
+              "pnl_sol": -0.03722050836323075,
+              "trades": 10,
+              "wins": 3
+            },
+            "34348537141": {
+              "pnl_sol": 0.5379182096997456,
+              "trades": 19,
+              "wins": 13
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.12553980459842204,
+          "ledger_hash": "dc54d216bfd99ac62c92f1489dcfad3f3c0992479a3a4f1debd8916050438f0e",
+          "maximum_drawdown_fraction": 0.04318763225118986,
+          "net_pnl_sol": 0.6954825426031657,
+          "profit_factor": 2.2194808423663672,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.3503554445205683,
+          "win_rate": 0.4523809523809524,
+          "wins": 38
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.10903142190405193,
+              "trades": 18,
+              "wins": 7
+            },
+            "34425005585": {
+              "pnl_sol": 0.011400279819610122,
+              "trades": 6,
+              "wins": 3
+            },
+            "34470147967": {
+              "pnl_sol": 0.07847640304473456,
+              "trades": 14,
+              "wins": 7
+            },
+            "34512979177": {
+              "pnl_sol": 0.04970046649952855,
+              "trades": 6,
+              "wins": 3
+            },
+            "34547229611": {
+              "pnl_sol": 0.03842331746057902,
+              "trades": 8,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.09262270585827936,
+          "ledger_hash": "4ad752e0fd59b0d4cf7f9ed64771691640f3c4c42018e2e13b87c5642b7cec8b",
+          "maximum_drawdown_fraction": 0.018939908075712147,
+          "net_pnl_sol": 0.28703188872850305,
+          "profit_factor": 1.9559024358545587,
+          "trades": 52,
+          "wilson_95_lower_bound": 0.2986784790886045,
+          "win_rate": 0.4230769230769231,
+          "wins": 22
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.07765329533169499,
+              "trades": 9,
+              "wins": 5
+            },
+            "34627236811": {
+              "pnl_sol": 0.016491194481905037,
+              "trades": 3,
+              "wins": 1
+            },
+            "34660606300": {
+              "pnl_sol": 0.12169190247234737,
+              "trades": 6,
+              "wins": 4
+            },
+            "34684115937": {
+              "pnl_sol": 0.15596476001258575,
+              "trades": 19,
+              "wins": 12
+            },
+            "34709541936": {
+              "pnl_sol": -0.10369531808499916,
+              "trades": 10,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.09105354631146957,
+          "ledger_hash": "898f5cc073a1ff402b10e390b246fdf85e2cfe5f460e10e81d96157b912de212",
+          "maximum_drawdown_fraction": 0.03513230992254194,
+          "net_pnl_sol": 0.2681058342135332,
+          "profit_factor": 1.6941247996453024,
+          "trades": 47,
+          "wilson_95_lower_bound": 0.37242217589372884,
+          "win_rate": 0.5106382978723404,
+          "wins": 24
+        }
+      ],
+      "largest_winner_contribution": 0.0395724447742027,
+      "ledger_hash": "d8f4c1c795c7831992c974af34a044ce0953a69cb5b2674b09ea19a57e1a4bd3",
+      "maximum_fold_drawdown_fraction": 0.06233413968832998,
+      "minimum_fold_profit_factor": 1.6941247996453024,
+      "minimum_fold_win_rate": 0.4230769230769231,
+      "net_pnl_sol": 1.9640612067983647,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 2,
+        "known_buyers_min": 2,
+        "known_fraction_min": 0.0,
+        "positive_expectancy_fraction_min": 0.5
+      },
+      "positive_capture_windows": 16,
+      "positive_folds": 4,
+      "profit_factor": 1.9573566785016718,
+      "rule_type": "buyer",
+      "trades": 271,
+      "wilson_95_lower_bound": 0.4100746395487426,
+      "win_rate": 0.46863468634686345,
+      "wins": 127
+    },
+    {
+      "candidate": "buyer|known=2|fraction=0.25|history=2|wr=0.60|pnl=0.010|positive=0.50",
+      "capture_windows": 20,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.2051014686771656,
+              "trades": 32,
+              "wins": 14
+            },
+            "34159449923": {
+              "pnl_sol": 0.03813880204757957,
+              "trades": 6,
+              "wins": 3
+            },
+            "34167878699": {
+              "pnl_sol": 0.4101840013637555,
+              "trades": 12,
+              "wins": 10
+            },
+            "34175839320": {
+              "pnl_sol": -0.031614141120982285,
+              "trades": 12,
+              "wins": 4
+            },
+            "34186192299": {
+              "pnl_sol": 0.09163081028564661,
+              "trades": 26,
+              "wins": 12
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.050605414735907836,
+          "ledger_hash": "5faec438f64ba968afae92ae16abc97498b62c1f8e03f72e70450ee1b2804816",
+          "maximum_drawdown_fraction": 0.06233413968832998,
+          "net_pnl_sol": 0.7134409412531628,
+          "profit_factor": 1.89773498123198,
+          "trades": 88,
+          "wilson_95_lower_bound": 0.38687686309205005,
+          "win_rate": 0.48863636363636365,
+          "wins": 43
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.1336958362125739,
+              "trades": 23,
+              "wins": 14
+            },
+            "34244224832": {
+              "pnl_sol": -0.024631524955950487,
+              "trades": 20,
+              "wins": 4
+            },
+            "34281858070": {
+              "pnl_sol": 0.08572053001002627,
+              "trades": 12,
+              "wins": 4
+            },
+            "34310065776": {
+              "pnl_sol": -0.03722050836323075,
+              "trades": 10,
+              "wins": 3
+            },
+            "34348537141": {
+              "pnl_sol": 0.5379182096997456,
+              "trades": 19,
+              "wins": 13
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.12553980459842204,
+          "ledger_hash": "dc54d216bfd99ac62c92f1489dcfad3f3c0992479a3a4f1debd8916050438f0e",
+          "maximum_drawdown_fraction": 0.04318763225118986,
+          "net_pnl_sol": 0.6954825426031657,
+          "profit_factor": 2.2194808423663672,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.3503554445205683,
+          "win_rate": 0.4523809523809524,
+          "wins": 38
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.10903142190405193,
+              "trades": 18,
+              "wins": 7
+            },
+            "34425005585": {
+              "pnl_sol": 0.011400279819610122,
+              "trades": 6,
+              "wins": 3
+            },
+            "34470147967": {
+              "pnl_sol": 0.07847640304473456,
+              "trades": 14,
+              "wins": 7
+            },
+            "34512979177": {
+              "pnl_sol": 0.04970046649952855,
+              "trades": 6,
+              "wins": 3
+            },
+            "34547229611": {
+              "pnl_sol": 0.03842331746057902,
+              "trades": 8,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.09262270585827936,
+          "ledger_hash": "4ad752e0fd59b0d4cf7f9ed64771691640f3c4c42018e2e13b87c5642b7cec8b",
+          "maximum_drawdown_fraction": 0.018939908075712147,
+          "net_pnl_sol": 0.28703188872850305,
+          "profit_factor": 1.9559024358545587,
+          "trades": 52,
+          "wilson_95_lower_bound": 0.2986784790886045,
+          "win_rate": 0.4230769230769231,
+          "wins": 22
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.07765329533169499,
+              "trades": 9,
+              "wins": 5
+            },
+            "34627236811": {
+              "pnl_sol": 0.016491194481905037,
+              "trades": 3,
+              "wins": 1
+            },
+            "34660606300": {
+              "pnl_sol": 0.12169190247234737,
+              "trades": 6,
+              "wins": 4
+            },
+            "34684115937": {
+              "pnl_sol": 0.15596476001258575,
+              "trades": 19,
+              "wins": 12
+            },
+            "34709541936": {
+              "pnl_sol": -0.10369531808499916,
+              "trades": 10,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.09105354631146957,
+          "ledger_hash": "898f5cc073a1ff402b10e390b246fdf85e2cfe5f460e10e81d96157b912de212",
+          "maximum_drawdown_fraction": 0.03513230992254194,
+          "net_pnl_sol": 0.2681058342135332,
+          "profit_factor": 1.6941247996453024,
+          "trades": 47,
+          "wilson_95_lower_bound": 0.37242217589372884,
+          "win_rate": 0.5106382978723404,
+          "wins": 24
+        }
+      ],
+      "largest_winner_contribution": 0.0395724447742027,
+      "ledger_hash": "d8f4c1c795c7831992c974af34a044ce0953a69cb5b2674b09ea19a57e1a4bd3",
+      "maximum_fold_drawdown_fraction": 0.06233413968832998,
+      "minimum_fold_profit_factor": 1.6941247996453024,
+      "minimum_fold_win_rate": 0.4230769230769231,
+      "net_pnl_sol": 1.9640612067983647,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 2,
+        "known_buyers_min": 2,
+        "known_fraction_min": 0.25,
+        "positive_expectancy_fraction_min": 0.5
+      },
+      "positive_capture_windows": 16,
+      "positive_folds": 4,
+      "profit_factor": 1.9573566785016718,
+      "rule_type": "buyer",
+      "trades": 271,
+      "wilson_95_lower_bound": 0.4100746395487426,
+      "win_rate": 0.46863468634686345,
+      "wins": 127
+    },
+    {
+      "candidate": "buyer|known=1|fraction=0.00|history=2|wr=0.60|pnl=0.010|positive=0.50",
+      "capture_windows": 20,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.2608406347971064,
+              "trades": 33,
+              "wins": 15
+            },
+            "34159449923": {
+              "pnl_sol": 0.03901296250158878,
+              "trades": 6,
+              "wins": 3
+            },
+            "34167878699": {
+              "pnl_sol": 0.4177950497504522,
+              "trades": 12,
+              "wins": 10
+            },
+            "34175839320": {
+              "pnl_sol": -0.06395377768534793,
+              "trades": 14,
+              "wins": 5
+            },
+            "34186192299": {
+              "pnl_sol": 0.09289544781055083,
+              "trades": 26,
+              "wins": 12
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.04861120007553015,
+          "ledger_hash": "17251eae8941355de506c995dad916cae1cc06f3625f02ae35a960c54a89d913",
+          "maximum_drawdown_fraction": 0.06285331448385649,
+          "net_pnl_sol": 0.7465903171743511,
+          "profit_factor": 1.8912275241081609,
+          "trades": 91,
+          "wilson_95_lower_bound": 0.39410407484574694,
+          "win_rate": 0.4945054945054945,
+          "wins": 45
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.1336958362125739,
+              "trades": 23,
+              "wins": 14
+            },
+            "34244224832": {
+              "pnl_sol": -0.024631524955950487,
+              "trades": 20,
+              "wins": 4
+            },
+            "34281858070": {
+              "pnl_sol": 0.08572053001002627,
+              "trades": 12,
+              "wins": 4
+            },
+            "34310065776": {
+              "pnl_sol": -0.03722050836323075,
+              "trades": 10,
+              "wins": 3
+            },
+            "34348537141": {
+              "pnl_sol": 0.5379182096997456,
+              "trades": 19,
+              "wins": 13
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.12553980459842204,
+          "ledger_hash": "dc54d216bfd99ac62c92f1489dcfad3f3c0992479a3a4f1debd8916050438f0e",
+          "maximum_drawdown_fraction": 0.04318763225118986,
+          "net_pnl_sol": 0.6954825426031657,
+          "profit_factor": 2.2194808423663672,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.3503554445205683,
+          "win_rate": 0.4523809523809524,
+          "wins": 38
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.10903142190405193,
+              "trades": 18,
+              "wins": 7
+            },
+            "34425005585": {
+              "pnl_sol": 0.011400279819610122,
+              "trades": 6,
+              "wins": 3
+            },
+            "34470147967": {
+              "pnl_sol": 0.07847640304473456,
+              "trades": 14,
+              "wins": 7
+            },
+            "34512979177": {
+              "pnl_sol": 0.04970046649952855,
+              "trades": 6,
+              "wins": 3
+            },
+            "34547229611": {
+              "pnl_sol": 0.03842331746057902,
+              "trades": 8,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.09262270585827936,
+          "ledger_hash": "4ad752e0fd59b0d4cf7f9ed64771691640f3c4c42018e2e13b87c5642b7cec8b",
+          "maximum_drawdown_fraction": 0.018939908075712147,
+          "net_pnl_sol": 0.28703188872850305,
+          "profit_factor": 1.9559024358545587,
+          "trades": 52,
+          "wilson_95_lower_bound": 0.2986784790886045,
+          "win_rate": 0.4230769230769231,
+          "wins": 22
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.07765329533169499,
+              "trades": 9,
+              "wins": 5
+            },
+            "34627236811": {
+              "pnl_sol": 0.016491194481905037,
+              "trades": 3,
+              "wins": 1
+            },
+            "34660606300": {
+              "pnl_sol": 0.12169190247234737,
+              "trades": 6,
+              "wins": 4
+            },
+            "34684115937": {
+              "pnl_sol": 0.14854902066414466,
+              "trades": 21,
+              "wins": 12
+            },
+            "34709541936": {
+              "pnl_sol": -0.1196164289914263,
+              "trades": 12,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.0910008712686402,
+          "ledger_hash": "7aa5ab8c359a6355d3a912624a90f8f5f1bdcc7128e069e180430b7cbb5cad18",
+          "maximum_drawdown_fraction": 0.039872142997142035,
+          "net_pnl_sol": 0.24476898395866575,
+          "profit_factor": 1.5983746898627005,
+          "trades": 51,
+          "wilson_95_lower_bound": 0.34052771426416406,
+          "win_rate": 0.47058823529411764,
+          "wins": 24
+        }
+      ],
+      "largest_winner_contribution": 0.03884104130628535,
+      "ledger_hash": "725d7853e9d2846979644962f90e8ba7b1424e66b9495d026f0537922279470a",
+      "maximum_fold_drawdown_fraction": 0.06285331448385649,
+      "minimum_fold_profit_factor": 1.5983746898627005,
+      "minimum_fold_win_rate": 0.4230769230769231,
+      "net_pnl_sol": 1.9738737324646856,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 2,
+        "known_buyers_min": 1,
+        "known_fraction_min": 0.0,
+        "positive_expectancy_fraction_min": 0.5
+      },
+      "positive_capture_windows": 16,
+      "positive_folds": 4,
+      "profit_factor": 1.932237789217111,
+      "rule_type": "buyer",
+      "trades": 278,
+      "wilson_95_lower_bound": 0.4062937263960543,
+      "win_rate": 0.46402877697841727,
+      "wins": 129
+    },
+    {
+      "candidate": "buyer|known=1|fraction=0.25|history=2|wr=0.60|pnl=0.010|positive=0.50",
+      "capture_windows": 20,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.2051014686771656,
+              "trades": 32,
+              "wins": 14
+            },
+            "34159449923": {
+              "pnl_sol": 0.03813880204757957,
+              "trades": 6,
+              "wins": 3
+            },
+            "34167878699": {
+              "pnl_sol": 0.4101840013637555,
+              "trades": 12,
+              "wins": 10
+            },
+            "34175839320": {
+              "pnl_sol": -0.06333524916991272,
+              "trades": 14,
+              "wins": 5
+            },
+            "34186192299": {
+              "pnl_sol": 0.0903726627960349,
+              "trades": 26,
+              "wins": 12
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.05018869317163915,
+          "ledger_hash": "8c903fb83db1aaaaf0b5313cdd901f06d7d02636f2b5b6fb2873ecee55dce21c",
+          "maximum_drawdown_fraction": 0.061817629263170026,
+          "net_pnl_sol": 0.68046168571462,
+          "profit_factor": 1.823348617967702,
+          "trades": 90,
+          "wilson_95_lower_bound": 0.3882031497910542,
+          "win_rate": 0.4888888888888889,
+          "wins": 44
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.1336958362125739,
+              "trades": 23,
+              "wins": 14
+            },
+            "34244224832": {
+              "pnl_sol": -0.024631524955950487,
+              "trades": 20,
+              "wins": 4
+            },
+            "34281858070": {
+              "pnl_sol": 0.08572053001002627,
+              "trades": 12,
+              "wins": 4
+            },
+            "34310065776": {
+              "pnl_sol": -0.03722050836323075,
+              "trades": 10,
+              "wins": 3
+            },
+            "34348537141": {
+              "pnl_sol": 0.5379182096997456,
+              "trades": 19,
+              "wins": 13
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.12553980459842204,
+          "ledger_hash": "dc54d216bfd99ac62c92f1489dcfad3f3c0992479a3a4f1debd8916050438f0e",
+          "maximum_drawdown_fraction": 0.04318763225118986,
+          "net_pnl_sol": 0.6954825426031657,
+          "profit_factor": 2.2194808423663672,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.3503554445205683,
+          "win_rate": 0.4523809523809524,
+          "wins": 38
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.10903142190405193,
+              "trades": 18,
+              "wins": 7
+            },
+            "34425005585": {
+              "pnl_sol": 0.011400279819610122,
+              "trades": 6,
+              "wins": 3
+            },
+            "34470147967": {
+              "pnl_sol": 0.07847640304473456,
+              "trades": 14,
+              "wins": 7
+            },
+            "34512979177": {
+              "pnl_sol": 0.04970046649952855,
+              "trades": 6,
+              "wins": 3
+            },
+            "34547229611": {
+              "pnl_sol": 0.03842331746057902,
+              "trades": 8,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.09262270585827936,
+          "ledger_hash": "4ad752e0fd59b0d4cf7f9ed64771691640f3c4c42018e2e13b87c5642b7cec8b",
+          "maximum_drawdown_fraction": 0.018939908075712147,
+          "net_pnl_sol": 0.28703188872850305,
+          "profit_factor": 1.9559024358545587,
+          "trades": 52,
+          "wilson_95_lower_bound": 0.2986784790886045,
+          "win_rate": 0.4230769230769231,
+          "wins": 22
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.07765329533169499,
+              "trades": 9,
+              "wins": 5
+            },
+            "34627236811": {
+              "pnl_sol": 0.016491194481905037,
+              "trades": 3,
+              "wins": 1
+            },
+            "34660606300": {
+              "pnl_sol": 0.12169190247234737,
+              "trades": 6,
+              "wins": 4
+            },
+            "34684115937": {
+              "pnl_sol": 0.14854902066414466,
+              "trades": 21,
+              "wins": 12
+            },
+            "34709541936": {
+              "pnl_sol": -0.1196164289914263,
+              "trades": 12,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.0910008712686402,
+          "ledger_hash": "7aa5ab8c359a6355d3a912624a90f8f5f1bdcc7128e069e180430b7cbb5cad18",
+          "maximum_drawdown_fraction": 0.039872142997142035,
+          "net_pnl_sol": 0.24476898395866575,
+          "profit_factor": 1.5983746898627005,
+          "trades": 51,
+          "wilson_95_lower_bound": 0.34052771426416406,
+          "win_rate": 0.47058823529411764,
+          "wins": 24
+        }
+      ],
+      "largest_winner_contribution": 0.03958985352553823,
+      "ledger_hash": "017d1d783ac0029833a8ef2f3a9f97e159184d28b5e37c2f5f90332807a0cbaf",
+      "maximum_fold_drawdown_fraction": 0.061817629263170026,
+      "minimum_fold_profit_factor": 1.5983746898627005,
+      "minimum_fold_win_rate": 0.4230769230769231,
+      "net_pnl_sol": 1.9077451010049544,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 2,
+        "known_buyers_min": 1,
+        "known_fraction_min": 0.25,
+        "positive_expectancy_fraction_min": 0.5
+      },
+      "positive_capture_windows": 16,
+      "positive_folds": 4,
+      "profit_factor": 1.9058204632085638,
+      "rule_type": "buyer",
+      "trades": 277,
+      "wilson_95_lower_bound": 0.40429998246324744,
+      "win_rate": 0.4620938628158845,
+      "wins": 128
+    },
+    {
+      "candidate": "buyer|known=1|fraction=0.50|history=2|wr=0.60|pnl=0.010|positive=0.50",
+      "capture_windows": 20,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.1557858547118023,
+              "trades": 29,
+              "wins": 12
+            },
+            "34159449923": {
+              "pnl_sol": 0.054021517133917694,
+              "trades": 3,
+              "wins": 2
+            },
+            "34167878699": {
+              "pnl_sol": 0.2794245695036614,
+              "trades": 10,
+              "wins": 8
+            },
+            "34175839320": {
+              "pnl_sol": -0.012603372516524713,
+              "trades": 11,
+              "wins": 4
+            },
+            "34186192299": {
+              "pnl_sol": 0.08587250519567657,
+              "trades": 26,
+              "wins": 12
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.057950601910037834,
+          "ledger_hash": "09e1701326b0efba7931ead55ed1fbf0b26189f1a24ba2a16eaf1caf72646088",
+          "maximum_drawdown_fraction": 0.059970168345718555,
+          "net_pnl_sol": 0.5625010740285306,
+          "profit_factor": 1.8036151148782524,
+          "trades": 79,
+          "wilson_95_lower_bound": 0.3742954498192782,
+          "win_rate": 0.4810126582278481,
+          "wins": 38
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.1336958362125739,
+              "trades": 23,
+              "wins": 14
+            },
+            "34244224832": {
+              "pnl_sol": -0.0013587991396672924,
+              "trades": 19,
+              "wins": 4
+            },
+            "34281858070": {
+              "pnl_sol": 0.08654818502750083,
+              "trades": 12,
+              "wins": 4
+            },
+            "34310065776": {
+              "pnl_sol": -0.037349484632617724,
+              "trades": 10,
+              "wins": 3
+            },
+            "34348537141": {
+              "pnl_sol": 0.45641063521361047,
+              "trades": 17,
+              "wins": 11
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.13174550845511843,
+          "ledger_hash": "ab36de32c1b64397c9dc6eaa6568072c15fbc26b46e825eed9568a72ae3df2ea",
+          "maximum_drawdown_fraction": 0.04339462990248707,
+          "net_pnl_sol": 0.6379463726813999,
+          "profit_factor": 2.1614689484382614,
+          "trades": 81,
+          "wilson_95_lower_bound": 0.3411937567641278,
+          "win_rate": 0.4444444444444444,
+          "wins": 36
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.11732133280347393,
+              "trades": 13,
+              "wins": 5
+            },
+            "34425005585": {
+              "pnl_sol": 0.0012927136585906898,
+              "trades": 5,
+              "wins": 2
+            },
+            "34470147967": {
+              "pnl_sol": 0.07841418336167214,
+              "trades": 14,
+              "wins": 7
+            },
+            "34512979177": {
+              "pnl_sol": 0.049664090795038696,
+              "trades": 6,
+              "wins": 3
+            },
+            "34547229611": {
+              "pnl_sol": 0.07482876535469035,
+              "trades": 6,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.09764138103754334,
+          "ledger_hash": "a74d7acef33c828e3cde1b7e6818fc60718c6194316aefa241ae9caf2c61cf4a",
+          "maximum_drawdown_fraction": 0.018815385785619625,
+          "net_pnl_sol": 0.32152108597346496,
+          "profit_factor": 2.382000098439764,
+          "trades": 44,
+          "wilson_95_lower_bound": 0.2968250416485458,
+          "win_rate": 0.4318181818181818,
+          "wins": 19
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.07765329533169499,
+              "trades": 9,
+              "wins": 5
+            },
+            "34627236811": {
+              "pnl_sol": 0.03784306626620175,
+              "trades": 2,
+              "wins": 1
+            },
+            "34660606300": {
+              "pnl_sol": 0.10403884910258693,
+              "trades": 5,
+              "wins": 3
+            },
+            "34684115937": {
+              "pnl_sol": 0.14876961272747832,
+              "trades": 21,
+              "wins": 12
+            },
+            "34709541936": {
+              "pnl_sol": -0.11585222896904684,
+              "trades": 11,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.09356389267808966,
+          "ledger_hash": "70cc8f00b16c2a6bf472d83de1e4a801cfe27cca177244a3329c58dd098a87ce",
+          "maximum_drawdown_fraction": 0.03861740965634904,
+          "net_pnl_sol": 0.2524525944589153,
+          "profit_factor": 1.6570421788794898,
+          "trades": 48,
+          "wilson_95_lower_bound": 0.34471090015787464,
+          "win_rate": 0.4791666666666667,
+          "wins": 23
+        }
+      ],
+      "largest_winner_contribution": 0.04296336143259124,
+      "ledger_hash": "d1655358e94e3a2846285e3d78526f929afdc4cf924db843c88a8914d27a1409",
+      "maximum_fold_drawdown_fraction": 0.059970168345718555,
+      "minimum_fold_profit_factor": 1.6570421788794898,
+      "minimum_fold_win_rate": 0.4318181818181818,
+      "net_pnl_sol": 1.7744211271423107,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 2,
+        "known_buyers_min": 1,
+        "known_fraction_min": 0.5,
+        "positive_expectancy_fraction_min": 0.5
+      },
+      "positive_capture_windows": 16,
+      "positive_folds": 4,
+      "profit_factor": 1.950873202829682,
+      "rule_type": "buyer",
+      "trades": 252,
+      "wilson_95_lower_bound": 0.39983471634281453,
+      "win_rate": 0.4603174603174603,
+      "wins": 116
+    },
+    {
+      "candidate": "buyer|known=2|fraction=0.00|history=5|wr=0.60|pnl=0.010|positive=0.00",
+      "capture_windows": 20,
+      "folds": [
+        {
+          "by_capture_window": {
+            "34150939561": {
+              "pnl_sol": 0.1268896779041269,
+              "trades": 35,
+              "wins": 14
+            },
+            "34159449923": {
+              "pnl_sol": 0.10400572261374455,
+              "trades": 11,
+              "wins": 7
+            },
+            "34167878699": {
+              "pnl_sol": 0.4062281052698377,
+              "trades": 15,
+              "wins": 10
+            },
+            "34175839320": {
+              "pnl_sol": -0.0007481111758233724,
+              "trades": 19,
+              "wins": 5
+            },
+            "34186192299": {
+              "pnl_sol": 0.26188883900224585,
+              "trades": 31,
+              "wins": 17
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.04384163174622517,
+          "ledger_hash": "e112bcd1018f5705c90009e27ba89358deefdfd60351acf389e723e637f4855e",
+          "maximum_drawdown_fraction": 0.06522878226767048,
+          "net_pnl_sol": 0.8982642336141331,
+          "profit_factor": 1.9650193799653743,
+          "trades": 111,
+          "wilson_95_lower_bound": 0.3868721294381169,
+          "win_rate": 0.4774774774774775,
+          "wins": 53
+        },
+        {
+          "by_capture_window": {
+            "34201101121": {
+              "pnl_sol": 0.06368701510148853,
+              "trades": 29,
+              "wins": 13
+            },
+            "34244224832": {
+              "pnl_sol": -0.03114981408483202,
+              "trades": 30,
+              "wins": 6
+            },
+            "34281858070": {
+              "pnl_sol": 0.09343030155972401,
+              "trades": 31,
+              "wins": 10
+            },
+            "34310065776": {
+              "pnl_sol": -0.08242370851693502,
+              "trades": 19,
+              "wins": 4
+            },
+            "34348537141": {
+              "pnl_sol": 0.42199648544767887,
+              "trades": 22,
+              "wins": 12
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.10483597357423914,
+          "ledger_hash": "34668b7e71c4de93c33c075e343ab35494e6c650d0e7534d452c9bbdb0b57a90",
+          "maximum_drawdown_fraction": 0.050890602903390945,
+          "net_pnl_sol": 0.4655402795071226,
+          "profit_factor": 1.4859543170603586,
+          "trades": 131,
+          "wilson_95_lower_bound": 0.2676912988309227,
+          "win_rate": 0.3435114503816794,
+          "wins": 45
+        },
+        {
+          "by_capture_window": {
+            "34388016481": {
+              "pnl_sol": 0.05334993927419367,
+              "trades": 22,
+              "wins": 7
+            },
+            "34425005585": {
+              "pnl_sol": 0.020399393389810002,
+              "trades": 10,
+              "wins": 4
+            },
+            "34470147967": {
+              "pnl_sol": 0.05999386984262002,
+              "trades": 15,
+              "wins": 7
+            },
+            "34512979177": {
+              "pnl_sol": 0.0723592601552206,
+              "trades": 11,
+              "wins": 5
+            },
+            "34547229611": {
+              "pnl_sol": 0.2221217784549756,
+              "trades": 18,
+              "wins": 8
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.060077682707193665,
+          "ledger_hash": "586d6c75706f02272f3387f0cfcf6087f75dcf85f4109673490e848a54a1e73c",
+          "maximum_drawdown_fraction": 0.034331576818586416,
+          "net_pnl_sol": 0.42822424111681956,
+          "profit_factor": 1.7847977519894367,
+          "trades": 76,
+          "wilson_95_lower_bound": 0.3044362924110896,
+          "win_rate": 0.40789473684210525,
+          "wins": 31
+        },
+        {
+          "by_capture_window": {
+            "34586174670": {
+              "pnl_sol": 0.03352354056063788,
+              "trades": 14,
+              "wins": 6
+            },
+            "34627236811": {
+              "pnl_sol": 0.12207907786220944,
+              "trades": 16,
+              "wins": 6
+            },
+            "34660606300": {
+              "pnl_sol": 0.30033904109812154,
+              "trades": 17,
+              "wins": 10
+            },
+            "34684115937": {
+              "pnl_sol": 0.1776538069608144,
+              "trades": 25,
+              "wins": 13
+            },
+            "34709541936": {
+              "pnl_sol": -0.16282700125356403,
+              "trades": 11,
+              "wins": 2
+            }
+          },
+          "capture_windows": 5,
+          "largest_winner_contribution": 0.05628073880265333,
+          "ledger_hash": "f97df6fad97ed715f7ada74c2d22a89a037a1f2c94897fa146aea361a4d0780d",
+          "maximum_drawdown_fraction": 0.060595091162690164,
+          "net_pnl_sol": 0.47076846522821914,
+          "profit_factor": 1.6915776511906566,
+          "trades": 83,
+          "wilson_95_lower_bound": 0.3436112760405485,
+          "win_rate": 0.4457831325301205,
+          "wins": 37
+        }
+      ],
+      "largest_winner_contribution": 0.027749708396308744,
+      "ledger_hash": "dc267570fb6ae6f73d6bfba0c153f942a57abacbda5c55031435db2e87da4772",
+      "maximum_fold_drawdown_fraction": 0.06522878226767048,
+      "minimum_fold_profit_factor": 1.4859543170603586,
+      "minimum_fold_win_rate": 0.3435114503816794,
+      "net_pnl_sol": 2.2627972194662944,
+      "parameters": {
+        "average_pnl_max_min": 0.01,
+        "bayesian_win_rate_max_min": 0.6,
+        "history_max_min": 5,
+        "known_buyers_min": 2,
+        "known_fraction_min": 0.0,
+        "positive_expectancy_fraction_min": 0.0
+      },
+      "positive_capture_windows": 16,
+      "positive_folds": 4,
+      "profit_factor": 1.7263770237451614,
+      "rule_type": "buyer",
+      "trades": 401,
+      "wilson_95_lower_bound": 0.36679488616571104,
+      "win_rate": 0.4139650872817955,
+      "wins": 166
+    }
+  ],
+  "untouched_holdout_passed": false,
+  "version": "e4-v12-actor-reputation-rules-v7",
+  "walk_forward_gate_passed": false,
+  "walk_forward_requirements_passed": 8,
+  "winner": {
+    "candidate": "buyer|known=2|fraction=0.50|history=5|wr=0.60|pnl=0.010|positive=0.50",
+    "capture_windows": 19,
+    "folds": [
+      {
+        "by_capture_window": {
+          "34150939561": {
+            "pnl_sol": 0.17861303246806362,
+            "trades": 27,
+            "wins": 12
+          },
+          "34159449923": {
+            "pnl_sol": 0.054456098289687255,
+            "trades": 3,
+            "wins": 2
+          },
+          "34167878699": {
+            "pnl_sol": 0.2884622503694494,
+            "trades": 9,
+            "wins": 8
+          },
+          "34175839320": {
+            "pnl_sol": 0.018578476413345535,
+            "trades": 9,
+            "wins": 3
+          },
+          "34186192299": {
+            "pnl_sol": 0.08839034990342462,
+            "trades": 26,
+            "wins": 12
+          }
+        },
+        "capture_windows": 5,
+        "largest_winner_contribution": 0.05848881091531932,
+        "ledger_hash": "10de563ac9e615205396d9d7b9249546edcf0d948548841b0be419a1748f8a4c",
+        "maximum_drawdown_fraction": 0.06100382540995245,
+        "net_pnl_sol": 0.6285002074439698,
+        "profit_factor": 1.9729528810664798,
+        "trades": 74,
+        "wilson_95_lower_bound": 0.38892400848268727,
+        "win_rate": 0.5,
+        "wins": 37
+      },
+      {
+        "by_capture_window": {
+          "34201101121": {
+            "pnl_sol": 0.1336958362125739,
+            "trades": 23,
+            "wins": 14
+          },
+          "34244224832": {
+            "pnl_sol": 0.020239992511991586,
+            "trades": 18,
+            "wins": 4
+          },
+          "34281858070": {
+            "pnl_sol": 0.08731630941580845,
+            "trades": 12,
+            "wins": 4
+          },
+          "34310065776": {
+            "pnl_sol": -0.0374691840435285,
+            "trades": 10,
+            "wins": 3
+          },
+          "34348537141": {
+            "pnl_sol": 0.45986014100802347,
+            "trades": 17,
+            "wins": 11
+          }
+        },
+        "capture_windows": 5,
+        "largest_winner_contribution": 0.13204542759508342,
+        "ledger_hash": "4fc24ea8ca5c524ee8dcb22a2ac49c40a86e982e6093ea73bf06a99c35fb9515",
+        "maximum_drawdown_fraction": 0.03628911596524024,
+        "net_pnl_sol": 0.6636430951048689,
+        "profit_factor": 2.253775501292077,
+        "trades": 80,
+        "wilson_95_lower_bound": 0.34577510374379766,
+        "win_rate": 0.45,
+        "wins": 36
+      },
+      {
+        "by_capture_window": {
+          "34388016481": {
+            "pnl_sol": 0.13621544031967314,
+            "trades": 11,
+            "wins": 5
+          },
+          "34425005585": {
+            "pnl_sol": 0.0012839677319947049,
+            "trades": 4,
+            "wins": 1
+          },
+          "34470147967": {
+            "pnl_sol": 0.1030491279059451,
+            "trades": 13,
+            "wins": 7
+          },
+          "34512979177": {
+            "pnl_sol": 0.0625609508934338,
+            "trades": 4,
+            "wins": 2
+          },
+          "34547229611": {
+            "pnl_sol": 0.07633994170844424,
+            "trades": 6,
+            "wins": 2
+          }
+        },
+        "capture_windows": 5,
+        "largest_winner_contribution": 0.09892965575650316,
+        "ledger_hash": "6dd0b17332928fae90b3663375df192cd61be45713ccbb6fc1a6fdda4627015e",
+        "maximum_drawdown_fraction": 0.01775080687757476,
+        "net_pnl_sol": 0.3794494285594907,
+        "profit_factor": 3.1395680410449236,
+        "trades": 38,
+        "wilson_95_lower_bound": 0.3014616531155089,
+        "win_rate": 0.4473684210526316,
+        "wins": 17
+      },
+      {
+        "by_capture_window": {
+          "34586174670": {
+            "pnl_sol": 0.07765329533169499,
+            "trades": 9,
+            "wins": 5
+          },
+          "34660606300": {
+            "pnl_sol": 0.04881389829686292,
+            "trades": 4,
+            "wins": 2
+          },
+          "34684115937": {
+            "pnl_sol": 0.1564070841704125,
+            "trades": 18,
+            "wins": 12
+          },
+          "34709541936": {
+            "pnl_sol": -0.0857786691370158,
+            "trades": 8,
+            "wins": 2
+          }
+        },
+        "capture_windows": 4,
+        "largest_winner_contribution": 0.1122837408660354,
+        "ledger_hash": "bb00465bfeab5c01e7da99efb44e87b0e58658b300c01c5f70f4c0ea3cde3197",
+        "maximum_drawdown_fraction": 0.029075891913103707,
+        "net_pnl_sol": 0.1970956086619533,
+        "profit_factor": 1.6176495169884404,
+        "trades": 39,
+        "wilson_95_lower_bound": 0.38569186821738816,
+        "win_rate": 0.5384615384615384,
+        "wins": 21
+      }
+    ],
+    "largest_winner_contribution": 0.04449310874435441,
+    "ledger_hash": "e68bdc5c90d8fe6c15eee4c7dce1513c368b7d7f72eb0e9b1809cf2b8fb2c44a",
+    "maximum_fold_drawdown_fraction": 0.06100382540995245,
+    "minimum_fold_profit_factor": 1.6176495169884404,
+    "minimum_fold_win_rate": 0.4473684210526316,
+    "net_pnl_sol": 1.8686883397702827,
+    "parameters": {
+      "average_pnl_max_min": 0.01,
+      "bayesian_win_rate_max_min": 0.6,
+      "history_max_min": 5,
+      "known_buyers_min": 2,
+      "known_fraction_min": 0.5,
+      "positive_expectancy_fraction_min": 0.5
+    },
+    "positive_capture_windows": 17,
+    "positive_folds": 4,
+    "profit_factor": 2.1178089601358687,
+    "rule_type": "buyer",
+    "trades": 231,
+    "wilson_95_lower_bound": 0.4169362012123895,
+    "win_rate": 0.4805194805194805,
+    "wins": 111
+  }
+}
