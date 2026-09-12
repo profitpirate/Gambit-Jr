@@ -1,0 +1,30 @@
+{
+  "version": "e4-v12-regime-robust-source-manifest-v1",
+  "parent_manifest": {
+    "path": "artifacts/e4-v12-riskset-source-manifest.json",
+    "sha256": "e2218156bc054af75f0dcc8c2debbfd04c2245343ba516850d4167e3a117dca1",
+    "captures": 22,
+    "launches": 66000,
+    "new_split": "train"
+  },
+  "chronological_policy": {
+    "train": "all 22 parent captures plus the first five new captures",
+    "validation": "the next three new captures",
+    "holdout": "the final three new captures; sealed until a candidate is frozen"
+  },
+  "new_captures": [
+    {"run_id":"34063856134","split":"train","capture_start_ns":1788733413302986052,"capture_end_ns":1788744517229355149,"source_commit":"b2bf74e9153e671615035a6f6e63eacbbe970dfb","launches":3000,"decoded_events":282243,"capture_errors":0,"events_sha256":"fc77512fc3ed971e0a48ffb5fe2a7ab68499ecc712017681e1edd6c2e4fe86a6"},
+    {"run_id":"34073802862","split":"train","capture_start_ns":1788745294231236914,"capture_end_ns":1788755751324435632,"source_commit":"dc79919a847186eafa912f415de71938f5ad2b68","launches":3000,"decoded_events":315348,"capture_errors":0,"events_sha256":"ca31bc7d94ef2c8f6ae00e26604677b7620790fc453496f8ee212c83038d5d8f"},
+    {"run_id":"34084120627","split":"train","capture_start_ns":1788756204609677332,"capture_end_ns":1788768653566793742,"source_commit":"5e19667318b55446c0d13b9e7a846b28ada28d8c","launches":3000,"decoded_events":323271,"capture_errors":0,"events_sha256":"c52f8292d99aaa60e38c7fd86c1b848dc2204a64fe821b79cc66354425580ca7"},
+    {"run_id":"34099929487","split":"train","capture_start_ns":1788769158423829048,"capture_end_ns":1788783558364342432,"source_commit":"17459f6a2c7a5092abfc7dcc0fb9ce6028e21069","launches":3000,"decoded_events":318057,"capture_errors":0,"events_sha256":"cc8726a6a4d1477f6dd1d1634a09c24274e04476b64b031fe89e29b5ca4434b6"},
+    {"run_id":"34123647690","split":"train","capture_start_ns":1788785186646787709,"capture_end_ns":1788794240943008955,"source_commit":"b2942d4a8fdbd7d5ce52cbb61ee39006c88b9032","launches":3000,"decoded_events":337281,"capture_errors":0,"events_sha256":"2e091edfb945085fd4af58b82c553178b63ee81ad1f3bd255aa4024970ea4a6f"},
+    {"run_id":"34138377553","split":"validation","capture_start_ns":1788794860298015445,"capture_end_ns":1788803783918355926,"source_commit":"b78b75d5fe30bd231e9767105744863c72f068ae","launches":3000,"decoded_events":280092,"capture_errors":0,"events_sha256":"076da6df38ff4fa07b7551874823ec007ee141b0f1b2848df0f43a26aa1de9f2"},
+    {"run_id":"34150939561","split":"validation","capture_start_ns":1788804998756458483,"capture_end_ns":1788811581877488723,"source_commit":"7863004d057ed1f2a3abc714fa9c0ec103a20e1e","launches":3000,"decoded_events":298540,"capture_errors":0,"events_sha256":"619977ace8de412a511da4b12050a6fe2d0aa6bbfeb7e5d2dc445e938dec5d89"},
+    {"run_id":"34159449923","split":"validation","capture_start_ns":1788812871315182269,"capture_end_ns":1788820666981250530,"source_commit":"5e737e61feb30705889c9cd1bbc86a86f00c604c","launches":3000,"decoded_events":295034,"capture_errors":0,"events_sha256":"6d9d1121b321e9e26555126cd3533482abfe8c13c55442f38aba07b0aa733bb8"},
+    {"run_id":"34167878699","split":"holdout","capture_start_ns":1788821299499872662,"capture_end_ns":1788829482286510826,"source_commit":"378f61062edb66bcd25d614b5231b0bc6a409184","launches":3000,"decoded_events":286663,"capture_errors":0,"events_sha256":"9e25ce0e4bce97b6591b4c417acfb138dd9402df6266dd7d64309bd8163272ca"},
+    {"run_id":"34175839320","split":"holdout","capture_start_ns":1788829945587613230,"capture_end_ns":1788839958768302101,"source_commit":"cb25c4fc4ad7a2f5c2caaf9021ca0a1add445459","launches":3000,"decoded_events":263381,"capture_errors":0,"events_sha256":"29549195792cc432f20a72f1502cbff24c1b8bd97b76d827b76655db89b04ede"},
+    {"run_id":"34186192299","split":"holdout","capture_start_ns":1788840801690211748,"capture_end_ns":1788853237608403643,"source_commit":"657ab3e8b3f2414f3863499c3e0b1eab1410ff52","launches":3000,"decoded_events":298168,"capture_errors":0,"events_sha256":"6aca68ad4f377fc69979bb44b81aaabea6d9406a7e8b78521f3fa2bddc13b040"}
+  ],
+  "totals": {"captures": 33, "launches": 99000, "train_launches": 81000, "validation_launches": 9000, "sealed_holdout_launches": 9000},
+  "production_paths_changed": 0
+}
