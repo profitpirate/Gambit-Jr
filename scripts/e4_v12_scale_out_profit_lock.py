@@ -66,6 +66,7 @@ def scale_out_outcome(
     policy: ScaleOutPolicy,
     *,
     latency_ms: int = 0,
+    position_sol: float | None = None,
 ) -> base.Outcome | None:
     decision_ns = trace.create_ns + HORIZON_MS * 1_000_000
     entry_ns = decision_ns + latency_ms * 1_000_000
@@ -73,7 +74,13 @@ def scale_out_outcome(
     if entry is None or entry.complete:
         return None
     entry_price = entry.price_sol or entry.virtual_sol / max(entry.virtual_tokens, 1e-12)
-    position = base.STARTING_BANKROLL_SOL * base.POSITION_FRACTION
+    position = (
+        base.STARTING_BANKROLL_SOL * base.POSITION_FRACTION
+        if position_sol is None
+        else position_sol
+    )
+    if position <= 0:
+        raise ValueError("position_sol must be positive")
     tokens = base.choice_sets.buy_tokens(position, entry.virtual_sol, entry.virtual_tokens)
     if entry.real_tokens > 0:
         tokens = min(tokens, entry.real_tokens)

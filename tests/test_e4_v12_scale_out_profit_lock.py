@@ -48,6 +48,81 @@ def test_scale_out_grid_includes_single_and_two_exit_policies() -> None:
     assert any(policy.partial_fraction < 1.0 for policy in research.POLICIES)
 
 
+def test_explicit_nominal_position_preserves_scale_out_quote() -> None:
+    decision_ns = research.HORIZON_MS * 1_000_000
+    point = research.base.Point(
+        timestamp_ns=decision_ns,
+        kind="buy",
+        trader="buyer",
+        signature="signature",
+        slot=1,
+        sol_amount=1.0,
+        price_sol=1e-8,
+        virtual_sol=30.0,
+        virtual_tokens=3_000_000_000.0,
+        real_tokens=1_000_000_000.0,
+        complete=False,
+    )
+    trace = research.base.Trace(
+        run_id="1",
+        split="test",
+        mint="mint",
+        creator="creator",
+        create_ns=0,
+        create_slot=1,
+        create_signature="create",
+        mayhem_mode=False,
+        cashback_enabled=False,
+        metadata_content_addressed=True,
+        creator_prior_launch_count=0,
+        points=[point],
+    )
+    policy = research.POLICIES[0]
+    implicit = research.scale_out_outcome(trace, policy)
+    explicit = research.scale_out_outcome(
+        trace,
+        policy,
+        position_sol=(
+            research.base.STARTING_BANKROLL_SOL * research.base.POSITION_FRACTION
+        ),
+    )
+    assert implicit == explicit
+
+
+def test_scale_out_rejects_non_positive_explicit_position() -> None:
+    decision_ns = research.HORIZON_MS * 1_000_000
+    trace = research.base.Trace(
+        run_id="1",
+        split="test",
+        mint="mint",
+        creator="creator",
+        create_ns=0,
+        create_slot=1,
+        create_signature="create",
+        mayhem_mode=False,
+        cashback_enabled=False,
+        metadata_content_addressed=True,
+        creator_prior_launch_count=0,
+        points=[
+            research.base.Point(
+                timestamp_ns=decision_ns,
+                kind="buy",
+                trader="buyer",
+                signature="signature",
+                slot=1,
+                sol_amount=1.0,
+                price_sol=1e-8,
+                virtual_sol=30.0,
+                virtual_tokens=3_000_000_000.0,
+                real_tokens=1_000_000_000.0,
+                complete=False,
+            )
+        ],
+    )
+    with pytest.raises(ValueError, match="position_sol must be positive"):
+        research.scale_out_outcome(trace, research.POLICIES[0], position_sol=0.0)
+
+
 def test_retrospective_confirmation_is_not_mislabelled_holdout() -> None:
     result = report()
     assert result["secondary_confirmation_gate_passed"] is False
