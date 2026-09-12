@@ -3,9 +3,10 @@ name: E4 V12 prelaunch social golden thesis
 on:
   push:
     branches:
-      - codex/e4-v12-sub10ms-entry-research-20260905
+      - codex/e4-v12-golden-live-2sol
     paths:
       - ".github/workflows/e4-v12-social-golden.yml"
+      - "scripts/e4_v12_social_prearm_runner.py"
       - "research/e4-v12-social-golden-trigger*.txt"
   workflow_dispatch:
 
@@ -18,7 +19,7 @@ env:
   GH_TOKEN: ${{ github.token }}
   REPO: profitpirate/Gambit-Jr
   SOURCE_BRANCH: codex/e4-v12-selection-reconstruction
-  RESEARCH_BRANCH: codex/e4-v12-sub10ms-entry-research-20260905
+  RESEARCH_BRANCH: codex/e4-v12-golden-live-2sol
   E4_PIPELINES_BACKGROUND: "false"
   E4_SOL_USD_FALLBACK: "150"
   E4_BUILDER_COMMAND: "node tools/e4-builder/strict-race-proxy-v12.mjs"
@@ -27,7 +28,7 @@ env:
   E4_V12_MAX_OUTPUT_SHORTFALL_BPS: "800"
 
 concurrency:
-  group: e4-v12-social-golden
+  group: e4-v12-social-golden-2sol
   cancel-in-progress: true
 
 jobs:
@@ -39,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          ref: codex/e4-v12-golden-live-2sol
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
@@ -50,7 +51,7 @@ jobs:
 
       - name: Compile social and economic research
         run: |
-          python -m compileall -q scripts/e4_v12_social_prearm_search.py scripts/e4_v12_true_latency_replay.py scripts/e4_v12_golden_thesis_search.py
+          python -m compileall -q scripts/e4_v12_social_prearm_runner.py scripts/e4_v12_social_prearm_search.py scripts/e4_v12_true_latency_replay.py scripts/e4_v12_golden_thesis_search.py
           python -m unittest tests.test_v12_true_latency_replay -v
 
       - name: Download ten chronological live windows
@@ -68,14 +69,13 @@ jobs:
           done < /tmp/run_ids
 
       - name: Search exact prelaunch X-status and identity thesis
-        continue-on-error: true
         run: |
           args=()
           while IFS=$'\t' read -r run_id batch events; do args+=(--pair "$batch:$events"); done < /tmp/pairs.tsv
-          python -m scripts.e4_v12_social_prearm_search \
+          python -m scripts.e4_v12_social_prearm_runner \
             --mode search "${args[@]}" \
             --latencies 0,1,2,5,10 \
-            --starting-balance-sol 3 \
+            --starting-balance-sol 2 \
             --minimum-win-rate 0.65 \
             --minimum-profit-factor 1.25 \
             --metadata-cache artifacts/social-cache.json \
@@ -110,13 +110,13 @@ jobs:
 
   untouched-live:
     needs: historical
-    if: needs.historical.outputs.status == 'HISTORICAL_HOLDOUT_CONFIRMED'
+    if: needs.historical.result == 'success' && needs.historical.outputs.status == 'HISTORICAL_HOLDOUT_CONFIRMED'
     runs-on: ubuntu-latest
     timeout-minutes: 480
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          ref: codex/e4-v12-golden-live-2sol
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
@@ -156,7 +156,7 @@ jobs:
           args=()
           while IFS=$'\t' read -r run_id batch events; do args+=(--pair "$batch:$events"); done < /tmp/history-pairs.tsv
           args+=(--pair "artifacts/social-live.json:artifacts/social-live-live-events.jsonl")
-          python -m scripts.e4_v12_social_prearm_search \
+          python -m scripts.e4_v12_social_prearm_runner \
             --mode apply "${args[@]}" \
             --model-input artifacts/social-model.json \
             --metadata-cache artifacts/social-live-cache.json \
@@ -175,7 +175,7 @@ jobs:
             --events artifacts/social-live-live-events.jsonl \
             --predictions artifacts/social-live-predictions.json \
             --latencies 0,1,2,5,10 \
-            --starting-balance-sol 3 \
+            --starting-balance-sol 2 \
             --entry-fraction 0.0185 \
             --fee-bps 125 \
             --max-output-shortfall-bps "$guard" \
@@ -198,7 +198,7 @@ jobs:
               else: low=0.0
               ok=n>=3 and wr>=0.65 and low>=0.30 and pnl>0 and pf>=1.25
               rows[latency]={'trades':n,'wins':w,'win_rate':wr,'wilson_low':low,'net_pnl_sol':pnl,'profit_factor':pf,'passed':ok}; passed=passed and ok
-          verdict={'version':'e4-v12-social-golden-live-v1','status':'FOUND_LIVE_SUB10MS_GOLDEN_THESIS' if passed else 'NOT_CONCLUSIVE','selected_mode':'social_prearm','latencies':rows,'untouched_live':True,'starting_balance_sol':3.0,'no_live_tuning':True}
+          verdict={'version':'e4-v12-social-golden-live-2sol-v1','status':'FOUND_LIVE_SUB10MS_GOLDEN_THESIS' if passed else 'NOT_CONCLUSIVE','selected_mode':'social_prearm','latencies':rows,'untouched_live':True,'starting_balance_sol':2.0,'no_live_tuning':True}
           Path('artifacts/social-live-verdict.json').write_text(json.dumps(verdict,indent=2,sort_keys=True)); Path('artifacts/social-live-status.txt').write_text(verdict['status']+'\n'); print(json.dumps(verdict,indent=2,sort_keys=True))
           if not passed: raise SystemExit(1)
           PY
