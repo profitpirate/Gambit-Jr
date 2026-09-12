@@ -1,0 +1,4576 @@
+{
+  "candidate": {
+    "horizon_ms": 250,
+    "model_family": "profit_probability_regime_blend",
+    "policy": "stop=0.70|take=2.00|hold=60000|protect=1.15:1.06|trail=1.25:0.25",
+    "policy_index": 5,
+    "priority_fee_sol": 0.001,
+    "recent_train_windows": [
+      "34167878699",
+      "34175839320",
+      "34186192299",
+      "34201101121",
+      "34244224832",
+      "34281858070",
+      "34310065776",
+      "34348537141"
+    ],
+    "validation": {
+      "by_capture_window": {
+        "34388016481": {
+          "pnl_sol": 0.09853012275158157,
+          "trades": 10,
+          "wins": 6
+        },
+        "34425005585": {
+          "pnl_sol": 0.0013069611138662451,
+          "trades": 3,
+          "wins": 1
+        },
+        "34470147967": {
+          "pnl_sol": 0.08449759690500527,
+          "trades": 22,
+          "wins": 17
+        },
+        "34512979177": {
+          "pnl_sol": 0.022912645396403537,
+          "trades": 14,
+          "wins": 8
+        },
+        "34547229611": {
+          "pnl_sol": 0.046639930758043444,
+          "trades": 1,
+          "wins": 1
+        }
+      },
+      "capture_windows": 5,
+      "exit_reasons": {
+        "INITIAL_STOP": 7,
+        "MAXIMUM_HOLD": 34,
+        "PROFIT_PROTECTION": 3,
+        "TAKE_PROFIT": 1,
+        "TRAILING_STOP": 5
+      },
+      "largest_winner_contribution": 0.11049955625301938,
+      "ledger": [
+        {
+          "decision_ns": 1788978666969542077,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "F5gYQPhD88r7QhuYnr596vj1MQBsyGQiSwjAbuoHpump",
+          "pnl_sol": 0.010117229414973741,
+          "run_id": "34388016481",
+          "score": 0.4511595860506901,
+          "win": true
+        },
+        {
+          "decision_ns": 1788978941095772496,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "6NZ2byy2DTXcqg2qghKpkKCSdH45S9XPXePnMEfFpump",
+          "pnl_sol": -0.003780019475962647,
+          "run_id": "34388016481",
+          "score": 0.45110573539123,
+          "win": false
+        },
+        {
+          "decision_ns": 1788980687495493496,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "6tKmvbTb7rF8X1hchiRrkCqh1YwgaLSoUSHvSKrFpump",
+          "pnl_sol": 0.03108946009336156,
+          "run_id": "34388016481",
+          "score": 0.543222166603034,
+          "win": true
+        },
+        {
+          "decision_ns": 1788982243788093815,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "6ugZeaQPsHCjtpa81cKnS7qdM6zVwiWaxn1kW2Sjpump",
+          "pnl_sol": 0.004132207479256203,
+          "run_id": "34388016481",
+          "score": 0.44940188009977444,
+          "win": true
+        },
+        {
+          "decision_ns": 1788982359885227347,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "6taDR4KhCPWMWhZymwsUB6k5e13ms1BFrwokNRd7pump",
+          "pnl_sol": -0.004294801405539728,
+          "run_id": "34388016481",
+          "score": 0.4614665648692497,
+          "win": false
+        },
+        {
+          "decision_ns": 1788982500251742678,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "AyGJuAx5foDftT6gsStkB92msZ9wMmK7a6FLy96rpump",
+          "pnl_sol": -0.020642888577234085,
+          "run_id": "34388016481",
+          "score": 0.44762547648005113,
+          "win": false
+        },
+        {
+          "decision_ns": 1788982588276715470,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "4dET68ev2KHsv2ufc9oHmaUj2epHq3HBtiSpguHBpump",
+          "pnl_sol": 0.02155450008786109,
+          "run_id": "34388016481",
+          "score": 0.5460565980334261,
+          "win": true
+        },
+        {
+          "decision_ns": 1788982603399675517,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "Buvoam3jMVx5z3Vin3NHmJXD8n5j64z7hpdEHb3hpump",
+          "pnl_sol": -0.0037333146712518056,
+          "run_id": "34388016481",
+          "score": 0.4601918607910745,
+          "win": false
+        },
+        {
+          "decision_ns": 1788982811730421717,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "26bG6aukFLyAnQNYGCYk12y5s6v1rF8mAj9FLcjcpump",
+          "pnl_sol": 0.031046477228490632,
+          "run_id": "34388016481",
+          "score": 0.49383157189583066,
+          "win": true
+        },
+        {
+          "decision_ns": 1788983086706682612,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "31MiuqALvFX734T4griG3njDkPXtJ8G3FFQHtpQopump",
+          "pnl_sol": 0.0330412725776266,
+          "run_id": "34388016481",
+          "score": 0.46589852707940327,
+          "win": true
+        },
+        {
+          "decision_ns": 1789005236818190777,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "9iUVBSaRPt4TmE5CmTytg9UrqbWdSPnt2i2VEW4Fpump",
+          "pnl_sol": -0.02154151282720134,
+          "run_id": "34425005585",
+          "score": 0.4666785047237888,
+          "win": false
+        },
+        {
+          "decision_ns": 1789008588674724100,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "Fv5ivQsVF4SgQXYCiNgV39HQ7swA44kJvzFBqNtYpump",
+          "pnl_sol": -0.03152119105451627,
+          "run_id": "34425005585",
+          "score": 0.4572731435984131,
+          "win": false
+        },
+        {
+          "decision_ns": 1789009873801459816,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "HepRgF9Jj1JvCTC9P6GrSmZfZfBJQmUzgzvCbEdVpump",
+          "pnl_sol": 0.054369664995583857,
+          "run_id": "34425005585",
+          "score": 0.45897155550770286,
+          "win": true
+        },
+        {
+          "decision_ns": 1789038907789052771,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "3tAtTzQAKm4fddbGT6bB1pqTj1AzmxwakhLe39tdpump",
+          "pnl_sol": 0.0018390855772564552,
+          "run_id": "34470147967",
+          "score": 0.6163459687649367,
+          "win": true
+        },
+        {
+          "decision_ns": 1789039228288427387,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "FfxszwUxumkdRam8b1GYMZptS2oAGTL2YJfBdDYepump",
+          "pnl_sol": 0.0029896917951963975,
+          "run_id": "34470147967",
+          "score": 0.613369414562041,
+          "win": true
+        },
+        {
+          "decision_ns": 1789040620585274604,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "EbHP1dHBD5mCPur2xJokZTCyNS3nppaVqdrf9iFjpump",
+          "pnl_sol": 0.0018450737135303971,
+          "run_id": "34470147967",
+          "score": 0.652920782627409,
+          "win": true
+        },
+        {
+          "decision_ns": 1789040909539715047,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "J6zcTmJTYZZLtkJRX8gxMgScF4ha8TCBPaDNkAsupump",
+          "pnl_sol": 0.0029749372142619593,
+          "run_id": "34470147967",
+          "score": 0.656018488384539,
+          "win": true
+        },
+        {
+          "decision_ns": 1789042054668017037,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "FmVabRjiB2u1Li1PCAuEYHxv9Vy7GDBp2wtbp4RXpump",
+          "pnl_sol": 0.001639089095901533,
+          "run_id": "34470147967",
+          "score": 0.6171933646439598,
+          "win": true
+        },
+        {
+          "decision_ns": 1789042197212119676,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "AuqzSH57BYCx1WM29PCjnG5w51y8nDyS71f7tyW9pump",
+          "pnl_sol": 0.0012819983728652173,
+          "run_id": "34470147967",
+          "score": 0.6355104815336721,
+          "win": true
+        },
+        {
+          "decision_ns": 1789042346749407229,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "3JfQeXCcwBGfRmJmd2VDUVaMePdoFxS5KrQY9jVApump",
+          "pnl_sol": -0.0034344061589127867,
+          "run_id": "34470147967",
+          "score": 0.4882170819206832,
+          "win": false
+        },
+        {
+          "decision_ns": 1789042421638528073,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9J1JLEa9KeaNmHC7cUzHzpBaQMH22TpcampUragipump",
+          "pnl_sol": 0.025698185364146205,
+          "run_id": "34470147967",
+          "score": 0.45753269740185754,
+          "win": true
+        },
+        {
+          "decision_ns": 1789042648006860089,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BF7ovXLLnwPKkhKy2gdx17jXtR2De8yM5RE2ukyvpump",
+          "pnl_sol": 0.013496763699505698,
+          "run_id": "34470147967",
+          "score": 0.5490418754675639,
+          "win": true
+        },
+        {
+          "decision_ns": 1789042841505328753,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "3aHStAdgUykgTUgqFoU4Ccv5ZyFoQnUnbQ7QAumXpump",
+          "pnl_sol": 0.011558562154758756,
+          "run_id": "34470147967",
+          "score": 0.5474681707055382,
+          "win": true
+        },
+        {
+          "decision_ns": 1789043241154793924,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CQM8Nqv2ePZucBJRFuEYnbtQ4P3R7U76ett3ZdsLpump",
+          "pnl_sol": 0.014255196720771426,
+          "run_id": "34470147967",
+          "score": 0.5514149207939426,
+          "win": true
+        },
+        {
+          "decision_ns": 1789043411933676519,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "Hb4Wpj5GkH5VRU8cUM5T72VHBVbYdw4fyEYAGWjRpump",
+          "pnl_sol": -0.005532967427362763,
+          "run_id": "34470147967",
+          "score": 0.5096956199109469,
+          "win": false
+        },
+        {
+          "decision_ns": 1789043446386290813,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7Hp2rA5bSNDNQdDgvyq4MernCYEVcLZHMZUqPSjopump",
+          "pnl_sol": 0.04014528788914241,
+          "run_id": "34470147967",
+          "score": 0.4913861096177875,
+          "win": true
+        },
+        {
+          "decision_ns": 1789043981059856663,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9raiDUcPGAjttsQvWX3LNqhxBktQABnTpBCzjx73pump",
+          "pnl_sol": -0.003903346181909545,
+          "run_id": "34470147967",
+          "score": 0.4613255522448591,
+          "win": false
+        },
+        {
+          "decision_ns": 1789044219107860151,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "HxSGLnfzqtSRvHAwx8gPmBqdhF75vg4sVjxDgv3Cpump",
+          "pnl_sol": 0.0021275983021261102,
+          "run_id": "34470147967",
+          "score": 0.635957163832702,
+          "win": true
+        },
+        {
+          "decision_ns": 1789044420804477983,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5ZhUArvyQCt3ePYEWdWofLCnCNm9N4WA6TV21eRMpump",
+          "pnl_sol": 0.005440312832677575,
+          "run_id": "34470147967",
+          "score": 0.6567224993442925,
+          "win": true
+        },
+        {
+          "decision_ns": 1789045197052971735,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "RAUSHCjbkNJGRjAcLHJkmGekiTFqHaccqrPJPmxpump",
+          "pnl_sol": 0.00314445682130126,
+          "run_id": "34470147967",
+          "score": 0.6596169564370817,
+          "win": true
+        },
+        {
+          "decision_ns": 1789045436186011279,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "Hd9He43mE1nVMqb6QCoeZ2ayK5mmFZANZkpHKoZspump",
+          "pnl_sol": 0.012044342566723765,
+          "run_id": "34470147967",
+          "score": 0.4514553798729619,
+          "win": true
+        },
+        {
+          "decision_ns": 1789045633756595078,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "GQYqWoAMhSXeCtBfwFREcYerG1r9m3JBwPGdYug1pump",
+          "pnl_sol": -0.024654059596363166,
+          "run_id": "34470147967",
+          "score": 0.4561953528840852,
+          "win": false
+        },
+        {
+          "decision_ns": 1789045678544268153,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "3tbQkk9hDZLejBkdL3jrGL43gSUf6H2WehRzinpmpump",
+          "pnl_sol": 0.001727544361451741,
+          "run_id": "34470147967",
+          "score": 0.6398938905612879,
+          "win": true
+        },
+        {
+          "decision_ns": 1789045687268354631,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5shnYM873STaxBNcDLv27sZR2XxZazVh1zNnDYatpump",
+          "pnl_sol": 0.0035826283037754605,
+          "run_id": "34470147967",
+          "score": 0.4569388849557248,
+          "win": true
+        },
+        {
+          "decision_ns": 1789046778453551504,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "DCy8veuhPHymUThQHUFSjnq4xJ5oLdYoqcidG5zHpump",
+          "pnl_sol": -0.02376837851583883,
+          "run_id": "34470147967",
+          "score": 0.44805320655663466,
+          "win": false
+        },
+        {
+          "decision_ns": 1789064475311184514,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "BTmzCywTtzDv2AqZJYkxN8wWRrcHFnwPjTbNTmxmpump",
+          "pnl_sol": 0.003906015898256808,
+          "run_id": "34512979177",
+          "score": 0.4474138545197208,
+          "win": true
+        },
+        {
+          "decision_ns": 1789066085662280870,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5z8z4o6KHtaKMGUuSu4ju2RvQCJy4wftzs1HjFqypump",
+          "pnl_sol": 0.003068761442429818,
+          "run_id": "34512979177",
+          "score": 0.6538427295240583,
+          "win": true
+        },
+        {
+          "decision_ns": 1789066569326025983,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "F36z6H9qGNHnVXmnkdYcqcSq8uq2S1nJULfYmnQYpump",
+          "pnl_sol": -0.024679922058498442,
+          "run_id": "34512979177",
+          "score": 0.4510945003741958,
+          "win": false
+        },
+        {
+          "decision_ns": 1789066743824979085,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "F86SDWzgHr7NG9fR9teR2CAxBj5vPLgDGiUiaD6apump",
+          "pnl_sol": -0.010324284729259794,
+          "run_id": "34512979177",
+          "score": 0.4626172663823923,
+          "win": false
+        },
+        {
+          "decision_ns": 1789067241253119288,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "FuiXySLwoR3pGd7E83NX9cE2GgEhVcDXpfadQeS9pump",
+          "pnl_sol": -0.014263063352492111,
+          "run_id": "34512979177",
+          "score": 0.47980747450310146,
+          "win": false
+        },
+        {
+          "decision_ns": 1789067915270626601,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7fvXC9anYjWeDNUDs4jMPExownkvxusWbbHR1D7Vpump",
+          "pnl_sol": -0.00036838298036501876,
+          "run_id": "34512979177",
+          "score": 0.6739132138906353,
+          "win": false
+        },
+        {
+          "decision_ns": 1789068269667231615,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7gg6bpqwgV7wJC24nxXhtkFAVAvYYivVVGpH3f6Cpump",
+          "pnl_sol": 0.017873218659607233,
+          "run_id": "34512979177",
+          "score": 0.4674323628694007,
+          "win": true
+        },
+        {
+          "decision_ns": 1789069218411442351,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "2fs8bNbCKbKwrfX3Z8kW7Pmgzn4QRXhsjuPJp6hRpump",
+          "pnl_sol": 0.0016361462181279998,
+          "run_id": "34512979177",
+          "score": 0.44798450604689966,
+          "win": true
+        },
+        {
+          "decision_ns": 1789069916857943479,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "4eeb77dDYvuwPpye5rjjLTHqqCPC9oEnRn2i79z2pump",
+          "pnl_sol": -0.0016198811052418188,
+          "run_id": "34512979177",
+          "score": 0.45785006341074386,
+          "win": false
+        },
+        {
+          "decision_ns": 1789070288396236167,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "CBKnTJHzS2G3kJnmvQWCEy1ichZw4G3kqNWUZRAtpump",
+          "pnl_sol": 0.01778069542883278,
+          "run_id": "34512979177",
+          "score": 0.45684882700721874,
+          "win": true
+        },
+        {
+          "decision_ns": 1789070599911228023,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "FFc1dc8h5Byr46WvbZUBhuBbPyZwGbZj1RM8fDa5pump",
+          "pnl_sol": -0.040085466257539414,
+          "run_id": "34512979177",
+          "score": 0.4506976032508915,
+          "win": false
+        },
+        {
+          "decision_ns": 1789070656332067044,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BR9nKEkxcmJt7GiUW4VuUH3ZXdP4NUSs4ETzUMnwpump",
+          "pnl_sol": 0.027863531674249202,
+          "run_id": "34512979177",
+          "score": 0.48333071247030923,
+          "win": true
+        },
+        {
+          "decision_ns": 1789070856334697451,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "AwZg1zg3wQinUM6zG7xwP38cgF7FzCKooA1Yib8spump",
+          "pnl_sol": 0.012708379466668973,
+          "run_id": "34512979177",
+          "score": 0.4546428950642898,
+          "win": true
+        },
+        {
+          "decision_ns": 1789070896361842206,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "ChvFUFfojYbomVC16Rid2tF2Hau3ZTLM9xYTsEKGpump",
+          "pnl_sol": 0.02941689709162732,
+          "run_id": "34512979177",
+          "score": 0.4556621969879499,
+          "win": true
+        },
+        {
+          "decision_ns": 1789094720670227375,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "Gkb56zBwFX1cov5oFKS29o8zGJRfdAZJAiFsXs4cpump",
+          "pnl_sol": 0.046639930758043444,
+          "run_id": "34547229611",
+          "score": 0.48323062570606395,
+          "win": true
+        }
+      ],
+      "ledger_hash": "0c7e2859788d9b0f8d29128e5f9eb509fe95388ef2ed06cf73ffeb1fbf25b5e3",
+      "maximum_drawdown_fraction": 0.030062809427705933,
+      "net_pnl_sol": 0.2538872569249002,
+      "profit_factor": 2.0660907421390844,
+      "rejected_concurrency": 0,
+      "threshold": 0.4474138545197208,
+      "trades": 50,
+      "wilson_95_lower_bound": 0.5215356854148286,
+      "win_rate": 0.66,
+      "wins": 33
+    }
+  },
+  "deterministic_replay": true,
+  "development_reproduction": {
+    "by_capture_window": {
+      "34388016481": {
+        "pnl_sol": 0.09853012275158157,
+        "trades": 10,
+        "wins": 6
+      },
+      "34425005585": {
+        "pnl_sol": 0.0013069611138662451,
+        "trades": 3,
+        "wins": 1
+      },
+      "34470147967": {
+        "pnl_sol": 0.08449759690500527,
+        "trades": 22,
+        "wins": 17
+      },
+      "34512979177": {
+        "pnl_sol": 0.022912645396403537,
+        "trades": 14,
+        "wins": 8
+      },
+      "34547229611": {
+        "pnl_sol": 0.046639930758043444,
+        "trades": 1,
+        "wins": 1
+      }
+    },
+    "capture_windows": 5,
+    "exit_reasons": {
+      "INITIAL_STOP": 7,
+      "MAXIMUM_HOLD": 34,
+      "PROFIT_PROTECTION": 3,
+      "TAKE_PROFIT": 1,
+      "TRAILING_STOP": 5
+    },
+    "largest_winner_contribution": 0.11049955625301938,
+    "ledger": [
+      {
+        "decision_ns": 1788978666969542077,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "F5gYQPhD88r7QhuYnr596vj1MQBsyGQiSwjAbuoHpump",
+        "pnl_sol": 0.010117229414973741,
+        "run_id": "34388016481",
+        "score": 0.4511595860506901,
+        "win": true
+      },
+      {
+        "decision_ns": 1788978941095772496,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "6NZ2byy2DTXcqg2qghKpkKCSdH45S9XPXePnMEfFpump",
+        "pnl_sol": -0.003780019475962647,
+        "run_id": "34388016481",
+        "score": 0.45110573539123,
+        "win": false
+      },
+      {
+        "decision_ns": 1788980687495493496,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "6tKmvbTb7rF8X1hchiRrkCqh1YwgaLSoUSHvSKrFpump",
+        "pnl_sol": 0.03108946009336156,
+        "run_id": "34388016481",
+        "score": 0.543222166603034,
+        "win": true
+      },
+      {
+        "decision_ns": 1788982243788093815,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "6ugZeaQPsHCjtpa81cKnS7qdM6zVwiWaxn1kW2Sjpump",
+        "pnl_sol": 0.004132207479256203,
+        "run_id": "34388016481",
+        "score": 0.44940188009977444,
+        "win": true
+      },
+      {
+        "decision_ns": 1788982359885227347,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "6taDR4KhCPWMWhZymwsUB6k5e13ms1BFrwokNRd7pump",
+        "pnl_sol": -0.004294801405539728,
+        "run_id": "34388016481",
+        "score": 0.4614665648692497,
+        "win": false
+      },
+      {
+        "decision_ns": 1788982500251742678,
+        "exit_reason": "INITIAL_STOP",
+        "mint": "AyGJuAx5foDftT6gsStkB92msZ9wMmK7a6FLy96rpump",
+        "pnl_sol": -0.020642888577234085,
+        "run_id": "34388016481",
+        "score": 0.44762547648005113,
+        "win": false
+      },
+      {
+        "decision_ns": 1788982588276715470,
+        "exit_reason": "TRAILING_STOP",
+        "mint": "4dET68ev2KHsv2ufc9oHmaUj2epHq3HBtiSpguHBpump",
+        "pnl_sol": 0.02155450008786109,
+        "run_id": "34388016481",
+        "score": 0.5460565980334261,
+        "win": true
+      },
+      {
+        "decision_ns": 1788982603399675517,
+        "exit_reason": "PROFIT_PROTECTION",
+        "mint": "Buvoam3jMVx5z3Vin3NHmJXD8n5j64z7hpdEHb3hpump",
+        "pnl_sol": -0.0037333146712518056,
+        "run_id": "34388016481",
+        "score": 0.4601918607910745,
+        "win": false
+      },
+      {
+        "decision_ns": 1788982811730421717,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "26bG6aukFLyAnQNYGCYk12y5s6v1rF8mAj9FLcjcpump",
+        "pnl_sol": 0.031046477228490632,
+        "run_id": "34388016481",
+        "score": 0.49383157189583066,
+        "win": true
+      },
+      {
+        "decision_ns": 1788983086706682612,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "31MiuqALvFX734T4griG3njDkPXtJ8G3FFQHtpQopump",
+        "pnl_sol": 0.0330412725776266,
+        "run_id": "34388016481",
+        "score": 0.46589852707940327,
+        "win": true
+      },
+      {
+        "decision_ns": 1789005236818190777,
+        "exit_reason": "INITIAL_STOP",
+        "mint": "9iUVBSaRPt4TmE5CmTytg9UrqbWdSPnt2i2VEW4Fpump",
+        "pnl_sol": -0.02154151282720134,
+        "run_id": "34425005585",
+        "score": 0.4666785047237888,
+        "win": false
+      },
+      {
+        "decision_ns": 1789008588674724100,
+        "exit_reason": "INITIAL_STOP",
+        "mint": "Fv5ivQsVF4SgQXYCiNgV39HQ7swA44kJvzFBqNtYpump",
+        "pnl_sol": -0.03152119105451627,
+        "run_id": "34425005585",
+        "score": 0.4572731435984131,
+        "win": false
+      },
+      {
+        "decision_ns": 1789009873801459816,
+        "exit_reason": "TAKE_PROFIT",
+        "mint": "HepRgF9Jj1JvCTC9P6GrSmZfZfBJQmUzgzvCbEdVpump",
+        "pnl_sol": 0.054369664995583857,
+        "run_id": "34425005585",
+        "score": 0.45897155550770286,
+        "win": true
+      },
+      {
+        "decision_ns": 1789038907789052771,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "3tAtTzQAKm4fddbGT6bB1pqTj1AzmxwakhLe39tdpump",
+        "pnl_sol": 0.0018390855772564552,
+        "run_id": "34470147967",
+        "score": 0.6163459687649367,
+        "win": true
+      },
+      {
+        "decision_ns": 1789039228288427387,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "FfxszwUxumkdRam8b1GYMZptS2oAGTL2YJfBdDYepump",
+        "pnl_sol": 0.0029896917951963975,
+        "run_id": "34470147967",
+        "score": 0.613369414562041,
+        "win": true
+      },
+      {
+        "decision_ns": 1789040620585274604,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "EbHP1dHBD5mCPur2xJokZTCyNS3nppaVqdrf9iFjpump",
+        "pnl_sol": 0.0018450737135303971,
+        "run_id": "34470147967",
+        "score": 0.652920782627409,
+        "win": true
+      },
+      {
+        "decision_ns": 1789040909539715047,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "J6zcTmJTYZZLtkJRX8gxMgScF4ha8TCBPaDNkAsupump",
+        "pnl_sol": 0.0029749372142619593,
+        "run_id": "34470147967",
+        "score": 0.656018488384539,
+        "win": true
+      },
+      {
+        "decision_ns": 1789042054668017037,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "FmVabRjiB2u1Li1PCAuEYHxv9Vy7GDBp2wtbp4RXpump",
+        "pnl_sol": 0.001639089095901533,
+        "run_id": "34470147967",
+        "score": 0.6171933646439598,
+        "win": true
+      },
+      {
+        "decision_ns": 1789042197212119676,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "AuqzSH57BYCx1WM29PCjnG5w51y8nDyS71f7tyW9pump",
+        "pnl_sol": 0.0012819983728652173,
+        "run_id": "34470147967",
+        "score": 0.6355104815336721,
+        "win": true
+      },
+      {
+        "decision_ns": 1789042346749407229,
+        "exit_reason": "PROFIT_PROTECTION",
+        "mint": "3JfQeXCcwBGfRmJmd2VDUVaMePdoFxS5KrQY9jVApump",
+        "pnl_sol": -0.0034344061589127867,
+        "run_id": "34470147967",
+        "score": 0.4882170819206832,
+        "win": false
+      },
+      {
+        "decision_ns": 1789042421638528073,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "9J1JLEa9KeaNmHC7cUzHzpBaQMH22TpcampUragipump",
+        "pnl_sol": 0.025698185364146205,
+        "run_id": "34470147967",
+        "score": 0.45753269740185754,
+        "win": true
+      },
+      {
+        "decision_ns": 1789042648006860089,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "BF7ovXLLnwPKkhKy2gdx17jXtR2De8yM5RE2ukyvpump",
+        "pnl_sol": 0.013496763699505698,
+        "run_id": "34470147967",
+        "score": 0.5490418754675639,
+        "win": true
+      },
+      {
+        "decision_ns": 1789042841505328753,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "3aHStAdgUykgTUgqFoU4Ccv5ZyFoQnUnbQ7QAumXpump",
+        "pnl_sol": 0.011558562154758756,
+        "run_id": "34470147967",
+        "score": 0.5474681707055382,
+        "win": true
+      },
+      {
+        "decision_ns": 1789043241154793924,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "CQM8Nqv2ePZucBJRFuEYnbtQ4P3R7U76ett3ZdsLpump",
+        "pnl_sol": 0.014255196720771426,
+        "run_id": "34470147967",
+        "score": 0.5514149207939426,
+        "win": true
+      },
+      {
+        "decision_ns": 1789043411933676519,
+        "exit_reason": "TRAILING_STOP",
+        "mint": "Hb4Wpj5GkH5VRU8cUM5T72VHBVbYdw4fyEYAGWjRpump",
+        "pnl_sol": -0.005532967427362763,
+        "run_id": "34470147967",
+        "score": 0.5096956199109469,
+        "win": false
+      },
+      {
+        "decision_ns": 1789043446386290813,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "7Hp2rA5bSNDNQdDgvyq4MernCYEVcLZHMZUqPSjopump",
+        "pnl_sol": 0.04014528788914241,
+        "run_id": "34470147967",
+        "score": 0.4913861096177875,
+        "win": true
+      },
+      {
+        "decision_ns": 1789043981059856663,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "9raiDUcPGAjttsQvWX3LNqhxBktQABnTpBCzjx73pump",
+        "pnl_sol": -0.003903346181909545,
+        "run_id": "34470147967",
+        "score": 0.4613255522448591,
+        "win": false
+      },
+      {
+        "decision_ns": 1789044219107860151,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "HxSGLnfzqtSRvHAwx8gPmBqdhF75vg4sVjxDgv3Cpump",
+        "pnl_sol": 0.0021275983021261102,
+        "run_id": "34470147967",
+        "score": 0.635957163832702,
+        "win": true
+      },
+      {
+        "decision_ns": 1789044420804477983,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "5ZhUArvyQCt3ePYEWdWofLCnCNm9N4WA6TV21eRMpump",
+        "pnl_sol": 0.005440312832677575,
+        "run_id": "34470147967",
+        "score": 0.6567224993442925,
+        "win": true
+      },
+      {
+        "decision_ns": 1789045197052971735,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "RAUSHCjbkNJGRjAcLHJkmGekiTFqHaccqrPJPmxpump",
+        "pnl_sol": 0.00314445682130126,
+        "run_id": "34470147967",
+        "score": 0.6596169564370817,
+        "win": true
+      },
+      {
+        "decision_ns": 1789045436186011279,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "Hd9He43mE1nVMqb6QCoeZ2ayK5mmFZANZkpHKoZspump",
+        "pnl_sol": 0.012044342566723765,
+        "run_id": "34470147967",
+        "score": 0.4514553798729619,
+        "win": true
+      },
+      {
+        "decision_ns": 1789045633756595078,
+        "exit_reason": "INITIAL_STOP",
+        "mint": "GQYqWoAMhSXeCtBfwFREcYerG1r9m3JBwPGdYug1pump",
+        "pnl_sol": -0.024654059596363166,
+        "run_id": "34470147967",
+        "score": 0.4561953528840852,
+        "win": false
+      },
+      {
+        "decision_ns": 1789045678544268153,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "3tbQkk9hDZLejBkdL3jrGL43gSUf6H2WehRzinpmpump",
+        "pnl_sol": 0.001727544361451741,
+        "run_id": "34470147967",
+        "score": 0.6398938905612879,
+        "win": true
+      },
+      {
+        "decision_ns": 1789045687268354631,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "5shnYM873STaxBNcDLv27sZR2XxZazVh1zNnDYatpump",
+        "pnl_sol": 0.0035826283037754605,
+        "run_id": "34470147967",
+        "score": 0.4569388849557248,
+        "win": true
+      },
+      {
+        "decision_ns": 1789046778453551504,
+        "exit_reason": "INITIAL_STOP",
+        "mint": "DCy8veuhPHymUThQHUFSjnq4xJ5oLdYoqcidG5zHpump",
+        "pnl_sol": -0.02376837851583883,
+        "run_id": "34470147967",
+        "score": 0.44805320655663466,
+        "win": false
+      },
+      {
+        "decision_ns": 1789064475311184514,
+        "exit_reason": "TRAILING_STOP",
+        "mint": "BTmzCywTtzDv2AqZJYkxN8wWRrcHFnwPjTbNTmxmpump",
+        "pnl_sol": 0.003906015898256808,
+        "run_id": "34512979177",
+        "score": 0.4474138545197208,
+        "win": true
+      },
+      {
+        "decision_ns": 1789066085662280870,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "5z8z4o6KHtaKMGUuSu4ju2RvQCJy4wftzs1HjFqypump",
+        "pnl_sol": 0.003068761442429818,
+        "run_id": "34512979177",
+        "score": 0.6538427295240583,
+        "win": true
+      },
+      {
+        "decision_ns": 1789066569326025983,
+        "exit_reason": "INITIAL_STOP",
+        "mint": "F36z6H9qGNHnVXmnkdYcqcSq8uq2S1nJULfYmnQYpump",
+        "pnl_sol": -0.024679922058498442,
+        "run_id": "34512979177",
+        "score": 0.4510945003741958,
+        "win": false
+      },
+      {
+        "decision_ns": 1789066743824979085,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "F86SDWzgHr7NG9fR9teR2CAxBj5vPLgDGiUiaD6apump",
+        "pnl_sol": -0.010324284729259794,
+        "run_id": "34512979177",
+        "score": 0.4626172663823923,
+        "win": false
+      },
+      {
+        "decision_ns": 1789067241253119288,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "FuiXySLwoR3pGd7E83NX9cE2GgEhVcDXpfadQeS9pump",
+        "pnl_sol": -0.014263063352492111,
+        "run_id": "34512979177",
+        "score": 0.47980747450310146,
+        "win": false
+      },
+      {
+        "decision_ns": 1789067915270626601,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "7fvXC9anYjWeDNUDs4jMPExownkvxusWbbHR1D7Vpump",
+        "pnl_sol": -0.00036838298036501876,
+        "run_id": "34512979177",
+        "score": 0.6739132138906353,
+        "win": false
+      },
+      {
+        "decision_ns": 1789068269667231615,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "7gg6bpqwgV7wJC24nxXhtkFAVAvYYivVVGpH3f6Cpump",
+        "pnl_sol": 0.017873218659607233,
+        "run_id": "34512979177",
+        "score": 0.4674323628694007,
+        "win": true
+      },
+      {
+        "decision_ns": 1789069218411442351,
+        "exit_reason": "TRAILING_STOP",
+        "mint": "2fs8bNbCKbKwrfX3Z8kW7Pmgzn4QRXhsjuPJp6hRpump",
+        "pnl_sol": 0.0016361462181279998,
+        "run_id": "34512979177",
+        "score": 0.44798450604689966,
+        "win": true
+      },
+      {
+        "decision_ns": 1789069916857943479,
+        "exit_reason": "PROFIT_PROTECTION",
+        "mint": "4eeb77dDYvuwPpye5rjjLTHqqCPC9oEnRn2i79z2pump",
+        "pnl_sol": -0.0016198811052418188,
+        "run_id": "34512979177",
+        "score": 0.45785006341074386,
+        "win": false
+      },
+      {
+        "decision_ns": 1789070288396236167,
+        "exit_reason": "TRAILING_STOP",
+        "mint": "CBKnTJHzS2G3kJnmvQWCEy1ichZw4G3kqNWUZRAtpump",
+        "pnl_sol": 0.01778069542883278,
+        "run_id": "34512979177",
+        "score": 0.45684882700721874,
+        "win": true
+      },
+      {
+        "decision_ns": 1789070599911228023,
+        "exit_reason": "INITIAL_STOP",
+        "mint": "FFc1dc8h5Byr46WvbZUBhuBbPyZwGbZj1RM8fDa5pump",
+        "pnl_sol": -0.040085466257539414,
+        "run_id": "34512979177",
+        "score": 0.4506976032508915,
+        "win": false
+      },
+      {
+        "decision_ns": 1789070656332067044,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "BR9nKEkxcmJt7GiUW4VuUH3ZXdP4NUSs4ETzUMnwpump",
+        "pnl_sol": 0.027863531674249202,
+        "run_id": "34512979177",
+        "score": 0.48333071247030923,
+        "win": true
+      },
+      {
+        "decision_ns": 1789070856334697451,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "AwZg1zg3wQinUM6zG7xwP38cgF7FzCKooA1Yib8spump",
+        "pnl_sol": 0.012708379466668973,
+        "run_id": "34512979177",
+        "score": 0.4546428950642898,
+        "win": true
+      },
+      {
+        "decision_ns": 1789070896361842206,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "ChvFUFfojYbomVC16Rid2tF2Hau3ZTLM9xYTsEKGpump",
+        "pnl_sol": 0.02941689709162732,
+        "run_id": "34512979177",
+        "score": 0.4556621969879499,
+        "win": true
+      },
+      {
+        "decision_ns": 1789094720670227375,
+        "exit_reason": "MAXIMUM_HOLD",
+        "mint": "Gkb56zBwFX1cov5oFKS29o8zGJRfdAZJAiFsXs4cpump",
+        "pnl_sol": 0.046639930758043444,
+        "run_id": "34547229611",
+        "score": 0.48323062570606395,
+        "win": true
+      }
+    ],
+    "ledger_hash": "0c7e2859788d9b0f8d29128e5f9eb509fe95388ef2ed06cf73ffeb1fbf25b5e3",
+    "maximum_drawdown_fraction": 0.030062809427705933,
+    "net_pnl_sol": 0.2538872569249002,
+    "profit_factor": 2.0660907421390844,
+    "rejected_concurrency": 0,
+    "threshold": 0.4474138545197208,
+    "trades": 50,
+    "wilson_95_lower_bound": 0.5215356854148286,
+    "win_rate": 0.66,
+    "wins": 33
+  },
+  "experiment_id": "e4x-b47b2976b7868a4e9bafef19f139b59ee63fd5adcc6fdd4315b5662c1cc41b94",
+  "holdout_data_audit": {
+    "exit_values_used_for_labels_and_replay_only": true,
+    "future_values_in_exit": true,
+    "future_values_in_features": false,
+    "holdout_opened": true,
+    "production_paths_changed": 0,
+    "rows": 15000,
+    "rows_by_horizon": {
+      "250": 15000
+    },
+    "rows_by_split": {
+      "holdout": 15000
+    },
+    "runs": [
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "run_id": "34586174670",
+        "sha256": "d2d22c70ee08036064fc2bd15fed99da2a8ce39736e8bbcd077af6cfe95ac6d7",
+        "split": "holdout"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "run_id": "34627236811",
+        "sha256": "480fcc5d437490fdeb4ddf046ef906254a4c0c002fe8092b94d4713918842728",
+        "split": "holdout"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "run_id": "34660606300",
+        "sha256": "0254a8336858c354bff82814cff9b5c4c7ef4532bd61951578ae2a77544251f1",
+        "split": "holdout"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "run_id": "34684115937",
+        "sha256": "7dc218abb35c39af30e8ff90c6ba13f62dd010e7c45e88b71056fd79f8d04fb5",
+        "split": "holdout"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "run_id": "34709541936",
+        "sha256": "d0763e9bff7db6ad810e70507b0465ad78703a7cefa7a7294ef4b3f41476eae1",
+        "split": "holdout"
+      }
+    ],
+    "version": "e4-v12-adaptive-exit-v3"
+  },
+  "holdout_rows": 15000,
+  "latencies": {
+    "0": {
+      "by_capture_window": {
+        "34586174670": {
+          "pnl_sol": 0.048032078764044195,
+          "trades": 18,
+          "wins": 10
+        },
+        "34627236811": {
+          "pnl_sol": 0.003223595584319096,
+          "trades": 10,
+          "wins": 5
+        },
+        "34660606300": {
+          "pnl_sol": 0.01958299091952237,
+          "trades": 2,
+          "wins": 1
+        },
+        "34684115937": {
+          "pnl_sol": 0.21767850260326563,
+          "trades": 17,
+          "wins": 13
+        },
+        "34709541936": {
+          "pnl_sol": -0.031760159503499634,
+          "trades": 3,
+          "wins": 1
+        }
+      },
+      "capture_windows": 5,
+      "exit_reasons": {
+        "INITIAL_STOP": 7,
+        "MAXIMUM_HOLD": 28,
+        "PROFIT_PROTECTION": 5,
+        "TAKE_PROFIT": 2,
+        "TRAILING_STOP": 8
+      },
+      "largest_winner_contribution": 0.10872291733176448,
+      "ledger": [
+        {
+          "decision_ns": 1789122716654167879,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "7Ac1jog8Zz2EsVGFpPDDzPyeV5PBqpUHNEeDLF9Apump",
+          "pnl_sol": -0.021657444463199706,
+          "run_id": "34586174670",
+          "score": 0.4695313224393623,
+          "win": false
+        },
+        {
+          "decision_ns": 1789123678849535999,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7LbLbvdNDmjX2qENCq3Wxf8tVUnCkd6KeNFMbbgZpump",
+          "pnl_sol": 0.028444633397871733,
+          "run_id": "34586174670",
+          "score": 0.4980446109957812,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124270044600937,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BFG7kZA8FVTch3bPWnUVB9ya1MneVfvaSba1cX4Qpump",
+          "pnl_sol": 0.03510968027635926,
+          "run_id": "34586174670",
+          "score": 0.49375819317200675,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124700899869921,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "2hXsdQs5H4RJjyGjejZgo2LZtfH92sdafEs8XPBQpump",
+          "pnl_sol": 0.023191258415276916,
+          "run_id": "34586174670",
+          "score": 0.5305165569519693,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124987720144288,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "6xSqvPfy6GDCWGTNFenruSvHZSCCvTizvaSW5vmjpump",
+          "pnl_sol": 0.022123427821065633,
+          "run_id": "34586174670",
+          "score": 0.5476908236798599,
+          "win": true
+        },
+        {
+          "decision_ns": 1789125212243070795,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "FBqih5obnm6TEN1SLuJTdsQfAZQFRf3T1P13eB88pump",
+          "pnl_sol": -0.015222783773139292,
+          "run_id": "34586174670",
+          "score": 0.4780325449777896,
+          "win": false
+        },
+        {
+          "decision_ns": 1789125895066358424,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "5CYD8MLYJfjThvKRFnvFRPG95kSwqE9yKChY39uDpump",
+          "pnl_sol": -0.0018701051614400319,
+          "run_id": "34586174670",
+          "score": 0.45923152094319286,
+          "win": false
+        },
+        {
+          "decision_ns": 1789126143743882615,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "CpdZEdbarmW2z9qEwNHVWJkDsX6P5wJZudnKx24Ppump",
+          "pnl_sol": -0.0010199741034979531,
+          "run_id": "34586174670",
+          "score": 0.4894594049536887,
+          "win": false
+        },
+        {
+          "decision_ns": 1789126318986770624,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "DRwAk1K8D9HXPxcxYYCZSHDvQ6uZWSytLSqdkYjBpump",
+          "pnl_sol": -0.002531727886971563,
+          "run_id": "34586174670",
+          "score": 0.47907874877746115,
+          "win": false
+        },
+        {
+          "decision_ns": 1789126484700968964,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "DSy2bVauU5TLNbB2DeKu9aKULeS8GiB8NjvVeBZjpump",
+          "pnl_sol": 0.004428626187799566,
+          "run_id": "34586174670",
+          "score": 0.46839512341898537,
+          "win": true
+        },
+        {
+          "decision_ns": 1789127873273215318,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "HqbLzRDDDpjaocX9E95k1uB4rbfPYRt2L7D9yeGtpump",
+          "pnl_sol": 0.006749598223796727,
+          "run_id": "34586174670",
+          "score": 0.463211486493027,
+          "win": true
+        },
+        {
+          "decision_ns": 1789128246367405309,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "EV43Z6FrfcMeBPxQjYieUDp4jio8cC5bkQoiCDB7pump",
+          "pnl_sol": -0.000765459310601263,
+          "run_id": "34586174670",
+          "score": 0.5289490749734331,
+          "win": false
+        },
+        {
+          "decision_ns": 1789128364884909675,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "FAe7SKTDYEmhKqoaSCev4HwXfBxZT49scndWoA6wpump",
+          "pnl_sol": -0.046019251922837526,
+          "run_id": "34586174670",
+          "score": 0.4603290673905402,
+          "win": false
+        },
+        {
+          "decision_ns": 1789128638619370443,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "D1d6kP9uHYQCUbdF3dtxXcJ3TrqFE3mERnPmFaJNpump",
+          "pnl_sol": 0.018470051583721794,
+          "run_id": "34586174670",
+          "score": 0.5160802859145736,
+          "win": true
+        },
+        {
+          "decision_ns": 1789130120852479160,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "2op47ADuoncb1owWSqddAMDDksAoJgccchSxV5D6pump",
+          "pnl_sol": 0.0074487158033967535,
+          "run_id": "34586174670",
+          "score": 0.45510160935835153,
+          "win": true
+        },
+        {
+          "decision_ns": 1789130190643360088,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CpRYwD2nVg6fWF7eTmamLaUgRorr9iSk26ZZdQoepump",
+          "pnl_sol": 0.010296492141065289,
+          "run_id": "34586174670",
+          "score": 0.44999308177372466,
+          "win": true
+        },
+        {
+          "decision_ns": 1789131228699322207,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "FiQqFqukhmoXc2Va5Wk8E8Kz2T7aupCoQBdJzo6pump",
+          "pnl_sol": -0.022307820271595044,
+          "run_id": "34586174670",
+          "score": 0.47224753052720186,
+          "win": false
+        },
+        {
+          "decision_ns": 1789131574219615911,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5z6c3VpkC4HFTJS4ZQYroZwtaoYWjM7KLNY4g2Ehpump",
+          "pnl_sol": 0.003164161806972904,
+          "run_id": "34586174670",
+          "score": 0.6609290841934597,
+          "win": true
+        },
+        {
+          "decision_ns": 1789149011134188312,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "C7LSBM7ZyzLQT1wu9dTqRQzJSexKdEwhimjqxMX8pump",
+          "pnl_sol": 0.0036832783644521125,
+          "run_id": "34627236811",
+          "score": 0.6157785758586655,
+          "win": true
+        },
+        {
+          "decision_ns": 1789149186314872360,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "Cp42Ekhbpdjfkg7HuideGZExSUbrazPHUazy8LmYpump",
+          "pnl_sol": -0.006950037203462663,
+          "run_id": "34627236811",
+          "score": 0.4569075884774864,
+          "win": false
+        },
+        {
+          "decision_ns": 1789150255829870321,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "GRtZNhPtcHTvhtCb2BuxDxsC8UAJsZQAkTVhwzADpump",
+          "pnl_sol": 0.0034367399466534027,
+          "run_id": "34627236811",
+          "score": 0.6127500015126041,
+          "win": true
+        },
+        {
+          "decision_ns": 1789150376383858357,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "EVBahqJvndaHitR72BVV3hXfa4SJCg6Sb52741Pdpump",
+          "pnl_sol": -0.021350229103845556,
+          "run_id": "34627236811",
+          "score": 0.4495565826115786,
+          "win": false
+        },
+        {
+          "decision_ns": 1789152633837154336,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "4QEUi1W8uEJBQmvhcJu66S9ehGE58tLkcT8dQmm6pump",
+          "pnl_sol": 0.002444694068313616,
+          "run_id": "34627236811",
+          "score": 0.6480129063347158,
+          "win": true
+        },
+        {
+          "decision_ns": 1789153325783786710,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "EjN7GSgaSE2ZSngUjQMbSpe7DK4v3ceqQcSaeyf8pump",
+          "pnl_sol": -0.021325199584065195,
+          "run_id": "34627236811",
+          "score": 0.45128583764668895,
+          "win": false
+        },
+        {
+          "decision_ns": 1789153353788574898,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "9bWvjq69VD2gnwMZvqAuvpsNCsKk8TTEBmzY2rYVpump",
+          "pnl_sol": -0.0013945474130166446,
+          "run_id": "34627236811",
+          "score": 0.4679439192931613,
+          "win": false
+        },
+        {
+          "decision_ns": 1789153929818073452,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "Ajrn7dKyKRE6cCfcAaJnHWe9DA5z8NeYKGMjegrj6ALL",
+          "pnl_sol": -0.007370603778361469,
+          "run_id": "34627236811",
+          "score": 0.4751541687600763,
+          "win": false
+        },
+        {
+          "decision_ns": 1789153983127342830,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "HcZaF28NmGiTrXgiU8v2iBhqAC9aKrqAsTn3kHNVpump",
+          "pnl_sol": 0.0037407719733032613,
+          "run_id": "34627236811",
+          "score": 0.6200862771189215,
+          "win": true
+        },
+        {
+          "decision_ns": 1789154464822852529,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7iG9So7vdddHUtn5mkk8uJH8jSrxnVSQtnzBQ5JBpump",
+          "pnl_sol": 0.04830872831434823,
+          "run_id": "34627236811",
+          "score": 0.4597726050760447,
+          "win": true
+        },
+        {
+          "decision_ns": 1789172336237490556,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "714o5Pch4wovjTB2sCp2EtfiV8GR7mTaRVHaDrudpump",
+          "pnl_sol": 0.021161536534027206,
+          "run_id": "34660606300",
+          "score": 0.4494733816214408,
+          "win": true
+        },
+        {
+          "decision_ns": 1789174556553352409,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "y6GkvYeq6hQ24PAiTy3Z11rLdydgsaStMRMYL1opump",
+          "pnl_sol": -0.0015785456145048365,
+          "run_id": "34660606300",
+          "score": 0.4497852204485291,
+          "win": false
+        },
+        {
+          "decision_ns": 1789204644984297916,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "JCnnPMtcLAWJ9F2UHRRGpZGkcyjjQrx4Jx5cS3Awpump",
+          "pnl_sol": -0.0003623654035738305,
+          "run_id": "34684115937",
+          "score": 0.45981761624892636,
+          "win": false
+        },
+        {
+          "decision_ns": 1789205843890391535,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "8L4DG1v2UgRkterGxubnrBcZFaY9w8vo3GPJnxDgpump",
+          "pnl_sol": 0.014729321165572969,
+          "run_id": "34684115937",
+          "score": 0.47180925588357336,
+          "win": true
+        },
+        {
+          "decision_ns": 1789205962450903800,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "8kAKqYLCAa8ZWM75GHydZYBC1X8VvX8KFbCQWbJUpump",
+          "pnl_sol": 0.02222219377657418,
+          "run_id": "34684115937",
+          "score": 0.5550271912637106,
+          "win": true
+        },
+        {
+          "decision_ns": 1789206155781909556,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "HCeioB6fwKUaMp74mvJskxb6f4ETT3U1nV1HJmMHpump",
+          "pnl_sol": 0.05286718362745226,
+          "run_id": "34684115937",
+          "score": 0.5184202445379703,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207000244201276,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9y4mr7QQcWyxLT1tTYxAkXBhbnhDqj5JZ9UT1Nj3pump",
+          "pnl_sol": 0.024481079511376118,
+          "run_id": "34684115937",
+          "score": 0.5093844110440138,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207377815103280,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "C7FFtBWLv1DTh2Yu7ga8UAgvFHKkpoaSSxFLbX9spump",
+          "pnl_sol": -0.003138920069113524,
+          "run_id": "34684115937",
+          "score": 0.5675388016560513,
+          "win": false
+        },
+        {
+          "decision_ns": 1789207541655673477,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "68111hFtPrBv1VtmrTU3UnoYqh8zg5yGfK99BjWFpump",
+          "pnl_sol": 0.054810185888610086,
+          "run_id": "34684115937",
+          "score": 0.5961516851572406,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207823479346323,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "AwpGHy5qHhcMmtkHbzEiUPpfbAxn7Pi4PLpdaW4Upump",
+          "pnl_sol": -0.023800623314948047,
+          "run_id": "34684115937",
+          "score": 0.5830904356736899,
+          "win": false
+        },
+        {
+          "decision_ns": 1789207886094215128,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "C6CNnMM6a4sbyfh3mdpspp1tXSt21Pcbn7HSgaPbpump",
+          "pnl_sol": 0.019784945685721145,
+          "run_id": "34684115937",
+          "score": 0.595454480235939,
+          "win": true
+        },
+        {
+          "decision_ns": 1789208432724555746,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "ABZLcejtewfXrMWTjwFT4bmYoN6tht51oLVfxtEPpump",
+          "pnl_sol": 0.02201503181475073,
+          "run_id": "34684115937",
+          "score": 0.5708268645276616,
+          "win": true
+        },
+        {
+          "decision_ns": 1789209436119403228,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "E3PoRKqKVTvnsvfbZzPf84Mh1bMvQuVgSTNpEDHvpump",
+          "pnl_sol": 0.0026905748591069673,
+          "run_id": "34684115937",
+          "score": 0.46604638838751405,
+          "win": true
+        },
+        {
+          "decision_ns": 1789210720130256721,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CHVHMVJfR3iqdH6RwCEwLQbhbXVaHcNksQ3Sn5ampump",
+          "pnl_sol": 0.0018687912905441667,
+          "run_id": "34684115937",
+          "score": 0.5010930941122635,
+          "win": true
+        },
+        {
+          "decision_ns": 1789211582930518618,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "ALwj4WZd27kWFiAVny7xmG9EPRQghU89RyVKgQUSpump",
+          "pnl_sol": 0.00828455466338511,
+          "run_id": "34684115937",
+          "score": 0.6367602129847146,
+          "win": true
+        },
+        {
+          "decision_ns": 1789212308588793433,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BLmbFWBhTRRTuXUsptyRbRduBqUXL4ZCcJNTXxZqpump",
+          "pnl_sol": 0.004179170459226944,
+          "run_id": "34684115937",
+          "score": 0.6659364802417176,
+          "win": true
+        },
+        {
+          "decision_ns": 1789212322451435456,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "8hTzSAzQ8mWhJKS4td3cLUuQCbxMJpt5XFPe8zMapump",
+          "pnl_sol": -0.014602077537343078,
+          "run_id": "34684115937",
+          "score": 0.4650958003262755,
+          "win": false
+        },
+        {
+          "decision_ns": 1789213879585449210,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9EKbxcvqeSktrRoanwquQgwHAMdsACh8mZ8ud6hLpump",
+          "pnl_sol": 0.03022860798343463,
+          "run_id": "34684115937",
+          "score": 0.4591885578147896,
+          "win": true
+        },
+        {
+          "decision_ns": 1789215819025321292,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5X7oMvPwX2hKammmMv46oPxEzm5f5wCYBFwQaxQwpump",
+          "pnl_sol": 0.001420848202488792,
+          "run_id": "34684115937",
+          "score": 0.6244476519337925,
+          "win": true
+        },
+        {
+          "decision_ns": 1789237395972813878,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "4SVwnsKkH1g61Zw4fzFuxkmVmeQNVx9PNkWNZCUzpump",
+          "pnl_sol": 0.002342371384001382,
+          "run_id": "34709541936",
+          "score": 0.5636319346375531,
+          "win": true
+        },
+        {
+          "decision_ns": 1789239748246274491,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7NupoB5Rc7xV9nGjfV5BVafndK4o6UNLPikM3ECqpump",
+          "pnl_sol": -0.010970846796250058,
+          "run_id": "34709541936",
+          "score": 0.4522503055913416,
+          "win": false
+        },
+        {
+          "decision_ns": 1789241024373919591,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "7BXTiWvsC92xrP3SAgaRt96j8vJr8CqhtSQJ47iDpump",
+          "pnl_sol": -0.023131684091250958,
+          "run_id": "34709541936",
+          "score": 0.46985127923239145,
+          "win": false
+        }
+      ],
+      "ledger_hash": "dcbb9181232e22000962fee9fa4dea58c2ab5d0d420ae4d34cbbe60d22460fec",
+      "maximum_drawdown_fraction": 0.029335127128887233,
+      "net_pnl_sol": 0.2567570083676505,
+      "profit_factor": 2.037946202851583,
+      "rejected_concurrency": 0,
+      "threshold": 0.4474138545197208,
+      "trades": 50,
+      "wilson_95_lower_bound": 0.4618118910275937,
+      "win_rate": 0.6,
+      "wins": 30
+    },
+    "1": {
+      "by_capture_window": {
+        "34586174670": {
+          "pnl_sol": 0.048032078764044195,
+          "trades": 18,
+          "wins": 10
+        },
+        "34627236811": {
+          "pnl_sol": 0.003223595584319096,
+          "trades": 10,
+          "wins": 5
+        },
+        "34660606300": {
+          "pnl_sol": 0.01958299091952237,
+          "trades": 2,
+          "wins": 1
+        },
+        "34684115937": {
+          "pnl_sol": 0.21756049297010233,
+          "trades": 17,
+          "wins": 13
+        },
+        "34709541936": {
+          "pnl_sol": -0.031759234507433,
+          "trades": 3,
+          "wins": 1
+        }
+      },
+      "capture_windows": 5,
+      "exit_reasons": {
+        "INITIAL_STOP": 7,
+        "MAXIMUM_HOLD": 28,
+        "PROFIT_PROTECTION": 5,
+        "TAKE_PROFIT": 2,
+        "TRAILING_STOP": 8
+      },
+      "largest_winner_contribution": 0.10872019222998658,
+      "ledger": [
+        {
+          "decision_ns": 1789122716654167879,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "7Ac1jog8Zz2EsVGFpPDDzPyeV5PBqpUHNEeDLF9Apump",
+          "pnl_sol": -0.021657444463199706,
+          "run_id": "34586174670",
+          "score": 0.4695313224393623,
+          "win": false
+        },
+        {
+          "decision_ns": 1789123678849535999,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7LbLbvdNDmjX2qENCq3Wxf8tVUnCkd6KeNFMbbgZpump",
+          "pnl_sol": 0.028444633397871733,
+          "run_id": "34586174670",
+          "score": 0.4980446109957812,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124270044600937,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BFG7kZA8FVTch3bPWnUVB9ya1MneVfvaSba1cX4Qpump",
+          "pnl_sol": 0.03510968027635926,
+          "run_id": "34586174670",
+          "score": 0.49375819317200675,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124700899869921,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "2hXsdQs5H4RJjyGjejZgo2LZtfH92sdafEs8XPBQpump",
+          "pnl_sol": 0.023191258415276916,
+          "run_id": "34586174670",
+          "score": 0.5305165569519693,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124987720144288,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "6xSqvPfy6GDCWGTNFenruSvHZSCCvTizvaSW5vmjpump",
+          "pnl_sol": 0.022123427821065633,
+          "run_id": "34586174670",
+          "score": 0.5476908236798599,
+          "win": true
+        },
+        {
+          "decision_ns": 1789125212243070795,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "FBqih5obnm6TEN1SLuJTdsQfAZQFRf3T1P13eB88pump",
+          "pnl_sol": -0.015222783773139292,
+          "run_id": "34586174670",
+          "score": 0.4780325449777896,
+          "win": false
+        },
+        {
+          "decision_ns": 1789125895066358424,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "5CYD8MLYJfjThvKRFnvFRPG95kSwqE9yKChY39uDpump",
+          "pnl_sol": -0.0018701051614400319,
+          "run_id": "34586174670",
+          "score": 0.45923152094319286,
+          "win": false
+        },
+        {
+          "decision_ns": 1789126143743882615,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "CpdZEdbarmW2z9qEwNHVWJkDsX6P5wJZudnKx24Ppump",
+          "pnl_sol": -0.0010199741034979531,
+          "run_id": "34586174670",
+          "score": 0.4894594049536887,
+          "win": false
+        },
+        {
+          "decision_ns": 1789126318986770624,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "DRwAk1K8D9HXPxcxYYCZSHDvQ6uZWSytLSqdkYjBpump",
+          "pnl_sol": -0.002531727886971563,
+          "run_id": "34586174670",
+          "score": 0.47907874877746115,
+          "win": false
+        },
+        {
+          "decision_ns": 1789126484700968964,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "DSy2bVauU5TLNbB2DeKu9aKULeS8GiB8NjvVeBZjpump",
+          "pnl_sol": 0.004428626187799566,
+          "run_id": "34586174670",
+          "score": 0.46839512341898537,
+          "win": true
+        },
+        {
+          "decision_ns": 1789127873273215318,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "HqbLzRDDDpjaocX9E95k1uB4rbfPYRt2L7D9yeGtpump",
+          "pnl_sol": 0.006749598223796727,
+          "run_id": "34586174670",
+          "score": 0.463211486493027,
+          "win": true
+        },
+        {
+          "decision_ns": 1789128246367405309,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "EV43Z6FrfcMeBPxQjYieUDp4jio8cC5bkQoiCDB7pump",
+          "pnl_sol": -0.000765459310601263,
+          "run_id": "34586174670",
+          "score": 0.5289490749734331,
+          "win": false
+        },
+        {
+          "decision_ns": 1789128364884909675,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "FAe7SKTDYEmhKqoaSCev4HwXfBxZT49scndWoA6wpump",
+          "pnl_sol": -0.046019251922837526,
+          "run_id": "34586174670",
+          "score": 0.4603290673905402,
+          "win": false
+        },
+        {
+          "decision_ns": 1789128638619370443,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "D1d6kP9uHYQCUbdF3dtxXcJ3TrqFE3mERnPmFaJNpump",
+          "pnl_sol": 0.018470051583721794,
+          "run_id": "34586174670",
+          "score": 0.5160802859145736,
+          "win": true
+        },
+        {
+          "decision_ns": 1789130120852479160,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "2op47ADuoncb1owWSqddAMDDksAoJgccchSxV5D6pump",
+          "pnl_sol": 0.0074487158033967535,
+          "run_id": "34586174670",
+          "score": 0.45510160935835153,
+          "win": true
+        },
+        {
+          "decision_ns": 1789130190643360088,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CpRYwD2nVg6fWF7eTmamLaUgRorr9iSk26ZZdQoepump",
+          "pnl_sol": 0.010296492141065289,
+          "run_id": "34586174670",
+          "score": 0.44999308177372466,
+          "win": true
+        },
+        {
+          "decision_ns": 1789131228699322207,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "FiQqFqukhmoXc2Va5Wk8E8Kz2T7aupCoQBdJzo6pump",
+          "pnl_sol": -0.022307820271595044,
+          "run_id": "34586174670",
+          "score": 0.47224753052720186,
+          "win": false
+        },
+        {
+          "decision_ns": 1789131574219615911,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5z6c3VpkC4HFTJS4ZQYroZwtaoYWjM7KLNY4g2Ehpump",
+          "pnl_sol": 0.003164161806972904,
+          "run_id": "34586174670",
+          "score": 0.6609290841934597,
+          "win": true
+        },
+        {
+          "decision_ns": 1789149011134188312,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "C7LSBM7ZyzLQT1wu9dTqRQzJSexKdEwhimjqxMX8pump",
+          "pnl_sol": 0.0036832783644521125,
+          "run_id": "34627236811",
+          "score": 0.6157785758586655,
+          "win": true
+        },
+        {
+          "decision_ns": 1789149186314872360,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "Cp42Ekhbpdjfkg7HuideGZExSUbrazPHUazy8LmYpump",
+          "pnl_sol": -0.006950037203462663,
+          "run_id": "34627236811",
+          "score": 0.4569075884774864,
+          "win": false
+        },
+        {
+          "decision_ns": 1789150255829870321,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "GRtZNhPtcHTvhtCb2BuxDxsC8UAJsZQAkTVhwzADpump",
+          "pnl_sol": 0.0034367399466534027,
+          "run_id": "34627236811",
+          "score": 0.6127500015126041,
+          "win": true
+        },
+        {
+          "decision_ns": 1789150376383858357,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "EVBahqJvndaHitR72BVV3hXfa4SJCg6Sb52741Pdpump",
+          "pnl_sol": -0.021350229103845556,
+          "run_id": "34627236811",
+          "score": 0.4495565826115786,
+          "win": false
+        },
+        {
+          "decision_ns": 1789152633837154336,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "4QEUi1W8uEJBQmvhcJu66S9ehGE58tLkcT8dQmm6pump",
+          "pnl_sol": 0.002444694068313616,
+          "run_id": "34627236811",
+          "score": 0.6480129063347158,
+          "win": true
+        },
+        {
+          "decision_ns": 1789153325783786710,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "EjN7GSgaSE2ZSngUjQMbSpe7DK4v3ceqQcSaeyf8pump",
+          "pnl_sol": -0.021325199584065195,
+          "run_id": "34627236811",
+          "score": 0.45128583764668895,
+          "win": false
+        },
+        {
+          "decision_ns": 1789153353788574898,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "9bWvjq69VD2gnwMZvqAuvpsNCsKk8TTEBmzY2rYVpump",
+          "pnl_sol": -0.0013945474130166446,
+          "run_id": "34627236811",
+          "score": 0.4679439192931613,
+          "win": false
+        },
+        {
+          "decision_ns": 1789153929818073452,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "Ajrn7dKyKRE6cCfcAaJnHWe9DA5z8NeYKGMjegrj6ALL",
+          "pnl_sol": -0.007370603778361469,
+          "run_id": "34627236811",
+          "score": 0.4751541687600763,
+          "win": false
+        },
+        {
+          "decision_ns": 1789153983127342830,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "HcZaF28NmGiTrXgiU8v2iBhqAC9aKrqAsTn3kHNVpump",
+          "pnl_sol": 0.0037407719733032613,
+          "run_id": "34627236811",
+          "score": 0.6200862771189215,
+          "win": true
+        },
+        {
+          "decision_ns": 1789154464822852529,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7iG9So7vdddHUtn5mkk8uJH8jSrxnVSQtnzBQ5JBpump",
+          "pnl_sol": 0.04830872831434823,
+          "run_id": "34627236811",
+          "score": 0.4597726050760447,
+          "win": true
+        },
+        {
+          "decision_ns": 1789172336237490556,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "714o5Pch4wovjTB2sCp2EtfiV8GR7mTaRVHaDrudpump",
+          "pnl_sol": 0.021161536534027206,
+          "run_id": "34660606300",
+          "score": 0.4494733816214408,
+          "win": true
+        },
+        {
+          "decision_ns": 1789174556553352409,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "y6GkvYeq6hQ24PAiTy3Z11rLdydgsaStMRMYL1opump",
+          "pnl_sol": -0.0015785456145048365,
+          "run_id": "34660606300",
+          "score": 0.4497852204485291,
+          "win": false
+        },
+        {
+          "decision_ns": 1789204644984297916,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "JCnnPMtcLAWJ9F2UHRRGpZGkcyjjQrx4Jx5cS3Awpump",
+          "pnl_sol": -0.0003623654035738305,
+          "run_id": "34684115937",
+          "score": 0.45981761624892636,
+          "win": false
+        },
+        {
+          "decision_ns": 1789205843890391535,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "8L4DG1v2UgRkterGxubnrBcZFaY9w8vo3GPJnxDgpump",
+          "pnl_sol": 0.014729321165572969,
+          "run_id": "34684115937",
+          "score": 0.47180925588357336,
+          "win": true
+        },
+        {
+          "decision_ns": 1789205962450903800,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "8kAKqYLCAa8ZWM75GHydZYBC1X8VvX8KFbCQWbJUpump",
+          "pnl_sol": 0.02222219377657418,
+          "run_id": "34684115937",
+          "score": 0.5550271912637106,
+          "win": true
+        },
+        {
+          "decision_ns": 1789206155781909556,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "HCeioB6fwKUaMp74mvJskxb6f4ETT3U1nV1HJmMHpump",
+          "pnl_sol": 0.05286718362745226,
+          "run_id": "34684115937",
+          "score": 0.5184202445379703,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207000244201276,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9y4mr7QQcWyxLT1tTYxAkXBhbnhDqj5JZ9UT1Nj3pump",
+          "pnl_sol": 0.024481079511376118,
+          "run_id": "34684115937",
+          "score": 0.5093844110440138,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207377815103280,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "C7FFtBWLv1DTh2Yu7ga8UAgvFHKkpoaSSxFLbX9spump",
+          "pnl_sol": -0.003252323871403777,
+          "run_id": "34684115937",
+          "score": 0.5675388016560513,
+          "win": false
+        },
+        {
+          "decision_ns": 1789207541655673477,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "68111hFtPrBv1VtmrTU3UnoYqh8zg5yGfK99BjWFpump",
+          "pnl_sol": 0.05480816081227741,
+          "run_id": "34684115937",
+          "score": 0.5961516851572406,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207823479346323,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "AwpGHy5qHhcMmtkHbzEiUPpfbAxn7Pi4PLpdaW4Upump",
+          "pnl_sol": -0.023799845967415127,
+          "run_id": "34684115937",
+          "score": 0.5830904356736899,
+          "win": false
+        },
+        {
+          "decision_ns": 1789207886094215128,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "C6CNnMM6a4sbyfh3mdpspp1tXSt21Pcbn7HSgaPbpump",
+          "pnl_sol": 0.019784168055669467,
+          "run_id": "34684115937",
+          "score": 0.595454480235939,
+          "win": true
+        },
+        {
+          "decision_ns": 1789208432724555746,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "ABZLcejtewfXrMWTjwFT4bmYoN6tht51oLVfxtEPpump",
+          "pnl_sol": 0.022014174066649822,
+          "run_id": "34684115937",
+          "score": 0.5708268645276616,
+          "win": true
+        },
+        {
+          "decision_ns": 1789209436119403228,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "E3PoRKqKVTvnsvfbZzPf84Mh1bMvQuVgSTNpEDHvpump",
+          "pnl_sol": 0.002690407078240295,
+          "run_id": "34684115937",
+          "score": 0.46604638838751405,
+          "win": true
+        },
+        {
+          "decision_ns": 1789210720130256721,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CHVHMVJfR3iqdH6RwCEwLQbhbXVaHcNksQ3Sn5ampump",
+          "pnl_sol": 0.001868652788194855,
+          "run_id": "34684115937",
+          "score": 0.5010930941122635,
+          "win": true
+        },
+        {
+          "decision_ns": 1789211582930518618,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "ALwj4WZd27kWFiAVny7xmG9EPRQghU89RyVKgQUSpump",
+          "pnl_sol": 0.008284186547461561,
+          "run_id": "34684115937",
+          "score": 0.6367602129847146,
+          "win": true
+        },
+        {
+          "decision_ns": 1789212308588793433,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BLmbFWBhTRRTuXUsptyRbRduBqUXL4ZCcJNTXxZqpump",
+          "pnl_sol": 0.0041789490804907126,
+          "run_id": "34684115937",
+          "score": 0.6659364802417176,
+          "win": true
+        },
+        {
+          "decision_ns": 1789212322451435456,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "8hTzSAzQ8mWhJKS4td3cLUuQCbxMJpt5XFPe8zMapump",
+          "pnl_sol": -0.014601626315265306,
+          "run_id": "34684115937",
+          "score": 0.4650958003262755,
+          "win": false
+        },
+        {
+          "decision_ns": 1789213879585449210,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9EKbxcvqeSktrRoanwquQgwHAMdsACh8mZ8ud6hLpump",
+          "pnl_sol": 0.03022745267820995,
+          "run_id": "34684115937",
+          "score": 0.4591885578147896,
+          "win": true
+        },
+        {
+          "decision_ns": 1789215819025321292,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5X7oMvPwX2hKammmMv46oPxEzm5f5wCYBFwQaxQwpump",
+          "pnl_sol": 0.001420725339590756,
+          "run_id": "34684115937",
+          "score": 0.6244476519337925,
+          "win": true
+        },
+        {
+          "decision_ns": 1789237395972813878,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "4SVwnsKkH1g61Zw4fzFuxkmVmeQNVx9PNkWNZCUzpump",
+          "pnl_sol": 0.0023422153770000093,
+          "run_id": "34709541936",
+          "score": 0.5636319346375531,
+          "win": true
+        },
+        {
+          "decision_ns": 1789239748246274491,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7NupoB5Rc7xV9nGjfV5BVafndK4o6UNLPikM3ECqpump",
+          "pnl_sol": -0.010970524857554814,
+          "run_id": "34709541936",
+          "score": 0.4522503055913416,
+          "win": false
+        },
+        {
+          "decision_ns": 1789241024373919591,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "7BXTiWvsC92xrP3SAgaRt96j8vJr8CqhtSQJ47iDpump",
+          "pnl_sol": -0.023130925026878198,
+          "run_id": "34709541936",
+          "score": 0.46985127923239145,
+          "win": false
+        }
+      ],
+      "ledger_hash": "7cb9197045e34f14693c22e18c2acd9c40c4008e697b707b41b71510f22c88f2",
+      "maximum_drawdown_fraction": 0.029335127128887233,
+      "net_pnl_sol": 0.25663992373055455,
+      "profit_factor": 2.037007164498586,
+      "rejected_concurrency": 0,
+      "threshold": 0.4474138545197208,
+      "trades": 50,
+      "wilson_95_lower_bound": 0.4618118910275937,
+      "win_rate": 0.6,
+      "wins": 30
+    },
+    "10": {
+      "by_capture_window": {
+        "34586174670": {
+          "pnl_sol": 0.047903023285696185,
+          "trades": 18,
+          "wins": 10
+        },
+        "34627236811": {
+          "pnl_sol": 0.003222600735816837,
+          "trades": 10,
+          "wins": 5
+        },
+        "34660606300": {
+          "pnl_sol": 0.01958198532946359,
+          "trades": 2,
+          "wins": 1
+        },
+        "34684115937": {
+          "pnl_sol": 0.21739456146388159,
+          "trades": 17,
+          "wins": 13
+        },
+        "34709541936": {
+          "pnl_sol": -0.03175690662799739,
+          "trades": 3,
+          "wins": 1
+        }
+      },
+      "capture_windows": 5,
+      "exit_reasons": {
+        "INITIAL_STOP": 7,
+        "MAXIMUM_HOLD": 28,
+        "PROFIT_PROTECTION": 5,
+        "TAKE_PROFIT": 2,
+        "TRAILING_STOP": 8
+      },
+      "largest_winner_contribution": 0.10871590161441602,
+      "ledger": [
+        {
+          "decision_ns": 1789122716654167879,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "7Ac1jog8Zz2EsVGFpPDDzPyeV5PBqpUHNEeDLF9Apump",
+          "pnl_sol": -0.021657444463199706,
+          "run_id": "34586174670",
+          "score": 0.4695313224393623,
+          "win": false
+        },
+        {
+          "decision_ns": 1789123678849535999,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7LbLbvdNDmjX2qENCq3Wxf8tVUnCkd6KeNFMbbgZpump",
+          "pnl_sol": 0.028444633397871733,
+          "run_id": "34586174670",
+          "score": 0.4980446109957812,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124270044600937,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BFG7kZA8FVTch3bPWnUVB9ya1MneVfvaSba1cX4Qpump",
+          "pnl_sol": 0.03510968027635926,
+          "run_id": "34586174670",
+          "score": 0.49375819317200675,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124700899869921,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "2hXsdQs5H4RJjyGjejZgo2LZtfH92sdafEs8XPBQpump",
+          "pnl_sol": 0.023191258415276916,
+          "run_id": "34586174670",
+          "score": 0.5305165569519693,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124987720144288,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "6xSqvPfy6GDCWGTNFenruSvHZSCCvTizvaSW5vmjpump",
+          "pnl_sol": 0.022123427821065633,
+          "run_id": "34586174670",
+          "score": 0.5476908236798599,
+          "win": true
+        },
+        {
+          "decision_ns": 1789125212243070795,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "FBqih5obnm6TEN1SLuJTdsQfAZQFRf3T1P13eB88pump",
+          "pnl_sol": -0.015222783773139292,
+          "run_id": "34586174670",
+          "score": 0.4780325449777896,
+          "win": false
+        },
+        {
+          "decision_ns": 1789125895066358424,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "5CYD8MLYJfjThvKRFnvFRPG95kSwqE9yKChY39uDpump",
+          "pnl_sol": -0.0018701051614400319,
+          "run_id": "34586174670",
+          "score": 0.45923152094319286,
+          "win": false
+        },
+        {
+          "decision_ns": 1789126143743882615,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "CpdZEdbarmW2z9qEwNHVWJkDsX6P5wJZudnKx24Ppump",
+          "pnl_sol": -0.001149072856153753,
+          "run_id": "34586174670",
+          "score": 0.4894594049536887,
+          "win": false
+        },
+        {
+          "decision_ns": 1789126318986770624,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "DRwAk1K8D9HXPxcxYYCZSHDvQ6uZWSytLSqdkYjBpump",
+          "pnl_sol": -0.002531705730657932,
+          "run_id": "34586174670",
+          "score": 0.47907874877746115,
+          "win": false
+        },
+        {
+          "decision_ns": 1789126484700968964,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "DSy2bVauU5TLNbB2DeKu9aKULeS8GiB8NjvVeBZjpump",
+          "pnl_sol": 0.004428355386418066,
+          "run_id": "34586174670",
+          "score": 0.46839512341898537,
+          "win": true
+        },
+        {
+          "decision_ns": 1789127873273215318,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "HqbLzRDDDpjaocX9E95k1uB4rbfPYRt2L7D9yeGtpump",
+          "pnl_sol": 0.006749229488490875,
+          "run_id": "34586174670",
+          "score": 0.463211486493027,
+          "win": true
+        },
+        {
+          "decision_ns": 1789128246367405309,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "EV43Z6FrfcMeBPxQjYieUDp4jio8cC5bkQoiCDB7pump",
+          "pnl_sol": -0.0007655115528809459,
+          "run_id": "34586174670",
+          "score": 0.5289490749734331,
+          "win": false
+        },
+        {
+          "decision_ns": 1789128364884909675,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "FAe7SKTDYEmhKqoaSCev4HwXfBxZT49scndWoA6wpump",
+          "pnl_sol": -0.046017395668177315,
+          "run_id": "34586174670",
+          "score": 0.4603290673905402,
+          "win": false
+        },
+        {
+          "decision_ns": 1789128638619370443,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "D1d6kP9uHYQCUbdF3dtxXcJ3TrqFE3mERnPmFaJNpump",
+          "pnl_sol": 0.01846918749879302,
+          "run_id": "34586174670",
+          "score": 0.5160802859145736,
+          "win": true
+        },
+        {
+          "decision_ns": 1789130120852479160,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "2op47ADuoncb1owWSqddAMDDksAoJgccchSxV5D6pump",
+          "pnl_sol": 0.007448316576840162,
+          "run_id": "34586174670",
+          "score": 0.45510160935835153,
+          "win": true
+        },
+        {
+          "decision_ns": 1789130190643360088,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CpRYwD2nVg6fWF7eTmamLaUgRorr9iSk26ZZdQoepump",
+          "pnl_sol": 0.010295972313346939,
+          "run_id": "34586174670",
+          "score": 0.44999308177372466,
+          "win": true
+        },
+        {
+          "decision_ns": 1789131228699322207,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "FiQqFqukhmoXc2Va5Wk8E8Kz2T7aupCoQBdJzo6pump",
+          "pnl_sol": -0.02230696176860191,
+          "run_id": "34586174670",
+          "score": 0.47224753052720186,
+          "win": false
+        },
+        {
+          "decision_ns": 1789131574219615911,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5z6c3VpkC4HFTJS4ZQYroZwtaoYWjM7KLNY4g2Ehpump",
+          "pnl_sol": 0.003163943085484469,
+          "run_id": "34586174670",
+          "score": 0.6609290841934597,
+          "win": true
+        },
+        {
+          "decision_ns": 1789149011134188312,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "C7LSBM7ZyzLQT1wu9dTqRQzJSexKdEwhimjqxMX8pump",
+          "pnl_sol": 0.003683037519386728,
+          "run_id": "34627236811",
+          "score": 0.6157785758586655,
+          "win": true
+        },
+        {
+          "decision_ns": 1789149186314872360,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "Cp42Ekhbpdjfkg7HuideGZExSUbrazPHUazy8LmYpump",
+          "pnl_sol": -0.006949827690105513,
+          "run_id": "34627236811",
+          "score": 0.4569075884774864,
+          "win": false
+        },
+        {
+          "decision_ns": 1789150255829870321,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "GRtZNhPtcHTvhtCb2BuxDxsC8UAJsZQAkTVhwzADpump",
+          "pnl_sol": 0.003436509236967436,
+          "run_id": "34627236811",
+          "score": 0.6127500015126041,
+          "win": true
+        },
+        {
+          "decision_ns": 1789150376383858357,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "EVBahqJvndaHitR72BVV3hXfa4SJCg6Sb52741Pdpump",
+          "pnl_sol": -0.0213494083980664,
+          "run_id": "34627236811",
+          "score": 0.4495565826115786,
+          "win": false
+        },
+        {
+          "decision_ns": 1789152633837154336,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "4QEUi1W8uEJBQmvhcJu66S9ehGE58tLkcT8dQmm6pump",
+          "pnl_sol": 0.0024445051685779012,
+          "run_id": "34627236811",
+          "score": 0.6480129063347158,
+          "win": true
+        },
+        {
+          "decision_ns": 1789153325783786710,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "EjN7GSgaSE2ZSngUjQMbSpe7DK4v3ceqQcSaeyf8pump",
+          "pnl_sol": -0.02132437885435059,
+          "run_id": "34627236811",
+          "score": 0.45128583764668895,
+          "win": false
+        },
+        {
+          "decision_ns": 1789153353788574898,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "9bWvjq69VD2gnwMZvqAuvpsNCsKk8TTEBmzY2rYVpump",
+          "pnl_sol": -0.0013945733625692971,
+          "run_id": "34627236811",
+          "score": 0.4679439192931613,
+          "win": false
+        },
+        {
+          "decision_ns": 1789153929818073452,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "Ajrn7dKyKRE6cCfcAaJnHWe9DA5z8NeYKGMjegrj6ALL",
+          "pnl_sol": -0.007370375541357423,
+          "run_id": "34627236811",
+          "score": 0.4751541687600763,
+          "win": false
+        },
+        {
+          "decision_ns": 1789153983127342830,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "HcZaF28NmGiTrXgiU8v2iBhqAC9aKrqAsTn3kHNVpump",
+          "pnl_sol": 0.0037405274016729176,
+          "run_id": "34627236811",
+          "score": 0.6200862771189215,
+          "win": true
+        },
+        {
+          "decision_ns": 1789154464822852529,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7iG9So7vdddHUtn5mkk8uJH8jSrxnVSQtnzBQ5JBpump",
+          "pnl_sol": 0.048306585255661075,
+          "run_id": "34627236811",
+          "score": 0.4597726050760447,
+          "win": true
+        },
+        {
+          "decision_ns": 1789172336237490556,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "714o5Pch4wovjTB2sCp2EtfiV8GR7mTaRVHaDrudpump",
+          "pnl_sol": 0.021160549132127865,
+          "run_id": "34660606300",
+          "score": 0.4494733816214408,
+          "win": true
+        },
+        {
+          "decision_ns": 1789174556553352409,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "y6GkvYeq6hQ24PAiTy3Z11rLdydgsaStMRMYL1opump",
+          "pnl_sol": -0.0015785638026642734,
+          "run_id": "34660606300",
+          "score": 0.4497852204485291,
+          "win": false
+        },
+        {
+          "decision_ns": 1789204644984297916,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "JCnnPMtcLAWJ9F2UHRRGpZGkcyjjQrx4Jx5cS3Awpump",
+          "pnl_sol": -0.00036243550721868495,
+          "run_id": "34684115937",
+          "score": 0.45981761624892636,
+          "win": false
+        },
+        {
+          "decision_ns": 1789205843890391535,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "8L4DG1v2UgRkterGxubnrBcZFaY9w8vo3GPJnxDgpump",
+          "pnl_sol": 0.014728606519138078,
+          "run_id": "34684115937",
+          "score": 0.47180925588357336,
+          "win": true
+        },
+        {
+          "decision_ns": 1789205962450903800,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "8kAKqYLCAa8ZWM75GHydZYBC1X8VvX8KFbCQWbJUpump",
+          "pnl_sol": 0.022221158471385775,
+          "run_id": "34684115937",
+          "score": 0.5550271912637106,
+          "win": true
+        },
+        {
+          "decision_ns": 1789206155781909556,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "HCeioB6fwKUaMp74mvJskxb6f4ETT3U1nV1HJmMHpump",
+          "pnl_sol": 0.05286483725122745,
+          "run_id": "34684115937",
+          "score": 0.5184202445379703,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207000244201276,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9y4mr7QQcWyxLT1tTYxAkXBhbnhDqj5JZ9UT1Nj3pump",
+          "pnl_sol": 0.024479946227972754,
+          "run_id": "34684115937",
+          "score": 0.5093844110440138,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207377815103280,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "C7FFtBWLv1DTh2Yu7ga8UAgvFHKkpoaSSxFLbX9spump",
+          "pnl_sol": -0.0034013644577925717,
+          "run_id": "34684115937",
+          "score": 0.5675388016560513,
+          "win": false
+        },
+        {
+          "decision_ns": 1789207541655673477,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "68111hFtPrBv1VtmrTU3UnoYqh8zg5yGfK99BjWFpump",
+          "pnl_sol": 0.05480306443001131,
+          "run_id": "34684115937",
+          "score": 0.5961516851572406,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207823479346323,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "AwpGHy5qHhcMmtkHbzEiUPpfbAxn7Pi4PLpdaW4Upump",
+          "pnl_sol": -0.023797889665759984,
+          "run_id": "34684115937",
+          "score": 0.5830904356736899,
+          "win": false
+        },
+        {
+          "decision_ns": 1789207886094215128,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "C6CNnMM6a4sbyfh3mdpspp1tXSt21Pcbn7HSgaPbpump",
+          "pnl_sol": 0.01978221104301716,
+          "run_id": "34684115937",
+          "score": 0.595454480235939,
+          "win": true
+        },
+        {
+          "decision_ns": 1789208432724555746,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "ABZLcejtewfXrMWTjwFT4bmYoN6tht51oLVfxtEPpump",
+          "pnl_sol": 0.022012015425940945,
+          "run_id": "34684115937",
+          "score": 0.5708268645276616,
+          "win": true
+        },
+        {
+          "decision_ns": 1789209436119403228,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "E3PoRKqKVTvnsvfbZzPf84Mh1bMvQuVgSTNpEDHvpump",
+          "pnl_sol": 0.002689984834683523,
+          "run_id": "34684115937",
+          "score": 0.46604638838751405,
+          "win": true
+        },
+        {
+          "decision_ns": 1789210720130256721,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CHVHMVJfR3iqdH6RwCEwLQbhbXVaHcNksQ3Sn5ampump",
+          "pnl_sol": 0.0018683042280416423,
+          "run_id": "34684115937",
+          "score": 0.5010930941122635,
+          "win": true
+        },
+        {
+          "decision_ns": 1789211582930518618,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "ALwj4WZd27kWFiAVny7xmG9EPRQghU89RyVKgQUSpump",
+          "pnl_sol": 0.008283260133264497,
+          "run_id": "34684115937",
+          "score": 0.6367602129847146,
+          "win": true
+        },
+        {
+          "decision_ns": 1789212308588793433,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BLmbFWBhTRRTuXUsptyRbRduBqUXL4ZCcJNTXxZqpump",
+          "pnl_sol": 0.004178391950545854,
+          "run_id": "34684115937",
+          "score": 0.6659364802417176,
+          "win": true
+        },
+        {
+          "decision_ns": 1789212322451435456,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "8hTzSAzQ8mWhJKS4td3cLUuQCbxMJpt5XFPe8zMapump",
+          "pnl_sol": -0.014600490753035808,
+          "run_id": "34684115937",
+          "score": 0.4650958003262755,
+          "win": false
+        },
+        {
+          "decision_ns": 1789213879585449210,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9EKbxcvqeSktrRoanwquQgwHAMdsACh8mZ8ud6hLpump",
+          "pnl_sol": 0.030224545194198593,
+          "run_id": "34684115937",
+          "score": 0.4591885578147896,
+          "win": true
+        },
+        {
+          "decision_ns": 1789215819025321292,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5X7oMvPwX2hKammmMv46oPxEzm5f5wCYBFwQaxQwpump",
+          "pnl_sol": 0.001420416138261063,
+          "run_id": "34684115937",
+          "score": 0.6244476519337925,
+          "win": true
+        },
+        {
+          "decision_ns": 1789237395972813878,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "4SVwnsKkH1g61Zw4fzFuxkmVmeQNVx9PNkWNZCUzpump",
+          "pnl_sol": 0.002341822763989712,
+          "run_id": "34709541936",
+          "score": 0.5636319346375531,
+          "win": true
+        },
+        {
+          "decision_ns": 1789239748246274491,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7NupoB5Rc7xV9nGjfV5BVafndK4o6UNLPikM3ECqpump",
+          "pnl_sol": -0.010969714654684555,
+          "run_id": "34709541936",
+          "score": 0.4522503055913416,
+          "win": false
+        },
+        {
+          "decision_ns": 1789241024373919591,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "7BXTiWvsC92xrP3SAgaRt96j8vJr8CqhtSQJ47iDpump",
+          "pnl_sol": -0.02312901473730255,
+          "run_id": "34709541936",
+          "score": 0.46985127923239145,
+          "win": false
+        }
+      ],
+      "ledger_hash": "8c8e9b4de023597a3c9d5efaebe91fa530e427c3c473ac9096eb66d034ec54e1",
+      "maximum_drawdown_fraction": 0.029377681361064816,
+      "net_pnl_sol": 0.25634526418686177,
+      "profit_factor": 2.0346973959503347,
+      "rejected_concurrency": 0,
+      "threshold": 0.4474138545197208,
+      "trades": 50,
+      "wilson_95_lower_bound": 0.4618118910275937,
+      "win_rate": 0.6,
+      "wins": 30
+    },
+    "2": {
+      "by_capture_window": {
+        "34586174670": {
+          "pnl_sol": 0.048032078764044195,
+          "trades": 18,
+          "wins": 10
+        },
+        "34627236811": {
+          "pnl_sol": 0.003223595584319096,
+          "trades": 10,
+          "wins": 5
+        },
+        "34660606300": {
+          "pnl_sol": 0.01958299091952237,
+          "trades": 2,
+          "wins": 1
+        },
+        "34684115937": {
+          "pnl_sol": 0.2175087572647404,
+          "trades": 17,
+          "wins": 13
+        },
+        "34709541936": {
+          "pnl_sol": -0.031758828986945514,
+          "trades": 3,
+          "wins": 1
+        }
+      },
+      "capture_windows": 5,
+      "exit_reasons": {
+        "INITIAL_STOP": 7,
+        "MAXIMUM_HOLD": 28,
+        "PROFIT_PROTECTION": 5,
+        "TAKE_PROFIT": 2,
+        "TRAILING_STOP": 8
+      },
+      "largest_winner_contribution": 0.10871899751843073,
+      "ledger": [
+        {
+          "decision_ns": 1789122716654167879,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "7Ac1jog8Zz2EsVGFpPDDzPyeV5PBqpUHNEeDLF9Apump",
+          "pnl_sol": -0.021657444463199706,
+          "run_id": "34586174670",
+          "score": 0.4695313224393623,
+          "win": false
+        },
+        {
+          "decision_ns": 1789123678849535999,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7LbLbvdNDmjX2qENCq3Wxf8tVUnCkd6KeNFMbbgZpump",
+          "pnl_sol": 0.028444633397871733,
+          "run_id": "34586174670",
+          "score": 0.4980446109957812,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124270044600937,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BFG7kZA8FVTch3bPWnUVB9ya1MneVfvaSba1cX4Qpump",
+          "pnl_sol": 0.03510968027635926,
+          "run_id": "34586174670",
+          "score": 0.49375819317200675,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124700899869921,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "2hXsdQs5H4RJjyGjejZgo2LZtfH92sdafEs8XPBQpump",
+          "pnl_sol": 0.023191258415276916,
+          "run_id": "34586174670",
+          "score": 0.5305165569519693,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124987720144288,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "6xSqvPfy6GDCWGTNFenruSvHZSCCvTizvaSW5vmjpump",
+          "pnl_sol": 0.022123427821065633,
+          "run_id": "34586174670",
+          "score": 0.5476908236798599,
+          "win": true
+        },
+        {
+          "decision_ns": 1789125212243070795,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "FBqih5obnm6TEN1SLuJTdsQfAZQFRf3T1P13eB88pump",
+          "pnl_sol": -0.015222783773139292,
+          "run_id": "34586174670",
+          "score": 0.4780325449777896,
+          "win": false
+        },
+        {
+          "decision_ns": 1789125895066358424,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "5CYD8MLYJfjThvKRFnvFRPG95kSwqE9yKChY39uDpump",
+          "pnl_sol": -0.0018701051614400319,
+          "run_id": "34586174670",
+          "score": 0.45923152094319286,
+          "win": false
+        },
+        {
+          "decision_ns": 1789126143743882615,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "CpdZEdbarmW2z9qEwNHVWJkDsX6P5wJZudnKx24Ppump",
+          "pnl_sol": -0.0010199741034979531,
+          "run_id": "34586174670",
+          "score": 0.4894594049536887,
+          "win": false
+        },
+        {
+          "decision_ns": 1789126318986770624,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "DRwAk1K8D9HXPxcxYYCZSHDvQ6uZWSytLSqdkYjBpump",
+          "pnl_sol": -0.002531727886971563,
+          "run_id": "34586174670",
+          "score": 0.47907874877746115,
+          "win": false
+        },
+        {
+          "decision_ns": 1789126484700968964,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "DSy2bVauU5TLNbB2DeKu9aKULeS8GiB8NjvVeBZjpump",
+          "pnl_sol": 0.004428626187799566,
+          "run_id": "34586174670",
+          "score": 0.46839512341898537,
+          "win": true
+        },
+        {
+          "decision_ns": 1789127873273215318,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "HqbLzRDDDpjaocX9E95k1uB4rbfPYRt2L7D9yeGtpump",
+          "pnl_sol": 0.006749598223796727,
+          "run_id": "34586174670",
+          "score": 0.463211486493027,
+          "win": true
+        },
+        {
+          "decision_ns": 1789128246367405309,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "EV43Z6FrfcMeBPxQjYieUDp4jio8cC5bkQoiCDB7pump",
+          "pnl_sol": -0.000765459310601263,
+          "run_id": "34586174670",
+          "score": 0.5289490749734331,
+          "win": false
+        },
+        {
+          "decision_ns": 1789128364884909675,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "FAe7SKTDYEmhKqoaSCev4HwXfBxZT49scndWoA6wpump",
+          "pnl_sol": -0.046019251922837526,
+          "run_id": "34586174670",
+          "score": 0.4603290673905402,
+          "win": false
+        },
+        {
+          "decision_ns": 1789128638619370443,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "D1d6kP9uHYQCUbdF3dtxXcJ3TrqFE3mERnPmFaJNpump",
+          "pnl_sol": 0.018470051583721794,
+          "run_id": "34586174670",
+          "score": 0.5160802859145736,
+          "win": true
+        },
+        {
+          "decision_ns": 1789130120852479160,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "2op47ADuoncb1owWSqddAMDDksAoJgccchSxV5D6pump",
+          "pnl_sol": 0.0074487158033967535,
+          "run_id": "34586174670",
+          "score": 0.45510160935835153,
+          "win": true
+        },
+        {
+          "decision_ns": 1789130190643360088,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CpRYwD2nVg6fWF7eTmamLaUgRorr9iSk26ZZdQoepump",
+          "pnl_sol": 0.010296492141065289,
+          "run_id": "34586174670",
+          "score": 0.44999308177372466,
+          "win": true
+        },
+        {
+          "decision_ns": 1789131228699322207,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "FiQqFqukhmoXc2Va5Wk8E8Kz2T7aupCoQBdJzo6pump",
+          "pnl_sol": -0.022307820271595044,
+          "run_id": "34586174670",
+          "score": 0.47224753052720186,
+          "win": false
+        },
+        {
+          "decision_ns": 1789131574219615911,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5z6c3VpkC4HFTJS4ZQYroZwtaoYWjM7KLNY4g2Ehpump",
+          "pnl_sol": 0.003164161806972904,
+          "run_id": "34586174670",
+          "score": 0.6609290841934597,
+          "win": true
+        },
+        {
+          "decision_ns": 1789149011134188312,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "C7LSBM7ZyzLQT1wu9dTqRQzJSexKdEwhimjqxMX8pump",
+          "pnl_sol": 0.0036832783644521125,
+          "run_id": "34627236811",
+          "score": 0.6157785758586655,
+          "win": true
+        },
+        {
+          "decision_ns": 1789149186314872360,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "Cp42Ekhbpdjfkg7HuideGZExSUbrazPHUazy8LmYpump",
+          "pnl_sol": -0.006950037203462663,
+          "run_id": "34627236811",
+          "score": 0.4569075884774864,
+          "win": false
+        },
+        {
+          "decision_ns": 1789150255829870321,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "GRtZNhPtcHTvhtCb2BuxDxsC8UAJsZQAkTVhwzADpump",
+          "pnl_sol": 0.0034367399466534027,
+          "run_id": "34627236811",
+          "score": 0.6127500015126041,
+          "win": true
+        },
+        {
+          "decision_ns": 1789150376383858357,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "EVBahqJvndaHitR72BVV3hXfa4SJCg6Sb52741Pdpump",
+          "pnl_sol": -0.021350229103845556,
+          "run_id": "34627236811",
+          "score": 0.4495565826115786,
+          "win": false
+        },
+        {
+          "decision_ns": 1789152633837154336,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "4QEUi1W8uEJBQmvhcJu66S9ehGE58tLkcT8dQmm6pump",
+          "pnl_sol": 0.002444694068313616,
+          "run_id": "34627236811",
+          "score": 0.6480129063347158,
+          "win": true
+        },
+        {
+          "decision_ns": 1789153325783786710,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "EjN7GSgaSE2ZSngUjQMbSpe7DK4v3ceqQcSaeyf8pump",
+          "pnl_sol": -0.021325199584065195,
+          "run_id": "34627236811",
+          "score": 0.45128583764668895,
+          "win": false
+        },
+        {
+          "decision_ns": 1789153353788574898,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "9bWvjq69VD2gnwMZvqAuvpsNCsKk8TTEBmzY2rYVpump",
+          "pnl_sol": -0.0013945474130166446,
+          "run_id": "34627236811",
+          "score": 0.4679439192931613,
+          "win": false
+        },
+        {
+          "decision_ns": 1789153929818073452,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "Ajrn7dKyKRE6cCfcAaJnHWe9DA5z8NeYKGMjegrj6ALL",
+          "pnl_sol": -0.007370603778361469,
+          "run_id": "34627236811",
+          "score": 0.4751541687600763,
+          "win": false
+        },
+        {
+          "decision_ns": 1789153983127342830,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "HcZaF28NmGiTrXgiU8v2iBhqAC9aKrqAsTn3kHNVpump",
+          "pnl_sol": 0.0037407719733032613,
+          "run_id": "34627236811",
+          "score": 0.6200862771189215,
+          "win": true
+        },
+        {
+          "decision_ns": 1789154464822852529,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7iG9So7vdddHUtn5mkk8uJH8jSrxnVSQtnzBQ5JBpump",
+          "pnl_sol": 0.04830872831434823,
+          "run_id": "34627236811",
+          "score": 0.4597726050760447,
+          "win": true
+        },
+        {
+          "decision_ns": 1789172336237490556,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "714o5Pch4wovjTB2sCp2EtfiV8GR7mTaRVHaDrudpump",
+          "pnl_sol": 0.021161536534027206,
+          "run_id": "34660606300",
+          "score": 0.4494733816214408,
+          "win": true
+        },
+        {
+          "decision_ns": 1789174556553352409,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "y6GkvYeq6hQ24PAiTy3Z11rLdydgsaStMRMYL1opump",
+          "pnl_sol": -0.0015785456145048365,
+          "run_id": "34660606300",
+          "score": 0.4497852204485291,
+          "win": false
+        },
+        {
+          "decision_ns": 1789204644984297916,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "JCnnPMtcLAWJ9F2UHRRGpZGkcyjjQrx4Jx5cS3Awpump",
+          "pnl_sol": -0.0003623654035738305,
+          "run_id": "34684115937",
+          "score": 0.45981761624892636,
+          "win": false
+        },
+        {
+          "decision_ns": 1789205843890391535,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "8L4DG1v2UgRkterGxubnrBcZFaY9w8vo3GPJnxDgpump",
+          "pnl_sol": 0.014729321165572969,
+          "run_id": "34684115937",
+          "score": 0.47180925588357336,
+          "win": true
+        },
+        {
+          "decision_ns": 1789205962450903800,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "8kAKqYLCAa8ZWM75GHydZYBC1X8VvX8KFbCQWbJUpump",
+          "pnl_sol": 0.02222219377657418,
+          "run_id": "34684115937",
+          "score": 0.5550271912637106,
+          "win": true
+        },
+        {
+          "decision_ns": 1789206155781909556,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "HCeioB6fwKUaMp74mvJskxb6f4ETT3U1nV1HJmMHpump",
+          "pnl_sol": 0.05286718362745226,
+          "run_id": "34684115937",
+          "score": 0.5184202445379703,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207000244201276,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9y4mr7QQcWyxLT1tTYxAkXBhbnhDqj5JZ9UT1Nj3pump",
+          "pnl_sol": 0.024481079511376118,
+          "run_id": "34684115937",
+          "score": 0.5093844110440138,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207377815103280,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "C7FFtBWLv1DTh2Yu7ga8UAgvFHKkpoaSSxFLbX9spump",
+          "pnl_sol": -0.003302040369497522,
+          "run_id": "34684115937",
+          "score": 0.5675388016560513,
+          "win": false
+        },
+        {
+          "decision_ns": 1789207541655673477,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "68111hFtPrBv1VtmrTU3UnoYqh8zg5yGfK99BjWFpump",
+          "pnl_sol": 0.05480727301397083,
+          "run_id": "34684115937",
+          "score": 0.5961516851572406,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207823479346323,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "AwpGHy5qHhcMmtkHbzEiUPpfbAxn7Pi4PLpdaW4Upump",
+          "pnl_sol": -0.023799505176397916,
+          "run_id": "34684115937",
+          "score": 0.5830904356736899,
+          "win": false
+        },
+        {
+          "decision_ns": 1789207886094215128,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "C6CNnMM6a4sbyfh3mdpspp1tXSt21Pcbn7HSgaPbpump",
+          "pnl_sol": 0.01978382714079535,
+          "run_id": "34684115937",
+          "score": 0.595454480235939,
+          "win": true
+        },
+        {
+          "decision_ns": 1789208432724555746,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "ABZLcejtewfXrMWTjwFT4bmYoN6tht51oLVfxtEPpump",
+          "pnl_sol": 0.022013798027831336,
+          "run_id": "34684115937",
+          "score": 0.5708268645276616,
+          "win": true
+        },
+        {
+          "decision_ns": 1789209436119403228,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "E3PoRKqKVTvnsvfbZzPf84Mh1bMvQuVgSTNpEDHvpump",
+          "pnl_sol": 0.0026903335227071584,
+          "run_id": "34684115937",
+          "score": 0.46604638838751405,
+          "win": true
+        },
+        {
+          "decision_ns": 1789210720130256721,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CHVHMVJfR3iqdH6RwCEwLQbhbXVaHcNksQ3Sn5ampump",
+          "pnl_sol": 0.001868592068433747,
+          "run_id": "34684115937",
+          "score": 0.5010930941122635,
+          "win": true
+        },
+        {
+          "decision_ns": 1789211582930518618,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "ALwj4WZd27kWFiAVny7xmG9EPRQghU89RyVKgQUSpump",
+          "pnl_sol": 0.008284025164560435,
+          "run_id": "34684115937",
+          "score": 0.6367602129847146,
+          "win": true
+        },
+        {
+          "decision_ns": 1789212308588793433,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BLmbFWBhTRRTuXUsptyRbRduBqUXL4ZCcJNTXxZqpump",
+          "pnl_sol": 0.004178852027523369,
+          "run_id": "34684115937",
+          "score": 0.6659364802417176,
+          "win": true
+        },
+        {
+          "decision_ns": 1789212322451435456,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "8hTzSAzQ8mWhJKS4td3cLUuQCbxMJpt5XFPe8zMapump",
+          "pnl_sol": -0.014601428498427445,
+          "run_id": "34684115937",
+          "score": 0.4650958003262755,
+          "win": false
+        },
+        {
+          "decision_ns": 1789213879585449210,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9EKbxcvqeSktrRoanwquQgwHAMdsACh8mZ8ud6hLpump",
+          "pnl_sol": 0.030226946189636894,
+          "run_id": "34684115937",
+          "score": 0.4591885578147896,
+          "win": true
+        },
+        {
+          "decision_ns": 1789215819025321292,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5X7oMvPwX2hKammmMv46oPxEzm5f5wCYBFwQaxQwpump",
+          "pnl_sol": 0.0014206714762024508,
+          "run_id": "34684115937",
+          "score": 0.6244476519337925,
+          "win": true
+        },
+        {
+          "decision_ns": 1789237395972813878,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "4SVwnsKkH1g61Zw4fzFuxkmVmeQNVx9PNkWNZCUzpump",
+          "pnl_sol": 0.0023421469831575864,
+          "run_id": "34709541936",
+          "score": 0.5636319346375531,
+          "win": true
+        },
+        {
+          "decision_ns": 1789239748246274491,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7NupoB5Rc7xV9nGjfV5BVafndK4o6UNLPikM3ECqpump",
+          "pnl_sol": -0.010970383718860999,
+          "run_id": "34709541936",
+          "score": 0.4522503055913416,
+          "win": false
+        },
+        {
+          "decision_ns": 1789241024373919591,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "7BXTiWvsC92xrP3SAgaRt96j8vJr8CqhtSQJ47iDpump",
+          "pnl_sol": -0.023130592251242102,
+          "run_id": "34709541936",
+          "score": 0.46985127923239145,
+          "win": false
+        }
+      ],
+      "ledger_hash": "e1ea7a05e6f7e91bb950f38f3377f55ae93f7f405a60c10616add3f247d80803",
+      "maximum_drawdown_fraction": 0.029335127128887233,
+      "net_pnl_sol": 0.25658859354568,
+      "profit_factor": 2.036595753605707,
+      "rejected_concurrency": 0,
+      "threshold": 0.4474138545197208,
+      "trades": 50,
+      "wilson_95_lower_bound": 0.4618118910275937,
+      "win_rate": 0.6,
+      "wins": 30
+    },
+    "5": {
+      "by_capture_window": {
+        "34586174670": {
+          "pnl_sol": 0.048032078764044195,
+          "trades": 18,
+          "wins": 10
+        },
+        "34627236811": {
+          "pnl_sol": 0.003223595584319096,
+          "trades": 10,
+          "wins": 5
+        },
+        "34660606300": {
+          "pnl_sol": 0.01958299091952237,
+          "trades": 2,
+          "wins": 1
+        },
+        "34684115937": {
+          "pnl_sol": 0.21740533696923897,
+          "trades": 17,
+          "wins": 13
+        },
+        "34709541936": {
+          "pnl_sol": -0.03175801834662752,
+          "trades": 3,
+          "wins": 1
+        }
+      },
+      "capture_windows": 5,
+      "exit_reasons": {
+        "INITIAL_STOP": 7,
+        "MAXIMUM_HOLD": 28,
+        "PROFIT_PROTECTION": 5,
+        "TAKE_PROFIT": 2,
+        "TRAILING_STOP": 8
+      },
+      "largest_winner_contribution": 0.10871660923838924,
+      "ledger": [
+        {
+          "decision_ns": 1789122716654167879,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "7Ac1jog8Zz2EsVGFpPDDzPyeV5PBqpUHNEeDLF9Apump",
+          "pnl_sol": -0.021657444463199706,
+          "run_id": "34586174670",
+          "score": 0.4695313224393623,
+          "win": false
+        },
+        {
+          "decision_ns": 1789123678849535999,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7LbLbvdNDmjX2qENCq3Wxf8tVUnCkd6KeNFMbbgZpump",
+          "pnl_sol": 0.028444633397871733,
+          "run_id": "34586174670",
+          "score": 0.4980446109957812,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124270044600937,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BFG7kZA8FVTch3bPWnUVB9ya1MneVfvaSba1cX4Qpump",
+          "pnl_sol": 0.03510968027635926,
+          "run_id": "34586174670",
+          "score": 0.49375819317200675,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124700899869921,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "2hXsdQs5H4RJjyGjejZgo2LZtfH92sdafEs8XPBQpump",
+          "pnl_sol": 0.023191258415276916,
+          "run_id": "34586174670",
+          "score": 0.5305165569519693,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124987720144288,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "6xSqvPfy6GDCWGTNFenruSvHZSCCvTizvaSW5vmjpump",
+          "pnl_sol": 0.022123427821065633,
+          "run_id": "34586174670",
+          "score": 0.5476908236798599,
+          "win": true
+        },
+        {
+          "decision_ns": 1789125212243070795,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "FBqih5obnm6TEN1SLuJTdsQfAZQFRf3T1P13eB88pump",
+          "pnl_sol": -0.015222783773139292,
+          "run_id": "34586174670",
+          "score": 0.4780325449777896,
+          "win": false
+        },
+        {
+          "decision_ns": 1789125895066358424,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "5CYD8MLYJfjThvKRFnvFRPG95kSwqE9yKChY39uDpump",
+          "pnl_sol": -0.0018701051614400319,
+          "run_id": "34586174670",
+          "score": 0.45923152094319286,
+          "win": false
+        },
+        {
+          "decision_ns": 1789126143743882615,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "CpdZEdbarmW2z9qEwNHVWJkDsX6P5wJZudnKx24Ppump",
+          "pnl_sol": -0.0010199741034979531,
+          "run_id": "34586174670",
+          "score": 0.4894594049536887,
+          "win": false
+        },
+        {
+          "decision_ns": 1789126318986770624,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "DRwAk1K8D9HXPxcxYYCZSHDvQ6uZWSytLSqdkYjBpump",
+          "pnl_sol": -0.002531727886971563,
+          "run_id": "34586174670",
+          "score": 0.47907874877746115,
+          "win": false
+        },
+        {
+          "decision_ns": 1789126484700968964,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "DSy2bVauU5TLNbB2DeKu9aKULeS8GiB8NjvVeBZjpump",
+          "pnl_sol": 0.004428626187799566,
+          "run_id": "34586174670",
+          "score": 0.46839512341898537,
+          "win": true
+        },
+        {
+          "decision_ns": 1789127873273215318,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "HqbLzRDDDpjaocX9E95k1uB4rbfPYRt2L7D9yeGtpump",
+          "pnl_sol": 0.006749598223796727,
+          "run_id": "34586174670",
+          "score": 0.463211486493027,
+          "win": true
+        },
+        {
+          "decision_ns": 1789128246367405309,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "EV43Z6FrfcMeBPxQjYieUDp4jio8cC5bkQoiCDB7pump",
+          "pnl_sol": -0.000765459310601263,
+          "run_id": "34586174670",
+          "score": 0.5289490749734331,
+          "win": false
+        },
+        {
+          "decision_ns": 1789128364884909675,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "FAe7SKTDYEmhKqoaSCev4HwXfBxZT49scndWoA6wpump",
+          "pnl_sol": -0.046019251922837526,
+          "run_id": "34586174670",
+          "score": 0.4603290673905402,
+          "win": false
+        },
+        {
+          "decision_ns": 1789128638619370443,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "D1d6kP9uHYQCUbdF3dtxXcJ3TrqFE3mERnPmFaJNpump",
+          "pnl_sol": 0.018470051583721794,
+          "run_id": "34586174670",
+          "score": 0.5160802859145736,
+          "win": true
+        },
+        {
+          "decision_ns": 1789130120852479160,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "2op47ADuoncb1owWSqddAMDDksAoJgccchSxV5D6pump",
+          "pnl_sol": 0.0074487158033967535,
+          "run_id": "34586174670",
+          "score": 0.45510160935835153,
+          "win": true
+        },
+        {
+          "decision_ns": 1789130190643360088,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CpRYwD2nVg6fWF7eTmamLaUgRorr9iSk26ZZdQoepump",
+          "pnl_sol": 0.010296492141065289,
+          "run_id": "34586174670",
+          "score": 0.44999308177372466,
+          "win": true
+        },
+        {
+          "decision_ns": 1789131228699322207,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "FiQqFqukhmoXc2Va5Wk8E8Kz2T7aupCoQBdJzo6pump",
+          "pnl_sol": -0.022307820271595044,
+          "run_id": "34586174670",
+          "score": 0.47224753052720186,
+          "win": false
+        },
+        {
+          "decision_ns": 1789131574219615911,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5z6c3VpkC4HFTJS4ZQYroZwtaoYWjM7KLNY4g2Ehpump",
+          "pnl_sol": 0.003164161806972904,
+          "run_id": "34586174670",
+          "score": 0.6609290841934597,
+          "win": true
+        },
+        {
+          "decision_ns": 1789149011134188312,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "C7LSBM7ZyzLQT1wu9dTqRQzJSexKdEwhimjqxMX8pump",
+          "pnl_sol": 0.0036832783644521125,
+          "run_id": "34627236811",
+          "score": 0.6157785758586655,
+          "win": true
+        },
+        {
+          "decision_ns": 1789149186314872360,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "Cp42Ekhbpdjfkg7HuideGZExSUbrazPHUazy8LmYpump",
+          "pnl_sol": -0.006950037203462663,
+          "run_id": "34627236811",
+          "score": 0.4569075884774864,
+          "win": false
+        },
+        {
+          "decision_ns": 1789150255829870321,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "GRtZNhPtcHTvhtCb2BuxDxsC8UAJsZQAkTVhwzADpump",
+          "pnl_sol": 0.0034367399466534027,
+          "run_id": "34627236811",
+          "score": 0.6127500015126041,
+          "win": true
+        },
+        {
+          "decision_ns": 1789150376383858357,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "EVBahqJvndaHitR72BVV3hXfa4SJCg6Sb52741Pdpump",
+          "pnl_sol": -0.021350229103845556,
+          "run_id": "34627236811",
+          "score": 0.4495565826115786,
+          "win": false
+        },
+        {
+          "decision_ns": 1789152633837154336,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "4QEUi1W8uEJBQmvhcJu66S9ehGE58tLkcT8dQmm6pump",
+          "pnl_sol": 0.002444694068313616,
+          "run_id": "34627236811",
+          "score": 0.6480129063347158,
+          "win": true
+        },
+        {
+          "decision_ns": 1789153325783786710,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "EjN7GSgaSE2ZSngUjQMbSpe7DK4v3ceqQcSaeyf8pump",
+          "pnl_sol": -0.021325199584065195,
+          "run_id": "34627236811",
+          "score": 0.45128583764668895,
+          "win": false
+        },
+        {
+          "decision_ns": 1789153353788574898,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "9bWvjq69VD2gnwMZvqAuvpsNCsKk8TTEBmzY2rYVpump",
+          "pnl_sol": -0.0013945474130166446,
+          "run_id": "34627236811",
+          "score": 0.4679439192931613,
+          "win": false
+        },
+        {
+          "decision_ns": 1789153929818073452,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "Ajrn7dKyKRE6cCfcAaJnHWe9DA5z8NeYKGMjegrj6ALL",
+          "pnl_sol": -0.007370603778361469,
+          "run_id": "34627236811",
+          "score": 0.4751541687600763,
+          "win": false
+        },
+        {
+          "decision_ns": 1789153983127342830,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "HcZaF28NmGiTrXgiU8v2iBhqAC9aKrqAsTn3kHNVpump",
+          "pnl_sol": 0.0037407719733032613,
+          "run_id": "34627236811",
+          "score": 0.6200862771189215,
+          "win": true
+        },
+        {
+          "decision_ns": 1789154464822852529,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7iG9So7vdddHUtn5mkk8uJH8jSrxnVSQtnzBQ5JBpump",
+          "pnl_sol": 0.04830872831434823,
+          "run_id": "34627236811",
+          "score": 0.4597726050760447,
+          "win": true
+        },
+        {
+          "decision_ns": 1789172336237490556,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "714o5Pch4wovjTB2sCp2EtfiV8GR7mTaRVHaDrudpump",
+          "pnl_sol": 0.021161536534027206,
+          "run_id": "34660606300",
+          "score": 0.4494733816214408,
+          "win": true
+        },
+        {
+          "decision_ns": 1789174556553352409,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "y6GkvYeq6hQ24PAiTy3Z11rLdydgsaStMRMYL1opump",
+          "pnl_sol": -0.0015785456145048365,
+          "run_id": "34660606300",
+          "score": 0.4497852204485291,
+          "win": false
+        },
+        {
+          "decision_ns": 1789204644984297916,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "JCnnPMtcLAWJ9F2UHRRGpZGkcyjjQrx4Jx5cS3Awpump",
+          "pnl_sol": -0.0003623654035738305,
+          "run_id": "34684115937",
+          "score": 0.45981761624892636,
+          "win": false
+        },
+        {
+          "decision_ns": 1789205843890391535,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "8L4DG1v2UgRkterGxubnrBcZFaY9w8vo3GPJnxDgpump",
+          "pnl_sol": 0.014729321165572969,
+          "run_id": "34684115937",
+          "score": 0.47180925588357336,
+          "win": true
+        },
+        {
+          "decision_ns": 1789205962450903800,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "8kAKqYLCAa8ZWM75GHydZYBC1X8VvX8KFbCQWbJUpump",
+          "pnl_sol": 0.02222219377657418,
+          "run_id": "34684115937",
+          "score": 0.5550271912637106,
+          "win": true
+        },
+        {
+          "decision_ns": 1789206155781909556,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "HCeioB6fwKUaMp74mvJskxb6f4ETT3U1nV1HJmMHpump",
+          "pnl_sol": 0.05286718362745226,
+          "run_id": "34684115937",
+          "score": 0.5184202445379703,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207000244201276,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9y4mr7QQcWyxLT1tTYxAkXBhbnhDqj5JZ9UT1Nj3pump",
+          "pnl_sol": 0.024481079511376118,
+          "run_id": "34684115937",
+          "score": 0.5093844110440138,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207377815103280,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "C7FFtBWLv1DTh2Yu7ga8UAgvFHKkpoaSSxFLbX9spump",
+          "pnl_sol": -0.0034014242454528665,
+          "run_id": "34684115937",
+          "score": 0.5675388016560513,
+          "win": false
+        },
+        {
+          "decision_ns": 1789207541655673477,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "68111hFtPrBv1VtmrTU3UnoYqh8zg5yGfK99BjWFpump",
+          "pnl_sol": 0.054805498294508315,
+          "run_id": "34684115937",
+          "score": 0.5961516851572406,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207823479346323,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "AwpGHy5qHhcMmtkHbzEiUPpfbAxn7Pi4PLpdaW4Upump",
+          "pnl_sol": -0.02379882393106727,
+          "run_id": "34684115937",
+          "score": 0.5830904356736899,
+          "win": false
+        },
+        {
+          "decision_ns": 1789207886094215128,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "C6CNnMM6a4sbyfh3mdpspp1tXSt21Pcbn7HSgaPbpump",
+          "pnl_sol": 0.019783145647873313,
+          "run_id": "34684115937",
+          "score": 0.595454480235939,
+          "win": true
+        },
+        {
+          "decision_ns": 1789208432724555746,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "ABZLcejtewfXrMWTjwFT4bmYoN6tht51oLVfxtEPpump",
+          "pnl_sol": 0.022013046321723226,
+          "run_id": "34684115937",
+          "score": 0.5708268645276616,
+          "win": true
+        },
+        {
+          "decision_ns": 1789209436119403228,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "E3PoRKqKVTvnsvfbZzPf84Mh1bMvQuVgSTNpEDHvpump",
+          "pnl_sol": 0.002690186484314225,
+          "run_id": "34684115937",
+          "score": 0.46604638838751405,
+          "win": true
+        },
+        {
+          "decision_ns": 1789210720130256721,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CHVHMVJfR3iqdH6RwCEwLQbhbXVaHcNksQ3Sn5ampump",
+          "pnl_sol": 0.001868470688903029,
+          "run_id": "34684115937",
+          "score": 0.5010930941122635,
+          "win": true
+        },
+        {
+          "decision_ns": 1789211582930518618,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "ALwj4WZd27kWFiAVny7xmG9EPRQghU89RyVKgQUSpump",
+          "pnl_sol": 0.008283702558205555,
+          "run_id": "34684115937",
+          "score": 0.6367602129847146,
+          "win": true
+        },
+        {
+          "decision_ns": 1789212308588793433,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BLmbFWBhTRRTuXUsptyRbRduBqUXL4ZCcJNTXxZqpump",
+          "pnl_sol": 0.004178658017477702,
+          "run_id": "34684115937",
+          "score": 0.6659364802417176,
+          "win": true
+        },
+        {
+          "decision_ns": 1789212322451435456,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "8hTzSAzQ8mWhJKS4td3cLUuQCbxMJpt5XFPe8zMapump",
+          "pnl_sol": -0.014601033060196104,
+          "run_id": "34684115937",
+          "score": 0.4650958003262755,
+          "win": false
+        },
+        {
+          "decision_ns": 1789213879585449210,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9EKbxcvqeSktrRoanwquQgwHAMdsACh8mZ8ud6hLpump",
+          "pnl_sol": 0.030225933712904884,
+          "run_id": "34684115937",
+          "score": 0.4591885578147896,
+          "win": true
+        },
+        {
+          "decision_ns": 1789215819025321292,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5X7oMvPwX2hKammmMv46oPxEzm5f5wCYBFwQaxQwpump",
+          "pnl_sol": 0.001420563802643257,
+          "run_id": "34684115937",
+          "score": 0.6244476519337925,
+          "win": true
+        },
+        {
+          "decision_ns": 1789237395972813878,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "4SVwnsKkH1g61Zw4fzFuxkmVmeQNVx9PNkWNZCUzpump",
+          "pnl_sol": 0.0023420102630462986,
+          "run_id": "34709541936",
+          "score": 0.5636319346375531,
+          "win": true
+        },
+        {
+          "decision_ns": 1789239748246274491,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7NupoB5Rc7xV9nGjfV5BVafndK4o6UNLPikM3ECqpump",
+          "pnl_sol": -0.010970101580919343,
+          "run_id": "34709541936",
+          "score": 0.4522503055913416,
+          "win": false
+        },
+        {
+          "decision_ns": 1789241024373919591,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "7BXTiWvsC92xrP3SAgaRt96j8vJr8CqhtSQJ47iDpump",
+          "pnl_sol": -0.023129927028754473,
+          "run_id": "34709541936",
+          "score": 0.46985127923239145,
+          "win": false
+        }
+      ],
+      "ledger_hash": "8078689c43247601bb647be2475cdb84804bd0c69a8dfbb61c52237f56197c16",
+      "maximum_drawdown_fraction": 0.029335127128887233,
+      "net_pnl_sol": 0.2564859838904967,
+      "profit_factor": 2.035773823400929,
+      "rejected_concurrency": 0,
+      "threshold": 0.4474138545197208,
+      "trades": 50,
+      "wilson_95_lower_bound": 0.4618118910275937,
+      "win_rate": 0.6,
+      "wins": 30
+    }
+  },
+  "production_paths_changed": 0,
+  "strongest_scalar_baseline": {
+    "direction": "high",
+    "feature": "buy_count",
+    "holdout": {
+      "by_capture_window": {
+        "34586174670": {
+          "pnl_sol": 0.05587856416188464,
+          "trades": 10,
+          "wins": 5
+        },
+        "34627236811": {
+          "pnl_sol": -0.027728195090461066,
+          "trades": 3,
+          "wins": 0
+        },
+        "34660606300": {
+          "pnl_sol": -0.09844198446573127,
+          "trades": 7,
+          "wins": 1
+        },
+        "34684115937": {
+          "pnl_sol": 0.06318210177819157,
+          "trades": 14,
+          "wins": 7
+        },
+        "34709541936": {
+          "pnl_sol": -0.029689428554446208,
+          "trades": 3,
+          "wins": 0
+        }
+      },
+      "capture_windows": 5,
+      "exit_reasons": {
+        "INITIAL_STOP": 13,
+        "MAXIMUM_HOLD": 10,
+        "PROFIT_PROTECTION": 8,
+        "TAKE_PROFIT": 2,
+        "TRAILING_STOP": 4
+      },
+      "largest_winner_contribution": 0.15681877598545207,
+      "ledger": [
+        {
+          "decision_ns": 1789123678849535999,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7LbLbvdNDmjX2qENCq3Wxf8tVUnCkd6KeNFMbbgZpump",
+          "pnl_sol": 0.02866605226824756,
+          "run_id": "34586174670",
+          "score": 24.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124270044600937,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BFG7kZA8FVTch3bPWnUVB9ya1MneVfvaSba1cX4Qpump",
+          "pnl_sol": 0.03537974495550388,
+          "run_id": "34586174670",
+          "score": 30.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124700899869921,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "2hXsdQs5H4RJjyGjejZgo2LZtfH92sdafEs8XPBQpump",
+          "pnl_sol": 0.023374719636292812,
+          "run_id": "34586174670",
+          "score": 23.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789124987720144288,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "6xSqvPfy6GDCWGTNFenruSvHZSCCvTizvaSW5vmjpump",
+          "pnl_sol": 0.022299228783146115,
+          "run_id": "34586174670",
+          "score": 22.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789126143743882615,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "CpdZEdbarmW2z9qEwNHVWJkDsX6P5wJZudnKx24Ppump",
+          "pnl_sol": -0.001007268376876258,
+          "run_id": "34586174670",
+          "score": 24.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789126318986770624,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "DRwAk1K8D9HXPxcxYYCZSHDvQ6uZWSytLSqdkYjBpump",
+          "pnl_sol": -0.0025385265230806822,
+          "run_id": "34586174670",
+          "score": 26.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789128246367405309,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "EV43Z6FrfcMeBPxQjYieUDp4jio8cC5bkQoiCDB7pump",
+          "pnl_sol": -0.0007540098224699601,
+          "run_id": "34586174670",
+          "score": 23.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789128364884909675,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "FAe7SKTDYEmhKqoaSCev4HwXfBxZT49scndWoA6wpump",
+          "pnl_sol": -0.04642607118548428,
+          "run_id": "34586174670",
+          "score": 15.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789128638619370443,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "D1d6kP9uHYQCUbdF3dtxXcJ3TrqFE3mERnPmFaJNpump",
+          "pnl_sol": 0.018659425596415806,
+          "run_id": "34586174670",
+          "score": 16.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789131869947699153,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "HZYMR8aKtXgqp8Ck9UYWLfURs6Gf1ifSd1qPF5brpump",
+          "pnl_sol": -0.021774731169810352,
+          "run_id": "34586174670",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789151219052767642,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "39X99Ze4HEHj7JtXHWJNe3EkSwA5mPRozexuTqEKpump",
+          "pnl_sol": -0.0034872925127697324,
+          "run_id": "34627236811",
+          "score": 17.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789151460179153835,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "D9o9LvwNkqjU9wU83sYtdrpPEmFAeW7VWGKGoYMXN6Pq",
+          "pnl_sol": -0.0031122798708247343,
+          "run_id": "34627236811",
+          "score": 16.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789152971496680629,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "DWk2KBjDjhu9z2wfV4LPS34xNqdvLQ1tv5DZ63svpump",
+          "pnl_sol": -0.0211286227068666,
+          "run_id": "34627236811",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789171838532457285,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "GxJoTKfwLrwXpxUu2Ags2eYDebpipohWUNc3Sf5Gpump",
+          "pnl_sol": -0.00632696388514134,
+          "run_id": "34660606300",
+          "score": 27.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789172590926140897,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "HtFQ17LRvyNYnP58Jy8DJs2zQ2HfMVNmuKSW8decpump",
+          "pnl_sol": -0.02119667289023793,
+          "run_id": "34660606300",
+          "score": 15.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789175234375805310,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "PH1tbQKnVGNYru8ttmACj3S88twZ6X5mFe2fRNdpump",
+          "pnl_sol": -0.020545161902577214,
+          "run_id": "34660606300",
+          "score": 15.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789176201742557590,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "3AVsaXV19q7EXvA1y6Hs7fjDKF8YR9U2jGcK6SdQpump",
+          "pnl_sol": -0.02106214116750041,
+          "run_id": "34660606300",
+          "score": 16.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789180129680517275,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "3BFUMX1Lg455NBRM9Mon46EK516VegY8fRYM7JxEpump",
+          "pnl_sol": -0.020279428090444085,
+          "run_id": "34660606300",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789180227684724288,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "8zEx2NZPw5c8BKdf61FSVV7msRyg9zuhY9oiPzrmpump",
+          "pnl_sol": 0.011888865534119011,
+          "run_id": "34660606300",
+          "score": 14.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789180276047411043,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "DQjKPwrfQwo6DEsGFkR8aWYHTqJbMAQQJMUfLeTepump",
+          "pnl_sol": -0.0209204820639493,
+          "run_id": "34660606300",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789203070197415011,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "4Ya4dm8JQWgBQaLAPZjtD6tS4HqtyKbLH35FDcJopump",
+          "pnl_sol": -0.02245436184270177,
+          "run_id": "34684115937",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789205962450903800,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "8kAKqYLCAa8ZWM75GHydZYBC1X8VvX8KFbCQWbJUpump",
+          "pnl_sol": 0.020824793284148012,
+          "run_id": "34684115937",
+          "score": 23.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789206155781909556,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "HCeioB6fwKUaMp74mvJskxb6f4ETT3U1nV1HJmMHpump",
+          "pnl_sol": 0.04970016840462749,
+          "run_id": "34684115937",
+          "score": 15.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789206732472462521,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "9iKAPEqEDNqfZ2wD3g25RMRpYFW78AnXJgm6yNq5zpad",
+          "pnl_sol": -0.02029100602596174,
+          "run_id": "34684115937",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789207000244201276,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9y4mr7QQcWyxLT1tTYxAkXBhbnhDqj5JZ9UT1Nj3pump",
+          "pnl_sol": 0.02278137652160401,
+          "run_id": "34684115937",
+          "score": 34.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207077350204566,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "9rN9bhMcY13VbSJPFAmigYxrphWNt4BZNzfJQ4j9pump",
+          "pnl_sol": -0.012839453075250772,
+          "run_id": "34684115937",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789207377815103280,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "C7FFtBWLv1DTh2Yu7ga8UAgvFHKkpoaSSxFLbX9spump",
+          "pnl_sol": -0.003061535290729535,
+          "run_id": "34684115937",
+          "score": 22.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789207541655673477,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "68111hFtPrBv1VtmrTU3UnoYqh8zg5yGfK99BjWFpump",
+          "pnl_sol": 0.05093036988424689,
+          "run_id": "34684115937",
+          "score": 23.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789207823479346323,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "AwpGHy5qHhcMmtkHbzEiUPpfbAxn7Pi4PLpdaW4Upump",
+          "pnl_sol": -0.02231131382545399,
+          "run_id": "34684115937",
+          "score": 24.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789207886094215128,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "C6CNnMM6a4sbyfh3mdpspp1tXSt21Pcbn7HSgaPbpump",
+          "pnl_sol": 0.018295094922433662,
+          "run_id": "34684115937",
+          "score": 24.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789208432724555746,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "ABZLcejtewfXrMWTjwFT4bmYoN6tht51oLVfxtEPpump",
+          "pnl_sol": 0.020371683978452376,
+          "run_id": "34684115937",
+          "score": 24.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789210720130256721,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CHVHMVJfR3iqdH6RwCEwLQbhbXVaHcNksQ3Sn5ampump",
+          "pnl_sol": 0.0016006188788573392,
+          "run_id": "34684115937",
+          "score": 21.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789213730710652678,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "EcSUPvvy66GuPJcZnaZ7YSk8dwQSzWhRzoihkhUgpump",
+          "pnl_sol": -0.01684048791185091,
+          "run_id": "34684115937",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789214780784184741,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "F9SG2fQdA5CuGHrECcrTnJgFs8fZNj9ZXH7dFMkCpump",
+          "pnl_sol": -0.02352384612422949,
+          "run_id": "34684115937",
+          "score": 15.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789238240475647437,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "3bvpTseNpkHLXQPyVLmPRY6Mi7qSGUnUXTfvpSEtpump",
+          "pnl_sol": -0.0053143132042983154,
+          "run_id": "34709541936",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789240189359786987,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "5UzZ63THVRsT6CmVbUikE6eecurD2QHiRnyiT3Ydpump",
+          "pnl_sol": -0.022144025356737783,
+          "run_id": "34709541936",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789240871799464419,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "GpuUuHJBUD9yVQTPWeEADD1Bh4PxQoJfc7wgZX7Cpump",
+          "pnl_sol": -0.0022310899934101097,
+          "run_id": "34709541936",
+          "score": 15.0,
+          "win": false
+        }
+      ],
+      "ledger_hash": "b5d1e8b64d5b7285e6ff244e2cf31bed15a3e234d2932a6b9dff5fb1013e99a7",
+      "maximum_drawdown_fraction": 0.06748857429340009,
+      "net_pnl_sol": -0.03679894217056345,
+      "profit_factor": 0.8982248755067941,
+      "rejected_concurrency": 0,
+      "threshold": 14.0,
+      "trades": 37,
+      "wilson_95_lower_bound": 0.21825406631100872,
+      "win_rate": 0.35135135135135137,
+      "wins": 13
+    },
+    "selection_used_holdout": false,
+    "threshold": 14.0,
+    "validation": {
+      "by_capture_window": {
+        "34388016481": {
+          "pnl_sol": 0.14123453855466955,
+          "trades": 10,
+          "wins": 5
+        },
+        "34425005585": {
+          "pnl_sol": -0.030538554758142565,
+          "trades": 6,
+          "wins": 1
+        },
+        "34470147967": {
+          "pnl_sol": 0.04345855707052168,
+          "trades": 12,
+          "wins": 6
+        },
+        "34512979177": {
+          "pnl_sol": 0.12816273961773272,
+          "trades": 6,
+          "wins": 4
+        },
+        "34547229611": {
+          "pnl_sol": -0.22730788773491803,
+          "trades": 24,
+          "wins": 5
+        }
+      },
+      "capture_windows": 5,
+      "exit_reasons": {
+        "INITIAL_STOP": 13,
+        "MAXIMUM_HOLD": 12,
+        "PROFIT_PROTECTION": 14,
+        "TAKE_PROFIT": 5,
+        "TRAILING_STOP": 14
+      },
+      "largest_winner_contribution": 0.09928195007003897,
+      "ledger": [
+        {
+          "decision_ns": 1788978039376440106,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "6xkJihaSGNihZ5scownCJVo8HWHiQiRGGjDmVSp5pump",
+          "pnl_sol": -0.020483051435890284,
+          "run_id": "34388016481",
+          "score": 20.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1788979049996954377,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "CYSLjczM4pi7NduPV6w6nSDmYhJehJwnt6VZL7Bpump",
+          "pnl_sol": -0.0018125381435415144,
+          "run_id": "34388016481",
+          "score": 15.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1788979786382388842,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "3sX9n38Kk2tdpXqrjZ6pdWf4vberFJbm9qc2neTipump",
+          "pnl_sol": -0.0014330085849827284,
+          "run_id": "34388016481",
+          "score": 15.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1788980233938342379,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "H5biB31kdu1onSrZzdpdyUjA8BvBpX8rSpqtYYNwpump",
+          "pnl_sol": 0.05052858681073229,
+          "run_id": "34388016481",
+          "score": 14.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1788980687495493496,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "6tKmvbTb7rF8X1hchiRrkCqh1YwgaLSoUSHvSKrFpump",
+          "pnl_sol": 0.03131471912654298,
+          "run_id": "34388016481",
+          "score": 15.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1788981107573003454,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "7sPHcFhhndfmguk3k3Ck7LXy74EBnywtvayYFMH6pump",
+          "pnl_sol": -0.0016396335040147897,
+          "run_id": "34388016481",
+          "score": 16.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1788982588276715470,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "4dET68ev2KHsv2ufc9oHmaUj2epHq3HBtiSpguHBpump",
+          "pnl_sol": 0.021865754829435563,
+          "run_id": "34388016481",
+          "score": 16.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1788982811730421717,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "26bG6aukFLyAnQNYGCYk12y5s6v1rF8mAj9FLcjcpump",
+          "pnl_sol": 0.03152462399998208,
+          "run_id": "34388016481",
+          "score": 20.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1788983086706682612,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "31MiuqALvFX734T4griG3njDkPXtJ8G3FFQHtpQopump",
+          "pnl_sol": 0.03354860912268243,
+          "run_id": "34388016481",
+          "score": 25.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1788983181472861040,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "Goqhd97RTTE2JDLragviuPtFBgWmdo9ZFaHZnV4wpump",
+          "pnl_sol": -0.0021795236662764603,
+          "run_id": "34388016481",
+          "score": 16.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789004123700646418,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "BF7xXNDDfnMUu5pWMzjerM4ZJK22EnNxtt4vx28vpump",
+          "pnl_sol": -0.0007719153130503476,
+          "run_id": "34425005585",
+          "score": 15.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789006166365458694,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "AuemQBeXMwBXKRHj5pRVR42eUQ99wxGAiEtcaKgppump",
+          "pnl_sol": -0.0019703013235341307,
+          "run_id": "34425005585",
+          "score": 16.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789007738488091167,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "78QPphnh23Wwto7ppaSs78bbHmiRKyurGn19nhevAExp",
+          "pnl_sol": -0.006110995776021207,
+          "run_id": "34425005585",
+          "score": 22.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789010022057746484,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "6s3b5PrqYu4arURvwfYQzz5fDE9PNqomVaJgDt4qpump",
+          "pnl_sol": 0.006122333838009128,
+          "run_id": "34425005585",
+          "score": 15.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789010212808828616,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "Ci8pWuCV7SLucszdTRHzDpQGzgiHrS8n3TZEiruWpump",
+          "pnl_sol": -0.0028112042991691732,
+          "run_id": "34425005585",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789010372306457754,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "2dVo2HAmQKqwFKHMZh12WnS7XD4MvG9yCRZzjmJupump",
+          "pnl_sol": -0.024996471884376835,
+          "run_id": "34425005585",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789041592238581138,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "GL3Mbu3WuZP6yojkvMfwDEG3hVFBjSDu5TesYQ8Npump",
+          "pnl_sol": -0.022020536261396155,
+          "run_id": "34470147967",
+          "score": 17.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789042346749407229,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "3JfQeXCcwBGfRmJmd2VDUVaMePdoFxS5KrQY9jVApump",
+          "pnl_sol": -0.0034235072083593915,
+          "run_id": "34470147967",
+          "score": 22.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789042421638528073,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9J1JLEa9KeaNmHC7cUzHzpBaQMH22TpcampUragipump",
+          "pnl_sol": 0.025486817611067407,
+          "run_id": "34470147967",
+          "score": 15.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789042517582879027,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "8GZHtpUHS4xjureVbmRqj3jGT1wpTEdhTxGGVZtpump",
+          "pnl_sol": -0.02237550161148239,
+          "run_id": "34470147967",
+          "score": 18.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789042648006860089,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BF7ovXLLnwPKkhKy2gdx17jXtR2De8yM5RE2ukyvpump",
+          "pnl_sol": 0.013267761130736237,
+          "run_id": "34470147967",
+          "score": 18.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789042841505328753,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "3aHStAdgUykgTUgqFoU4Ccv5ZyFoQnUnbQ7QAumXpump",
+          "pnl_sol": 0.011358064402537484,
+          "run_id": "34470147967",
+          "score": 22.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789042952373094164,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "GsbwmcuDdUW1HPyAyKK8BBCuUD865Amh6KFGenZUJ3TF",
+          "pnl_sol": 0.010291027365384349,
+          "run_id": "34470147967",
+          "score": 14.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789043241154793924,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CQM8Nqv2ePZucBJRFuEYnbtQ4P3R7U76ett3ZdsLpump",
+          "pnl_sol": 0.014067642991913945,
+          "run_id": "34470147967",
+          "score": 22.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789043298945253705,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "5Yc3ZW6DEwHp4zZ91K6cd2jNQ7YdPQvrVqA9qKWYpump",
+          "pnl_sol": -0.012952452933191645,
+          "run_id": "34470147967",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789043411933676519,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "Hb4Wpj5GkH5VRU8cUM5T72VHBVbYdw4fyEYAGWjRpump",
+          "pnl_sol": -0.005477851267296142,
+          "run_id": "34470147967",
+          "score": 22.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789043446386290813,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7Hp2rA5bSNDNQdDgvyq4MernCYEVcLZHMZUqPSjopump",
+          "pnl_sol": 0.039486372475869225,
+          "run_id": "34470147967",
+          "score": 21.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789043776960471431,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9QWYfJV9es1tbk3chcHcdQzh6s6QpSCL69a35oijKMsZ",
+          "pnl_sol": -0.00424927962526124,
+          "run_id": "34470147967",
+          "score": 19.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789067106861832377,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "DVE31ex45ur2cX36LFRnFMjTudmKt1DGNDCpUbLipump",
+          "pnl_sol": 0.0557433280693971,
+          "run_id": "34512979177",
+          "score": 15.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789067134360271512,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "SwikeTF4BNHbHqYjqFzv5FYjzWqQDMdv8gupwnQpump",
+          "pnl_sol": 0.055669859459640945,
+          "run_id": "34512979177",
+          "score": 16.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789067786156154551,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "FDJS7mbKBQxYbyeyJZwFa33MwiqAG2NGXrfJeLh2pump",
+          "pnl_sol": 0.00039622544922533753,
+          "run_id": "34512979177",
+          "score": 14.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789067866469569270,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "qkMjLFBszndwYFpDMxeLXrqw7qu4SgNNgKUhaqppump",
+          "pnl_sol": 0.0440487276857774,
+          "run_id": "34512979177",
+          "score": 14.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789068332941404058,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "63o4jGjGpHzoUf1Q4gw6aLuDiRGwcs48xcrfnbH5pump",
+          "pnl_sol": -0.023484151890435588,
+          "run_id": "34512979177",
+          "score": 17.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789069761934680477,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "eCUxbppT1fy5sNcrKk3yd1ef3doW2tVeyVufoSNpump",
+          "pnl_sol": -0.004211249155872482,
+          "run_id": "34512979177",
+          "score": 15.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789087062522128136,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "APdKShiwiveRZG2Pkd49taadz3k9bdmhHDg56FNHpump",
+          "pnl_sol": -0.0031826494268720404,
+          "run_id": "34547229611",
+          "score": 17.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789087311135910697,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "3E9fF8yng4o7XpEVCLuz7wcRPRmd4L2qa6N9ATJcpump",
+          "pnl_sol": -0.0020089157523536794,
+          "run_id": "34547229611",
+          "score": 24.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789088500953006924,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "LiJnzmBpKsQL2jpLnYvqnkdoAQxiJfsZeT4W4P4pump",
+          "pnl_sol": -0.02430308547360674,
+          "run_id": "34547229611",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789088730741058378,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "GETqZFtcMFR86qi9X2mNHgbxASHXzt3XexqywfHkpump",
+          "pnl_sol": 0.001903169637156879,
+          "run_id": "34547229611",
+          "score": 14.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789089307245206386,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "8EsRgDsFEV1DKMy6J6EgsS663jjCw5HMAFpYszLppump",
+          "pnl_sol": 0.055578212448576206,
+          "run_id": "34547229611",
+          "score": 16.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789089396275458570,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "D1ouA2wX9zEjTPYNzNzKsYyqcEfj5oSHUMGATH8Qpump",
+          "pnl_sol": -0.01903273747361612,
+          "run_id": "34547229611",
+          "score": 16.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789089850800194157,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "Eew6BzMaxWFeRtLaF6BEN36er32pSzuyWWQodwQypump",
+          "pnl_sol": -0.02149287712103714,
+          "run_id": "34547229611",
+          "score": 16.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789089995735222992,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "JAPHdTgG5qXrQEpQDhJbZ4XAugH6a4BRch5Wu1fppump",
+          "pnl_sol": -0.0007612859531927613,
+          "run_id": "34547229611",
+          "score": 21.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789090371193401093,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "6iqxB4XVLR5RGv7BbjcXwsMLANfGNZRbbTQ8zBm4pump",
+          "pnl_sol": -0.03157522723993526,
+          "run_id": "34547229611",
+          "score": 23.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789090572292887615,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "VNiyiuJRF2mq4zYBoLwoFZ1FNkkBd8rKsUKC9bbpump",
+          "pnl_sol": -0.034172376544996164,
+          "run_id": "34547229611",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789090893203314784,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "LS38Vt8nEjTibbTD1NtyY3wx2MmZByrHe8byNtQpump",
+          "pnl_sol": -0.040868418207066395,
+          "run_id": "34547229611",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789091036186009470,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "AUkb2bzA61j29oVy2gBkT7wrtJHa64W8amdWpZyMpump",
+          "pnl_sol": -0.001395938469458978,
+          "run_id": "34547229611",
+          "score": 18.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789091105682415780,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "8AjDS8nshfZfsX1MyeD4L1JKTNe74MpybH6pMDuepump",
+          "pnl_sol": -0.029819813776467863,
+          "run_id": "34547229611",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789091193091494890,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "85WkSAyDvGaPChYgGuhLQFtvGbHHov1vSu19TGspump",
+          "pnl_sol": -0.03613744155779658,
+          "run_id": "34547229611",
+          "score": 15.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789091386413483675,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "CMFsNhyMDsP8y3F1izH8kp9rVjkRfFNcirUwRhBFpump",
+          "pnl_sol": -0.0011151661699333876,
+          "run_id": "34547229611",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789091721722146966,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "GqfDwxEaru91UTLNQRWdShd2uJRXckQmEfyb3XKmpump",
+          "pnl_sol": -0.0010118517729983054,
+          "run_id": "34547229611",
+          "score": 16.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789091980513303340,
+          "exit_reason": "PROFIT_PROTECTION",
+          "mint": "CMWwPJg8smNcfu2GVJ7hJh6ixR5ZL7irwcbPYsEFpump",
+          "pnl_sol": -0.00681338774328942,
+          "run_id": "34547229611",
+          "score": 19.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789092703910136585,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "J4zEiHuPSMwssJXBASNH4w2ZdDLEwJP7Mcj35uojpump",
+          "pnl_sol": 0.001317614993984327,
+          "run_id": "34547229611",
+          "score": 15.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789092995827555013,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "7xw1ZFdr2k2yyUaVKTcyUymvreALR2P3WEWNXRRypump",
+          "pnl_sol": 0.05208953727648001,
+          "run_id": "34547229611",
+          "score": 15.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789093813922026496,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "CakgVmjrcFx5G9D8izMhHHqr3gz3x3vpDCjLdNzipump",
+          "pnl_sol": -0.04537526898977448,
+          "run_id": "34547229611",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789094336116936711,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "HJRpUtxj7f9dJrx15DmMw27DAru4ua8z1a2vFRM1pump",
+          "pnl_sol": -0.021548839555600413,
+          "run_id": "34547229611",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789094400368402645,
+          "exit_reason": "INITIAL_STOP",
+          "mint": "5t9Ffbi2VZnu18GaG3JbMcKEz95z2QJZwwna3dYGpump",
+          "pnl_sol": -0.02279628582141595,
+          "run_id": "34547229611",
+          "score": 14.0,
+          "win": false
+        },
+        {
+          "decision_ns": 1789094825288357146,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "QVxBWDfQhSyHDcQei2ci64XG2pfPv4dpEoUnLvWpump",
+          "pnl_sol": 0.005855890138274172,
+          "run_id": "34547229611",
+          "score": 15.0,
+          "win": true
+        },
+        {
+          "decision_ns": 1789095059072522174,
+          "exit_reason": "TRAILING_STOP",
+          "mint": "Adx6wFR2tUA7EzMWaDMRRHXHDpdZK3PQ7Kqbz4briH7M",
+          "pnl_sol": -0.0006407451799779543,
+          "run_id": "34547229611",
+          "score": 15.0,
+          "win": false
+        }
+      ],
+      "ledger_hash": "b270aca4b0a4eaecffe264b8dc7352e471c60fb7887403dba5c6062ae69010db",
+      "maximum_drawdown_fraction": 0.08683658804203824,
+      "net_pnl_sol": 0.055009392749862496,
+      "profit_factor": 1.1086164416383293,
+      "rejected_concurrency": 0,
+      "threshold": 14.0,
+      "trades": 58,
+      "wilson_95_lower_bound": 0.25054734348500335,
+      "win_rate": 0.3620689655172414,
+      "wins": 21
+    }
+  },
+  "verdict": {
+    "failed_requirements": [
+      "win_rate_at_least_65_percent",
+      "wilson_lower_bound_at_least_55_percent"
+    ],
+    "failure_classification": "FALSE_POSITIVE_OVERLOAD",
+    "historical_qualification_passed": false,
+    "live_confirmation_authorised": false,
+    "production_paths_changed": 0,
+    "production_promotion_authorised": false,
+    "requirements": {
+      "all_five_holdout_windows_represented": true,
+      "at_least_50_closed_trades": true,
+      "at_least_four_profitable_windows": true,
+      "beats_frozen_scalar_baseline_pnl": true,
+      "every_latency_pnl_positive": true,
+      "every_latency_profit_factor_at_least_1_25": true,
+      "largest_winner_at_most_25_percent": true,
+      "maximum_drawdown_at_most_15_percent": true,
+      "net_pnl_positive": true,
+      "profit_factor_at_least_1_25": true,
+      "wilson_lower_bound_at_least_55_percent": false,
+      "win_rate_at_least_65_percent": false
+    },
+    "status": "NOT_CONCLUSIVE",
+    "untouched_live_confirmation_required": true
+  },
+  "version": "e4-v12-adaptive-exit-v3"
+}
