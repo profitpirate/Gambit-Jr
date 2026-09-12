@@ -1,0 +1,58 @@
+{
+  "version": "e4-v12-causal-regime-veto-position-holdout-protocol-v1",
+  "experiment_id": "e4x-863d8d0942bf9336535c47aa3ec21bcdad44bf238f9c36a976b9f2b3f7c7adb7",
+  "frozen_candidate": {
+    "path": "artifacts/e4-v12-causal-regime-veto-position-frozen-candidate.json",
+    "sha256": "0531f4d12fca0a6f881174c6a91dc5ce55ec0d0b7c42159d75d12cf8ff8af2ce",
+    "source_commit": "a6b5efc5aa1d22da554c36d526e2312ba7a8a814",
+    "frozen_at_utc": "2026-09-12T23:21:47Z",
+    "frozen_at_epoch_ns": 1789255307000000000
+  },
+  "quarantine": {
+    "workflow_run_id": "34722511299",
+    "run_started_at_utc": "2026-09-12T22:21:12Z",
+    "reason_not_final_holdout": "workflow began before the V10 candidate freeze",
+    "may_change_frozen_candidate": false,
+    "may_count_toward_final_gate": false,
+    "may_update_later_point_in_time_actor_memory": true
+  },
+  "final_evidence_contract": {
+    "required_capture_windows": 5,
+    "launches_per_window": 3000,
+    "required_total_launches": 15000,
+    "capture_errors_allowed": 0,
+    "parse_errors_allowed": 0,
+    "every_workflow_run_started_after_epoch_ns": 1789255307000000000,
+    "every_capture_started_after_epoch_ns": 1789255307000000000,
+    "strictly_chronological_non_overlapping": true,
+    "feature_or_parameter_changes_allowed": false,
+    "actor_resolution_delay_ms": 60000,
+    "veto_threshold_source": "actor-rule matches in strictly earlier capture windows only",
+    "latencies_ms": [0, 1, 2, 5, 10]
+  },
+  "golden_gate": {
+    "minimum_closed_trades": 50,
+    "required_capture_windows_represented": 5,
+    "minimum_profitable_capture_windows": 4,
+    "minimum_win_rate": 0.65,
+    "minimum_wilson_95_lower_bound": 0.55,
+    "minimum_net_pnl_sol": 0.0,
+    "minimum_profit_factor": 1.25,
+    "maximum_drawdown_fraction": 0.15,
+    "maximum_largest_winner_contribution": 0.25,
+    "every_latency_net_pnl_positive": true,
+    "every_latency_minimum_profit_factor": 1.25,
+    "every_latency_quote_coverage": 1.0,
+    "must_beat_same_size_no_veto_baseline_pnl": true
+  },
+  "result_policy": {
+    "quarantine_result_is_early_warning_only": true,
+    "final_gate_is_evaluated_once": true,
+    "failure_is_retired_without_parameter_tuning": true,
+    "passing_result_is_untouched_live_market_replay_not_real_money_trading": true,
+    "live_confirmation_authorised_only_after_all_gates_pass": true,
+    "production_promotion_authorised": false,
+    "production_deployment_authorised": false,
+    "production_paths_changed": 0
+  }
+}
