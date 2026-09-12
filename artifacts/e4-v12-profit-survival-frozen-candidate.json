@@ -1,0 +1,353 @@
+{
+  "candidate": {
+    "horizon_ms": 250,
+    "model_family": "hist_gradient_boosting",
+    "policy": "stop=0.70|take=1.20|hold=60000",
+    "policy_index": 3,
+    "priority_fee_sol": 0.001,
+    "train_positive_labels": 6444,
+    "validation": {
+      "by_capture_window": {
+        "33716649440": {
+          "pnl_sol": 0.015616234233445624,
+          "trades": 2,
+          "wins": 2
+        },
+        "33741470396": {
+          "pnl_sol": 0.011324549870782318,
+          "trades": 1,
+          "wins": 1
+        },
+        "33769636983": {
+          "pnl_sol": 0.08214817958674023,
+          "trades": 10,
+          "wins": 10
+        },
+        "33781389703": {
+          "pnl_sol": 0.05761514086345515,
+          "trades": 7,
+          "wins": 7
+        }
+      },
+      "capture_windows": 4,
+      "exit_reasons": {
+        "TAKE_PROFIT": 20
+      },
+      "largest_winner_contribution": 0.06793203983219999,
+      "ledger": [
+        {
+          "decision_ns": 1788417120517296361,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "LvZdhcZuXvuw9gkHKkKrN9mGCn1yVWumfE6rLGNpump",
+          "pnl_sol": 0.007332810230221365,
+          "run_id": "33716649440",
+          "score": 0.8578686109811461,
+          "win": true
+        },
+        {
+          "decision_ns": 1788421608079716029,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+          "pnl_sol": 0.008283424003224259,
+          "run_id": "33716649440",
+          "score": 0.8776720044097184,
+          "win": true
+        },
+        {
+          "decision_ns": 1788442632521838180,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "E9N9ZmHHj6simihEbzNicfboVVktEj2N5UVaf8xYpump",
+          "pnl_sol": 0.011324549870782318,
+          "run_id": "33741470396",
+          "score": 0.8759984236074261,
+          "win": true
+        },
+        {
+          "decision_ns": 1788448312441454514,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "85LENmh3qH2KajsdbNoPnbSAWbd9MY2z5BiPsjdzpump",
+          "pnl_sol": 0.0074300125346010715,
+          "run_id": "33769636983",
+          "score": 0.8563564818440715,
+          "win": true
+        },
+        {
+          "decision_ns": 1788448471157855130,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "Cp8w64X1ak2mCNLXvNf6xFLynDnCuH69CuiNZ13epump",
+          "pnl_sol": 0.007208061316547082,
+          "run_id": "33769636983",
+          "score": 0.8563564818440715,
+          "win": true
+        },
+        {
+          "decision_ns": 1788448853375186914,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "5Pvs2s39SgVjH5DycX8PdAD8jZwM3qfQuXHNPzE6pump",
+          "pnl_sol": 0.011212145310260997,
+          "run_id": "33769636983",
+          "score": 0.8563564818440715,
+          "win": true
+        },
+        {
+          "decision_ns": 1788449493924166276,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "AXNphW9EyHKnwXHJT1fjNWWaXp7ZwvZgeQZyX8AKpump",
+          "pnl_sol": 0.00696624676689063,
+          "run_id": "33769636983",
+          "score": 0.8710630939026046,
+          "win": true
+        },
+        {
+          "decision_ns": 1788449657005060481,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "3ubwt6E2KuctFL8NLTDLDBHy6cGYgQJpWzp4SjS3pump",
+          "pnl_sol": 0.007398408767242494,
+          "run_id": "33769636983",
+          "score": 0.8563564818440715,
+          "win": true
+        },
+        {
+          "decision_ns": 1788450945178759532,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+          "pnl_sol": 0.00907981877715263,
+          "run_id": "33769636983",
+          "score": 0.8877160487147372,
+          "win": true
+        },
+        {
+          "decision_ns": 1788451865488744119,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "tEZ8p6wxxi16sJcqDTsqH3eYLC81bWmwJmVucyTpump",
+          "pnl_sol": 0.007480556585311167,
+          "run_id": "33769636983",
+          "score": 0.8663826808249301,
+          "win": true
+        },
+        {
+          "decision_ns": 1788452004056366792,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+          "pnl_sol": 0.007193463750930877,
+          "run_id": "33769636983",
+          "score": 0.8877160487147372,
+          "win": true
+        },
+        {
+          "decision_ns": 1788452509468188555,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+          "pnl_sol": 0.008239225253612321,
+          "run_id": "33769636983",
+          "score": 0.8877160487147372,
+          "win": true
+        },
+        {
+          "decision_ns": 1788452600455753714,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "6593PYD9tSS8rEPtQQns2wuLudr5hQismWXPGQzKpump",
+          "pnl_sol": 0.009940240524190964,
+          "run_id": "33769636983",
+          "score": 0.8533927148186019,
+          "win": true
+        },
+        {
+          "decision_ns": 1788455068836877238,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "85xnarwnG742CdwWrSeUF43SorSsm4FKedhA4a5Upump",
+          "pnl_sol": 0.008644866676377774,
+          "run_id": "33781389703",
+          "score": 0.8718976009417098,
+          "win": true
+        },
+        {
+          "decision_ns": 1788455568759986804,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+          "pnl_sol": 0.008984907702651666,
+          "run_id": "33781389703",
+          "score": 0.883310034445694,
+          "win": true
+        },
+        {
+          "decision_ns": 1788456120706313977,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+          "pnl_sol": 0.00751984912740554,
+          "run_id": "33781389703",
+          "score": 0.8877160487147372,
+          "win": true
+        },
+        {
+          "decision_ns": 1788456602329642583,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "Rehqq7y5n5sBbUjKhwGvNrn8vBjmVPt1HxPmDa9pump",
+          "pnl_sol": 0.008280853928676668,
+          "run_id": "33781389703",
+          "score": 0.8630359829848452,
+          "win": true
+        },
+        {
+          "decision_ns": 1788458679511288639,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "79pYpjWUQUVmJ2frJvdGCWKvbtTg5thgGDxnD357pump",
+          "pnl_sol": 0.007441345144385159,
+          "run_id": "33781389703",
+          "score": 0.8549843898001465,
+          "win": true
+        },
+        {
+          "decision_ns": 1788459210713501852,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+          "pnl_sol": 0.009084840410500061,
+          "run_id": "33781389703",
+          "score": 0.8936549808963415,
+          "win": true
+        },
+        {
+          "decision_ns": 1788459667772608059,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "JE87Dph9L4Nuw2RnqeGLfKqC1qR7L3vpPHPSrVzJpump",
+          "pnl_sol": 0.007658477873458282,
+          "run_id": "33781389703",
+          "score": 0.8725955177285257,
+          "win": true
+        }
+      ],
+      "ledger_hash": "e789a9b4bcd3d7a646cbac116d1e142bc10cdf2c36dc57878a36eb2865d865b8",
+      "maximum_drawdown_fraction": 0.0,
+      "net_pnl_sol": 0.16670410455442397,
+      "profit_factor": 166704104554.42334,
+      "rejected_concurrency": 0,
+      "threshold": 0.8533927148186019,
+      "trades": 20,
+      "wilson_95_lower_bound": 0.8388698745050667,
+      "win_rate": 1.0,
+      "wins": 20
+    },
+    "validation_positive_labels": 3380
+  },
+  "development_ledger_hash": "e789a9b4bcd3d7a646cbac116d1e142bc10cdf2c36dc57878a36eb2865d865b8",
+  "experiment_id": "e4x-80a1e57c2d9988be50d5022ce8f800c5491e421723a690414d88cfc7ac5d7fa3",
+  "holdout_rows_read_before_freeze": 0,
+  "identity": {
+    "bankroll": 3.0,
+    "candidate_risk_set_policy": "one independent launch at each causal confirmation horizon",
+    "causal_horizon_ms": 250,
+    "chronological_split": {
+      "holdout": "sealed until explicit certification",
+      "train": [
+        "33605109571",
+        "33627431540",
+        "33644544746",
+        "33656916992",
+        "33669514091",
+        "33681664773",
+        "33692043170",
+        "33704841852"
+      ],
+      "validation": [
+        "33716649440",
+        "33741470396",
+        "33769636983",
+        "33781389703"
+      ]
+    },
+    "dataset_source_manifest_fingerprint": "e2218156bc054af75f0dcc8c2debbfd04c2245343ba516850d4167e3a117dca1",
+    "evidence_epoch": [
+      {
+        "run_id": "33605109571",
+        "sha256": "1bfe30a7a7e2bc159616c2f68a2ee6410a9ec4b26d28eedcd0609b6b35e1dded"
+      },
+      {
+        "run_id": "33627431540",
+        "sha256": "54e96699d70b53357c0f7249f228fa4af83ed43f15b7a5455988ac12cbeef9f5"
+      },
+      {
+        "run_id": "33644544746",
+        "sha256": "2552e11c1d6a36aebc882f3e997ae24ddd85db378e3c75a3997aaf2a664d0553"
+      },
+      {
+        "run_id": "33656916992",
+        "sha256": "5549961baff426b65700294a7692c7b7d164beae60078596fb2c72018039a70c"
+      },
+      {
+        "run_id": "33669514091",
+        "sha256": "9b8f0ab72e51c649622378ede0fc7cbeb1c120263fb4da3b44b289e23673ec2f"
+      },
+      {
+        "run_id": "33681664773",
+        "sha256": "d70c12f8bed120d5fe0389e06f1be0a655201380b7235a0f93a73600a8f626c2"
+      },
+      {
+        "run_id": "33692043170",
+        "sha256": "f8e5d3ef5120aaa6abfd29c83437a87fbc7636276935c3901af7cd1818d0cceb"
+      },
+      {
+        "run_id": "33704841852",
+        "sha256": "b09a14c770216b8bbaf4f5a44bd295b14cb01d675b188378419ddd9037886f7a"
+      },
+      {
+        "run_id": "33716649440",
+        "sha256": "6c865406cb400819488ba0a7657ebfd51f0d1c5d84cfb2a5de0999dfb4503f70"
+      },
+      {
+        "run_id": "33741470396",
+        "sha256": "99d52116113a13660e41e41a52c77fe4b5cb6b8a671c440f57f06ebc8ac4f713"
+      },
+      {
+        "run_id": "33769636983",
+        "sha256": "9fc5016470fbfb51a2e6c5b0742226773a19e7489fd9f6dd3ac107b905f0cd7e"
+      },
+      {
+        "run_id": "33781389703",
+        "sha256": "2a8a555434665ac1fd8a24e3957ff45ada7d4d4e84d80ada0e649847d4896376"
+      }
+    ],
+    "execution_policy": "paper replay; one entry per launch; no re-entry",
+    "exit_policy": {
+      "hold_ms": 60000,
+      "stop": 0.7,
+      "take": 1.2,
+      "uses_e4_future_sells": false
+    },
+    "feature_set_fingerprint": "7c1ce4f336bbe30beb0b61759d485a063e37edb565050518af09a380cec0e9e1",
+    "fee_model": {
+      "base_transaction_fee_sol": 5e-06,
+      "priority_fee_sol": 0.001,
+      "protocol_and_creator_fee_bps": 175.0,
+      "tip_sol": 0.001
+    },
+    "full_parameters": {
+      "l2_regularization": 5.0,
+      "learning_rate": 0.05,
+      "max_iter": 120,
+      "max_leaf_nodes": 15,
+      "min_samples_leaf": 30,
+      "random_seed": 12091,
+      "threshold": 0.8533927148186019
+    },
+    "latency_assumptions_ms": [
+      0,
+      1,
+      2,
+      5,
+      10
+    ],
+    "model_family": "hist_gradient_boosting",
+    "output_guard": "reserve-valid exact constant-product quote",
+    "position_sizing": {
+      "fraction": 0.0185,
+      "maximum_concurrent_positions": 2
+    },
+    "source_code_fingerprint": "0981afe3094799d62faf644a3db5b18c546e9fcc13596550e563116dda808507",
+    "thesis_family_identifier": "causal-profit-survival-hazard-v1"
+  },
+  "live_evidence_authorised": false,
+  "production_paths_changed": 0,
+  "production_promotion_authorised": false,
+  "status": "FROZEN_FOR_ONE_TIME_HISTORICAL_HOLDOUT",
+  "version": "e4-v12-profit-survival-v1"
+}

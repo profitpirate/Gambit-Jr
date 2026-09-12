@@ -1,0 +1,4079 @@
+{
+  "candidate_configurations_in_census": 360,
+  "candidate_configurations_modelled": 48,
+  "development_only": true,
+  "frozen_candidate_ready": true,
+  "holdout_rows_read": 0,
+  "production_paths_changed": 0,
+  "selection_rule": "validation gate count, then PnL and profit factor; all models and labels fitted on chronological training windows only",
+  "thesis_family": "causal-profit-survival-hazard-v1",
+  "top_candidates": [
+    {
+      "horizon_ms": 250,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.70|take=1.20|hold=60000",
+      "policy_index": 3,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 6444,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": 0.015616234233445624,
+            "trades": 2,
+            "wins": 2
+          },
+          "33741470396": {
+            "pnl_sol": 0.011324549870782318,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.08214817958674023,
+            "trades": 10,
+            "wins": 10
+          },
+          "33781389703": {
+            "pnl_sol": 0.05761514086345515,
+            "trades": 7,
+            "wins": 7
+          }
+        },
+        "capture_windows": 4,
+        "exit_reasons": {
+          "TAKE_PROFIT": 20
+        },
+        "largest_winner_contribution": 0.06793203983219999,
+        "ledger": [
+          {
+            "decision_ns": 1788417120517296361,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "LvZdhcZuXvuw9gkHKkKrN9mGCn1yVWumfE6rLGNpump",
+            "pnl_sol": 0.007332810230221365,
+            "run_id": "33716649440",
+            "score": 0.8578686109811461,
+            "win": true
+          },
+          {
+            "decision_ns": 1788421608079716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.008283424003224259,
+            "run_id": "33716649440",
+            "score": 0.8776720044097184,
+            "win": true
+          },
+          {
+            "decision_ns": 1788442632521838180,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "E9N9ZmHHj6simihEbzNicfboVVktEj2N5UVaf8xYpump",
+            "pnl_sol": 0.011324549870782318,
+            "run_id": "33741470396",
+            "score": 0.8759984236074261,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448312441454514,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "85LENmh3qH2KajsdbNoPnbSAWbd9MY2z5BiPsjdzpump",
+            "pnl_sol": 0.0074300125346010715,
+            "run_id": "33769636983",
+            "score": 0.8563564818440715,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448471157855130,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Cp8w64X1ak2mCNLXvNf6xFLynDnCuH69CuiNZ13epump",
+            "pnl_sol": 0.007208061316547082,
+            "run_id": "33769636983",
+            "score": 0.8563564818440715,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448853375186914,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "5Pvs2s39SgVjH5DycX8PdAD8jZwM3qfQuXHNPzE6pump",
+            "pnl_sol": 0.011212145310260997,
+            "run_id": "33769636983",
+            "score": 0.8563564818440715,
+            "win": true
+          },
+          {
+            "decision_ns": 1788449493924166276,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "AXNphW9EyHKnwXHJT1fjNWWaXp7ZwvZgeQZyX8AKpump",
+            "pnl_sol": 0.00696624676689063,
+            "run_id": "33769636983",
+            "score": 0.8710630939026046,
+            "win": true
+          },
+          {
+            "decision_ns": 1788449657005060481,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "3ubwt6E2KuctFL8NLTDLDBHy6cGYgQJpWzp4SjS3pump",
+            "pnl_sol": 0.007398408767242494,
+            "run_id": "33769636983",
+            "score": 0.8563564818440715,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450945178759532,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+            "pnl_sol": 0.00907981877715263,
+            "run_id": "33769636983",
+            "score": 0.8877160487147372,
+            "win": true
+          },
+          {
+            "decision_ns": 1788451865488744119,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "tEZ8p6wxxi16sJcqDTsqH3eYLC81bWmwJmVucyTpump",
+            "pnl_sol": 0.007480556585311167,
+            "run_id": "33769636983",
+            "score": 0.8663826808249301,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452004056366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.007193463750930877,
+            "run_id": "33769636983",
+            "score": 0.8877160487147372,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452509468188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.008239225253612321,
+            "run_id": "33769636983",
+            "score": 0.8877160487147372,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452600455753714,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "6593PYD9tSS8rEPtQQns2wuLudr5hQismWXPGQzKpump",
+            "pnl_sol": 0.009940240524190964,
+            "run_id": "33769636983",
+            "score": 0.8533927148186019,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455068836877238,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "85xnarwnG742CdwWrSeUF43SorSsm4FKedhA4a5Upump",
+            "pnl_sol": 0.008644866676377774,
+            "run_id": "33781389703",
+            "score": 0.8718976009417098,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455568759986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.008984907702651666,
+            "run_id": "33781389703",
+            "score": 0.883310034445694,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456120706313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.00751984912740554,
+            "run_id": "33781389703",
+            "score": 0.8877160487147372,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456602329642583,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Rehqq7y5n5sBbUjKhwGvNrn8vBjmVPt1HxPmDa9pump",
+            "pnl_sol": 0.008280853928676668,
+            "run_id": "33781389703",
+            "score": 0.8630359829848452,
+            "win": true
+          },
+          {
+            "decision_ns": 1788458679511288639,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "79pYpjWUQUVmJ2frJvdGCWKvbtTg5thgGDxnD357pump",
+            "pnl_sol": 0.007441345144385159,
+            "run_id": "33781389703",
+            "score": 0.8549843898001465,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459210713501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.009084840410500061,
+            "run_id": "33781389703",
+            "score": 0.8936549808963415,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459667772608059,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "JE87Dph9L4Nuw2RnqeGLfKqC1qR7L3vpPHPSrVzJpump",
+            "pnl_sol": 0.007658477873458282,
+            "run_id": "33781389703",
+            "score": 0.8725955177285257,
+            "win": true
+          }
+        ],
+        "ledger_hash": "e789a9b4bcd3d7a646cbac116d1e142bc10cdf2c36dc57878a36eb2865d865b8",
+        "maximum_drawdown_fraction": 0.0,
+        "net_pnl_sol": 0.16670410455442397,
+        "profit_factor": 166704104554.42334,
+        "rejected_concurrency": 0,
+        "threshold": 0.8533927148186019,
+        "trades": 20,
+        "wilson_95_lower_bound": 0.8388698745050667,
+        "win_rate": 1.0,
+        "wins": 20
+      },
+      "validation_positive_labels": 3380
+    },
+    {
+      "horizon_ms": 1000,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.70|take=1.20|hold=60000",
+      "policy_index": 3,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 5993,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": -0.008717568147623395,
+            "trades": 3,
+            "wins": 2
+          },
+          "33741470396": {
+            "pnl_sol": 0.016256561228563754,
+            "trades": 4,
+            "wins": 3
+          },
+          "33769636983": {
+            "pnl_sol": 0.09518773778419012,
+            "trades": 27,
+            "wins": 23
+          },
+          "33781389703": {
+            "pnl_sol": -0.0008226057051710992,
+            "trades": 16,
+            "wins": 12
+          }
+        },
+        "capture_windows": 4,
+        "exit_reasons": {
+          "INITIAL_STOP": 9,
+          "MAXIMUM_HOLD": 2,
+          "TAKE_PROFIT": 39
+        },
+        "largest_winner_contribution": 0.03935595147355257,
+        "ledger": [
+          {
+            "decision_ns": 1788421359520287394,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "8u9vXyvEfwk8znA4K3PCsa26jGUgvPfvxVYTYemRpump",
+            "pnl_sol": -0.023350497506746892,
+            "run_id": "33716649440",
+            "score": 0.8747226061102263,
+            "win": false
+          },
+          {
+            "decision_ns": 1788421608829716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.006826075967105154,
+            "run_id": "33716649440",
+            "score": 0.8982905760694153,
+            "win": true
+          },
+          {
+            "decision_ns": 1788421739925465286,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "887fP8gGVr6XNcViQB4QDq43GR5xgQ8erXz4rToNpump",
+            "pnl_sol": 0.007806853392018344,
+            "run_id": "33716649440",
+            "score": 0.845293718190028,
+            "win": true
+          },
+          {
+            "decision_ns": 1788439940016165246,
+            "exit_reason": "MAXIMUM_HOLD",
+            "mint": "GWSzFjaWSnPjazJHjt8ctpG2TukqUhU2jfdc3fMFpump",
+            "pnl_sol": -0.00840815837124683,
+            "run_id": "33741470396",
+            "score": 0.8599530256195874,
+            "win": false
+          },
+          {
+            "decision_ns": 1788440553535788097,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FMofbp9ejin1ErQ1M7d95inQrow5YmJsRDbT4vc4pump",
+            "pnl_sol": 0.0069874497588049075,
+            "run_id": "33741470396",
+            "score": 0.8492038281981851,
+            "win": true
+          },
+          {
+            "decision_ns": 1788442633271838180,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "E9N9ZmHHj6simihEbzNicfboVVktEj2N5UVaf8xYpump",
+            "pnl_sol": 0.01070016400120398,
+            "run_id": "33741470396",
+            "score": 0.8501265072978539,
+            "win": true
+          },
+          {
+            "decision_ns": 1788442684009735837,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "5hjsY7sfjHvDQoocGSPLFat6bhVWW9njqZQ5P5gSpump",
+            "pnl_sol": 0.006977105839801698,
+            "run_id": "33741470396",
+            "score": 0.8416911277585081,
+            "win": true
+          },
+          {
+            "decision_ns": 1788447356411537632,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "HzbAMXiq4VCj4ccMYXNNMvs6J24UJJwgJLurXyDipump",
+            "pnl_sol": 0.007116663922182714,
+            "run_id": "33769636983",
+            "score": 0.8603856360192298,
+            "win": true
+          },
+          {
+            "decision_ns": 1788447406758050845,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "E2RPQHJLHhKQ9HuFwGSfshXZG34ZAQkwjuWBr6copump",
+            "pnl_sol": 0.006976534957890745,
+            "run_id": "33769636983",
+            "score": 0.856530612115465,
+            "win": true
+          },
+          {
+            "decision_ns": 1788447433340820011,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "3qBmGVxj6m4Kth1kwDw2uvWptdAQu2DyCedP1hUipump",
+            "pnl_sol": -0.020715865154908544,
+            "run_id": "33769636983",
+            "score": 0.8521062166970326,
+            "win": false
+          },
+          {
+            "decision_ns": 1788447888752447143,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "6EgQXYJszxL5t7iAi8QTzy6VVhcmq1gMMrj3AepTpump",
+            "pnl_sol": 0.007815029851475995,
+            "run_id": "33769636983",
+            "score": 0.8492177265858067,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448016609945168,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "6QRvPH7Nok1YkrucozjnVVNc23cL8ZbyrgLWkB3Spump",
+            "pnl_sol": 0.006837996266461671,
+            "run_id": "33769636983",
+            "score": 0.8439150793093972,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448212563169527,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "2EaixuHpUM61XRh8NBm94UMYmgatZUDAFmd8ohPqpump",
+            "pnl_sol": 0.008317980442600861,
+            "run_id": "33769636983",
+            "score": 0.857440227475344,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448313191454514,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "85LENmh3qH2KajsdbNoPnbSAWbd9MY2z5BiPsjdzpump",
+            "pnl_sol": 0.00686152625926844,
+            "run_id": "33769636983",
+            "score": 0.8506140146564586,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448471907855130,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Cp8w64X1ak2mCNLXvNf6xFLynDnCuH69CuiNZ13epump",
+            "pnl_sol": 0.007488977687804758,
+            "run_id": "33769636983",
+            "score": 0.8505406536853071,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448854125186914,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "5Pvs2s39SgVjH5DycX8PdAD8jZwM3qfQuXHNPzE6pump",
+            "pnl_sol": 0.01076002188604936,
+            "run_id": "33769636983",
+            "score": 0.8414313486129514,
+            "win": true
+          },
+          {
+            "decision_ns": 1788449617070123486,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "E7biJYLAcfWvvMWHY6JcFSNUDHqDVWEUnn3ZEGBUpump",
+            "pnl_sol": -0.021057786276599287,
+            "run_id": "33769636983",
+            "score": 0.8495103705868267,
+            "win": false
+          },
+          {
+            "decision_ns": 1788449638571811499,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "AXV7pzKxKH8Gx8JQRNjwGzZeYRRjYH3698tz8eaGpump",
+            "pnl_sol": 0.012327619949358666,
+            "run_id": "33769636983",
+            "score": 0.8403853243397587,
+            "win": true
+          },
+          {
+            "decision_ns": 1788449776516882192,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bm2mCxLHrQ6DDHfx6J2wkRWAqghkyvgUi2WREoWupump",
+            "pnl_sol": 0.007002813059302421,
+            "run_id": "33769636983",
+            "score": 0.8454085296026579,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450405981415670,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "72UFTDfqMEwThFCg7rPFvNqCf1Qn3ix63SadJVfFpump",
+            "pnl_sol": 0.007347305302803989,
+            "run_id": "33769636983",
+            "score": 0.8515850163679297,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450945928759532,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+            "pnl_sol": 0.0072509628271648155,
+            "run_id": "33769636983",
+            "score": 0.8908429368806814,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450979775498533,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "679fne1mfgLnxuUbtDpdxcqjXjdkt8qNwWHpTDBLpump",
+            "pnl_sol": 0.007738732304384682,
+            "run_id": "33769636983",
+            "score": 0.869988332376238,
+            "win": true
+          },
+          {
+            "decision_ns": 1788451062852522669,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "9HJ4WFzyEWpr1woB27JVJ9KPaHXkLn2vx7YtbG7mpump",
+            "pnl_sol": 0.011399481154806657,
+            "run_id": "33769636983",
+            "score": 0.8431891771675492,
+            "win": true
+          },
+          {
+            "decision_ns": 1788451105101020463,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "GXKp9k3a8GqstUFJ8uwqhKAZn4KYDpovMfZ1sKbBpump",
+            "pnl_sol": 0.007342815882297245,
+            "run_id": "33769636983",
+            "score": 0.8418148422312958,
+            "win": true
+          },
+          {
+            "decision_ns": 1788451519920240727,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "5aWUJ4h8jL9qDrFNLcEJFnhKPVMjWVB4Rzpi4ucCpump",
+            "pnl_sol": 0.007216872323887673,
+            "run_id": "33769636983",
+            "score": 0.843467080633421,
+            "win": true
+          },
+          {
+            "decision_ns": 1788451864294806486,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "BEXri3gUtWDUv3ncCzTEDnggXp6Jyn8jL6hwwpTopump",
+            "pnl_sol": 0.007236811856764891,
+            "run_id": "33769636983",
+            "score": 0.8507288567601633,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452004806366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.008909261274028538,
+            "run_id": "33769636983",
+            "score": 0.8857817046168555,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452035401329381,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "A4fTXrpVpk4Asd4NTuHZwfy4N6GyPiUVoSVahLBgpump",
+            "pnl_sol": 0.008813636981080307,
+            "run_id": "33769636983",
+            "score": 0.8697291063740555,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452510218188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.00824362742847349,
+            "run_id": "33769636983",
+            "score": 0.8876581888532373,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452516248235925,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FyG29XSuBsY6jrU3uAiyp1di2WoSdtGabwPFmM5qpump",
+            "pnl_sol": 0.007227180257700229,
+            "run_id": "33769636983",
+            "score": 0.8428837892515061,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452591252749848,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "Arme4rpJJbUBuHAaVjvSfgrPKxvn439RiJww434opump",
+            "pnl_sol": -0.02217688826273053,
+            "run_id": "33769636983",
+            "score": 0.8495479053390722,
+            "win": false
+          },
+          {
+            "decision_ns": 1788452933973618083,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "BAcZ65wjAqJLenrVMM751L3ZVTBwzRa4GgvYp7DQpump",
+            "pnl_sol": -0.026475816053294958,
+            "run_id": "33769636983",
+            "score": 0.8875131007481574,
+            "win": false
+          },
+          {
+            "decision_ns": 1788452962241791441,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Fym5HSFMioNxCmucbs8KtecPfzojSHwd5a63HZywpump",
+            "pnl_sol": 0.00725545483330195,
+            "run_id": "33769636983",
+            "score": 0.8684653890762621,
+            "win": true
+          },
+          {
+            "decision_ns": 1788453151600367613,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "ENsykjD8NSbKeRhPYNGqwe56Vw3QLBq4sLa9HCu3pump",
+            "pnl_sol": 0.00812678682263334,
+            "run_id": "33769636983",
+            "score": 0.9012775720154175,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455069586877238,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "85xnarwnG742CdwWrSeUF43SorSsm4FKedhA4a5Upump",
+            "pnl_sol": 0.008129132347990446,
+            "run_id": "33781389703",
+            "score": 0.845293718190028,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455230300071896,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "H3MsFiY6Pc7CtsDC373MrgZPhtJ8PMRyc19UiqAupump",
+            "pnl_sol": -0.024707086421000113,
+            "run_id": "33781389703",
+            "score": 0.8454085296026579,
+            "win": false
+          },
+          {
+            "decision_ns": 1788455375105893937,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Fz2Vh8wew916j1ee9w6rSEgH9mdffW5bgAMKA1Qmpump",
+            "pnl_sol": 0.009186022899449857,
+            "run_id": "33781389703",
+            "score": 0.8747226061102263,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455487147549489,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "BvnnMjpoFKATfvy8WQ8km34AffaYjFTFNecnMVtUpump",
+            "pnl_sol": -0.02186463854603902,
+            "run_id": "33781389703",
+            "score": 0.8765169087854762,
+            "win": false
+          },
+          {
+            "decision_ns": 1788455569509986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.008733690830643563,
+            "run_id": "33781389703",
+            "score": 0.8775126333450468,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455667004620141,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8eobot6AkC41a4vJtvXeNkskDUNZh4xYDfvUWzZpump",
+            "pnl_sol": 0.007216080414236249,
+            "run_id": "33781389703",
+            "score": 0.8417258261754831,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456121456313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.0071257368089486794,
+            "run_id": "33781389703",
+            "score": 0.8865757054448783,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456166277236261,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FJ3uPoWfyxpD6gKeHQaZuQ3JY1XKrhVhUAVoFNgEpump",
+            "pnl_sol": 0.007617596697040166,
+            "run_id": "33781389703",
+            "score": 0.8734160207134023,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456223935611159,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Gi8btuCPP2f35kdC6aqANvwaw9Xw1BjYWfh53th8pump",
+            "pnl_sol": 0.007944431728738446,
+            "run_id": "33781389703",
+            "score": 0.8775126333450468,
+            "win": true
+          },
+          {
+            "decision_ns": 1788457367749665184,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7r7PzaoVTHxts5cy1XhwibmZy4PEqzwfWDNfaQyUpump",
+            "pnl_sol": 0.007933543403953261,
+            "run_id": "33781389703",
+            "score": 0.8456315892008571,
+            "win": true
+          },
+          {
+            "decision_ns": 1788458256672041176,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "nQys4VBMb8roPg6UEsN1QcvJvtzjPJi4UgBWUrSpump",
+            "pnl_sol": 0.0071229013204907946,
+            "run_id": "33781389703",
+            "score": 0.8456945881777931,
+            "win": true
+          },
+          {
+            "decision_ns": 1788458330341883291,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "FZrX25Ng7bHTe4rw7W5B227CuqQekSEqqo65gUi2pump",
+            "pnl_sol": -0.021498195111249785,
+            "run_id": "33781389703",
+            "score": 0.8440170100863978,
+            "win": false
+          },
+          {
+            "decision_ns": 1788458495802593406,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "3t3LqNaH84NjmcNa8m3BUFAowwfAMGPEgDGqdnwfpump",
+            "pnl_sol": -0.021074888392074886,
+            "run_id": "33781389703",
+            "score": 0.8546436471008967,
+            "win": false
+          },
+          {
+            "decision_ns": 1788459180864400916,
+            "exit_reason": "MAXIMUM_HOLD",
+            "mint": "AjPjt9YRu2iLwRQpCFHZTuyNipZHFNCCn3Vi57CCpump",
+            "pnl_sol": 0.001116499765133526,
+            "run_id": "33781389703",
+            "score": 0.8454652261402644,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459211463501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.007894985260353302,
+            "run_id": "33781389703",
+            "score": 0.8876581888532373,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459298216560037,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FeRVEYxtWaxWpXQc22j4R9XXpQLBowFKbzQrCL9Fpump",
+            "pnl_sol": 0.008301581288214413,
+            "run_id": "33781389703",
+            "score": 0.8455488319643761,
+            "win": true
+          }
+        ],
+        "ledger_hash": "da2f8fd578fdb9c2c014997490db451fb5f8c8fda7d581ce6ef4b98bdd4846b2",
+        "maximum_drawdown_fraction": 0.02084234412656283,
+        "net_pnl_sol": 0.1019041251599595,
+        "profit_factor": 1.4822041920715232,
+        "rejected_concurrency": 0,
+        "threshold": 0.8403853243397587,
+        "trades": 50,
+        "wilson_95_lower_bound": 0.6696262789551477,
+        "win_rate": 0.8,
+        "wins": 40
+      },
+      "validation_positive_labels": 3198
+    },
+    {
+      "horizon_ms": 250,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.70|take=1.20|hold=30000",
+      "policy_index": 2,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 6180,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": -0.0070790230030266105,
+            "trades": 3,
+            "wins": 2
+          },
+          "33741470396": {
+            "pnl_sol": 0.01122423287429928,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.03786735226473146,
+            "trades": 9,
+            "wins": 8
+          },
+          "33781389703": {
+            "pnl_sol": 0.05689547044810483,
+            "trades": 7,
+            "wins": 7
+          }
+        },
+        "capture_windows": 4,
+        "exit_reasons": {
+          "INITIAL_STOP": 2,
+          "TAKE_PROFIT": 18
+        },
+        "largest_winner_contribution": 0.07699006423451549,
+        "ledger": [
+          {
+            "decision_ns": 1788417120517296361,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "LvZdhcZuXvuw9gkHKkKrN9mGCn1yVWumfE6rLGNpump",
+            "pnl_sol": 0.007332810230221365,
+            "run_id": "33716649440",
+            "score": 0.8738802871329651,
+            "win": true
+          },
+          {
+            "decision_ns": 1788421358770287394,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "8u9vXyvEfwk8znA4K3PCsa26jGUgvPfvxVYTYemRpump",
+            "pnl_sol": -0.022617878927139644,
+            "run_id": "33716649440",
+            "score": 0.8833197487114617,
+            "win": false
+          },
+          {
+            "decision_ns": 1788421608079716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.008206045693891668,
+            "run_id": "33716649440",
+            "score": 0.9025490986853381,
+            "win": true
+          },
+          {
+            "decision_ns": 1788442632521838180,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "E9N9ZmHHj6simihEbzNicfboVVktEj2N5UVaf8xYpump",
+            "pnl_sol": 0.01122423287429928,
+            "run_id": "33741470396",
+            "score": 0.89110881238225,
+            "win": true
+          },
+          {
+            "decision_ns": 1788449493924166276,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "AXNphW9EyHKnwXHJT1fjNWWaXp7ZwvZgeQZyX8AKpump",
+            "pnl_sol": 0.0068232912169544566,
+            "run_id": "33769636983",
+            "score": 0.8777242471324458,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450945178759532,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+            "pnl_sol": 0.008876756223398986,
+            "run_id": "33769636983",
+            "score": 0.9134566039375546,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450979025498533,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "679fne1mfgLnxuUbtDpdxcqjXjdkt8qNwWHpTDBLpump",
+            "pnl_sol": 0.007001633064728174,
+            "run_id": "33769636983",
+            "score": 0.8695064841770049,
+            "win": true
+          },
+          {
+            "decision_ns": 1788451865488744119,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "tEZ8p6wxxi16sJcqDTsqH3eYLC81bWmwJmVucyTpump",
+            "pnl_sol": 0.0073282671256861345,
+            "run_id": "33769636983",
+            "score": 0.878020562564733,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452004056366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.007045687511776644,
+            "run_id": "33769636983",
+            "score": 0.9134566039375546,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452034651329381,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "A4fTXrpVpk4Asd4NTuHZwfy4N6GyPiUVoSVahLBgpump",
+            "pnl_sol": 0.009726396167759152,
+            "run_id": "33769636983",
+            "score": 0.8833197487114617,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452509468188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.008106778037064097,
+            "run_id": "33769636983",
+            "score": 0.9134566039375546,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452933223618083,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "BAcZ65wjAqJLenrVMM751L3ZVTBwzRa4GgvYp7DQpump",
+            "pnl_sol": -0.024262158493599285,
+            "run_id": "33769636983",
+            "score": 0.8833197487114617,
+            "win": false
+          },
+          {
+            "decision_ns": 1788453150850367613,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "ENsykjD8NSbKeRhPYNGqwe56Vw3QLBq4sLa9HCu3pump",
+            "pnl_sol": 0.0072207014109631,
+            "run_id": "33769636983",
+            "score": 0.8782126011583153,
+            "win": true
+          },
+          {
+            "decision_ns": 1788454835918686147,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Eowdhbdke18HaJk5gGcW7PQWJmLi8ygyyGZVZ3kJpump",
+            "pnl_sol": 0.007674192410044314,
+            "run_id": "33781389703",
+            "score": 0.8782126011583153,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455068836877238,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "85xnarwnG742CdwWrSeUF43SorSsm4FKedhA4a5Upump",
+            "pnl_sol": 0.008441390476415733,
+            "run_id": "33781389703",
+            "score": 0.9064234407985945,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455568759986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.008774799651055612,
+            "run_id": "33781389703",
+            "score": 0.9134566039375546,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456120706313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.007337633694785857,
+            "run_id": "33781389703",
+            "score": 0.9134566039375546,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456165527236261,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FJ3uPoWfyxpD6gKeHQaZuQ3JY1XKrhVhUAVoFNgEpump",
+            "pnl_sol": 0.007661076018037477,
+            "run_id": "33781389703",
+            "score": 0.8833197487114617,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456223185611159,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Gi8btuCPP2f35kdC6aqANvwaw9Xw1BjYWfh53th8pump",
+            "pnl_sol": 0.008132517110272013,
+            "run_id": "33781389703",
+            "score": 0.8782126011583153,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459210713501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.008873861087493821,
+            "run_id": "33781389703",
+            "score": 0.9153494703954514,
+            "win": true
+          }
+        ],
+        "ledger_hash": "e11c63774c58ea51b08d4de53574b4d93564e9588c0b512b0c616155c1eea88f",
+        "maximum_drawdown_fraction": 0.00808738616453312,
+        "net_pnl_sol": 0.09890803258410852,
+        "profit_factor": 3.109811297641024,
+        "rejected_concurrency": 0,
+        "threshold": 0.8695064841770049,
+        "trades": 20,
+        "wilson_95_lower_bound": 0.6989617935882066,
+        "win_rate": 0.9,
+        "wins": 18
+      },
+      "validation_positive_labels": 3204
+    },
+    {
+      "horizon_ms": 250,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.80|take=1.20|hold=60000",
+      "policy_index": 13,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 5929,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": -0.00816629455007857,
+            "trades": 2,
+            "wins": 1
+          },
+          "33741470396": {
+            "pnl_sol": 0.01121942694437194,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.03350006516974744,
+            "trades": 4,
+            "wins": 4
+          },
+          "33781389703": {
+            "pnl_sol": 0.04083984287224792,
+            "trades": 5,
+            "wins": 5
+          }
+        },
+        "capture_windows": 4,
+        "exit_reasons": {
+          "INITIAL_STOP": 1,
+          "TAKE_PROFIT": 11
+        },
+        "largest_winner_contribution": 0.11965898755376761,
+        "ledger": [
+          {
+            "decision_ns": 1788421358770287394,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "8u9vXyvEfwk8znA4K3PCsa26jGUgvPfvxVYTYemRpump",
+            "pnl_sol": -0.016368633247692575,
+            "run_id": "33716649440",
+            "score": 0.8943384194558079,
+            "win": false
+          },
+          {
+            "decision_ns": 1788421608079716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.008202338697614005,
+            "run_id": "33716649440",
+            "score": 0.8899166480323552,
+            "win": true
+          },
+          {
+            "decision_ns": 1788442632521838180,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "E9N9ZmHHj6simihEbzNicfboVVktEj2N5UVaf8xYpump",
+            "pnl_sol": 0.01121942694437194,
+            "run_id": "33741470396",
+            "score": 0.8861366816305346,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450945178759532,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+            "pnl_sol": 0.008848149775834174,
+            "run_id": "33769636983",
+            "score": 0.9045344255542592,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452004056366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.006979246428173748,
+            "run_id": "33769636983",
+            "score": 0.9051983022777361,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452034651329381,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "A4fTXrpVpk4Asd4NTuHZwfy4N6GyPiUVoSVahLBgpump",
+            "pnl_sol": 0.009640219229042846,
+            "run_id": "33769636983",
+            "score": 0.8880916196714602,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452509468188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.008032449736696673,
+            "run_id": "33769636983",
+            "score": 0.9045344255542592,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455068836877238,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "85xnarwnG742CdwWrSeUF43SorSsm4FKedhA4a5Upump",
+            "pnl_sol": 0.008396402818462434,
+            "run_id": "33781389703",
+            "score": 0.9060308541496002,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455568759986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.008728345721012679,
+            "run_id": "33781389703",
+            "score": 0.9051983022777361,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456120706313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.0072973466953331345,
+            "run_id": "33781389703",
+            "score": 0.9051983022777361,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456165527236261,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FJ3uPoWfyxpD6gKeHQaZuQ3JY1XKrhVhUAVoFNgEpump",
+            "pnl_sol": 0.00761936709661553,
+            "run_id": "33781389703",
+            "score": 0.8855445057247876,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459210713501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.008798380540824144,
+            "run_id": "33781389703",
+            "score": 0.9224747935413813,
+            "win": true
+          }
+        ],
+        "ledger_hash": "52fb9f315e8c75ea84a8db786a2a6f944e4fa40dd27f0ee5f2e4fa1d201123c8",
+        "maximum_drawdown_fraction": 0.005456211082564148,
+        "net_pnl_sol": 0.0773930404362897,
+        "profit_factor": 5.72813088699379,
+        "rejected_concurrency": 0,
+        "threshold": 0.8855445057247876,
+        "trades": 12,
+        "wilson_95_lower_bound": 0.6461140782014047,
+        "win_rate": 0.9166666666666666,
+        "wins": 11
+      },
+      "validation_positive_labels": 3085
+    },
+    {
+      "horizon_ms": 250,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.70|take=1.20|hold=60000",
+      "policy_index": 3,
+      "priority_fee_sol": 0.005,
+      "train_positive_labels": 6217,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": 0.0042583376341575885,
+            "trades": 1,
+            "wins": 1
+          },
+          "33741470396": {
+            "pnl_sol": 0.007274345986273176,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.0150598196831557,
+            "trades": 4,
+            "wins": 4
+          },
+          "33781389703": {
+            "pnl_sol": 0.02466893635848906,
+            "trades": 6,
+            "wins": 6
+          }
+        },
+        "capture_windows": 4,
+        "exit_reasons": {
+          "TAKE_PROFIT": 12
+        },
+        "largest_winner_contribution": 0.14190678284158523,
+        "ledger": [
+          {
+            "decision_ns": 1788421608079716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.0042583376341575885,
+            "run_id": "33716649440",
+            "score": 0.87954121242634,
+            "win": true
+          },
+          {
+            "decision_ns": 1788442632521838180,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "E9N9ZmHHj6simihEbzNicfboVVktEj2N5UVaf8xYpump",
+            "pnl_sol": 0.007274345986273176,
+            "run_id": "33741470396",
+            "score": 0.8990299168296662,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450945178759532,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+            "pnl_sol": 0.0048787952008172986,
+            "run_id": "33769636983",
+            "score": 0.881150626516642,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452004056366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.002992699962787615,
+            "run_id": "33769636983",
+            "score": 0.885974082660437,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452509468188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.004002234621410111,
+            "run_id": "33769636983",
+            "score": 0.881150626516642,
+            "win": true
+          },
+          {
+            "decision_ns": 1788453150850367613,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "ENsykjD8NSbKeRhPYNGqwe56Vw3QLBq4sLa9HCu3pump",
+            "pnl_sol": 0.003186089898140676,
+            "run_id": "33769636983",
+            "score": 0.9005319368809674,
+            "win": true
+          },
+          {
+            "decision_ns": 1788454835918686147,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Eowdhbdke18HaJk5gGcW7PQWJmLi8ygyyGZVZ3kJpump",
+            "pnl_sol": 0.003625128274586456,
+            "run_id": "33781389703",
+            "score": 0.8734626413825799,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455068836877238,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "85xnarwnG742CdwWrSeUF43SorSsm4FKedhA4a5Upump",
+            "pnl_sol": 0.004374700984305591,
+            "run_id": "33781389703",
+            "score": 0.872773359998334,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455568759986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.004691836697604368,
+            "run_id": "33781389703",
+            "score": 0.87954121242634,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456120706313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.0032534992743489533,
+            "run_id": "33781389703",
+            "score": 0.885974082660437,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456223185611159,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Gi8btuCPP2f35kdC6aqANvwaw9Xw1BjYWfh53th8pump",
+            "pnl_sol": 0.0040030343671954155,
+            "run_id": "33781389703",
+            "score": 0.8734626413825799,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459210713501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.004720736760448277,
+            "run_id": "33781389703",
+            "score": 0.8817173991834498,
+            "win": true
+          }
+        ],
+        "ledger_hash": "316af973db1f66356b4da8dce9122e77d87d5efec22afab1f7975c9fe245af9b",
+        "maximum_drawdown_fraction": 0.0,
+        "net_pnl_sol": 0.05126143966207586,
+        "profit_factor": 51261439662.07552,
+        "rejected_concurrency": 0,
+        "threshold": 0.872773359998334,
+        "trades": 12,
+        "wilson_95_lower_bound": 0.7574992425007574,
+        "win_rate": 1.0,
+        "wins": 12
+      },
+      "validation_positive_labels": 3214
+    },
+    {
+      "horizon_ms": 1000,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.80|take=1.10|hold=30000",
+      "policy_index": 10,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 6219,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": 0.0016474107732798102,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.009234429669679793,
+            "trades": 11,
+            "wins": 10
+          },
+          "33781389703": {
+            "pnl_sol": 0.026804374876868785,
+            "trades": 8,
+            "wins": 8
+          }
+        },
+        "capture_windows": 3,
+        "exit_reasons": {
+          "INITIAL_STOP": 1,
+          "TAKE_PROFIT": 19
+        },
+        "largest_winner_contribution": 0.12438439269329368,
+        "ledger": [
+          {
+            "decision_ns": 1788421739925465286,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "887fP8gGVr6XNcViQB4QDq43GR5xgQ8erXz4rToNpump",
+            "pnl_sol": 0.0016474107732798102,
+            "run_id": "33716649440",
+            "score": 0.9075621191558473,
+            "win": true
+          },
+          {
+            "decision_ns": 1788447888752447143,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "6EgQXYJszxL5t7iAi8QTzy6VVhcmq1gMMrj3AepTpump",
+            "pnl_sol": 0.002945035917312787,
+            "run_id": "33769636983",
+            "score": 0.9079765576539025,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448313191454514,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "85LENmh3qH2KajsdbNoPnbSAWbd9MY2z5BiPsjdzpump",
+            "pnl_sol": 0.0033921996778387073,
+            "run_id": "33769636983",
+            "score": 0.9135256585774966,
+            "win": true
+          },
+          {
+            "decision_ns": 1788449617070123486,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "E7biJYLAcfWvvMWHY6JcFSNUDHqDVWEUnn3ZEGBUpump",
+            "pnl_sol": -0.01869704898711448,
+            "run_id": "33769636983",
+            "score": 0.9066105969397694,
+            "win": false
+          },
+          {
+            "decision_ns": 1788449776516882192,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bm2mCxLHrQ6DDHfx6J2wkRWAqghkyvgUi2WREoWupump",
+            "pnl_sol": 0.004570250771434789,
+            "run_id": "33769636983",
+            "score": 0.9126913663353048,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450405981415670,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "72UFTDfqMEwThFCg7rPFvNqCf1Qn3ix63SadJVfFpump",
+            "pnl_sol": 0.001863247697160196,
+            "run_id": "33769636983",
+            "score": 0.9126030810200422,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450945928759532,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+            "pnl_sol": 0.0036549034647565468,
+            "run_id": "33769636983",
+            "score": 0.9223083012013412,
+            "win": true
+          },
+          {
+            "decision_ns": 1788451105101020463,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "GXKp9k3a8GqstUFJ8uwqhKAZn4KYDpovMfZ1sKbBpump",
+            "pnl_sol": 0.0026094362417195954,
+            "run_id": "33769636983",
+            "score": 0.9027917126233921,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452004806366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.0018298445103481983,
+            "run_id": "33769636983",
+            "score": 0.9226705777909219,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452510218188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.002661714747048058,
+            "run_id": "33769636983",
+            "score": 0.9253026596296923,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452516248235925,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FyG29XSuBsY6jrU3uAiyp1di2WoSdtGabwPFmM5qpump",
+            "pnl_sol": 0.0016962825670602602,
+            "run_id": "33769636983",
+            "score": 0.9091435744889458,
+            "win": true
+          },
+          {
+            "decision_ns": 1788453151600367613,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "ENsykjD8NSbKeRhPYNGqwe56Vw3QLBq4sLa9HCu3pump",
+            "pnl_sol": 0.0027085630621151366,
+            "run_id": "33769636983",
+            "score": 0.926428111921597,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455069586877238,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "85xnarwnG742CdwWrSeUF43SorSsm4FKedhA4a5Upump",
+            "pnl_sol": 0.0035073242508581667,
+            "run_id": "33781389703",
+            "score": 0.9075621191558473,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455667004620141,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8eobot6AkC41a4vJtvXeNkskDUNZh4xYDfvUWzZpump",
+            "pnl_sol": 0.007013198088884551,
+            "run_id": "33781389703",
+            "score": 0.9105688596878896,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456121456313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.002546958034017173,
+            "run_id": "33781389703",
+            "score": 0.9226743616126094,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456166277236261,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FJ3uPoWfyxpD6gKeHQaZuQ3JY1XKrhVhUAVoFNgEpump",
+            "pnl_sol": 0.0017167140832331854,
+            "run_id": "33781389703",
+            "score": 0.9239562832168984,
+            "win": true
+          },
+          {
+            "decision_ns": 1788458256672041176,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "nQys4VBMb8roPg6UEsN1QcvJvtzjPJi4UgBWUrSpump",
+            "pnl_sol": 0.002986063451563277,
+            "run_id": "33781389703",
+            "score": 0.9059031088826482,
+            "win": true
+          },
+          {
+            "decision_ns": 1788458495802593406,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "3t3LqNaH84NjmcNa8m3BUFAowwfAMGPEgDGqdnwfpump",
+            "pnl_sol": 0.002278590456821293,
+            "run_id": "33781389703",
+            "score": 0.9044285029895884,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459211463501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.0028379314194792726,
+            "run_id": "33781389703",
+            "score": 0.9295582665986232,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459298216560037,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FeRVEYxtWaxWpXQc22j4R9XXpQLBowFKbzQrCL9Fpump",
+            "pnl_sol": 0.003917595092011866,
+            "run_id": "33781389703",
+            "score": 0.9051376632580562,
+            "win": true
+          }
+        ],
+        "ledger_hash": "008adc8ab7840475c100e4b8e680dd297762d18a67479a2ededc0e70aaa11b67",
+        "maximum_drawdown_fraction": 0.006232349662371443,
+        "net_pnl_sol": 0.037686215319828964,
+        "profit_factor": 3.0156237139775772,
+        "rejected_concurrency": 0,
+        "threshold": 0.9027917126233921,
+        "trades": 20,
+        "wilson_95_lower_bound": 0.7638641064874331,
+        "win_rate": 0.95,
+        "wins": 19
+      },
+      "validation_positive_labels": 3292
+    },
+    {
+      "horizon_ms": 1000,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.85|take=1.10|hold=60000",
+      "policy_index": 21,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 6124,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": 0.0018951185150000507,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.013754958283709248,
+            "trades": 5,
+            "wins": 5
+          },
+          "33781389703": {
+            "pnl_sol": 0.016334860089928585,
+            "trades": 6,
+            "wins": 6
+          }
+        },
+        "capture_windows": 3,
+        "exit_reasons": {
+          "TAKE_PROFIT": 12
+        },
+        "largest_winner_contribution": 0.12213519822832562,
+        "ledger": [
+          {
+            "decision_ns": 1788421608829716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.0018951185150000507,
+            "run_id": "33716649440",
+            "score": 0.9186692518804235,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450945928759532,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+            "pnl_sol": 0.0036665682263133104,
+            "run_id": "33769636983",
+            "score": 0.9238610332716088,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452004806366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.0018344129426469402,
+            "run_id": "33769636983",
+            "score": 0.9315804130223301,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452035401329381,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "A4fTXrpVpk4Asd4NTuHZwfy4N6GyPiUVoSVahLBgpump",
+            "pnl_sol": 0.0028662234566143793,
+            "run_id": "33769636983",
+            "score": 0.9126330684671197,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452510218188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.002671730845969722,
+            "run_id": "33769636983",
+            "score": 0.9323703996585544,
+            "win": true
+          },
+          {
+            "decision_ns": 1788453151600367613,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "ENsykjD8NSbKeRhPYNGqwe56Vw3QLBq4sLa9HCu3pump",
+            "pnl_sol": 0.0027160228121648963,
+            "run_id": "33769636983",
+            "score": 0.9249347356444684,
+            "win": true
+          },
+          {
+            "decision_ns": 1788454836668686147,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Eowdhbdke18HaJk5gGcW7PQWJmLi8ygyyGZVZ3kJpump",
+            "pnl_sol": 0.0026600822919747996,
+            "run_id": "33781389703",
+            "score": 0.9184486110671966,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455569509986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.002676902691192272,
+            "run_id": "33781389703",
+            "score": 0.9145743356872539,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456121456313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.002546332353455541,
+            "run_id": "33781389703",
+            "score": 0.9323703996585544,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456166277236261,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FJ3uPoWfyxpD6gKeHQaZuQ3JY1XKrhVhUAVoFNgEpump",
+            "pnl_sol": 0.0017162021830577912,
+            "run_id": "33781389703",
+            "score": 0.9150092349771,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459211463501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.002828853963033909,
+            "run_id": "33781389703",
+            "score": 0.9201883357895951,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459298216560037,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FeRVEYxtWaxWpXQc22j4R9XXpQLBowFKbzQrCL9Fpump",
+            "pnl_sol": 0.003906486607214273,
+            "run_id": "33781389703",
+            "score": 0.9127848708336274,
+            "win": true
+          }
+        ],
+        "ledger_hash": "9c456bef5b0a4357cabdf89cae05979daccf54f17e1cd37ef6c78477c9bef2dd",
+        "maximum_drawdown_fraction": 0.0,
+        "net_pnl_sol": 0.03198493688863868,
+        "profit_factor": 31984936888.637886,
+        "rejected_concurrency": 0,
+        "threshold": 0.9126330684671197,
+        "trades": 12,
+        "wilson_95_lower_bound": 0.7574992425007574,
+        "win_rate": 1.0,
+        "wins": 12
+      },
+      "validation_positive_labels": 3302
+    },
+    {
+      "horizon_ms": 3000,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.85|take=1.10|hold=60000",
+      "policy_index": 21,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 5776,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": -0.006844599674243161,
+            "trades": 3,
+            "wins": 2
+          },
+          "33741470396": {
+            "pnl_sol": 0.0034092494913266977,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.018661218544775024,
+            "trades": 14,
+            "wins": 13
+          },
+          "33781389703": {
+            "pnl_sol": 0.011781321597002473,
+            "trades": 12,
+            "wins": 11
+          }
+        },
+        "capture_windows": 4,
+        "exit_reasons": {
+          "INITIAL_STOP": 3,
+          "TAKE_PROFIT": 27
+        },
+        "largest_winner_contribution": 0.07522906058857265,
+        "ledger": [
+          {
+            "decision_ns": 1788421361520287394,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "8u9vXyvEfwk8znA4K3PCsa26jGUgvPfvxVYTYemRpump",
+            "pnl_sol": -0.0122249723007158,
+            "run_id": "33716649440",
+            "score": 0.8782594576020462,
+            "win": false
+          },
+          {
+            "decision_ns": 1788421610829716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.0028184400174482913,
+            "run_id": "33716649440",
+            "score": 0.9121122644472703,
+            "win": true
+          },
+          {
+            "decision_ns": 1788421741925465286,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "887fP8gGVr6XNcViQB4QDq43GR5xgQ8erXz4rToNpump",
+            "pnl_sol": 0.0025619326090243477,
+            "run_id": "33716649440",
+            "score": 0.8645143909454248,
+            "win": true
+          },
+          {
+            "decision_ns": 1788438836056697421,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "dmDrscHtxf9TxGuFmwAwMh6GbNimmKqMcfV4N9Hpump",
+            "pnl_sol": 0.0034092494913266977,
+            "run_id": "33741470396",
+            "score": 0.8825355845019315,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448315191454514,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "85LENmh3qH2KajsdbNoPnbSAWbd9MY2z5BiPsjdzpump",
+            "pnl_sol": 0.004194114542102861,
+            "run_id": "33769636983",
+            "score": 0.8791444043788965,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448473907855130,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Cp8w64X1ak2mCNLXvNf6xFLynDnCuH69CuiNZ13epump",
+            "pnl_sol": 0.0013898142879608874,
+            "run_id": "33769636983",
+            "score": 0.8696347938000273,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448856125186914,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "5Pvs2s39SgVjH5DycX8PdAD8jZwM3qfQuXHNPzE6pump",
+            "pnl_sol": 0.004740174329678583,
+            "run_id": "33769636983",
+            "score": 0.8689087075409043,
+            "win": true
+          },
+          {
+            "decision_ns": 1788449496674166276,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "AXNphW9EyHKnwXHJT1fjNWWaXp7ZwvZgeQZyX8AKpump",
+            "pnl_sol": 0.001983653897060726,
+            "run_id": "33769636983",
+            "score": 0.8704387768441322,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450947928759532,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+            "pnl_sol": 0.0018852297576369484,
+            "run_id": "33769636983",
+            "score": 0.8874758560932023,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450981775498533,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "679fne1mfgLnxuUbtDpdxcqjXjdkt8qNwWHpTDBLpump",
+            "pnl_sol": 0.0021062034761731574,
+            "run_id": "33769636983",
+            "score": 0.8784328674602628,
+            "win": true
+          },
+          {
+            "decision_ns": 1788451956461090316,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "8gjxkvoweQuyirGrCUA2A37M4tZL74n5hTr1oUKHpump",
+            "pnl_sol": 0.002420155437127418,
+            "run_id": "33769636983",
+            "score": 0.8763182539158061,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452006806366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.002576657244416157,
+            "run_id": "33769636983",
+            "score": 0.910086682389495,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452037401329381,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "A4fTXrpVpk4Asd4NTuHZwfy4N6GyPiUVoSVahLBgpump",
+            "pnl_sol": 0.001706688508518156,
+            "run_id": "33769636983",
+            "score": 0.9072731787516537,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452321306868015,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "85acwvrneALbScYeKDum59f8tGcJjkoJ9EwU7YnNpump",
+            "pnl_sol": 0.0015749167051682944,
+            "run_id": "33769636983",
+            "score": 0.8825411802884386,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452512218188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.002900691156048449,
+            "run_id": "33769636983",
+            "score": 0.9171430863251679,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452964241791441,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Fym5HSFMioNxCmucbs8KtecPfzojSHwd5a63HZywpump",
+            "pnl_sol": 0.00171253949387528,
+            "run_id": "33769636983",
+            "score": 0.9078659825571278,
+            "win": true
+          },
+          {
+            "decision_ns": 1788453153600367613,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "ENsykjD8NSbKeRhPYNGqwe56Vw3QLBq4sLa9HCu3pump",
+            "pnl_sol": 0.0021951807692566216,
+            "run_id": "33769636983",
+            "score": 0.886665900154605,
+            "win": true
+          },
+          {
+            "decision_ns": 1788453213745333783,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "C5ojT7ArR9QCeZYhyt6oB8uWBCfyXtyZL7K1hPrrpump",
+            "pnl_sol": -0.012724801060248515,
+            "run_id": "33769636983",
+            "score": 0.8839170661545405,
+            "win": false
+          },
+          {
+            "decision_ns": 1788454838668686147,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Eowdhbdke18HaJk5gGcW7PQWJmLi8ygyyGZVZ3kJpump",
+            "pnl_sol": 0.0014859438017765514,
+            "run_id": "33781389703",
+            "score": 0.9141478058883488,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455071586877238,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "85xnarwnG742CdwWrSeUF43SorSsm4FKedhA4a5Upump",
+            "pnl_sol": 0.002230034969361014,
+            "run_id": "33781389703",
+            "score": 0.9026670449059248,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455377105893937,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Fz2Vh8wew916j1ee9w6rSEgH9mdffW5bgAMKA1Qmpump",
+            "pnl_sol": 0.001701970058583968,
+            "run_id": "33781389703",
+            "score": 0.9076942933851628,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455489147549489,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "BvnnMjpoFKATfvy8WQ8km34AffaYjFTFNecnMVtUpump",
+            "pnl_sol": -0.013070437856725965,
+            "run_id": "33781389703",
+            "score": 0.8988806173624998,
+            "win": false
+          },
+          {
+            "decision_ns": 1788455571509986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.001705359836466365,
+            "run_id": "33781389703",
+            "score": 0.9081431830223878,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455669004620141,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8eobot6AkC41a4vJtvXeNkskDUNZh4xYDfvUWzZpump",
+            "pnl_sol": 0.0013607844698239266,
+            "run_id": "33781389703",
+            "score": 0.8690323318475318,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456123456313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.0016608632046926433,
+            "run_id": "33781389703",
+            "score": 0.9043413083860264,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456168277236261,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FJ3uPoWfyxpD6gKeHQaZuQ3JY1XKrhVhUAVoFNgEpump",
+            "pnl_sol": 0.003110594735743731,
+            "run_id": "33781389703",
+            "score": 0.9005855356523685,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456225935611159,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Gi8btuCPP2f35kdC6aqANvwaw9Xw1BjYWfh53th8pump",
+            "pnl_sol": 0.0019277278820924865,
+            "run_id": "33781389703",
+            "score": 0.9038279010941357,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456914180114712,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "H3S11Trk55Hq1fUhtkmX3UJsiwKS2CGPwmb9gqeApump",
+            "pnl_sol": 0.002931318238632699,
+            "run_id": "33781389703",
+            "score": 0.8731562237072984,
+            "win": true
+          },
+          {
+            "decision_ns": 1788457284037628381,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "HyiB4DSgwx6cnt426CNK12hb15j8J2GbuhthVJT3pump",
+            "pnl_sol": 0.004891950303028199,
+            "run_id": "33781389703",
+            "score": 0.8690323318475318,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459213463501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.001845211953526854,
+            "run_id": "33781389703",
+            "score": 0.915011293763778,
+            "win": true
+          }
+        ],
+        "ledger_hash": "77d5cbfbddc92d565e72410d03393139a52335a2103e53198268527901aadfe0",
+        "maximum_drawdown_fraction": 0.006792430029084251,
+        "net_pnl_sol": 0.027007189958860867,
+        "profit_factor": 1.7103377149650068,
+        "rejected_concurrency": 0,
+        "threshold": 0.8645143909454248,
+        "trades": 30,
+        "wilson_95_lower_bound": 0.7437855868473338,
+        "win_rate": 0.9,
+        "wins": 27
+      },
+      "validation_positive_labels": 3190
+    },
+    {
+      "horizon_ms": 3000,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.70|take=1.10|hold=30000",
+      "policy_index": 0,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 6344,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": 0.0028381759145827204,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.008822206276332206,
+            "trades": 4,
+            "wins": 4
+          },
+          "33781389703": {
+            "pnl_sol": 0.014022815710459421,
+            "trades": 7,
+            "wins": 7
+          }
+        },
+        "capture_windows": 3,
+        "exit_reasons": {
+          "TAKE_PROFIT": 12
+        },
+        "largest_winner_contribution": 0.1215425677797085,
+        "ledger": [
+          {
+            "decision_ns": 1788421610829716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.0028381759145827204,
+            "run_id": "33716649440",
+            "score": 0.9354997569390701,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452006806366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.00255774609715579,
+            "run_id": "33769636983",
+            "score": 0.9356363076725303,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452037401329381,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "A4fTXrpVpk4Asd4NTuHZwfy4N6GyPiUVoSVahLBgpump",
+            "pnl_sol": 0.0016913580465414343,
+            "run_id": "33769636983",
+            "score": 0.9326241646526471,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452512218188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.0028778688672870187,
+            "run_id": "33769636983",
+            "score": 0.9327663656557446,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452964241791441,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Fym5HSFMioNxCmucbs8KtecPfzojSHwd5a63HZywpump",
+            "pnl_sol": 0.0016952332653479632,
+            "run_id": "33769636983",
+            "score": 0.9350877755626159,
+            "win": true
+          },
+          {
+            "decision_ns": 1788454838668686147,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Eowdhbdke18HaJk5gGcW7PQWJmLi8ygyyGZVZ3kJpump",
+            "pnl_sol": 0.0014818157820552583,
+            "run_id": "33781389703",
+            "score": 0.9356363076725303,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455071586877238,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "85xnarwnG742CdwWrSeUF43SorSsm4FKedhA4a5Upump",
+            "pnl_sol": 0.002225023737972044,
+            "run_id": "33781389703",
+            "score": 0.9328290273991546,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455377105893937,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Fz2Vh8wew916j1ee9w6rSEgH9mdffW5bgAMKA1Qmpump",
+            "pnl_sol": 0.0016975807625719194,
+            "run_id": "33781389703",
+            "score": 0.9320518261668838,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455571509986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.0017170691418640568,
+            "run_id": "33781389703",
+            "score": 0.9274326027421124,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456168277236261,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FJ3uPoWfyxpD6gKeHQaZuQ3JY1XKrhVhUAVoFNgEpump",
+            "pnl_sol": 0.0031216018217274585,
+            "run_id": "33781389703",
+            "score": 0.9274326027421124,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456225935611159,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Gi8btuCPP2f35kdC6aqANvwaw9Xw1BjYWfh53th8pump",
+            "pnl_sol": 0.0019361954521519079,
+            "run_id": "33781389703",
+            "score": 0.9242964615335268,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459213463501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.0018435290121167763,
+            "run_id": "33781389703",
+            "score": 0.9363706427702418,
+            "win": true
+          }
+        ],
+        "ledger_hash": "869dc7051c69ddb53fd4b88f0dac73793781f6650de19f8635087575f7862f24",
+        "maximum_drawdown_fraction": 0.0,
+        "net_pnl_sol": 0.0256831979013743,
+        "profit_factor": 25683197901.374348,
+        "rejected_concurrency": 0,
+        "threshold": 0.9242964615335268,
+        "trades": 12,
+        "wilson_95_lower_bound": 0.7574992425007574,
+        "win_rate": 1.0,
+        "wins": 12
+      },
+      "validation_positive_labels": 3405
+    },
+    {
+      "horizon_ms": 3000,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.80|take=1.10|hold=30000",
+      "policy_index": 10,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 5873,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": 0.0028381759145827204,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.008822206276332206,
+            "trades": 4,
+            "wins": 4
+          },
+          "33781389703": {
+            "pnl_sol": 0.014022815710459421,
+            "trades": 7,
+            "wins": 7
+          }
+        },
+        "capture_windows": 3,
+        "exit_reasons": {
+          "TAKE_PROFIT": 12
+        },
+        "largest_winner_contribution": 0.1215425677797085,
+        "ledger": [
+          {
+            "decision_ns": 1788421610829716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.0028381759145827204,
+            "run_id": "33716649440",
+            "score": 0.9152917296480118,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452006806366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.00255774609715579,
+            "run_id": "33769636983",
+            "score": 0.9081450547536372,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452037401329381,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "A4fTXrpVpk4Asd4NTuHZwfy4N6GyPiUVoSVahLBgpump",
+            "pnl_sol": 0.0016913580465414343,
+            "run_id": "33769636983",
+            "score": 0.9168333801876275,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452512218188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.0028778688672870187,
+            "run_id": "33769636983",
+            "score": 0.917519848742024,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452964241791441,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Fym5HSFMioNxCmucbs8KtecPfzojSHwd5a63HZywpump",
+            "pnl_sol": 0.0016952332653479632,
+            "run_id": "33769636983",
+            "score": 0.9168333801876275,
+            "win": true
+          },
+          {
+            "decision_ns": 1788454838668686147,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Eowdhbdke18HaJk5gGcW7PQWJmLi8ygyyGZVZ3kJpump",
+            "pnl_sol": 0.0014818157820552583,
+            "run_id": "33781389703",
+            "score": 0.917519848742024,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455071586877238,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "85xnarwnG742CdwWrSeUF43SorSsm4FKedhA4a5Upump",
+            "pnl_sol": 0.002225023737972044,
+            "run_id": "33781389703",
+            "score": 0.9073884369334645,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455377105893937,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Fz2Vh8wew916j1ee9w6rSEgH9mdffW5bgAMKA1Qmpump",
+            "pnl_sol": 0.0016975807625719194,
+            "run_id": "33781389703",
+            "score": 0.9113037673629405,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455571509986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.0017170691418640568,
+            "run_id": "33781389703",
+            "score": 0.9127365651467121,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456168277236261,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FJ3uPoWfyxpD6gKeHQaZuQ3JY1XKrhVhUAVoFNgEpump",
+            "pnl_sol": 0.0031216018217274585,
+            "run_id": "33781389703",
+            "score": 0.9117371902856907,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456225935611159,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Gi8btuCPP2f35kdC6aqANvwaw9Xw1BjYWfh53th8pump",
+            "pnl_sol": 0.0019361954521519079,
+            "run_id": "33781389703",
+            "score": 0.9069287521519346,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459213463501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.0018435290121167763,
+            "run_id": "33781389703",
+            "score": 0.919339551334908,
+            "win": true
+          }
+        ],
+        "ledger_hash": "ab0de37e86a1253aabee309175f3b4bf27ebf97890139954aeb683c6fd9fd1ec",
+        "maximum_drawdown_fraction": 0.0,
+        "net_pnl_sol": 0.0256831979013743,
+        "profit_factor": 25683197901.374348,
+        "rejected_concurrency": 0,
+        "threshold": 0.9069287521519346,
+        "trades": 12,
+        "wilson_95_lower_bound": 0.7574992425007574,
+        "win_rate": 1.0,
+        "wins": 12
+      },
+      "validation_positive_labels": 3163
+    },
+    {
+      "horizon_ms": 1000,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.85|take=1.10|hold=30000",
+      "policy_index": 20,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 5815,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": -0.013785325973059141,
+            "trades": 3,
+            "wins": 2
+          },
+          "33741470396": {
+            "pnl_sol": -0.009578704915250431,
+            "trades": 3,
+            "wins": 2
+          },
+          "33769636983": {
+            "pnl_sol": 0.014623525064538623,
+            "trades": 26,
+            "wins": 23
+          },
+          "33781389703": {
+            "pnl_sol": 0.031695317313374737,
+            "trades": 18,
+            "wins": 16
+          }
+        },
+        "capture_windows": 4,
+        "exit_reasons": {
+          "INITIAL_STOP": 6,
+          "MAXIMUM_HOLD": 1,
+          "TAKE_PROFIT": 43
+        },
+        "largest_winner_contribution": 0.0610075185075231,
+        "ledger": [
+          {
+            "decision_ns": 1788421359520287394,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "8u9vXyvEfwk8znA4K3PCsa26jGUgvPfvxVYTYemRpump",
+            "pnl_sol": -0.017286615926850622,
+            "run_id": "33716649440",
+            "score": 0.9175670157479927,
+            "win": false
+          },
+          {
+            "decision_ns": 1788421608829716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.0018726452313873806,
+            "run_id": "33716649440",
+            "score": 0.901905271860037,
+            "win": true
+          },
+          {
+            "decision_ns": 1788421739925465286,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "887fP8gGVr6XNcViQB4QDq43GR5xgQ8erXz4rToNpump",
+            "pnl_sol": 0.0016286447224041004,
+            "run_id": "33716649440",
+            "score": 0.896592092552062,
+            "win": true
+          },
+          {
+            "decision_ns": 1788442462904239840,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "9yBouawm5Jn7xg33nZ5STzM8nWY8WJENxNH39J2bpump",
+            "pnl_sol": -0.012910855318378801,
+            "run_id": "33741470396",
+            "score": 0.9007346526422582,
+            "win": false
+          },
+          {
+            "decision_ns": 1788442570782974643,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "2LQeM1j8t4pDSFP4zK3XKcdoJo1D7XDuR9AzWGtCpump",
+            "pnl_sol": 0.0013342418903220452,
+            "run_id": "33741470396",
+            "score": 0.8996120457614314,
+            "win": true
+          },
+          {
+            "decision_ns": 1788442633271838180,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "E9N9ZmHHj6simihEbzNicfboVVktEj2N5UVaf8xYpump",
+            "pnl_sol": 0.001997908512806325,
+            "run_id": "33741470396",
+            "score": 0.8980288754912256,
+            "win": true
+          },
+          {
+            "decision_ns": 1788447433340820011,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "3qBmGVxj6m4Kth1kwDw2uvWptdAQu2DyCedP1hUipump",
+            "pnl_sol": 0.0013254244561672138,
+            "run_id": "33769636983",
+            "score": 0.8998050161986217,
+            "win": true
+          },
+          {
+            "decision_ns": 1788447499047066388,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "9qu9DCgd96TjaNuNSQSWjNyCNR1GnJHHgWFYRkskpump",
+            "pnl_sol": 0.004611217372115506,
+            "run_id": "33769636983",
+            "score": 0.8973819778926214,
+            "win": true
+          },
+          {
+            "decision_ns": 1788447507256128612,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "AXJ3BveVyVPa9WdxWdEb6kY7WqJMtPhLNefXR7eapump",
+            "pnl_sol": 0.0016135369345707043,
+            "run_id": "33769636983",
+            "score": 0.8999153485466801,
+            "win": true
+          },
+          {
+            "decision_ns": 1788447888752447143,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "6EgQXYJszxL5t7iAi8QTzy6VVhcmq1gMMrj3AepTpump",
+            "pnl_sol": 0.002916240437137417,
+            "run_id": "33769636983",
+            "score": 0.9086216246798855,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448063982514719,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "2rutC5YTtPhYu7nsYwMb5X6SRL84hZE6h9aFVf3Hpump",
+            "pnl_sol": -0.012605433629405263,
+            "run_id": "33769636983",
+            "score": 0.9006257356740444,
+            "win": false
+          },
+          {
+            "decision_ns": 1788448097941891340,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "9Uavku8occEnJCHxPU4irprsgPGqizx79NBkvrGQpump",
+            "pnl_sol": 0.0021990065505710574,
+            "run_id": "33769636983",
+            "score": 0.8980131573354029,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448099524889721,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "8cM4pxWu3KDeAfCy6d4ynMwbzhAS6GkqYvMbZnrzpump",
+            "pnl_sol": -0.012319742253888398,
+            "run_id": "33769636983",
+            "score": 0.9112228346276581,
+            "win": false
+          },
+          {
+            "decision_ns": 1788448208063633730,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "HLqWtyQu458jQv4iYXkh5WHEb5hyn2Bb1XUumgqtpump",
+            "pnl_sol": 0.001495294397034115,
+            "run_id": "33769636983",
+            "score": 0.9018689247155245,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448313191454514,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "85LENmh3qH2KajsdbNoPnbSAWbd9MY2z5BiPsjdzpump",
+            "pnl_sol": 0.003322644617537132,
+            "run_id": "33769636983",
+            "score": 0.9050228798887202,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448379171830271,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "2gR3kxx1tQ8K2A1iic2JdY5atiCaPkoqUcKCz7eGpump",
+            "pnl_sol": 0.0014419397964705663,
+            "run_id": "33769636983",
+            "score": 0.9044081831690558,
+            "win": true
+          },
+          {
+            "decision_ns": 1788448854125186914,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "5Pvs2s39SgVjH5DycX8PdAD8jZwM3qfQuXHNPzE6pump",
+            "pnl_sol": 0.0019653226545340505,
+            "run_id": "33769636983",
+            "score": 0.9083940800635768,
+            "win": true
+          },
+          {
+            "decision_ns": 1788449279002636649,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7EEuzaJBDgEc1RNi8UAzW2h26KA1sfkpwXmCyf5cpump",
+            "pnl_sol": 0.003366956431443302,
+            "run_id": "33769636983",
+            "score": 0.9090940173131761,
+            "win": true
+          },
+          {
+            "decision_ns": 1788449657755060481,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "3ubwt6E2KuctFL8NLTDLDBHy6cGYgQJpWzp4SjS3pump",
+            "pnl_sol": 0.0015098352336509815,
+            "run_id": "33769636983",
+            "score": 0.9064887991234052,
+            "win": true
+          },
+          {
+            "decision_ns": 1788449843345039601,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "AzocPhJAq7Rzn1mFCZxdw6A1QWD6RHn13Dt9AsGGpump",
+            "pnl_sol": 0.0015357653720194167,
+            "run_id": "33769636983",
+            "score": 0.8994272990007117,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450405981415670,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "72UFTDfqMEwThFCg7rPFvNqCf1Qn3ix63SadJVfFpump",
+            "pnl_sol": 0.0018440685071475851,
+            "run_id": "33769636983",
+            "score": 0.9138920022923168,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450945928759532,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+            "pnl_sol": 0.0036268222700410954,
+            "run_id": "33769636983",
+            "score": 0.9164295666519677,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450979775498533,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "679fne1mfgLnxuUbtDpdxcqjXjdkt8qNwWHpTDBLpump",
+            "pnl_sol": 0.0019634718528142164,
+            "run_id": "33769636983",
+            "score": 0.904305437566197,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450992483152332,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "9hNXfSyszgMFay8rXUTBTu46zKcPkYEQU3HFp4v9pump",
+            "pnl_sol": 0.0013151149837548753,
+            "run_id": "33769636983",
+            "score": 0.9001611248026627,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452004806366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.0018116768393624874,
+            "run_id": "33769636983",
+            "score": 0.931379142209458,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452035401329381,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "A4fTXrpVpk4Asd4NTuHZwfy4N6GyPiUVoSVahLBgpump",
+            "pnl_sol": 0.0028373579818840797,
+            "run_id": "33769636983",
+            "score": 0.9120372423593888,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452510218188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.0026439994203753397,
+            "run_id": "33769636983",
+            "score": 0.9338906576093564,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452516248235925,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FyG29XSuBsY6jrU3uAiyp1di2WoSdtGabwPFmM5qpump",
+            "pnl_sol": 0.0016822227495725192,
+            "run_id": "33769636983",
+            "score": 0.8995286139045909,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452601205753714,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "6593PYD9tSS8rEPtQQns2wuLudr5hQismWXPGQzKpump",
+            "pnl_sol": 0.003792892238055262,
+            "run_id": "33769636983",
+            "score": 0.9001604807750917,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452933973618083,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "BAcZ65wjAqJLenrVMM751L3ZVTBwzRa4GgvYp7DQpump",
+            "pnl_sol": -0.013487250867284292,
+            "run_id": "33769636983",
+            "score": 0.9226363113354955,
+            "win": false
+          },
+          {
+            "decision_ns": 1788452962241791441,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Fym5HSFMioNxCmucbs8KtecPfzojSHwd5a63HZywpump",
+            "pnl_sol": 0.0015372761766183213,
+            "run_id": "33769636983",
+            "score": 0.914605619319876,
+            "win": true
+          },
+          {
+            "decision_ns": 1788453151600367613,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "ENsykjD8NSbKeRhPYNGqwe56Vw3QLBq4sLa9HCu3pump",
+            "pnl_sol": 0.002677864542239332,
+            "run_id": "33769636983",
+            "score": 0.9167153393605326,
+            "win": true
+          },
+          {
+            "decision_ns": 1788454836668686147,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Eowdhbdke18HaJk5gGcW7PQWJmLi8ygyyGZVZ3kJpump",
+            "pnl_sol": 0.002622351098969848,
+            "run_id": "33781389703",
+            "score": 0.9059501756125359,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455069586877238,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "85xnarwnG742CdwWrSeUF43SorSsm4FKedhA4a5Upump",
+            "pnl_sol": 0.0034762006496696363,
+            "run_id": "33781389703",
+            "score": 0.896592092552062,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455375105893937,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Fz2Vh8wew916j1ee9w6rSEgH9mdffW5bgAMKA1Qmpump",
+            "pnl_sol": 0.003414229913184852,
+            "run_id": "33781389703",
+            "score": 0.9105897198179991,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455487147549489,
+            "exit_reason": "INITIAL_STOP",
+            "mint": "BvnnMjpoFKATfvy8WQ8km34AffaYjFTFNecnMVtUpump",
+            "pnl_sol": -0.012588954884412452,
+            "run_id": "33781389703",
+            "score": 0.9027954258060954,
+            "win": false
+          },
+          {
+            "decision_ns": 1788455569509986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.002630170938285395,
+            "run_id": "33781389703",
+            "score": 0.9124884340596437,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455667004620141,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8eobot6AkC41a4vJtvXeNkskDUNZh4xYDfvUWzZpump",
+            "pnl_sol": 0.006942666357316371,
+            "run_id": "33781389703",
+            "score": 0.901377304281681,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456121456313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.002511333341316209,
+            "run_id": "33781389703",
+            "score": 0.9251982718231535,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456166277236261,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FJ3uPoWfyxpD6gKeHQaZuQ3JY1XKrhVhUAVoFNgEpump",
+            "pnl_sol": 0.001687567762314053,
+            "run_id": "33781389703",
+            "score": 0.9317336596735737,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456223935611159,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Gi8btuCPP2f35kdC6aqANvwaw9Xw1BjYWfh53th8pump",
+            "pnl_sol": 0.0027356427197730085,
+            "run_id": "33781389703",
+            "score": 0.9152594260122993,
+            "win": true
+          },
+          {
+            "decision_ns": 1788457538300354234,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FrrLuUmX6DzZvQ8rhbmk74zar6VTkFrfRPt9ACE2pump",
+            "pnl_sol": 0.006909515962781207,
+            "run_id": "33781389703",
+            "score": 0.9016644003384414,
+            "win": true
+          },
+          {
+            "decision_ns": 1788457555484310590,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "5rMyF81GuoQJoiY47qNMsJ1839SFevCaP1DzgEumpump",
+            "pnl_sol": 0.002845792535606212,
+            "run_id": "33781389703",
+            "score": 0.8985197127328107,
+            "win": true
+          },
+          {
+            "decision_ns": 1788458256672041176,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "nQys4VBMb8roPg6UEsN1QcvJvtzjPJi4UgBWUrSpump",
+            "pnl_sol": 0.0029675551784400095,
+            "run_id": "33781389703",
+            "score": 0.9064492400946738,
+            "win": true
+          },
+          {
+            "decision_ns": 1788458495802593406,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "3t3LqNaH84NjmcNa8m3BUFAowwfAMGPEgDGqdnwfpump",
+            "pnl_sol": 0.0022626951775222975,
+            "run_id": "33781389703",
+            "score": 0.901377304281681,
+            "win": true
+          },
+          {
+            "decision_ns": 1788458647776252114,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7T2uZWHbnGzUcj6LV9TxVVWVgZZnsG1FesaBUUrKpump",
+            "pnl_sol": 0.0024441584686449233,
+            "run_id": "33781389703",
+            "score": 0.9003418841080698,
+            "win": true
+          },
+          {
+            "decision_ns": 1788458680261288639,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "79pYpjWUQUVmJ2frJvdGCWKvbtTg5thgGDxnD357pump",
+            "pnl_sol": 0.0014472438090583906,
+            "run_id": "33781389703",
+            "score": 0.9082419904621168,
+            "win": true
+          },
+          {
+            "decision_ns": 1788458818868725376,
+            "exit_reason": "MAXIMUM_HOLD",
+            "mint": "6HPkZvTrhvynsDfucPL8ybunMuoCyQgYY3dng4Hjpump",
+            "pnl_sol": -0.009646511856984251,
+            "run_id": "33781389703",
+            "score": 0.8986986995669762,
+            "win": false
+          },
+          {
+            "decision_ns": 1788458830366775698,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "HDwQmiG8DggTcttZpMAKHRRvym12DzbdhX1FbHjtpump",
+            "pnl_sol": 0.0062129798552852805,
+            "run_id": "33781389703",
+            "score": 0.9023589174637432,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459211463501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.0028206802866037467,
+            "run_id": "33781389703",
+            "score": 0.9316834270410015,
+            "win": true
+          }
+        ],
+        "ledger_hash": "e9e19b398aa8f16fd0cbc6995e2b38bf34b962afc23c00f96527a6f3263918dc",
+        "maximum_drawdown_fraction": 0.0118745936736806,
+        "net_pnl_sol": 0.02295481148960299,
+        "profit_factor": 1.2526800520423587,
+        "rejected_concurrency": 0,
+        "threshold": 0.896592092552062,
+        "trades": 50,
+        "wilson_95_lower_bound": 0.7381354280147191,
+        "win_rate": 0.86,
+        "wins": 43
+      },
+      "validation_positive_labels": 3100
+    },
+    {
+      "horizon_ms": 250,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.90|take=1.10|hold=30000",
+      "policy_index": 30,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 5993,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": 0.001954492861257366,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.007347418280409183,
+            "trades": 3,
+            "wins": 3
+          },
+          "33781389703": {
+            "pnl_sol": 0.011743145898500632,
+            "trades": 4,
+            "wins": 4
+          }
+        },
+        "capture_windows": 3,
+        "exit_reasons": {
+          "TAKE_PROFIT": 8
+        },
+        "largest_winner_contribution": 0.17916991251313702,
+        "ledger": [
+          {
+            "decision_ns": 1788421608079716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.001954492861257366,
+            "run_id": "33716649440",
+            "score": 0.9514221680603964,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450945178759532,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+            "pnl_sol": 0.0029985024059197007,
+            "run_id": "33769636983",
+            "score": 0.9436551496625356,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452004056366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.001645635905323524,
+            "run_id": "33769636983",
+            "score": 0.9437741255340869,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452509468188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.0027032799691659587,
+            "run_id": "33769636983",
+            "score": 0.9436551496625356,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455568759986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.002748020700082794,
+            "run_id": "33781389703",
+            "score": 0.951300002861661,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456120706313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.0037706410287207323,
+            "run_id": "33781389703",
+            "score": 0.9436551496625356,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456223185611159,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Gi8btuCPP2f35kdC6aqANvwaw9Xw1BjYWfh53th8pump",
+            "pnl_sol": 0.0015347983432981022,
+            "run_id": "33781389703",
+            "score": 0.9346195658308629,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459210713501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.003689685826399003,
+            "run_id": "33781389703",
+            "score": 0.9404556377516389,
+            "win": true
+          }
+        ],
+        "ledger_hash": "3b26556cefc8b602f063c60e97c23cd6fe26222c1d3ed8e9e7ab038a96cf1b9d",
+        "maximum_drawdown_fraction": 0.0,
+        "net_pnl_sol": 0.021045057040166792,
+        "profit_factor": 21045057040.167183,
+        "rejected_concurrency": 0,
+        "threshold": 0.9346195658308629,
+        "trades": 8,
+        "wilson_95_lower_bound": 0.6755843804891231,
+        "win_rate": 1.0,
+        "wins": 8
+      },
+      "validation_positive_labels": 3062
+    },
+    {
+      "horizon_ms": 250,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.80|take=1.10|hold=60000",
+      "policy_index": 11,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 7107,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": 0.001954492861257366,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.008818172972772147,
+            "trades": 4,
+            "wins": 4
+          },
+          "33781389703": {
+            "pnl_sol": 0.010213384016927375,
+            "trades": 3,
+            "wins": 3
+          }
+        },
+        "capture_windows": 3,
+        "exit_reasons": {
+          "TAKE_PROFIT": 8
+        },
+        "largest_winner_contribution": 0.17980828689533077,
+        "ledger": [
+          {
+            "decision_ns": 1788421608079716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.001954492861257366,
+            "run_id": "33716649440",
+            "score": 0.9555110521454464,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450945178759532,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+            "pnl_sol": 0.0029985024059197007,
+            "run_id": "33769636983",
+            "score": 0.9541526751438565,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452004056366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.001645635905323524,
+            "run_id": "33769636983",
+            "score": 0.9527036692943363,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452509468188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.0027032799691659587,
+            "run_id": "33769636983",
+            "score": 0.9541526751438565,
+            "win": true
+          },
+          {
+            "decision_ns": 1788453150850367613,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "ENsykjD8NSbKeRhPYNGqwe56Vw3QLBq4sLa9HCu3pump",
+            "pnl_sol": 0.0014707546923629633,
+            "run_id": "33769636983",
+            "score": 0.9543124071773094,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455568759986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.002750343673218754,
+            "run_id": "33781389703",
+            "score": 0.9525246085627372,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456120706313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.0037734656724005694,
+            "run_id": "33781389703",
+            "score": 0.9527036692943363,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459210713501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.003689574671308052,
+            "run_id": "33781389703",
+            "score": 0.9538950318999627,
+            "win": true
+          }
+        ],
+        "ledger_hash": "5b011d7164cad113287ba4ac78a67d6605793a8c238eb1de5a780cd4ed5133c4",
+        "maximum_drawdown_fraction": 0.0,
+        "net_pnl_sol": 0.020986049850956423,
+        "profit_factor": 20986049850.95689,
+        "rejected_concurrency": 0,
+        "threshold": 0.9525246085627372,
+        "trades": 8,
+        "wilson_95_lower_bound": 0.6755843804891231,
+        "win_rate": 1.0,
+        "wins": 8
+      },
+      "validation_positive_labels": 3706
+    },
+    {
+      "horizon_ms": 250,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.85|take=1.10|hold=60000",
+      "policy_index": 21,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 6702,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": 0.001954492861257366,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.008818172972772147,
+            "trades": 4,
+            "wins": 4
+          },
+          "33781389703": {
+            "pnl_sol": 0.010213384016927375,
+            "trades": 3,
+            "wins": 3
+          }
+        },
+        "capture_windows": 3,
+        "exit_reasons": {
+          "TAKE_PROFIT": 8
+        },
+        "largest_winner_contribution": 0.17980828689533077,
+        "ledger": [
+          {
+            "decision_ns": 1788421608079716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.001954492861257366,
+            "run_id": "33716649440",
+            "score": 0.9465250058440627,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450945178759532,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+            "pnl_sol": 0.0029985024059197007,
+            "run_id": "33769636983",
+            "score": 0.9488724068833765,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452004056366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.001645635905323524,
+            "run_id": "33769636983",
+            "score": 0.9489060430535348,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452509468188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.0027032799691659587,
+            "run_id": "33769636983",
+            "score": 0.9488724068833765,
+            "win": true
+          },
+          {
+            "decision_ns": 1788453150850367613,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "ENsykjD8NSbKeRhPYNGqwe56Vw3QLBq4sLa9HCu3pump",
+            "pnl_sol": 0.0014707546923629633,
+            "run_id": "33769636983",
+            "score": 0.9453915770322578,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455568759986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.002750343673218754,
+            "run_id": "33781389703",
+            "score": 0.9471723449402417,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456120706313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.0037734656724005694,
+            "run_id": "33781389703",
+            "score": 0.9489060430535348,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459210713501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.003689574671308052,
+            "run_id": "33781389703",
+            "score": 0.9488724068833765,
+            "win": true
+          }
+        ],
+        "ledger_hash": "131e4a5f1e711243b94f3814218791c7ed765ca7f43ad6147023b1af12dcf5f1",
+        "maximum_drawdown_fraction": 0.0,
+        "net_pnl_sol": 0.020986049850956423,
+        "profit_factor": 20986049850.95689,
+        "rejected_concurrency": 0,
+        "threshold": 0.9453915770322578,
+        "trades": 8,
+        "wilson_95_lower_bound": 0.6755843804891231,
+        "win_rate": 1.0,
+        "wins": 8
+      },
+      "validation_positive_labels": 3501
+    },
+    {
+      "horizon_ms": 250,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.80|take=1.10|hold=30000",
+      "policy_index": 10,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 6791,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": 0.001954492861257366,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.008818172972772147,
+            "trades": 4,
+            "wins": 4
+          },
+          "33781389703": {
+            "pnl_sol": 0.010213384016927375,
+            "trades": 3,
+            "wins": 3
+          }
+        },
+        "capture_windows": 3,
+        "exit_reasons": {
+          "TAKE_PROFIT": 8
+        },
+        "largest_winner_contribution": 0.17980828689533077,
+        "ledger": [
+          {
+            "decision_ns": 1788421608079716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.001954492861257366,
+            "run_id": "33716649440",
+            "score": 0.9630885981857784,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450945178759532,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+            "pnl_sol": 0.0029985024059197007,
+            "run_id": "33769636983",
+            "score": 0.9592124108836072,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452004056366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.001645635905323524,
+            "run_id": "33769636983",
+            "score": 0.9608334920424726,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452509468188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.0027032799691659587,
+            "run_id": "33769636983",
+            "score": 0.9592124108836072,
+            "win": true
+          },
+          {
+            "decision_ns": 1788453150850367613,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "ENsykjD8NSbKeRhPYNGqwe56Vw3QLBq4sLa9HCu3pump",
+            "pnl_sol": 0.0014707546923629633,
+            "run_id": "33769636983",
+            "score": 0.9580550484491583,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455568759986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.002750343673218754,
+            "run_id": "33781389703",
+            "score": 0.9630885981857784,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456120706313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.0037734656724005694,
+            "run_id": "33781389703",
+            "score": 0.960652219254301,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459210713501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.003689574671308052,
+            "run_id": "33781389703",
+            "score": 0.9609596995419611,
+            "win": true
+          }
+        ],
+        "ledger_hash": "b48b47432a354f4cbc4a42bb8e20c9f41a2711037255f7ed59e21fdeef6265c8",
+        "maximum_drawdown_fraction": 0.0,
+        "net_pnl_sol": 0.020986049850956423,
+        "profit_factor": 20986049850.95689,
+        "rejected_concurrency": 0,
+        "threshold": 0.9580550484491583,
+        "trades": 8,
+        "wilson_95_lower_bound": 0.6755843804891231,
+        "win_rate": 1.0,
+        "wins": 8
+      },
+      "validation_positive_labels": 3493
+    },
+    {
+      "horizon_ms": 250,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.90|take=1.10|hold=60000",
+      "policy_index": 31,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 6285,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": 0.001954492861257366,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.008818172972772147,
+            "trades": 4,
+            "wins": 4
+          },
+          "33781389703": {
+            "pnl_sol": 0.010213384016927375,
+            "trades": 3,
+            "wins": 3
+          }
+        },
+        "capture_windows": 3,
+        "exit_reasons": {
+          "TAKE_PROFIT": 8
+        },
+        "largest_winner_contribution": 0.17980828689533077,
+        "ledger": [
+          {
+            "decision_ns": 1788421608079716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.001954492861257366,
+            "run_id": "33716649440",
+            "score": 0.9444899463944524,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450945178759532,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+            "pnl_sol": 0.0029985024059197007,
+            "run_id": "33769636983",
+            "score": 0.9373033275681073,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452004056366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.001645635905323524,
+            "run_id": "33769636983",
+            "score": 0.93893696413672,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452509468188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.0027032799691659587,
+            "run_id": "33769636983",
+            "score": 0.9373033275681073,
+            "win": true
+          },
+          {
+            "decision_ns": 1788453150850367613,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "ENsykjD8NSbKeRhPYNGqwe56Vw3QLBq4sLa9HCu3pump",
+            "pnl_sol": 0.0014707546923629633,
+            "run_id": "33769636983",
+            "score": 0.932470590023326,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455568759986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.002750343673218754,
+            "run_id": "33781389703",
+            "score": 0.9444899463944524,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456120706313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.0037734656724005694,
+            "run_id": "33781389703",
+            "score": 0.93893696413672,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459210713501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.003689574671308052,
+            "run_id": "33781389703",
+            "score": 0.93893696413672,
+            "win": true
+          }
+        ],
+        "ledger_hash": "4c9480f20d4d7d87c391fbd91adc1dc8c7414a97969618b5ade199c8313f96c6",
+        "maximum_drawdown_fraction": 0.0,
+        "net_pnl_sol": 0.020986049850956423,
+        "profit_factor": 20986049850.95689,
+        "rejected_concurrency": 0,
+        "threshold": 0.932470590023326,
+        "trades": 8,
+        "wilson_95_lower_bound": 0.6755843804891231,
+        "win_rate": 1.0,
+        "wins": 8
+      },
+      "validation_positive_labels": 3255
+    },
+    {
+      "horizon_ms": 250,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.85|take=1.10|hold=30000",
+      "policy_index": 20,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 6398,
+      "validation": {
+        "by_capture_window": {
+          "33769636983": {
+            "pnl_sol": 0.008807199878798543,
+            "trades": 4,
+            "wins": 4
+          },
+          "33781389703": {
+            "pnl_sol": 0.01160920384055375,
+            "trades": 4,
+            "wins": 4
+          }
+        },
+        "capture_windows": 2,
+        "exit_reasons": {
+          "TAKE_PROFIT": 8
+        },
+        "largest_winner_contribution": 0.18462808689351312,
+        "ledger": [
+          {
+            "decision_ns": 1788450945178759532,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+            "pnl_sol": 0.0029952447583581204,
+            "run_id": "33769636983",
+            "score": 0.957244195557419,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452004056366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.0016432574873208455,
+            "run_id": "33769636983",
+            "score": 0.9573445309330841,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452509468188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.0027002104421371687,
+            "run_id": "33769636983",
+            "score": 0.957244195557419,
+            "win": true
+          },
+          {
+            "decision_ns": 1788453150850367613,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "ENsykjD8NSbKeRhPYNGqwe56Vw3QLBq4sLa9HCu3pump",
+            "pnl_sol": 0.001468487190982408,
+            "run_id": "33769636983",
+            "score": 0.9581864104299743,
+            "win": true
+          },
+          {
+            "decision_ns": 1788454835918686147,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Eowdhbdke18HaJk5gGcW7PQWJmLi8ygyyGZVZ3kJpump",
+            "pnl_sol": 0.002617197963810533,
+            "run_id": "33781389703",
+            "score": 0.9522211751253291,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456120706313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.0037694415599496198,
+            "run_id": "33781389703",
+            "score": 0.9573445309330841,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456223185611159,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Gi8btuCPP2f35kdC6aqANvwaw9Xw1BjYWfh53th8pump",
+            "pnl_sol": 0.001534062719265511,
+            "run_id": "33781389703",
+            "score": 0.9522211751253291,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459210713501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.0036885015975280863,
+            "run_id": "33781389703",
+            "score": 0.9575803691194956,
+            "win": true
+          }
+        ],
+        "ledger_hash": "fc3d09c6dc6e5aef66ca6d118a3ff12fd1146465ef91016574d92aea16e75dd9",
+        "maximum_drawdown_fraction": 0.0,
+        "net_pnl_sol": 0.02041640371935216,
+        "profit_factor": 20416403719.352295,
+        "rejected_concurrency": 0,
+        "threshold": 0.9522211751253291,
+        "trades": 8,
+        "wilson_95_lower_bound": 0.6755843804891231,
+        "win_rate": 1.0,
+        "wins": 8
+      },
+      "validation_positive_labels": 3299
+    },
+    {
+      "horizon_ms": 1000,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.70|take=1.10|hold=30000",
+      "policy_index": 0,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 6744,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": 0.0018951185150000507,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.012446809295141338,
+            "trades": 5,
+            "wins": 5
+          },
+          "33781389703": {
+            "pnl_sol": 0.0053517989045794925,
+            "trades": 2,
+            "wins": 2
+          }
+        },
+        "capture_windows": 3,
+        "exit_reasons": {
+          "TAKE_PROFIT": 8
+        },
+        "largest_winner_contribution": 0.1861795016974915,
+        "ledger": [
+          {
+            "decision_ns": 1788421608829716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.0018951185150000507,
+            "run_id": "33716649440",
+            "score": 0.9247854683829225,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450945928759532,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+            "pnl_sol": 0.0036665682263133104,
+            "run_id": "33769636983",
+            "score": 0.9252080996289863,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452004806366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.0018344129426469402,
+            "run_id": "33769636983",
+            "score": 0.9321563498093466,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452510218188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.002667277893299125,
+            "run_id": "33769636983",
+            "score": 0.9252080996289863,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452962241791441,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Fym5HSFMioNxCmucbs8KtecPfzojSHwd5a63HZywpump",
+            "pnl_sol": 0.0015645739770860367,
+            "run_id": "33769636983",
+            "score": 0.922592606848427,
+            "win": true
+          },
+          {
+            "decision_ns": 1788453151600367613,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "ENsykjD8NSbKeRhPYNGqwe56Vw3QLBq4sLa9HCu3pump",
+            "pnl_sol": 0.002713976255795926,
+            "run_id": "33769636983",
+            "score": 0.930248384555753,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456121456313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.0025363209854423474,
+            "run_id": "33781389703",
+            "score": 0.9252080996289863,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459211463501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.002815477919137145,
+            "run_id": "33781389703",
+            "score": 0.9241347687921735,
+            "win": true
+          }
+        ],
+        "ledger_hash": "2ebece3b622e68e01cc98a72356d1d3a210991a9bdea812f8c7caa3d28fbbbe5",
+        "maximum_drawdown_fraction": 0.0,
+        "net_pnl_sol": 0.019693726714721027,
+        "profit_factor": 19693726714.720882,
+        "rejected_concurrency": 0,
+        "threshold": 0.922592606848427,
+        "trades": 8,
+        "wilson_95_lower_bound": 0.6755843804891231,
+        "win_rate": 1.0,
+        "wins": 8
+      },
+      "validation_positive_labels": 3559
+    },
+    {
+      "horizon_ms": 3000,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.80|take=1.10|hold=60000",
+      "policy_index": 11,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 6180,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": 0.0028381759145827204,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.007126973010984243,
+            "trades": 3,
+            "wins": 3
+          },
+          "33781389703": {
+            "pnl_sol": 0.008316906734144147,
+            "trades": 4,
+            "wins": 4
+          }
+        },
+        "capture_windows": 3,
+        "exit_reasons": {
+          "TAKE_PROFIT": 8
+        },
+        "largest_winner_contribution": 0.17024085244470516,
+        "ledger": [
+          {
+            "decision_ns": 1788421610829716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.0028381759145827204,
+            "run_id": "33716649440",
+            "score": 0.919933682162547,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452006806366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.00255774609715579,
+            "run_id": "33769636983",
+            "score": 0.9180954005175788,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452037401329381,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "A4fTXrpVpk4Asd4NTuHZwfy4N6GyPiUVoSVahLBgpump",
+            "pnl_sol": 0.0016913580465414343,
+            "run_id": "33769636983",
+            "score": 0.9163535185319619,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452512218188555,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+            "pnl_sol": 0.0028778688672870187,
+            "run_id": "33769636983",
+            "score": 0.919933682162547,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455571509986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.0017083104962535706,
+            "run_id": "33781389703",
+            "score": 0.919933682162547,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456123456313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.0016621221621681698,
+            "run_id": "33781389703",
+            "score": 0.9151473805366975,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456168277236261,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "FJ3uPoWfyxpD6gKeHQaZuQ3JY1XKrhVhUAVoFNgEpump",
+            "pnl_sol": 0.003112352739950766,
+            "run_id": "33781389703",
+            "score": 0.9163535185319619,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459213463501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.0018341213357716407,
+            "run_id": "33781389703",
+            "score": 0.9209651305399149,
+            "win": true
+          }
+        ],
+        "ledger_hash": "4a64b32c3d19180c2db01cccba9f6431fd3de5d6737e1671c70a43e2d0401fe1",
+        "maximum_drawdown_fraction": 0.0,
+        "net_pnl_sol": 0.01828205565971075,
+        "profit_factor": 18282055659.71111,
+        "rejected_concurrency": 0,
+        "threshold": 0.9151473805366975,
+        "trades": 8,
+        "wilson_95_lower_bound": 0.6755843804891231,
+        "win_rate": 1.0,
+        "wins": 8
+      },
+      "validation_positive_labels": 3377
+    },
+    {
+      "horizon_ms": 250,
+      "model_family": "hist_gradient_boosting",
+      "policy": "stop=0.70|take=1.10|hold=30000",
+      "policy_index": 0,
+      "priority_fee_sol": 0.001,
+      "train_positive_labels": 7280,
+      "validation": {
+        "by_capture_window": {
+          "33716649440": {
+            "pnl_sol": 0.001954492861257366,
+            "trades": 1,
+            "wins": 1
+          },
+          "33769636983": {
+            "pnl_sol": 0.006107137623982975,
+            "trades": 4,
+            "wins": 4
+          },
+          "33781389703": {
+            "pnl_sol": 0.010198760965776432,
+            "trades": 3,
+            "wins": 3
+          }
+        },
+        "capture_windows": 3,
+        "exit_reasons": {
+          "TAKE_PROFIT": 8
+        },
+        "largest_winner_contribution": 0.2063624446292251,
+        "ledger": [
+          {
+            "decision_ns": 1788421608079716029,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+            "pnl_sol": 0.001954492861257366,
+            "run_id": "33716649440",
+            "score": 0.9551353247426546,
+            "win": true
+          },
+          {
+            "decision_ns": 1788450979025498533,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "679fne1mfgLnxuUbtDpdxcqjXjdkt8qNwWHpTDBLpump",
+            "pnl_sol": 0.0015554361977619321,
+            "run_id": "33769636983",
+            "score": 0.9536765316856238,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452004056366792,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+            "pnl_sol": 0.0016438827633204547,
+            "run_id": "33769636983",
+            "score": 0.9485040913872089,
+            "win": true
+          },
+          {
+            "decision_ns": 1788452034651329381,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "A4fTXrpVpk4Asd4NTuHZwfy4N6GyPiUVoSVahLBgpump",
+            "pnl_sol": 0.001440191613822285,
+            "run_id": "33769636983",
+            "score": 0.9566406659280986,
+            "win": true
+          },
+          {
+            "decision_ns": 1788453150850367613,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "ENsykjD8NSbKeRhPYNGqwe56Vw3QLBq4sLa9HCu3pump",
+            "pnl_sol": 0.001467627049078303,
+            "run_id": "33769636983",
+            "score": 0.9473220864121725,
+            "win": true
+          },
+          {
+            "decision_ns": 1788455568759986804,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+            "pnl_sol": 0.00274606174753899,
+            "run_id": "33781389703",
+            "score": 0.9580102240241477,
+            "win": true
+          },
+          {
+            "decision_ns": 1788456120706313977,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+            "pnl_sol": 0.0037682590197184243,
+            "run_id": "33781389703",
+            "score": 0.9485040913872089,
+            "win": true
+          },
+          {
+            "decision_ns": 1788459210713501852,
+            "exit_reason": "TAKE_PROFIT",
+            "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+            "pnl_sol": 0.003684440198519018,
+            "run_id": "33781389703",
+            "score": 0.9482901566816427,
+            "win": true
+          }
+        ],
+        "ledger_hash": "7a9bc74db002ec23193e5be979c12052628652fffe09bb790244d2cb0c521bd5",
+        "maximum_drawdown_fraction": 0.0,
+        "net_pnl_sol": 0.018260391451016655,
+        "profit_factor": 18260391451.016773,
+        "rejected_concurrency": 0,
+        "threshold": 0.9473220864121725,
+        "trades": 8,
+        "wilson_95_lower_bound": 0.6755843804891231,
+        "win_rate": 1.0,
+        "wins": 8
+      },
+      "validation_positive_labels": 3769
+    }
+  ],
+  "version": "e4-v12-profit-survival-v1",
+  "winner": {
+    "horizon_ms": 250,
+    "model_family": "hist_gradient_boosting",
+    "policy": "stop=0.70|take=1.20|hold=60000",
+    "policy_index": 3,
+    "priority_fee_sol": 0.001,
+    "train_positive_labels": 6444,
+    "validation": {
+      "by_capture_window": {
+        "33716649440": {
+          "pnl_sol": 0.015616234233445624,
+          "trades": 2,
+          "wins": 2
+        },
+        "33741470396": {
+          "pnl_sol": 0.011324549870782318,
+          "trades": 1,
+          "wins": 1
+        },
+        "33769636983": {
+          "pnl_sol": 0.08214817958674023,
+          "trades": 10,
+          "wins": 10
+        },
+        "33781389703": {
+          "pnl_sol": 0.05761514086345515,
+          "trades": 7,
+          "wins": 7
+        }
+      },
+      "capture_windows": 4,
+      "exit_reasons": {
+        "TAKE_PROFIT": 20
+      },
+      "largest_winner_contribution": 0.06793203983219999,
+      "ledger": [
+        {
+          "decision_ns": 1788417120517296361,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "LvZdhcZuXvuw9gkHKkKrN9mGCn1yVWumfE6rLGNpump",
+          "pnl_sol": 0.007332810230221365,
+          "run_id": "33716649440",
+          "score": 0.8578686109811461,
+          "win": true
+        },
+        {
+          "decision_ns": 1788421608079716029,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "24hm4JBecvgtuU39SGC6JvwsXCyqCCF2ZscbtV1Vpump",
+          "pnl_sol": 0.008283424003224259,
+          "run_id": "33716649440",
+          "score": 0.8776720044097184,
+          "win": true
+        },
+        {
+          "decision_ns": 1788442632521838180,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "E9N9ZmHHj6simihEbzNicfboVVktEj2N5UVaf8xYpump",
+          "pnl_sol": 0.011324549870782318,
+          "run_id": "33741470396",
+          "score": 0.8759984236074261,
+          "win": true
+        },
+        {
+          "decision_ns": 1788448312441454514,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "85LENmh3qH2KajsdbNoPnbSAWbd9MY2z5BiPsjdzpump",
+          "pnl_sol": 0.0074300125346010715,
+          "run_id": "33769636983",
+          "score": 0.8563564818440715,
+          "win": true
+        },
+        {
+          "decision_ns": 1788448471157855130,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "Cp8w64X1ak2mCNLXvNf6xFLynDnCuH69CuiNZ13epump",
+          "pnl_sol": 0.007208061316547082,
+          "run_id": "33769636983",
+          "score": 0.8563564818440715,
+          "win": true
+        },
+        {
+          "decision_ns": 1788448853375186914,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "5Pvs2s39SgVjH5DycX8PdAD8jZwM3qfQuXHNPzE6pump",
+          "pnl_sol": 0.011212145310260997,
+          "run_id": "33769636983",
+          "score": 0.8563564818440715,
+          "win": true
+        },
+        {
+          "decision_ns": 1788449493924166276,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "AXNphW9EyHKnwXHJT1fjNWWaXp7ZwvZgeQZyX8AKpump",
+          "pnl_sol": 0.00696624676689063,
+          "run_id": "33769636983",
+          "score": 0.8710630939026046,
+          "win": true
+        },
+        {
+          "decision_ns": 1788449657005060481,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "3ubwt6E2KuctFL8NLTDLDBHy6cGYgQJpWzp4SjS3pump",
+          "pnl_sol": 0.007398408767242494,
+          "run_id": "33769636983",
+          "score": 0.8563564818440715,
+          "win": true
+        },
+        {
+          "decision_ns": 1788450945178759532,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "7AhNQPbY78AE3dF6YqgtU3x2LiQkT9GXFMStLKCYpump",
+          "pnl_sol": 0.00907981877715263,
+          "run_id": "33769636983",
+          "score": 0.8877160487147372,
+          "win": true
+        },
+        {
+          "decision_ns": 1788451865488744119,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "tEZ8p6wxxi16sJcqDTsqH3eYLC81bWmwJmVucyTpump",
+          "pnl_sol": 0.007480556585311167,
+          "run_id": "33769636983",
+          "score": 0.8663826808249301,
+          "win": true
+        },
+        {
+          "decision_ns": 1788452004056366792,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "B8gZpcJRRr9am23PmBMG51korwxYXD8Q6wnsprWpump",
+          "pnl_sol": 0.007193463750930877,
+          "run_id": "33769636983",
+          "score": 0.8877160487147372,
+          "win": true
+        },
+        {
+          "decision_ns": 1788452509468188555,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "Bf5Ti7ah9f4WpNk4AVefN2mmCjhEaH2rGAP6gAfPpump",
+          "pnl_sol": 0.008239225253612321,
+          "run_id": "33769636983",
+          "score": 0.8877160487147372,
+          "win": true
+        },
+        {
+          "decision_ns": 1788452600455753714,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "6593PYD9tSS8rEPtQQns2wuLudr5hQismWXPGQzKpump",
+          "pnl_sol": 0.009940240524190964,
+          "run_id": "33769636983",
+          "score": 0.8533927148186019,
+          "win": true
+        },
+        {
+          "decision_ns": 1788455068836877238,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "85xnarwnG742CdwWrSeUF43SorSsm4FKedhA4a5Upump",
+          "pnl_sol": 0.008644866676377774,
+          "run_id": "33781389703",
+          "score": 0.8718976009417098,
+          "win": true
+        },
+        {
+          "decision_ns": 1788455568759986804,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "EogPCvemMGnAM9AoZp8NQj5PXpZ5hMpapfZBj2Gtpump",
+          "pnl_sol": 0.008984907702651666,
+          "run_id": "33781389703",
+          "score": 0.883310034445694,
+          "win": true
+        },
+        {
+          "decision_ns": 1788456120706313977,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "CZpnKbZrUWxF4kCqcRCyPhzYtwScytmvRkv1oJGrpump",
+          "pnl_sol": 0.00751984912740554,
+          "run_id": "33781389703",
+          "score": 0.8877160487147372,
+          "win": true
+        },
+        {
+          "decision_ns": 1788456602329642583,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "Rehqq7y5n5sBbUjKhwGvNrn8vBjmVPt1HxPmDa9pump",
+          "pnl_sol": 0.008280853928676668,
+          "run_id": "33781389703",
+          "score": 0.8630359829848452,
+          "win": true
+        },
+        {
+          "decision_ns": 1788458679511288639,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "79pYpjWUQUVmJ2frJvdGCWKvbtTg5thgGDxnD357pump",
+          "pnl_sol": 0.007441345144385159,
+          "run_id": "33781389703",
+          "score": 0.8549843898001465,
+          "win": true
+        },
+        {
+          "decision_ns": 1788459210713501852,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "EfS1MCtt3LtcnK3wGw8yAav5s4eXtWFPxtoUmsT2pump",
+          "pnl_sol": 0.009084840410500061,
+          "run_id": "33781389703",
+          "score": 0.8936549808963415,
+          "win": true
+        },
+        {
+          "decision_ns": 1788459667772608059,
+          "exit_reason": "TAKE_PROFIT",
+          "mint": "JE87Dph9L4Nuw2RnqeGLfKqC1qR7L3vpPHPSrVzJpump",
+          "pnl_sol": 0.007658477873458282,
+          "run_id": "33781389703",
+          "score": 0.8725955177285257,
+          "win": true
+        }
+      ],
+      "ledger_hash": "e789a9b4bcd3d7a646cbac116d1e142bc10cdf2c36dc57878a36eb2865d865b8",
+      "maximum_drawdown_fraction": 0.0,
+      "net_pnl_sol": 0.16670410455442397,
+      "profit_factor": 166704104554.42334,
+      "rejected_concurrency": 0,
+      "threshold": 0.8533927148186019,
+      "trades": 20,
+      "wilson_95_lower_bound": 0.8388698745050667,
+      "win_rate": 1.0,
+      "wins": 20
+    },
+    "validation_positive_labels": 3380
+  }
+}
