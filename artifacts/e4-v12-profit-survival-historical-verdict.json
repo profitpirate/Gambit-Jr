@@ -1,0 +1,29 @@
+{
+  "experiment_id": "e4x-80a1e57c2d9988be50d5022ce8f800c5491e421723a690414d88cfc7ac5d7fa3",
+  "failed_requirements": [
+    "net_pnl_positive",
+    "profit_factor_at_least_1_25",
+    "every_latency_pnl_positive",
+    "every_latency_profit_factor_at_least_1_25"
+  ],
+  "failure_classification": "NEGATIVE_EXPECTANCY",
+  "historical_qualification_passed": false,
+  "live_confirmation_authorised": false,
+  "production_paths_changed": 0,
+  "production_promotion_authorised": false,
+  "requirements": {
+    "at_least_20_closed_trades": true,
+    "at_least_two_capture_windows": true,
+    "beats_frozen_scalar_baseline_pnl": true,
+    "every_latency_pnl_positive": false,
+    "every_latency_profit_factor_at_least_1_25": false,
+    "every_latency_win_rate_at_least_65_percent": true,
+    "largest_winner_at_most_50_percent": true,
+    "maximum_drawdown_at_most_15_percent": true,
+    "net_pnl_positive": false,
+    "profit_factor_at_least_1_25": false,
+    "wilson_lower_bound_at_least_45_percent": true,
+    "win_rate_at_least_65_percent": true
+  },
+  "status": "NOT_CONCLUSIVE"
+}
