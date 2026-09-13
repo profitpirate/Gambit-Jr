@@ -1,0 +1,128 @@
+name: E4 V12 dual prototype 2 SOL forward live
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-dual-prototype-live-2sol
+    paths:
+      - ".github/workflows/e4-v12-dual-prototype-live-2sol.yml"
+      - "tools/e4_v12_dual_prototype_live.py"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+  GH_TOKEN: ${{ github.token }}
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
+  E4_BUILDER_PRELOAD: "tools/e4-builder/fast-preload-v4.mjs"
+
+concurrency:
+  group: e4-v12-dual-prototype-live-2sol
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    outputs:
+      corpus_path: ${{ steps.corpus.outputs.path }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-dual-prototype-live-2sol
+      - uses: actions/checkout@v4
+        with:
+          ref: 1b5995a2f04b70c49071fba3c2d60e2f85d5d04d
+          path: research
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install numpy scikit-learn pandas
+      - name: Download exact frozen 66k research corpus
+        run: |
+          mkdir -p frozen
+          gh run download 34262315056 --repo "$GITHUB_REPOSITORY" \
+            --name e4-v12-allout-launch-corpus-34262315056 --dir frozen
+      - name: Resolve corpus path
+        id: corpus
+        run: |
+          corpus="$(find frozen -name e4-v12-allout-launch-corpus.jsonl.gz -print -quit)"
+          test -s "$corpus"
+          echo "path=$corpus" >> "$GITHUB_OUTPUT"
+      - name: Prove both frozen theses reproduce their archived results
+        run: |
+          python tools/e4_v12_dual_prototype_live.py \
+            --research-root research \
+            --corpus "${{ steps.corpus.outputs.path }}" \
+            --preflight
+
+  live:
+    needs: preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-dual-prototype-live-2sol
+      - uses: actions/checkout@v4
+        with:
+          ref: 1b5995a2f04b70c49071fba3c2d60e2f85d5d04d
+          path: research
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install -e . -r requirements-e4.txt numpy scikit-learn pandas
+      - working-directory: tools/e4-builder
+        run: npm install --omit=dev
+      - name: Download exact frozen 66k research corpus
+        run: |
+          mkdir -p frozen artifacts
+          gh run download 34262315056 --repo "$GITHUB_REPOSITORY" \
+            --name e4-v12-allout-launch-corpus-34262315056 --dir frozen
+          corpus="$(find frozen -name e4-v12-allout-launch-corpus.jsonl.gz -print -quit)"
+          test -s "$corpus"
+          echo "FROZEN_CORPUS=$corpus" >> "$GITHUB_ENV"
+      - name: Capture one untouched 3000-launch live market window
+        run: |
+          export E4_HOLDOUT_PROGRESS_PATH=artifacts/e4-v12-dual-prototype-live-progress.json
+          python scripts/e4_300_launch_holdout_v12.py \
+            --target-launches 3000 \
+            --capture-seconds 16200 \
+            --tail-seconds 300 \
+            --heartbeat-seconds 60 \
+            --minimum-launches 3000 \
+            --wallet-signatures 1000 \
+            --builder-probes 100 \
+            --testnet-route-probes 0 \
+            --stress-iterations 0 \
+            --output artifacts/e4-v12-dual-prototype-live-batch.json
+      - name: Run both frozen theses with separate 2 SOL paper bankrolls
+        run: |
+          python tools/e4_v12_dual_prototype_live.py \
+            --research-root research \
+            --corpus "$FROZEN_CORPUS" \
+            --batch artifacts/e4-v12-dual-prototype-live-batch.json \
+            --events artifacts/e4-v12-dual-prototype-live-batch-live-events.jsonl \
+            --run-id "$GITHUB_RUN_ID" \
+            --output artifacts/e4-v12-dual-prototype-live-2sol.json
+          cat artifacts/e4-v12-dual-prototype-live-2sol.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-v12-dual-prototype-live-2sol-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-dual-prototype-live-progress.json
+            artifacts/e4-v12-dual-prototype-live-batch.json
+            artifacts/e4-v12-dual-prototype-live-batch-live-events.jsonl
+            artifacts/e4-v12-dual-prototype-live-2sol.json
+            artifacts/e4-v12-dual-prototype-live-2sol.md
+          if-no-files-found: warn
+          retention-days: 30
