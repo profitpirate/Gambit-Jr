@@ -1,0 +1,58 @@
+{
+  "version": "e4-v12-relative-price-capped-actor-holdout-protocol-v1",
+  "experiment_id": "e4x-207b67e8dc16497ba27d4f6699c7a760bb3728290cc91e85a68ff026ac03744c",
+  "frozen_candidate": {
+    "path": "artifacts/e4-v12-relative-price-capped-actor-frozen-candidate.json",
+    "sha256_lf": "e1a2a91f66eac8c0f5430cbb2856bd18018e3683144579846c9a0f79946683ba",
+    "source_commit": "612a555ce73e89cb7a113c4b09a7d763f976725b",
+    "frozen_at_utc": "2026-09-13T23:32:46Z",
+    "frozen_at_epoch_ns": 1789342366000000000
+  },
+  "final_evidence_contract": {
+    "required_capture_windows": 10,
+    "launches_per_window": 3000,
+    "required_total_launches": 30000,
+    "capture_errors_allowed": 0,
+    "parse_errors_allowed": 0,
+    "every_workflow_run_started_after_epoch_ns": 1789342366000000000,
+    "every_capture_started_after_epoch_ns": 1789342366000000000,
+    "every_capture_starts_after_consumed_evidence_epoch_ns": 1789338026465570793,
+    "strictly_chronological_non_overlapping": true,
+    "feature_or_parameter_changes_allowed": false,
+    "actor_resolution_delay_ms": 60000,
+    "relative_price_threshold_source": "actor-rule matches in all 54 consumed development windows only",
+    "relative_price_threshold_quantile": 0.05,
+    "relative_price_keep": "at_or_above",
+    "latencies_ms": [0, 1, 2, 5, 10],
+    "position_sizing": "min(current bankroll * 4%, initial 3 SOL bankroll * 4%)",
+    "position_cap_sol": 0.12,
+    "optional_stopping_allowed": false
+  },
+  "golden_gate": {
+    "minimum_closed_trades": 50,
+    "minimum_capture_windows_represented": 8,
+    "minimum_profitable_capture_windows": 7,
+    "minimum_win_rate": 0.65,
+    "minimum_wilson_95_lower_bound": 0.55,
+    "minimum_net_pnl_sol": 0.0,
+    "minimum_profit_factor": 1.25,
+    "maximum_drawdown_fraction": 0.15,
+    "maximum_largest_winner_contribution": 0.25,
+    "every_latency_net_pnl_positive": true,
+    "every_latency_minimum_profit_factor": 1.25,
+    "every_latency_quote_coverage": 1.0,
+    "must_beat_same_size_capped_actor_only_baseline_pnl": true,
+    "must_beat_same_size_capped_actor_only_baseline_win_rate": true,
+    "must_beat_same_size_capped_actor_only_baseline_profit_factor": true
+  },
+  "result_policy": {
+    "all_ten_windows_are_acquired_before_evaluation": true,
+    "final_gate_is_evaluated_once": true,
+    "failure_is_retired_without_parameter_tuning_or_optional_windows": true,
+    "passing_result_is_untouched_live_market_replay_not_real_money_trading": true,
+    "live_confirmation_authorised_only_after_all_gates_pass": true,
+    "production_promotion_authorised": false,
+    "production_deployment_authorised": false,
+    "production_paths_changed": 0
+  }
+}

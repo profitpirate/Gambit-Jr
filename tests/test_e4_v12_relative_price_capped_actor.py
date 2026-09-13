@@ -38,6 +38,10 @@ def frozen() -> dict:
     return load_artifact("e4-v12-relative-price-capped-actor-frozen-candidate.json")
 
 
+def protocol() -> dict:
+    return load_artifact("e4-v12-relative-price-capped-actor-holdout-protocol.json")
+
+
 def test_v11_rule_is_interpretable_causal_and_capped() -> None:
     assert research.ACTOR_RULE.known_buyers_min == 1
     assert research.ACTOR_RULE.history_max_min == 5
@@ -120,3 +124,22 @@ def test_v11_freeze_is_content_addressed_and_cannot_promote() -> None:
         assert payload["production_promotion_authorised"] is False
         assert payload["production_deployment_authorised"] is False
         assert payload["production_paths_changed"] == 0
+
+
+def test_v11_protocol_requires_ten_strictly_later_windows_without_optional_stopping() -> None:
+    candidate = frozen()
+    contract = protocol()
+    frozen_spec = contract["frozen_candidate"]
+    frozen_path = ROOT / frozen_spec["path"]
+    assert contract["experiment_id"] == candidate["experiment_id"]
+    assert frozen_spec["sha256_lf"] == research.sha256_lf(frozen_path)
+    assert frozen_spec["source_commit"] == "612a555ce73e89cb7a113c4b09a7d763f976725b"
+    evidence = contract["final_evidence_contract"]
+    assert evidence["required_capture_windows"] == 10
+    assert evidence["required_total_launches"] == 30_000
+    assert evidence["optional_stopping_allowed"] is False
+    assert evidence["every_capture_started_after_epoch_ns"] >= frozen_spec[
+        "frozen_at_epoch_ns"
+    ]
+    assert contract["result_policy"]["final_gate_is_evaluated_once"] is True
+    assert contract["result_policy"]["production_deployment_authorised"] is False
