@@ -71,15 +71,39 @@
       "workflow_conclusion": "success",
       "workflow_run_started_at": "2026-09-13T09:28:53Z",
       "workflow_run_started_at_epoch_ns": 1789291733000000000
+    },
+    {
+      "artifact_name": "e4-v12-forward-34760648934",
+      "batch_path": ".tmp-regime-veto-holdout/runs/34760648934/artifacts/e4-v12-forward-batch.json",
+      "batch_sha256": "34b0c0a46b28608f8bbe904be6545b1b0662d07ae378c72ad19559f73fd485a7",
+      "capture_end_ns": 1789317423252997788,
+      "capture_errors": 0,
+      "capture_start_ns": 1789307063673774615,
+      "copy_audit_path": ".tmp-regime-veto-holdout/runs/34760648934/artifacts/e4-v12-copy-audit.json",
+      "copy_audit_sha256": "8db22d547f2bf7e106d675b718f356cc3311ad5b424cb4e1f41c10f79089e4bc",
+      "decoded_events": 262769,
+      "events_path": ".tmp-regime-veto-holdout/runs/34760648934/artifacts/e4-v12-forward-batch-live-events.jsonl",
+      "events_sha256": "edf589388b2dd19d9ecf3600f9ca6b4741a233322c4b20c374e8439ae5012fa9",
+      "hypothesis_only": true,
+      "launches": 3000,
+      "mainnet_funds_risked_sol": 0,
+      "mainnet_transactions_sent": 0,
+      "registration_version": "e4-v12-holdout-capture-registration-v1",
+      "role": "untouched_live",
+      "run_id": "34760648934",
+      "source_commit": "18cc1078b556586119824f8a7010e45694cfd0c6",
+      "workflow_conclusion": "success",
+      "workflow_run_started_at": "2026-09-13T13:43:50Z",
+      "workflow_run_started_at_epoch_ns": 1789307030000000000
     }
   ],
   "data_audit": {
     "actor_updates_delayed_ms": 60000,
-    "captures": 51,
+    "captures": 52,
     "future_values_in_features": false,
-    "launches": 153000,
+    "launches": 156000,
     "parse_errors": 0,
-    "rows": 152425,
+    "rows": 155425,
     "runs": [
       {
         "hash_match": true,
@@ -663,16 +687,27 @@
         "run_id": "34749576265",
         "sha256": "0a977e25fae90e9de97d4cac32ede8694f709674a093e7b6cc58d1fbd802e9b4",
         "split": "untouched_live"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 894,
+        "rows_with_known_creator": 1675,
+        "run_id": "34760648934",
+        "sha256": "edf589388b2dd19d9ecf3600f9ca6b4741a233322c4b20c374e8439ae5012fa9",
+        "split": "untouched_live"
       }
     ]
   },
   "deterministic_replay": false,
   "experiment_id": "e4x-863d8d0942bf9336535c47aa3ec21bcdad44bf238f9c36a976b9f2b3f7c7adb7",
-  "final_capture_windows": 2,
-  "final_total_launches": 6000,
+  "final_capture_windows": 3,
+  "final_total_launches": 9000,
   "latencies": {},
   "live_confirmation_authorised": false,
-  "manifest_sha256": "de35515edbd0a11da9db4c9eca362daa2e0946ccf06fa49206be930c3d4058c3",
+  "manifest_sha256": "1a0b44a524ec31cbfa848e09e54606fe343a820d3022558b7fda1cf6ea44ee36",
   "production_deployment_authorised": false,
   "production_paths_changed": 0,
   "production_promotion_authorised": false,
@@ -858,6 +893,17 @@
       "thresholds": {
         "buyer_average_pnl_max|q=0.05|keep=at_or_above": 0.011358041119077992,
         "prior_price_multiple_median|q=0.93|keep=at_or_below": 1.0674764127677903
+      }
+    },
+    {
+      "current_actor_rows": 4,
+      "prior_actor_rows": 608,
+      "role": "untouched_live",
+      "run_id": "34760648934",
+      "selected_rows": 4,
+      "thresholds": {
+        "buyer_average_pnl_max|q=0.05|keep=at_or_above": 0.011383386487796266,
+        "prior_price_multiple_median|q=0.93|keep=at_or_below": 1.0673907351236047
       }
     }
   ],
