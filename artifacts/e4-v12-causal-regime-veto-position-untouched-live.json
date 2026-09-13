@@ -119,15 +119,39 @@
       "workflow_conclusion": "success",
       "workflow_run_started_at": "2026-09-13T16:59:40Z",
       "workflow_run_started_at_epoch_ns": 1789318780000000000
+    },
+    {
+      "artifact_name": "e4-v12-forward-34779504872",
+      "batch_path": ".tmp-regime-veto-holdout/runs/34779504872/artifacts/e4-v12-forward-batch.json",
+      "batch_sha256": "93d091c87513c1594c65b6c2c65bc6033d50f03c7b5a50b229be6d6dc27a1e0a",
+      "capture_end_ns": 1789338026465570793,
+      "capture_errors": 0,
+      "capture_start_ns": 1789329777876002711,
+      "copy_audit_path": ".tmp-regime-veto-holdout/runs/34779504872/artifacts/e4-v12-copy-audit.json",
+      "copy_audit_sha256": "8d1c5d61f977bc3401ae719db0f21a9660d6a2fcc6d5beb823cf06b515540e75",
+      "decoded_events": 270388,
+      "events_path": ".tmp-regime-veto-holdout/runs/34779504872/artifacts/e4-v12-forward-batch-live-events.jsonl",
+      "events_sha256": "7790819db72fcd00bc94559f1ffd06dd5a91945804697f7282c09447e944d022",
+      "hypothesis_only": true,
+      "launches": 3000,
+      "mainnet_funds_risked_sol": 0,
+      "mainnet_transactions_sent": 0,
+      "registration_version": "e4-v12-holdout-capture-registration-v1",
+      "role": "untouched_live",
+      "run_id": "34779504872",
+      "source_commit": "4f4492da297c17c6957aee68351650baf23349dd",
+      "workflow_conclusion": "success",
+      "workflow_run_started_at": "2026-09-13T20:02:25Z",
+      "workflow_run_started_at_epoch_ns": 1789329745000000000
     }
   ],
   "data_audit": {
     "actor_updates_delayed_ms": 60000,
-    "captures": 53,
+    "captures": 54,
     "future_values_in_features": false,
-    "launches": 159000,
+    "launches": 162000,
     "parse_errors": 0,
-    "rows": 158425,
+    "rows": 161425,
     "runs": [
       {
         "hash_match": true,
@@ -733,16 +757,278 @@
         "run_id": "34770227385",
         "sha256": "4a39e70f47d0516fa397a88e23e73ed2525905ed62356405e80ec02f475153c9",
         "split": "untouched_live"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 832,
+        "rows_with_known_creator": 1645,
+        "run_id": "34779504872",
+        "sha256": "7790819db72fcd00bc94559f1ffd06dd5a91945804697f7282c09447e944d022",
+        "split": "untouched_live"
       }
     ]
   },
-  "deterministic_replay": false,
+  "deterministic_replay": true,
   "experiment_id": "e4x-863d8d0942bf9336535c47aa3ec21bcdad44bf238f9c36a976b9f2b3f7c7adb7",
-  "final_capture_windows": 4,
-  "final_total_launches": 12000,
-  "latencies": {},
+  "final_capture_windows": 5,
+  "final_total_launches": 15000,
+  "latencies": {
+    "0": {
+      "attempted_quotes": 26,
+      "by_capture_window": {
+        "34729110702": {
+          "pnl_sol": 0.15300450587006115,
+          "trades": 8,
+          "wins": 6
+        },
+        "34749576265": {
+          "pnl_sol": 0.21869435872652027,
+          "trades": 9,
+          "wins": 7
+        },
+        "34760648934": {
+          "pnl_sol": -0.04975571060993002,
+          "trades": 4,
+          "wins": 2
+        },
+        "34770227385": {
+          "pnl_sol": 0.03374034752667944,
+          "trades": 4,
+          "wins": 3
+        },
+        "34779504872": {
+          "pnl_sol": -0.015720161766017357,
+          "trades": 1,
+          "wins": 0
+        }
+      },
+      "capture_windows": 5,
+      "exit_reasons": {
+        "INITIAL_STOP": 4,
+        "MAXIMUM_HOLD": 12,
+        "RUNNER_TAKE_PROFIT": 1,
+        "RUNNER_TRAILING_STOP": 9
+      },
+      "largest_winner_contribution": 0.1686823021396747,
+      "latency_ms": 0,
+      "ledger_hash": "b8a9c9f9b785a59dc65dce7e0ba694823829b74fd61be3bc01e8aa4db3f5a50d",
+      "maximum_drawdown_fraction": 0.05502933507846889,
+      "net_pnl_sol": 0.3399633397473134,
+      "profit_factor": 1.9902589590727147,
+      "quote_coverage": 1.0,
+      "rejected_concurrency": 0,
+      "rejected_quote": 0,
+      "trades": 26,
+      "wilson_95_lower_bound": 0.5001138848576876,
+      "win_rate": 0.6923076923076923,
+      "wins": 18
+    },
+    "1": {
+      "attempted_quotes": 26,
+      "by_capture_window": {
+        "34729110702": {
+          "pnl_sol": 0.15300450587006115,
+          "trades": 8,
+          "wins": 6
+        },
+        "34749576265": {
+          "pnl_sol": 0.21869435872652027,
+          "trades": 9,
+          "wins": 7
+        },
+        "34760648934": {
+          "pnl_sol": -0.04975571060993002,
+          "trades": 4,
+          "wins": 2
+        },
+        "34770227385": {
+          "pnl_sol": 0.03374034752667944,
+          "trades": 4,
+          "wins": 3
+        },
+        "34779504872": {
+          "pnl_sol": -0.015720161766017357,
+          "trades": 1,
+          "wins": 0
+        }
+      },
+      "capture_windows": 5,
+      "exit_reasons": {
+        "INITIAL_STOP": 4,
+        "MAXIMUM_HOLD": 12,
+        "RUNNER_TAKE_PROFIT": 1,
+        "RUNNER_TRAILING_STOP": 9
+      },
+      "largest_winner_contribution": 0.1686823021396747,
+      "latency_ms": 1,
+      "ledger_hash": "dca417adbfd0361471c46c379d90477fdcaa86c65f78c27f1567d1957788629d",
+      "maximum_drawdown_fraction": 0.05502933507846889,
+      "net_pnl_sol": 0.3399633397473134,
+      "profit_factor": 1.9902589590727147,
+      "quote_coverage": 1.0,
+      "rejected_concurrency": 0,
+      "rejected_quote": 0,
+      "trades": 26,
+      "wilson_95_lower_bound": 0.5001138848576876,
+      "win_rate": 0.6923076923076923,
+      "wins": 18
+    },
+    "10": {
+      "attempted_quotes": 26,
+      "by_capture_window": {
+        "34729110702": {
+          "pnl_sol": 0.15300450587006115,
+          "trades": 8,
+          "wins": 6
+        },
+        "34749576265": {
+          "pnl_sol": 0.21869435872652027,
+          "trades": 9,
+          "wins": 7
+        },
+        "34760648934": {
+          "pnl_sol": -0.04975571060993002,
+          "trades": 4,
+          "wins": 2
+        },
+        "34770227385": {
+          "pnl_sol": 0.03374034752667944,
+          "trades": 4,
+          "wins": 3
+        },
+        "34779504872": {
+          "pnl_sol": -0.015720161766017357,
+          "trades": 1,
+          "wins": 0
+        }
+      },
+      "capture_windows": 5,
+      "exit_reasons": {
+        "INITIAL_STOP": 4,
+        "MAXIMUM_HOLD": 12,
+        "RUNNER_TAKE_PROFIT": 1,
+        "RUNNER_TRAILING_STOP": 9
+      },
+      "largest_winner_contribution": 0.1686823021396747,
+      "latency_ms": 10,
+      "ledger_hash": "2ad9cf896204ef314925c9be108a5b0e006f3a68674c8e68bcb8353700a5eb56",
+      "maximum_drawdown_fraction": 0.05502933507846889,
+      "net_pnl_sol": 0.3399633397473134,
+      "profit_factor": 1.9902589590727147,
+      "quote_coverage": 1.0,
+      "rejected_concurrency": 0,
+      "rejected_quote": 0,
+      "trades": 26,
+      "wilson_95_lower_bound": 0.5001138848576876,
+      "win_rate": 0.6923076923076923,
+      "wins": 18
+    },
+    "2": {
+      "attempted_quotes": 26,
+      "by_capture_window": {
+        "34729110702": {
+          "pnl_sol": 0.15300450587006115,
+          "trades": 8,
+          "wins": 6
+        },
+        "34749576265": {
+          "pnl_sol": 0.21869435872652027,
+          "trades": 9,
+          "wins": 7
+        },
+        "34760648934": {
+          "pnl_sol": -0.04975571060993002,
+          "trades": 4,
+          "wins": 2
+        },
+        "34770227385": {
+          "pnl_sol": 0.03374034752667944,
+          "trades": 4,
+          "wins": 3
+        },
+        "34779504872": {
+          "pnl_sol": -0.015720161766017357,
+          "trades": 1,
+          "wins": 0
+        }
+      },
+      "capture_windows": 5,
+      "exit_reasons": {
+        "INITIAL_STOP": 4,
+        "MAXIMUM_HOLD": 12,
+        "RUNNER_TAKE_PROFIT": 1,
+        "RUNNER_TRAILING_STOP": 9
+      },
+      "largest_winner_contribution": 0.1686823021396747,
+      "latency_ms": 2,
+      "ledger_hash": "12b06eaad65d6e5b5580b8ee8462ddf0fc5edd7d0276dab218c2570c0d7e5c95",
+      "maximum_drawdown_fraction": 0.05502933507846889,
+      "net_pnl_sol": 0.3399633397473134,
+      "profit_factor": 1.9902589590727147,
+      "quote_coverage": 1.0,
+      "rejected_concurrency": 0,
+      "rejected_quote": 0,
+      "trades": 26,
+      "wilson_95_lower_bound": 0.5001138848576876,
+      "win_rate": 0.6923076923076923,
+      "wins": 18
+    },
+    "5": {
+      "attempted_quotes": 26,
+      "by_capture_window": {
+        "34729110702": {
+          "pnl_sol": 0.15300450587006115,
+          "trades": 8,
+          "wins": 6
+        },
+        "34749576265": {
+          "pnl_sol": 0.21869435872652027,
+          "trades": 9,
+          "wins": 7
+        },
+        "34760648934": {
+          "pnl_sol": -0.04975571060993002,
+          "trades": 4,
+          "wins": 2
+        },
+        "34770227385": {
+          "pnl_sol": 0.03374034752667944,
+          "trades": 4,
+          "wins": 3
+        },
+        "34779504872": {
+          "pnl_sol": -0.015720161766017357,
+          "trades": 1,
+          "wins": 0
+        }
+      },
+      "capture_windows": 5,
+      "exit_reasons": {
+        "INITIAL_STOP": 4,
+        "MAXIMUM_HOLD": 12,
+        "RUNNER_TAKE_PROFIT": 1,
+        "RUNNER_TRAILING_STOP": 9
+      },
+      "largest_winner_contribution": 0.1686823021396747,
+      "latency_ms": 5,
+      "ledger_hash": "3213eb9095e61443eaf56bc82c4259386196d693ebd6c74f34c5f2f02f31efcd",
+      "maximum_drawdown_fraction": 0.05502933507846889,
+      "net_pnl_sol": 0.3399633397473134,
+      "profit_factor": 1.9902589590727147,
+      "quote_coverage": 1.0,
+      "rejected_concurrency": 0,
+      "rejected_quote": 0,
+      "trades": 26,
+      "wilson_95_lower_bound": 0.5001138848576876,
+      "win_rate": 0.6923076923076923,
+      "wins": 18
+    }
+  },
   "live_confirmation_authorised": false,
-  "manifest_sha256": "636e82f6f51746525bf95da6b677e81e64e4346d80f18889dc51c06d78b23c21",
+  "manifest_sha256": "e66dc5969075e7448836ccc9597d83bbbea4398c1607de05f0bebccf5d2ac0d4",
   "production_deployment_authorised": false,
   "production_paths_changed": 0,
   "production_promotion_authorised": false,
@@ -895,7 +1181,56 @@
     "may_change_frozen_candidate": false,
     "may_count_toward_final_gate": false
   },
-  "same_size_no_veto_baseline": {},
+  "same_size_no_veto_baseline": {
+    "attempted_quotes": 26,
+    "by_capture_window": {
+      "34729110702": {
+        "pnl_sol": 0.15300450587006115,
+        "trades": 8,
+        "wins": 6
+      },
+      "34749576265": {
+        "pnl_sol": 0.21869435872652027,
+        "trades": 9,
+        "wins": 7
+      },
+      "34760648934": {
+        "pnl_sol": -0.04975571060993002,
+        "trades": 4,
+        "wins": 2
+      },
+      "34770227385": {
+        "pnl_sol": 0.03374034752667944,
+        "trades": 4,
+        "wins": 3
+      },
+      "34779504872": {
+        "pnl_sol": -0.015720161766017357,
+        "trades": 1,
+        "wins": 0
+      }
+    },
+    "capture_windows": 5,
+    "exit_reasons": {
+      "INITIAL_STOP": 4,
+      "MAXIMUM_HOLD": 12,
+      "RUNNER_TAKE_PROFIT": 1,
+      "RUNNER_TRAILING_STOP": 9
+    },
+    "largest_winner_contribution": 0.1686823021396747,
+    "latency_ms": 0,
+    "ledger_hash": "b8a9c9f9b785a59dc65dce7e0ba694823829b74fd61be3bc01e8aa4db3f5a50d",
+    "maximum_drawdown_fraction": 0.05502933507846889,
+    "net_pnl_sol": 0.3399633397473134,
+    "profit_factor": 1.9902589590727147,
+    "quote_coverage": 1.0,
+    "rejected_concurrency": 0,
+    "rejected_quote": 0,
+    "trades": 26,
+    "wilson_95_lower_bound": 0.5001138848576876,
+    "win_rate": 0.6923076923076923,
+    "wins": 18
+  },
   "selection_audit": [
     {
       "current_actor_rows": 5,
@@ -951,14 +1286,47 @@
         "buyer_average_pnl_max|q=0.05|keep=at_or_above": 0.01139436212556719,
         "prior_price_multiple_median|q=0.93|keep=at_or_below": 1.0673698104242018
       }
+    },
+    {
+      "current_actor_rows": 1,
+      "prior_actor_rows": 616,
+      "role": "untouched_live",
+      "run_id": "34779504872",
+      "selected_rows": 1,
+      "thresholds": {
+        "buyer_average_pnl_max|q=0.05|keep=at_or_above": 0.011405337763338113,
+        "prior_price_multiple_median|q=0.93|keep=at_or_below": 1.0673521065967464
+      }
     }
   ],
   "untouched_holdout_passed": false,
   "verdict": {
+    "failed_requirements": [
+      "minimum_closed_trades",
+      "minimum_profitable_windows",
+      "minimum_wilson_bound",
+      "beats_same_size_no_veto_baseline_pnl"
+    ],
+    "failure_classification": "INSUFFICIENT_LABELS",
     "live_confirmation_authorised": false,
     "production_paths_changed": 0,
     "production_promotion_authorised": false,
-    "status": "WAITING_FOR_FIVE_STRICTLY_LATER_WINDOWS",
+    "requirements": {
+      "all_five_windows_represented": true,
+      "beats_same_size_no_veto_baseline_pnl": false,
+      "every_latency_full_quote_coverage": true,
+      "every_latency_positive": true,
+      "every_latency_profit_factor": true,
+      "largest_winner_limit": true,
+      "maximum_drawdown": true,
+      "minimum_closed_trades": false,
+      "minimum_profit_factor": true,
+      "minimum_profitable_windows": false,
+      "minimum_wilson_bound": false,
+      "minimum_win_rate": true,
+      "positive_net_pnl": true
+    },
+    "status": "NOT_CONCLUSIVE",
     "untouched_live_gate_passed": false
   },
   "version": "e4-v12-causal-regime-veto-holdout-v1"
