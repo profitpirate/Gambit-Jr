@@ -203,4 +203,3 @@ def test_v11_partial_manifest_does_not_reveal_early_economics(tmp_path: Path) ->
     assert result["same_size_capped_actor_only_baseline"] == {}
     assert result["verdict"]["status"] == "WAITING_FOR_10_STRICTLY_LATER_WINDOWS"
     assert result["production_paths_changed"] == 0
-
