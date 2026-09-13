@@ -143,3 +143,19 @@ def test_v11_protocol_requires_ten_strictly_later_windows_without_optional_stopp
     ]
     assert contract["result_policy"]["final_gate_is_evaluated_once"] is True
     assert contract["result_policy"]["production_deployment_authorised"] is False
+
+
+def test_v11_forward_workflow_is_bounded_read_only_evidence_collection() -> None:
+    workflow = (
+        ROOT
+        / ".github/workflows/e4-v12-relative-price-capped-actor-forward.yml"
+    ).read_text(encoding="utf-8")
+    assert "contents: read" in workflow
+    assert "--target-launches 3000" in workflow
+    assert "--minimum-launches 3000" in workflow
+    assert "cancel-in-progress: false" in workflow
+    assert "required_capture_windows\"] == 10" in workflow
+    assert "production_deployment_authorised\"] is False" in workflow
+    assert "git push" not in workflow
+    assert "src/memecoin_bot/" not in workflow
+    assert "models/e4/" not in workflow
