@@ -2,22 +2,22 @@
 
 **Classification:** FAILED_FORWARD_EDGE_CERTIFICATION
 **Frozen strategy fingerprint:** `93616ed547c2548f9a554fcc4185e5b4a33736d27dedbe3a7449d88db0506801`
-**Independent batches:** 44
-**Copy-audited batches:** 44
-**Fresh launches:** 132000
+**Independent batches:** 45
+**Copy-audited batches:** 45
+**Fresh launches:** 135000
 
 ## Direct E4-copy cohort
-**Closed:** 434
-**WR:** 17.05%
-**95% CI:** 13.81% – 20.87%
-**P&L:** -0.851945 SOL
-**PF:** 0.30783428306725164
-**E4 trade capture:** 85.10%
-**E4 winner-mint capture:** 87.94%
+**Closed:** 437
+**WR:** 16.93%
+**95% CI:** 13.71% – 20.73%
+**P&L:** -0.857118 SOL
+**PF:** 0.30654589906964685
+**E4 trade capture:** 85.19%
+**E4 winner-mint capture:** 88.01%
 **Median source→decision:** 0.0 ms
-**Median decision→fill:** 296.9498005 ms
-**Median source→fill:** 296.9498005 ms
-**Median fill drift:** 1478.0946679942454 bps
+**Median decision→fill:** 296.965179 ms
+**Median source→fill:** 296.965179 ms
+**Median fill drift:** 1465.6983326685013 bps
 
 ## Non-copy V12 cohort
 **Closed:** 43
@@ -27,15 +27,15 @@
 **Families:** {"v12_elite_creator_quality_launch": 5, "v12_proven_creator_quality_launch": 38}
 
 ## All V12 positions (diagnostic only)
-**Closed:** 477
-**WR:** 15.93%
-**P&L:** -1.068613 SOL
-**PF:** 0.2639047841139118
+**Closed:** 480
+**WR:** 15.83%
+**P&L:** -1.073786 SOL
+**PF:** 0.2629677240759234
 
 ## Same-window E4
-**Closed:** 510
+**Closed:** 513
 **WR:** 66.67%
-**P&L:** 38.975966 SOL
+**P&L:** 38.848662 SOL
 **Historical E4 exact-net benchmark:** 60.08%, PF ~4.92
 **Copy-only evidence sufficient:** YES
 
