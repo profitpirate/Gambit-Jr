@@ -6,6 +6,8 @@ on:
       - codex/e4-v12-causal-regime-veto-position-v10
     paths:
       - ".github/workflows/e4-v12-causal-regime-veto-final.yml"
+      - "scripts/e4_v12_causal_regime_veto_holdout.py"
+      - "tests/test_e4_v12_causal_regime_veto_holdout.py"
 
 permissions:
   actions: read

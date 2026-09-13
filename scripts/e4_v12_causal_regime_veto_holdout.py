@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import heapq
 import json
 import pickle
@@ -37,6 +38,14 @@ FINAL_ROLE = "untouched_live"
 QUARANTINE_ROLE = "quarantine"
 
 
+def newline_equivalent_sha256(path: Path, expected: str) -> bool:
+    """Accept only byte-identical content modulo Git's LF/CRLF checkout policy."""
+    raw = path.read_bytes()
+    lf = raw.replace(b"\r\n", b"\n")
+    variants = (raw, lf, lf.replace(b"\n", b"\r\n"))
+    return expected in {hashlib.sha256(value).hexdigest() for value in variants}
+
+
 def read_json(path: Path) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
@@ -48,7 +57,7 @@ def verify_protocol(root: Path) -> dict[str, Any]:
     protocol = read_json(root / PROTOCOL_PATH)
     frozen_spec = protocol["frozen_candidate"]
     frozen_path = root / str(frozen_spec["path"])
-    if base.sha256_path(frozen_path) != frozen_spec["sha256"]:
+    if not newline_equivalent_sha256(frozen_path, str(frozen_spec["sha256"])):
         raise ValueError("frozen candidate hash no longer matches the protocol")
     frozen = read_json(frozen_path)
     if frozen["experiment_id"] != protocol["experiment_id"]:

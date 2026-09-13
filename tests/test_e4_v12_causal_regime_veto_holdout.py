@@ -99,6 +99,16 @@ def test_protocol_content_addresses_the_frozen_candidate() -> None:
     assert specification["result_policy"]["production_deployment_authorised"] is False
 
 
+def test_frozen_hash_allows_only_git_newline_normalisation(tmp_path: Path) -> None:
+    path = tmp_path / "frozen.json"
+    crlf = b'{\r\n  "candidate": true\r\n}\r\n'
+    expected = hashlib.sha256(crlf).hexdigest()
+    path.write_bytes(crlf.replace(b"\r\n", b"\n"))
+    assert holdout.newline_equivalent_sha256(path, expected)
+    path.write_bytes(path.read_bytes() + b" ")
+    assert not holdout.newline_equivalent_sha256(path, expected)
+
+
 def test_prefreeze_capture_is_quarantine_but_never_final(tmp_path: Path) -> None:
     specification = protocol()
     freeze_ns = specification["frozen_candidate"]["frozen_at_epoch_ns"]
