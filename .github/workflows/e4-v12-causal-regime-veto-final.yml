@@ -1,0 +1,186 @@
+name: E4 V12 causal regime veto final gate
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-causal-regime-veto-position-v10
+    paths:
+      - ".github/workflows/e4-v12-causal-regime-veto-final.yml"
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: e4-v12-causal-regime-veto-final
+  cancel-in-progress: false
+
+jobs:
+  sealed-final-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-causal-regime-veto-position-v10
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install research and validation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,research]"
+
+      - name: Download quarantine capture
+        uses: actions/download-artifact@v4
+        with:
+          name: e4-v12-forward-34722511299
+          path: .tmp-regime-veto-holdout/runs/34722511299
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: 34722511299
+
+      - name: Download untouched-live capture 1
+        uses: actions/download-artifact@v4
+        with:
+          name: e4-v12-forward-34729110702
+          path: .tmp-regime-veto-holdout/runs/34729110702
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: 34729110702
+
+      - name: Download untouched-live capture 2
+        uses: actions/download-artifact@v4
+        with:
+          name: e4-v12-forward-34749576265
+          path: .tmp-regime-veto-holdout/runs/34749576265
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: 34749576265
+
+      - name: Download untouched-live capture 3
+        uses: actions/download-artifact@v4
+        with:
+          name: e4-v12-forward-34760648934
+          path: .tmp-regime-veto-holdout/runs/34760648934
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: 34760648934
+
+      - name: Download untouched-live capture 4
+        uses: actions/download-artifact@v4
+        with:
+          name: e4-v12-forward-34770227385
+          path: .tmp-regime-veto-holdout/runs/34770227385
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: 34770227385
+
+      - name: Download untouched-live capture 5
+        uses: actions/download-artifact@v4
+        with:
+          name: e4-v12-forward-34779504872
+          path: .tmp-regime-veto-holdout/runs/34779504872
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: 34779504872
+
+      - name: Restore the content-addressed sealed manifest
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          source = Path("artifacts/e4-v12-causal-regime-veto-position-untouched-live.json")
+          report = json.loads(source.read_text(encoding="utf-8"))
+          manifest = {
+              "version": "e4-v12-causal-regime-veto-holdout-manifest-v1",
+              "experiment_id": report["experiment_id"],
+              "captures": report["captures"],
+          }
+          target = Path(
+              ".tmp-regime-veto-holdout/"
+              "e4-v12-causal-regime-veto-holdout-manifest.json"
+          )
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_text(
+              json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Register the fifth strictly post-freeze window
+        run: |
+          python scripts/e4_v12_register_holdout_capture.py \
+            --artifact-dir .tmp-regime-veto-holdout/runs/34779504872 \
+            --run-id 34779504872 \
+            --workflow-started-at 2026-09-13T20:02:25Z
+
+      - name: Reveal the sealed five-window verdict
+        run: python scripts/e4_v12_causal_regime_veto_holdout.py
+
+      - name: Verify the final evidence envelope
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path("artifacts/e4-v12-causal-regime-veto-position-untouched-live.json")
+          report = json.loads(path.read_text(encoding="utf-8"))
+          assert report["final_capture_windows"] == 5
+          assert report["final_total_launches"] == 15_000
+          assert report["deterministic_replay"] is True
+          assert report["production_paths_changed"] == 0
+          assert report["production_promotion_authorised"] is False
+          assert report["production_deployment_authorised"] is False
+          summary = {
+              "experiment_id": report["experiment_id"],
+              "final_capture_windows": report["final_capture_windows"],
+              "final_total_launches": report["final_total_launches"],
+              "deterministic_replay": report["deterministic_replay"],
+              "verdict": report["verdict"],
+              "production_paths_changed": report["production_paths_changed"],
+          }
+          rendered = "```json\n" + json.dumps(summary, indent=2, sort_keys=True) + "\n```\n"
+          print(rendered)
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a", encoding="utf-8") as handle:
+              handle.write("## Sealed V10 five-window result\n\n" + rendered)
+          PY
+
+      - name: Run focused registrar and sealed-gate tests
+        run: |
+          python -m pytest -q \
+            tests/test_e4_v12_register_holdout_capture.py \
+            tests/test_e4_v12_causal_regime_veto_holdout.py
+
+      - name: Run focused Ruff gate
+        run: |
+          python -m ruff check \
+            scripts/e4_v12_register_holdout_capture.py \
+            scripts/e4_v12_causal_regime_veto_holdout.py \
+            tests/test_e4_v12_register_holdout_capture.py \
+            tests/test_e4_v12_causal_regime_veto_holdout.py
+
+      - name: Commit only the final sealed evidence
+        run: |
+          test "$(git diff --name-only)" = \
+            "artifacts/e4-v12-causal-regime-veto-position-untouched-live.json"
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- artifacts/e4-v12-causal-regime-veto-position-untouched-live.json
+          git commit -m "data(e4): register fifth untouched V10 holdout window [skip ci]"
+          git push origin HEAD:codex/e4-v12-causal-regime-veto-position-v10
+
+      - name: Upload the sealed final report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e4-v12-causal-regime-veto-final-${{ github.run_id }}
+          path: artifacts/e4-v12-causal-regime-veto-position-untouched-live.json
+          if-no-files-found: error
