@@ -1,0 +1,79 @@
+{
+  "version": "e4-v12-relative-price-capped-actor-source-manifest-v1",
+  "parent_manifest": {
+    "path": "artifacts/e4-v12-adaptive-exit-source-manifest.json",
+    "sha256_lf": "5e5f64f8b363e778dc3930c7dce779091d48f5a7bbcacf6e1ab876d2cdce68ef",
+    "captures": 48,
+    "launches": 144000
+  },
+  "supplemental_captures": [
+    {
+      "run_id": "34722511299",
+      "capture_start_ns": 1789251723248437115,
+      "capture_end_ns": 1789260167831001037,
+      "events_sha256": "4e6c9deb864862ec5f748e20064eea838c92318d17cfab2d1b51df3d0b70d1ba",
+      "batch_sha256": "146525d2dcc3db0f5ec5cc1839908e0ee46533644c4b794b09d56e6d53ca1ffd",
+      "launches": 3000,
+      "capture_errors": 0,
+      "role": "consumed_development"
+    },
+    {
+      "run_id": "34729110702",
+      "capture_start_ns": 1789260822981887217,
+      "capture_end_ns": 1789272240273638165,
+      "events_sha256": "b351d1c76d603f4aff832ca9e892398e394be5f7f9250b1aff0a4c239f384d73",
+      "batch_sha256": "3c489d9a5c371acca6184384587b82a21f47c3121a0c815300e06b3d7202e162",
+      "launches": 3000,
+      "capture_errors": 0,
+      "role": "consumed_development"
+    },
+    {
+      "run_id": "34749576265",
+      "capture_start_ns": 1789291807319384512,
+      "capture_end_ns": 1789305669925552279,
+      "events_sha256": "0a977e25fae90e9de97d4cac32ede8694f709674a093e7b6cc58d1fbd802e9b4",
+      "batch_sha256": "b75f79ef2c7b544eda0b21a8cbc77abea338bc1543a5c25c895d67aa604fc5c5",
+      "launches": 3000,
+      "capture_errors": 0,
+      "role": "consumed_development"
+    },
+    {
+      "run_id": "34760648934",
+      "capture_start_ns": 1789307063673774615,
+      "capture_end_ns": 1789317423252997788,
+      "events_sha256": "edf589388b2dd19d9ecf3600f9ca6b4741a233322c4b20c374e8439ae5012fa9",
+      "batch_sha256": "34b0c0a46b28608f8bbe904be6545b1b0662d07ae378c72ad19559f73fd485a7",
+      "launches": 3000,
+      "capture_errors": 0,
+      "role": "consumed_development"
+    },
+    {
+      "run_id": "34770227385",
+      "capture_start_ns": 1789318813940945207,
+      "capture_end_ns": 1789327024266007841,
+      "events_sha256": "4a39e70f47d0516fa397a88e23e73ed2525905ed62356405e80ec02f475153c9",
+      "batch_sha256": "85edd4f8e9aea756bd5d8ff1f6badc8634423e9ad856f998f71b51db733f8e04",
+      "launches": 3000,
+      "capture_errors": 0,
+      "role": "consumed_development"
+    },
+    {
+      "run_id": "34779504872",
+      "capture_start_ns": 1789329777876002711,
+      "capture_end_ns": 1789338026465570793,
+      "events_sha256": "7790819db72fcd00bc94559f1ffd06dd5a91945804697f7282c09447e944d022",
+      "batch_sha256": "93d091c87513c1594c65b6c2c65bc6033d50f03c7b5a50b229be6d6dc27a1e0a",
+      "launches": 3000,
+      "capture_errors": 0,
+      "role": "consumed_development"
+    }
+  ],
+  "chronological_policy": "all 54 captures are consumed development evidence; any V11 gate evidence must start strictly later than 1789338026465570793",
+  "totals": {
+    "captures": 54,
+    "launches": 162000,
+    "supplemental_captures": 6,
+    "supplemental_launches": 18000
+  },
+  "production_paths_changed": 0
+}
