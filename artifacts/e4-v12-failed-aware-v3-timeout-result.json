@@ -1,0 +1,104 @@
+{
+  "artifact": {
+    "archive_sha256": "ffdeab4e4cc0339045281d6dcea07a0fa9c9b98670f3eb7fc0d0a992156b119a",
+    "github_artifact_id": 10312128600,
+    "name": "e4-v12-failed-aware-v3-historical-34725238840",
+    "size_bytes": 50398
+  },
+  "completed_horizons": [
+    {
+      "dataset_rows": 70814,
+      "failure_classification": "NO_TRAIN_SURVIVOR",
+      "horizon_ms": 100,
+      "reason": "no causal pre-impact lattice survived train and validation economics",
+      "report_sha256": "3b2c6853529370196755238476a7aad6ae941a9d431edfdb3ae5aaff4351b22f",
+      "single_atom_survivors": 0,
+      "status": "NOT_CONCLUSIVE"
+    },
+    {
+      "dataset_rows": 70819,
+      "failure_classification": "NO_TRAIN_SURVIVOR",
+      "horizon_ms": 250,
+      "reason": "no causal pre-impact lattice survived train and validation economics",
+      "report_sha256": "c0d6ef76d64b3a82e712be6a060fd6057c4929cb2ca23dfb7bf01a8cb2269205",
+      "single_atom_survivors": 0,
+      "status": "NOT_CONCLUSIVE"
+    },
+    {
+      "dataset_rows": 70823,
+      "failure_classification": "NO_TRAIN_SURVIVOR",
+      "horizon_ms": 500,
+      "reason": "no causal pre-impact lattice survived train and validation economics",
+      "report_sha256": "3253c61a7ebca0dcfe045214dcfd9641d6f240402fbadfa91005adcb1cea6991",
+      "single_atom_survivors": 0,
+      "status": "NOT_CONCLUSIVE"
+    }
+  ],
+  "evidence_integrity": {
+    "curve_audit": {
+      "coverage": 1.0,
+      "input_files": 10,
+      "mints_scanned": 30000,
+      "p95_absolute_error_bps": 0.0000075263639764955315,
+      "parse_errors": 0,
+      "passed": true,
+      "reversible_buys": 81,
+      "sha256": "2aca6aadf5f80ced885de5d133c5a7aa2a0ca8b6a7aea26f8f3b58096bdaebf6",
+      "total_e4_buys": 81,
+      "within_100_bps_fraction": 1.0
+    },
+    "failed_intent_registry": {
+      "attempt_count": 371,
+      "sha256": "5a60d0888b652b157c6ede3cf3794fda6562c23d7d40cd35277f6d5c7d9e98ac",
+      "version": "e4-v12-failed-intent-registry-v2"
+    },
+    "latency_benchmark": {
+      "combined_p95_upper_bound_ms": 6.4697778,
+      "does_not_claim": "mainnet landing latency",
+      "maximum_p95_ms": 10.0,
+      "passed": true,
+      "scope": "guarded request -> local build/sign -> warmed loopback socket receipt",
+      "sha256": "1876fab69d2323bcda82314db65ab3878711dca28bf9edcb5c16b6c5fb0e528f"
+    }
+  },
+  "experiment_family": "e4-v12-failed-aware-v3-golden",
+  "failure_classification": "INFRASTRUCTURE_FAILURE",
+  "material_change_required_before_rerun": {
+    "completed_horizons": "A materially different feature set, parameters, dataset/evidence epoch, or causal policy is required before rerunning 100/250/500 ms.",
+    "unfinished_horizons": "A verified runtime or search-complexity change that permits 750/1000/1500 ms to complete within the declared execution budget is required."
+  },
+  "production_deployment_authorised": false,
+  "production_paths_changed": 0,
+  "production_promotion_authorised": false,
+  "run": {
+    "completed_at": "2026-09-13T05:22:42Z",
+    "conclusion": "cancelled",
+    "github_run_id": 34725238840,
+    "historical_job_conclusion": "cancelled",
+    "historical_job_id": 103638112515,
+    "historical_job_started_at": "2026-09-12T23:22:25Z",
+    "source_branch": "codex/e4-v12-sub10ms-entry-research-20260905",
+    "source_commit": "d3c05bdaf788d60f5ccf7d1dc0d8c0ccbc1ef8ac",
+    "started_at": "2026-09-12T23:22:21Z",
+    "timeout_minutes": 360
+  },
+  "selector": {
+    "horizon_ms": null,
+    "sha256": "af8fa4793c32f9a984d433e01f94346a9698729273631ab0e730bd4cac3744db",
+    "status": "NOT_CONCLUSIVE",
+    "version": "e4-v12-failed-aware-v3-selector"
+  },
+  "scientific_conclusion": "No causal pre-impact lattice survived train and validation economics at any completed horizon. The remaining horizons were not evaluated and must not be represented as scientific failures.",
+  "untouched_live": {
+    "authorised": false,
+    "job_conclusion": "skipped",
+    "job_id": 103678374377,
+    "reason": "historical selector did not produce HISTORICAL_HOLDOUT_CONFIRMED"
+  },
+  "unfinished_horizons_ms": [
+    750,
+    1000,
+    1500
+  ],
+  "version": "e4-v12-failed-aware-v3-timeout-result-v1"
+}
