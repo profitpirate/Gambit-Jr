@@ -53,7 +53,7 @@ jobs:
       - name: Install only the live-paper dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e production -r production/requirements-e4.txt numpy scikit-learn aiohttp
+          python -m pip install -e production -r production/requirements-e4.txt numpy scikit-learn aiohttp pandas
 
       - name: Compile true-online runner before spending live-stream time
         run: |
