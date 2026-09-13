@@ -1,0 +1,50 @@
+{
+  "experiment_id": "e4x-863d8d0942bf9336535c47aa3ec21bcdad44bf238f9c36a976b9f2b3f7c7adb7",
+  "failures": [
+    {
+      "artifact": {
+        "archive_sha256": "d95d2cd000c58bcecc28e4597ec8f722c996080858cdd7e1bac9a9a58c9eaf9e",
+        "github_artifact_id": 10314454498,
+        "name": "e4-v12-forward-34737461092",
+        "progress_sha256": "4c638199f2e497124cb0c6fd8c30ed265e587d7d95fe8b5e1c9642b8da5f4e60",
+        "size_bytes": 385721
+      },
+      "capture": {
+        "captured_events": 257616,
+        "captured_launches": 2906,
+        "elapsed_seconds": 14400.132,
+        "errors": 0,
+        "minimum_launches": 3000,
+        "queue_depth": 0,
+        "target_launches": 3000
+      },
+      "failure_classification": "INFRASTRUCTURE_FAILURE",
+      "logs_archive_sha256": "91b2eb71b6fa0d465e870a9e291e30e4dedb1029c998d999f57165e8cf90bf2d",
+      "reason": "The bounded 240-minute live capture ended at 2906/3000 launches during a lower-cadence market interval; the strict minimum was correctly enforced.",
+      "retry": {
+        "capture_seconds": 16200,
+        "dispatched_at": "2026-09-13T09:28:53.7918059Z",
+        "job_timeout_minutes": 360,
+        "minimum_launches": 3000,
+        "run_id": 34749576265,
+        "source_commit": "06be2fc24f4a7db205c2b0584fafe8bf1b143339"
+      },
+      "run": {
+        "capture_completed_at": "2026-09-13T09:23:17Z",
+        "capture_started_at": "2026-09-13T05:23:16Z",
+        "completed_at": "2026-09-13T09:23:21Z",
+        "conclusion": "failure",
+        "github_run_id": 34737461092,
+        "source_branch": "codex/e4-v12-selection-reconstruction",
+        "source_commit": "c1d870baf9202eb75032dee551670d14039278f2",
+        "workflow_started_at": "2026-09-13T04:15:26Z"
+      },
+      "scientific_result_available": false,
+      "untouched_window_registered": false
+    }
+  ],
+  "production_deployment_authorised": false,
+  "production_paths_changed": 0,
+  "production_promotion_authorised": false,
+  "version": "e4-v12-causal-regime-veto-capture-failures-v1"
+}
