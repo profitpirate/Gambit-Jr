@@ -1,0 +1,96 @@
+name: E4 V12 dual prototype true online live
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-dual-prototype-online-live
+    paths:
+      - ".github/workflows/e4-v12-dual-prototype-online-live.yml"
+      - "tools/e4_v12_dual_prototype_online_live.py"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: e4-v12-dual-prototype-true-online-live
+  cancel-in-progress: false
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONUNBUFFERED: "1"
+  E4_SOL_USD_FALLBACK: "150"
+
+jobs:
+  online-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-dual-prototype-online-live
+          fetch-depth: 1
+
+      - name: Checkout frozen thesis research code
+        uses: actions/checkout@v4
+        with:
+          ref: 1b5995a2f04b70c49071fba3c2d60e2f85d5d04d
+          path: research
+          fetch-depth: 1
+
+      - name: Checkout current live market capture code
+        uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-selection-reconstruction
+          path: production
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install only the live-paper dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e production -r production/requirements-e4.txt numpy scikit-learn aiohttp
+
+      - name: Compile true-online runner before spending live-stream time
+        run: |
+          python -m py_compile tools/e4_v12_dual_prototype_online_live.py
+          python tools/e4_v12_dual_prototype_online_live.py --help >/dev/null
+
+      - name: Download exact frozen 66k thesis corpus
+        run: |
+          mkdir -p frozen artifacts
+          gh run download 34262315056 --repo "$GITHUB_REPOSITORY" \
+            --name e4-v12-allout-launch-corpus-34262315056 --dir frozen
+          corpus="$(find frozen -name e4-v12-allout-launch-corpus.jsonl.gz -print -quit)"
+          test -s "$corpus"
+          echo "FROZEN_CORPUS=$corpus" >> "$GITHUB_ENV"
+
+      - name: Run both frozen theses directly on newly arriving launches
+        run: |
+          python tools/e4_v12_dual_prototype_online_live.py \
+            --research-root research \
+            --production-root production \
+            --corpus "$FROZEN_CORPUS" \
+            --duration-seconds 19800 \
+            --target-closed-trades 20 \
+            --entry-delay-ms 10 \
+            --heartbeat-seconds 60 \
+            --output artifacts/e4-v12-dual-prototype-online-live.json \
+            --progress artifacts/e4-v12-dual-prototype-online-progress.json
+          cat artifacts/e4-v12-dual-prototype-online-live.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload only forward-live thesis evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e4-v12-dual-prototype-online-live-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-dual-prototype-online-progress.json
+            artifacts/e4-v12-dual-prototype-online-live.json
+            artifacts/e4-v12-dual-prototype-online-live.md
+          if-no-files-found: warn
+          retention-days: 30
