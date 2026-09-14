@@ -1,6 +1,6 @@
 {
   "fatal": [],
-  "last_signal_age_seconds": 366.7866461277008,
+  "last_signal_age_seconds": 427.9906265735626,
   "publication_failures": 0,
   "resource_limits": {
     "max_runner_seconds": 20400,
@@ -53,43 +53,43 @@
         "wins": 0
       }
     },
-    "checked_at": 1789353888.8626428,
+    "checked_at": 1789353948.8925204,
     "config_hash": "7e39d6edf7339dfe99d54794292c0d9604fb56edadd53aff7e73bb2f9edd8263",
     "counts": {
-      "UNSUPPORTED_QUOTE": 18,
-      "decoded_events": 13166,
-      "launches_seen": 216,
+      "UNSUPPORTED_QUOTE": 20,
+      "decoded_events": 15548,
+      "launches_seen": 255,
       "live_prior_selection_updates": 1,
-      "scored": 198
+      "scored": 235
     },
-    "elapsed_seconds": 370.1775236129761,
+    "elapsed_seconds": 430.2074017524719,
     "endpoints": {
       "0": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 50935
+        "messages": 64191
       },
       "1": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 40019
+        "messages": 51993
       }
     },
     "execution_model": "paper reserve quotes; 10ms floor is an assumption, NOT proven transaction landing latency",
     "failures": [],
     "feed": {
-      "age_seconds": 9.1,
+      "age_seconds": 8.96,
       "fallback_used": false,
       "fresh": true,
       "recent_errors": [],
-      "sol_usd": 100.665,
+      "sol_usd": 100.73,
       "source": "coinbase"
     },
-    "last_event_at": 1789353888.6112103,
-    "last_launch_at": 1789353888.6070035,
-    "last_score_at": 1789353888.6151836,
+    "last_event_at": 1789353948.8482513,
+    "last_launch_at": 1789353944.9721062,
+    "last_score_at": 1789353944.982434,
     "live_history_outcomes": "selection priors updated on received E4 buys; no invented net-PnL outcome priors",
     "no_retuning": true,
     "paper_only": true,
@@ -117,24 +117,29 @@
             "score": 0.8494961149261236
           },
           {
+            "gap": 0.1668400250858968,
+            "mint": "2LJVD5K87r3TALG2As3msm4MSBmw1yNypHZt45xPpump",
+            "score": 0.8255340695819395
+          },
+          {
             "gap": 0.19605990366152148,
             "mint": "Goh6nn9y1Afw4CzvVE44ycWfMEYtQeFpbVTsWVkypump",
             "score": 0.7963141910063148
-          },
-          {
-            "gap": 0.2517388092605187,
-            "mint": "B1bp1C41TK9yWbPivJLJMfEzYLS21bbaMqww4TY6pump",
-            "score": 0.7406352854073176
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 198
+          "BELOW_THRESHOLD": 235
         },
-        "recent_score_p50": 0.4382138207249552,
+        "recent_score_p50": 0.42710208895328056,
         "score_max": 0.9006081306475204
       },
       "B_75": {
         "closest_misses": [
+          {
+            "gap": 0.05451113253789497,
+            "mint": "8Bnr2Cu2ogz5PLqWBQRjz1Yf2VX84e2kU5HNMZggpump",
+            "score": 0.9293170849264695
+          },
           {
             "gap": 0.06484746862138424,
             "mint": "B1bp1C41TK9yWbPivJLJMfEzYLS21bbaMqww4TY6pump",
@@ -154,28 +159,23 @@
             "gap": 0.13757414067817253,
             "mint": "2jMKk7xE7FzWhpPBi2uVWCbXCQU8DWwYooB9izaipump",
             "score": 0.8462540767861919
-          },
-          {
-            "gap": 0.16206196294606745,
-            "mint": "Goh6nn9y1Afw4CzvVE44ycWfMEYtQeFpbVTsWVkypump",
-            "score": 0.821766254518297
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 198
+          "BELOW_THRESHOLD": 235
         },
-        "recent_score_p50": 0.37086910434730247,
-        "score_max": 0.9189807488429802
+        "recent_score_p50": 0.35752433008244583,
+        "score_max": 0.9293170849264695
       }
     },
-    "scoring_ms_p95": 11.461257950037403,
+    "scoring_ms_p95": 11.485073900030326,
     "started_at": 1789353518.6851196,
     "status": "RUNNING",
     "version": "e4-v12-supervised-online-v2",
     "wall_time_limit_seconds": 19800.0
   },
   "runner_pid": 3489,
-  "supervisor_checked_at": 1789353892.6627626,
+  "supervisor_checked_at": 1789353953.866743,
   "supervisor_state": "WATCHING",
   "warnings": []
 }
