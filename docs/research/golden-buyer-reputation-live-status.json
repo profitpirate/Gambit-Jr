@@ -6,66 +6,66 @@
     "account": {
       "active_positions": 0,
       "campaign_starting_balance_sol": 5.0,
-      "cash_sol": 5.035141227743887,
-      "closed_trades": 12,
-      "equity_sol": 5.035141227743887,
-      "expectancy_sol": 0.002928435645324002,
+      "cash_sol": 5.031806549767257,
+      "closed_trades": 13,
+      "equity_sol": 5.031806549767257,
+      "expectancy_sol": 0.002446657674404517,
       "largest_winner_profit_share": 0.3349606371026469,
-      "losses": 5,
+      "losses": 6,
       "maximum_drawdown_fraction": 0.00924514342425439,
-      "net_pnl_sol": 0.035141227743888025,
+      "net_pnl_sol": 0.031806549767258725,
       "pending_entries": 0,
-      "profit_factor": 1.366201544379581,
+      "profit_factor": 1.320320171899193,
       "rejections": {},
-      "roi_fraction": 0.007028245548777345,
+      "roi_fraction": 0.006361309953451411,
       "shadow_conviction": {
         "activation_closed_trades": 11,
         "activation_equity_sol": 5.020153260572336,
         "actual_position_fraction": 0.0185,
         "enabled": true,
         "execution_unchanged": true,
-        "losses": 0,
+        "losses": 1,
         "market_impact_adjusted": false,
         "note": "Sizing-only counterfactual; same selected trades and percentage returns as fixed 1.85% paper execution.",
-        "profit_factor": 999.0,
-        "shadow_equity_sol": 5.036356468325365,
-        "shadow_net_pnl_sol_since_activation": 0.01620320775302897,
-        "shadow_roi_since_activation": 0.003227632088503629,
-        "shadow_trades": 1,
+        "profit_factor": 2.9956617052714734,
+        "shadow_equity_sol": 5.030947577286528,
+        "shadow_net_pnl_sol_since_activation": 0.010794316714192398,
+        "shadow_roi_since_activation": 0.0021501966481720647,
+        "shadow_trades": 2,
         "version": "golden-conviction-shadow-v1",
         "wins": 1
       },
-      "signals": 12,
+      "signals": 13,
       "task_errors": [],
       "unresolved_exposure": false,
-      "win_rate": 0.5833333333333334,
+      "win_rate": 0.5384615384615384,
       "wins": 7
     },
-    "checked_at": 1789417439.15204,
+    "checked_at": 1789417559.7992897,
     "counts": {
-      "benchmark_outcomes": 801,
-      "benchmark_skipped": 11,
-      "benchmark_wins": 151,
-      "decisions": 813,
-      "decoded_events": 110633,
-      "early_buyers_seen": 706,
-      "launches_seen": 813,
-      "qualified": 1,
-      "unsupported_quote": 311
+      "benchmark_outcomes": 849,
+      "benchmark_skipped": 12,
+      "benchmark_wins": 163,
+      "decisions": 861,
+      "decoded_events": 116830,
+      "early_buyers_seen": 744,
+      "launches_seen": 861,
+      "qualified": 2,
+      "unsupported_quote": 325
     },
-    "elapsed_seconds": 2136.46280169487,
+    "elapsed_seconds": 2257.110051393509,
     "endpoints": {
       "wss://api.mainnet-beta.solana.com": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 535281
+        "messages": 555362
       },
       "wss://solana-rpc.publicnode.com": {
         "connections": 2,
         "disconnects": 1,
         "errors": [],
-        "messages": 200490
+        "messages": 208507
       }
     },
     "frozen_rule": {
@@ -76,148 +76,148 @@
       "minimum_prior_win_rate": 0.7,
       "position_fraction": 0.0185
     },
-    "last_event_at": 1789417439.151731,
+    "last_event_at": 1789417559.5102286,
     "no_e4_entry_signal": true,
     "paper_only": true,
     "phase": "online",
-    "queue_depth": 1,
+    "queue_depth": 6,
     "recent_decisions": [
       {
         "buyer_count": 0,
-        "mint": "CfiJHqExfCJkeXufDJ22MbLfyueFC9fuWYEAjW1npump",
+        "mint": "973WipqvqvQbSx7yJKB5fujTLkG67AhWGocxGLdBpump",
         "prior_appearances": 0,
         "prior_win_rate": null,
         "qualifies": false
       },
       {
         "buyer_count": 0,
-        "mint": "Gz28QgAyqcV4a3iRwCfNHodHfbsWDLcZHhnNxzqspump",
+        "mint": "8jpLZKCq7jgGy9PtwaEG9WLnFhfQrryeJFFhcEW2pump",
         "prior_appearances": 0,
         "prior_win_rate": null,
-        "qualifies": false
-      },
-      {
-        "buyer_count": 0,
-        "mint": "5qDFD8oQT2QtDLh39P6JJz6h5GfWD3nM5U613G27pump",
-        "prior_appearances": 0,
-        "prior_win_rate": null,
-        "qualifies": false
-      },
-      {
-        "buyer_count": 0,
-        "mint": "ATcF4fkPAu85HQypNHmbbSK6h1UtJKGBwdDTt84Bpump",
-        "prior_appearances": 0,
-        "prior_win_rate": null,
-        "qualifies": false
-      },
-      {
-        "buyer_count": 0,
-        "mint": "4q5fqUfWtLXJeiy4tLZ9eNRReFx2o5hEBB6mBGdwpump",
-        "prior_appearances": 0,
-        "prior_win_rate": null,
-        "qualifies": false
-      },
-      {
-        "buyer_count": 0,
-        "mint": "xQU32tAq1uGaYKSPLfHfXP3U4DszfgXMtPziAmypump",
-        "prior_appearances": 0,
-        "prior_win_rate": null,
-        "qualifies": false
-      },
-      {
-        "buyer_count": 0,
-        "mint": "2ffVdBwrfBopMBdB7942qgKYrKTFqJHt6mvakb3epump",
-        "prior_appearances": 0,
-        "prior_win_rate": null,
-        "qualifies": false
-      },
-      {
-        "buyer_count": 0,
-        "mint": "6ddftCnFbLaQ1NkWbvLuriPuvvRBQyXYoqQvT4nzpump",
-        "prior_appearances": 0,
-        "prior_win_rate": null,
-        "qualifies": false
-      },
-      {
-        "buyer_count": 1,
-        "mint": "9NuLyc5CAYEWAUoASTf8hhhV9bCGiEKndiRb8ncLpump",
-        "prior_appearances": 4,
-        "prior_win_rate": 0.25,
-        "qualifies": false
-      },
-      {
-        "buyer_count": 0,
-        "mint": "p7X6cdnmbDXVJeqXVNwLhbpsVwf2yNz5XvYwzEzpump",
-        "prior_appearances": 0,
-        "prior_win_rate": null,
-        "qualifies": false
-      },
-      {
-        "buyer_count": 0,
-        "mint": "CagjRFzFRwibJeRTiV4GpTQfrr3mWqzQwWcLEd8mpump",
-        "prior_appearances": 0,
-        "prior_win_rate": null,
-        "qualifies": false
-      },
-      {
-        "buyer_count": 0,
-        "mint": "8UrdtNe85zSqLViq7gQfYvF3Vac9FLGqvVvfHF1xpump",
-        "prior_appearances": 0,
-        "prior_win_rate": null,
-        "qualifies": false
-      },
-      {
-        "buyer_count": 0,
-        "mint": "9ptYVChRTj3kcabTPQ23scWfB1LuKDAZ4S6byUYVpump",
-        "prior_appearances": 0,
-        "prior_win_rate": null,
-        "qualifies": false
-      },
-      {
-        "buyer_count": 0,
-        "mint": "2FduxcHP4iMZFN68UfyJKwfXHa6MsNiqPxEZTk76pump",
-        "prior_appearances": 0,
-        "prior_win_rate": null,
-        "qualifies": false
-      },
-      {
-        "buyer_count": 0,
-        "mint": "3aUcv4fcJ8Jx9aEeMfj38zuVcr5kcbsRMyboca1opump",
-        "prior_appearances": 0,
-        "prior_win_rate": null,
-        "qualifies": false
-      },
-      {
-        "buyer_count": 1,
-        "mint": "4XJEGjvQWsKbU4GRCf2jq32RUffJD592F3SPQ79qpump",
-        "prior_appearances": 942,
-        "prior_win_rate": 0.27282377919320594,
         "qualifies": false
       },
       {
         "buyer_count": 3,
-        "mint": "ExXdrtdEmLupdFrStqB9PiVspYtWWwiGUJdpf3pipump",
-        "prior_appearances": 26,
-        "prior_win_rate": 0.5769230769230769,
+        "mint": "RsEHWAJ1KzfrbobCeF5FS412nG8zjHD5qQbThxqpump",
+        "prior_appearances": 337,
+        "prior_win_rate": 0.10385756676557864,
         "qualifies": false
       },
       {
+        "buyer_count": 2,
+        "mint": "j2yZN9LQVuizdX7EWtrNUESLDTTRyhgi2rpntQfpump",
+        "prior_appearances": 11,
+        "prior_win_rate": 0.8181818181818182,
+        "qualifies": true
+      },
+      {
         "buyer_count": 0,
-        "mint": "Fv3vycgEW6oq5X5D6b7UUeKv7m6Wftr6ya4PPGS4pump",
+        "mint": "JD5XRjfg4rAvTxvEeXmmhrzDu9G2GWEXvhTULYiTpump",
         "prior_appearances": 0,
         "prior_win_rate": null,
         "qualifies": false
       },
       {
         "buyer_count": 0,
-        "mint": "9bDbx8NSEKZMS6PqEWy2e6gXLq3uLaiBeZScgYwkpump",
+        "mint": "99knJyMwuf6o9gg7uySqXyiYEuK7eEJWvGyWaKvgpump",
         "prior_appearances": 0,
         "prior_win_rate": null,
         "qualifies": false
       },
       {
         "buyer_count": 0,
-        "mint": "ADJX4bgPNna5KtjsYeWyFm9n1Fd6gtqgqYSxVUXKpump",
+        "mint": "7SCWdKyGAtXDcZ5BsbkUuRSjdJPuKcUJD4oK8c1Dpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "7ueH12xRt1QqPtCuv8cS65Ga5S9HsZ8tJboTtdtopump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "HjvjvTVEYbsWX4REfDK7nPR3KSdDqdxtrJr4fFTkpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "4MRrXEFvWS9ZdKAVn5TKevykR11YLmvwSBXiL27Hpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "6iYuKsKFrurkR58Zgz4xdosWYFfUoHGDH8saN4eRpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "8FcZNUVT75nu3AhWSLSDy2A3BBnzzTwNX8WjPhZFpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "8SRP4tHoVsjQ33x8L6hjZTnt5EHsKcJgQGugKCjcpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "29NHQwHwvhu5NfBJNrddcv33iTDkU369L7Pw9NnKpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "voWtBeKxEynbjo82FBQqLtf882hSCGU7jRcXwaipump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 5,
+        "mint": "GKXhbnQdbwk8QW9GGWkDr6N3spZxnTACXnVEzVX6pump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 4,
+        "mint": "dmGy14LfJjEKGyddAu2RvhFRrVc91T2Uux29kZqpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "6ZXqmCbk4XG541afrpK9XW9MKiZVCeaehAALk93Upump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "2XbyXv5KPXsoo3yB2L6jNmeMm7jCLc8H85iWn5tQpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "2DkFqmRBrMfV31deHnbw88mqTtbHTsDFxF6L7U4opump",
         "prior_appearances": 0,
         "prior_win_rate": null,
         "qualifies": false
@@ -230,7 +230,7 @@
   },
   "runner_pid": 2486,
   "stop_reason": null,
-  "supervisor_checked_at": 1789417454.752498,
+  "supervisor_checked_at": 1789417575.823775,
   "supervisor_state": "WATCHING",
   "warnings": []
 }
