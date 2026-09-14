@@ -228,7 +228,13 @@ class RunnerGuardian:
         ):
             return self._bounded_action("EXIT", self.remaining_fraction, "PERSISTENT_DETERIORATION", mark)
 
-        # 4) Strength scale-outs. These are experimental Golden rules, not
+        # 4) Max hold is an absolute flattening ceiling. It is checked before
+        # discretionary strength/give-back scale-outs so a milestone reached at
+        # the ceiling cannot accidentally keep exposure open beyond its tier.
+        if mark.t_ms >= self.config.max_hold_ms:
+            return self._bounded_action("EXIT", self.remaining_fraction, "MAX_RUNNER_HOLD", mark)
+
+        # 5) Strength scale-outs. These are experimental Golden rules, not
         # claimed E4 thresholds. They create an initial-plus-runner structure.
         for level, fraction in self.config.strength_steps:
             if self.peak_return >= level and level not in self.strength_taken:
@@ -239,7 +245,7 @@ class RunnerGuardian:
                     mark,
                 )
 
-        # 5) Peak give-back protection. Reduce, do not automatically flatten,
+        # 6) Peak give-back protection. Reduce, do not automatically flatten,
         # while the runner is still profitable. This lets strong trades breathe.
         if (
             self.peak_return >= 0.10
@@ -253,10 +259,6 @@ class RunnerGuardian:
                 f"PEAK_GIVEBACK_{self.trail_reductions}",
                 mark,
             )
-
-        # 6) Time is only a final ceiling, not the primary exit reason.
-        if mark.t_ms >= self.config.max_hold_ms:
-            return self._bounded_action("EXIT", self.remaining_fraction, "MAX_RUNNER_HOLD", mark)
 
         return None
 
@@ -291,12 +293,15 @@ def self_test() -> None:
     assert g.on_mark(Mark(500, -0.17)) is None
     assert not g.closed
 
-    # Sustained deep deterioration eventually exits.
-    g.on_mark(Mark(900, -0.19))
-    g.on_mark(Mark(1000, -0.21))
-    g.on_mark(Mark(1100, -0.23))
-    action = g.on_mark(Mark(1200, -0.26))
-    assert action is not None and action.kind == "EXIT"
+    # Sustained deep deterioration exits by 1200ms (it may trigger earlier once
+    # four declining marks exist).
+    exit_action = None
+    for t, r in ((900, -0.19), (1000, -0.21), (1100, -0.23), (1200, -0.26)):
+        action = g.on_mark(Mark(t, r))
+        if action is not None and action.kind == "EXIT":
+            exit_action = action
+            break
+    assert exit_action is not None and g.closed
 
     # Strong runner gets progressive scale-out rather than forced 2s flatten.
     g2 = RunnerGuardian(TIERS["EXCEPTIONAL"])
