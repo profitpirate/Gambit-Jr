@@ -1,6 +1,6 @@
 {
   "fatal": [],
-  "last_signal_age_seconds": 1956.9164690971375,
+  "last_signal_age_seconds": 2018.5103011131287,
   "publication_failures": 0,
   "resource_limits": {
     "max_runner_seconds": 20400,
@@ -53,22 +53,22 @@
         "wins": 0
       }
     },
-    "checked_at": 1789355479.6754649,
+    "checked_at": 1789355539.704995,
     "config_hash": "7e39d6edf7339dfe99d54794292c0d9604fb56edadd53aff7e73bb2f9edd8263",
     "counts": {
-      "UNSUPPORTED_QUOTE": 121,
-      "decoded_events": 65993,
-      "launches_seen": 718,
+      "UNSUPPORTED_QUOTE": 124,
+      "decoded_events": 67998,
+      "launches_seen": 733,
       "live_prior_selection_updates": 2,
-      "scored": 597
+      "scored": 609
     },
-    "elapsed_seconds": 1960.990345954895,
+    "elapsed_seconds": 2021.0198760032654,
     "endpoints": {
       "0": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 378812
+        "messages": 399936
       },
       "1": {
         "connections": 2,
@@ -76,33 +76,38 @@
         "errors": [
           "ConnectionError:WebSocket closed"
         ],
-        "messages": 263576
+        "messages": 271135
       }
     },
     "execution_model": "paper reserve quotes; 10ms floor is an assumption, NOT proven transaction landing latency",
     "failures": [],
     "feed": {
-      "age_seconds": 5.76,
+      "age_seconds": 5.56,
       "fallback_used": false,
       "fresh": true,
       "recent_errors": [],
-      "sol_usd": 101.13,
+      "sol_usd": 101.225,
       "source": "coinbase"
     },
-    "last_event_at": 1789355479.4728062,
-    "last_launch_at": 1789355478.4408023,
-    "last_score_at": 1789355474.931939,
+    "last_event_at": 1789355539.43427,
+    "last_launch_at": 1789355537.5724893,
+    "last_score_at": 1789355537.5808046,
     "live_history_outcomes": "selection priors updated on received E4 buys; no invented net-PnL outcome priors",
     "no_retuning": true,
     "paper_only": true,
     "phase": "online",
-    "queue_depth": 0,
+    "queue_depth": 1,
     "run_id": "34799774359",
     "sample_target_per_thesis": 20,
     "score_queue_depth": 0,
     "scoring": {
       "A_86_96": {
         "closest_misses": [
+          {
+            "gap": 0.056033922991124196,
+            "mint": "8yhLqGfQePBMUvhhcbYAoXgFLynDGFc9afcmQWAPpump",
+            "score": 0.9363401716767121
+          },
           {
             "gap": 0.06298970037696316,
             "mint": "FEbGt9geziSfa7VAQi6aBhdw1mXJQFbZLddoXCjbpump",
@@ -122,21 +127,21 @@
             "gap": 0.07546742562156128,
             "mint": "B8CHg2mEAPdCsjNE4Eb935BkT96fn1iBymBwfjPVpump",
             "score": 0.916906669046275
-          },
-          {
-            "gap": 0.07734320577791842,
-            "mint": "3VaqYT4R7NnYzubk5HWFbKx87g2pE7zkT6D3W47kpump",
-            "score": 0.9150308888899179
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 597
+          "BELOW_THRESHOLD": 609
         },
-        "recent_score_p50": 0.44264164199423156,
-        "score_max": 0.9293843942908732
+        "recent_score_p50": 0.4445299128435572,
+        "score_max": 0.9363401716767121
       },
       "B_75": {
         "closest_misses": [
+          {
+            "gap": 0.014799155658987595,
+            "mint": "8yhLqGfQePBMUvhhcbYAoXgFLynDGFc9afcmQWAPpump",
+            "score": 0.9690290618053768
+          },
           {
             "gap": 0.016592072025533033,
             "mint": "FEbGt9geziSfa7VAQi6aBhdw1mXJQFbZLddoXCjbpump",
@@ -156,28 +161,23 @@
             "gap": 0.0331159754214817,
             "mint": "ZEqJmBLyC6p8FUsgfTREvuXH6gF8ByzqwuJ8jiYpump",
             "score": 0.9507122420428827
-          },
-          {
-            "gap": 0.04292994222066582,
-            "mint": "7ztLL8dz6Xtoxikrbu6pigWPQPtyTJg3k1wvjunmpump",
-            "score": 0.9408982752436986
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 597
+          "BELOW_THRESHOLD": 609
         },
-        "recent_score_p50": 0.3915239603627875,
-        "score_max": 0.9672361454388314
+        "recent_score_p50": 0.3919235941741173,
+        "score_max": 0.9690290618053768
       }
     },
-    "scoring_ms_p95": 11.447923000037004,
+    "scoring_ms_p95": 11.436210800036406,
     "started_at": 1789353518.6851196,
     "status": "RUNNING",
     "version": "e4-v12-supervised-online-v2",
     "wall_time_limit_seconds": 19800.0
   },
   "runner_pid": 3489,
-  "supervisor_checked_at": 1789355482.7925856,
+  "supervisor_checked_at": 1789355544.3864176,
   "supervisor_state": "WATCHING",
   "warnings": [
     "A_86_96:NO_SIGNALS_ABOVE_UNCHANGED_THRESHOLD",
