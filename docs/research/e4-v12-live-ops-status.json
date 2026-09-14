@@ -1,6 +1,6 @@
 {
   "fatal": [],
-  "last_signal_age_seconds": 1589.399650335312,
+  "last_signal_age_seconds": 1650.698234796524,
   "publication_failures": 0,
   "resource_limits": {
     "max_runner_seconds": 20400,
@@ -53,22 +53,22 @@
         "wins": 0
       }
     },
-    "checked_at": 1789355114.4900165,
+    "checked_at": 1789355174.5219333,
     "config_hash": "7e39d6edf7339dfe99d54794292c0d9604fb56edadd53aff7e73bb2f9edd8263",
     "counts": {
       "UNSUPPORTED_QUOTE": 103,
-      "decoded_events": 54055,
-      "launches_seen": 614,
+      "decoded_events": 55415,
+      "launches_seen": 624,
       "live_prior_selection_updates": 2,
-      "scored": 511
+      "scored": 521
     },
-    "elapsed_seconds": 1595.804898262024,
+    "elapsed_seconds": 1655.836814880371,
     "endpoints": {
       "0": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 305270
+        "messages": 307750
       },
       "1": {
         "connections": 2,
@@ -76,22 +76,22 @@
         "errors": [
           "ConnectionError:WebSocket closed"
         ],
-        "messages": 218803
+        "messages": 220601
       }
     },
     "execution_model": "paper reserve quotes; 10ms floor is an assumption, NOT proven transaction landing latency",
     "failures": [],
     "feed": {
-      "age_seconds": 1.68,
+      "age_seconds": 1.56,
       "fallback_used": false,
       "fresh": true,
       "recent_errors": [],
-      "sol_usd": 100.95,
+      "sol_usd": 101.04,
       "source": "coinbase"
     },
-    "last_event_at": 1789355114.3525858,
-    "last_launch_at": 1789355112.8267486,
-    "last_score_at": 1789355112.834992,
+    "last_event_at": 1789355174.3026521,
+    "last_launch_at": 1789355171.5802789,
+    "last_score_at": 1789355171.5895922,
     "live_history_outcomes": "selection priors updated on received E4 buys; no invented net-PnL outcome priors",
     "no_retuning": true,
     "paper_only": true,
@@ -130,9 +130,9 @@
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 511
+          "BELOW_THRESHOLD": 521
         },
-        "recent_score_p50": 0.4361802164039537,
+        "recent_score_p50": 0.43513859170611285,
         "score_max": 0.9293843942908732
       },
       "B_75": {
@@ -164,20 +164,20 @@
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 511
+          "BELOW_THRESHOLD": 521
         },
-        "recent_score_p50": 0.3854535388292865,
+        "recent_score_p50": 0.38507401023660026,
         "score_max": 0.9672361454388314
       }
     },
-    "scoring_ms_p95": 11.621398499954694,
+    "scoring_ms_p95": 11.5962149999973,
     "started_at": 1789353518.6851196,
     "status": "RUNNING",
     "version": "e4-v12-supervised-online-v2",
     "wall_time_limit_seconds": 19800.0
   },
   "runner_pid": 3489,
-  "supervisor_checked_at": 1789355115.2757668,
+  "supervisor_checked_at": 1789355176.5743513,
   "supervisor_state": "WATCHING",
   "warnings": [
     "A_86_96:NO_SIGNALS_ABOVE_UNCHANGED_THRESHOLD",
