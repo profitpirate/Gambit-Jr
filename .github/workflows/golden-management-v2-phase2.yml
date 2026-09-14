@@ -1,0 +1,223 @@
+name: Golden Management v2 Phase 2 stress and bulletproofing
+
+on:
+  push:
+    branches: [codex/golden-management-v2]
+    paths:
+      - "tools/golden_management_v2.py"
+      - "tools/golden_management_v2_live.py"
+      - "tools/golden_management_v2_report.py"
+      - "tools/golden_management_v2_stress.py"
+      - "tests/test_golden_management_v2.py"
+      - ".github/workflows/golden-management-v2-phase2.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: golden-management-v2-phase2
+  cancel-in-progress: true
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  policy-stress:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/golden-management-v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile and unit test
+        run: |
+          PYTHONPATH="$PWD:$PWD/tools" python -m py_compile tools/golden_management_v2.py tools/golden_management_v2_live.py tools/golden_management_v2_report.py tools/golden_management_v2_stress.py
+          PYTHONPATH="$PWD:$PWD/tools" python -m unittest tests.test_golden_management_v2 -v
+      - name: 50k adversarial randomized paths
+        run: |
+          mkdir -p artifacts
+          PYTHONPATH="$PWD:$PWD/tools" python tools/golden_management_v2_stress.py --paths 50000 --seed 20260914 --output artifacts/stress.json
+          python - <<'PY'
+          import json
+          d=json.load(open('artifacts/stress.json'))
+          assert d['status']=='PASS'
+          assert d['paths']==50000
+          assert d['max_total_fraction_sold'] <= 1.000000001
+          print('POLICY_STRESS_PASS')
+          PY
+      - name: Synthetic 50-trade final-report contract
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          rows=[]
+          for i in range(50):
+            win=i%3!=0
+            rows.append({
+              'status':'CLOSED','mint':f'SYNTH{i:03d}','win':win,'pnl_sol':.01 if win else -.008,
+              'return_fraction':.10 if win else -.08,'stake_sol':.1,'conviction_tier':['BASE','MEDIUM','HIGH','EXCEPTIONAL'][i%4],
+              'position_fraction':[.05,.08,.15,.25][i%4],'conviction_score':60+i%40,
+              'entry_reason':{'prior_appearances':20+i,'prior_wins':15,'prior_win_rate':.75,'buyer_count':3},
+              'create_to_decision_ms':10.3,'decision_to_entry_ms':6.5,'create_to_entry_ms':16.8,
+              'mfe_fraction':.2,'mae_fraction':-.1,'actual_hold_ms':3000,'exit_reason':'TEST_EXIT',
+              'control_v1_2s':{'pnl_sol':.001},
+              'post_exit':{'complete':True,'went_higher_than_exit':i%2==0,'went_lower_than_exit':True,'max_return_fraction':.25,'min_return_fraction':-.12},
+              'actions':[{'kind':'INITIAL','reason':'STRUCTURAL_INITIAL','t_ms':350,'fraction_of_entry':.3,'mark_return':.01,'proceeds_sol':.03}],
+            })
+          state={'account':{'cash_sol':3.1,'ledger':rows}}
+          pathlib.Path('artifacts/synth-state.json').write_text(json.dumps(state))
+          PY
+          python tools/golden_management_v2_report.py --state artifacts/synth-state.json --minimum-trades 50 --output-md artifacts/synth-report.md --output-json artifacts/synth-report.json
+          grep -q 'Trade 50' artifacts/synth-report.md
+          grep -q 'Suggested feedback' artifacts/synth-report.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: golden-v2-policy-stress-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 30
+
+  exact-transport-speed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          path: transport
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install exact transport benchmark stack
+        working-directory: transport
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e . -r requirements-e4.txt
+          cd tools/e4-builder && npm install --omit=dev
+      - name: Transport regression tests
+        working-directory: transport
+        env:
+          E4_PIPELINES_BACKGROUND: "false"
+          E4_SOL_USD_FALLBACK: "150"
+          E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
+          E4_BUILDER_PRELOAD: "tools/e4-builder/fast-preload-v4.mjs"
+          E4_BUILDER_WORKERS: "2"
+          E4_BUILDER_RACE_CHILDREN: "4"
+          E4_BALANCE_CACHE_MAX_STALENESS_MS: "5000"
+          E4_DIRECT_COPY_MAX_OUTPUT_SHORTFALL_BPS: "600"
+        run: |
+          python -m unittest tests.test_e4_v12_true_latency_replay -v
+          python -m unittest tests.test_e4_v12_sub10ms_transport_final -v
+      - name: Exact 1000-probe quote-to-route-ack benchmark
+        working-directory: transport
+        env:
+          E4_PIPELINES_BACKGROUND: "false"
+          E4_SOL_USD_FALLBACK: "150"
+          E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
+          E4_BUILDER_PRELOAD: "tools/e4-builder/fast-preload-v4.mjs"
+          E4_BUILDER_WORKERS: "2"
+          E4_BUILDER_RACE_CHILDREN: "4"
+          E4_BALANCE_CACHE_MAX_STALENESS_MS: "5000"
+          E4_DIRECT_COPY_MAX_OUTPUT_SHORTFALL_BPS: "600"
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_v12_sub10ms_benchmark_v4.py --warmup 100 --probes 1000 --output artifacts/v2-transport-benchmark.json
+          python - <<'PY'
+          import json
+          d=json.load(open('artifacts/v2-transport-benchmark.json'))
+          q=d.get('quote_to_route_ack_ms') or {}
+          assert d.get('sub10ms_p95_pass') is True, d
+          assert float(q.get('p95') or 1e9) < 10.0, q
+          print('EXACT_TRANSPORT_P95_MS',q.get('p95'))
+          print('EXACT_TRANSPORT_P99_MS',q.get('p99'))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: golden-v2-exact-transport-${{ github.run_id }}
+          path: transport/artifacts/v2-transport-benchmark.json
+          retention-days: 30
+
+  fresh-live-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/golden-management-v2
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-selection-reconstruction
+          path: production
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install live decoder dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e production -r production/requirements-e4.txt aiohttp
+      - name: Restore exact frozen reputation corpus
+        run: |
+          mkdir -p frozen artifacts/live-smoke
+          gh run download 34262315056 --repo "$GITHUB_REPOSITORY" --name e4-v12-allout-launch-corpus-34262315056 --dir frozen
+          corpus="$(find frozen -name e4-v12-allout-launch-corpus.jsonl.gz -print -quit)"
+          test -s "$corpus"
+          echo "CORPUS=$corpus" >> "$GITHUB_ENV"
+      - name: Two-minute true-online fresh-launch smoke
+        run: |
+          set +e
+          PYTHONPATH="$PWD:$PWD/tools" python tools/golden_management_v2_live.py \
+            --production-root production --corpus "$CORPUS" --starting-balance-sol 3 \
+            --execution-delay-ms 6 --target-closed-trades 999 --duration-seconds 120 --heartbeat-seconds 15 \
+            --state-output artifacts/live-smoke/state.json --status artifacts/live-smoke/status.json --output artifacts/live-smoke/final.json
+          rc=$?
+          set -e
+          test "$rc" -eq 3 || test "$rc" -eq 0
+      - name: Assert live means live and fresh
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('artifacts/live-smoke/final.json'))
+          assert s['paper_only'] is True
+          assert s['real_money_execution'] is False
+          assert s['historical_replay'] is False
+          assert s['market_data_mode']=='LIVE_SOLANA_WEBSOCKET_FRESH_LAUNCHES_ONLY'
+          assert int(s['counts'].get('launches_seen',0)) > 0, s['counts']
+          assert int(s['counts'].get('decoded_events',0)) > 0, s['counts']
+          a=s['account']
+          assert float(a['campaign_starting_balance_sol'])==3.0
+          assert not a.get('task_errors')
+          assert not a.get('unresolved_exposure')
+          lat=a.get('execution_latency_ms') or {}
+          if int(lat.get('count') or 0) >= 1:
+              assert float(lat.get('p95') or 1e9) < 10.0, lat
+          print('FRESH_LIVE_SMOKE_PASS',s['counts'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: golden-v2-fresh-live-smoke-${{ github.run_id }}
+          path: artifacts/live-smoke/
+          retention-days: 30
+
+  phase2-gate:
+    needs: [policy-stress, exact-transport-speed, fresh-live-smoke]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Phase 2 complete
+        run: |
+          mkdir -p artifacts
+          cat > artifacts/phase2.json <<'JSON'
+          {"phase":2,"name":"stress testing / bulletproofing / bug fixing","status":"COMPLETE","requirements":{"randomized_paths":50000,"exact_transport_p95_lt_ms":10,"fresh_live_smoke":true,"paper_only":true}}
+          JSON
+      - uses: actions/upload-artifact@v4
+        with:
+          name: golden-management-v2-phase2-${{ github.run_id }}
+          path: artifacts/phase2.json
+          retention-days: 30
