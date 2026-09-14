@@ -1,6 +1,6 @@
 {
   "fatal": [],
-  "last_signal_age_seconds": 0.0,
+  "last_signal_age_seconds": 61.219977378845215,
   "publication_failures": 0,
   "resource_limits": {
     "max_runner_seconds": 20400,
@@ -53,41 +53,42 @@
         "wins": 0
       }
     },
-    "checked_at": 1789353523.6882424,
+    "checked_at": 1789353583.7138312,
     "config_hash": "7e39d6edf7339dfe99d54794292c0d9604fb56edadd53aff7e73bb2f9edd8263",
     "counts": {
-      "decoded_events": 222,
-      "launches_seen": 3,
-      "scored": 3
+      "UNSUPPORTED_QUOTE": 5,
+      "decoded_events": 2352,
+      "launches_seen": 41,
+      "scored": 36
     },
-    "elapsed_seconds": 5.0031232833862305,
+    "elapsed_seconds": 65.02871227264404,
     "endpoints": {
       "0": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 763
+        "messages": 10126
       },
       "1": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 1055
+        "messages": 9044
       }
     },
     "execution_model": "paper reserve quotes; 10ms floor is an assumption, NOT proven transaction landing latency",
     "failures": [],
     "feed": {
-      "age_seconds": 4.96,
+      "age_seconds": 4.76,
       "fallback_used": false,
       "fresh": true,
       "recent_errors": [],
-      "sol_usd": 100.66,
+      "sol_usd": 100.67,
       "source": "coinbase"
     },
-    "last_event_at": 1789353523.684128,
-    "last_launch_at": 1789353520.906847,
-    "last_score_at": 1789353520.9159963,
+    "last_event_at": 1789353583.7076192,
+    "last_launch_at": 1789353581.7968504,
+    "last_score_at": 1789353581.8054302,
     "live_history_outcomes": "selection priors updated on received E4 buys; no invented net-PnL outcome priors",
     "no_retuning": true,
     "paper_only": true,
@@ -100,60 +101,80 @@
       "A_86_96": {
         "closest_misses": [
           {
-            "gap": 0.53245336713839,
-            "mint": "HiktdKENtLKMLrxqnWzPenkZYdGeTWi1J9QXD5hNpump",
-            "score": 0.45992072752944635
+            "gap": 0.19605990366152148,
+            "mint": "Goh6nn9y1Afw4CzvVE44ycWfMEYtQeFpbVTsWVkypump",
+            "score": 0.7963141910063148
           },
           {
-            "gap": 0.6006406703364212,
-            "mint": "5yDbuJBgQninveQadoak4Li9qCrJQJEm7M1rTpXipump",
-            "score": 0.3917334243314151
+            "gap": 0.27426107819669965,
+            "mint": "H48EXdNDXj5CFr8p3uuCxajbwWica2o4G3GbEbXDpump",
+            "score": 0.7181130164711367
           },
           {
-            "gap": 0.6662849589615996,
-            "mint": "HhfBDs1AJKUJgXSiEwaEH3RAVaPKA4iaJ2NBJXJdpump",
-            "score": 0.32608913570623677
+            "gap": 0.370011806175119,
+            "mint": "HGGD7vpuEnf3PZfG2iwjnFhUd4D5DMwrtXdcF1rLpump",
+            "score": 0.6223622884927174
+          },
+          {
+            "gap": 0.40086125415286455,
+            "mint": "8kBv4KrXHWCa3ayBLdLfRKkBbjcNr74YHXbmEJaVpump",
+            "score": 0.5915128405149718
+          },
+          {
+            "gap": 0.4195407960229891,
+            "mint": "BcakGzvUiDkgQraXqrpydaeGxKxAyXcDP7LE8qUEpump",
+            "score": 0.5728332986448472
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 3
+          "BELOW_THRESHOLD": 36
         },
-        "recent_score_p50": 0.3917334243314151,
-        "score_max": 0.45992072752944635
+        "recent_score_p50": 0.4198361042123392,
+        "score_max": 0.7963141910063148
       },
       "B_75": {
         "closest_misses": [
           {
-            "gap": 0.43689677114176073,
-            "mint": "HiktdKENtLKMLrxqnWzPenkZYdGeTWi1J9QXD5hNpump",
-            "score": 0.5469314463226037
+            "gap": 0.12410973983388363,
+            "mint": "H48EXdNDXj5CFr8p3uuCxajbwWica2o4G3GbEbXDpump",
+            "score": 0.8597184776304808
           },
           {
-            "gap": 0.7005978971524277,
-            "mint": "5yDbuJBgQninveQadoak4Li9qCrJQJEm7M1rTpXipump",
-            "score": 0.28323032031193673
+            "gap": 0.16206196294606745,
+            "mint": "Goh6nn9y1Afw4CzvVE44ycWfMEYtQeFpbVTsWVkypump",
+            "score": 0.821766254518297
           },
           {
-            "gap": 0.7841341356463739,
-            "mint": "HhfBDs1AJKUJgXSiEwaEH3RAVaPKA4iaJ2NBJXJdpump",
-            "score": 0.19969408181799053
+            "gap": 0.33897546186535277,
+            "mint": "8kBv4KrXHWCa3ayBLdLfRKkBbjcNr74YHXbmEJaVpump",
+            "score": 0.6448527555990117
+          },
+          {
+            "gap": 0.40089047883135054,
+            "mint": "HGGD7vpuEnf3PZfG2iwjnFhUd4D5DMwrtXdcF1rLpump",
+            "score": 0.5829377386330139
+          },
+          {
+            "gap": 0.426229174247417,
+            "mint": "9W8Z25doBm5WKjbgpQmFXaE7v2Y1uWVCBiPMd8uUpump",
+            "score": 0.5575990432169474
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 3
+          "BELOW_THRESHOLD": 36
         },
-        "recent_score_p50": 0.28323032031193673,
-        "score_max": 0.5469314463226037
+        "recent_score_p50": 0.35364282352071297,
+        "score_max": 0.8597184776304808
       }
     },
-    "scoring_ms_p95": 9.293623299993214,
+    "scoring_ms_p95": 11.231756999997344,
     "started_at": 1789353518.6851196,
     "status": "RUNNING",
     "version": "e4-v12-supervised-online-v2",
     "wall_time_limit_seconds": 19800.0
   },
   "runner_pid": 3489,
-  "supervisor_checked_at": 1789353525.8761165,
+  "supervisor_checked_at": 1789353587.096094,
   "supervisor_state": "WATCHING",
   "warnings": []
 }
