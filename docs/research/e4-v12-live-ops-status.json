@@ -1,6 +1,6 @@
 {
   "fatal": [],
-  "last_signal_age_seconds": 550.6876957416534,
+  "last_signal_age_seconds": 611.8987035751343,
   "publication_failures": 0,
   "resource_limits": {
     "max_runner_seconds": 20400,
@@ -53,48 +53,48 @@
         "wins": 0
       }
     },
-    "checked_at": 1789354073.952901,
+    "checked_at": 1789354133.9844332,
     "config_hash": "7e39d6edf7339dfe99d54794292c0d9604fb56edadd53aff7e73bb2f9edd8263",
     "counts": {
-      "UNSUPPORTED_QUOTE": 30,
-      "decoded_events": 19904,
-      "launches_seen": 296,
+      "UNSUPPORTED_QUOTE": 38,
+      "decoded_events": 22569,
+      "launches_seen": 324,
       "live_prior_selection_updates": 1,
-      "scored": 266
+      "scored": 286
     },
-    "elapsed_seconds": 555.2677817344666,
+    "elapsed_seconds": 615.2993142604828,
     "endpoints": {
       "0": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 102709
+        "messages": 117251
       },
       "1": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 76841
+        "messages": 89548
       }
     },
     "execution_model": "paper reserve quotes; 10ms floor is an assumption, NOT proven transaction landing latency",
     "failures": [],
     "feed": {
-      "age_seconds": 13.68,
+      "age_seconds": 13.56,
       "fallback_used": false,
       "fresh": true,
       "recent_errors": [],
-      "sol_usd": 100.825,
+      "sol_usd": 100.8,
       "source": "coinbase"
     },
-    "last_event_at": 1789354073.8199196,
-    "last_launch_at": 1789354068.139646,
-    "last_score_at": 1789354068.1480484,
+    "last_event_at": 1789354133.6860893,
+    "last_launch_at": 1789354133.369357,
+    "last_score_at": 1789354133.3782306,
     "live_history_outcomes": "selection priors updated on received E4 buys; no invented net-PnL outcome priors",
     "no_retuning": true,
     "paper_only": true,
     "phase": "online",
-    "queue_depth": 1,
+    "queue_depth": 0,
     "run_id": "34799774359",
     "sample_target_per_thesis": 20,
     "score_queue_depth": 0,
@@ -107,6 +107,16 @@
             "score": 0.9201342523620247
           },
           {
+            "gap": 0.08554669395002734,
+            "mint": "Gxbd2H3SZKiTQ88F8doaLut79EGyykbLdn4tRhCDpump",
+            "score": 0.906827400717809
+          },
+          {
+            "gap": 0.08643354352150245,
+            "mint": "6p3n2mdrx6FTKRXdRuWtMAfdEGXvNonzYyaNBHoipump",
+            "score": 0.9059405511463339
+          },
+          {
             "gap": 0.08749434935446787,
             "mint": "ia7pVaas5aybDwvansjXuCDbdqHQ9YBkqwuyW3zpump",
             "score": 0.9048797453133685
@@ -115,20 +125,10 @@
             "gap": 0.0917659640203159,
             "mint": "3rijuxxRu3afUGnxHGpKvx3EvKgRit3rqDKabnKUpump",
             "score": 0.9006081306475204
-          },
-          {
-            "gap": 0.10346009951934731,
-            "mint": "2jMKk7xE7FzWhpPBi2uVWCbXCQU8DWwYooB9izaipump",
-            "score": 0.888913995148489
-          },
-          {
-            "gap": 0.14287797974171268,
-            "mint": "HeGdgwyxcrY44aqzvECdY6U3SuFAwDqUoM4Pm8Fcpump",
-            "score": 0.8494961149261236
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 266
+          "BELOW_THRESHOLD": 286
         },
         "recent_score_p50": 0.42725154236341967,
         "score_max": 0.9201342523620247
@@ -151,31 +151,31 @@
             "score": 0.919906176241366
           },
           {
+            "gap": 0.06475951764133092,
+            "mint": "Gxbd2H3SZKiTQ88F8doaLut79EGyykbLdn4tRhCDpump",
+            "score": 0.9190686998230335
+          },
+          {
             "gap": 0.06484746862138424,
             "mint": "B1bp1C41TK9yWbPivJLJMfEzYLS21bbaMqww4TY6pump",
             "score": 0.9189807488429802
-          },
-          {
-            "gap": 0.06645176478171888,
-            "mint": "3rijuxxRu3afUGnxHGpKvx3EvKgRit3rqDKabnKUpump",
-            "score": 0.9173764526826456
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 266
+          "BELOW_THRESHOLD": 286
         },
-        "recent_score_p50": 0.3619231681949595,
+        "recent_score_p50": 0.3676907564202671,
         "score_max": 0.933840376189143
       }
     },
-    "scoring_ms_p95": 11.666054250028424,
+    "scoring_ms_p95": 11.699580499964668,
     "started_at": 1789353518.6851196,
     "status": "RUNNING",
     "version": "e4-v12-supervised-online-v2",
     "wall_time_limit_seconds": 19800.0
   },
   "runner_pid": 3489,
-  "supervisor_checked_at": 1789354076.5638123,
+  "supervisor_checked_at": 1789354137.77482,
   "supervisor_state": "WATCHING",
   "warnings": []
 }
