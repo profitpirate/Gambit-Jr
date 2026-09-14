@@ -225,16 +225,35 @@
     "closed_positions": 11,
     "losses": 4,
     "net_realized_pnl_sol": 4.773264704000001,
-    "open": [],
-    "open_positions": 0,
+    "open": [
+      {
+        "buy_count": 1,
+        "cost_sol": 0.11104428,
+        "first_buy_time": 1789411718,
+        "last_activity_time": 1789411719,
+        "mint": "DTLAyMTAvFwwmJHuyYifJauDoZYutKbXXYigVg8dpump",
+        "pnl_sol": -0.11104428,
+        "proceeds_sol": 0,
+        "sell_count": 0,
+        "signatures": [
+          "3Fu3Rz5Y7Zgjr5xwtxB4nkB9VMa9PxVwAnJMzsNKQpbQQ2hHL8k5VDGMjWBZ4Wdfxz5DUUAwyR4gf1ZF2KtC22mu",
+          "dxEXhYc6uSi4VZquW8uyJ6dmJDRxcGEteBnT9u5xnpaJeEawWyLESL8nmexMJYZ35VnHMG9sb5wirJCU6oyzG19",
+          "3f7yfgnvt9vRpPAVfNx16rfeZy1HCdXxEHN1pxt2QSUEsd9mCjMMeYcAcEwyjJHgGENVuAAC7XMfoUXwPpFWw5pN"
+        ],
+        "sold_fraction": 0.0,
+        "tokens_bought": 28809999.283232,
+        "tokens_sold": 0
+      }
+    ],
+    "open_positions": 1,
     "profit_factor": 16.600482255316226,
-    "same_window_positions_opened": 11,
+    "same_window_positions_opened": 12,
     "win_rate": 0.6363636363636364,
     "wins": 7
   },
-  "end_epoch": 1789411629,
+  "end_epoch": 1789412236,
   "paper_strategy_unchanged": true,
-  "parsed_trade_transactions": 43,
+  "parsed_trade_transactions": 46,
   "rpc_recent_errors": [
     "getTransaction@https://api.mainnet-beta.solana.com:RuntimeError:429",
     "getTransaction@https://api.mainnet-beta.solana.com:RuntimeError:429",
@@ -261,5 +280,5 @@
   "unparsed_or_nontrade_transactions": 35,
   "version": "e4-same-window-benchmark-v1",
   "wallet": "E4EzXdwf7NNdqM2XGswWaWHfxgucVCo24PTCcrimTKBz",
-  "wallet_signatures_in_window": 78
+  "wallet_signatures_in_window": 81
 }
