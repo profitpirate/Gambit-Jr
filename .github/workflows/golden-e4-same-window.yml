@@ -21,7 +21,7 @@ env:
 jobs:
   e4-shadow:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
         with:
@@ -38,43 +38,49 @@ jobs:
       - name: Compile benchmark
         run: python -m py_compile tools/e4_same_window_backfill.py
 
-      - name: Read exact Golden live-window start
-        run: |
-          test -s "$GOLDEN_STATUS"
-          start="$(python - <<'PY'
-          import json
-          s=json.load(open('docs/research/golden-buyer-reputation-live-status.json'))
-          print(int(float(s['runner']['started_at'])))
-          PY
-          )"
-          echo "WINDOW_START=$start" >> "$GITHUB_ENV"
-          echo "Golden window starts at epoch $start"
-
-      - name: Reconstruct E4 wallet activity in same live window
+      - name: Shadow E4 until the current Golden session ends
         run: |
           mkdir -p artifacts/e4-shadow
-          python tools/e4_same_window_backfill.py \
-            --start-epoch "$WINDOW_START" \
-            --max-signatures 5000 \
-            --output artifacts/e4-shadow/e4-same-window.json
+          for iteration in $(seq 1 24); do
+            gh api "repos/$GITHUB_REPOSITORY/contents/$GOLDEN_STATUS?ref=$BRANCH" --jq .content | base64 -d > /tmp/golden-status.json
+            read -r start phase status <<EOF
+          $(python - <<'PY'
+          import json
+          s=json.load(open('/tmp/golden-status.json'))
+          r=s.get('runner',s)
+          print(int(float(r['started_at'])), r.get('phase',''), r.get('status',''))
+          PY
+          )
+          EOF
+            echo "Iteration $iteration: Golden start=$start phase=$phase status=$status"
+            python tools/e4_same_window_backfill.py \
+              --start-epoch "$start" \
+              --max-signatures 5000 \
+              --output artifacts/e4-shadow/e4-same-window.json
 
-      - name: Publish same-window benchmark without touching Golden rule
-        run: |
-          cp artifacts/e4-shadow/e4-same-window.json /tmp/shadow.json
-          content="$(base64 -w0 /tmp/shadow.json)"
-          sha="$(gh api "repos/$GITHUB_REPOSITORY/contents/$SHADOW_STATUS?ref=$BRANCH" --jq .sha 2>/dev/null || true)"
-          if [ -n "$sha" ]; then
-            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$SHADOW_STATUS" \
-              -f message='data(golden): publish E4 same-window benchmark [skip ci]' \
-              -f branch="$BRANCH" -f content="$content" -f sha="$sha" >/dev/null
-          else
-            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$SHADOW_STATUS" \
-              -f message='data(golden): publish E4 same-window benchmark [skip ci]' \
-              -f branch="$BRANCH" -f content="$content" >/dev/null
-          fi
+            content="$(base64 -w0 artifacts/e4-shadow/e4-same-window.json)"
+            sha="$(gh api "repos/$GITHUB_REPOSITORY/contents/$SHADOW_STATUS?ref=$BRANCH" --jq .sha 2>/dev/null || true)"
+            if [ -n "$sha" ]; then
+              gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$SHADOW_STATUS" \
+                -f message='data(golden): refresh E4 same-window benchmark [skip ci]' \
+                -f branch="$BRANCH" -f content="$content" -f sha="$sha" >/dev/null
+            else
+              gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$SHADOW_STATUS" \
+                -f message='data(golden): publish E4 same-window benchmark [skip ci]' \
+                -f branch="$BRANCH" -f content="$content" >/dev/null
+            fi
+
+            if [ "$status" != "RUNNING" ] || [ "$phase" != "online" ]; then
+              echo "Golden session is terminal; shadow observer stopping."
+              break
+            fi
+            sleep 600
+          done
 
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: golden-e4-same-window-${{ github.run_id }}
           path: artifacts/e4-shadow/e4-same-window.json
+          if-no-files-found: warn
           retention-days: 14
