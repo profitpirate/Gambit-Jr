@@ -1,0 +1,112 @@
+{
+  "contract": {
+    "e4_wallet_must_be_excluded_from_entry_flow_features": true,
+    "no_live_retuning": true,
+    "source_size_and_delay_are_labels_only": true
+  },
+  "corpus_rows": 66000,
+  "delay_cohorts": {
+    "1.0": {
+      "losses": 10,
+      "median_hold_ms": 5000.0,
+      "net_pnl_sol": 37.07379735,
+      "profit_factor": 8.07501756652172,
+      "trades": 63,
+      "win_rate": 0.8412698412698413,
+      "wins": 53
+    },
+    "10.0": {
+      "losses": 43,
+      "median_hold_ms": 5000.0,
+      "net_pnl_sol": 58.702090578,
+      "profit_factor": 3.576790119455291,
+      "trades": 145,
+      "win_rate": 0.7034482758620689,
+      "wins": 102
+    },
+    "2.0": {
+      "losses": 22,
+      "median_hold_ms": 5000.0,
+      "net_pnl_sol": 40.870652493,
+      "profit_factor": 5.923554996637878,
+      "trades": 88,
+      "win_rate": 0.75,
+      "wins": 66
+    },
+    "5.0": {
+      "losses": 31,
+      "median_hold_ms": 5000.0,
+      "net_pnl_sol": 46.208233310000004,
+      "profit_factor": 5.71971899179328,
+      "trades": 112,
+      "win_rate": 0.7232142857142857,
+      "wins": 81
+    }
+  },
+  "exit_behaviour": {
+    "losers": {
+      "fully_exited_within_5s_fraction": 0.8939393939393939,
+      "median_hold_ms": 2000.0,
+      "median_sell_count": 2.0,
+      "trades": 66
+    },
+    "winners": {
+      "fully_exited_within_5s_fraction": 0.5743243243243243,
+      "median_hold_ms": 5000.0,
+      "median_sell_count": 3.0,
+      "trades": 148
+    }
+  },
+  "exploratory_rule": {
+    "certified": false,
+    "definition": "non-mayhem && cashback && creator_prior_selection_count>=3 && creator_prior_known_win_rate>=0.25; hold 2000ms",
+    "holdout": {
+      "latencies": {
+        "0": {"losses": 1, "net_pnl_sol": 4.12712186431484, "profit_factor": 2458.543883726821, "trades": 112, "win_rate": 0.9910714285714286, "wins": 111},
+        "1": {"losses": 11, "net_pnl_sol": 2.1587875875606413, "profit_factor": 55.05810450441678, "trades": 112, "win_rate": 0.9017857142857143, "wins": 101},
+        "2": {"losses": 22, "net_pnl_sol": 1.6296577915765387, "profit_factor": 14.164672064809846, "trades": 112, "win_rate": 0.8035714285714286, "wins": 90},
+        "5": {"losses": 36, "net_pnl_sol": 1.0610791181789778, "profit_factor": 6.194781166118334, "trades": 112, "win_rate": 0.6785714285714286, "wins": 76},
+        "10": {"losses": 43, "net_pnl_sol": 0.7309321119718082, "profit_factor": 4.093857656967342, "trades": 112, "win_rate": 0.6160714285714286, "wins": 69}
+      },
+      "minimum_net_pnl_sol": 0.7309321119718082,
+      "minimum_profit_factor": 4.093857656967342,
+      "minimum_win_rate": 0.6160714285714286,
+      "trades": 112
+    },
+    "validation": {
+      "latencies": {
+        "0": {"losses": 1, "net_pnl_sol": 1.6766429688353535, "profit_factor": 166.6462944911821, "trades": 42, "win_rate": 0.9761904761904762, "wins": 41},
+        "1": {"losses": 6, "net_pnl_sol": 0.8733691073876213, "profit_factor": 20.11964088947571, "trades": 42, "win_rate": 0.8571428571428571, "wins": 36},
+        "2": {"losses": 5, "net_pnl_sol": 0.8262815974253168, "profit_factor": 20.851526488702326, "trades": 42, "win_rate": 0.8809523809523809, "wins": 37},
+        "5": {"losses": 5, "net_pnl_sol": 0.632784822303615, "profit_factor": 14.511048802046325, "trades": 42, "win_rate": 0.8809523809523809, "wins": 37},
+        "10": {"losses": 7, "net_pnl_sol": 0.45841353181447475, "profit_factor": 8.785277637188539, "trades": 42, "win_rate": 0.8333333333333334, "wins": 35}
+      },
+      "minimum_net_pnl_sol": 0.45841353181447475,
+      "minimum_profit_factor": 8.785277637188539,
+      "minimum_win_rate": 0.8333333333333334,
+      "trades": 42
+    }
+  },
+  "joint_cohorts": {
+    "cost_ge_2.0_delay_le_10.0ms": {"losses": 23, "median_hold_ms": 5000.0, "net_pnl_sol": 54.20144998200001, "profit_factor": 3.664224791799002, "trades": 98, "win_rate": 0.7653061224489796, "wins": 75},
+    "cost_ge_2.0_delay_le_5.0ms": {"losses": 16, "median_hold_ms": 6000.0, "net_pnl_sol": 42.431901191, "profit_factor": 6.415351522742101, "trades": 75, "win_rate": 0.7866666666666666, "wins": 59},
+    "cost_ge_2.5_delay_le_10.0ms": {"losses": 17, "median_hold_ms": 5500.0, "net_pnl_sol": 49.727476127, "profit_factor": 3.6038104995838047, "trades": 78, "win_rate": 0.782051282051282, "wins": 61},
+    "cost_ge_2.5_delay_le_5.0ms": {"losses": 12, "median_hold_ms": 6000.0, "net_pnl_sol": 39.643141101000005, "profit_factor": 6.454519885113379, "trades": 60, "win_rate": 0.8, "wins": 48}
+  },
+  "normal_e4_landed": {
+    "losses": 66,
+    "median_hold_ms": 4000.0,
+    "net_pnl_sol": 85.270147355,
+    "profit_factor": 3.9418676792965237,
+    "trades": 214,
+    "win_rate": 0.6915887850467289,
+    "wins": 148
+  },
+  "size_cohorts": {
+    "1.0": {"losses": 66, "median_hold_ms": 4000.0, "net_pnl_sol": 85.270147355, "profit_factor": 3.9418676792965237, "trades": 214, "win_rate": 0.6915887850467289, "wins": 148},
+    "2.0": {"losses": 36, "median_hold_ms": 5000.0, "net_pnl_sol": 80.243850779, "profit_factor": 4.14820783865687, "trades": 150, "win_rate": 0.76, "wins": 114},
+    "2.5": {"losses": 29, "median_hold_ms": 5000.0, "net_pnl_sol": 73.104629349, "profit_factor": 4.030248207319366, "trades": 124, "win_rate": 0.7661290322580645, "wins": 95},
+    "3.0": {"losses": 26, "median_hold_ms": 5000.0, "net_pnl_sol": 68.895034037, "profit_factor": 3.90704671254833, "trades": 108, "win_rate": 0.7592592592592593, "wins": 82}
+  },
+  "version": "e4-v12-wallet-conviction-research-v1"
+}
