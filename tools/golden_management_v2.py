@@ -3,8 +3,8 @@
 
 This module does NOT copy E4 trades and does NOT claim to recover E4's private
 exit formula. It turns the behaviors that were strongly observed across E4's
-recent and older wallet history into a bounded experimental management policy
-for Golden's own selected trades.
+recent and older wallet history into an aggressive paper-research management
+policy for Golden's own selected trades.
 
 Confirmed observations used as architecture:
 - one-shot entry;
@@ -17,6 +17,10 @@ Confirmed observations used as architecture:
 Unconfirmed details (exact invalidation trigger, exact later scale-out trigger)
 remain experimental and are deliberately isolated in RunnerGuardian so they can
 be replaced without changing the Golden entry thesis.
+
+IMPORTANT: position fractions in this module are for simulated/paper research.
+The purpose of v2 is to measure both upside and drawdown under aggressive
+conviction sizing rather than constrain the experiment to the old 1.85% stake.
 """
 from __future__ import annotations
 
@@ -25,7 +29,7 @@ from collections import deque
 from typing import Any, Mapping
 import math
 
-VERSION = "golden-management-v2"
+VERSION = "golden-management-v2-aggressive"
 
 
 def _clip(x: float, lo: float = 0.0, hi: float = 1.0) -> float:
@@ -44,22 +48,23 @@ class TierConfig:
 
 
 TIERS: dict[str, TierConfig] = {
-    # Fractions are account-equity fractions for paper research, not real-money
-    # recommendations. They are hard-capped at 8% by construction.
+    # Aggressive PAPER-RESEARCH ladder. The experiment is explicitly intended
+    # to learn what happens when conviction meaningfully changes capital at risk.
+    # 1.85% remains only as the frozen v1 control and is not used here.
     "BASE": TierConfig(
-        "BASE", 0.02, 0.30, 350.0, 4_000.0,
+        "BASE", 0.03, 0.30, 350.0, 4_000.0,
         ((0.15, 0.10), (0.30, 0.10)), 0.10,
     ),
     "MEDIUM": TierConfig(
-        "MEDIUM", 0.03, 0.30, 350.0, 6_000.0,
+        "MEDIUM", 0.075, 0.30, 350.0, 6_000.0,
         ((0.15, 0.10), (0.30, 0.10), (0.50, 0.10)), 0.11,
     ),
     "HIGH": TierConfig(
-        "HIGH", 0.05, 0.20, 325.0, 10_000.0,
+        "HIGH", 0.125, 0.20, 325.0, 10_000.0,
         ((0.15, 0.10), (0.30, 0.10), (0.50, 0.15), (0.80, 0.10)), 0.13,
     ),
     "EXCEPTIONAL": TierConfig(
-        "EXCEPTIONAL", 0.08, 0.20, 300.0, 16_000.0,
+        "EXCEPTIONAL", 0.20, 0.20, 300.0, 16_000.0,
         ((0.15, 0.10), (0.30, 0.10), (0.50, 0.15), (0.80, 0.10), (1.20, 0.10)), 0.15,
     ),
 }
@@ -68,9 +73,9 @@ TIERS: dict[str, TierConfig] = {
 def conviction(decision: Mapping[str, Any]) -> dict[str, Any]:
     """Entry-time-only conviction score.
 
-    This is intentionally the same causal information family as the previous
-    shadow conviction layer: buyer historical WR, causal sample size, and buyer
-    diversity. No future P&L, E4 activity, or post-entry path enters this score.
+    Uses only causal information available before entry: buyer historical WR,
+    causal sample size, and buyer diversity. No future P&L, E4 activity, or
+    post-entry path enters the score.
     """
     rate = float(decision.get("prior_win_rate") or 0.0)
     appearances = max(0, int(decision.get("prior_appearances") or 0))
@@ -200,8 +205,9 @@ class RunnerGuardian:
         trend = self._trend(300.0)
         drawdown_from_peak = self.peak_return - mark.return_fraction
 
-        # 2) Absolute emergency guardrail. This is intentionally wide; it is a
-        # catastrophic fail-safe rather than the normal exit policy.
+        # 2) Absolute emergency guardrail. Wide by design: this is a catastrophic
+        # fail-safe, not the normal exit policy. Aggressive sizing remains useful
+        # research only if catastrophic path behavior is still observable.
         if mark.return_fraction <= -0.35:
             return self._bounded_action("EXIT", self.remaining_fraction, "EMERGENCY_CATASTROPHIC_DRAWDOWN", mark)
 
@@ -259,6 +265,7 @@ class RunnerGuardian:
         return {
             "management_version": VERSION,
             "tier": self.config.name,
+            "position_fraction": self.config.position_fraction,
             "initial_done": self.initial_done,
             "remaining_fraction": self.remaining_fraction,
             "peak_return": None if self.peak_return < -1e8 else self.peak_return,
@@ -272,9 +279,14 @@ class RunnerGuardian:
 
 def self_test() -> None:
     low = conviction({"prior_win_rate": 0.70, "prior_appearances": 10, "buyer_count": 1})
-    high = conviction({"prior_win_rate": 0.90, "prior_appearances": 100, "buyer_count": 5})
-    assert low["conviction_tier"] == "BASE" and low["initial_fraction"] == 0.30
-    assert high["conviction_tier"] == "EXCEPTIONAL" and high["initial_fraction"] == 0.20
+    med = conviction({"prior_win_rate": 0.76, "prior_appearances": 30, "buyer_count": 2})
+    high = conviction({"prior_win_rate": 0.84, "prior_appearances": 60, "buyer_count": 4})
+    exceptional = conviction({"prior_win_rate": 0.90, "prior_appearances": 100, "buyer_count": 5})
+    assert low["conviction_tier"] == "BASE" and math.isclose(low["position_fraction"], 0.03)
+    assert exceptional["conviction_tier"] == "EXCEPTIONAL" and math.isclose(exceptional["position_fraction"], 0.20)
+    assert TIERS["MEDIUM"].position_fraction == 0.075
+    assert TIERS["HIGH"].position_fraction == 0.125
+    assert TIERS["EXCEPTIONAL"].initial_fraction == 0.20
 
     # A temporary -17% drawdown must not be killed solely because it crossed -10%.
     g = RunnerGuardian(TIERS["HIGH"])
@@ -295,7 +307,7 @@ def self_test() -> None:
     a = g2.on_mark(Mark(1000, 0.16))
     assert a and a.kind == "SCALE_OUT"
     assert not g2.closed
-    print("GOLDEN_MANAGEMENT_V2_SELF_TEST_OK")
+    print("GOLDEN_MANAGEMENT_V2_AGGRESSIVE_SELF_TEST_OK")
 
 
 if __name__ == "__main__":
