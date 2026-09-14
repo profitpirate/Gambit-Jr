@@ -1,0 +1,269 @@
+name: Golden Management v2 Phase 3 true-online 50 trades
+
+on:
+  push:
+    branches: [codex/golden-management-v2]
+    paths:
+      - ".github/workflows/golden-management-v2-phase3-live.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: golden-management-v2-phase3-live
+  cancel-in-progress: false
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONUNBUFFERED: "1"
+  BRANCH: codex/golden-management-v2
+  STATE_PATH: docs/research/golden-management-v2-campaign-state.json
+  STATUS_PATH: docs/research/golden-management-v2-live-status.json
+  PHASE2_RUN_ID: "34902029022"
+  PHASE2_ARTIFACT: golden-management-v2-phase2-34902029022
+
+jobs:
+  live-windows:
+    name: true-online-window-${{ matrix.window }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        window: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    steps:
+      - name: Checkout v2 branch at latest head
+        uses: actions/checkout@v4
+        with:
+          ref: codex/golden-management-v2
+          fetch-depth: 0
+      - name: Checkout production live decoder
+        uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-selection-reconstruction
+          path: production
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install live-paper dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e production -r production/requirements-e4.txt aiohttp
+      - name: Require completed Phase 2 gate
+        run: |
+          mkdir -p phase2-proof
+          gh run download "$PHASE2_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$PHASE2_ARTIFACT" --dir phase2-proof
+          python - <<'PY'
+          import json, pathlib
+          p=next(pathlib.Path('phase2-proof').rglob('phase2.json'))
+          d=json.loads(p.read_text())
+          assert d['phase']==2 and d['status']=='COMPLETE', d
+          req=d['requirements']
+          assert req['randomized_paths'] >= 50000
+          assert req['two_consecutive_exact_transport_p95_lt_ms'] == 10
+          assert req['fresh_live_smoke'] is True
+          assert req['clean_session_drain'] is True
+          print('PHASE2_PROOF_OK',d)
+          PY
+      - name: Restore exact frozen causal reputation corpus
+        run: |
+          mkdir -p frozen artifacts/v2-live
+          gh run download 34262315056 --repo "$GITHUB_REPOSITORY" --name e4-v12-allout-launch-corpus-34262315056 --dir frozen
+          corpus="$(find frozen -name e4-v12-allout-launch-corpus.jsonl.gz -print -quit)"
+          test -s "$corpus"
+          echo "CORPUS=$corpus" >> "$GITHUB_ENV"
+      - name: Restore 3 SOL campaign state if present
+        run: |
+          git fetch origin "$BRANCH"
+          git checkout "$BRANCH"
+          git pull --ff-only origin "$BRANCH"
+          mkdir -p artifacts/v2-live
+          if [ -s "$STATE_PATH" ]; then
+            cp "$STATE_PATH" artifacts/v2-live/resume-state.json
+            closed="$(python - <<'PY'
+          import json
+          s=json.load(open('artifacts/v2-live/resume-state.json'))
+          assert s['paper_only'] is True
+          assert abs(float(s['campaign_starting_balance_sol'])-3.0) < 1e-12
+          print(sum(r.get('status')=='CLOSED' for r in (s.get('account') or {}).get('ledger',[])))
+          PY
+          )"
+            echo "RESTORED_CLOSED=$closed"
+            echo "CLOSED_BEFORE=$closed" >> "$GITHUB_ENV"
+            echo "RESUME_ARG=--resume-state artifacts/v2-live/resume-state.json" >> "$GITHUB_ENV"
+            if [ "$closed" -ge 50 ]; then
+              echo "SKIP_LIVE=true" >> "$GITHUB_ENV"
+            else
+              echo "SKIP_LIVE=false" >> "$GITHUB_ENV"
+            fi
+          else
+            echo "CLOSED_BEFORE=0" >> "$GITHUB_ENV"
+            echo "RESUME_ARG=" >> "$GITHUB_ENV"
+            echo "SKIP_LIVE=false" >> "$GITHUB_ENV"
+            echo "Starting a genuinely fresh 3 SOL v2 campaign."
+          fi
+      - name: True-online live-market paper window
+        if: env.SKIP_LIVE != 'true'
+        run: |
+          set +e
+          PYTHONPATH="$PWD:$PWD/tools" python tools/golden_management_v2_hardened.py \
+            --production-root production \
+            --corpus "$CORPUS" \
+            --starting-balance-sol 3 \
+            --execution-delay-ms 6 \
+            --target-closed-trades 50 \
+            --duration-seconds 15900 \
+            --heartbeat-seconds 30 \
+            $RESUME_ARG \
+            --state-output artifacts/v2-live/session-state.json \
+            --status artifacts/v2-live/status.json \
+            --output artifacts/v2-live/final.json
+          rc=$?
+          set -e
+          echo "RUNNER_RC=$rc"
+          if [ "$rc" -eq 2 ]; then
+            echo "::error::Technical corruption/exposure failure"
+            exit 2
+          fi
+          if [ "$rc" -ne 0 ] && [ "$rc" -ne 3 ]; then
+            echo "::error::Unexpected runner exit code $rc"
+            exit "$rc"
+          fi
+      - name: Prove this window was live, fresh, clean and sub-10ms paper execution
+        if: env.SKIP_LIVE != 'true'
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('artifacts/v2-live/final.json'))
+          assert s['paper_only'] is True
+          assert s['real_money_execution'] is False
+          assert s['historical_replay'] is False
+          assert s['market_data_mode']=='LIVE_SOLANA_WEBSOCKET_FRESH_LAUNCHES_ONLY'
+          assert s['clean_drain_required'] is True
+          assert int(s['counts'].get('launches_seen',0)) > 0, s['counts']
+          assert int(s['counts'].get('decoded_events',0)) > 0, s['counts']
+          a=s['account']
+          assert float(a['campaign_starting_balance_sol'])==3.0
+          assert not a.get('task_errors'), a.get('task_errors')
+          assert not a.get('unresolved_exposure')
+          assert int(a.get('active_positions',0))==0
+          assert int(a.get('pending_entries',0))==0
+          assert s.get('post_exit_complete_for_all_closed') is True
+          lat=a.get('execution_latency_ms') or {}
+          if int(lat.get('count') or 0) > 0:
+              assert float(lat.get('p95') or 1e9) < 10.0, lat
+          tiers=s['management_tiers']
+          assert float(tiers['BASE']['position_fraction'])==0.05
+          assert float(tiers['MEDIUM']['position_fraction'])==0.08
+          assert float(tiers['HIGH']['position_fraction'])==0.15
+          assert float(tiers['EXCEPTIONAL']['position_fraction'])==0.25
+          print('TRUE_ONLINE_WINDOW_VERIFIED', {'closed':a['closed_trades'],'latency':lat,'counts':s['counts']})
+          PY
+      - name: Persist only a clean campaign continuation
+        if: env.SKIP_LIVE != 'true'
+        run: |
+          cp artifacts/v2-live/session-state.json "$STATE_PATH"
+          cp artifacts/v2-live/final.json "$STATUS_PATH"
+          git config user.name "gambit-v2-research"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$STATE_PATH" "$STATUS_PATH"
+          if git diff --cached --quiet; then
+            echo "No campaign change to persist."
+          else
+            git commit -m "data(golden-v2): persist true-online window ${{ matrix.window }} [skip ci]"
+            git pull --rebase origin "$BRANCH"
+            git push origin HEAD:"$BRANCH"
+          fi
+      - name: Window summary
+        run: |
+          git pull --ff-only origin "$BRANCH" || true
+          if [ -s "$STATE_PATH" ]; then
+            python - <<'PY'
+          import json, os
+          s=json.load(open(os.environ['STATE_PATH']))
+          rows=[r for r in (s.get('account') or {}).get('ledger',[]) if r.get('status')=='CLOSED']
+          print('CAMPAIGN_CLOSED',len(rows),'WINS',sum(bool(r.get('win')) for r in rows),'CASH',s['account'].get('cash_sol'))
+          PY
+          fi
+      - uses: actions/upload-artifact@v4
+        if: env.SKIP_LIVE != 'true'
+        with:
+          name: golden-v2-live-window-${{ matrix.window }}-${{ github.run_id }}
+          path: artifacts/v2-live/
+          if-no-files-found: error
+          retention-days: 30
+
+  phase3-final-report:
+    name: require-50-and-publish-full-report
+    needs: [live-windows]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/golden-management-v2
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch latest persisted campaign state
+        run: |
+          git fetch origin "$BRANCH"
+          git checkout "$BRANCH"
+          git pull --ff-only origin "$BRANCH"
+          test -s "$STATE_PATH"
+      - name: Hard Phase 3 requirement — at least 50 closed fresh-live trades
+        run: |
+          python - <<'PY'
+          import json, os
+          s=json.load(open(os.environ['STATE_PATH']))
+          assert s['paper_only'] is True
+          assert abs(float(s['campaign_starting_balance_sol'])-3.0)<1e-12
+          rows=[r for r in (s.get('account') or {}).get('ledger',[]) if r.get('status')=='CLOSED']
+          assert len(rows)>=50, f'Phase 3 incomplete: only {len(rows)} closed trades'
+          assert all((r.get('post_exit') or {}).get('complete') is True for r in rows), 'post-exit tracking incomplete'
+          print('PHASE3_50_TRADE_GATE_OK',len(rows))
+          PY
+      - name: Generate full per-trade report
+        run: |
+          mkdir -p artifacts/final-report
+          python tools/golden_management_v2_report.py \
+            --state "$STATE_PATH" --minimum-trades 50 \
+            --output-md artifacts/final-report/golden-management-v2-50-trade-report.md \
+            --output-json artifacts/final-report/golden-management-v2-50-trade-report.json
+          cp artifacts/final-report/golden-management-v2-50-trade-report.md docs/research/golden-management-v2-final-report.md
+          cp artifacts/final-report/golden-management-v2-50-trade-report.json docs/research/golden-management-v2-final-report.json
+          python - <<'PY'
+          import json, pathlib, os
+          s=json.load(open(os.environ['STATE_PATH']))
+          rows=[r for r in s['account']['ledger'] if r.get('status')=='CLOSED']
+          marker={
+            'phase':3,'name':'true-online live-market paper testing','status':'COMPLETE',
+            'closed_trades':len(rows),'minimum_required':50,'starting_bankroll_sol':3.0,
+            'fresh_live_market_only':True,'historical_replay':False,'real_money_execution':False,
+            'full_report_md':'docs/research/golden-management-v2-final-report.md',
+            'full_report_json':'docs/research/golden-management-v2-final-report.json'
+          }
+          pathlib.Path('docs/research/golden-management-v2-phase3-complete.json').write_text(json.dumps(marker,indent=2,sort_keys=True)+'\n')
+          print(marker)
+          PY
+      - name: Persist final report and completion marker
+        run: |
+          git config user.name "gambit-v2-research"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/research/golden-management-v2-final-report.md docs/research/golden-management-v2-final-report.json docs/research/golden-management-v2-phase3-complete.json
+          git commit -m "research(golden-v2): complete 50-trade true-online phase 3 [skip ci]"
+          git pull --rebase origin "$BRANCH"
+          git push origin HEAD:"$BRANCH"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: golden-management-v2-phase3-final-${{ github.run_id }}
+          path: |
+            artifacts/final-report/
+            docs/research/golden-management-v2-phase3-complete.json
+            docs/research/golden-management-v2-campaign-state.json
+          retention-days: 60
