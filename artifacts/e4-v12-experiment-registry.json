@@ -9694,13 +9694,14 @@
       "dataset_version": "rolling-runs:34779504872,34770227385,34760648934,34749576265,34729110702,34722511299,34709541936,34684115937,34660606300,34627236811,34586174670,34547229611,34512979177,34470147967,34425005585,34388016481,34348537141,34310065776,34281858070",
       "dispatch_attempts": 1,
       "drawdown": null,
-      "duplicate_suppression_count": 0,
+      "duplicate_suppression_count": 1,
       "evidence_epoch": "v12-direct-e4-parameter-copy-2026-09-03",
       "exact_artifact_paths": [
+        "https://github.com/profitpirate/Gambit-Jr/actions/runs/34787511875",
         "codex/e4-v12-sub10ms-entry-research-20260905:.github/workflows/e4-v12-reactive-profit-golden.yml"
       ],
       "experiment_id": "e4x-275ab79da18f7d2e16c0058436585de9408864046e77cfd97536828ff950b1f5",
-      "failure_classification": null,
+      "failure_classification": "HOLDOUT_COLLAPSE",
       "identity": {
         "bankroll": {
           "definition_committed_by": "d65dac6c18513b30fa2d74d4cae226e47178fc9e74fed423a56d208f4b7e9b7b",
@@ -9825,28 +9826,30 @@
         "source_code_fingerprint": "e15bd40c8c62335f2255e2a7116a2ce5e0dcea76439491a7954afb9bfc07d9f2",
         "thesis_family_identifier": "reactive-profit"
       },
-      "last_duplicate_failure_classification": null,
+      "last_duplicate_failure_classification": "DUPLICATE_EXPERIMENT",
       "latency_results": null,
-      "latest_run_id": null,
-      "latest_run_url": null,
+      "latest_run_id": 34787511875,
+      "latest_run_url": "https://github.com/profitpirate/Gambit-Jr/actions/runs/34787511875",
       "live_metrics": null,
       "live_status": null,
-      "material_change_required_before_rerun": null,
+      "material_change_required_before_rerun": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "reason_for_retirement": null,
+      "reason_for_retirement": "workflow completed without an untouched-live golden pass",
       "recall": null,
       "ref": "codex/e4-v12-sub10ms-entry-research-20260905",
-      "retired": false,
+      "retired": true,
       "retry_not_before": null,
       "selection_precision": null,
       "source_commit": "d3c05bdaf788d60f5ccf7d1dc0d8c0ccbc1ef8ac",
-      "state": "DISPATCHED",
-      "suppressed_duplicate_run_ids": [],
+      "state": "COMPLETED_FAILED",
+      "suppressed_duplicate_run_ids": [
+        34787511875
+      ],
       "thesis_family": "reactive-profit",
       "trade_count": null,
       "train_metrics": null,
-      "updated_timestamp": "2026-09-13T22:40:49.685348Z",
+      "updated_timestamp": "2026-09-14T00:26:33.392474Z",
       "validation_metrics": null,
       "wilson_lower_bound": null,
       "workflow": "e4-v12-reactive-profit-golden.yml",
@@ -27462,6 +27465,271 @@
     },
     {
       "chronological_holdout_metrics": null,
+      "created_timestamp": "2026-09-14T00:26:40.727147Z",
+      "dataset_source_manifest": {
+        "policy": "rolling-successful-evidence-risk-set",
+        "runs": [
+          {
+            "created_at": "2026-09-13T20:02:25Z",
+            "head_sha": "4f4492da297c17c6957aee68351650baf23349dd",
+            "run_id": 34779504872,
+            "updated_at": "2026-09-13T22:24:49Z"
+          },
+          {
+            "created_at": "2026-09-13T16:59:40Z",
+            "head_sha": "07a25025f5b76a1f79342e92e084268691ff2a99",
+            "run_id": 34770227385,
+            "updated_at": "2026-09-13T19:22:23Z"
+          },
+          {
+            "created_at": "2026-09-13T13:43:50Z",
+            "head_sha": "18cc1078b556586119824f8a7010e45694cfd0c6",
+            "run_id": 34760648934,
+            "updated_at": "2026-09-13T16:42:22Z"
+          },
+          {
+            "created_at": "2026-09-13T09:28:53Z",
+            "head_sha": "06be2fc24f4a7db205c2b0584fafe8bf1b143339",
+            "run_id": 34749576265,
+            "updated_at": "2026-09-13T13:25:27Z"
+          },
+          {
+            "created_at": "2026-09-13T00:53:05Z",
+            "head_sha": "67b7e9700f56f32d50d31b989fba6b9e5418f1ad",
+            "run_id": 34729110702,
+            "updated_at": "2026-09-13T04:09:24Z"
+          },
+          {
+            "created_at": "2026-09-12T22:21:12Z",
+            "head_sha": "11cf4af378c26e73b8f3c4a31c5bd133555b16dc",
+            "run_id": 34722511299,
+            "updated_at": "2026-09-13T00:47:46Z"
+          },
+          {
+            "created_at": "2026-09-12T17:53:00Z",
+            "head_sha": "c92a88f0e4df11600f2d4a4488f9f95b4350922d",
+            "run_id": 34709541936,
+            "updated_at": "2026-09-12T19:39:16Z"
+          },
+          {
+            "created_at": "2026-09-12T08:46:07Z",
+            "head_sha": "6b4ff76ee5c11a2b2071ed6532d97e5db306cf2b",
+            "run_id": 34684115937,
+            "updated_at": "2026-09-12T12:45:41Z"
+          },
+          {
+            "created_at": "2026-09-12T00:08:25Z",
+            "head_sha": "ff62d03e768a2f141c388da1385845e9e2177518",
+            "run_id": 34660606300,
+            "updated_at": "2026-09-12T02:57:56Z"
+          },
+          {
+            "created_at": "2026-09-11T17:21:40Z",
+            "head_sha": "6152bf71550e1ce695a6165fdf7dfa817d3ded97",
+            "run_id": 34627236811,
+            "updated_at": "2026-09-11T19:41:14Z"
+          },
+          {
+            "created_at": "2026-09-11T09:49:51Z",
+            "head_sha": "03dbbb43d88b8344268e883da2b29ca9f8d41747",
+            "run_id": 34586174670,
+            "updated_at": "2026-09-11T13:14:37Z"
+          },
+          {
+            "created_at": "2026-09-11T00:36:51Z",
+            "head_sha": "a3410dfbe831abda0c714dc23d99a46b96734317",
+            "run_id": 34547229611,
+            "updated_at": "2026-09-11T03:22:31Z"
+          },
+          {
+            "created_at": "2026-09-10T18:13:19Z",
+            "head_sha": "2bcac4b9c289b13417d8415e4a54477185b30d18",
+            "run_id": 34512979177,
+            "updated_at": "2026-09-10T20:24:27Z"
+          },
+          {
+            "created_at": "2026-09-10T11:13:21Z",
+            "head_sha": "698f18b1cc43d8db5a0efb29b36023ee377b4be9",
+            "run_id": 34470147967,
+            "updated_at": "2026-09-10T13:38:20Z"
+          },
+          {
+            "created_at": "2026-09-10T01:19:28Z",
+            "head_sha": "d4ea6299179a09c6502cb57333c82086fb95e7f5",
+            "run_id": 34425005585,
+            "updated_at": "2026-09-10T03:36:58Z"
+          },
+          {
+            "created_at": "2026-09-09T18:16:41Z",
+            "head_sha": "42c4b3e4e42b8f28aff24af26354d153f26814d7",
+            "run_id": 34388016481,
+            "updated_at": "2026-09-09T20:08:56Z"
+          },
+          {
+            "created_at": "2026-09-09T12:00:15Z",
+            "head_sha": "1fe47e26ebe934bda8c2a8ed0d64fd24d4653cce",
+            "run_id": 34348537141,
+            "updated_at": "2026-09-09T14:11:27Z"
+          },
+          {
+            "created_at": "2026-09-09T04:12:38Z",
+            "head_sha": "8b6ab8a48c35f80f4c1a4220d3be9c1d6831dd42",
+            "run_id": 34310065776,
+            "updated_at": "2026-09-09T07:58:04Z"
+          },
+          {
+            "created_at": "2026-09-08T21:40:04Z",
+            "head_sha": "8d318ffd34ebb4195c3f3c224befc3b81741d079",
+            "run_id": 34281858070,
+            "updated_at": "2026-09-08T23:57:31Z"
+          }
+        ],
+        "source_ref": "codex/e4-v12-selection-reconstruction"
+      },
+      "dataset_version": "rolling-runs:34779504872,34770227385,34760648934,34749576265,34729110702,34722511299,34709541936,34684115937,34660606300,34627236811,34586174670,34547229611,34512979177,34470147967,34425005585,34388016481,34348537141,34310065776,34281858070",
+      "dispatch_attempts": 1,
+      "drawdown": null,
+      "duplicate_suppression_count": 0,
+      "evidence_epoch": "v12-direct-e4-parameter-copy-2026-09-03",
+      "exact_artifact_paths": [
+        "codex/e4-v12-sub10ms-entry-research-20260905:.github/workflows/e4-v12-social-golden.yml"
+      ],
+      "experiment_id": "e4x-696ead47ef8db79c6b79f2a51d3b6e5fc913d1f05de84412ad5f94a119c19047",
+      "failure_classification": null,
+      "identity": {
+        "bankroll": {
+          "definition_committed_by": "8a53d5c5579e03dd5f49c0b8ef90411b818a5852319ca5bdd866c0d9b5f6a74a",
+          "starting_balance_sol": 3.0
+        },
+        "candidate_risk_set_policy": "frozen chronological launch risk sets",
+        "causal_horizon": "0/1/2/5/10ms causal execution replay",
+        "chronological_split": {
+          "definition_committed_by": "8a53d5c5579e03dd5f49c0b8ef90411b818a5852319ca5bdd866c0d9b5f6a74a",
+          "policy": "strict chronological train/validation/untouched-holdout"
+        },
+        "dataset_source_manifest_fingerprint": "5505ad58d6d253ec580315f1ebc3403d0fe2c9a581a7740332a8d261b1cf9273",
+        "evidence_epoch": "v12-direct-e4-parameter-copy-2026-09-03",
+        "execution_policy": {
+          "definition_committed_by": "8a53d5c5579e03dd5f49c0b8ef90411b818a5852319ca5bdd866c0d9b5f6a74a",
+          "policy": "paper replay only; immutable V12 execution semantics"
+        },
+        "exit_policy": {
+          "definition_committed_by": "8a53d5c5579e03dd5f49c0b8ef90411b818a5852319ca5bdd866c0d9b5f6a74a",
+          "policy": "workflow-defined causal exit policy"
+        },
+        "feature_set_fingerprint": "675bb6d72524fd621688ed02f9023a9eb6611a41e3427d0257e7b994f7c64ed4",
+        "fee_model": {
+          "definition_committed_by": "8a53d5c5579e03dd5f49c0b8ef90411b818a5852319ca5bdd866c0d9b5f6a74a",
+          "policy": "workflow-defined Solana fees and priority fees"
+        },
+        "full_parameters": {
+          "workflow_definition_sha256": "8a53d5c5579e03dd5f49c0b8ef90411b818a5852319ca5bdd866c0d9b5f6a74a",
+          "workflow_parameter_contract": [
+            "PYTHONUNBUFFERED: \"1\"",
+            "GH_TOKEN: ${{ github.token }}",
+            "REPO: profitpirate/Gambit-Jr",
+            "SOURCE_BRANCH: codex/e4-v12-selection-reconstruction",
+            "RESEARCH_BRANCH: codex/e4-v12-sub10ms-entry-research-20260905",
+            "E4_PIPELINES_BACKGROUND: \"false\"",
+            "E4_SOL_USD_FALLBACK: \"150\"",
+            "E4_BUILDER_COMMAND: \"node tools/e4-builder/strict-race-proxy-v12.mjs\"",
+            "E4_BUILDER_PRELOAD: \"${{ github.workspace }}/tools/e4-builder/fast-preload-v4.mjs\"",
+            "E4_V12_BUY_SLIPPAGE_BPS: \"800\"",
+            "E4_V12_MAX_OUTPUT_SHORTFALL_BPS: \"800\"",
+            "- run: python -m pip install --upgrade pip",
+            "gh run list --repo \"$REPO\" --workflow e4-v12-selection-certification.yml --branch \"$SOURCE_BRANCH\" --status success --limit 16 --json databaseId,createdAt --jq 'sort_by(.createdAt) | .[-10:] | .[].databaseId' > /tmp/run_ids",
+            "gh run download \"$run_id\" --repo \"$REPO\" --name \"e4-v12-forward-$run_id\" --dir \"historical/$run_id\"",
+            "while IFS=$'\\t' read -r run_id batch events; do args+=(--pair \"$batch:$events\"); done < /tmp/pairs.tsv",
+            "--mode search \"${args[@]}\" \\",
+            "--latencies 0,1,2,5,10 \\",
+            "--starting-balance-sol 3 \\",
+            "--minimum-win-rate 0.65 \\",
+            "--minimum-profit-factor 1.25 \\",
+            "--metadata-cache artifacts/social-cache.json \\",
+            "--metadata-concurrency 120 \\",
+            "--metadata-timeout 2.5 \\",
+            "--output artifacts/social-report.json \\",
+            "--model-output artifacts/social-model.json \\",
+            "--predictions-output artifacts/social-holdout-predictions.json",
+            "- run: python -m pip install --upgrade pip",
+            "run: npm install --omit=dev",
+            "gh run list --repo \"$REPO\" --workflow e4-v12-selection-certification.yml --branch \"$SOURCE_BRANCH\" --status success --limit 16 --json databaseId,createdAt --jq 'sort_by(.createdAt) | .[-10:] | .[].databaseId' > /tmp/run_ids",
+            "gh run download \"$run_id\" --repo \"$REPO\" --name \"e4-v12-forward-$run_id\" --dir \"historical/$run_id\"",
+            "python scripts/e4_300_launch_holdout_v12.py --target-launches 3000 --capture-seconds 14400 --tail-seconds 300 --heartbeat-seconds 60 --minimum-launches 3000 --wallet-signatures 1500 --builder-probes 250 --testnet-route-probes 0 --stress-iterations 0 --output artifacts/social-live.json",
+            "while IFS=$'\\t' read -r run_id batch events; do args+=(--pair \"$batch:$events\"); done < /tmp/history-pairs.tsv",
+            "args+=(--pair \"artifacts/social-live.json:artifacts/social-live-live-events.jsonl\")",
+            "--mode apply \"${args[@]}\" \\",
+            "--model-input artifacts/social-model.json \\",
+            "--metadata-cache artifacts/social-live-cache.json \\",
+            "--metadata-concurrency 120 \\",
+            "--metadata-timeout 2.5 \\",
+            "--output artifacts/social-live-apply.json \\",
+            "--model-output artifacts/social-live-unused.json \\",
+            "--predictions-output artifacts/social-live-predictions.json",
+            "--batch artifacts/social-live.json \\",
+            "--events artifacts/social-live-live-events.jsonl \\",
+            "--predictions artifacts/social-live-predictions.json \\",
+            "--latencies 0,1,2,5,10 \\",
+            "--starting-balance-sol 3 \\",
+            "--entry-fraction 0.0185 \\",
+            "--fee-bps 125 \\",
+            "--max-output-shortfall-bps \"$guard\" \\",
+            "--confirmation-ms 1500 \\",
+            "--max-concurrent 2 \\",
+            "--output artifacts/social-live-economics.json"
+          ]
+        },
+        "latency_assumptions": {
+          "definition_committed_by": "8a53d5c5579e03dd5f49c0b8ef90411b818a5852319ca5bdd866c0d9b5f6a74a",
+          "replay_ms": [
+            0,
+            1,
+            2,
+            5,
+            10
+          ]
+        },
+        "model_family": "social evidence selector",
+        "output_guard": {
+          "definition_committed_by": "8a53d5c5579e03dd5f49c0b8ef90411b818a5852319ca5bdd866c0d9b5f6a74a",
+          "policy": "V12 bounded output deterioration guard"
+        },
+        "position_sizing": {
+          "definition_committed_by": "8a53d5c5579e03dd5f49c0b8ef90411b818a5852319ca5bdd866c0d9b5f6a74a",
+          "policy": "workflow-defined bounded position sizing"
+        },
+        "source_code_fingerprint": "9e4382f8ad34ca14bda26c480f024bdaa898faf992470035121d80bad2145ef0",
+        "thesis_family_identifier": "social"
+      },
+      "last_duplicate_failure_classification": null,
+      "latency_results": null,
+      "latest_run_id": null,
+      "latest_run_url": null,
+      "live_metrics": null,
+      "live_status": null,
+      "material_change_required_before_rerun": null,
+      "pnl": null,
+      "profit_factor": null,
+      "reason_for_retirement": null,
+      "recall": null,
+      "ref": "codex/e4-v12-sub10ms-entry-research-20260905",
+      "retired": false,
+      "retry_not_before": null,
+      "selection_precision": null,
+      "source_commit": "d3c05bdaf788d60f5ccf7d1dc0d8c0ccbc1ef8ac",
+      "state": "DISPATCHED",
+      "suppressed_duplicate_run_ids": [],
+      "thesis_family": "social",
+      "trade_count": null,
+      "train_metrics": null,
+      "updated_timestamp": "2026-09-14T00:26:40.727147Z",
+      "validation_metrics": null,
+      "wilson_lower_bound": null,
+      "workflow": "e4-v12-social-golden.yml",
+      "wr": null
+    },
+    {
+      "chronological_holdout_metrics": null,
       "created_timestamp": "2026-09-12T21:40:34.939062Z",
       "dataset_source_manifest": {
         "policy": "rolling-successful-evidence-risk-set",
@@ -30699,13 +30967,14 @@
       "dataset_version": "rolling-runs:34779504872,34770227385,34760648934,34749576265,34729110702,34722511299,34709541936,34684115937,34660606300,34627236811,34586174670,34547229611,34512979177,34470147967,34425005585,34388016481,34348537141,34310065776,34281858070",
       "dispatch_attempts": 1,
       "drawdown": null,
-      "duplicate_suppression_count": 0,
+      "duplicate_suppression_count": 1,
       "evidence_epoch": "v12-direct-e4-parameter-copy-2026-09-03",
       "exact_artifact_paths": [
+        "https://github.com/profitpirate/Gambit-Jr/actions/runs/34787510828",
         "codex/e4-v12-sub10ms-entry-research-20260905:.github/workflows/e4-v12-reactive-lattice-golden.yml"
       ],
       "experiment_id": "e4x-72af32d86f8e00e6a7dca795326de7de2cd7ace652138b25fb0b8dbd371bc6d2",
-      "failure_classification": null,
+      "failure_classification": "NO_TRAIN_SURVIVOR",
       "identity": {
         "bankroll": {
           "definition_committed_by": "c71e833fa06bec9e42e4ef481c5c788e2b4b859bdadc0cc8d41649d7879d164f",
@@ -30810,28 +31079,30 @@
         "source_code_fingerprint": "ac5f5002bf951505855c17d683672f4ae31d7b3365c2c79846248a7a095a1184",
         "thesis_family_identifier": "reactive-lattice"
       },
-      "last_duplicate_failure_classification": null,
+      "last_duplicate_failure_classification": "DUPLICATE_EXPERIMENT",
       "latency_results": null,
-      "latest_run_id": null,
-      "latest_run_url": null,
+      "latest_run_id": 34787510828,
+      "latest_run_url": "https://github.com/profitpirate/Gambit-Jr/actions/runs/34787510828",
       "live_metrics": null,
       "live_status": null,
-      "material_change_required_before_rerun": null,
+      "material_change_required_before_rerun": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "reason_for_retirement": null,
+      "reason_for_retirement": "golden search failed without an infrastructure marker",
       "recall": null,
       "ref": "codex/e4-v12-sub10ms-entry-research-20260905",
-      "retired": false,
+      "retired": true,
       "retry_not_before": null,
       "selection_precision": null,
       "source_commit": "d3c05bdaf788d60f5ccf7d1dc0d8c0ccbc1ef8ac",
-      "state": "DISPATCHED",
-      "suppressed_duplicate_run_ids": [],
+      "state": "COMPLETED_FAILED",
+      "suppressed_duplicate_run_ids": [
+        34787510828
+      ],
       "thesis_family": "reactive-lattice",
       "trade_count": null,
       "train_metrics": null,
-      "updated_timestamp": "2026-09-13T22:40:48.345375Z",
+      "updated_timestamp": "2026-09-14T00:26:31.613049Z",
       "validation_metrics": null,
       "wilson_lower_bound": null,
       "workflow": "e4-v12-reactive-lattice-golden.yml",
@@ -34059,13 +34330,14 @@
       "dataset_version": "rolling-runs:34779504872,34770227385,34760648934,34749576265,34729110702,34722511299,34709541936,34684115937,34660606300,34627236811,34586174670,34547229611,34512979177,34470147967,34425005585,34388016481,34348537141,34310065776,34281858070",
       "dispatch_attempts": 1,
       "drawdown": null,
-      "duplicate_suppression_count": 0,
+      "duplicate_suppression_count": 1,
       "evidence_epoch": "v12-direct-e4-parameter-copy-2026-09-03",
       "exact_artifact_paths": [
+        "https://github.com/profitpirate/Gambit-Jr/actions/runs/34787512877",
         "codex/e4-v12-sub10ms-entry-research-20260905:.github/workflows/e4-v12-market-golden.yml"
       ],
       "experiment_id": "e4x-7a8b6ab7e5a49decd01247d105fed51581435eddd71b75ee4e8a99e5c9bde526",
-      "failure_classification": null,
+      "failure_classification": "NO_TRAIN_SURVIVOR",
       "identity": {
         "bankroll": {
           "definition_committed_by": "d445c6ade07f68b6bce188788c823e0db9d4049e74cc1699e7198a9e4da1e18e",
@@ -34172,28 +34444,30 @@
         "source_code_fingerprint": "44ba40fc5fd9c5376e3e50028698c3c746f3c3682316e2dcd6393c550768ef62",
         "thesis_family_identifier": "market-only"
       },
-      "last_duplicate_failure_classification": null,
+      "last_duplicate_failure_classification": "DUPLICATE_EXPERIMENT",
       "latency_results": null,
-      "latest_run_id": null,
-      "latest_run_url": null,
+      "latest_run_id": 34787512877,
+      "latest_run_url": "https://github.com/profitpirate/Gambit-Jr/actions/runs/34787512877",
       "live_metrics": null,
       "live_status": null,
-      "material_change_required_before_rerun": null,
+      "material_change_required_before_rerun": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "reason_for_retirement": null,
+      "reason_for_retirement": "golden search failed without an infrastructure marker",
       "recall": null,
       "ref": "codex/e4-v12-sub10ms-entry-research-20260905",
-      "retired": false,
+      "retired": true,
       "retry_not_before": null,
       "selection_precision": null,
       "source_commit": "d3c05bdaf788d60f5ccf7d1dc0d8c0ccbc1ef8ac",
-      "state": "DISPATCHED",
-      "suppressed_duplicate_run_ids": [],
+      "state": "COMPLETED_FAILED",
+      "suppressed_duplicate_run_ids": [
+        34787512877
+      ],
       "thesis_family": "market-only",
       "trade_count": null,
       "train_metrics": null,
-      "updated_timestamp": "2026-09-13T22:40:51.076624Z",
+      "updated_timestamp": "2026-09-14T00:26:35.223955Z",
       "validation_metrics": null,
       "wilson_lower_bound": null,
       "workflow": "e4-v12-market-golden.yml",
@@ -37917,6 +38191,330 @@
       "trade_count": null,
       "train_metrics": null,
       "updated_timestamp": "2026-09-13T06:07:30.636273Z",
+      "validation_metrics": null,
+      "wilson_lower_bound": null,
+      "workflow": "e4-v12-golden-master.yml",
+      "wr": null
+    },
+    {
+      "chronological_holdout_metrics": null,
+      "created_timestamp": "2026-09-14T00:26:38.905735Z",
+      "dataset_source_manifest": {
+        "policy": "rolling-successful-evidence-risk-set",
+        "runs": [
+          {
+            "created_at": "2026-09-13T20:02:25Z",
+            "head_sha": "4f4492da297c17c6957aee68351650baf23349dd",
+            "run_id": 34779504872,
+            "updated_at": "2026-09-13T22:24:49Z"
+          },
+          {
+            "created_at": "2026-09-13T16:59:40Z",
+            "head_sha": "07a25025f5b76a1f79342e92e084268691ff2a99",
+            "run_id": 34770227385,
+            "updated_at": "2026-09-13T19:22:23Z"
+          },
+          {
+            "created_at": "2026-09-13T13:43:50Z",
+            "head_sha": "18cc1078b556586119824f8a7010e45694cfd0c6",
+            "run_id": 34760648934,
+            "updated_at": "2026-09-13T16:42:22Z"
+          },
+          {
+            "created_at": "2026-09-13T09:28:53Z",
+            "head_sha": "06be2fc24f4a7db205c2b0584fafe8bf1b143339",
+            "run_id": 34749576265,
+            "updated_at": "2026-09-13T13:25:27Z"
+          },
+          {
+            "created_at": "2026-09-13T00:53:05Z",
+            "head_sha": "67b7e9700f56f32d50d31b989fba6b9e5418f1ad",
+            "run_id": 34729110702,
+            "updated_at": "2026-09-13T04:09:24Z"
+          },
+          {
+            "created_at": "2026-09-12T22:21:12Z",
+            "head_sha": "11cf4af378c26e73b8f3c4a31c5bd133555b16dc",
+            "run_id": 34722511299,
+            "updated_at": "2026-09-13T00:47:46Z"
+          },
+          {
+            "created_at": "2026-09-12T17:53:00Z",
+            "head_sha": "c92a88f0e4df11600f2d4a4488f9f95b4350922d",
+            "run_id": 34709541936,
+            "updated_at": "2026-09-12T19:39:16Z"
+          },
+          {
+            "created_at": "2026-09-12T08:46:07Z",
+            "head_sha": "6b4ff76ee5c11a2b2071ed6532d97e5db306cf2b",
+            "run_id": 34684115937,
+            "updated_at": "2026-09-12T12:45:41Z"
+          },
+          {
+            "created_at": "2026-09-12T00:08:25Z",
+            "head_sha": "ff62d03e768a2f141c388da1385845e9e2177518",
+            "run_id": 34660606300,
+            "updated_at": "2026-09-12T02:57:56Z"
+          },
+          {
+            "created_at": "2026-09-11T17:21:40Z",
+            "head_sha": "6152bf71550e1ce695a6165fdf7dfa817d3ded97",
+            "run_id": 34627236811,
+            "updated_at": "2026-09-11T19:41:14Z"
+          },
+          {
+            "created_at": "2026-09-11T09:49:51Z",
+            "head_sha": "03dbbb43d88b8344268e883da2b29ca9f8d41747",
+            "run_id": 34586174670,
+            "updated_at": "2026-09-11T13:14:37Z"
+          },
+          {
+            "created_at": "2026-09-11T00:36:51Z",
+            "head_sha": "a3410dfbe831abda0c714dc23d99a46b96734317",
+            "run_id": 34547229611,
+            "updated_at": "2026-09-11T03:22:31Z"
+          },
+          {
+            "created_at": "2026-09-10T18:13:19Z",
+            "head_sha": "2bcac4b9c289b13417d8415e4a54477185b30d18",
+            "run_id": 34512979177,
+            "updated_at": "2026-09-10T20:24:27Z"
+          },
+          {
+            "created_at": "2026-09-10T11:13:21Z",
+            "head_sha": "698f18b1cc43d8db5a0efb29b36023ee377b4be9",
+            "run_id": 34470147967,
+            "updated_at": "2026-09-10T13:38:20Z"
+          },
+          {
+            "created_at": "2026-09-10T01:19:28Z",
+            "head_sha": "d4ea6299179a09c6502cb57333c82086fb95e7f5",
+            "run_id": 34425005585,
+            "updated_at": "2026-09-10T03:36:58Z"
+          },
+          {
+            "created_at": "2026-09-09T18:16:41Z",
+            "head_sha": "42c4b3e4e42b8f28aff24af26354d153f26814d7",
+            "run_id": 34388016481,
+            "updated_at": "2026-09-09T20:08:56Z"
+          },
+          {
+            "created_at": "2026-09-09T12:00:15Z",
+            "head_sha": "1fe47e26ebe934bda8c2a8ed0d64fd24d4653cce",
+            "run_id": 34348537141,
+            "updated_at": "2026-09-09T14:11:27Z"
+          },
+          {
+            "created_at": "2026-09-09T04:12:38Z",
+            "head_sha": "8b6ab8a48c35f80f4c1a4220d3be9c1d6831dd42",
+            "run_id": 34310065776,
+            "updated_at": "2026-09-09T07:58:04Z"
+          },
+          {
+            "created_at": "2026-09-08T21:40:04Z",
+            "head_sha": "8d318ffd34ebb4195c3f3c224befc3b81741d079",
+            "run_id": 34281858070,
+            "updated_at": "2026-09-08T23:57:31Z"
+          }
+        ],
+        "source_ref": "codex/e4-v12-selection-reconstruction"
+      },
+      "dataset_version": "rolling-runs:34779504872,34770227385,34760648934,34749576265,34729110702,34722511299,34709541936,34684115937,34660606300,34627236811,34586174670,34547229611,34512979177,34470147967,34425005585,34388016481,34348537141,34310065776,34281858070",
+      "dispatch_attempts": 1,
+      "drawdown": null,
+      "duplicate_suppression_count": 0,
+      "evidence_epoch": "v12-direct-e4-parameter-copy-2026-09-03",
+      "exact_artifact_paths": [
+        "codex/e4-v12-sub10ms-entry-research-20260905:.github/workflows/e4-v12-golden-master.yml"
+      ],
+      "experiment_id": "e4x-888e445e09cdf4e5c5d23bf463b5bdcf1a319b6219f0cd428bcf60559815913c",
+      "failure_classification": null,
+      "identity": {
+        "bankroll": {
+          "definition_committed_by": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "starting_balance_sol": 3.0
+        },
+        "candidate_risk_set_policy": "frozen chronological launch risk sets",
+        "causal_horizon": "0/1/2/5/10ms causal execution replay",
+        "chronological_split": {
+          "definition_committed_by": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "policy": "strict chronological train/validation/untouched-holdout"
+        },
+        "dataset_source_manifest_fingerprint": "5505ad58d6d253ec580315f1ebc3403d0fe2c9a581a7740332a8d261b1cf9273",
+        "evidence_epoch": "v12-direct-e4-parameter-copy-2026-09-03",
+        "execution_policy": {
+          "definition_committed_by": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "policy": "paper replay only; immutable V12 execution semantics"
+        },
+        "exit_policy": {
+          "definition_committed_by": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "policy": "workflow-defined causal exit policy"
+        },
+        "feature_set_fingerprint": "b5c59830d9b09093381981319491438da1b7e885627f6ae200f49a7aa8ae0d90",
+        "fee_model": {
+          "definition_committed_by": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "policy": "workflow-defined Solana fees and priority fees"
+        },
+        "full_parameters": {
+          "workflow_definition_sha256": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "workflow_parameter_contract": [
+            "PYTHONUNBUFFERED: \"1\"",
+            "GH_TOKEN: ${{ github.token }}",
+            "REPO: profitpirate/Gambit-Jr",
+            "SOURCE_BRANCH: codex/e4-v12-selection-reconstruction",
+            "RESEARCH_BRANCH: codex/e4-v12-sub10ms-entry-research-20260905",
+            "E4_PIPELINES_BACKGROUND: \"false\"",
+            "E4_SOL_USD_FALLBACK: \"150\"",
+            "E4_BUILDER_COMMAND: \"node tools/e4-builder/strict-race-proxy-v12.mjs\"",
+            "E4_BUILDER_PRELOAD: \"${{ github.workspace }}/tools/e4-builder/fast-preload-v4.mjs\"",
+            "E4_V12_BUY_SLIPPAGE_BPS: \"800\"",
+            "E4_V12_MAX_OUTPUT_SHORTFALL_BPS: \"800\"",
+            "matrix:",
+            "include:",
+            "- id: failed-100",
+            "type: failed_preimpact",
+            "horizon: 100",
+            "- id: failed-500",
+            "type: failed_preimpact",
+            "horizon: 500",
+            "- id: failed-1000",
+            "type: failed_preimpact",
+            "horizon: 1000",
+            "- id: cluster-100",
+            "type: clustered_preimpact",
+            "horizon: 100",
+            "- id: cluster-500",
+            "type: clustered_preimpact",
+            "horizon: 500",
+            "- id: cluster-1000",
+            "type: clustered_preimpact",
+            "horizon: 1000",
+            "- id: reactive-lattice",
+            "type: reactive_lattice",
+            "horizon: 0",
+            "- id: reactive-independent",
+            "type: reactive_independent",
+            "horizon: 0",
+            "- run: python -m pip install --upgrade pip",
+            "gh run list --repo \"$REPO\" \\",
+            "--workflow e4-v12-selection-certification.yml \\",
+            "--branch \"$SOURCE_BRANCH\" \\",
+            "--status success \\",
+            "--limit 18 \\",
+            "--json databaseId,createdAt \\",
+            "--jq 'sort_by(.createdAt) | .[-10:] | .[].databaseId' > /tmp/run_ids",
+            "gh run download \"$run_id\" --repo \"$REPO\" --name \"e4-v12-forward-$run_id\" --dir \"historical/$run_id\"",
+            "--source matched/docs \\",
+            "--source matched/models \\",
+            "--source matched/research \\",
+            "--output artifacts/failed-intents.json",
+            "CANDIDATE_TYPE: ${{ matrix.type }}",
+            "HORIZON_MS: ${{ matrix.horizon }}",
+            "while IFS=$'\\t' read -r run_id batch events; do args+=(--pair \"$batch:$events\"); done < /tmp/pairs.tsv",
+            "--mode search \"${args[@]}\" --horizon-ms \"$HORIZON_MS\" \\",
+            "--latencies 0,1,2,5,10 --starting-balance-sol 3 \\",
+            "--minimum-win-rate 0.65 --minimum-profit-factor 1.25 \\",
+            "--output artifacts/report.json --model-output artifacts/model.json \\",
+            "--predictions-output artifacts/holdout-predictions.json",
+            "--mode search \"${args[@]}\" --horizon-ms \"$HORIZON_MS\" \\",
+            "--latencies 0,1,2,5,10 --starting-balance-sol 3 \\",
+            "--minimum-win-rate 0.65 --minimum-profit-factor 1.25 \\",
+            "--output artifacts/report.json --model-output artifacts/model.json \\",
+            "--predictions-output artifacts/holdout-predictions.json",
+            "--mode search \"${args[@]}\" --latencies 0,1,2,5,10 \\",
+            "--starting-balance-sol 3 --minimum-win-rate 0.65 \\",
+            "--minimum-profit-factor 1.25 --output artifacts/report.json \\",
+            "--model-output artifacts/model.json \\",
+            "--predictions-output artifacts/holdout-predictions.json",
+            "--mode search \"${args[@]}\" --latencies 0,1,2,5,10 \\",
+            "--starting-balance-sol 3 --minimum-win-rate 0.65 \\",
+            "--minimum-profit-factor 1.25 --policy-candidates 420 \\",
+            "--retained-policies 32 --output artifacts/report.json \\",
+            "--model-output artifacts/model.joblib \\",
+            "--predictions-output artifacts/holdout-predictions.json",
+            "CANDIDATE_ID: ${{ matrix.id }}",
+            "CANDIDATE_TYPE: ${{ matrix.type }}",
+            "HORIZON_MS: ${{ matrix.horizon }}",
+            "type: ${{ steps.choose.outputs.type }}",
+            "horizon: ${{ steps.choose.outputs.horizon }}",
+            "- run: python -m pip install --upgrade pip",
+            "run: npm install --omit=dev",
+            "python -m scripts.e4_v12_hotpath_benchmark_v3 --iterations 1000 --warmup 100 --maximum-p95-ms 10 --output artifacts/hotpath.json",
+            "gh run list --repo \"$REPO\" --workflow e4-v12-selection-certification.yml --branch \"$SOURCE_BRANCH\" --status success --limit 18 --json databaseId,createdAt --jq 'sort_by(.createdAt) | .[-10:] | .[].databaseId' > /tmp/run_ids",
+            "gh run download \"$run_id\" --repo \"$REPO\" --name \"e4-v12-forward-$run_id\" --dir \"historical/$run_id\"",
+            "--target-launches 3000 --capture-seconds 14400 --tail-seconds 300 \\",
+            "--heartbeat-seconds 60 --minimum-launches 3000 --wallet-signatures 1500 \\",
+            "--builder-probes 250 --testnet-route-probes 0 --stress-iterations 0 \\",
+            "--output artifacts/live-batch.json",
+            "SELECTED_TYPE: ${{ needs.select.outputs.type }}",
+            "SELECTED_HORIZON: ${{ needs.select.outputs.horizon }}",
+            "while IFS=$'\\t' read -r run_id batch events; do args+=(--pair \"$batch:$events\"); done < /tmp/history-pairs.tsv",
+            "args+=(--pair \"artifacts/live-batch.json:artifacts/live-batch-live-events.jsonl\")",
+            "python -m scripts.e4_v12_preimpact_lattice_failed --mode apply \"${args[@]}\" --horizon-ms \"$SELECTED_HORIZON\" --model-input selected/model.json --output artifacts/live-apply.json --model-output artifacts/live-unused.json --predictions-output artifacts/live-predictions.json",
+            "python -m scripts.e4_v12_preimpact_lattice_clustered --mode apply \"${args[@]}\" --horizon-ms \"$SELECTED_HORIZON\" --model-input selected/model.json --output artifacts/live-apply.json --model-output artifacts/live-unused.json --predictions-output artifacts/live-predictions.json",
+            "python -m scripts.e4_v12_reactive_lattice_registry_v3 --mode apply \"${args[@]}\" --model-input selected/model.json --output artifacts/live-apply.json --model-output artifacts/live-unused.json --predictions-output artifacts/live-predictions.json",
+            "python -m scripts.e4_v12_reactive_independent_golden --mode apply \"${args[@]}\" --model-input selected/model.joblib --output artifacts/live-apply.json --model-output artifacts/live-unused.joblib --predictions-output artifacts/live-predictions.json --policy-output artifacts/live-policy.json --guard-output artifacts/live-guard.txt",
+            "SELECTED_TYPE: ${{ needs.select.outputs.type }}",
+            "--events artifacts/live-batch-live-events.jsonl \\",
+            "--predictions artifacts/live-predictions.json \\",
+            "--policy artifacts/live-policy.json \\",
+            "--latencies 0,1,2,5,10 --starting-balance-sol 3 --reserve-sol 0.03 \\",
+            "--fee-bps 125 --max-output-shortfall-bps \"$guard\" --max-concurrent 2 \\",
+            "--output artifacts/live-economics.json",
+            "--batch artifacts/live-batch.json \\",
+            "--events artifacts/live-batch-live-events.jsonl \\",
+            "--predictions artifacts/live-predictions.json \\",
+            "--latencies 0,1,2,5,10 --starting-balance-sol 3 --entry-fraction 0.0185 \\",
+            "--fee-bps 125 --max-output-shortfall-bps \"$guard\" --confirmation-ms 1500 \\",
+            "--max-concurrent 2 --output artifacts/live-economics.json",
+            "SELECTED_TYPE: ${{ needs.select.outputs.type }}",
+            "if ! git diff --cached --quiet; then git commit -m 'research(e4-v12): persist untouched-live sub-10ms golden thesis [skip ci]'; git push origin HEAD:\"$RESEARCH_BRANCH\"; fi"
+          ]
+        },
+        "latency_assumptions": {
+          "definition_committed_by": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "replay_ms": [
+            0,
+            1,
+            2,
+            5,
+            10
+          ]
+        },
+        "model_family": "multi-family tournament",
+        "output_guard": {
+          "definition_committed_by": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "policy": "V12 bounded output deterioration guard"
+        },
+        "position_sizing": {
+          "definition_committed_by": "0f182da3500a697e551fa74f9f5a4c4ec71cc9dd018c22a40a46f28f69c327c2",
+          "policy": "workflow-defined bounded position sizing"
+        },
+        "source_code_fingerprint": "cde7de9f56034e95ba8c18f41d4161225ecffa0d017bec8a994e252c19421359",
+        "thesis_family_identifier": "parallel-master"
+      },
+      "last_duplicate_failure_classification": null,
+      "latency_results": null,
+      "latest_run_id": null,
+      "latest_run_url": null,
+      "live_metrics": null,
+      "live_status": null,
+      "material_change_required_before_rerun": null,
+      "pnl": null,
+      "profit_factor": null,
+      "reason_for_retirement": null,
+      "recall": null,
+      "ref": "codex/e4-v12-sub10ms-entry-research-20260905",
+      "retired": false,
+      "retry_not_before": null,
+      "selection_precision": null,
+      "source_commit": "d3c05bdaf788d60f5ccf7d1dc0d8c0ccbc1ef8ac",
+      "state": "DISPATCHED",
+      "suppressed_duplicate_run_ids": [],
+      "thesis_family": "parallel-master",
+      "trade_count": null,
+      "train_metrics": null,
+      "updated_timestamp": "2026-09-14T00:26:38.905735Z",
       "validation_metrics": null,
       "wilson_lower_bound": null,
       "workflow": "e4-v12-golden-master.yml",
@@ -45054,13 +45652,14 @@
       "dataset_version": "rolling-runs:34779504872,34770227385,34760648934,34749576265,34729110702,34722511299,34709541936,34684115937,34660606300,34627236811,34586174670,34547229611,34512979177,34470147967,34425005585,34388016481,34348537141,34310065776,34281858070",
       "dispatch_attempts": 1,
       "drawdown": null,
-      "duplicate_suppression_count": 0,
+      "duplicate_suppression_count": 1,
       "evidence_epoch": "v12-direct-e4-parameter-copy-2026-09-03",
       "exact_artifact_paths": [
+        "https://github.com/profitpirate/Gambit-Jr/actions/runs/34787509775",
         "codex/e4-v12-sub10ms-entry-research-20260905:.github/workflows/e4-v12-reactive-independent-golden.yml"
       ],
       "experiment_id": "e4x-b13f1335b2a73855f6cdcae54447c1e7ee5cc579f107234713aef2dce2fcd755",
-      "failure_classification": null,
+      "failure_classification": "NO_TRAIN_SURVIVOR",
       "identity": {
         "bankroll": {
           "definition_committed_by": "161cb367005623f63b7e9517658b60e379ea472b2ba0270d509046c110d5665c",
@@ -45186,28 +45785,30 @@
         "source_code_fingerprint": "2c995389162c52d3490e79b41a3dd7360869c07ba8f4f6c92c89ba553cdb68da",
         "thesis_family_identifier": "reactive-independent"
       },
-      "last_duplicate_failure_classification": null,
+      "last_duplicate_failure_classification": "DUPLICATE_EXPERIMENT",
       "latency_results": null,
-      "latest_run_id": null,
-      "latest_run_url": null,
+      "latest_run_id": 34787509775,
+      "latest_run_url": "https://github.com/profitpirate/Gambit-Jr/actions/runs/34787509775",
       "live_metrics": null,
       "live_status": null,
-      "material_change_required_before_rerun": null,
+      "material_change_required_before_rerun": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "reason_for_retirement": null,
+      "reason_for_retirement": "golden search failed without an infrastructure marker",
       "recall": null,
       "ref": "codex/e4-v12-sub10ms-entry-research-20260905",
-      "retired": false,
+      "retired": true,
       "retry_not_before": null,
       "selection_precision": null,
       "source_commit": "d3c05bdaf788d60f5ccf7d1dc0d8c0ccbc1ef8ac",
-      "state": "DISPATCHED",
-      "suppressed_duplicate_run_ids": [],
+      "state": "COMPLETED_FAILED",
+      "suppressed_duplicate_run_ids": [
+        34787509775
+      ],
       "thesis_family": "reactive-independent",
       "trade_count": null,
       "train_metrics": null,
-      "updated_timestamp": "2026-09-13T22:40:46.935714Z",
+      "updated_timestamp": "2026-09-14T00:26:29.469668Z",
       "validation_metrics": null,
       "wilson_lower_bound": null,
       "workflow": "e4-v12-reactive-independent-golden.yml",
@@ -47888,13 +48489,14 @@
       "dataset_version": "rolling-runs:34779504872,34770227385,34760648934,34749576265,34729110702,34722511299,34709541936,34684115937,34660606300,34627236811,34586174670,34547229611,34512979177,34470147967,34425005585,34388016481,34348537141,34310065776,34281858070",
       "dispatch_attempts": 1,
       "drawdown": null,
-      "duplicate_suppression_count": 0,
+      "duplicate_suppression_count": 1,
       "evidence_epoch": "v12-direct-e4-parameter-copy-2026-09-03",
       "exact_artifact_paths": [
+        "https://github.com/profitpirate/Gambit-Jr/actions/runs/34787508847",
         "codex/e4-v12-sub10ms-entry-research-20260905:.github/workflows/e4-v12-bayesian-source-golden.yml"
       ],
       "experiment_id": "e4x-b8416e3f7613828775a06a843d59beb365ab11365063e0b94b840358c63b50f1",
-      "failure_classification": null,
+      "failure_classification": "HOLDOUT_COLLAPSE",
       "identity": {
         "bankroll": {
           "definition_committed_by": "47d5759aa7922c4e8a9b0e7ecd820cbb89581d9cc3a1e6041f95bbb589bfced7",
@@ -48013,28 +48615,30 @@
         "source_code_fingerprint": "a440da973067025dd58857009db7ea10155628691dfd7b65e5eb42dcbeef90ae",
         "thesis_family_identifier": "bayesian-source-confidence"
       },
-      "last_duplicate_failure_classification": null,
+      "last_duplicate_failure_classification": "DUPLICATE_EXPERIMENT",
       "latency_results": null,
-      "latest_run_id": null,
-      "latest_run_url": null,
+      "latest_run_id": 34787508847,
+      "latest_run_url": "https://github.com/profitpirate/Gambit-Jr/actions/runs/34787508847",
       "live_metrics": null,
       "live_status": null,
-      "material_change_required_before_rerun": null,
+      "material_change_required_before_rerun": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "reason_for_retirement": null,
+      "reason_for_retirement": "workflow completed without an untouched-live golden pass",
       "recall": null,
       "ref": "codex/e4-v12-sub10ms-entry-research-20260905",
-      "retired": false,
+      "retired": true,
       "retry_not_before": null,
       "selection_precision": null,
       "source_commit": "d3c05bdaf788d60f5ccf7d1dc0d8c0ccbc1ef8ac",
-      "state": "DISPATCHED",
-      "suppressed_duplicate_run_ids": [],
+      "state": "COMPLETED_FAILED",
+      "suppressed_duplicate_run_ids": [
+        34787508847
+      ],
       "thesis_family": "bayesian-source-confidence",
       "trade_count": null,
       "train_metrics": null,
-      "updated_timestamp": "2026-09-13T22:40:45.564898Z",
+      "updated_timestamp": "2026-09-14T00:26:18.766303Z",
       "validation_metrics": null,
       "wilson_lower_bound": null,
       "workflow": "e4-v12-bayesian-source-golden.yml",
