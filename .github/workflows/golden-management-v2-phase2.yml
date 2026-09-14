@@ -6,6 +6,7 @@ on:
     paths:
       - "tools/golden_management_v2.py"
       - "tools/golden_management_v2_live.py"
+      - "tools/golden_management_v2_hardened.py"
       - "tools/golden_management_v2_report.py"
       - "tools/golden_management_v2_stress.py"
       - "tests/test_golden_management_v2.py"
@@ -37,8 +38,9 @@ jobs:
           python-version: "3.12"
       - name: Compile and unit test
         run: |
-          PYTHONPATH="$PWD:$PWD/tools" python -m py_compile tools/golden_management_v2.py tools/golden_management_v2_live.py tools/golden_management_v2_report.py tools/golden_management_v2_stress.py
+          PYTHONPATH="$PWD:$PWD/tools" python -m py_compile tools/golden_management_v2.py tools/golden_management_v2_live.py tools/golden_management_v2_hardened.py tools/golden_management_v2_report.py tools/golden_management_v2_stress.py
           PYTHONPATH="$PWD:$PWD/tools" python -m unittest tests.test_golden_management_v2 -v
+          PYTHONPATH="$PWD:$PWD/tools" python tools/golden_management_v2_hardened.py --self-test
       - name: 50k adversarial randomized paths
         run: |
           mkdir -p artifacts
@@ -170,10 +172,10 @@ jobs:
           corpus="$(find frozen -name e4-v12-allout-launch-corpus.jsonl.gz -print -quit)"
           test -s "$corpus"
           echo "CORPUS=$corpus" >> "$GITHUB_ENV"
-      - name: Two-minute true-online fresh-launch smoke
+      - name: Two-minute true-online fresh-launch hardened smoke
         run: |
           set +e
-          PYTHONPATH="$PWD:$PWD/tools" python tools/golden_management_v2_live.py \
+          PYTHONPATH="$PWD:$PWD/tools" python tools/golden_management_v2_hardened.py \
             --production-root production --corpus "$CORPUS" --starting-balance-sol 3 \
             --execution-delay-ms 6 --target-closed-trades 999 --duration-seconds 120 --heartbeat-seconds 15 \
             --state-output artifacts/live-smoke/state.json --status artifacts/live-smoke/status.json --output artifacts/live-smoke/final.json
@@ -189,16 +191,19 @@ jobs:
           assert s['real_money_execution'] is False
           assert s['historical_replay'] is False
           assert s['market_data_mode']=='LIVE_SOLANA_WEBSOCKET_FRESH_LAUNCHES_ONLY'
+          assert s['clean_drain_required'] is True
           assert int(s['counts'].get('launches_seen',0)) > 0, s['counts']
           assert int(s['counts'].get('decoded_events',0)) > 0, s['counts']
           a=s['account']
           assert float(a['campaign_starting_balance_sol'])==3.0
           assert not a.get('task_errors')
           assert not a.get('unresolved_exposure')
+          assert int(a.get('active_positions',0))==0
+          assert int(a.get('pending_entries',0))==0
           lat=a.get('execution_latency_ms') or {}
           if int(lat.get('count') or 0) >= 1:
               assert float(lat.get('p95') or 1e9) < 10.0, lat
-          print('FRESH_LIVE_SMOKE_PASS',s['counts'])
+          print('FRESH_LIVE_HARDENED_SMOKE_PASS',s['counts'])
           PY
       - uses: actions/upload-artifact@v4
         with:
@@ -214,7 +219,7 @@ jobs:
         run: |
           mkdir -p artifacts
           cat > artifacts/phase2.json <<'JSON'
-          {"phase":2,"name":"stress testing / bulletproofing / bug fixing","status":"COMPLETE","requirements":{"randomized_paths":50000,"exact_transport_p95_lt_ms":10,"fresh_live_smoke":true,"paper_only":true}}
+          {"phase":2,"name":"stress testing / bulletproofing / bug fixing","status":"COMPLETE","requirements":{"randomized_paths":50000,"exact_transport_p95_lt_ms":10,"fresh_live_smoke":true,"clean_session_drain":true,"distinct_market_state_policy_ticks":true,"paper_only":true}}
           JSON
       - uses: actions/upload-artifact@v4
         with:
