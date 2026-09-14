@@ -1,0 +1,77 @@
+name: Golden Management v2 Phase 1 implementation
+
+on:
+  push:
+    branches: [codex/golden-management-v2]
+    paths:
+      - "tools/golden_management_v2.py"
+      - "tools/golden_management_v2_live.py"
+      - "tools/golden_management_v2_report.py"
+      - "tests/test_golden_management_v2.py"
+      - ".github/workflows/golden-management-v2-phase1.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: golden-management-v2-phase1
+  cancel-in-progress: true
+
+jobs:
+  implementation-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/golden-management-v2
+          fetch-depth: 1
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-selection-reconstruction
+          path: production
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e production -r production/requirements-e4.txt aiohttp
+      - name: Compile v2 implementation
+        run: |
+          python -m py_compile tools/golden_management_v2.py tools/golden_management_v2_live.py tools/golden_management_v2_report.py
+      - name: Unit tests
+        run: |
+          PYTHONPATH="$PWD:$PWD/tools" python -m unittest tests.test_golden_management_v2 -v
+          PYTHONPATH="$PWD:$PWD/tools" python tools/golden_management_v2.py
+          PYTHONPATH="$PWD:$PWD/tools" python tools/golden_management_v2_live.py --self-test
+      - name: Contract assertions
+        run: |
+          PYTHONPATH="$PWD:$PWD/tools" python - <<'PY'
+          import inspect
+          import golden_management_v2 as m
+          import golden_management_v2_live as live
+          assert live.STARTING_BALANCE_SOL == 3.0
+          assert [m.TIERS[x].position_fraction for x in ('BASE','MEDIUM','HIGH','EXCEPTIONAL')] == [0.05,0.08,0.15,0.25]
+          assert [m.TIERS[x].initial_fraction for x in ('BASE','MEDIUM','HIGH','EXCEPTIONAL')] == [0.30,0.30,0.20,0.20]
+          src=inspect.getsource(live)
+          assert 'LIVE_SOLANA_WEBSOCKET_FRESH_LAUNCHES_ONLY' in src
+          assert 'historical_replay' in src
+          assert 'real_money_execution' in src
+          assert 'sign_and_send' not in src and 'sendTransaction' not in src
+          assert 'CONTROL_HOLD_MS = 2000.0' in src
+          print('PHASE1_CONTRACT_OK')
+          PY
+      - name: Phase 1 marker
+        run: |
+          mkdir -p artifacts
+          cat > artifacts/phase1.json <<'JSON'
+          {"phase":1,"name":"implementations","status":"COMPLETE","bankroll_sol":3.0,"paper_only":true,"fresh_live_market_required":true,"sizing":{"BASE":0.05,"MEDIUM":0.08,"HIGH":0.15,"EXCEPTIONAL":0.25}}
+          JSON
+      - uses: actions/upload-artifact@v4
+        with:
+          name: golden-management-v2-phase1-${{ github.run_id }}
+          path: artifacts/phase1.json
+          retention-days: 30
