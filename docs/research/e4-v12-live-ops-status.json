@@ -1,6 +1,6 @@
 {
   "fatal": [],
-  "last_signal_age_seconds": 2385.4321415424347,
+  "last_signal_age_seconds": 2446.476045846939,
   "publication_failures": 0,
   "resource_limits": {
     "max_runner_seconds": 20400,
@@ -53,56 +53,62 @@
         "wins": 0
       }
     },
-    "checked_at": 1789355909.908013,
+    "checked_at": 1789355969.9402695,
     "config_hash": "7e39d6edf7339dfe99d54794292c0d9604fb56edadd53aff7e73bb2f9edd8263",
     "counts": {
-      "UNSUPPORTED_QUOTE": 136,
-      "decoded_events": 80129,
-      "launches_seen": 836,
+      "UNSUPPORTED_QUOTE": 137,
+      "decoded_events": 81748,
+      "launches_seen": 852,
       "live_prior_selection_updates": 2,
-      "scored": 700
+      "scored": 715
     },
-    "elapsed_seconds": 2391.222894191742,
+    "elapsed_seconds": 2451.2551505565643,
     "endpoints": {
       "0": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 442726
+        "messages": 453053
       },
       "1": {
-        "connections": 2,
-        "disconnects": 1,
+        "connections": 3,
+        "disconnects": 2,
         "errors": [
+          "ConnectionError:WebSocket closed",
           "ConnectionError:WebSocket closed"
         ],
-        "messages": 299065
+        "messages": 304673
       }
     },
     "execution_model": "paper reserve quotes; 10ms floor is an assumption, NOT proven transaction landing latency",
     "failures": [],
     "feed": {
-      "age_seconds": 14.58,
+      "age_seconds": 14.43,
       "fallback_used": false,
       "fresh": true,
       "recent_errors": [],
-      "sol_usd": 101.08,
+      "sol_usd": 101.06,
       "source": "coinbase"
     },
-    "last_event_at": 1789355909.9043274,
-    "last_launch_at": 1789355904.1604464,
-    "last_score_at": 1789355899.0617237,
+    "last_event_at": 1789355969.9371998,
+    "last_launch_at": 1789355968.2750356,
+    "last_score_at": 1789355968.2859073,
     "live_history_outcomes": "selection priors updated on received E4 buys; no invented net-PnL outcome priors",
     "no_retuning": true,
     "paper_only": true,
     "phase": "online",
-    "queue_depth": 0,
+    "queue_depth": 1,
     "run_id": "34799774359",
     "sample_target_per_thesis": 20,
     "score_queue_depth": 0,
     "scoring": {
       "A_86_96": {
         "closest_misses": [
+          {
+            "gap": 0.03275711208261223,
+            "mint": "8f6xAzqMjrYBhGwx4iSMiH4mn4PAhreqdvvXBnrJpump",
+            "score": 0.9596169825852241
+          },
           {
             "gap": 0.056033922991124196,
             "mint": "8yhLqGfQePBMUvhhcbYAoXgFLynDGFc9afcmQWAPpump",
@@ -122,18 +128,13 @@
             "gap": 0.0722398423058116,
             "mint": "8gWwiaH2XvpfVQgSyvqj9x4K8Z4ZKcjepSDTsC2Apump",
             "score": 0.9201342523620247
-          },
-          {
-            "gap": 0.07546742562156128,
-            "mint": "B8CHg2mEAPdCsjNE4Eb935BkT96fn1iBymBwfjPVpump",
-            "score": 0.916906669046275
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 700
+          "BELOW_THRESHOLD": 715
         },
-        "recent_score_p50": 0.4451608995876163,
-        "score_max": 0.9363401716767121
+        "recent_score_p50": 0.4477326283108874,
+        "score_max": 0.9596169825852241
       },
       "B_75": {
         "closest_misses": [
@@ -148,6 +149,11 @@
             "score": 0.9672361454388314
           },
           {
+            "gap": 0.017028408105856596,
+            "mint": "8f6xAzqMjrYBhGwx4iSMiH4mn4PAhreqdvvXBnrJpump",
+            "score": 0.9667998093585078
+          },
+          {
             "gap": 0.02181505531095118,
             "mint": "FZ3EEgn1UsxdnxC6J88QJbsg2wcs2r9k7LDVXWaxpump",
             "score": 0.9620131621534133
@@ -156,28 +162,23 @@
             "gap": 0.030851292274864606,
             "mint": "8fwMgQk3kL4Ra8arzmfwSG6frxHSaTAdHC4pLvk1pump",
             "score": 0.9529769251894998
-          },
-          {
-            "gap": 0.0331159754214817,
-            "mint": "ZEqJmBLyC6p8FUsgfTREvuXH6gF8ByzqwuJ8jiYpump",
-            "score": 0.9507122420428827
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 700
+          "BELOW_THRESHOLD": 715
         },
-        "recent_score_p50": 0.3963728173640988,
+        "recent_score_p50": 0.3963537383948115,
         "score_max": 0.9690290618053768
       }
     },
-    "scoring_ms_p95": 11.42340385015359,
+    "scoring_ms_p95": 11.426288100119564,
     "started_at": 1789353518.6851196,
     "status": "RUNNING",
     "version": "e4-v12-supervised-online-v2",
     "wall_time_limit_seconds": 19800.0
   },
   "runner_pid": 3489,
-  "supervisor_checked_at": 1789355911.308258,
+  "supervisor_checked_at": 1789355972.3521624,
   "supervisor_state": "WATCHING",
   "warnings": [
     "A_86_96:NO_SIGNALS_ABOVE_UNCHANGED_THRESHOLD",
