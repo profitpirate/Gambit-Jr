@@ -21,6 +21,8 @@ WSOL = "So11111111111111111111111111111111111111112"
 CANDIDATES = legacy.CANDIDATES
 CONFIG_HASH = hashlib.sha256(json.dumps(CANDIDATES, sort_keys=True).encode()).hexdigest()
 ROOT = Path(__file__).resolve().parent
+MINT_CURVES = {}
+RESERVE_REFRESHER = None
 
 def write_json(path, value):
     legacy.atomic_json(Path(path), value)
@@ -163,6 +165,14 @@ class Account:
         if not all(math.isfinite(float(state.get(k,0))) and state.get(k,0)>0 for k in ("vsol","vtok")):
             raise ValueError("INVALID_RESERVES")
         return dict(state)
+    async def resolve_state(self,mint):
+        try:
+            return self.quote_state(mint)
+        except ValueError as exc:
+            if str(exc) not in {"NO_RESERVE_STATE","STALE_RESERVE_STATE"} or RESERVE_REFRESHER is None:
+                raise
+            self.states[mint] = await RESERVE_REFRESHER(mint,self.states.get(mint))
+            return self.quote_state(mint)
     def reject(self,mint,reason):
         self.rejections[reason]+=1
         self.evidence.append("execution",dict(thesis=self.name,mint=mint,kind="REJECT",reason=reason,at_ns=time.time_ns()))
@@ -186,7 +196,7 @@ class Account:
         try:
             await asyncio.sleep(self.delay_ms/1000.)
             if not self.price.fresh(): self.reject(mint,"STALE_SOL_USD");return
-            state=self.quote_state(mint)
+            state=await self.resolve_state(mint)
             stake=min(max(0.,self.cash-.03),self.equity()*.0185)
             if stake<=0: self.reject(mint,"INSUFFICIENT_CASH");return
             if state.get("rtok") is None or not math.isfinite(state["rtok"]) or state["rtok"]<=0:
@@ -205,12 +215,12 @@ class Account:
             self.checkpoint()
             await asyncio.sleep(hold/1000.)
             try:
-                exit_state=self.quote_state(mint)
+                exit_state=await self.resolve_state(mint)
                 proceeds=self.build.quote_sell(tokens,exit_state)
                 pnl=proceeds-stake
                 self.cash+=proceeds;self.active.pop(mint)
                 exit_ns=time.time_ns()
-                self.ledger.append(dict(p,exit_ns=exit_ns,exit_state_ns=exit_state["ns"],
+                self.ledger.append(dict(p,exit_ns=exit_ns,exit_state_ns=exit_state["ns"],exit_quote_source=exit_state.get("quote_source","stream"),
                                         actual_hold_ms=(exit_ns-now)/1e6,proceeds_sol=proceeds,pnl_sol=pnl,
                                         win=pnl>0,balance_after_sol=self.equity(),status="CLOSED"))
                 self.evidence.append("execution",dict(self.ledger[-1],thesis=self.name,kind="PAPER_EXIT"))
@@ -235,20 +245,56 @@ class Account:
                     net_pnl_sol=sum(pnls),ending_bankroll_sol=self.equity(),cash_sol=self.cash,
                     locked_principal_sol=sum(p["stake_sol"] for p in self.active.values()),
                     profit_factor=gross/loss if loss else None,roi_fraction=sum(pnls)/2,
-                    maximum_drawdown_fraction=dd,active_positions=len(self.active),pending_entries=len(self.pending),
+                    maximum_drawdown_fraction=dd,drawdown_basis="realized_equity_plus_locked_principal",active_positions=len(self.active),pending_entries=len(self.pending),
                     rejections=dict(self.rejections),task_errors=list(self.errors),
                     unpriced_exposure=any(p.get("status")=="UNRESOLVED_EXIT" for p in self.active.values()))
 
 def native_quote(raw):
-    return raw.get("quote_mint") in (None,"",WSOL)
+    return raw.get("quote_mint") in (None,"",WSOL,"11111111111111111111111111111111")
 
 def checked_state(event,build):
+    raw=event.raw
+    if raw.get("bonding_curve"):MINT_CURVES[event.mint]=raw["bonding_curve"]
+    if getattr(event,"complete",False) or getattr(event,"kind","")=="MIGRATION":
+        return dict(ns=int(event.received_ns),complete=True,quote_source="stream",vsol=0,vtok=0,rtok=0)
     state=legacy.state_from_live_event(event,build)
     if state:
         raw=event.raw
         state["rtok"]=None if raw.get("real_token_reserves") is None else build.normal_tokens(raw["real_token_reserves"])
         state["unsupported_quote"]=not native_quote(raw)
     return state
+
+
+async def refresh_curve(mint, previous, prod, build):
+    """Request a current native curve only when the streamed quote is stale."""
+    from memecoin_bot.realtime.pumpfun import decode_account_data, decode_bonding_curve_account
+    curve=MINT_CURVES.get(mint)
+    if not curve:raise ValueError("NO_CURVE_ADDRESS_FOR_FRESH_QUOTE")
+    config={"encoding":"base64","commitment":"processed"}
+    if previous and previous.get("slot",-1)>=0:config["minContextSlot"]=int(previous["slot"])
+    errors=[]
+    async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=3)) as session:
+        for url in prod.DEFAULT_HTTP_RPCS[:2]:
+            try:
+                async with session.post(url,json={"jsonrpc":"2.0","id":1,"method":"getAccountInfo",
+                                                  "params":[curve,config]}) as r:
+                    r.raise_for_status();payload=await r.json()
+                if payload.get("error"):raise ValueError("RPC_ACCOUNT_ERROR")
+                result=payload["result"];value=result["value"]
+                if not value or value.get("owner")!=prod.PUMP_PROGRAM_ID:raise ValueError("CURVE_OWNER_OR_ACCOUNT_INVALID")
+                raw=decode_bonding_curve_account(decode_account_data(value["data"]))
+                if not raw.get("quote_is_sol"):raise ValueError("NON_SOL_CURVE")
+                vsol=build.normal_sol(raw["virtual_sol_reserves"])
+                vtok=build.normal_tokens(raw["virtual_token_reserves"])
+                if vsol<=0 or vtok<=0:raise ValueError("INVALID_RPC_RESERVES")
+                price=vsol/vtok
+                return dict(ns=time.time_ns(),slot=result["context"]["slot"],vsol=vsol,vtok=vtok,
+                    rtok=build.normal_tokens(raw["real_token_reserves"]),price=price,
+                    fdv=price*float(raw["token_total_supply"])/1e6*prod.hardening._SOL_USD,
+                    complete=bool(raw["curve_complete"]),unsupported_quote=False,quote_source="fresh_rpc")
+            except Exception as exc:errors.append(type(exc).__name__)
+    raise ValueError("FRESH_CURVE_QUOTE_UNAVAILABLE:"+",".join(errors))
+
 
 def validate_row(row,fields):
     missing=[f for f in fields if f not in row]
@@ -330,6 +376,15 @@ async def online(args):
         corpus_sha256=legacy.FROZEN_CORPUS_SHA256,code_sha256=legacy.sha256_path(Path(__file__)),
         frozen_before_stream_at=time.time(),research_ref="1b5995a2f04b70c49071fba3c2d60e2f85d5d04d",
         paper_only=True,fee_bps=build.FEE_BPS,priority_and_tip_sol=build.PRIORITY_AND_TIP_SOL))
+    global RESERVE_REFRESHER
+    async def reserve_refresher(mint,previous):
+        state=await refresh_curve(mint,previous,prod,build)
+        # Never roll back a newer streamed slot received while RPC was in flight.
+        current=states.get(mint)
+        if current and current.get("slot",-1)>state.get("slot",-1):
+            return dict(current)
+        return state
+    RESERVE_REFRESHER=reserve_refresher
     price=PriceFeed(prod)
     async with aiohttp.ClientSession() as session:
         if not await price.refresh(session):raise RuntimeError("NO_VERIFIED_SOL_USD")
