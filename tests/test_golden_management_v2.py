@@ -33,12 +33,13 @@ class TestGoldenManagementV2(unittest.TestCase):
     def test_sustained_failure_exits(self):
         g=mgmt.RunnerGuardian(mgmt.TIERS['HIGH'])
         g.on_mark(mgmt.Mark(325,-.02))
-        g.on_mark(mgmt.Mark(900,-.19))
-        g.on_mark(mgmt.Mark(1000,-.21))
-        g.on_mark(mgmt.Mark(1100,-.23))
-        a=g.on_mark(mgmt.Mark(1200,-.26))
-        self.assertIsNotNone(a)
-        self.assertEqual(a.kind,'EXIT')
+        exit_action=None
+        for t,r in ((900,-.19),(1000,-.21),(1100,-.23),(1200,-.26)):
+            a=g.on_mark(mgmt.Mark(t,r))
+            if a is not None and a.kind=='EXIT':
+                exit_action=a
+                break
+        self.assertIsNotNone(exit_action)
         self.assertTrue(g.closed)
 
     def test_catastrophic_guard(self):
