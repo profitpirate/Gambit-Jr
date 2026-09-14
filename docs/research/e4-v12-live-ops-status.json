@@ -2,7 +2,7 @@
   "fatal": [
     "NO_SIGNAL_RESOURCE_GUARD"
   ],
-  "last_signal_age_seconds": 3974.7241430282593,
+  "last_signal_age_seconds": 3980.658062696457,
   "publication_failures": 0,
   "resource_limits": {
     "max_runner_seconds": 20400,
@@ -55,22 +55,22 @@
         "wins": 0
       }
     },
-    "checked_at": 1789357495.7902858,
+    "checked_at": 1789357501.624639,
     "config_hash": "7e39d6edf7339dfe99d54794292c0d9604fb56edadd53aff7e73bb2f9edd8263",
     "counts": {
       "UNSUPPORTED_QUOTE": 249,
-      "decoded_events": 132232,
+      "decoded_events": 132344,
       "launches_seen": 1252,
       "live_prior_selection_updates": 3,
       "scored": 1003
     },
-    "elapsed_seconds": 3977.1051666736603,
+    "elapsed_seconds": 3982.9395203590393,
     "endpoints": {
       "0": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 667106
+        "messages": 667248
       },
       "1": {
         "connections": 4,
@@ -80,20 +80,20 @@
           "ConnectionError:WebSocket closed",
           "ConnectionError:WebSocket closed"
         ],
-        "messages": 456277
+        "messages": 456649
       }
     },
     "execution_model": "paper reserve quotes; 10ms floor is an assumption, NOT proven transaction landing latency",
     "failures": [],
     "feed": {
-      "age_seconds": 5.64,
+      "age_seconds": 11.48,
       "fallback_used": false,
       "fresh": true,
       "recent_errors": [],
       "sol_usd": 100.8,
       "source": "coinbase"
     },
-    "last_event_at": 1789357495.7701232,
+    "last_event_at": 1789357501.3503335,
     "last_launch_at": 1789357493.335362,
     "last_score_at": 1789357493.345268,
     "live_history_outcomes": "selection priors updated on received E4 buys; no invented net-PnL outcome priors",
@@ -176,15 +176,12 @@
     },
     "scoring_ms_p95": 11.3824601000033,
     "started_at": 1789353518.6851196,
-    "status": "RUNNING",
+    "status": "OPERATIONS_STOPPED",
     "version": "e4-v12-supervised-online-v2",
     "wall_time_limit_seconds": 19800.0
   },
   "runner_pid": 3489,
-  "supervisor_checked_at": 1789357500.6002595,
-  "supervisor_state": "WATCHING",
-  "warnings": [
-    "A_86_96:NO_SIGNALS_ABOVE_UNCHANGED_THRESHOLD",
-    "B_75:NO_SIGNALS_ABOVE_UNCHANGED_THRESHOLD"
-  ]
+  "supervisor_checked_at": 1789357506.5341792,
+  "supervisor_state": "STOPPING",
+  "warnings": []
 }
