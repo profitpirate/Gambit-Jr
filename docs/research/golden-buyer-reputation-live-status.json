@@ -2,10 +2,218 @@
   "fatal": [],
   "publication_failures": 0,
   "run_id": "34854530711",
-  "runner": {},
+  "runner": {
+    "account": {
+      "active_positions": 0,
+      "campaign_starting_balance_sol": 5.0,
+      "cash_sol": 5.0,
+      "closed_trades": 0,
+      "equity_sol": 5.0,
+      "expectancy_sol": null,
+      "largest_winner_profit_share": null,
+      "losses": 0,
+      "maximum_drawdown_fraction": 0.0,
+      "net_pnl_sol": 0,
+      "pending_entries": 0,
+      "profit_factor": null,
+      "rejections": {},
+      "roi_fraction": 0.0,
+      "signals": 0,
+      "task_errors": [],
+      "unresolved_exposure": false,
+      "win_rate": null,
+      "wins": 0
+    },
+    "checked_at": 1789395539.551239,
+    "counts": {
+      "benchmark_outcomes": 27,
+      "benchmark_skipped": 1,
+      "benchmark_wins": 11,
+      "decisions": 28,
+      "decoded_events": 5787,
+      "early_buyers_seen": 21,
+      "launches_seen": 28,
+      "qualified": 0,
+      "unsupported_quote": 22
+    },
+    "elapsed_seconds": 90.47778558731079,
+    "endpoints": {
+      "wss://api.mainnet-beta.solana.com": {
+        "connections": 1,
+        "disconnects": 0,
+        "errors": [],
+        "messages": 53233
+      },
+      "wss://solana-rpc.publicnode.com": {
+        "connections": 1,
+        "disconnects": 0,
+        "errors": [],
+        "messages": 25829
+      }
+    },
+    "frozen_rule": {
+      "decision_ms": 10,
+      "hold_ms": 2000,
+      "max_concurrent": 2,
+      "minimum_prior_appearances": 10,
+      "minimum_prior_win_rate": 0.7,
+      "position_fraction": 0.0185
+    },
+    "last_event_at": 1789395539.3802235,
+    "no_e4_entry_signal": true,
+    "paper_only": true,
+    "phase": "online",
+    "queue_depth": 0,
+    "recent_decisions": [
+      {
+        "buyer_count": 0,
+        "mint": "HkZixGkB1Udfv4EBGnVqwsdNc4AQmueF2ga2y6DXpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "Enjti7hkfHZbPrBFhDFzcvEhZ4TUzbC65Kw3fXJEpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 7,
+        "mint": "8p8DQ7V8fXcPTtquBkH6ZFF6VdJzJSGsFx1G6VFGpump",
+        "prior_appearances": 341,
+        "prior_win_rate": 0.17888563049853373,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "HnXKZG8j7VcgbbTvUNYKGa24cdLNGEZwNGM5QCYJpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "EaYGrgQAcABsdwWX5o6e1wLJz9QN5ATZ2rdHvnZPpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 2,
+        "mint": "BryMjXtjcHnkKAhjkhscTpe9jLQL3Uo2EP1yT1xaRiLz",
+        "prior_appearances": 545,
+        "prior_win_rate": 0.26788990825688075,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 2,
+        "mint": "8MoaAtJuy7HzwcNPfyGeWi6Smx56ex2q2o4QhbcPpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "CjHFboaauFY47pgAahdhACLzyJCX2DgRdMrXt54hpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "2XP7C9U5ZmiMqaedzskNGbqHRZxk7aAHGKVUjdJRTjSM",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "B89JVgddFLqSnzGyUyA6UrBGuMDmq4yDHt6fnJHpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "3xXiWZYYaosYr2tTj7e1P3zbQf5Bb5Vd9rZCP5MPpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "9prQf4iX1rXynCZ83yPr98QNKfpugkVASN1sTgGipump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "3TN5EDVyKD3UU4vLz9GxWfZJMzeYSswpCwNE2sakhtSA",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 1,
+        "mint": "FNQN37SoQN4zxT3Hg6vyJfcitNiAkD3H5Ghz1B6pump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "DfZcwagH6bjsw7GqbuJo3t359NCxsfCTNJgnpEripump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "CjxGEYbPc59TdunM3YrzXTRRP2Qyo3nMaTH4DhrEpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "8cg5swTzBqyqQxyyR9d3aMCZYHmqjRXiWKAnrHQDpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 1,
+        "mint": "9cknjMPTqaSF5B8kinDvHyJCuBqtXhR7gyVAz1ESpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "6sEh75DXTiQ5dAaaNASwiKAfmkdWH75gLLDaFMhhpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      },
+      {
+        "buyer_count": 0,
+        "mint": "Hrb9Yqec22jcmqGQMXh1BZsxM9Hdru6bv9JG6iJpump",
+        "prior_appearances": 0,
+        "prior_win_rate": null,
+        "qualifies": false
+      }
+    ],
+    "rule_version": "golden-buyer-reputation-v1",
+    "started_at": 1789395449.0734537,
+    "status": "RUNNING",
+    "version": "golden-buyer-reputation-live-v1"
+  },
   "runner_pid": 2284,
   "stop_reason": null,
-  "supervisor_checked_at": 1789395423.4012117,
+  "supervisor_checked_at": 1789395544.9365218,
   "supervisor_state": "WATCHING",
   "warnings": []
 }
