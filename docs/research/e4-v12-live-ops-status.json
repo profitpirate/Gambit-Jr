@@ -1,6 +1,6 @@
 {
   "fatal": [],
-  "last_signal_age_seconds": 917.0975127220154,
+  "last_signal_age_seconds": 978.2037928104401,
   "publication_failures": 0,
   "resource_limits": {
     "max_runner_seconds": 20400,
@@ -53,48 +53,48 @@
         "wins": 0
       }
     },
-    "checked_at": 1789354439.1413481,
+    "checked_at": 1789354499.1711342,
     "config_hash": "7e39d6edf7339dfe99d54794292c0d9604fb56edadd53aff7e73bb2f9edd8263",
     "counts": {
-      "UNSUPPORTED_QUOTE": 65,
-      "decoded_events": 33767,
-      "launches_seen": 430,
+      "UNSUPPORTED_QUOTE": 66,
+      "decoded_events": 35611,
+      "launches_seen": 444,
       "live_prior_selection_updates": 1,
-      "scored": 365
+      "scored": 378
     },
-    "elapsed_seconds": 920.4562292098999,
+    "elapsed_seconds": 980.4860153198242,
     "endpoints": {
       "0": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 175514
+        "messages": 185968
       },
       "1": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 124986
+        "messages": 135804
       }
     },
     "execution_model": "paper reserve quotes; 10ms floor is an assumption, NOT proven transaction landing latency",
     "failures": [],
     "feed": {
-      "age_seconds": 17.71,
+      "age_seconds": 17.59,
       "fallback_used": false,
       "fresh": true,
       "recent_errors": [],
-      "sol_usd": 101.0,
+      "sol_usd": 101.005,
       "source": "coinbase"
     },
-    "last_event_at": 1789354438.9471052,
-    "last_launch_at": 1789354437.9606268,
-    "last_score_at": 1789354437.970338,
+    "last_event_at": 1789354499.027193,
+    "last_launch_at": 1789354497.3480697,
+    "last_score_at": 1789354497.3598742,
     "live_history_outcomes": "selection priors updated on received E4 buys; no invented net-PnL outcome priors",
     "no_retuning": true,
     "paper_only": true,
     "phase": "online",
-    "queue_depth": 1,
+    "queue_depth": 0,
     "run_id": "34799774359",
     "sample_target_per_thesis": 20,
     "score_queue_depth": 0,
@@ -128,9 +128,9 @@
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 365
+          "BELOW_THRESHOLD": 378
         },
-        "recent_score_p50": 0.42738220023252677,
+        "recent_score_p50": 0.42725154236341967,
         "score_max": 0.9293843942908732
       },
       "B_75": {
@@ -162,20 +162,20 @@
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 365
+          "BELOW_THRESHOLD": 378
         },
-        "recent_score_p50": 0.37828420632153564,
+        "recent_score_p50": 0.3795568454393706,
         "score_max": 0.9672361454388314
       }
     },
-    "scoring_ms_p95": 11.574941399999263,
+    "scoring_ms_p95": 11.610182850003524,
     "started_at": 1789353518.6851196,
     "status": "RUNNING",
     "version": "e4-v12-supervised-online-v2",
     "wall_time_limit_seconds": 19800.0
   },
   "runner_pid": 3489,
-  "supervisor_checked_at": 1789354442.9736292,
+  "supervisor_checked_at": 1789354504.0799093,
   "supervisor_state": "WATCHING",
   "warnings": [
     "A_86_96:NO_SIGNALS_ABOVE_UNCHANGED_THRESHOLD",
