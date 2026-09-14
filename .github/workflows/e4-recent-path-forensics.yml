@@ -1,0 +1,86 @@
+name: E4 recent trade path forensics
+
+on:
+  push:
+    branches:
+      - codex/golden-thesis-buyer-reputation-v1
+    paths:
+      - ".github/workflows/e4-recent-path-forensics.yml"
+      - "tools/e4_recent_path_backfill.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  BRANCH: codex/golden-thesis-buyer-reputation-v1
+  SUMMARY_PATH: docs/research/e4-recent-path-summary.json
+
+jobs:
+  path-forensics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout research branch
+        uses: actions/checkout@v4
+        with:
+          ref: codex/golden-thesis-buyer-reputation-v1
+          fetch-depth: 1
+
+      - name: Checkout current decoder
+        uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-selection-reconstruction
+          path: production
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install read-only research dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e production -r production/requirements-e4.txt aiohttp solders
+
+      - name: Preflight
+        run: python -m py_compile tools/e4_recent_path_backfill.py
+
+      - name: Backfill event-level paths for recent E4 trades
+        run: |
+          mkdir -p artifacts/e4-path
+          test -s docs/research/e4-trade-forensics-v1.json
+          python tools/e4_recent_path_backfill.py \
+            --forensics docs/research/e4-trade-forensics-v1.json \
+            --production-root production \
+            --post-seconds 20 \
+            --max-positions 13 \
+            --output artifacts/e4-path/e4-recent-path-full.json \
+            --summary artifacts/e4-path/e4-recent-path-summary.json
+
+      - name: Publish compact path summary
+        if: always()
+        run: |
+          test -s artifacts/e4-path/e4-recent-path-summary.json || exit 0
+          content="$(base64 -w0 artifacts/e4-path/e4-recent-path-summary.json)"
+          sha="$(gh api "repos/$GITHUB_REPOSITORY/contents/$SUMMARY_PATH?ref=$BRANCH" --jq .sha 2>/dev/null || true)"
+          if [ -n "$sha" ]; then
+            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$SUMMARY_PATH" \
+              -f message='data(e4): publish recent path forensics [skip ci]' \
+              -f branch="$BRANCH" -f content="$content" -f sha="$sha" >/dev/null
+          else
+            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$SUMMARY_PATH" \
+              -f message='data(e4): publish recent path forensics [skip ci]' \
+              -f branch="$BRANCH" -f content="$content" >/dev/null
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Upload full event paths
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e4-recent-path-forensics-${{ github.run_id }}
+          path: artifacts/e4-path/
+          if-no-files-found: error
+          retention-days: 30
