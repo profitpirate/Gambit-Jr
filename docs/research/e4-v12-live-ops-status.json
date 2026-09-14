@@ -1,6 +1,6 @@
 {
   "fatal": [],
-  "last_signal_age_seconds": 427.9906265735626,
+  "last_signal_age_seconds": 489.23216938972473,
   "publication_failures": 0,
   "resource_limits": {
     "max_runner_seconds": 20400,
@@ -53,54 +53,64 @@
         "wins": 0
       }
     },
-    "checked_at": 1789353948.8925204,
+    "checked_at": 1789354013.9251184,
     "config_hash": "7e39d6edf7339dfe99d54794292c0d9604fb56edadd53aff7e73bb2f9edd8263",
     "counts": {
-      "UNSUPPORTED_QUOTE": 20,
-      "decoded_events": 15548,
-      "launches_seen": 255,
+      "UNSUPPORTED_QUOTE": 22,
+      "decoded_events": 17539,
+      "launches_seen": 275,
       "live_prior_selection_updates": 1,
-      "scored": 235
+      "scored": 253
     },
-    "elapsed_seconds": 430.2074017524719,
+    "elapsed_seconds": 495.239999294281,
     "endpoints": {
       "0": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 64191
+        "messages": 82638
       },
       "1": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 51993
+        "messages": 61160
       }
     },
     "execution_model": "paper reserve quotes; 10ms floor is an assumption, NOT proven transaction landing latency",
     "failures": [],
     "feed": {
-      "age_seconds": 8.96,
+      "age_seconds": 13.82,
       "fallback_used": false,
       "fresh": true,
       "recent_errors": [],
-      "sol_usd": 100.73,
+      "sol_usd": 100.8,
       "source": "coinbase"
     },
-    "last_event_at": 1789353948.8482513,
-    "last_launch_at": 1789353944.9721062,
-    "last_score_at": 1789353944.982434,
+    "last_event_at": 1789354013.8124743,
+    "last_launch_at": 1789354012.3798265,
+    "last_score_at": 1789354012.3902485,
     "live_history_outcomes": "selection priors updated on received E4 buys; no invented net-PnL outcome priors",
     "no_retuning": true,
     "paper_only": true,
     "phase": "online",
-    "queue_depth": 0,
+    "queue_depth": 1,
     "run_id": "34799774359",
     "sample_target_per_thesis": 20,
     "score_queue_depth": 0,
     "scoring": {
       "A_86_96": {
         "closest_misses": [
+          {
+            "gap": 0.0722398423058116,
+            "mint": "8gWwiaH2XvpfVQgSyvqj9x4K8Z4ZKcjepSDTsC2Apump",
+            "score": 0.9201342523620247
+          },
+          {
+            "gap": 0.08749434935446787,
+            "mint": "ia7pVaas5aybDwvansjXuCDbdqHQ9YBkqwuyW3zpump",
+            "score": 0.9048797453133685
+          },
           {
             "gap": 0.0917659640203159,
             "mint": "3rijuxxRu3afUGnxHGpKvx3EvKgRit3rqDKabnKUpump",
@@ -115,30 +125,30 @@
             "gap": 0.14287797974171268,
             "mint": "HeGdgwyxcrY44aqzvECdY6U3SuFAwDqUoM4Pm8Fcpump",
             "score": 0.8494961149261236
-          },
-          {
-            "gap": 0.1668400250858968,
-            "mint": "2LJVD5K87r3TALG2As3msm4MSBmw1yNypHZt45xPpump",
-            "score": 0.8255340695819395
-          },
-          {
-            "gap": 0.19605990366152148,
-            "mint": "Goh6nn9y1Afw4CzvVE44ycWfMEYtQeFpbVTsWVkypump",
-            "score": 0.7963141910063148
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 235
+          "BELOW_THRESHOLD": 253
         },
-        "recent_score_p50": 0.42710208895328056,
-        "score_max": 0.9006081306475204
+        "recent_score_p50": 0.42738220023252677,
+        "score_max": 0.9201342523620247
       },
       "B_75": {
         "closest_misses": [
           {
+            "gap": 0.04998784127522149,
+            "mint": "8gWwiaH2XvpfVQgSyvqj9x4K8Z4ZKcjepSDTsC2Apump",
+            "score": 0.933840376189143
+          },
+          {
             "gap": 0.05451113253789497,
             "mint": "8Bnr2Cu2ogz5PLqWBQRjz1Yf2VX84e2kU5HNMZggpump",
             "score": 0.9293170849264695
+          },
+          {
+            "gap": 0.0639220412229985,
+            "mint": "ia7pVaas5aybDwvansjXuCDbdqHQ9YBkqwuyW3zpump",
+            "score": 0.919906176241366
           },
           {
             "gap": 0.06484746862138424,
@@ -149,33 +159,23 @@
             "gap": 0.06645176478171888,
             "mint": "3rijuxxRu3afUGnxHGpKvx3EvKgRit3rqDKabnKUpump",
             "score": 0.9173764526826456
-          },
-          {
-            "gap": 0.12410973983388363,
-            "mint": "H48EXdNDXj5CFr8p3uuCxajbwWica2o4G3GbEbXDpump",
-            "score": 0.8597184776304808
-          },
-          {
-            "gap": 0.13757414067817253,
-            "mint": "2jMKk7xE7FzWhpPBi2uVWCbXCQU8DWwYooB9izaipump",
-            "score": 0.8462540767861919
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 235
+          "BELOW_THRESHOLD": 253
         },
-        "recent_score_p50": 0.35752433008244583,
-        "score_max": 0.9293170849264695
+        "recent_score_p50": 0.3581658927784976,
+        "score_max": 0.933840376189143
       }
     },
-    "scoring_ms_p95": 11.485073900030326,
+    "scoring_ms_p95": 11.53239420000318,
     "started_at": 1789353518.6851196,
     "status": "RUNNING",
     "version": "e4-v12-supervised-online-v2",
     "wall_time_limit_seconds": 19800.0
   },
   "runner_pid": 3489,
-  "supervisor_checked_at": 1789353953.866743,
+  "supervisor_checked_at": 1789354015.108286,
   "supervisor_state": "WATCHING",
   "warnings": []
 }
