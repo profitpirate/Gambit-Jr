@@ -1,6 +1,6 @@
 {
   "fatal": [],
-  "last_signal_age_seconds": 1100.333295583725,
+  "last_signal_age_seconds": 1161.4316487312317,
   "publication_failures": 0,
   "resource_limits": {
     "max_runner_seconds": 20400,
@@ -53,43 +53,43 @@
         "wins": 0
       }
     },
-    "checked_at": 1789354624.2337935,
+    "checked_at": 1789354684.2643123,
     "config_hash": "7e39d6edf7339dfe99d54794292c0d9604fb56edadd53aff7e73bb2f9edd8263",
     "counts": {
-      "UNSUPPORTED_QUOTE": 73,
-      "decoded_events": 39209,
-      "launches_seen": 483,
+      "UNSUPPORTED_QUOTE": 79,
+      "decoded_events": 40819,
+      "launches_seen": 502,
       "live_prior_selection_updates": 1,
-      "scored": 410
+      "scored": 423
     },
-    "elapsed_seconds": 1105.548674583435,
+    "elapsed_seconds": 1165.579193353653,
     "endpoints": {
       "0": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 206694
+        "messages": 214281
       },
       "1": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 149395
+        "messages": 153272
       }
     },
     "execution_model": "paper reserve quotes; 10ms floor is an assumption, NOT proven transaction landing latency",
     "failures": [],
     "feed": {
-      "age_seconds": 22.35,
+      "age_seconds": 22.29,
       "fallback_used": false,
       "fresh": true,
       "recent_errors": [],
-      "sol_usd": 100.96,
+      "sol_usd": 100.935,
       "source": "coinbase"
     },
-    "last_event_at": 1789354624.157407,
-    "last_launch_at": 1789354623.7032728,
-    "last_score_at": 1789354611.1052434,
+    "last_event_at": 1789354684.039606,
+    "last_launch_at": 1789354679.4535031,
+    "last_score_at": 1789354679.463254,
     "live_history_outcomes": "selection priors updated on received E4 buys; no invented net-PnL outcome priors",
     "no_retuning": true,
     "paper_only": true,
@@ -112,6 +112,11 @@
             "score": 0.9201342523620247
           },
           {
+            "gap": 0.07734320577791842,
+            "mint": "3VaqYT4R7NnYzubk5HWFbKx87g2pE7zkT6D3W47kpump",
+            "score": 0.9150308888899179
+          },
+          {
             "gap": 0.08554669395002734,
             "mint": "Gxbd2H3SZKiTQ88F8doaLut79EGyykbLdn4tRhCDpump",
             "score": 0.906827400717809
@@ -120,17 +125,12 @@
             "gap": 0.08643354352150245,
             "mint": "6p3n2mdrx6FTKRXdRuWtMAfdEGXvNonzYyaNBHoipump",
             "score": 0.9059405511463339
-          },
-          {
-            "gap": 0.08749434935446787,
-            "mint": "ia7pVaas5aybDwvansjXuCDbdqHQ9YBkqwuyW3zpump",
-            "score": 0.9048797453133685
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 410
+          "BELOW_THRESHOLD": 423
         },
-        "recent_score_p50": 0.43109672197311666,
+        "recent_score_p50": 0.43125041562311905,
         "score_max": 0.9293843942908732
       },
       "B_75": {
@@ -156,26 +156,26 @@
             "score": 0.933840376189143
           },
           {
-            "gap": 0.05451113253789497,
-            "mint": "8Bnr2Cu2ogz5PLqWBQRjz1Yf2VX84e2kU5HNMZggpump",
-            "score": 0.9293170849264695
+            "gap": 0.05296493352077303,
+            "mint": "3VaqYT4R7NnYzubk5HWFbKx87g2pE7zkT6D3W47kpump",
+            "score": 0.9308632839435914
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 410
+          "BELOW_THRESHOLD": 423
         },
-        "recent_score_p50": 0.384297392166822,
+        "recent_score_p50": 0.3844437588075904,
         "score_max": 0.9672361454388314
       }
     },
-    "scoring_ms_p95": 11.506990499975698,
+    "scoring_ms_p95": 11.517899999955716,
     "started_at": 1789353518.6851196,
     "status": "RUNNING",
     "version": "e4-v12-supervised-online-v2",
     "wall_time_limit_seconds": 19800.0
   },
   "runner_pid": 3489,
-  "supervisor_checked_at": 1789354626.209412,
+  "supervisor_checked_at": 1789354687.3077652,
   "supervisor_state": "WATCHING",
   "warnings": [
     "A_86_96:NO_SIGNALS_ABOVE_UNCHANGED_THRESHOLD",
