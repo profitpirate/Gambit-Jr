@@ -1,0 +1,80 @@
+name: Golden Thesis E4 same-window shadow benchmark
+
+on:
+  push:
+    branches:
+      - codex/golden-thesis-buyer-reputation-v1
+    paths:
+      - ".github/workflows/golden-e4-same-window.yml"
+      - "tools/e4_same_window_backfill.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  BRANCH: codex/golden-thesis-buyer-reputation-v1
+  GOLDEN_STATUS: docs/research/golden-buyer-reputation-live-status.json
+  SHADOW_STATUS: docs/research/golden-e4-same-window-status.json
+
+jobs:
+  e4-shadow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/golden-thesis-buyer-reputation-v1
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install benchmark dependency
+        run: python -m pip install aiohttp
+
+      - name: Compile benchmark
+        run: python -m py_compile tools/e4_same_window_backfill.py
+
+      - name: Read exact Golden live-window start
+        run: |
+          test -s "$GOLDEN_STATUS"
+          start="$(python - <<'PY'
+          import json
+          s=json.load(open('docs/research/golden-buyer-reputation-live-status.json'))
+          print(int(float(s['runner']['started_at'])))
+          PY
+          )"
+          echo "WINDOW_START=$start" >> "$GITHUB_ENV"
+          echo "Golden window starts at epoch $start"
+
+      - name: Reconstruct E4 wallet activity in same live window
+        run: |
+          mkdir -p artifacts/e4-shadow
+          python tools/e4_same_window_backfill.py \
+            --start-epoch "$WINDOW_START" \
+            --max-signatures 5000 \
+            --output artifacts/e4-shadow/e4-same-window.json
+
+      - name: Publish same-window benchmark without touching Golden rule
+        run: |
+          cp artifacts/e4-shadow/e4-same-window.json /tmp/shadow.json
+          content="$(base64 -w0 /tmp/shadow.json)"
+          sha="$(gh api "repos/$GITHUB_REPOSITORY/contents/$SHADOW_STATUS?ref=$BRANCH" --jq .sha 2>/dev/null || true)"
+          if [ -n "$sha" ]; then
+            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$SHADOW_STATUS" \
+              -f message='data(golden): publish E4 same-window benchmark [skip ci]' \
+              -f branch="$BRANCH" -f content="$content" -f sha="$sha" >/dev/null
+          else
+            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$SHADOW_STATUS" \
+              -f message='data(golden): publish E4 same-window benchmark [skip ci]' \
+              -f branch="$BRANCH" -f content="$content" >/dev/null
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: golden-e4-same-window-${{ github.run_id }}
+          path: artifacts/e4-shadow/e4-same-window.json
+          retention-days: 14
