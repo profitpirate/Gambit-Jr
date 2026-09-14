@@ -1,0 +1,186 @@
+name: Golden Thesis buyer reputation 5 SOL live paper
+
+on:
+  push:
+    branches:
+      - codex/golden-thesis-buyer-reputation-v1
+    paths:
+      - ".github/workflows/golden-buyer-reputation-live.yml"
+      - "tools/golden_buyer_reputation_core.py"
+      - "tools/golden_buyer_reputation_live.py"
+      - "tools/golden_buyer_reputation_watchdog.py"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: golden-buyer-reputation-live-5sol
+  cancel-in-progress: false
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONUNBUFFERED: "1"
+  CAMPAIGN_BRANCH: codex/golden-thesis-buyer-reputation-v1
+  STATE_PATH: docs/research/golden-buyer-reputation-live-state.json
+
+jobs:
+  prospective-live-paper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - name: Checkout frozen Golden candidate
+        uses: actions/checkout@v4
+        with:
+          ref: codex/golden-thesis-buyer-reputation-v1
+          fetch-depth: 1
+
+      - name: Checkout current market decoder
+        uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-selection-reconstruction
+          path: production
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install paper-only dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e production -r production/requirements-e4.txt aiohttp
+
+      - name: Preflight frozen rule and live runner
+        run: |
+          python -m py_compile tools/golden_buyer_reputation_core.py tools/golden_buyer_reputation_live.py tools/golden_buyer_reputation_watchdog.py
+          python tools/golden_buyer_reputation_live.py --self-test
+
+      - name: Restore exact frozen 66k research corpus
+        run: |
+          mkdir -p frozen artifacts/golden-live
+          gh run download 34262315056 --repo "$GITHUB_REPOSITORY" \
+            --name e4-v12-allout-launch-corpus-34262315056 --dir frozen
+          corpus="$(find frozen -name e4-v12-allout-launch-corpus.jsonl.gz -print -quit)"
+          test -s "$corpus"
+          echo "FROZEN_CORPUS=$corpus" >> "$GITHUB_ENV"
+
+      - name: Resolve persistent 5 SOL campaign state
+        run: |
+          if test -s "$STATE_PATH"; then
+            cp "$STATE_PATH" artifacts/golden-live/resume-state.json
+            echo "RESUME_ARG=--resume-state artifacts/golden-live/resume-state.json" >> "$GITHUB_ENV"
+          else
+            echo "RESUME_ARG=" >> "$GITHUB_ENV"
+          fi
+
+      - name: Run frozen thesis on newly arriving launches under watchdog
+        id: live
+        continue-on-error: true
+        run: |
+          python tools/golden_buyer_reputation_watchdog.py \
+            --output-dir artifacts/golden-live \
+            --repo "$GITHUB_REPOSITORY" \
+            --branch "$CAMPAIGN_BRANCH" \
+            --status-path docs/research/golden-buyer-reputation-live-status.json \
+            --target-closed-trades 50 \
+            --max-runner-seconds 19500 \
+            -- \
+            python tools/golden_buyer_reputation_live.py \
+              --production-root production \
+              --corpus "$FROZEN_CORPUS" \
+              --starting-balance-sol 5 \
+              --execution-delay-ms 10 \
+              --target-closed-trades 50 \
+              --duration-seconds 18900 \
+              --heartbeat-seconds 30 \
+              $RESUME_ARG \
+              --state-output artifacts/golden-live/session-state.json \
+              --status artifacts/golden-live/status.json \
+              --output artifacts/golden-live/final.json
+
+      - name: Persist clean campaign state without resetting bankroll
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, pathlib, sys
+          p=pathlib.Path('artifacts/golden-live/session-state.json')
+          s=pathlib.Path('artifacts/golden-live/status.json')
+          if not p.exists() or not s.exists():
+              sys.exit(10)
+          status=json.loads(s.read_text())
+          account=status.get('account',{})
+          if status.get('status')=='TECHNICAL_FAILURE' or account.get('task_errors') or account.get('unresolved_exposure'):
+              sys.exit(11)
+          print('state is clean and may be persisted')
+          PY
+          rc=$?
+          if [ "$rc" -eq 10 ]; then
+            echo "::warning::No campaign state was produced"
+            exit 0
+          elif [ "$rc" -eq 11 ]; then
+            echo "::warning::Refusing to persist technically compromised state"
+            exit 0
+          fi
+          content="$(base64 -w0 artifacts/golden-live/session-state.json)"
+          sha="$(gh api "repos/$GITHUB_REPOSITORY/contents/$STATE_PATH?ref=$CAMPAIGN_BRANCH" --jq .sha 2>/dev/null || true)"
+          if [ -n "$sha" ]; then
+            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$STATE_PATH" \
+              -f message='data(golden): persist 5 SOL forward-paper campaign state [skip ci]' \
+              -f branch="$CAMPAIGN_BRANCH" -f content="$content" -f sha="$sha" >/dev/null
+          else
+            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$STATE_PATH" \
+              -f message='data(golden): persist 5 SOL forward-paper campaign state [skip ci]' \
+              -f branch="$CAMPAIGN_BRANCH" -f content="$content" >/dev/null
+          fi
+
+      - name: Publish truthful run summary
+        if: always()
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json, pathlib
+          p=pathlib.Path('artifacts/golden-live/status.json')
+          print('# Golden Buyer Reputation — 5 SOL prospective live paper')
+          if not p.exists():
+              print('\nNo final runner status was produced.')
+              raise SystemExit
+          s=json.loads(p.read_text())
+          a=s.get('account',{})
+          c=s.get('counts',{})
+          print(f"\n**Status:** `{s.get('status')}`")
+          print(f"\nLaunches: **{c.get('launches_seen',0)}** | Decisions: **{c.get('decisions',0)}** | Qualified: **{c.get('qualified',0)}**")
+          print(f"\nSignals: **{a.get('signals',0)}** | Closed: **{a.get('closed_trades',0)}** | Wins/Losses: **{a.get('wins',0)}/{a.get('losses',0)}**")
+          wr=a.get('win_rate'); wr='N/A' if wr is None else f'{100*wr:.2f}%'
+          print(f"\nWR: **{wr}** | Net P&L: **{a.get('net_pnl_sol',0):+.6f} SOL** | Equity: **{a.get('equity_sol',0):.6f} SOL**")
+          print('\nA successful workflow is not a profitability certificate; certification still requires 50 prospective closed trades and all frozen gates.')
+          PY
+
+      - name: Upload prospective evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-buyer-reputation-live-${{ github.run_id }}
+          path: |
+            artifacts/golden-live/status.json
+            artifacts/golden-live/supervisor.json
+            artifacts/golden-live/final.json
+            artifacts/golden-live/session-state.json
+            artifacts/golden-live/resume-state.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Fail only on technical corruption
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, pathlib, sys
+          p=pathlib.Path('artifacts/golden-live/status.json')
+          if not p.exists():
+              raise SystemExit('runner status missing')
+          s=json.loads(p.read_text())
+          a=s.get('account',{})
+          if s.get('status')=='TECHNICAL_FAILURE' or a.get('task_errors') or a.get('unresolved_exposure'):
+              raise SystemExit('technical live-paper failure')
+          print('Operationally clean. Performance/sample completeness is reported separately.')
+          PY
