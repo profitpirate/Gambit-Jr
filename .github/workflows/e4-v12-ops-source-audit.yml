@@ -1,0 +1,40 @@
+name: E4 V12 pinned operational source audit
+on:
+  push:
+    branches: [codex/e4-v12-ops-supervised-live]
+    paths: [.github/workflows/e4-v12-ops-source-audit.yml]
+permissions:
+  contents: read
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 08f673ac6ab43a77a128f12b1b50682ed03ea4d6
+          path: online
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 1b5995a2f04b70c49071fba3c2d60e2f85d5d04d
+          path: research
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 1b868ae5fad229a2747f2097f4df9700940c6023
+          path: production
+          persist-credentials: false
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e4-v12-pinned-source-audit
+          retention-days: 7
+          path: |
+            online/tools/*.py
+            online/tests/*.py
+            research/scripts/*.py
+            research/docs/research/e4-v12-prototype-tournament.json
+            production/scripts/*.py
+            production/src/**/*.py
+            production/pyproject.toml
+            production/requirements-e4.txt
