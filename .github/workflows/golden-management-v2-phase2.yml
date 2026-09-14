@@ -36,6 +36,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install policy test dependencies
+        run: python -m pip install aiohttp
       - name: Compile and unit test
         run: |
           PYTHONPATH="$PWD:$PWD/tools" python -m py_compile tools/golden_management_v2.py tools/golden_management_v2_live.py tools/golden_management_v2_hardened.py tools/golden_management_v2_report.py tools/golden_management_v2_stress.py
@@ -85,7 +87,7 @@ jobs:
 
   exact-transport-speed:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -111,40 +113,65 @@ jobs:
           E4_SOL_USD_FALLBACK: "150"
           E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
           E4_BUILDER_PRELOAD: "tools/e4-builder/fast-preload-v4.mjs"
-          E4_BUILDER_WORKERS: "2"
-          E4_BUILDER_RACE_CHILDREN: "4"
           E4_BALANCE_CACHE_MAX_STALENESS_MS: "5000"
           E4_DIRECT_COPY_MAX_OUTPUT_SHORTFALL_BPS: "600"
         run: |
           python -m unittest tests.test_e4_v12_true_latency_replay -v
           python -m unittest tests.test_e4_v12_sub10ms_transport_final -v
-      - name: Exact 1000-probe quote-to-route-ack benchmark
+      - name: Tune builder race width on this runner
         working-directory: transport
         env:
           E4_PIPELINES_BACKGROUND: "false"
           E4_SOL_USD_FALLBACK: "150"
           E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
           E4_BUILDER_PRELOAD: "tools/e4-builder/fast-preload-v4.mjs"
-          E4_BUILDER_WORKERS: "2"
-          E4_BUILDER_RACE_CHILDREN: "4"
           E4_BALANCE_CACHE_MAX_STALENESS_MS: "5000"
           E4_DIRECT_COPY_MAX_OUTPUT_SHORTFALL_BPS: "600"
         run: |
           mkdir -p artifacts
-          python scripts/e4_v12_sub10ms_benchmark_v4.py --warmup 100 --probes 1000 --output artifacts/v2-transport-benchmark.json
+          for n in 2 3 4; do
+            echo "TUNING_RACE_CHILDREN=$n"
+            E4_BUILDER_RACE_CHILDREN="$n" python scripts/e4_v12_sub10ms_benchmark_v4.py --warmup 80 --probes 300 --output "artifacts/tune-$n.json" || true
+          done
+          python - <<'PY'
+          import json, pathlib
+          rows=[]
+          for n in (2,3,4):
+              d=json.load(open(f'artifacts/tune-{n}.json'))
+              q=d.get('quote_to_route_ack_ms') or {}
+              rows.append((float(q.get('p95') or 1e9), float(q.get('median') or 1e9), n))
+          rows.sort()
+          best=rows[0][2]
+          pathlib.Path('artifacts/best-race-children.txt').write_text(str(best))
+          print('TRANSPORT_TUNING', rows, 'BEST', best)
+          PY
+      - name: Two consecutive exact 1000-probe certifications
+        working-directory: transport
+        env:
+          E4_PIPELINES_BACKGROUND: "false"
+          E4_SOL_USD_FALLBACK: "150"
+          E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
+          E4_BUILDER_PRELOAD: "tools/e4-builder/fast-preload-v4.mjs"
+          E4_BALANCE_CACHE_MAX_STALENESS_MS: "5000"
+          E4_DIRECT_COPY_MAX_OUTPUT_SHORTFALL_BPS: "600"
+        run: |
+          best="$(cat artifacts/best-race-children.txt)"
+          echo "CERTIFYING_RACE_CHILDREN=$best"
+          E4_BUILDER_RACE_CHILDREN="$best" python scripts/e4_v12_sub10ms_benchmark_v4.py --warmup 120 --probes 1000 --output artifacts/v2-transport-cert-1.json
+          E4_BUILDER_RACE_CHILDREN="$best" python scripts/e4_v12_sub10ms_benchmark_v4.py --warmup 120 --probes 1000 --output artifacts/v2-transport-cert-2.json
           python - <<'PY'
           import json
-          d=json.load(open('artifacts/v2-transport-benchmark.json'))
-          q=d.get('quote_to_route_ack_ms') or {}
-          assert d.get('sub10ms_p95_pass') is True, d
-          assert float(q.get('p95') or 1e9) < 10.0, q
-          print('EXACT_TRANSPORT_P95_MS',q.get('p95'))
-          print('EXACT_TRANSPORT_P99_MS',q.get('p99'))
+          for i in (1,2):
+              d=json.load(open(f'artifacts/v2-transport-cert-{i}.json'))
+              q=d.get('quote_to_route_ack_ms') or {}
+              assert d.get('sub10ms_p95_pass') is True, d
+              assert float(q.get('p95') or 1e9) < 10.0, q
+              print(f'CERT_{i}_P95_MS',q.get('p95'),'P99_MS',q.get('p99'),'MEDIAN_MS',q.get('median'))
           PY
       - uses: actions/upload-artifact@v4
         with:
           name: golden-v2-exact-transport-${{ github.run_id }}
-          path: transport/artifacts/v2-transport-benchmark.json
+          path: transport/artifacts/
           retention-days: 30
 
   fresh-live-smoke:
@@ -219,7 +246,7 @@ jobs:
         run: |
           mkdir -p artifacts
           cat > artifacts/phase2.json <<'JSON'
-          {"phase":2,"name":"stress testing / bulletproofing / bug fixing","status":"COMPLETE","requirements":{"randomized_paths":50000,"exact_transport_p95_lt_ms":10,"fresh_live_smoke":true,"clean_session_drain":true,"distinct_market_state_policy_ticks":true,"paper_only":true}}
+          {"phase":2,"name":"stress testing / bulletproofing / bug fixing","status":"COMPLETE","requirements":{"randomized_paths":50000,"two_consecutive_exact_transport_p95_lt_ms":10,"fresh_live_smoke":true,"clean_session_drain":true,"distinct_market_state_policy_ticks":true,"paper_only":true}}
           JSON
       - uses: actions/upload-artifact@v4
         with:
