@@ -1,0 +1,36 @@
+{
+  "version": "golden-thesis-buyer-reputation-v1",
+  "status": "GOLDEN_CANDIDATE",
+  "paper_only": true,
+  "standalone_strategy": true,
+  "uses_e4_as_entry_signal": false,
+  "frozen_rule": {
+    "decision_horizon_ms": 10,
+    "minimum_combined_prior_buyer_appearances": 10,
+    "minimum_combined_prior_buyer_win_rate": 0.70,
+    "benchmark_entry_ms": 10,
+    "hold_ms": 2000,
+    "exclude_creator": true,
+    "exclude_e4_wallet": true
+  },
+  "historical_supporting_evidence": {
+    "train": {"trades": 74, "wins": 47, "win_rate": 0.6351, "fixed_stake_net_pnl_sol": 0.43479, "profit_factor": 3.67},
+    "validation": {"trades": 58, "wins": 47, "win_rate": 0.8103, "fixed_stake_net_pnl_sol": 0.45216, "profit_factor": 6.94},
+    "holdout_supporting_only": {"trades": 92, "wins": 74, "win_rate": 0.8043, "fixed_stake_net_pnl_sol": 2.18384}
+  },
+  "later_sequential_captures": {
+    "34779504872": {"signals": 6, "wins": 5, "losses": 1, "win_rate": 0.8333333333, "fixed_stake_net_pnl_sol": 0.07414},
+    "34809168521": {"signals": 3, "wins": 2, "losses": 1, "win_rate": 0.6666666667, "fixed_stake_net_pnl_sol": 0.00754},
+    "combined": {"signals": 9, "wins": 7, "losses": 2, "win_rate": 0.7777777778, "fixed_stake_net_pnl_sol": 0.08168, "two_sol_ending_balance_sol": 2.05506}
+  },
+  "certification": {
+    "minimum_prospective_closed_trades": 50,
+    "minimum_profit_factor": 1.25,
+    "maximum_drawdown_fraction": 0.20,
+    "require_positive_pnl": true,
+    "require_positive_expectancy": true,
+    "maximum_largest_winner_profit_share": 0.50,
+    "state_must_persist_across_batches": true,
+    "no_live_retuning": true
+  }
+}
