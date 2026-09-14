@@ -1,6 +1,6 @@
 {
   "fatal": [],
-  "last_signal_age_seconds": 3546.7689712047577,
+  "last_signal_age_seconds": 3607.8223283290863,
   "publication_failures": 0,
   "resource_limits": {
     "max_runner_seconds": 20400,
@@ -53,46 +53,47 @@
         "wins": 0
       }
     },
-    "checked_at": 1789357070.5387275,
+    "checked_at": 1789357130.5731475,
     "config_hash": "7e39d6edf7339dfe99d54794292c0d9604fb56edadd53aff7e73bb2f9edd8263",
     "counts": {
-      "UNSUPPORTED_QUOTE": 221,
-      "decoded_events": 118622,
-      "launches_seen": 1148,
+      "UNSUPPORTED_QUOTE": 224,
+      "decoded_events": 120066,
+      "launches_seen": 1160,
       "live_prior_selection_updates": 3,
-      "scored": 927
+      "scored": 936
     },
-    "elapsed_seconds": 3551.853608608246,
+    "elapsed_seconds": 3611.8880290985107,
     "endpoints": {
       "0": {
         "connections": 1,
         "disconnects": 0,
         "errors": [],
-        "messages": 624074
+        "messages": 626682
       },
       "1": {
-        "connections": 3,
-        "disconnects": 2,
+        "connections": 4,
+        "disconnects": 3,
         "errors": [
+          "ConnectionError:WebSocket closed",
           "ConnectionError:WebSocket closed",
           "ConnectionError:WebSocket closed"
         ],
-        "messages": 421113
+        "messages": 424239
       }
     },
     "execution_model": "paper reserve quotes; 10ms floor is an assumption, NOT proven transaction landing latency",
     "failures": [],
     "feed": {
-      "age_seconds": 1.5,
+      "age_seconds": 1.29,
       "fallback_used": false,
       "fresh": true,
       "recent_errors": [],
-      "sol_usd": 100.9,
+      "sol_usd": 100.915,
       "source": "coinbase"
     },
-    "last_event_at": 1789357070.4333222,
-    "last_launch_at": 1789357064.0734212,
-    "last_score_at": 1789357064.080897,
+    "last_event_at": 1789357130.35604,
+    "last_launch_at": 1789357125.271374,
+    "last_score_at": 1789357125.2810135,
     "live_history_outcomes": "selection priors updated on received E4 buys; no invented net-PnL outcome priors",
     "no_retuning": true,
     "paper_only": true,
@@ -131,9 +132,9 @@
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 927
+          "BELOW_THRESHOLD": 936
         },
-        "recent_score_p50": 0.45220856679491966,
+        "recent_score_p50": 0.45234859046066345,
         "score_max": 0.9596169825852241
       },
       "B_75": {
@@ -165,20 +166,20 @@
           }
         ],
         "reasons": {
-          "BELOW_THRESHOLD": 927
+          "BELOW_THRESHOLD": 936
         },
-        "recent_score_p50": 0.40245839470425265,
+        "recent_score_p50": 0.40327035194592187,
         "score_max": 0.9690290618053768
       }
     },
-    "scoring_ms_p95": 11.43090290006512,
+    "scoring_ms_p95": 11.42571125012637,
     "started_at": 1789353518.6851196,
     "status": "RUNNING",
     "version": "e4-v12-supervised-online-v2",
     "wall_time_limit_seconds": 19800.0
   },
   "runner_pid": 3489,
-  "supervisor_checked_at": 1789357072.6450877,
+  "supervisor_checked_at": 1789357133.6984448,
   "supervisor_state": "WATCHING",
   "warnings": [
     "A_86_96:NO_SIGNALS_ABOVE_UNCHANGED_THRESHOLD",
