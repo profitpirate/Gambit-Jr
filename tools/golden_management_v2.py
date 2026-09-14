@@ -29,7 +29,7 @@ from collections import deque
 from typing import Any, Mapping
 import math
 
-VERSION = "golden-management-v2-aggressive"
+VERSION = "golden-management-v2-aggressive-5-8-15-25"
 
 
 def _clip(x: float, lo: float = 0.0, hi: float = 1.0) -> float:
@@ -52,19 +52,19 @@ TIERS: dict[str, TierConfig] = {
     # to learn what happens when conviction meaningfully changes capital at risk.
     # 1.85% remains only as the frozen v1 control and is not used here.
     "BASE": TierConfig(
-        "BASE", 0.03, 0.30, 350.0, 4_000.0,
+        "BASE", 0.05, 0.30, 350.0, 4_000.0,
         ((0.15, 0.10), (0.30, 0.10)), 0.10,
     ),
     "MEDIUM": TierConfig(
-        "MEDIUM", 0.075, 0.30, 350.0, 6_000.0,
+        "MEDIUM", 0.08, 0.30, 350.0, 6_000.0,
         ((0.15, 0.10), (0.30, 0.10), (0.50, 0.10)), 0.11,
     ),
     "HIGH": TierConfig(
-        "HIGH", 0.125, 0.20, 325.0, 10_000.0,
+        "HIGH", 0.15, 0.20, 325.0, 10_000.0,
         ((0.15, 0.10), (0.30, 0.10), (0.50, 0.15), (0.80, 0.10)), 0.13,
     ),
     "EXCEPTIONAL": TierConfig(
-        "EXCEPTIONAL", 0.20, 0.20, 300.0, 16_000.0,
+        "EXCEPTIONAL", 0.25, 0.20, 300.0, 16_000.0,
         ((0.15, 0.10), (0.30, 0.10), (0.50, 0.15), (0.80, 0.10), (1.20, 0.10)), 0.15,
     ),
 }
@@ -206,8 +206,7 @@ class RunnerGuardian:
         drawdown_from_peak = self.peak_return - mark.return_fraction
 
         # 2) Absolute emergency guardrail. Wide by design: this is a catastrophic
-        # fail-safe, not the normal exit policy. Aggressive sizing remains useful
-        # research only if catastrophic path behavior is still observable.
+        # fail-safe, not the normal exit policy.
         if mark.return_fraction <= -0.35:
             return self._bounded_action("EXIT", self.remaining_fraction, "EMERGENCY_CATASTROPHIC_DRAWDOWN", mark)
 
@@ -279,13 +278,11 @@ class RunnerGuardian:
 
 def self_test() -> None:
     low = conviction({"prior_win_rate": 0.70, "prior_appearances": 10, "buyer_count": 1})
-    med = conviction({"prior_win_rate": 0.76, "prior_appearances": 30, "buyer_count": 2})
-    high = conviction({"prior_win_rate": 0.84, "prior_appearances": 60, "buyer_count": 4})
     exceptional = conviction({"prior_win_rate": 0.90, "prior_appearances": 100, "buyer_count": 5})
-    assert low["conviction_tier"] == "BASE" and math.isclose(low["position_fraction"], 0.03)
-    assert exceptional["conviction_tier"] == "EXCEPTIONAL" and math.isclose(exceptional["position_fraction"], 0.20)
-    assert TIERS["MEDIUM"].position_fraction == 0.075
-    assert TIERS["HIGH"].position_fraction == 0.125
+    assert low["conviction_tier"] == "BASE" and math.isclose(low["position_fraction"], 0.05)
+    assert exceptional["conviction_tier"] == "EXCEPTIONAL" and math.isclose(exceptional["position_fraction"], 0.25)
+    assert math.isclose(TIERS["MEDIUM"].position_fraction, 0.08)
+    assert math.isclose(TIERS["HIGH"].position_fraction, 0.15)
     assert TIERS["EXCEPTIONAL"].initial_fraction == 0.20
 
     # A temporary -17% drawdown must not be killed solely because it crossed -10%.
@@ -307,7 +304,7 @@ def self_test() -> None:
     a = g2.on_mark(Mark(1000, 0.16))
     assert a and a.kind == "SCALE_OUT"
     assert not g2.closed
-    print("GOLDEN_MANAGEMENT_V2_AGGRESSIVE_SELF_TEST_OK")
+    print("GOLDEN_MANAGEMENT_V2_AGGRESSIVE_5_8_15_25_SELF_TEST_OK")
 
 
 if __name__ == "__main__":
