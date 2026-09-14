@@ -1,0 +1,221 @@
+name: Golden Thesis 5 SOL + shadow conviction sizing
+
+on:
+  push:
+    branches:
+      - codex/golden-thesis-buyer-reputation-v1
+    paths:
+      - ".github/workflows/golden-conviction-shadow-live.yml"
+      - "tools/golden_buyer_reputation_conviction_live.py"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: golden-conviction-shadow-live-5sol
+  cancel-in-progress: false
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONUNBUFFERED: "1"
+  CAMPAIGN_BRANCH: codex/golden-thesis-buyer-reputation-v1
+  STATE_PATH: docs/research/golden-buyer-reputation-live-state.json
+  BOOTSTRAP_RUN_ID: "34854530711"
+  BOOTSTRAP_ARTIFACT: golden-buyer-reputation-live-34854530711
+
+jobs:
+  prospective-live-paper-with-shadow-sizing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - name: Checkout Golden candidate and shadow layer
+        uses: actions/checkout@v4
+        with:
+          ref: codex/golden-thesis-buyer-reputation-v1
+          fetch-depth: 1
+
+      - name: Checkout current market decoder
+        uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-selection-reconstruction
+          path: production
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install paper-only dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e production -r production/requirements-e4.txt aiohttp
+
+      - name: Preflight frozen Golden rule and shadow conviction layer
+        run: |
+          python -m py_compile \
+            tools/golden_buyer_reputation_core.py \
+            tools/golden_buyer_reputation_live.py \
+            tools/golden_buyer_reputation_conviction_live.py \
+            tools/golden_buyer_reputation_watchdog.py
+          python tools/golden_buyer_reputation_conviction_live.py --self-test
+
+      - name: Restore exact frozen 66k research corpus
+        run: |
+          mkdir -p frozen artifacts/golden-live
+          gh run download 34262315056 --repo "$GITHUB_REPOSITORY" \
+            --name e4-v12-allout-launch-corpus-34262315056 --dir frozen
+          corpus="$(find frozen -name e4-v12-allout-launch-corpus.jsonl.gz -print -quit)"
+          test -s "$corpus"
+          echo "FROZEN_CORPUS=$corpus" >> "$GITHUB_ENV"
+
+      - name: Restore exact 5 SOL campaign state
+        run: |
+          mkdir -p artifacts/golden-live
+          if gh api "repos/$GITHUB_REPOSITORY/contents/$STATE_PATH?ref=$CAMPAIGN_BRANCH" >/tmp/state.json 2>/dev/null; then
+            python - <<'PY'
+          import base64, json, pathlib
+          obj=json.load(open('/tmp/state.json'))
+          pathlib.Path('artifacts/golden-live/resume-state.json').write_bytes(base64.b64decode(obj['content']))
+          PY
+            echo "Restored persistent campaign state from branch."
+          else
+            mkdir -p artifacts/bootstrap
+            gh run download "$BOOTSTRAP_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+              --name "$BOOTSTRAP_ARTIFACT" --dir artifacts/bootstrap
+            bootstrap="$(find artifacts/bootstrap -name session-state.json -print -quit)"
+            test -s "$bootstrap"
+            cp "$bootstrap" artifacts/golden-live/resume-state.json
+            echo "Bootstrapped campaign from completed run $BOOTSTRAP_RUN_ID."
+          fi
+          python - <<'PY'
+          import json
+          s=json.load(open('artifacts/golden-live/resume-state.json'))
+          a=s['account']
+          rows=[r for r in a.get('ledger',[]) if r.get('status')=='CLOSED']
+          print('RESTORED_CAMPAIGN', {'cash_sol':a.get('cash_sol'), 'closed_trades':len(rows), 'wins':sum(bool(r.get('win')) for r in rows)})
+          assert abs(float(s['campaign_starting_balance_sol'])-5.0) < 1e-12
+          assert len(rows) >= 11
+          PY
+          echo "RESUME_ARG=--resume-state artifacts/golden-live/resume-state.json" >> "$GITHUB_ENV"
+
+      - name: Continue frozen Golden thesis with shadow-only conviction sizing
+        id: live
+        continue-on-error: true
+        run: |
+          python tools/golden_buyer_reputation_watchdog.py \
+            --output-dir artifacts/golden-live \
+            --repo "$GITHUB_REPOSITORY" \
+            --branch "$CAMPAIGN_BRANCH" \
+            --status-path docs/research/golden-buyer-reputation-live-status.json \
+            --target-closed-trades 50 \
+            --max-runner-seconds 19500 \
+            -- \
+            python tools/golden_buyer_reputation_conviction_live.py \
+              --production-root production \
+              --corpus "$FROZEN_CORPUS" \
+              --starting-balance-sol 5 \
+              --execution-delay-ms 10 \
+              --target-closed-trades 50 \
+              --duration-seconds 18900 \
+              --heartbeat-seconds 30 \
+              $RESUME_ARG \
+              --state-output artifacts/golden-live/session-state.json \
+              --status artifacts/golden-live/status.json \
+              --output artifacts/golden-live/final.json
+
+      - name: Persist clean continuation state
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, pathlib, sys
+          p=pathlib.Path('artifacts/golden-live/session-state.json')
+          s=pathlib.Path('artifacts/golden-live/status.json')
+          if not p.exists() or not s.exists():
+              sys.exit(10)
+          status=json.loads(s.read_text())
+          account=status.get('account',{})
+          if status.get('status')=='TECHNICAL_FAILURE' or account.get('task_errors') or account.get('unresolved_exposure'):
+              sys.exit(11)
+          sh=account.get('shadow_conviction',{})
+          if sh.get('execution_unchanged') is not True:
+              sys.exit(12)
+          print('clean state; frozen execution remained unchanged; shadow may be persisted')
+          PY
+          rc=$?
+          if [ "$rc" -eq 10 ]; then
+            echo "::warning::No campaign state was produced"
+            exit 0
+          elif [ "$rc" -eq 11 ]; then
+            echo "::warning::Refusing to persist technically compromised state"
+            exit 0
+          elif [ "$rc" -eq 12 ]; then
+            echo "::error::Shadow layer did not attest execution_unchanged"
+            exit 1
+          fi
+          content="$(base64 -w0 artifacts/golden-live/session-state.json)"
+          sha="$(gh api "repos/$GITHUB_REPOSITORY/contents/$STATE_PATH?ref=$CAMPAIGN_BRANCH" --jq .sha 2>/dev/null || true)"
+          if [ -n "$sha" ]; then
+            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$STATE_PATH" \
+              -f message='data(golden): persist conviction-shadow continuation state [skip ci]' \
+              -f branch="$CAMPAIGN_BRANCH" -f content="$content" -f sha="$sha" >/dev/null
+          else
+            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$STATE_PATH" \
+              -f message='data(golden): persist conviction-shadow continuation state [skip ci]' \
+              -f branch="$CAMPAIGN_BRANCH" -f content="$content" >/dev/null
+          fi
+
+      - name: Publish fixed-vs-shadow summary
+        if: always()
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json, pathlib
+          p=pathlib.Path('artifacts/golden-live/status.json')
+          print('# Golden Buyer Reputation + Shadow Conviction v1')
+          if not p.exists():
+              print('\nNo runner status was produced.')
+              raise SystemExit
+          s=json.loads(p.read_text())
+          a=s.get('account',{})
+          sh=a.get('shadow_conviction',{})
+          c=s.get('counts',{})
+          print(f"\n**Status:** `{s.get('status')}`")
+          print(f"\nLaunches this session: **{c.get('launches_seen',0)}** | Qualified this session: **{c.get('qualified',0)}**")
+          print(f"\nFrozen account — Closed: **{a.get('closed_trades',0)}**, W/L: **{a.get('wins',0)}/{a.get('losses',0)}**, Equity: **{a.get('equity_sol',0):.6f} SOL**, Net: **{a.get('net_pnl_sol',0):+.6f} SOL**")
+          print(f"\nShadow sizing activates after closed trade **#{sh.get('activation_closed_trades','?')}** and has **{sh.get('shadow_trades',0)}** prospective sizing observations.")
+          print(f"\nShadow equity from activation baseline: **{sh.get('shadow_equity_sol',0):.6f} SOL**, Shadow net: **{sh.get('shadow_net_pnl_sol_since_activation',0):+.6f} SOL**")
+          print('\nThe shadow layer never changes Golden entries, exits, or the actual 1.85% paper position size. Shadow P&L is a sizing-only counterfactual and is not market-impact adjusted.')
+          PY
+
+      - name: Upload prospective evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-conviction-shadow-live-${{ github.run_id }}
+          path: |
+            artifacts/golden-live/status.json
+            artifacts/golden-live/supervisor.json
+            artifacts/golden-live/final.json
+            artifacts/golden-live/session-state.json
+            artifacts/golden-live/resume-state.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Fail only on technical corruption
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path('artifacts/golden-live/status.json')
+          if not p.exists():
+              raise SystemExit('runner status missing')
+          s=json.loads(p.read_text())
+          a=s.get('account',{})
+          if s.get('status')=='TECHNICAL_FAILURE' or a.get('task_errors') or a.get('unresolved_exposure'):
+              raise SystemExit('technical live-paper failure')
+          sh=a.get('shadow_conviction',{})
+          if sh.get('execution_unchanged') is not True:
+              raise SystemExit('shadow execution-isolation attestation missing')
+          print('Operationally clean; fixed Golden execution remained unchanged.')
+          PY
