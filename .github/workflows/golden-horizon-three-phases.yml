@@ -1,0 +1,276 @@
+name: Golden horizons - build, 100 fresh-live coins, final report
+
+on:
+  push:
+    branches: [codex/golden-2s-horizon-cost-tournament]
+    paths:
+      - '.github/workflows/golden-horizon-three-phases.yml'
+      - 'tools/golden_horizon_*.py'
+      - 'tests/test_golden_horizon.py'
+      - 'config/golden-horizon.json'
+      - 'docs/research/golden-horizon-launch.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: golden-horizon-cost-campaign
+  cancel-in-progress: false
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  BRANCH: codex/golden-2s-horizon-cost-tournament
+  PYTHONUNBUFFERED: '1'
+  PYTHONPATH: tools:tests
+  STATE_PATH: docs/research/golden-horizon-state.json
+  STATUS_PATH: docs/research/golden-horizon-status.json
+
+jobs:
+  phase1-build:
+    name: Phase 1 - build, configure and verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+      - uses: actions/checkout@v4
+        with:
+          ref: 8c18f0fffe67500012a18d2dee983b81e2abb938
+          path: production
+          sparse-checkout: src/memecoin_bot/realtime/pumpfun.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install read-only HTTP dependency
+        run: python -m pip install aiohttp==3.14.3
+      - name: Compile, test accounting and guard false completion
+        run: |
+          mkdir -p artifacts/phase1
+          python -m py_compile tools/golden_horizon_*.py
+          python -m unittest discover -s tests -p test_golden_horizon.py -v 2>&1 | tee artifacts/phase1/unit-tests.log
+          python - <<'PY'
+          import json
+          from test_golden_horizon import stress
+          d=stress(1000)
+          assert d['status']=='PASS' and d['fixture_positions_counted_as_live']==0
+          open('artifacts/phase1/stress.json','w').write(json.dumps(d,indent=2)+'\n')
+          print(d)
+          PY
+      - name: Restore frozen pre-existing reputation corpus only
+        run: |
+          mkdir -p frozen
+          gh run download 34262315056 --repo "$GITHUB_REPOSITORY" --name e4-v12-allout-launch-corpus-34262315056 --dir frozen
+          corpus="$(find frozen -name e4-v12-allout-launch-corpus.jsonl.gz -print -quit)"
+          test -s "$corpus"
+          echo "CORPUS=$corpus" >> "$GITHUB_ENV"
+      - name: Real fresh-launch connectivity and independently confirmed creation proof
+        run: |
+          python tools/golden_horizon_live.py --production-root production --corpus "$CORPUS" \
+            --output artifacts/phase1/smoke --smoke --target 999 --duration 120 --window smoke
+      - name: Require all build gates before completing phase 1
+        run: |
+          python tools/golden_horizon_preflight.py --production-root production \
+            --smoke artifacts/phase1/smoke/smoke-pass.json --stress artifacts/phase1/stress.json \
+            --output artifacts/phase1/phase1-complete.json
+          python tools/golden_horizon_publish.py --local artifacts/phase1/phase1-complete.json \
+            --remote docs/research/golden-horizon-phase1-complete.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: golden-horizon-phase1-${{ github.run_id }}
+          path: artifacts/phase1/
+          retention-days: 60
+
+  phase2-live:
+    name: Phase 2 - fresh-live window ${{ matrix.window }}
+    needs: phase1-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 290
+    strategy:
+      fail-fast: true
+      max-parallel: 1
+      matrix:
+        window: [1, 2, 3, 4, 5, 6, 7, 8]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install read-only HTTP dependency
+        run: python -m pip install aiohttp==3.14.3
+      - name: Refuse lost or invalid previous window, then restore clean state
+        run: |
+          mkdir -p artifacts/window
+          git fetch origin "$BRANCH"
+          if git show "FETCH_HEAD:$STATUS_PATH" > artifacts/window/previous-status.json 2>/dev/null; then
+            python - <<'PY'
+          import json
+          d=json.load(open('artifacts/window/previous-status.json'))
+          assert d.get('status') in ('CLEAN_WINDOW_END','TARGET_REACHED'), 'Previous window not certified clean; preserve and inspect its artifacts, never reset or skip it'
+          assert not d.get('errors'), d.get('errors')
+          PY
+          fi
+          if git show "FETCH_HEAD:$STATE_PATH" > artifacts/window/resume.json 2>/dev/null; then
+            python - <<'PY'
+          import json,os
+          from golden_horizon_engine import Config,Engine
+          s=json.load(open('artifacts/window/resume.json'))
+          e=Engine(Config(**s['engine']['config']),s['engine']);e.validate()
+          count=e.matched_closed()
+          with open(os.environ['GITHUB_ENV'],'a') as f:
+              f.write('SKIP_LIVE='+('true' if count>=100 else 'false')+'\n')
+              f.write('RESUME_ARG=--resume artifacts/window/resume.json\n')
+          print('RESTORED_WITHOUT_RESET',count)
+          PY
+          else
+            rm -f artifacts/window/resume.json
+            echo 'SKIP_LIVE=false' >> "$GITHUB_ENV"
+            echo 'RESUME_ARG=' >> "$GITHUB_ENV"
+          fi
+      - uses: actions/checkout@v4
+        if: env.SKIP_LIVE != 'true'
+        with:
+          ref: 8c18f0fffe67500012a18d2dee983b81e2abb938
+          path: production
+          sparse-checkout: src/memecoin_bot/realtime/pumpfun.py
+          sparse-checkout-cone-mode: false
+      - name: Restore exact frozen prior corpus, never replay market outcomes
+        if: env.SKIP_LIVE != 'true'
+        run: |
+          mkdir -p frozen
+          gh run download 34262315056 --repo "$GITHUB_REPOSITORY" --name e4-v12-allout-launch-corpus-34262315056 --dir frozen
+          corpus="$(find frozen -name e4-v12-allout-launch-corpus.jsonl.gz -print -quit)"
+          test -s "$corpus"
+          echo "CORPUS=$corpus" >> "$GITHUB_ENV"
+      - name: Real incoming launches, twelve cost-aware paper accounts, remote heartbeat
+        if: env.SKIP_LIVE != 'true'
+        run: |
+          python tools/golden_horizon_publish.py --local artifacts/window/status.json \
+            --remote "$STATUS_PATH" --watch --stop-file artifacts/stop-publisher > artifacts/publisher.log 2>&1 &
+          publisher=$!
+          cleanup() { kill "$publisher" 2>/dev/null || true; wait "$publisher" 2>/dev/null || true; }
+          trap cleanup EXIT
+          set +e
+          python tools/golden_horizon_live.py --production-root production --corpus "$CORPUS" \
+            --manifest config/golden-horizon.json --output artifacts/window \
+            --window '${{ matrix.window }}' --duration 14400 --target 100 $RESUME_ARG
+          rc=$?
+          set -e
+          cleanup
+          trap - EXIT
+          test -s artifacts/window/status.json
+          python tools/golden_horizon_publish.py --local artifacts/window/status.json --remote "$STATUS_PATH"
+          if [ "$rc" -ne 0 ]; then
+            echo '::error::Window blocked; all failed/open evidence is retained. No reset or continuation from older state.'
+            exit "$rc"
+          fi
+      - name: Validate every retained position and persist clean continuation only
+        if: env.SKIP_LIVE != 'true'
+        run: |
+          python - <<'PY'
+          import json
+          from golden_horizon_engine import Config,Engine
+          s=json.load(open('artifacts/window/state.json'))
+          e=Engine(Config(**s['engine']['config']),s['engine']);e.validate()
+          assert s['engine']['clean'] and not s['engine']['bundles'] and not s['engine']['errors']
+          for x in s['sessions']:assert not x['errors']
+          for h in e.history:assert (h.get('creation_proof') or {}).get('verified') is True
+          print('CLEAN_NO_LOSSES_DROPPED',e.matched_closed())
+          PY
+          mkdir -p /tmp/horizon-persist
+          cp artifacts/window/state.json /tmp/horizon-persist/state.json
+          # Change checkout only AFTER trading stops. Code during the window used github.sha.
+          git fetch origin "$BRANCH"
+          git checkout -B evidence FETCH_HEAD
+          cp /tmp/horizon-persist/state.json "$STATE_PATH"
+          git config user.name gambit-horizon-research
+          git config user.email actions@users.noreply.github.com
+          git add "$STATE_PATH"
+          if ! git diff --cached --quiet; then
+            git commit -m 'data(horizon): preserve clean live-window evidence [skip ci]'
+            git pull --rebase origin "$BRANCH"
+            git push origin HEAD:"$BRANCH"
+          fi
+      - name: Declare phase 2 complete only at 100 matched closed trades
+        if: env.SKIP_LIVE != 'true'
+        run: |
+          count="$(python - <<'PY'
+          import json
+          from golden_horizon_engine import Config,Engine
+          s=json.load(open('artifacts/window/state.json'));e=Engine(Config(**s['engine']['config']),s['engine'])
+          print(e.matched_closed())
+          PY
+          )"
+          if [ "$count" -ge 100 ]; then
+            python tools/golden_horizon_report.py --state artifacts/window/state.json --output artifacts/phase2 --gate-only
+            python tools/golden_horizon_publish.py --local artifacts/phase2/phase2-complete.json \
+              --remote docs/research/golden-horizon-phase2-complete.json
+          else
+            echo "Clean checkpoint, NOT phase completion: $count / 100"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always() && env.SKIP_LIVE != 'true'
+        with:
+          name: golden-horizon-window-${{ matrix.window }}-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 60
+
+  phase3-report:
+    name: Phase 3 - audit, results and research conclusion
+    needs: phase2-live
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install aiohttp==3.14.3
+      - name: Retrieve actual completed campaign without changing strategy source
+        run: |
+          mkdir -p artifacts/final
+          git fetch origin "$BRANCH"
+          git show "FETCH_HEAD:$STATE_PATH" > artifacts/final/state.json
+      - name: Verify 100 matched trades and generate every-coin research report
+        run: |
+          python tools/golden_horizon_report.py --state artifacts/final/state.json --output artifacts/final
+          cp config/golden-horizon.json artifacts/final/manifest.json
+          echo '${{ github.sha }}' > artifacts/final/source-sha.txt
+      - name: Persist completed results and both evidence-gated markers
+        run: |
+          mkdir -p /tmp/horizon-final
+          cp artifacts/final/phase2-complete.json artifacts/final/phase3-complete.json \
+             artifacts/final/final-results.json artifacts/final/final-report.md /tmp/horizon-final/
+          git fetch origin "$BRANCH"
+          git checkout -B evidence FETCH_HEAD
+          cp /tmp/horizon-final/phase2-complete.json docs/research/golden-horizon-phase2-complete.json
+          cp /tmp/horizon-final/phase3-complete.json docs/research/golden-horizon-phase3-complete.json
+          cp /tmp/horizon-final/final-results.json docs/research/golden-horizon-final-results.json
+          cp /tmp/horizon-final/final-report.md docs/research/golden-horizon-final-report.md
+          git config user.name gambit-horizon-research
+          git config user.email actions@users.noreply.github.com
+          git add docs/research/golden-horizon-phase2-complete.json docs/research/golden-horizon-phase3-complete.json \
+                  docs/research/golden-horizon-final-results.json docs/research/golden-horizon-final-report.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(horizon): complete 100-cohort results and per-coin report [skip ci]'
+            git pull --rebase origin "$BRANCH"
+            git push origin HEAD:"$BRANCH"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: golden-horizon-final-${{ github.run_id }}
+          path: artifacts/final/
+          retention-days: 60
