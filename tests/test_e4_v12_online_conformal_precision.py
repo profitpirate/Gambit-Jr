@@ -240,14 +240,21 @@ def test_holdout_protocol_requires_ten_strictly_later_windows_and_one_evaluation
     assert result_policy["untouched_live_pass_required_to_declare_found"] is True
 
 
-def test_holdout_manifest_starts_empty_and_cannot_imply_success() -> None:
+def test_holdout_manifest_tracks_only_frozen_progress_and_cannot_imply_success() -> None:
     manifest = artifact("e4-v12-online-conformal-holdout-manifest.json")
     contract = protocol()
     assert manifest["experiment_id"] == development()["experiment_id"]
     assert manifest["protocol_sha256_lf"] == research.sha256_lf(
         ROOT / "artifacts/e4-v12-online-conformal-holdout-protocol.json"
     )
-    assert manifest["captures"] == []
+    captures = manifest["captures"]
+    assert 0 < len(captures) <= (
+        contract["final_evidence_contract"]["required_capture_windows"]
+    )
+    assert all(capture["role"] == "untouched_live" for capture in captures)
+    assert all(capture["launches"] == 3_000 for capture in captures)
+    assert "untouched_holdout_passed" not in manifest
+    assert "live_confirmation_authorised" not in manifest
     assert manifest["production_paths_changed"] == 0
     assert contract["result_policy"]["production_promotion_authorised"] is False
     assert contract["result_policy"]["production_deployment_authorised"] is False

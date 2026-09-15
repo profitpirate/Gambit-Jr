@@ -119,14 +119,21 @@ def test_protocol_is_frozen_and_never_authorises_production() -> None:
     assert specification["result_policy"]["production_paths_changed"] == 0
 
 
-def test_empty_manifest_is_valid_and_waiting_is_not_a_live_pass() -> None:
+def test_registered_manifest_progress_is_valid_and_not_a_live_pass() -> None:
     specification = holdout.verify_protocol(ROOT)
     payload = holdout.read_json(ROOT / holdout.DEFAULT_MANIFEST_PATH)
     captures = holdout.validate_manifest(ROOT, payload, specification)
+    required = specification["final_evidence_contract"][
+        "required_capture_windows"
+    ]
+    assert 0 < len(captures) <= required
+    assert all(capture["role"] == holdout.FINAL_ROLE for capture in captures)
+    assert all(capture["launches"] == 3_000 for capture in captures)
+    if len(captures) == required:
+        return
     report = holdout.waiting_report(
         ROOT, specification, ROOT / holdout.DEFAULT_MANIFEST_PATH, captures
     )
-    assert captures == []
     assert report["final_evaluation_complete"] is False
     assert report["untouched_holdout_passed"] is False
     assert report["verdict"]["status"] == "WAITING_FOR_10_STRICTLY_LATER_WINDOWS"
