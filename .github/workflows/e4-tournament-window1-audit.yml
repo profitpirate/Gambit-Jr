@@ -1,0 +1,163 @@
+name: E4 whole-wallet tournament window 1 audit
+
+on:
+  push:
+    branches: [codex/e4-tournament-window1-audit]
+    paths: [".github/workflows/e4-tournament-window1-audit.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e4-tournament-window1-audit
+  cancel-in-progress: false
+
+jobs:
+  readonly-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install read-only HTTP dependency
+        run: python -m pip install aiohttp
+      - name: Fetch exact-window signatures and preserve raw transactions
+        env:
+          PYTHONUNBUFFERED: "1"
+          PYTHONPATH: "tools"
+        run: |
+          mkdir -p artifacts/e4-window1
+          python - <<'PY'
+          import asyncio, collections, gzip, json, math, pathlib, time
+          import e4_same_window_backfill as old
+          OUT=pathlib.Path('artifacts/e4-window1')
+          START=1789442159.8801332
+          END=1789458069.4553118
+          LO=math.floor(START)-600
+          HI=math.ceil(END)+60
+          MAX_PAGES=30
+
+          def save(name, data):
+              old.atomic(OUT/name, data)
+
+          def in_window(t):
+              return math.ceil(START) <= int(t) <= math.floor(END)
+
+          async def main():
+              selected=[]; scanned=[]; seen=set(); before=None
+              crossed_lower=False; history_exhausted=False; pages=0; newest=None
+              errors=[]; parsed=[]; raw_txs={}; unparsed=[]; failed=[]
+              async with old.Rpc() as rpc:
+                  for page_index in range(MAX_PAGES):
+                      opts={'limit':1000,'commitment':'confirmed'}
+                      if before: opts['before']=before
+                      page=await rpc.call('getSignaturesForAddress',[old.E4_WALLET,opts]) or []
+                      pages+=1
+                      if not page:
+                          history_exhausted=True; break
+                      for row in page:
+                          sig=str(row.get('signature') or '')
+                          if not sig or sig in seen: continue
+                          seen.add(sig); scanned.append(row)
+                          bt=row.get('blockTime')
+                          if bt is not None:
+                              bt=int(bt); newest=max(newest or bt,bt)
+                              if LO <= bt <= HI: selected.append(row)
+                              if bt<LO: crossed_lower=True
+                          else:
+                              errors.append({'signature':sig,'error':'MISSING_SIGNATURE_BLOCK_TIME'})
+                      print('SIGNATURE_PAGE',pages,'scanned',len(scanned),'selected',len(selected),flush=True)
+                      save('progress.json',{'stage':'SIGNATURES','pages':pages,'scanned':len(scanned),'selected':len(selected)})
+                      if crossed_lower: break
+                      if len(page)<1000:
+                          history_exhausted=True;break
+                      new_before=page[-1].get('signature')
+                      if not new_before or new_before==before:
+                          errors.append({'error':'PAGINATION_STALLED'});break
+                      before=new_before
+                  save('signatures.json',{'window_start':START,'window_end':END,'padding_start':LO,'padding_end':HI,'selected':selected,'scanned':scanned})
+                  sem=asyncio.Semaphore(3)
+                  completed=0
+                  raw_file=gzip.open(OUT/'transactions.jsonl.gz','wt',encoding='utf-8')
+                  async def one(row):
+                      nonlocal completed
+                      sig=row['signature']
+                      async with sem:
+                          try:
+                              tx=await rpc.call('getTransaction',[sig,{'encoding':'jsonParsed','commitment':'confirmed','maxSupportedTransactionVersion':0}],attempts=4)
+                              if not isinstance(tx,dict):
+                                  errors.append({'signature':sig,'error':'TRANSACTION_UNAVAILABLE'})
+                              else:
+                                  raw_txs[sig]=tx
+                                  raw_file.write(json.dumps({'signature_row':row,'transaction':tx},separators=(',',':'))+'\n')
+                                  meta=tx.get('meta') or {}
+                                  if meta.get('err') is not None:
+                                      keys=old.account_key_strings(tx)
+                                      failed.append({'signature':sig,'block_time':row.get('blockTime'),'fee_sol':old.finite(meta.get('fee'))/1e9,'fee_payer_is_e4':bool(keys and keys[0]==old.E4_WALLET)})
+                                  else:
+                                      trades=old.parse_tx(row,tx)
+                                      if trades:
+                                          parsed.extend(trades)
+                                      else:
+                                          unparsed.append({'signature':sig,'block_time':row.get('blockTime'),'reason':'NOT_A_SINGLE_NONBASE_TOKEN_WALLET_DELTA'})
+                          except Exception as exc:
+                              errors.append({'signature':sig,'error':repr(exc)})
+                          completed+=1
+                          if completed%25==0:
+                              raw_file.flush()
+                              print('TRANSACTIONS',completed,'/',len(selected),'parsed',len(parsed),'fetch_errors',len(errors),flush=True)
+                              save('progress.json',{'stage':'TRANSACTIONS','completed':completed,'selected':len(selected),'parsed_legs':len(parsed),'errors':errors})
+                          await asyncio.sleep(0.08)
+                  try:
+                      await asyncio.gather(*(one(r) for r in selected))
+                  finally:
+                      raw_file.close()
+                  rpc_errors=list(rpc.errors)
+              parsed.sort(key=lambda r:(r['block_time'],r['slot'],r['signature']))
+              by_mint=collections.defaultdict(list)
+              for leg in parsed: by_mint[leg['mint']].append(leg)
+              closed=[]; excluded=[]; open_positions=[]
+              for mint,legs in by_mint.items():
+                  buys=[r for r in legs if r['side']=='BUY']
+                  sells=[r for r in legs if r['side']=='SELL']
+                  inside=[r for r in legs if in_window(r['block_time'])]
+                  if not inside:continue
+                  why=[]
+                  if len(buys)!=1:why.append('BUY_COUNT_NOT_ONE_OR_CARRY_IN')
+                  if any(r['cost_sol']<=0 for r in buys) or any(r['proceeds_sol']<=0 for r in sells):why.append('NONPOSITIVE_OR_AMBIGUOUS_CASH_LEG')
+                  if buys and not in_window(buys[0]['block_time']):why.append('ENTRY_OUTSIDE_WINDOW')
+                  if any(not in_window(r['block_time']) for r in sells):why.append('EXIT_OUTSIDE_WINDOW')
+                  if len(buys)==1:
+                      tx=raw_txs.get(buys[0]['signature']) or {}
+                      prior=old.owner_token_map((tx.get('meta') or {}).get('preTokenBalances') or []).get(mint,0)
+                      if prior>1e-6:why.append('PREEXISTING_TOKENS_AT_BUY')
+                      if any((s['block_time'],s['slot'])<(buys[0]['block_time'],buys[0]['slot']) for s in sells):why.append('SELL_BEFORE_BUY')
+                  bought=sum(max(0,r['token_delta']) for r in buys)
+                  sold=sum(max(0,-r['token_delta']) for r in sells)
+                  cost=sum(r['cost_sol'] for r in buys);proceeds=sum(r['proceeds_sol'] for r in sells)
+                  frac=sold/bought if bought else None
+                  record={'mint':mint,'buy_count':len(buys),'sell_count':len(sells),'cost_sol':cost,'proceeds_sol':proceeds,'pnl_sol':proceeds-cost,'return_fraction':(proceeds-cost)/cost if cost>0 else None,'sold_fraction':frac,'first_buy_time':min((r['block_time']for r in buys),default=None),'last_sell_time':max((r['block_time']for r in sells),default=None),'legs':legs,'exclusion_reasons':why}
+                  if why:excluded.append(record)
+                  elif frac is not None and abs(frac-1)<1e-6:
+                      record['win']=record['pnl_sol']>0;closed.append(record)
+                  else:
+                      record['exclusion_reasons']=['INCOMPLETE_TOKEN_ROUND_TRIP'];open_positions.append(record)
+              p=[r['pnl_sol']for r in closed];g=sum(x for x in p if x>0);l=-sum(x for x in p if x<0)
+              relevant_failed=[r for r in failed if in_window(r.get('block_time') or 0)]
+              coverage={'pagination_pages':pages,'signatures_scanned':len(scanned),'selected_with_padding':len(selected),'crossed_lower_boundary':crossed_lower,'history_exhausted':history_exhausted,'latest_seen_block_time':newest,'history_covers_window':bool((crossed_lower or history_exhausted)and(newest or 0)>=END),'successful_transaction_fetches':len(raw_txs),'errors':errors,'unparsed_or_nontrade':unparsed,'failed_transactions':relevant_failed}
+              summary={'closed_round_trips':len(closed),'wins':sum(x>0 for x in p),'losses':sum(x<0 for x in p),'breakeven':sum(x==0 for x in p),'win_rate':sum(x>0 for x in p)/len(p)if p else None,'net_wallet_cashflow_pnl_sol':sum(p),'gross_winning_cashflow_sol':g,'gross_losing_cashflow_sol':l,'profit_factor':g/l if l else None,'failed_tx_fees_paid_by_e4_sol':sum(r['fee_sol']for r in relevant_failed if r['fee_payer_is_e4']),'excluded_mints':len(excluded),'incomplete_round_trips':len(open_positions)}
+              result={'version':'e4-tournament-window1-readonly-audit-v1','benchmark_only':True,'signing_or_broadcasting':False,'wallet':old.E4_WALLET,'window_start_epoch':START,'window_end_epoch':END,'block_time_resolution_seconds':1,'coverage':coverage,'summary':summary,'closed':closed,'excluded':excluded,'incomplete':open_positions,'parsed_legs':parsed,'rpc_recent_errors':rpc_errors[-30:],'caveats':['Wallet SOL cashflow reconstruction, not a decoded swap-budget or total-wealth return.','Unparsed transactions require inspection; they are not silently treated as zero-profit trades.','Transaction blockTime has second resolution; exact sub-second window boundaries are not recoverable here.','Only fully sold single-entry positions opened and closed inside the requested window enter the headline. Carry-in and carry-out positions are listed separately.','No inference of E4 internal decision timing, total bankroll, or intent is made.']}
+              save('audit.json',result)
+              print('E4_WINDOW1_AUDIT',json.dumps({'summary':summary,'history_covers_window':coverage['history_covers_window'],'fetch_errors':len(errors),'unparsed':len(unparsed)},sort_keys=True),flush=True)
+          asyncio.run(main())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-tournament-window1-audit-${{ github.run_id }}
+          path: artifacts/e4-window1/
+          if-no-files-found: warn
+          retention-days: 30
