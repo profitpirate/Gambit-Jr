@@ -32,6 +32,17 @@ MAXIMUM_HOLD_MS = adaptive.POLICIES[POLICY_INDEX].hold_ms
 NOMINAL_POSITION = base.STARTING_BANKROLL_SOL * base.POSITION_FRACTION
 VARIABLE_FEE_RATE = base.PROTOCOL_AND_CREATOR_FEE_BPS / 10_000
 FIXED_FEE = 0.001 + base.TIP_SOL + base.BASE_TRANSACTION_FEE_SOL
+SOURCE_FILES = (
+    "scripts/e4_v12_online_conformal_precision.py",
+    "scripts/e4_v12_online_conformal_latency.py",
+    "scripts/e4_v12_online_conformal_holdout.py",
+    "scripts/e4_v12_adaptive_exit_search.py",
+    "scripts/e4_v12_causal_actor_memory.py",
+    "scripts/e4_v12_causal_regime_veto_holdout.py",
+    "scripts/e4_v12_profit_survival_search.py",
+    "scripts/e4_v12_relative_price_capped_actor.py",
+    "scripts/e4_v12_relative_price_capped_actor_holdout.py",
+)
 
 
 def gross_multiple_from_nominal_pnl(pnl_sol: float) -> float:
@@ -135,6 +146,13 @@ def replay(
 
 def sha256_lf(path: Path) -> str:
     return __import__("hashlib").sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
+
+def source_code_fingerprint(root: Path | None = None) -> str:
+    root = Path.cwd() if root is None else root
+    return base.stable_hash(
+        {relative: sha256_lf(root / relative) for relative in SOURCE_FILES}
+    )
 
 
 def main() -> dict[str, Any]:
@@ -246,7 +264,7 @@ def main() -> dict[str, Any]:
     }
     identity = {
         "thesis_family_identifier": THESIS_FAMILY,
-        "source_code_fingerprint": sha256_lf(Path(__file__)),
+        "source_code_fingerprint": source_code_fingerprint(),
         "dataset_source_manifest_fingerprint": payload["manifest_sha256"],
         "evidence_epoch": windows,
         "feature_set_fingerprint": base.stable_hash(actors.FEATURE_NAMES),

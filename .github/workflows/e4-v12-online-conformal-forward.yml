@@ -1,0 +1,177 @@
+name: E4 V12 online conformal untouched forward capture
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/e4-v12-flow-survival-hazard-v12
+    paths:
+      - ".github/workflows/e4-v12-online-conformal-forward.yml"
+      - "artifacts/e4-v12-online-conformal-frozen-candidate.json"
+      - "artifacts/e4-v12-online-conformal-holdout-protocol.json"
+      - "artifacts/e4-v12-online-conformal-holdout-manifest.json"
+      - "artifacts/e4-v12-online-conformal-forward-trigger.txt"
+
+permissions:
+  contents: read
+
+env:
+  PYTHONUNBUFFERED: "1"
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
+  E4_BUILDER_PRELOAD: "tools/e4-builder/fast-preload-v4.mjs"
+  E4_HOLDOUT_PROGRESS_PATH: "artifacts/e4-v12-online-conformal-forward-progress.json"
+
+concurrency:
+  group: e4-v12-online-conformal-untouched-forward-capture
+  cancel-in-progress: false
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    outputs:
+      capture_needed: ${{ steps.contract.outputs.capture_needed }}
+      registered_windows: ${{ steps.contract.outputs.registered_windows }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-flow-survival-hazard-v12
+          fetch-depth: 1
+
+      - id: contract
+        name: Verify frozen evidence contract and remaining window count
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          protocol_path = Path(
+              "artifacts/e4-v12-online-conformal-holdout-protocol.json"
+          )
+          manifest_path = Path(
+              "artifacts/e4-v12-online-conformal-holdout-manifest.json"
+          )
+          protocol = json.loads(protocol_path.read_text(encoding="utf-8"))
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+          def sha256_lf(path: Path) -> str:
+              return hashlib.sha256(
+                  path.read_bytes().replace(b"\r\n", b"\n")
+              ).hexdigest()
+
+          frozen_path = Path(protocol["frozen_candidate"]["path"])
+          assert sha256_lf(frozen_path) == protocol["frozen_candidate"]["sha256"]
+          assert sha256_lf(protocol_path) == manifest["protocol_sha256_lf"]
+          assert protocol["experiment_id"] == manifest["experiment_id"]
+          contract = protocol["final_evidence_contract"]
+          required = contract["required_capture_windows"]
+          registered = len(manifest["captures"])
+          assert required == 10
+          assert 0 <= registered <= required
+          assert contract["launches_per_window"] == 3000
+          assert contract["optional_stopping_allowed"] is False
+          assert protocol["result_policy"]["final_gate_is_evaluated_once"] is True
+          assert protocol["result_policy"]["production_deployment_authorised"] is False
+          assert protocol["result_policy"]["production_paths_changed"] == 0
+          with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
+              output.write(f"capture_needed={'true' if registered < required else 'false'}\n")
+              output.write(f"registered_windows={registered}\n")
+          print(
+              "online-conformal contract verified",
+              protocol["experiment_id"],
+              f"registered={registered}/{required}",
+          )
+          PY
+
+  capture:
+    needs: contract
+    if: needs.contract.outputs.capture_needed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-flow-survival-hazard-v12
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install capture dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+          python -m pip install -r requirements-e4.txt
+          npm --prefix tools/e4-builder install --omit=dev
+
+      - name: Compile the read-only capture harness
+        run: |
+          python -m compileall -q \
+            scripts/e4_300_launch_holdout_v12.py \
+            scripts/e4_v12_online_conformal_holdout.py \
+            scripts/e4_v12_register_online_conformal_capture.py
+          node --check tools/e4-builder/race-proxy-v3.mjs
+          node --check tools/e4-builder/fast-preload-v4.mjs
+
+      - name: Capture exactly 3000 fresh Pump launches
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_300_launch_holdout_v12.py \
+            --target-launches 3000 \
+            --capture-seconds 16200 \
+            --tail-seconds 300 \
+            --heartbeat-seconds 60 \
+            --minimum-launches 3000 \
+            --wallet-signatures 1000 \
+            --builder-probes 0 \
+            --testnet-route-probes 0 \
+            --stress-iterations 0 \
+            --output artifacts/e4-v12-online-conformal-forward-batch.json
+
+      - name: Verify the captured evidence envelope
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          batch = json.loads(
+              Path(
+                  "artifacts/e4-v12-online-conformal-forward-batch.json"
+              ).read_text(encoding="utf-8")
+          )
+          assert batch["capture"]["unique_launches"] == 3000
+          assert len(batch["capture"]["cohort"]) == 3000
+          assert batch["capture"]["target_reached"] is True
+          assert batch["capture"]["errors"] == []
+          assert batch["hypothesis_only"] is True
+          assert batch["mainnet_transactions_sent"] == 0
+          assert batch["mainnet_funds_risked_sol"] == 0
+          events = Path(
+              "artifacts/e4-v12-online-conformal-forward-batch-live-events.jsonl"
+          )
+          assert events.is_file()
+          assert sum(1 for _ in events.open("rb")) == batch["capture"]["decoded_events"]
+          print("fresh online-conformal evidence envelope verified")
+          PY
+
+      - name: Upload immutable untouched capture
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e4-v12-online-conformal-forward-${{ github.run_id }}
+          path: |
+            artifacts/e4-v12-online-conformal-forward-progress.json
+            artifacts/e4-v12-online-conformal-forward-batch.json
+            artifacts/e4-v12-online-conformal-forward-batch.md
+            artifacts/e4-v12-online-conformal-forward-batch-live-events.jsonl
+          if-no-files-found: error
+          retention-days: 30

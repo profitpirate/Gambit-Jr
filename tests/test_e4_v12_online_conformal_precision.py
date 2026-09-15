@@ -68,8 +68,8 @@ def test_experiment_identity_is_deterministic_complete_and_novel() -> None:
     }
     assert set(identity) == expected_keys
     assert report["experiment_id"] == f"e4x-{research.base.stable_hash(identity)}"
-    assert identity["source_code_fingerprint"] == research.sha256_lf(
-        SCRIPTS / "e4_v12_online_conformal_precision.py"
+    assert identity["source_code_fingerprint"] == research.source_code_fingerprint(
+        ROOT
     )
     assert report["experiment_id"] not in {
         "e4x-207b67e8dc16497ba27d4f6699c7a760bb3728290cc91e85a68ff026ac03744c",
