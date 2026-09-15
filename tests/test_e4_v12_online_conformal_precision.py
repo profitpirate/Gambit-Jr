@@ -88,7 +88,8 @@ def test_evidence_epoch_and_chronology_are_strictly_point_in_time() -> None:
     epoch = report["identity"]["evidence_epoch"]
     assert len(epoch) == 64
     assert epoch == sorted(epoch, key=int)
-    for split in report["identity"]["chronological_split"]:
+    chronology = report["identity"]["chronological_split"]
+    for split in chronology["development_folds"]:
         fit = split["fit"]
         calibration = split["calibration"]
         test = split["test"]
@@ -99,6 +100,11 @@ def test_evidence_epoch_and_chronology_are_strictly_point_in_time() -> None:
         assert max(map(int, calibration)) < min(map(int, test))
         assert len(calibration) == 5
         assert len(test) == 10
+    live = chronology["frozen_live_training"]
+    assert live["fit"] == epoch[:-5]
+    assert live["calibration"] == epoch[-5:]
+    assert set(live["fit"]).isdisjoint(live["calibration"])
+    assert live["untouched_live"] == "exactly ten strictly future capture windows"
     assert all(report["anti_lookahead"].values())
 
 

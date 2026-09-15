@@ -263,7 +263,14 @@ def main() -> dict[str, Any]:
             "score at 250ms; accept only above the causal rolling 99.73rd "
             "percentile of prior model scores"
         ),
-        "chronological_split": chronological_split,
+        "chronological_split": {
+            "development_folds": chronological_split,
+            "frozen_live_training": {
+                "fit": windows[:-5],
+                "calibration": windows[-5:],
+                "untouched_live": "exactly ten strictly future capture windows",
+            },
+        },
         "bankroll_sol": base.STARTING_BANKROLL_SOL,
         "position_sizing": {
             "fraction_of_current_bankroll": base.POSITION_FRACTION,
