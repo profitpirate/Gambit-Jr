@@ -1,0 +1,68 @@
+{
+  "experiment": "golden-horizon-cost-v1",
+  "phase_order": ["build_configure_verify", "prospective_live_market_100_matched_closed", "audit_report_conclusion"],
+  "target_matched_closed_per_arm": 100,
+  "families": ["FULL", "PARTIALS"],
+  "horizons_seconds": [2, 3, 4, 5, 7, 10],
+  "starting_balance_sol_per_arm": 3,
+  "assumed_token_account_bytes": 200,
+  "execution_model": {
+    "starting_sol": 3.0,
+    "protocol_bps": 125.0,
+    "platform_bps": 100.0,
+    "base_fee_sol": 0.000005,
+    "priority_sol": 0.001,
+    "tip_sol": 0.001,
+    "inclusion_delay_ms": 250,
+    "max_slippage_bps": 2000,
+    "max_attempts": 5,
+    "retry_ms": 250,
+    "reserve_sol": 0.03,
+    "post_seconds": 20,
+    "max_concurrent": 2,
+    "feed_stale_ms": 3000,
+    "max_entry_age_ms": 3000
+  },
+  "cost_provenance": {
+    "checked_date": "2026-09-15",
+    "base_fee": {"classification": "DOCUMENTED_CONFIG_NOT_ACTUAL_FEE", "source": "https://solana.com/docs/core/fees/fee-structure", "one_signature_assumed": true},
+    "pump_fee": {"classification": "DOCUMENTED_CONFIG_NOT_ACTUAL_FEE", "source": "https://pump.fun/docs/fees", "note": "SOL bonding curve total protocol and creator fee, no graduated-pool route assumed"},
+    "axiom_fee": {"classification": "DOCUMENTED_CONFIG_NOT_ACCOUNT_OBSERVATION", "source": "https://docs.axiom.trade/getting-started/fees/axiom-fees", "note": "1 percent before cashback, inferred from documented net plus cashback; no unobserved rebate credited"},
+    "priority_tip": {"classification": "DOCUMENTED_DEFAULTS_NOT_USER_PRESET", "source": "https://docs.axiom.trade/getting-started/fees/solana-fees", "note": "Each 0.001 SOL; not a measured fee bid required for a particular trade"},
+    "rent": {"classification": "OBSERVED_RPC_QUOTE_WITH_ASSUMED_ACCOUNT_SIZE", "note": "200 bytes is a cost scenario, not a verified Axiom token-account layout. Refund on final close is a model assumption."},
+    "slippage": {"classification": "CAUSAL_LIVE_RESERVE_MODEL", "note": "Quote-to-fill drift and constant-product price impact, not a made-up realized Axiom fill; 20 percent tolerance is an experimental setting."},
+    "delay": {"classification": "SENSITIVITY_ASSUMPTION", "note": "250 ms delay for every submission, including every partial and final sell; NOT a certification of Axiom inclusion speed."},
+    "failed_attempts": {"classification": "MODELLED_FAILURE_NOT_REAL_TRANSACTION", "source": "https://solana.com/docs/core/fees/fee-structure", "note": "Live quote drift beyond slippage produces a modeled landed failure charged base and priority; in-transaction tip and swap fees roll back. Dropped/revert-protected alternatives are reported in sensitivity, not invented as observations."},
+    "actual_axiom_profit_and_fees": {"classification": "UNAVAILABLE_NO_BROADCAST", "value": null},
+    "actual_axiom_transaction_failure_rate": {"classification": "UNMEASURED", "value": null}
+  },
+  "truth_constraints": {
+    "broadcast_transactions": false,
+    "actual_axiom_fills": false,
+    "axiom_listing_verified": null,
+    "historical_market_replay_in_live_phase": false,
+    "synthetic_prices_in_live_phase": false,
+    "frozen_historical_corpus_use": "prior reputation features only; never counted as prospective outcomes",
+    "all_failed_attempt_costs_retained": true,
+    "reset_bankroll_on_failure": false,
+    "drop_losing_or_unresolved_positions": false
+  },
+  "completion": {
+    "minimum_matched_closed": 100,
+    "same_mint_cohort_across_12_arms": true,
+    "every_traded_creation_independently_confirmed": true,
+    "no_unresolved_inventory": true,
+    "post_exit_measured_separately_for_each_arm": true,
+    "missing_post_exit_ticks_are_unknown_not_false": true,
+    "cost_reconciliation_required": true,
+    "economic_profitability_required_to_finish_experiment": false
+  },
+  "limitations": [
+    "These are twelve independent counterfactual accounts, not twelve wallets funded with real SOL.",
+    "Axiom is the documented fee reference, not an authenticated market/execution connection.",
+    "Per-arm virtual reserve overlays preserve own partial-sell impact, while holding externally observed trader reserve changes fixed; that counterfactual approximation does not prove actual execution.",
+    "Unmodeled leader admission, MEV, route failure and network drops remain unknown; a zero modeled failure count cannot establish a real zero failure rate.",
+    "Safety and cost-model changes make this a new experiment, not a continuation of the earlier low-cost paper balances.",
+    "Horizon selection on these data is exploratory; the chosen finalists require the separately requested unseen multi-day stress/forward phase."
+  ]
+}
