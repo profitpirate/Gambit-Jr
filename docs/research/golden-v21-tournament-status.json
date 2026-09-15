@@ -1,0 +1,136 @@
+{
+  "accepting_new_entries": false,
+  "active_signals": 0,
+  "arms": {
+    "FLOW_V2_1": {
+      "cash_sol": 2.9972243530009814,
+      "closed_trades": 22,
+      "equity_sol": 2.9972243530009814,
+      "execution_latency_ms": {
+        "count": 22,
+        "max": 7.12071,
+        "median": 6.4594175,
+        "p95": 7.0419619,
+        "p99": 7.10590626
+      },
+      "expectancy_sol": -0.00012616577268261114,
+      "losses": 11,
+      "maximum_drawdown_fraction": 0.06667779734765965,
+      "net_pnl_sol": -0.002775646999017445,
+      "profit_factor": 0.9887691651992655,
+      "roi_fraction": -0.0009252156663395184,
+      "starting_balance_sol": 3.0,
+      "win_rate": 0.5,
+      "wins": 11
+    },
+    "FULL_2S_CONTROL": {
+      "cash_sol": 3.065824669908009,
+      "closed_trades": 22,
+      "equity_sol": 3.065824669908009,
+      "execution_latency_ms": {
+        "count": 22,
+        "max": 7.12071,
+        "median": 6.4594175,
+        "p95": 7.0419619,
+        "p99": 7.10590626
+      },
+      "expectancy_sol": 0.0029920304503640457,
+      "losses": 10,
+      "maximum_drawdown_fraction": 0.050140008375492685,
+      "net_pnl_sol": 0.065824669908009,
+      "profit_factor": 1.2984507249884634,
+      "roi_fraction": 0.021941556636003057,
+      "starting_balance_sol": 3.0,
+      "win_rate": 0.5454545454545454,
+      "wins": 12
+    },
+    "PARTIALS_2S": {
+      "cash_sol": 3.031173492730046,
+      "closed_trades": 22,
+      "equity_sol": 3.031173492730046,
+      "execution_latency_ms": {
+        "count": 22,
+        "max": 7.12071,
+        "median": 6.4594175,
+        "p95": 7.0419619,
+        "p99": 7.10590626
+      },
+      "expectancy_sol": 0.0014169769422748557,
+      "losses": 9,
+      "maximum_drawdown_fraction": 0.039321672405811366,
+      "net_pnl_sol": 0.031173492730046826,
+      "profit_factor": 1.1836428036492732,
+      "roi_fraction": 0.010391164243348738,
+      "starting_balance_sol": 3.0,
+      "win_rate": 0.5909090909090909,
+      "wins": 13
+    },
+    "V2_CURRENT": {
+      "cash_sol": 2.9649647189078983,
+      "closed_trades": 22,
+      "equity_sol": 2.9649647189078983,
+      "execution_latency_ms": {
+        "count": 22,
+        "max": 7.12071,
+        "median": 6.4594175,
+        "p95": 7.0419619,
+        "p99": 7.10590626
+      },
+      "expectancy_sol": -0.0015925127769137357,
+      "losses": 13,
+      "maximum_drawdown_fraction": 0.03599512029936124,
+      "net_pnl_sol": -0.03503528109210219,
+      "profit_factor": 0.8258365419045917,
+      "roi_fraction": -0.011678427030700544,
+      "starting_balance_sol": 3.0,
+      "win_rate": 0.4090909090909091,
+      "wins": 9
+    }
+  },
+  "checked_at": 1789458069.4553118,
+  "cohort_closed": 22,
+  "counts": {
+    "benchmark_outcomes": 3825,
+    "benchmark_skipped": 88,
+    "benchmark_wins": 848,
+    "decisions": 3913,
+    "decoded_events": 456166,
+    "early_buyers_seen": 2541,
+    "entry_cutoff_reached": 1,
+    "launches_seen": 3913,
+    "qualified": 23,
+    "unsupported_quote": 574
+  },
+  "e4_mode": "OBSERVATIONAL_ONLY_SAME_COIN_EVENTS_WHEN_PRESENT",
+  "elapsed_seconds": 15909.575178861618,
+  "endpoints": {
+    "wss://api.mainnet-beta.solana.com": {
+      "connections": 1,
+      "disconnects": 0,
+      "errors": [],
+      "messages": 1786638
+    },
+    "wss://solana-rpc.publicnode.com": {
+      "connections": 15,
+      "disconnects": 14,
+      "errors": [],
+      "messages": 1616353
+    }
+  },
+  "historical_replay": false,
+  "market_data_mode": "LIVE_SOLANA_WEBSOCKET_FRESH_LAUNCHES_ONLY",
+  "paper_only": true,
+  "post_exit_pending": 0,
+  "queue_depth": 0,
+  "real_money_execution": false,
+  "rejections": {
+    "CONCURRENCY": 1
+  },
+  "requirement_met": false,
+  "signals": 23,
+  "started_at": 1789442159.8801332,
+  "status": "TIME_LIMIT_REACHED",
+  "target_cohort_closed": 100,
+  "task_errors": [],
+  "version": "golden-management-v2.1-tournament-live-v1"
+}
