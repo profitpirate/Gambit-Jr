@@ -1,0 +1,54 @@
+{
+  "consumed_development_evidence": {
+    "capture_windows": 64,
+    "last_capture_end_ns": 1789445163804856012,
+    "last_capture_run_id": "34918286614",
+    "launches": 192000,
+    "may_never_be_relabelled_as_untouched": true
+  },
+  "experiment_id": "e4x-b1086b70febc39fefa73d35f8451674a126a3c0256ca95a608b57f9c9c6cd1cc",
+  "final_evidence_contract": {
+    "capture_errors_required": 0,
+    "captures_must_not_overlap": true,
+    "every_capture_starts_after_consumed_evidence_epoch_ns": 1789445163804856012,
+    "every_workflow_and_capture_starts_after_frozen_at_epoch_ns": 1789451997000000000,
+    "hypothesis_only_required": true,
+    "launches_per_window": 3000,
+    "mainnet_funds_risked_sol_required": 0.0,
+    "mainnet_transactions_sent_required": 0,
+    "optional_stopping_allowed": false,
+    "required_capture_windows": 10,
+    "required_total_launches": 30000,
+    "role": "untouched_live"
+  },
+  "frozen_candidate": {
+    "frozen_at_epoch_ns": 1789451997000000000,
+    "path": "artifacts/e4-v12-online-conformal-frozen-candidate.json",
+    "sha256": "093d1e8a761ba3fd7d910f27b9c9de2d7040e487a52b1b671bc46d42139d7860",
+    "source_commit": "c38b929711ccb5a715f2f17162d994b96f614368"
+  },
+  "golden_gate": {
+    "every_latency_minimum_profit_factor": 1.25,
+    "every_latency_net_pnl_positive": true,
+    "every_latency_quote_coverage": 1.0,
+    "maximum_drawdown_fraction": 0.15,
+    "maximum_largest_winner_contribution": 0.25,
+    "minimum_capture_windows_represented": 8,
+    "minimum_closed_trades": 50,
+    "minimum_net_pnl_sol": 0.0,
+    "minimum_profit_factor": 1.25,
+    "minimum_profitable_capture_windows": 7,
+    "minimum_wilson_95_lower_bound": 0.55,
+    "minimum_win_rate": 0.65
+  },
+  "result_policy": {
+    "deterministic_replay_required": true,
+    "final_gate_is_evaluated_once": true,
+    "production_deployment_authorised": false,
+    "production_paths_changed": 0,
+    "production_promotion_authorised": false,
+    "sentinel_cannot_declare_found": true,
+    "untouched_live_pass_required_to_declare_found": true
+  },
+  "version": "e4-v12-online-conformal-holdout-protocol-v1"
+}

@@ -44,6 +44,14 @@ def ablation() -> dict:
     return artifact("e4-v12-online-conformal-ablation.json")
 
 
+def frozen() -> dict:
+    return artifact("e4-v12-online-conformal-frozen-candidate.json")
+
+
+def protocol() -> dict:
+    return artifact("e4-v12-online-conformal-holdout-protocol.json")
+
+
 def test_experiment_identity_is_deterministic_complete_and_novel() -> None:
     report = development()
     identity = report["identity"]
@@ -185,3 +193,61 @@ def test_research_artifacts_cannot_promote_or_touch_production() -> None:
         assert report["untouched_holdout_passed"] is False
         assert report["production_promotion_authorised"] is False
         assert report["production_deployment_authorised"] is False
+
+
+def test_frozen_candidate_is_bound_to_exact_development_evidence() -> None:
+    candidate = frozen()
+    report = development()
+    assert candidate["experiment_id"] == report["experiment_id"]
+    assert candidate["identity"] == report["identity"]
+    assert candidate["source_commit"] == "c38b929711ccb5a715f2f17162d994b96f614368"
+    for relative, digest in candidate["source_artifacts"].items():
+        assert research.sha256_lf(ROOT / relative) == digest
+    assert candidate["candidate"]["development"] == report["aggregate"]
+    assert candidate["holdout_status"] == "strictly later evidence required"
+    assert candidate["consumed_evidence_end_ns"] < candidate["frozen_at_epoch_ns"]
+    assert candidate["untouched_holdout_passed"] is False
+    assert candidate["production_paths_changed"] == 0
+
+
+def test_holdout_protocol_requires_ten_strictly_later_windows_and_one_evaluation() -> None:
+    candidate = frozen()
+    contract = protocol()
+    frozen_spec = contract["frozen_candidate"]
+    assert contract["experiment_id"] == candidate["experiment_id"]
+    assert frozen_spec["sha256"] == research.sha256_lf(
+        ROOT / frozen_spec["path"]
+    )
+    evidence = contract["final_evidence_contract"]
+    assert evidence["required_capture_windows"] == 10
+    assert evidence["launches_per_window"] == 3_000
+    assert evidence["required_total_launches"] == 30_000
+    assert evidence["captures_must_not_overlap"] is True
+    assert evidence["optional_stopping_allowed"] is False
+    assert evidence["hypothesis_only_required"] is True
+    assert evidence["mainnet_transactions_sent_required"] == 0
+    assert evidence["mainnet_funds_risked_sol_required"] == 0.0
+    gate = contract["golden_gate"]
+    assert gate["minimum_closed_trades"] == 50
+    assert gate["minimum_win_rate"] == 0.65
+    assert gate["minimum_wilson_95_lower_bound"] == 0.55
+    assert gate["minimum_profit_factor"] == 1.25
+    assert gate["maximum_drawdown_fraction"] == 0.15
+    result_policy = contract["result_policy"]
+    assert result_policy["final_gate_is_evaluated_once"] is True
+    assert result_policy["deterministic_replay_required"] is True
+    assert result_policy["sentinel_cannot_declare_found"] is True
+    assert result_policy["untouched_live_pass_required_to_declare_found"] is True
+
+
+def test_holdout_manifest_starts_empty_and_cannot_imply_success() -> None:
+    manifest = artifact("e4-v12-online-conformal-holdout-manifest.json")
+    contract = protocol()
+    assert manifest["experiment_id"] == development()["experiment_id"]
+    assert manifest["protocol_sha256_lf"] == research.sha256_lf(
+        ROOT / "artifacts/e4-v12-online-conformal-holdout-protocol.json"
+    )
+    assert manifest["captures"] == []
+    assert manifest["production_paths_changed"] == 0
+    assert contract["result_policy"]["production_promotion_authorised"] is False
+    assert contract["result_policy"]["production_deployment_authorised"] is False
