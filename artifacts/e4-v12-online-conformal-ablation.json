@@ -1,0 +1,466 @@
+{
+  "ablation_gate_passed": true,
+  "dataset_manifest_sha256": "22944bba1bf62f95fd5c266c59492cda3c226150d64ac57562fdd461beeb08ee",
+  "experiment_id": "e4x-ae5587882bf987837e8b1be1bfce6054ee217e04b8d49a201542d10780bc5c49",
+  "production_deployment_authorised": false,
+  "production_paths_changed": 0,
+  "production_promotion_authorised": false,
+  "requirements": {
+    "actor_memory_adds_precision": true,
+    "adaptive_exit_adds_precision": true,
+    "market_context_adds_precision": true,
+    "real_labels_beat_shuffle": true,
+    "real_labels_beat_shuffle_pnl": true,
+    "rolling_guard_adds_precision": true
+  },
+  "results": {
+    "actor_memory_only_16": {
+      "aggregate": {
+        "minimum_fold_profit_factor": 1.4240829641719281,
+        "minimum_fold_win_rate": 0.5308641975308642,
+        "net_pnl_sol": 2.064467579126358,
+        "positive_folds": 4,
+        "profit_factor": 1.965853004172538,
+        "trades": 322,
+        "wilson_95_lower_bound": 0.5293317208620066,
+        "win_rate": 0.5838509316770186,
+        "wins": 188
+      },
+      "features": 16,
+      "folds": [
+        {
+          "gross_loss_sol": -0.5832922458648682,
+          "gross_profit_sol": 1.4429731369018555,
+          "net_pnl_sol": 0.8596808910369873,
+          "profit_factor": 2.473842481417369,
+          "trades": 100,
+          "wilson_95_lower_bound": 0.542352199811621,
+          "win_rate": 0.64,
+          "wins": 64
+        },
+        {
+          "gross_loss_sol": -0.3787456750869751,
+          "gross_profit_sol": 1.059697151184082,
+          "net_pnl_sol": 0.6809514760971069,
+          "profit_factor": 2.797912216266848,
+          "trades": 77,
+          "wilson_95_lower_bound": 0.4857664933049152,
+          "win_rate": 0.5974025974025974,
+          "wins": 46
+        },
+        {
+          "gross_loss_sol": -0.4245630204677582,
+          "gross_profit_sol": 0.6299737095832825,
+          "net_pnl_sol": 0.2054106891155243,
+          "profit_factor": 1.4838167226368775,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.4257338252067978,
+          "win_rate": 0.546875,
+          "wins": 35
+        },
+        {
+          "gross_loss_sol": -0.7508543133735657,
+          "gross_profit_sol": 1.0692788362503052,
+          "net_pnl_sol": 0.3184245228767395,
+          "profit_factor": 1.4240829641719281,
+          "trades": 81,
+          "wilson_95_lower_bound": 0.4232652726062298,
+          "win_rate": 0.5308641975308642,
+          "wins": 43
+        }
+      ]
+    },
+    "base_snapshot_only_30": {
+      "aggregate": {
+        "minimum_fold_profit_factor": 0.8213777557788788,
+        "minimum_fold_win_rate": 0.5853658536585366,
+        "net_pnl_sol": 0.9033461511135101,
+        "positive_folds": 3,
+        "profit_factor": 1.401108991552119,
+        "trades": 348,
+        "wilson_95_lower_bound": 0.5628253667878477,
+        "win_rate": 0.6149425287356322,
+        "wins": 214
+      },
+      "features": 30,
+      "folds": [
+        {
+          "gross_loss_sol": -0.5792259573936462,
+          "gross_profit_sol": 1.048870325088501,
+          "net_pnl_sol": 0.46964436769485474,
+          "profit_factor": 1.810813744964266,
+          "trades": 103,
+          "wilson_95_lower_bound": 0.5744161092063891,
+          "win_rate": 0.6699029126213593,
+          "wins": 69
+        },
+        {
+          "gross_loss_sol": -0.4324939250946045,
+          "gross_profit_sol": 0.7275382876396179,
+          "net_pnl_sol": 0.2950443625450134,
+          "profit_factor": 1.682193079314293,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.48834040553873787,
+          "win_rate": 0.5952380952380952,
+          "wins": 50
+        },
+        {
+          "gross_loss_sol": -0.4109523594379425,
+          "gross_profit_sol": 0.6977678537368774,
+          "net_pnl_sol": 0.28681549429893494,
+          "profit_factor": 1.6979288175671046,
+          "trades": 79,
+          "wilson_95_lower_bound": 0.4847295283843976,
+          "win_rate": 0.5949367088607594,
+          "wins": 47
+        },
+        {
+          "gross_loss_sol": -0.8294491767883301,
+          "gross_profit_sol": 0.6812911033630371,
+          "net_pnl_sol": -0.14815807342529297,
+          "profit_factor": 0.8213777557788788,
+          "trades": 82,
+          "wilson_95_lower_bound": 0.477254991169574,
+          "win_rate": 0.5853658536585366,
+          "wins": 48
+        }
+      ]
+    },
+    "fixed_baseline_exit": {
+      "aggregate": {
+        "minimum_fold_profit_factor": 1.184117131528691,
+        "minimum_fold_win_rate": 0.5764705882352941,
+        "net_pnl_sol": 2.273745536804199,
+        "positive_folds": 4,
+        "profit_factor": 2.2789820264480594,
+        "trades": 318,
+        "wilson_95_lower_bound": 0.5459053663341674,
+        "win_rate": 0.60062893081761,
+        "wins": 191
+      },
+      "folds": [
+        {
+          "gross_loss_sol": -0.42051512002944946,
+          "gross_profit_sol": 1.111616849899292,
+          "net_pnl_sol": 0.6911017298698425,
+          "profit_factor": 2.6434646388492364,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.5254685409761142,
+          "win_rate": 0.6292134831460674,
+          "wins": 56
+        },
+        {
+          "gross_loss_sol": -0.35450097918510437,
+          "gross_profit_sol": 1.2200177907943726,
+          "net_pnl_sol": 0.8655168116092682,
+          "profit_factor": 3.441507534334156,
+          "trades": 85,
+          "wilson_95_lower_bound": 0.47036157660275524,
+          "win_rate": 0.5764705882352941,
+          "wins": 49
+        },
+        {
+          "gross_loss_sol": -0.3476145565509796,
+          "gross_profit_sol": 0.9441177845001221,
+          "net_pnl_sol": 0.5965032279491425,
+          "profit_factor": 2.7159903597468076,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.48691694294402404,
+          "win_rate": 0.609375,
+          "wins": 39
+        },
+        {
+          "gross_loss_sol": -0.6551468968391418,
+          "gross_profit_sol": 0.7757706642150879,
+          "net_pnl_sol": 0.12062376737594604,
+          "profit_factor": 1.184117131528691,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.47803841126883023,
+          "win_rate": 0.5875,
+          "wins": 47
+        }
+      ]
+    },
+    "fixed_calibration_threshold": {
+      "aggregate": {
+        "minimum_fold_profit_factor": 1.2246167475541176,
+        "minimum_fold_win_rate": 0.5428571428571428,
+        "net_pnl_sol": 2.910651370882988,
+        "positive_folds": 4,
+        "profit_factor": 2.0555941456456415,
+        "trades": 490,
+        "wilson_95_lower_bound": 0.5601310631330599,
+        "win_rate": 0.6040816326530613,
+        "wins": 296
+      },
+      "folds": [
+        {
+          "gross_loss_sol": -0.8970280885696411,
+          "gross_profit_sol": 2.240654945373535,
+          "net_pnl_sol": 1.343626856803894,
+          "profit_factor": 2.497864865019309,
+          "trades": 183,
+          "wilson_95_lower_bound": 0.5564345406746688,
+          "win_rate": 0.6284153005464481,
+          "wins": 115
+        },
+        {
+          "gross_loss_sol": -0.6073505878448486,
+          "gross_profit_sol": 1.7545689344406128,
+          "net_pnl_sol": 1.1472183465957642,
+          "profit_factor": 2.8888898266594385,
+          "trades": 143,
+          "wilson_95_lower_bound": 0.5336183508362925,
+          "win_rate": 0.6153846153846154,
+          "wins": 88
+        },
+        {
+          "gross_loss_sol": -0.15119118988513947,
+          "gross_profit_sol": 0.32351720333099365,
+          "net_pnl_sol": 0.1723260134458542,
+          "profit_factor": 2.139788724308413,
+          "trades": 24,
+          "wilson_95_lower_bound": 0.5083193634129031,
+          "win_rate": 0.7083333333333334,
+          "wins": 17
+        },
+        {
+          "gross_loss_sol": -1.1017885208129883,
+          "gross_profit_sol": 1.3492686748504639,
+          "net_pnl_sol": 0.24748015403747559,
+          "profit_factor": 1.2246167475541176,
+          "trades": 140,
+          "wilson_95_lower_bound": 0.4602936027719097,
+          "win_rate": 0.5428571428571428,
+          "wins": 76
+        }
+      ]
+    },
+    "full_58": {
+      "aggregate": {
+        "minimum_fold_profit_factor": 1.260770302512064,
+        "minimum_fold_win_rate": 0.625,
+        "net_pnl_sol": 2.0482670068740845,
+        "positive_folds": 4,
+        "profit_factor": 2.1910070870779945,
+        "trades": 318,
+        "wilson_95_lower_bound": 0.6066872909888928,
+        "win_rate": 0.660377358490566,
+        "wins": 210
+      },
+      "features": 58,
+      "folds": [
+        {
+          "gross_loss_sol": -0.402238130569458,
+          "gross_profit_sol": 1.0986171960830688,
+          "net_pnl_sol": 0.6963790655136108,
+          "profit_factor": 2.73126069507068,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.5946267078910946,
+          "win_rate": 0.6966292134831461,
+          "wins": 62
+        },
+        {
+          "gross_loss_sol": -0.3408326804637909,
+          "gross_profit_sol": 1.0787347555160522,
+          "net_pnl_sol": 0.7379020750522614,
+          "profit_factor": 3.1649980103086213,
+          "trades": 85,
+          "wilson_95_lower_bound": 0.5531293986319203,
+          "win_rate": 0.6588235294117647,
+          "wins": 56
+        },
+        {
+          "gross_loss_sol": -0.3287954032421112,
+          "gross_profit_sol": 0.7738252878189087,
+          "net_pnl_sol": 0.4450298845767975,
+          "profit_factor": 2.3535161385729473,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.5340341181762039,
+          "win_rate": 0.65625,
+          "wins": 42
+        },
+        {
+          "gross_loss_sol": -0.6479111313819885,
+          "gross_profit_sol": 0.8168671131134033,
+          "net_pnl_sol": 0.1689559817314148,
+          "profit_factor": 1.260770302512064,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.515485228513904,
+          "win_rate": 0.625,
+          "wins": 50
+        }
+      ]
+    },
+    "shuffled_labels": {
+      "aggregate": {
+        "minimum_fold_profit_factor": 0.11405068507891959,
+        "minimum_fold_win_rate": 0.06837606837606838,
+        "net_pnl_sol": -1.3490282446146011,
+        "positive_folds": 0,
+        "profit_factor": 0.4941040542262566,
+        "trades": 359,
+        "wilson_95_lower_bound": 0.1097293743584376,
+        "win_rate": 0.14206128133704735,
+        "wins": 51
+      },
+      "folds": [
+        {
+          "gross_loss_sol": -0.7465918660163879,
+          "gross_profit_sol": 0.2612197697162628,
+          "net_pnl_sol": -0.4853720963001251,
+          "profit_factor": 0.3498829569495055,
+          "trades": 78,
+          "wilson_95_lower_bound": 0.10006850973163445,
+          "win_rate": 0.16666666666666666,
+          "wins": 13
+        },
+        {
+          "gross_loss_sol": -0.5606791377067566,
+          "gross_profit_sol": 0.49331292510032654,
+          "net_pnl_sol": -0.06736621260643005,
+          "profit_factor": 0.8798489045232434,
+          "trades": 83,
+          "wilson_95_lower_bound": 0.14181449316941397,
+          "win_rate": 0.21686746987951808,
+          "wins": 18
+        },
+        {
+          "gross_loss_sol": -0.771012544631958,
+          "gross_profit_sol": 0.08793450891971588,
+          "net_pnl_sol": -0.6830780357122421,
+          "profit_factor": 0.11405068507891959,
+          "trades": 117,
+          "wilson_95_lower_bound": 0.0350512906011003,
+          "win_rate": 0.06837606837606838,
+          "wins": 8
+        },
+        {
+          "gross_loss_sol": -0.5883285403251648,
+          "gross_profit_sol": 0.47511664032936096,
+          "net_pnl_sol": -0.11321189999580383,
+          "profit_factor": 0.8075702736888603,
+          "trades": 81,
+          "wilson_95_lower_bound": 0.0868262281666345,
+          "win_rate": 0.14814814814814814,
+          "wins": 12
+        }
+      ]
+    },
+    "without_actor_memory_42": {
+      "aggregate": {
+        "minimum_fold_profit_factor": 0.8518940482466123,
+        "minimum_fold_win_rate": 0.5189873417721519,
+        "net_pnl_sol": 0.6036035716533661,
+        "positive_folds": 2,
+        "profit_factor": 1.272086644071296,
+        "trades": 345,
+        "wilson_95_lower_bound": 0.5416246198663737,
+        "win_rate": 0.5942028985507246,
+        "wins": 205
+      },
+      "features": 42,
+      "folds": [
+        {
+          "gross_loss_sol": -0.4463701546192169,
+          "gross_profit_sol": 0.8809016346931458,
+          "net_pnl_sol": 0.43453148007392883,
+          "profit_factor": 1.97347789850469,
+          "trades": 91,
+          "wilson_95_lower_bound": 0.5685683540449548,
+          "win_rate": 0.6703296703296703,
+          "wins": 61
+        },
+        {
+          "gross_loss_sol": -0.3644460439682007,
+          "gross_profit_sol": 0.6867115497589111,
+          "net_pnl_sol": 0.32226550579071045,
+          "profit_factor": 1.8842612263856247,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.491640345784806,
+          "win_rate": 0.5955056179775281,
+          "wins": 53
+        },
+        {
+          "gross_loss_sol": -0.5997322201728821,
+          "gross_profit_sol": 0.5661900043487549,
+          "net_pnl_sol": -0.0335422158241272,
+          "profit_factor": 0.9440713460176308,
+          "trades": 79,
+          "wilson_95_lower_bound": 0.4105091395596985,
+          "win_rate": 0.5189873417721519,
+          "wins": 41
+        },
+        {
+          "gross_loss_sol": -0.8078756928443909,
+          "gross_profit_sol": 0.6882244944572449,
+          "net_pnl_sol": -0.119651198387146,
+          "profit_factor": 0.8518940482466123,
+          "trades": 86,
+          "wilson_95_lower_bound": 0.4758426436472955,
+          "win_rate": 0.5813953488372093,
+          "wins": 50
+        }
+      ]
+    },
+    "without_market_context_46": {
+      "aggregate": {
+        "minimum_fold_profit_factor": 1.2431273840162373,
+        "minimum_fold_win_rate": 0.6097560975609756,
+        "net_pnl_sol": 1.8440667390823364,
+        "positive_folds": 4,
+        "profit_factor": 2.0113987017297106,
+        "trades": 315,
+        "wilson_95_lower_bound": 0.5901322509864444,
+        "win_rate": 0.6444444444444445,
+        "wins": 203
+      },
+      "features": 46,
+      "folds": [
+        {
+          "gross_loss_sol": -0.5561658143997192,
+          "gross_profit_sol": 1.176243782043457,
+          "net_pnl_sol": 0.6200779676437378,
+          "profit_factor": 2.114915644919672,
+          "trades": 99,
+          "wilson_95_lower_bound": 0.5484341356971444,
+          "win_rate": 0.6464646464646465,
+          "wins": 64
+        },
+        {
+          "gross_loss_sol": -0.3734256625175476,
+          "gross_profit_sol": 0.976209819316864,
+          "net_pnl_sol": 0.6027841567993164,
+          "profit_factor": 2.6142012113883335,
+          "trades": 82,
+          "wilson_95_lower_bound": 0.5015337111477397,
+          "win_rate": 0.6097560975609756,
+          "wins": 50
+        },
+        {
+          "gross_loss_sol": -0.299368679523468,
+          "gross_profit_sol": 0.7760769724845886,
+          "net_pnl_sol": 0.4767082929611206,
+          "profit_factor": 2.5923786473586348,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.5499887622745426,
+          "win_rate": 0.671875,
+          "wins": 43
+        },
+        {
+          "gross_loss_sol": -0.5943235158920288,
+          "gross_profit_sol": 0.7388198375701904,
+          "net_pnl_sol": 0.14449632167816162,
+          "profit_factor": 1.2431273840162373,
+          "trades": 70,
+          "wilson_95_lower_bound": 0.5403933101563948,
+          "win_rate": 0.6571428571428571,
+          "wins": 46
+        }
+      ]
+    }
+  },
+  "thesis_family": "window-conformal-stable-precision-v12",
+  "untouched_holdout_passed": false,
+  "version": "e4-v12-online-conformal-ablation-v1"
+}
