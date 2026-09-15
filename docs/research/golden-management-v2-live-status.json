@@ -1,0 +1,256 @@
+{
+  "account": {
+    "active_positions": 0,
+    "campaign_starting_balance_sol": 3.0,
+    "cash_sol": 3.2952153051864586,
+    "closed_trades": 45,
+    "equity_sol": 3.2952153051864586,
+    "execution_latency_ms": {
+      "count": 45,
+      "max": 7.031653,
+      "median": 6.518799,
+      "p95": 6.9445752,
+      "p99": 7.02597612
+    },
+    "expectancy_sol": 0.006560340115254642,
+    "losses": 19,
+    "maximum_drawdown_fraction": 0.14428520387899718,
+    "net_pnl_sol": 0.2952153051864589,
+    "pending_entries": 0,
+    "post_exit_tracking_pending": 0,
+    "profit_factor": 1.221702697473161,
+    "rejections": {
+      "CONCURRENCY": 1
+    },
+    "roi_fraction": 0.09840510172881944,
+    "signals": 46,
+    "task_errors": [],
+    "tier_counts": {
+      "BASE": 4,
+      "EXCEPTIONAL": 10,
+      "HIGH": 23,
+      "MEDIUM": 8
+    },
+    "unresolved_exposure": false,
+    "v1_control_net_pnl_sol": 2.068399994164901,
+    "win_rate": 0.5777777777777777,
+    "wins": 26
+  },
+  "checked_at": 1789439606.9213982,
+  "clean_drain_required": true,
+  "counts": {
+    "benchmark_outcomes": 5085,
+    "benchmark_skipped": 78,
+    "benchmark_wins": 1158,
+    "decisions": 5163,
+    "decoded_events": 633473,
+    "early_buyers_seen": 3821,
+    "entry_cutoff_reached": 1,
+    "launches_seen": 5163,
+    "qualified": 46,
+    "unsupported_quote": 1319
+  },
+  "elapsed_seconds": 15900.012637853622,
+  "endpoints": {
+    "wss://api.mainnet-beta.solana.com": {
+      "connections": 1,
+      "disconnects": 0,
+      "errors": [],
+      "messages": 3804653
+    },
+    "wss://solana-rpc.publicnode.com": {
+      "connections": 22,
+      "disconnects": 21,
+      "errors": [],
+      "messages": 2063413
+    }
+  },
+  "entry_rule": {
+    "decision_ms": 10,
+    "minimum_prior_appearances": 10,
+    "minimum_prior_win_rate": 0.7
+  },
+  "historical_replay": false,
+  "last_event_at": 1789439606.7485688,
+  "management_tiers": {
+    "BASE": {
+      "initial_fraction": 0.3,
+      "max_hold_ms": 4000.0,
+      "position_fraction": 0.05
+    },
+    "EXCEPTIONAL": {
+      "initial_fraction": 0.2,
+      "max_hold_ms": 16000.0,
+      "position_fraction": 0.25
+    },
+    "HIGH": {
+      "initial_fraction": 0.2,
+      "max_hold_ms": 10000.0,
+      "position_fraction": 0.15
+    },
+    "MEDIUM": {
+      "initial_fraction": 0.3,
+      "max_hold_ms": 6000.0,
+      "position_fraction": 0.08
+    }
+  },
+  "management_version": "golden-management-v2-aggressive-5-8-15-25",
+  "market_data_mode": "LIVE_SOLANA_WEBSOCKET_FRESH_LAUNCHES_ONLY",
+  "no_e4_entry_signal": true,
+  "paper_only": true,
+  "phase": "online",
+  "phase3_requirement": {
+    "met": false,
+    "minimum_closed_trades": 50
+  },
+  "post_exit_complete_for_all_closed": true,
+  "queue_depth": 0,
+  "real_money_execution": false,
+  "recent_decisions": [
+    {
+      "buyer_count": 3,
+      "mint": "64H9KJaoFqgvzNf2WnTMMHqkmbtsSr7HK3zRB6VCpump",
+      "prior_appearances": 20,
+      "prior_win_rate": 0.7,
+      "qualifies": true
+    },
+    {
+      "buyer_count": 0,
+      "mint": "EcHMauknfFJWzYgjgWc71yrcRjVG7fVdZgMjNAUDU198",
+      "prior_appearances": 0,
+      "prior_win_rate": null,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 0,
+      "mint": "8TMgqVPivrZDr6jdAKKL85KoCnGV1QYfXpeHVxsWpump",
+      "prior_appearances": 0,
+      "prior_win_rate": null,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 0,
+      "mint": "6mEVkgYb3MKWwYfMyHWXX4RqGHyGcXLhEncmBfMTpump",
+      "prior_appearances": 0,
+      "prior_win_rate": null,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 0,
+      "mint": "8dZBLKsUEBY66MsTRUVEiXQJpwgY8Lz49pe1zkHwxd4W",
+      "prior_appearances": 0,
+      "prior_win_rate": null,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 0,
+      "mint": "GSjJAj9421kxEnRTTGtEhiWbAsTVxGWAi75MLGAZLyQV",
+      "prior_appearances": 0,
+      "prior_win_rate": null,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 0,
+      "mint": "zhgzxFBac2yNPwgAjwTH4dvKXHFXUP5g6z9eJgtpump",
+      "prior_appearances": 0,
+      "prior_win_rate": null,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 1,
+      "mint": "GTbF83DnFGGGSUTgaHsZoGq1ZZgrw8uSoZSqBVFLpump",
+      "prior_appearances": 0,
+      "prior_win_rate": null,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 0,
+      "mint": "UT64fqZ4aEf4E4q5T91pmWaYe2BHt2FfcVbf3Bipump",
+      "prior_appearances": 0,
+      "prior_win_rate": null,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 0,
+      "mint": "6TnQpifUtFUNxAZ9cNtnKg8u46bnWt4cNNG4fwd6pump",
+      "prior_appearances": 0,
+      "prior_win_rate": null,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 0,
+      "mint": "6gf1JxfrxymzgJ7Seav4igNkKxzgi8RfKH9tEfx4pump",
+      "prior_appearances": 0,
+      "prior_win_rate": null,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 0,
+      "mint": "5vMSSR6ZVavxtxEuro9xeJtpwUTu5mT8jAQo6sBkpump",
+      "prior_appearances": 0,
+      "prior_win_rate": null,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 0,
+      "mint": "EobXr4wg83GJYT8yg4niYRJSVPZMQmpeVFHxxGPCpump",
+      "prior_appearances": 0,
+      "prior_win_rate": null,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 0,
+      "mint": "DsCXmaSdLWR8Kp4N9zXLwYRZVs6ACT9PBZ6iNsc3fenv",
+      "prior_appearances": 0,
+      "prior_win_rate": null,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 0,
+      "mint": "FaH92wfgRCLJzU98scYtGkEp8jj3chqJZxPp1DwyL44L",
+      "prior_appearances": 0,
+      "prior_win_rate": null,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 3,
+      "mint": "2GGWGqJqt2zHc55Mb2hsK5uJp3YsuUSQeYm72NeSpump",
+      "prior_appearances": 1340,
+      "prior_win_rate": 0.258955223880597,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 5,
+      "mint": "24vUnZNVNYxPcM69EZdkA4KKUzdidQCcR7w6E5UVpump",
+      "prior_appearances": 256,
+      "prior_win_rate": 0.28125,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 0,
+      "mint": "8vwA2WJ1mjkYWHmZhBu6KAQa8vzEjmr3XGgZwGPGpump",
+      "prior_appearances": 0,
+      "prior_win_rate": null,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 3,
+      "mint": "BkPVCTWtikSNCtQ5JytHzvTWNXMHxagfJx2jmAtMpump",
+      "prior_appearances": 23,
+      "prior_win_rate": 0.6086956521739131,
+      "qualifies": false
+    },
+    {
+      "buyer_count": 1,
+      "mint": "5QUCBZAqCqWnyeFSJWpXrvXWvu7bbiUp5J8wT3nQpump",
+      "prior_appearances": 0,
+      "prior_win_rate": null,
+      "qualifies": false
+    }
+  ],
+  "rule_version": "golden-buyer-reputation-v1",
+  "session_accepting_new_entries": false,
+  "started_at": 1789423706.9087608,
+  "status": "TIME_LIMIT_REACHED",
+  "version": "golden-management-v2-hardened-v1"
+}
