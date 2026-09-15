@@ -1,0 +1,474 @@
+{
+  "active_untouched_live_data_used": false,
+  "candidate_fitted": false,
+  "categories": {
+    "loss_to_loss": 105,
+    "loss_to_win": 6,
+    "win_to_loss": 35,
+    "win_to_win": 171
+  },
+  "diagnostic_id": "e4d-00a4cf727c67e1d4e621c19702fc8e04bf8f5fcd0677c2a84aa4106ef891b3f5",
+  "finding": "Latency failure concentrates in selections with sparse proven buyer history and high early return volatility. Any resilience candidate derived from this finding requires strictly later evidence.",
+  "folds": [
+    {
+      "categories": {
+        "loss_to_loss": 27,
+        "loss_to_win": 1,
+        "win_to_loss": 8,
+        "win_to_win": 53
+      },
+      "fast_win_rate": 0.6853932584269663,
+      "fold": 0,
+      "slow_win_rate": 0.6067415730337079,
+      "trades": 89
+    },
+    {
+      "categories": {
+        "loss_to_loss": 26,
+        "loss_to_win": 3,
+        "win_to_loss": 6,
+        "win_to_win": 49
+      },
+      "fast_win_rate": 0.6547619047619048,
+      "fold": 1,
+      "slow_win_rate": 0.6190476190476191,
+      "trades": 84
+    },
+    {
+      "categories": {
+        "loss_to_loss": 21,
+        "loss_to_win": 1,
+        "win_to_loss": 6,
+        "win_to_win": 36
+      },
+      "fast_win_rate": 0.65625,
+      "fold": 2,
+      "slow_win_rate": 0.578125,
+      "trades": 64
+    },
+    {
+      "categories": {
+        "loss_to_loss": 31,
+        "loss_to_win": 1,
+        "win_to_loss": 15,
+        "win_to_win": 33
+      },
+      "fast_win_rate": 0.6,
+      "fold": 3,
+      "slow_win_rate": 0.425,
+      "trades": 80
+    }
+  ],
+  "identity": {
+    "dataset_source_manifest_fingerprint": "22944bba1bf62f95fd5c266c59492cda3c226150d64ac57562fdd461beeb08ee",
+    "feature_set_fingerprint": "3a272d18e1aa124b8d4855947f5faae125ae15a50bd15fc0e93bba9b904779cc",
+    "latencies_ms": [
+      10,
+      300
+    ],
+    "selection_policy": "unchanged frozen development selections",
+    "source_code_fingerprint": "f8457eb162f3344fb7b150de0b0f3892b6941edc924f1d0c8bc51b65c16f5c7f",
+    "source_experiment_id": "e4x-b1086b70febc39fefa73d35f8451674a126a3c0256ca95a608b57f9c9c6cd1cc",
+    "target": "net PnL greater than zero after exact latency replay"
+  },
+  "live_confirmation_authorised": false,
+  "net_winner_loss_at_300ms": 29,
+  "pnl_delta_300_minus_10": {
+    "maximum_sol": 0.15185145549430823,
+    "mean_sol": -0.0009801647069778334,
+    "median_sol": -0.0005113823827066905,
+    "minimum_sol": -0.05552603713753325
+  },
+  "production_deployment_authorised": false,
+  "production_paths_changed": 0,
+  "production_promotion_authorised": false,
+  "source_selection_count": 317,
+  "top_consistent_decision_features": [
+    {
+      "absolute_auc_edge": 0.11140032284100077,
+      "auc_for_300ms_win": 0.6114003228410008,
+      "category_medians": {
+        "loss_to_loss": 97.83333333333333,
+        "loss_to_win": 208.49019607843138,
+        "win_to_loss": 2.0,
+        "win_to_win": 121.0
+      },
+      "direction": "higher",
+      "directionally_consistent_folds": 4,
+      "feature": "buyer_history_count_mean",
+      "fold_aucs": [
+        0.5542328042328042,
+        0.5715144230769231,
+        0.6521521521521522,
+        0.5847186700767264
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.1092615012106537,
+      "auc_for_300ms_win": 0.6092615012106537,
+      "category_medians": {
+        "loss_to_loss": 0.014171353153130825,
+        "loss_to_win": 0.013725760953699383,
+        "win_to_loss": 0.0,
+        "win_to_win": 0.014540875620997484
+      },
+      "direction": "higher",
+      "directionally_consistent_folds": 4,
+      "feature": "buyer_average_pnl_max",
+      "fold_aucs": [
+        0.5505291005291005,
+        0.6325120192307693,
+        0.5775775775775777,
+        0.5828005115089514
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.10238095238095246,
+      "auc_for_300ms_win": 0.6023809523809525,
+      "category_medians": {
+        "loss_to_loss": 0.01053771345828447,
+        "loss_to_win": 0.011756392560095974,
+        "win_to_loss": 0.0,
+        "win_to_win": 0.0104330653154156
+      },
+      "direction": "higher",
+      "directionally_consistent_folds": 4,
+      "feature": "buyer_average_pnl_mean",
+      "fold_aucs": [
+        0.5137566137566137,
+        0.7301682692307692,
+        0.5625625625625625,
+        0.5620204603580563
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.09957627118644069,
+      "auc_for_300ms_win": 0.4004237288135593,
+      "category_medians": {
+        "loss_to_loss": 0.05830678645245756,
+        "loss_to_win": 0.07261914798907122,
+        "win_to_loss": 0.32827889514826364,
+        "win_to_win": 0.05773002892481081
+      },
+      "direction": "lower",
+      "directionally_consistent_folds": 4,
+      "feature": "log_return_volatility",
+      "fold_aucs": [
+        0.4883597883597883,
+        0.344951923076923,
+        0.4184184184184184,
+        0.3481457800511509
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.08458434221146083,
+      "auc_for_300ms_win": 0.5845843422114608,
+      "category_medians": {
+        "loss_to_loss": 133.0,
+        "loss_to_win": 373.5,
+        "win_to_loss": 2.0,
+        "win_to_win": 187.0
+      },
+      "direction": "higher",
+      "directionally_consistent_folds": 4,
+      "feature": "buyer_history_count_max",
+      "fold_aucs": [
+        0.579100529100529,
+        0.50390625,
+        0.6131131131131131,
+        0.5661764705882353
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.08099273607748181,
+      "auc_for_300ms_win": 0.5809927360774818,
+      "category_medians": {
+        "loss_to_loss": 0.6666666666666666,
+        "loss_to_win": 0.6479166666666667,
+        "win_to_loss": 0.5,
+        "win_to_win": 0.6666666666666666
+      },
+      "direction": "higher",
+      "directionally_consistent_folds": 4,
+      "feature": "buyer_bayesian_win_rate_max",
+      "fold_aucs": [
+        0.5447089947089947,
+        0.5120192307692307,
+        0.5815815815815817,
+        0.6250000000000001
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.06261097659402748,
+      "auc_for_300ms_win": 0.4373890234059725,
+      "category_medians": {
+        "loss_to_loss": 1.648102019,
+        "loss_to_win": 1.7055756364999999,
+        "win_to_loss": 19.570661976,
+        "win_to_win": 1.742189775
+      },
+      "direction": "lower",
+      "directionally_consistent_folds": 4,
+      "feature": "median_buy_sol",
+      "fold_aucs": [
+        0.43015873015873024,
+        0.49849759615384615,
+        0.4134134134134134,
+        0.42391304347826086
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.051008878127522195,
+      "auc_for_300ms_win": 0.5510088781275222,
+      "category_medians": {
+        "loss_to_loss": 0.5933458486332307,
+        "loss_to_win": 0.5719997101955627,
+        "win_to_loss": 0.5,
+        "win_to_win": 0.596647613921087
+      },
+      "direction": "higher",
+      "directionally_consistent_folds": 4,
+      "feature": "buyer_bayesian_win_rate_mean",
+      "fold_aucs": [
+        0.5010582010582011,
+        0.5691105769230769,
+        0.5205205205205206,
+        0.5959079283887468
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.017150928167877333,
+      "auc_for_300ms_win": 0.5171509281678773,
+      "category_medians": {
+        "loss_to_loss": 0.0,
+        "loss_to_win": 0.0,
+        "win_to_loss": 0.0,
+        "win_to_win": 0.0
+      },
+      "direction": "higher",
+      "directionally_consistent_folds": 4,
+      "feature": "prefix_drawdown",
+      "fold_aucs": [
+        0.5137566137566137,
+        0.5198317307692308,
+        0.5075075075075075,
+        0.5147058823529411
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.017150928167877333,
+      "auc_for_300ms_win": 0.5171509281678773,
+      "category_medians": {
+        "loss_to_loss": 0.0,
+        "loss_to_win": 0.0,
+        "win_to_loss": 0.0,
+        "win_to_win": 0.0
+      },
+      "direction": "higher",
+      "directionally_consistent_folds": 4,
+      "feature": "relative_prefix_drawdown",
+      "fold_aucs": [
+        0.5137566137566137,
+        0.5198317307692308,
+        0.5075075075075075,
+        0.5147058823529411
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.013175948345439892,
+      "auc_for_300ms_win": 0.4868240516545601,
+      "category_medians": {
+        "loss_to_loss": 0.5,
+        "loss_to_win": 0.5,
+        "win_to_loss": 0.5,
+        "win_to_win": 0.5
+      },
+      "direction": "lower",
+      "directionally_consistent_folds": 4,
+      "feature": "creator_bayesian_win_rate",
+      "fold_aucs": [
+        0.4716931216931217,
+        0.48046875,
+        0.45945945945945943,
+        0.4565217391304348
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.11148103309120261,
+      "auc_for_300ms_win": 0.3885189669087974,
+      "category_medians": {
+        "loss_to_loss": 5.301689325,
+        "loss_to_win": 5.264460378,
+        "win_to_loss": 19.700231546,
+        "win_to_win": 5.301573152
+      },
+      "direction": "lower",
+      "directionally_consistent_folds": 3,
+      "feature": "maximum_buy_sol",
+      "fold_aucs": [
+        0.5222222222222223,
+        0.33443509615384615,
+        0.4019019019019019,
+        0.3324808184143222
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.10950363196125901,
+      "auc_for_300ms_win": 0.609503631961259,
+      "category_medians": {
+        "loss_to_loss": 8.0,
+        "loss_to_win": 12.0,
+        "win_to_loss": 4.0,
+        "win_to_win": 10.0
+      },
+      "direction": "higher",
+      "directionally_consistent_folds": 3,
+      "feature": "same_slot_buyers",
+      "fold_aucs": [
+        0.6383597883597883,
+        0.4666466346153846,
+        0.5965965965965966,
+        0.570012787723785
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.1001815980629539,
+      "auc_for_300ms_win": 0.6001815980629539,
+      "category_medians": {
+        "loss_to_loss": 7999999999.999999,
+        "loss_to_win": 13500000000.0,
+        "win_to_loss": 3999999999.9999995,
+        "win_to_win": 9000000000.0
+      },
+      "direction": "higher",
+      "directionally_consistent_folds": 3,
+      "feature": "relative_unique_buyers",
+      "fold_aucs": [
+        0.5997354497354498,
+        0.44741586538461536,
+        0.5755755755755756,
+        0.5776854219948848
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.09876916868442298,
+      "auc_for_300ms_win": 0.598769168684423,
+      "category_medians": {
+        "loss_to_loss": 10.0,
+        "loss_to_win": 13.5,
+        "win_to_loss": 5.0,
+        "win_to_win": 11.0
+      },
+      "direction": "higher",
+      "directionally_consistent_folds": 3,
+      "feature": "buy_count",
+      "fold_aucs": [
+        0.5994708994708995,
+        0.44230769230769235,
+        0.6141141141141142,
+        0.5546675191815856
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.09677158999192903,
+      "auc_for_300ms_win": 0.596771589991929,
+      "category_medians": {
+        "loss_to_loss": 9.0,
+        "loss_to_win": 13.5,
+        "win_to_loss": 4.0,
+        "win_to_win": 10.0
+      },
+      "direction": "higher",
+      "directionally_consistent_folds": 3,
+      "feature": "unique_buyers",
+      "fold_aucs": [
+        0.5997354497354498,
+        0.44741586538461536,
+        0.5970970970970971,
+        0.5498721227621484
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.09677158999192903,
+      "auc_for_300ms_win": 0.596771589991929,
+      "category_medians": {
+        "loss_to_loss": 9.0,
+        "loss_to_win": 13.5,
+        "win_to_loss": 4.0,
+        "win_to_win": 10.0
+      },
+      "direction": "higher",
+      "directionally_consistent_folds": 3,
+      "feature": "buyers_last_250ms",
+      "fold_aucs": [
+        0.5997354497354498,
+        0.44741586538461536,
+        0.5970970970970971,
+        0.5498721227621484
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.09677158999192903,
+      "auc_for_300ms_win": 0.596771589991929,
+      "category_medians": {
+        "loss_to_loss": 9.0,
+        "loss_to_win": 13.5,
+        "win_to_loss": 4.0,
+        "win_to_win": 10.0
+      },
+      "direction": "higher",
+      "directionally_consistent_folds": 3,
+      "feature": "buyers_last_1000ms",
+      "fold_aucs": [
+        0.5997354497354498,
+        0.44741586538461536,
+        0.5970970970970971,
+        0.5498721227621484
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.09677158999192903,
+      "auc_for_300ms_win": 0.596771589991929,
+      "category_medians": {
+        "loss_to_loss": 9.0,
+        "loss_to_win": 13.5,
+        "win_to_loss": 4.0,
+        "win_to_win": 10.0
+      },
+      "direction": "higher",
+      "directionally_consistent_folds": 3,
+      "feature": "early_buyer_count",
+      "fold_aucs": [
+        0.5997354497354498,
+        0.44741586538461536,
+        0.5970970970970971,
+        0.5498721227621484
+      ]
+    },
+    {
+      "absolute_auc_edge": 0.08246569814366422,
+      "auc_for_300ms_win": 0.4175343018563358,
+      "category_medians": {
+        "loss_to_loss": 4.7183391398537715,
+        "loss_to_win": 5.597221587397884,
+        "win_to_loss": 13.060251965037205,
+        "win_to_win": 4.7104345723275785
+      },
+      "direction": "lower",
+      "directionally_consistent_folds": 3,
+      "feature": "price_multiple_from_create",
+      "fold_aucs": [
+        0.47830687830687835,
+        0.25,
+        0.5265265265265267,
+        0.3321611253196931
+      ]
+    }
+  ],
+  "trace_audit": {
+    "cache_hit": true,
+    "selected_traces": 317
+  },
+  "version": "e4-v12-latency-flip-autopsy-v1",
+  "win_to_loss_fraction_of_10ms_winners": 0.16990291262135923
+}
