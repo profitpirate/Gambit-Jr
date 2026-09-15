@@ -192,6 +192,51 @@ def test_golden_gate_passes_only_complete_untouched_live_economics() -> None:
     assert verdict["failure_classification"] == "FALSE_POSITIVE_OVERLOAD"
 
 
+@pytest.mark.parametrize(
+    ("latency", "field", "value", "failed_requirement"),
+    [
+        ("0", "trades", 49, "minimum_closed_trades"),
+        ("0", "capture_windows", 7, "minimum_capture_windows_represented"),
+        (
+            "0",
+            "profitable_capture_windows",
+            6,
+            "minimum_profitable_capture_windows",
+        ),
+        ("0", "win_rate", 0.649, "minimum_win_rate"),
+        ("0", "wilson_95_lower_bound", 0.549, "minimum_wilson_bound"),
+        ("0", "net_pnl_sol", 0.0, "positive_net_pnl"),
+        ("0", "profit_factor", 1.249, "minimum_profit_factor"),
+        ("0", "maximum_drawdown_fraction", 0.151, "maximum_drawdown"),
+        (
+            "0",
+            "largest_winner_contribution",
+            0.251,
+            "largest_winner_limit",
+        ),
+        ("10", "net_pnl_sol", 0.0, "every_latency_positive"),
+        ("10", "profit_factor", 1.249, "every_latency_profit_factor"),
+        ("10", "quote_coverage", 0.999, "every_latency_full_quote_coverage"),
+    ],
+)
+def test_each_frozen_golden_gate_requirement_can_veto_the_result(
+    latency: str,
+    field: str,
+    value: float,
+    failed_requirement: str,
+) -> None:
+    economics = {str(delay): metric() for delay in (0, 1, 2, 5, 10)}
+    economics[latency][field] = value
+
+    verdict = holdout.golden_gate(economics, protocol())
+
+    assert verdict["untouched_live_gate_passed"] is False
+    assert verdict["requirements"][failed_requirement] is False
+    assert failed_requirement in verdict["failed_requirements"]
+    assert verdict["production_promotion_authorised"] is False
+    assert verdict["production_deployment_authorised"] is False
+
+
 def test_registration_is_atomic_idempotent_and_rejects_changed_duplicate(
     tmp_path: Path,
 ) -> None:
