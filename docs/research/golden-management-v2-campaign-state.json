@@ -1,6 +1,6 @@
 {
   "account": {
-    "cash_sol": 3.2952153051864586,
+    "cash_sol": 2.9399282162327043,
     "execution_latencies_ms": [
       6.642374,
       6.585235,
@@ -46,7 +46,12 @@
       6.291659,
       6.155941,
       6.111894,
-      6.223406
+      6.223406,
+      7.106467,
+      6.207306,
+      6.911942,
+      10.682281,
+      7.09734
     ],
     "ledger": [
       {
@@ -19386,12 +19391,1041 @@
         "stake_sol": 0.16363383258301967,
         "status": "CLOSED",
         "win": true
+      },
+      {
+        "actions": [
+          {
+            "fraction_of_entry": 0.19999999999999998,
+            "kind": "INITIAL",
+            "mark_return": -0.04623158563670715,
+            "proceeds_sol": 0.09515408930576309,
+            "reason": "STRUCTURAL_INITIAL_20PCT",
+            "remaining_fraction": 0.7999999999999999,
+            "state_ns": 1789439921018709466,
+            "t_ms": 325.692772,
+            "tokens_sold": 2293176.3774635247
+          },
+          {
+            "fraction_of_entry": 0.7999999999999999,
+            "kind": "EXIT",
+            "mark_return": -0.33640034767805105,
+            "proceeds_sol": 0.2629438152845303,
+            "reason": "PERSISTENT_DETERIORATION_DEEP",
+            "remaining_fraction": 0.0,
+            "state_ns": 1789439922236543202,
+            "t_ms": 1218.772804,
+            "tokens_sold": 9172705.509854099
+          }
+        ],
+        "actual_hold_ms": 1218.82359,
+        "balance_after_sol": 3.1590309139987833,
+        "control_v1_2s": null,
+        "conviction_score": 80.0,
+        "conviction_tier": "HIGH",
+        "create_ns": 1789439921000811218,
+        "create_to_decision_ms": 10.263924,
+        "create_to_entry_ms": 17.370391,
+        "decision_ns": 1789439921011075142,
+        "decision_to_entry_ms": 7.106467,
+        "entry_ns": 1789439921018181609,
+        "entry_reason": {
+          "buyer_count": 3,
+          "buyers": [
+            "89ooxuy4NTf3UNswCsjXx7fEd2WtJasaqUQbcrMUsPrm",
+            "B7v2xGaFp6h6iDAaDs4nDJb46o7v5244x6EkUi4WHBnB",
+            "2o7X9WDFfvycFjX8QKxVhwK9cjWdAYveT8JLVSurHPV2"
+          ],
+          "conviction": {
+            "conviction_score": 80.0,
+            "conviction_tier": "HIGH",
+            "initial_fraction": 0.2,
+            "management_version": "golden-management-v2-aggressive-5-8-15-25",
+            "position_fraction": 0.15,
+            "score_inputs": {
+              "buyer_count": 3,
+              "prior_appearances": 100,
+              "prior_win_rate": 0.78
+            }
+          },
+          "prior_appearances": 100,
+          "prior_win_rate": 0.78,
+          "prior_wins": 78,
+          "rule": "golden-buyer-reputation-v1"
+        },
+        "entry_state_ns": 1789439921014454002,
+        "equity_before_sol": 3.2952153051864586,
+        "exit_ns": 1789439922237005199,
+        "exit_reason": "PERSISTENT_DETERIORATION_DEEP",
+        "exit_state_ns": 1789439922236543202,
+        "initial_fraction": 0.2,
+        "mae_fraction": -0.33640034767805105,
+        "mark_remaining_value_sol": 0.0,
+        "mfe_fraction": -0.023565932927640088,
+        "mint": "5pE1GX9NWthDMYowbS5CUTLfq1SywQVk6JtQEAYTpump",
+        "original_tokens": 11465881.887317624,
+        "path": [
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.04623158563670715,
+            "state_ns": 1789439921018709466,
+            "t_ms": 4.613714,
+            "vsol": 36.855164251,
+            "vtok": 873418980.942164
+          },
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.04623158563670715,
+            "state_ns": 1789439921018709466,
+            "t_ms": 325.692772,
+            "vsol": 36.855164251,
+            "vtok": 873418980.942164
+          },
+          {
+            "remaining_fraction": 0.7999999999999999,
+            "return_fraction": -0.023565932927640088,
+            "state_ns": 1789439921621785517,
+            "t_ms": 606.060216,
+            "vsol": 37.293245819,
+            "vtok": 863158979.501528
+          },
+          {
+            "remaining_fraction": 0.7999999999999999,
+            "return_fraction": -0.133460662377337,
+            "state_ns": 1789439921938974774,
+            "t_ms": 923.023842,
+            "vsol": 35.1192644,
+            "vtok": 916590952.402916
+          },
+          {
+            "remaining_fraction": 0.7999999999999999,
+            "return_fraction": -0.2376882287085672,
+            "state_ns": 1789439921942365732,
+            "t_ms": 927.618848,
+            "vsol": 32.927631325,
+            "vtok": 977598409.291421
+          },
+          {
+            "remaining_fraction": 0.7999999999999999,
+            "return_fraction": -0.33640034767805105,
+            "state_ns": 1789439922236543202,
+            "t_ms": 1218.772804,
+            "vsol": 30.710759716,
+            "vtok": 1048166841.306094
+          }
+        ],
+        "pnl_sol": -0.1361843911876754,
+        "position_fraction": 0.15,
+        "post_exit": {
+          "complete": true,
+          "exit_full_position_return": -0.33640034767805105,
+          "max_return_fraction": -0.3388805843478999,
+          "min_return_fraction": -0.3666163585519311,
+          "went_higher_than_exit": false,
+          "went_lower_than_exit": true,
+          "window_seconds": 20.0
+        },
+        "proceeds_sol": 0.3580979045902934,
+        "realized_proceeds_sol": 0.3580979045902934,
+        "remaining_tokens": 0.0,
+        "return_fraction": -0.27551945993398336,
+        "signal_ns": 1789439921011122233,
+        "stake_sol": 0.4942822957779688,
+        "status": "CLOSED",
+        "win": false
+      },
+      {
+        "actions": [
+          {
+            "fraction_of_entry": 0.2,
+            "kind": "INITIAL",
+            "mark_return": -0.01884455264611995,
+            "proceeds_sol": 0.09375666019261847,
+            "reason": "STRUCTURAL_INITIAL_20PCT",
+            "remaining_fraction": 0.7999999999999999,
+            "state_ns": 1789440145043664278,
+            "t_ms": 328.51383,
+            "tokens_sold": 1948789.9315393844
+          },
+          {
+            "fraction_of_entry": 0.7999999999999999,
+            "kind": "EXIT",
+            "mark_return": -0.4244628704933052,
+            "proceeds_sol": 0.21854494887578807,
+            "reason": "EMERGENCY_CATASTROPHIC_DRAWDOWN",
+            "remaining_fraction": 0.0,
+            "state_ns": 1789440145940314085,
+            "t_ms": 1148.17193,
+            "tokens_sold": 7795159.726157537
+          }
+        ],
+        "actual_hold_ms": 1148.209968,
+        "balance_after_sol": 2.9974778859673723,
+        "control_v1_2s": null,
+        "conviction_score": 76.822,
+        "conviction_tier": "HIGH",
+        "create_ns": 1789440144775827187,
+        "create_to_decision_ms": 11.251431,
+        "create_to_entry_ms": 17.458737,
+        "decision_ns": 1789440144787078618,
+        "decision_to_entry_ms": 6.207306,
+        "entry_ns": 1789440144793285924,
+        "entry_reason": {
+          "buyer_count": 3,
+          "buyers": [
+            "7WY9jecZHuZBjeGdxfys18d2d7xVpYYDpHVZrRnGNKok",
+            "89ooxuy4NTf3UNswCsjXx7fEd2WtJasaqUQbcrMUsPrm",
+            "B7v2xGaFp6h6iDAaDs4nDJb46o7v5244x6EkUi4WHBnB"
+          ],
+          "conviction": {
+            "conviction_score": 76.822,
+            "conviction_tier": "HIGH",
+            "initial_fraction": 0.2,
+            "management_version": "golden-management-v2-aggressive-5-8-15-25",
+            "position_fraction": 0.15,
+            "score_inputs": {
+              "buyer_count": 3,
+              "prior_appearances": 74,
+              "prior_win_rate": 0.7702702702702703
+            }
+          },
+          "prior_appearances": 74,
+          "prior_win_rate": 0.7702702702702703,
+          "prior_wins": 57,
+          "rule": "golden-buyer-reputation-v1"
+        },
+        "entry_state_ns": 1789440144793079531,
+        "equity_before_sol": 3.1590309139987833,
+        "exit_ns": 1789440145941495892,
+        "exit_reason": "EMERGENCY_CATASTROPHIC_DRAWDOWN",
+        "exit_state_ns": 1789440145940314085,
+        "initial_fraction": 0.2,
+        "mae_fraction": -0.4244628704933052,
+        "mark_remaining_value_sol": 0.0,
+        "mfe_fraction": -0.01884455264611995,
+        "mint": "DDg5ctB6TasKmCChLJRRnDWRaub7tJRT4XBxr7uzpump",
+        "original_tokens": 9743949.657696921,
+        "path": [
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.0481151476350673,
+            "state_ns": 1789440144793079531,
+            "t_ms": 4.170795,
+            "vsol": 39.080952533,
+            "vtok": 823674908.498734
+          },
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.01884455264611995,
+            "state_ns": 1789440145043664278,
+            "t_ms": 251.359488,
+            "vsol": 39.680637603,
+            "vtok": 811226884.117399
+          },
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.01884455264611995,
+            "state_ns": 1789440145043664278,
+            "t_ms": 328.51383,
+            "vsol": 39.680637603,
+            "vtok": 811226884.117399
+          },
+          {
+            "remaining_fraction": 0.7999999999999999,
+            "return_fraction": -0.4244628704933052,
+            "state_ns": 1789440145940314085,
+            "t_ms": 1148.17193,
+            "vsol": 30.352119222,
+            "vtok": 1060551975.618665
+          }
+        ],
+        "pnl_sol": -0.16155302803141092,
+        "position_fraction": 0.15,
+        "post_exit": {
+          "complete": true,
+          "exit_full_position_return": -0.4244628704933052,
+          "max_return_fraction": -0.43768706502324917,
+          "min_return_fraction": -0.43768706502324917,
+          "went_higher_than_exit": false,
+          "went_lower_than_exit": true,
+          "window_seconds": 20.0
+        },
+        "proceeds_sol": 0.31230160906840654,
+        "realized_proceeds_sol": 0.31230160906840654,
+        "remaining_tokens": 0.0,
+        "return_fraction": -0.3409337281580296,
+        "signal_ns": 1789440144787121313,
+        "stake_sol": 0.47385463709981746,
+        "status": "CLOSED",
+        "win": false
+      },
+      {
+        "actions": [
+          {
+            "fraction_of_entry": 0.3,
+            "kind": "INITIAL",
+            "mark_return": -0.14557870955230068,
+            "proceeds_sol": 0.061609877631591925,
+            "reason": "STRUCTURAL_INITIAL_30PCT",
+            "remaining_fraction": 0.7,
+            "state_ns": 1789440321893065643,
+            "t_ms": 353.52147,
+            "tokens_sold": 1542628.465147047
+          },
+          {
+            "fraction_of_entry": 0.15,
+            "kind": "SCALE_OUT",
+            "mark_return": 0.030316232136094134,
+            "proceeds_sol": 0.03713247201281316,
+            "reason": "PEAK_GIVEBACK_1",
+            "remaining_fraction": 0.5499999999999999,
+            "state_ns": 1789440326039551646,
+            "t_ms": 4495.078537,
+            "tokens_sold": 771314.2325735235
+          },
+          {
+            "fraction_of_entry": 0.15,
+            "kind": "SCALE_OUT",
+            "mark_return": 0.030318787858677032,
+            "proceeds_sol": 0.03713256468487303,
+            "reason": "PEAK_GIVEBACK_2",
+            "remaining_fraction": 0.39999999999999997,
+            "state_ns": 1789440326665623055,
+            "t_ms": 5122.804135,
+            "tokens_sold": 771314.2325735235
+          },
+          {
+            "fraction_of_entry": 0.39999999999999997,
+            "kind": "EXIT",
+            "mark_return": 0.0848887814783994,
+            "proceeds_sol": 0.10437741669679812,
+            "reason": "MAX_RUNNER_HOLD",
+            "remaining_fraction": 0.0,
+            "state_ns": 1789440327545293782,
+            "t_ms": 6003.18816,
+            "tokens_sold": 2056837.953529396
+          }
+        ],
+        "actual_hold_ms": 6003.223183,
+        "balance_after_sol": 2.9979319861160594,
+        "control_v1_2s": {
+          "captured_at_ms": 2002.93016,
+          "pnl_sol": -0.018735448196231824,
+          "proceeds_sol": 0.22106278268115798,
+          "return_fraction": -0.078130051784291
+        },
+        "conviction_score": 70.109,
+        "conviction_tier": "MEDIUM",
+        "create_ns": 1789440321526754590,
+        "create_to_decision_ms": 11.007591,
+        "create_to_entry_ms": 17.919533,
+        "decision_ns": 1789440321537762181,
+        "decision_to_entry_ms": 6.911942,
+        "entry_ns": 1789440321544674123,
+        "entry_reason": {
+          "buyer_count": 3,
+          "buyers": [
+            "7WY9jecZHuZBjeGdxfys18d2d7xVpYYDpHVZrRnGNKok",
+            "89ooxuy4NTf3UNswCsjXx7fEd2WtJasaqUQbcrMUsPrm",
+            "B7v2xGaFp6h6iDAaDs4nDJb46o7v5244x6EkUi4WHBnB"
+          ],
+          "conviction": {
+            "conviction_score": 70.109,
+            "conviction_tier": "MEDIUM",
+            "initial_fraction": 0.3,
+            "management_version": "golden-management-v2-aggressive-5-8-15-25",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "buyer_count": 3,
+              "prior_appearances": 80,
+              "prior_win_rate": 0.7125
+            }
+          },
+          "prior_appearances": 80,
+          "prior_win_rate": 0.7125,
+          "prior_wins": 57,
+          "rule": "golden-buyer-reputation-v1"
+        },
+        "entry_state_ns": 1789440321540523122,
+        "equity_before_sol": 2.9974778859673723,
+        "exit_ns": 1789440327547897306,
+        "exit_reason": "MAX_RUNNER_HOLD",
+        "exit_state_ns": 1789440327545293782,
+        "initial_fraction": 0.3,
+        "mae_fraction": -0.14557870955230068,
+        "mark_remaining_value_sol": 0.0,
+        "mfe_fraction": 0.14551659208626377,
+        "mint": "6NAMySQ5Y2hRkPQPswbFMk6zPbjnaLG6y1BtJoZcpump",
+        "original_tokens": 5142094.883823491,
+        "path": [
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.03780405706064749,
+            "state_ns": 1789440321540523122,
+            "t_ms": 4.869147,
+            "vsol": 38.37468496,
+            "vtok": 838834248.002149
+          },
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.016059762577877,
+            "state_ns": 1789440321857736939,
+            "t_ms": 313.767951,
+            "vsol": 38.8069228,
+            "vtok": 829491175.24615
+          },
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.14557870955230068,
+            "state_ns": 1789440321893065643,
+            "t_ms": 348.570611,
+            "vsol": 36.156835305,
+            "vtok": 890288094.351295
+          },
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.14557870955230068,
+            "state_ns": 1789440321893065643,
+            "t_ms": 353.52147,
+            "vsol": 36.156835305,
+            "vtok": 890288094.351295
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": -0.1455763807292788,
+            "state_ns": 1789440321905204352,
+            "t_ms": 361.908591,
+            "vsol": 36.156884686,
+            "vtok": 890286878.471485
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": -0.1376397955525287,
+            "state_ns": 1789440322189976116,
+            "t_ms": 646.720966,
+            "vsol": 36.32478592,
+            "vtok": 886171774.670119
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": -0.11714351966854852,
+            "state_ns": 1789440322532826888,
+            "t_ms": 989.432158,
+            "vsol": 36.75487437,
+            "vtok": 875802204.629175
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": -0.1154989798052537,
+            "state_ns": 1789440322565889099,
+            "t_ms": 1024.502532,
+            "vsol": 36.789166954,
+            "vtok": 874985836.0335
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": -0.016912459739071517,
+            "state_ns": 1789440322577819913,
+            "t_ms": 1033.917466,
+            "vsol": 38.790062605,
+            "vtok": 829851715.726684
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": -0.0018739412498898211,
+            "state_ns": 1789440322582178929,
+            "t_ms": 1038.521893,
+            "vsol": 39.086358901,
+            "vtok": 823560979.119617
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": -0.0018714254937635122,
+            "state_ns": 1789440323222293819,
+            "t_ms": 1680.295278,
+            "vsol": 39.086408282,
+            "vtok": 823559938.669933
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": -0.0017185801517464183,
+            "state_ns": 1789440323241470080,
+            "t_ms": 1697.878142,
+            "vsol": 39.08940829,
+            "vtok": 823496732.646419
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": -0.078130051784291,
+            "state_ns": 1789440323510966912,
+            "t_ms": 1969.427144,
+            "vsol": 37.560033815,
+            "vtok": 857027982.646418
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": -0.078130051784291,
+            "state_ns": 1789440323510966912,
+            "t_ms": 2002.93016,
+            "vsol": 37.560033815,
+            "vtok": 857027982.646418
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": -0.02726257399965426,
+            "state_ns": 1789440323835100337,
+            "t_ms": 2290.677434,
+            "vsol": 38.584830019,
+            "vtok": 834265694.4085
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": 0.027667537781590035,
+            "state_ns": 1789440324113274759,
+            "t_ms": 2571.079791,
+            "vsol": 39.662014709,
+            "vtok": 811607787.613021
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": 0.001966169855561084,
+            "state_ns": 1789440324215339757,
+            "t_ms": 2674.792669,
+            "vsol": 39.16166268,
+            "vtok": 821977357.653965
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": 0.09790604978764605,
+            "state_ns": 1789440324384329293,
+            "t_ms": 2842.797017,
+            "vsol": 40.998564919,
+            "vtok": 785149433.308905
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": 0.14551659208626377,
+            "state_ns": 1789440324424327442,
+            "t_ms": 2879.868184,
+            "vsol": 41.880514713,
+            "vtok": 768615195.735498
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": 0.11824147704328403,
+            "state_ns": 1789440324998869090,
+            "t_ms": 3458.41996,
+            "vsol": 41.377540824,
+            "vtok": 777958268.491497
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": 0.1182441388182347,
+            "state_ns": 1789440325025475857,
+            "t_ms": 3484.901268,
+            "vsol": 41.377590205,
+            "vtok": 777957340.076404
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": 0.12090760742262918,
+            "state_ns": 1789440325746835165,
+            "t_ms": 4202.827239,
+            "vsol": 41.42697292,
+            "vtok": 777029981.833158
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": 0.030316232136094134,
+            "state_ns": 1789440326039551646,
+            "t_ms": 4495.078537,
+            "vsol": 39.713224309,
+            "vtok": 810561231.833158
+          },
+          {
+            "remaining_fraction": 0.5499999999999999,
+            "return_fraction": 0.030318787858677032,
+            "state_ns": 1789440326665623055,
+            "t_ms": 5122.804135,
+            "vsol": 39.71327369,
+            "vtok": 810560223.970801
+          },
+          {
+            "remaining_fraction": 0.39999999999999997,
+            "return_fraction": 0.0848887814783994,
+            "state_ns": 1789440327545293782,
+            "t_ms": 6003.18816,
+            "vsol": 40.754140233,
+            "vtok": 789858400.465404
+          }
+        ],
+        "pnl_sol": 0.0004541001486864371,
+        "position_fraction": 0.08,
+        "post_exit": {
+          "complete": true,
+          "exit_full_position_return": 0.0848887814783994,
+          "max_return_fraction": 0.15012688542051822,
+          "min_return_fraction": -0.14104065322406167,
+          "went_higher_than_exit": true,
+          "went_lower_than_exit": true,
+          "window_seconds": 20.0
+        },
+        "proceeds_sol": 0.24025233102607624,
+        "realized_proceeds_sol": 0.24025233102607624,
+        "remaining_tokens": 0.0,
+        "return_fraction": 0.0018936759751101795,
+        "signal_ns": 1789440321537797744,
+        "stake_sol": 0.2397982308773898,
+        "status": "CLOSED",
+        "win": true
+      },
+      {
+        "actions": [
+          {
+            "fraction_of_entry": 0.3,
+            "kind": "INITIAL",
+            "mark_return": -0.037671889796419444,
+            "proceeds_sol": 0.06942830769486456,
+            "reason": "STRUCTURAL_INITIAL_30PCT",
+            "remaining_fraction": 0.7,
+            "state_ns": 1789440578522205080,
+            "t_ms": 351.470021,
+            "tokens_sold": 1507996.714272595
+          },
+          {
+            "fraction_of_entry": 0.7,
+            "kind": "EXIT",
+            "mark_return": -0.4124153674855666,
+            "proceeds_sol": 0.098740963628948,
+            "reason": "EMERGENCY_CATASTROPHIC_DRAWDOWN",
+            "remaining_fraction": 0.0,
+            "state_ns": 1789440579730267908,
+            "t_ms": 1208.782815,
+            "tokens_sold": 3518658.9999693884
+          }
+        ],
+        "actual_hold_ms": 1208.812701,
+        "balance_after_sol": 2.926266698550587,
+        "control_v1_2s": null,
+        "conviction_score": 73.409,
+        "conviction_tier": "MEDIUM",
+        "create_ns": 1789440578503124340,
+        "create_to_decision_ms": 10.248665,
+        "create_to_entry_ms": 20.930946,
+        "decision_ns": 1789440578513373005,
+        "decision_to_entry_ms": 10.682281,
+        "entry_ns": 1789440578524055286,
+        "entry_reason": {
+          "buyer_count": 3,
+          "buyers": [
+            "89ooxuy4NTf3UNswCsjXx7fEd2WtJasaqUQbcrMUsPrm",
+            "B7v2xGaFp6h6iDAaDs4nDJb46o7v5244x6EkUi4WHBnB",
+            "2o7X9WDFfvycFjX8QKxVhwK9cjWdAYveT8JLVSurHPV2"
+          ],
+          "conviction": {
+            "conviction_score": 73.409,
+            "conviction_tier": "MEDIUM",
+            "initial_fraction": 0.3,
+            "management_version": "golden-management-v2-aggressive-5-8-15-25",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "buyer_count": 3,
+              "prior_appearances": 110,
+              "prior_win_rate": 0.7272727272727273
+            }
+          },
+          "prior_appearances": 110,
+          "prior_win_rate": 0.7272727272727273,
+          "prior_wins": 80,
+          "rule": "golden-buyer-reputation-v1"
+        },
+        "entry_state_ns": 1789440578522205080,
+        "equity_before_sol": 2.9979319861160594,
+        "exit_ns": 1789440579732867987,
+        "exit_reason": "EMERGENCY_CATASTROPHIC_DRAWDOWN",
+        "exit_state_ns": 1789440579730267908,
+        "initial_fraction": 0.3,
+        "mae_fraction": -0.4124153674855666,
+        "mark_remaining_value_sol": 0.0,
+        "mfe_fraction": -0.037671889796419444,
+        "mint": "G73RzN2hjmGav3ATkA4Y2JQ1BnDjan4QKN5pdXg6pump",
+        "original_tokens": 5026655.714241983,
+        "path": [
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.037671889796419444,
+            "state_ns": 1789440578522205080,
+            "t_ms": 4.657918,
+            "vsol": 38.817108656,
+            "vtok": 829273511.517087
+          },
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.037671889796419444,
+            "state_ns": 1789440578522205080,
+            "t_ms": 351.470021,
+            "vsol": 38.817108656,
+            "vtok": 829273511.517087
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": -0.33063915368985675,
+            "state_ns": 1789440579727543321,
+            "t_ms": 1203.787397,
+            "vsol": 32.362032937,
+            "vtok": 994684112.260763
+          },
+          {
+            "remaining_fraction": 0.7,
+            "return_fraction": -0.4124153674855666,
+            "state_ns": 1789440579730267908,
+            "t_ms": 1208.782815,
+            "vsol": 30.317968178,
+            "vtok": 1061746612.260762
+          }
+        ],
+        "pnl_sol": -0.07166528756547219,
+        "position_fraction": 0.08,
+        "post_exit": {
+          "complete": true,
+          "exit_full_position_return": -0.4124153674855666,
+          "max_return_fraction": -0.4246602400350009,
+          "min_return_fraction": -0.4246602400350009,
+          "went_higher_than_exit": false,
+          "went_lower_than_exit": true,
+          "window_seconds": 20.0
+        },
+        "proceeds_sol": 0.16816927132381257,
+        "realized_proceeds_sol": 0.16816927132381257,
+        "remaining_tokens": 0.0,
+        "return_fraction": -0.29881134686079647,
+        "signal_ns": 1789440578513512216,
+        "stake_sol": 0.23983455888928476,
+        "status": "CLOSED",
+        "win": false
+      },
+      {
+        "actions": [
+          {
+            "fraction_of_entry": 0.3,
+            "kind": "INITIAL",
+            "mark_return": -0.15669938092679625,
+            "proceeds_sol": 0.05935425715031702,
+            "reason": "STRUCTURAL_INITIAL_30PCT",
+            "remaining_fraction": 0.7000000000000001,
+            "state_ns": 1789440858309717134,
+            "t_ms": 353.331385,
+            "tokens_sold": 1530873.4872874524
+          },
+          {
+            "fraction_of_entry": 0.1,
+            "kind": "SCALE_OUT",
+            "mark_return": 0.19060484583885673,
+            "proceeds_sol": 0.02790559896923606,
+            "reason": "STRENGTH_MILESTONE_15PCT",
+            "remaining_fraction": 0.6,
+            "state_ns": 1789440859551029930,
+            "t_ms": 1536.359315,
+            "tokens_sold": 510291.1624291509
+          },
+          {
+            "fraction_of_entry": 0.6,
+            "kind": "EXIT",
+            "mark_return": 0.1401303083966452,
+            "proceeds_sol": 0.1605029974466111,
+            "reason": "MAX_RUNNER_HOLD",
+            "remaining_fraction": 0.0,
+            "state_ns": 1789440863815507522,
+            "t_ms": 6004.03914,
+            "tokens_sold": 3061746.974574905
+          }
+        ],
+        "actual_hold_ms": 6004.105781,
+        "balance_after_sol": 2.9399282162327043,
+        "control_v1_2s": {
+          "captured_at_ms": 2003.589714,
+          "pnl_sol": 0.04462149722644937,
+          "proceeds_sol": 0.27872283311049634,
+          "return_fraction": 0.19060761468081022
+        },
+        "conviction_score": 73.496,
+        "conviction_tier": "MEDIUM",
+        "create_ns": 1789440857998680126,
+        "create_to_decision_ms": 10.867749,
+        "create_to_entry_ms": 17.965089,
+        "decision_ns": 1789440858009547875,
+        "decision_to_entry_ms": 7.09734,
+        "entry_ns": 1789440858016645215,
+        "entry_reason": {
+          "buyer_count": 4,
+          "buyers": [
+            "8gWB58bqkevFkjzZxu35Bf1tPe7bmZAEiu5XUYmrCtx1",
+            "89ooxuy4NTf3UNswCsjXx7fEd2WtJasaqUQbcrMUsPrm",
+            "B7v2xGaFp6h6iDAaDs4nDJb46o7v5244x6EkUi4WHBnB",
+            "2o7X9WDFfvycFjX8QKxVhwK9cjWdAYveT8JLVSurHPV2"
+          ],
+          "conviction": {
+            "conviction_score": 73.496,
+            "conviction_tier": "MEDIUM",
+            "initial_fraction": 0.3,
+            "management_version": "golden-management-v2-aggressive-5-8-15-25",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "buyer_count": 4,
+              "prior_appearances": 113,
+              "prior_win_rate": 0.7079646017699115
+            }
+          },
+          "prior_appearances": 113,
+          "prior_win_rate": 0.7079646017699115,
+          "prior_wins": 80,
+          "rule": "golden-buyer-reputation-v1"
+        },
+        "entry_state_ns": 1789440857999319821,
+        "equity_before_sol": 2.926266698550587,
+        "exit_ns": 1789440864020750996,
+        "exit_reason": "MAX_RUNNER_HOLD",
+        "exit_state_ns": 1789440863815507522,
+        "initial_fraction": 0.3,
+        "mae_fraction": -0.15670171391416932,
+        "mark_remaining_value_sol": 0.0,
+        "mfe_fraction": 0.19060761468081022,
+        "mint": "7sMBkv5b6ipfGEMe5stSPLXg2YEZBnmcYrZHtbWGpump",
+        "original_tokens": 5102911.624291508,
+        "path": [
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.037648813737920506,
+            "state_ns": 1789440857999319821,
+            "t_ms": 4.228782,
+            "vsol": 38.062954476,
+            "vtok": 845704187.816875
+          },
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.02976851849631601,
+            "state_ns": 1789440858048196647,
+            "t_ms": 33.010594,
+            "vsol": 38.218843757,
+            "vtok": 842254679.546293
+          },
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.02926817833582762,
+            "state_ns": 1789440858229142226,
+            "t_ms": 214.461555,
+            "vsol": 38.228720299,
+            "vtok": 842037079.720557
+          },
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.15670171391416932,
+            "state_ns": 1789440858305213678,
+            "t_ms": 290.615162,
+            "vsol": 35.625690999,
+            "vtok": 903561421.547335
+          },
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.15669938092679625,
+            "state_ns": 1789440858309717134,
+            "t_ms": 295.395195,
+            "vsol": 35.62574038,
+            "vtok": 903560169.142122
+          },
+          {
+            "remaining_fraction": 1.0,
+            "return_fraction": -0.15669938092679625,
+            "state_ns": 1789440858309717134,
+            "t_ms": 353.331385,
+            "vsol": 35.62574038,
+            "vtok": 903560169.142122
+          },
+          {
+            "remaining_fraction": 0.7000000000000001,
+            "return_fraction": -0.14874832785699277,
+            "state_ns": 1789440858586194836,
+            "t_ms": 572.6569,
+            "vsol": 35.793641614,
+            "vtok": 899321738.52562
+          },
+          {
+            "remaining_fraction": 0.7000000000000001,
+            "return_fraction": -0.10684389163951813,
+            "state_ns": 1789440858596279614,
+            "t_ms": 581.931224,
+            "vsol": 36.665935952,
+            "vtok": 877926586.886637
+          },
+          {
+            "remaining_fraction": 0.7000000000000001,
+            "return_fraction": -0.06396760281511382,
+            "state_ns": 1789440858642638940,
+            "t_ms": 626.218635,
+            "vsol": 37.537662974,
+            "vtok": 857538734.590296
+          },
+          {
+            "remaining_fraction": 0.7000000000000001,
+            "return_fraction": -0.010789530093637034,
+            "state_ns": 1789440858935756298,
+            "t_ms": 920.462492,
+            "vsol": 38.591727879,
+            "vtok": 834116578.246074
+          },
+          {
+            "remaining_fraction": 0.7000000000000001,
+            "return_fraction": 0.036413817462394915,
+            "state_ns": 1789440859201573528,
+            "t_ms": 1188.481845,
+            "vsol": 39.504018646,
+            "vtok": 814853807.565965
+          },
+          {
+            "remaining_fraction": 0.7000000000000001,
+            "return_fraction": 0.03657835694936429,
+            "state_ns": 1789440859205268894,
+            "t_ms": 1195.106161,
+            "vsol": 39.507162166,
+            "vtok": 814788970.997014
+          },
+          {
+            "remaining_fraction": 0.7000000000000001,
+            "return_fraction": 0.08736297465012899,
+            "state_ns": 1789440859507252579,
+            "t_ms": 1494.895215,
+            "vsol": 40.465840448,
+            "vtok": 795485764.10783
+          },
+          {
+            "remaining_fraction": 0.7000000000000001,
+            "return_fraction": 0.1347630577653962,
+            "state_ns": 1789440859547822890,
+            "t_ms": 1531.818182,
+            "vsol": 41.34076135,
+            "vtok": 778650391.493612
+          },
+          {
+            "remaining_fraction": 0.7000000000000001,
+            "return_fraction": 0.19060484583885673,
+            "state_ns": 1789440859551029930,
+            "t_ms": 1536.359315,
+            "vsol": 42.348537209,
+            "vtok": 760120706.217464
+          },
+          {
+            "remaining_fraction": 0.6,
+            "return_fraction": 0.19060761468081022,
+            "state_ns": 1789440859849088087,
+            "t_ms": 1836.462157,
+            "vsol": 42.34858659,
+            "vtok": 760119819.888935
+          },
+          {
+            "remaining_fraction": 0.6,
+            "return_fraction": 0.19060761468081022,
+            "state_ns": 1789440859849088087,
+            "t_ms": 2003.589714,
+            "vsol": 42.34858659,
+            "vtok": 760119819.888935
+          },
+          {
+            "remaining_fraction": 0.6,
+            "return_fraction": 0.10112031786151987,
+            "state_ns": 1789440860144421953,
+            "t_ms": 2129.381771,
+            "vsol": 40.721693966,
+            "vtok": 790487744.417236
+          },
+          {
+            "remaining_fraction": 0.6,
+            "return_fraction": 0.12231648024546371,
+            "state_ns": 1789440860416301046,
+            "t_ms": 2403.005135,
+            "vsol": 41.112805077,
+            "vtok": 782967738.439248
+          },
+          {
+            "remaining_fraction": 0.6,
+            "return_fraction": 0.12213112400442605,
+            "state_ns": 1789440860722815188,
+            "t_ms": 2707.656757,
+            "vsol": 41.10940086,
+            "vtok": 783032575.008199
+          },
+          {
+            "remaining_fraction": 0.6,
+            "return_fraction": 0.17350000328324833,
+            "state_ns": 1789440861067280629,
+            "t_ms": 3050.929608,
+            "vsol": 42.042387637,
+            "vtok": 765655849.309721
+          },
+          {
+            "remaining_fraction": 0.6,
+            "return_fraction": 0.1735027523070356,
+            "state_ns": 1789440861387530159,
+            "t_ms": 3373.235451,
+            "vsol": 42.042437018,
+            "vtok": 765654950.025843
+          },
+          {
+            "remaining_fraction": 0.6,
+            "return_fraction": 0.08589989847812673,
+            "state_ns": 1789440862998953315,
+            "t_ms": 4982.523856,
+            "vsol": 40.438536433,
+            "vtok": 796022874.554145
+          },
+          {
+            "remaining_fraction": 0.6,
+            "return_fraction": 0.08590254363198846,
+            "state_ns": 1789440863346484612,
+            "t_ms": 5331.58406,
+            "vsol": 40.438585814,
+            "vtok": 796021902.521896
+          },
+          {
+            "remaining_fraction": 0.6,
+            "return_fraction": 0.1401303083966452,
+            "state_ns": 1789440863815507522,
+            "t_ms": 5799.391415,
+            "vsol": 41.438678136,
+            "vtok": 776810493.580736
+          },
+          {
+            "remaining_fraction": 0.6,
+            "return_fraction": 0.1401303083966452,
+            "state_ns": 1789440863815507522,
+            "t_ms": 6004.03914,
+            "vsol": 41.438678136,
+            "vtok": 776810493.580736
+          }
+        ],
+        "pnl_sol": 0.013661517682117208,
+        "position_fraction": 0.08,
+        "post_exit": {
+          "complete": true,
+          "exit_full_position_return": 0.1401303083966452,
+          "max_return_fraction": 0.38819013024299953,
+          "min_return_fraction": 0.022864563447952513,
+          "went_higher_than_exit": true,
+          "went_lower_than_exit": true,
+          "window_seconds": 20.0
+        },
+        "proceeds_sol": 0.24776285356616418,
+        "realized_proceeds_sol": 0.24776285356616418,
+        "remaining_tokens": 0.0,
+        "return_fraction": 0.0583572820314187,
+        "signal_ns": 1789440858009582898,
+        "stake_sol": 0.23410133588404697,
+        "status": "CLOSED",
+        "win": true
       }
     ],
     "rejections": {
       "CONCURRENCY": 1
     },
-    "signals": 46
+    "signals": 51
   },
   "campaign_starting_balance_sol": 3.0,
   "management_version": "golden-management-v2-aggressive-5-8-15-25",
@@ -19477,6 +20511,10 @@
       1,
       0
     ],
+    "25qhGeGQXNBqdZpWm1kqmxJRcHPhitg2BCJ6oyxAK9qU": [
+      1,
+      0
+    ],
     "25rhxu9qYWg4bmnEstkVcdN9prwKWCoYNvCcaoyBvj3B": [
       1,
       1
@@ -19494,7 +20532,7 @@
       1
     ],
     "283FxqaYa3Ya5pgGGFHqPegYmbBxmbC3pMka8yKyg9Jc": [
-      11,
+      12,
       0
     ],
     "28dZdiXK64A8dvUMPDb6yJZTM5Y44dSQRHDGr4f8tuxs": [
@@ -19506,16 +20544,16 @@
       0
     ],
     "29yFzeBZgxf5zqrAkKXwgZtQehRf4pL8WbV2nRJikbw8": [
-      2,
-      1
+      3,
+      2
     ],
     "2A9dycuCcjRYyaWVcPoGJAZs2TwMNM3quDUr7LtDLh3V": [
       3,
       2
     ],
     "2CQgjcdNEo7WtbQLpJTAVcC3Ga61pNvRDTgP5grzctFG": [
-      37,
-      16
+      43,
+      17
     ],
     "2CacK1Xxk5KKEsn9hbCeK2q2GgTGZ1H1ZxE11hBNYUQq": [
       3,
@@ -19593,6 +20631,10 @@
       3,
       3
     ],
+    "2StnHjyZoDZDEbNfWfyYr29b6SxmoRaDS8euXwYFxBr2": [
+      1,
+      1
+    ],
     "2TFd3TWqueQeN4Djgoqwqh1ThsuTgKzeh7Jy5ocH2D3T": [
       1,
       1
@@ -19642,8 +20684,8 @@
       0
     ],
     "2Xtmbm2qV2sfZ3DGqWdFLEZjyb3nTWybs7zmuBxXCJcs": [
-      3,
-      2
+      4,
+      3
     ],
     "2XwmK62bxyFkVrz2zSf7zfEdrKJ3tiGXzCqvPM6inkj3": [
       1,
@@ -19673,6 +20715,10 @@
       9,
       1
     ],
+    "2apiB9ATUWb1vBcQJE9XtKEF81ricX1hkQfjiSy6dngN": [
+      1,
+      1
+    ],
     "2ayq6rzt8hyUYNyNzpQabW6uHF6g6JNTVPNb1Vj1S3eU": [
       1,
       0
@@ -19690,7 +20736,7 @@
       0
     ],
     "2bRoascfGCKkRnyZLmzJh7cKpiD45zyEzUmg9XPZzueC": [
-      5,
+      6,
       1
     ],
     "2ba1waVTuF9S66jbWP5ZuffHmo3MjMuXzKq26kqXHzfs": [
@@ -19746,7 +20792,7 @@
       1
     ],
     "2iSMjjhBhsRmxBTvp4ZiZkMv7baQjm5r1CYVM7nPSs5E": [
-      3,
+      4,
       0
     ],
     "2k6wLxZPyBaEovVaaEsWZaP5qWLUSwCVag46w1YmCmfv": [
@@ -19765,6 +20811,10 @@
       2,
       0
     ],
+    "2mpYrCv8XifEaB1JsaRZwiGkKpQP6V6DpHdomnLLGud5": [
+      3,
+      0
+    ],
     "2mqrindMAjJEQPLhroYWyiYPo5h9iAsahfdd4QtsjwdY": [
       5,
       2
@@ -19778,8 +20828,8 @@
       2
     ],
     "2o7X9WDFfvycFjX8QKxVhwK9cjWdAYveT8JLVSurHPV2": [
-      32,
-      25
+      37,
+      27
     ],
     "2rnrwiLjxE1MCJu4QieAtqDz15XWmBhhh79tkhDDjQrH": [
       1,
@@ -19885,6 +20935,10 @@
       1,
       0
     ],
+    "3Cwe9edDGdEBGxpt1aM6g1fpiVFvKyEKGK5CxH2vk8S5": [
+      1,
+      0
+    ],
     "3F3QeXxgCTNz2YoCcXaTVdYV48yJtuHfiYjhdRsmvzU6": [
       1,
       1
@@ -19906,7 +20960,7 @@
       0
     ],
     "3Jxw3Ay7w86xttZiG4dh1zW27UrvTBc9HrcomLBi4hVW": [
-      5,
+      6,
       0
     ],
     "3NZmJAUgEdsMpHi5D8goYzmTsssWUyPtGsTuDfepNLik": [
@@ -19926,7 +20980,11 @@
       0
     ],
     "3Sfme9Wt5S3NPzhc7xZpxwByn3EVYUXgkbHXi9im93An": [
-      4,
+      5,
+      0
+    ],
+    "3SmnSapyT84wx74x5iJyf73UXS16i5nwaaFaLFtKKuxJ": [
+      1,
       0
     ],
     "3TS17YyhyYDsK7c4cebtwMV83ZhoZZsw4APyALoEKPwr": [
@@ -19937,13 +20995,17 @@
       4,
       2
     ],
+    "3VGujTqq29Z1e2HSZZvSir7FoLgxoByMW98nBZwjguaB": [
+      1,
+      1
+    ],
     "3Wg8AMAiBqK3prWZnXvZ8B7LTTuq7a4y6EA5qhV2AL5q": [
       10,
       10
     ],
     "3XJsbDAcx3qCrHBCxXN8Ze13MuojCE21RN7Sd2a4tnLk": [
-      2,
-      0
+      3,
+      1
     ],
     "3XnFiYjLsmWauSFyH4A6kD54qNU9xFDAewnqoqKwgCgX": [
       1,
@@ -20058,8 +21120,8 @@
       10
     ],
     "3uuGdtp8Yves8TfbnjRJbv5VPNabTRnTv9g4GFmbGckw": [
-      2,
-      1
+      3,
+      2
     ],
     "3uz65G8e463MA5FxcSu1rTUyWRtrRLRZYskKtEHHj7qn": [
       1,
@@ -20090,7 +21152,7 @@
       1
     ],
     "3yrJE1A8dgSuy5NLimG5GSYxA6wMkvnAYLD9Y4xR2fjJ": [
-      1,
+      2,
       0
     ],
     "3zW5n4S1q2KsRwvweR5iA64mTkc7NVAf6SgYUWWYFfKt": [
@@ -20165,6 +21227,10 @@
       1,
       0
     ],
+    "4Ep39bmf1k4A8rSejhMqkifUf8e874mLERfrTUNcTnzA": [
+      1,
+      0
+    ],
     "4G46jNRNzcZq4UUTcjxDMDtjCdbNcsUbTj3VQFt12uDV": [
       1,
       0
@@ -20226,11 +21292,11 @@
       0
     ],
     "4TmZAeqF67AGUWXLtF4phCcJA6WqnXMjHvwWCWBPw4j8": [
-      23,
+      25,
       4
     ],
     "4TnayWRQizk4RpxYLusVLKumJooSWRDRAzzwKRELbCRK": [
-      21,
+      22,
       5
     ],
     "4UBgwJaDbvHNC8sGLuqF1v2V3wi3o67cDqykBK58psTg": [
@@ -20262,7 +21328,7 @@
       0
     ],
     "4aYa4ALRT4RLXsr6MEeo5LUPBHLC5ULQBy1g9eH1ojc6": [
-      2,
+      3,
       2
     ],
     "4afpNX19JZb5o9WUDKjTVTBMU4TWXyW85wXsXcnW4LDC": [
@@ -20280,6 +21346,10 @@
     "4dkm3eUZigTtCGSyd8FLVuBKNsHuoaXNCiWydEprMYTb": [
       1,
       1
+    ],
+    "4gGHGymcvsr1EPNNmViobaFzkZtJcto1awNuGinfBGHn": [
+      1,
+      0
     ],
     "4gHF79cfKEMCrNMsxkDEhfgW8zxP58px4LYAenfxesMQ": [
       1,
@@ -20301,6 +21371,10 @@
       9,
       1
     ],
+    "4mUCW68NHueip3vV3t4pV1c9czhriZKZ8MQzEC1RBkts": [
+      1,
+      0
+    ],
     "4n2mQWqkpSBxtksaeLyfyUJaHqgUSiwPKtQTdPDEBUCh": [
       1,
       0
@@ -20314,8 +21388,8 @@
       3
     ],
     "4pGwgSxQtmrca1EuUQrF2M5kZu4XVpnUbivbHDX9xDLr": [
-      10,
-      2
+      12,
+      3
     ],
     "4q6KHz5EPKPPorNynPDYU1YKHiGDWtdQyRVkyF6tSdvM": [
       3,
@@ -20330,7 +21404,7 @@
       1
     ],
     "4sTJsPEwfdWpo6img7qmvV3cgnksgYwzEN9ycqzxb2Cf": [
-      1,
+      2,
       0
     ],
     "4sxHG11zwJuTrAcNSg5eiWV73M58hrzBK4L6rXFzh8Vq": [
@@ -20347,6 +21421,10 @@
     ],
     "4vU36WwwsWgwTXKBccuKZaQn9jazcmYxjqeBU9PmGWJn": [
       2,
+      1
+    ],
+    "4vhKSj6s2CVpXDs1szrWqndVFqaav5o86gAjyofKLytJ": [
+      1,
       1
     ],
     "4vtuFrR4DU2bWm8qe2MCp2qp7351St3ozC2ccby4QFhr": [
@@ -20370,11 +21448,11 @@
       0
     ],
     "4yFAz7dp5WwuZs3vbWKedbRiUmSFxTVGCdsLAxfEQrG3": [
-      5,
-      2
+      6,
+      3
     ],
     "4zQG6oUwbjRrzVCG3wMAo6xuEBXe2doupdeeekKmPYUu": [
-      3,
+      4,
       2
     ],
     "51vA2wwnaSwvtQMURCHd8coNFxktNpdrvTFv4AyodqvN": [
@@ -20478,7 +21556,7 @@
       0
     ],
     "5N7QpBjhRrXzP2g7roJEE1q38oboKMNgmtmSfNcfLp8X": [
-      3,
+      4,
       1
     ],
     "5NC31QESwABy3JqAJhskA3c2eyEeeqdaorM38LTKvxBp": [
@@ -20509,6 +21587,14 @@
       1,
       0
     ],
+    "5PtKj6VsAjXx7KNBMmRvVcV2LTeRSVyNWLrWMfq2kafV": [
+      1,
+      0
+    ],
+    "5QJWNEjKJJKPEGqQ438qr6nCL2gs4UkFxSTpu2iQK7Tu": [
+      1,
+      0
+    ],
     "5Qix4hWMfTigWjXgpHor7ijuLKQK2KDNdg9ZMkahi6Le": [
       1,
       0
@@ -20534,7 +21620,7 @@
       1
     ],
     "5SN39VnMLAd6HaPdVTaW7pSsjGtYx3UWwSvpPfs2xtNX": [
-      2,
+      3,
       0
     ],
     "5SSQ6xxUv1iRtmxizgFANta28UpcrrqLB9N6xMfFv4BZ": [
@@ -20566,6 +21652,10 @@
       1
     ],
     "5XU3VxynZaqX9dQMHwmThER63qDtedpPZ4pyhzefpT6q": [
+      2,
+      0
+    ],
+    "5ZnupsyFJPysX6ZioW88ppSF3moyiX54MMt1LDhEy7b3": [
       1,
       0
     ],
@@ -20690,10 +21780,14 @@
       1
     ],
     "5wxzgrMuJdcrfrZH1fV4TqDWqGUgWstyAQWeFc75PwmB": [
-      8,
+      9,
       1
     ],
     "5wz9yJ3UtRXWDF1d2uf3ZwNZF9hbFUdaERxZhgdPoCp8": [
+      1,
+      0
+    ],
+    "5xFhXswZ7ncwEoKfhRYuoajJ6YYmFAvuL5pumo9FAxJm": [
       1,
       0
     ],
@@ -20722,11 +21816,15 @@
       0
     ],
     "63NTJpMS8GWEMc311erKkNN7yFYhRJRQmUp4nVg1Euoa": [
-      1,
+      2,
       0
     ],
     "63tGpFWLaPCYieiF8uQzHVqTLB8cp1tX5DiXn87iRTfg": [
       2,
+      0
+    ],
+    "65unP62bjM4msBYMXRdgcaQ66PxRoqjQcdkExVJ3S98L": [
+      1,
       0
     ],
     "66kKyosjzAHzj9jzNwHwoit4gq8mFGpy2j7Yze6W1r9a": [
@@ -20746,6 +21844,10 @@
       1
     ],
     "68qfiDbAezd3LA2ttLR8RVTAHyecsydk65F9VjJiqkou": [
+      1,
+      0
+    ],
+    "69nfXaN7qkvX1MegsdjFrjgMu1LjjM8pY8wA4XT3fjzN": [
       1,
       0
     ],
@@ -20799,6 +21901,10 @@
     ],
     "6GyNVzC8fnrRQkJCi5QsF4fdw1EUF2URbgjLrV77h77a": [
       8,
+      0
+    ],
+    "6HvvdHW5WXicDu8Xnfw1kAps8B9RJA7TpqrTawne6p79": [
+      1,
       0
     ],
     "6Hz7VapLRLxF9Js4MsmZcqJ1QXTymA39gAyLcSioh1mK": [
@@ -20861,6 +21967,10 @@
       1,
       0
     ],
+    "6YBcnnjza7vC1ktEpTGTZmhU8xVcJYHsTb1KWjHsVjzw": [
+      1,
+      0
+    ],
     "6YKPJettEpcfHfrKz5pkWbq8g8WFNZm5si8cCUAWe2Ha": [
       1,
       0
@@ -20914,8 +22024,8 @@
       0
     ],
     "6ePbEvTDFGPembAtY1vwLF4CWbTWKFisUE2G2k53tHHw": [
-      2,
-      1
+      3,
+      2
     ],
     "6eYQ8Dbnq7vPxfeY4RDEnCxvcrQLw8a2uZDZUPMfZDGj": [
       1,
@@ -20989,13 +22099,17 @@
       1,
       0
     ],
+    "6vHrfZ43ZQw9MCCychLoPoFxbM3sDWeFCszUqoPfVGsA": [
+      1,
+      0
+    ],
     "6veLs42UJEsFk2fGiJszVrbBgC6foBMkBaDBxLSdZ3po": [
       1,
       1
     ],
     "6vj4mbsEVy3Ac72QpJcDDPTo7tybDbKziGSSZqJZtM48": [
-      1,
-      0
+      3,
+      1
     ],
     "6vs4xg1ARxHSfEciqmVhhD5C4s5zDi6yiWR6RcA4aviu": [
       1,
@@ -21010,8 +22124,8 @@
       0
     ],
     "6xk9MNaLg3D2L9n3BQW23aYs1TsBdovVPZPAiqVf8iFW": [
-      2,
-      0
+      3,
+      1
     ],
     "6y288bkkFc6HQzB6FrjqLDzct7y23AhAVryz8jGBhq7n": [
       1,
@@ -21024,6 +22138,10 @@
     "6yvXgCcgc4cAXsEh52WhVant4RjVth6cW5cwnh9M3JLn": [
       1,
       1
+    ],
+    "71kNdNXjLiz2y4kSrntNPuAppoZJ8L2E6JuTgQMK75k7": [
+      1,
+      0
     ],
     "74FvEWV6dd1UoZKqs6E9anwLv5rnpejRBr5K4pCNCgFk": [
       5,
@@ -21121,6 +22239,10 @@
       1,
       0
     ],
+    "7LQ4vhWzLwFf7kVCgrGvEY9KopFiGVgpV88Y4USqCaB2": [
+      2,
+      1
+    ],
     "7Md9sRQEomMXdhpQkV3NJw2Gjdy3KcvySawPwQ2vJ6sh": [
       3,
       3
@@ -21178,8 +22300,8 @@
       0
     ],
     "7WY9jecZHuZBjeGdxfys18d2d7xVpYYDpHVZrRnGNKok": [
-      5,
-      5
+      8,
+      6
     ],
     "7XUMJArTd2HTKZ9vXuUpwmkG94RBs92Esd6AJuCAKu9u": [
       1,
@@ -21210,7 +22332,7 @@
       0
     ],
     "7ayYrXwJH5XXpH1q9z3ajdLz7kV2P42ExUz5exUwdmTi": [
-      8,
+      11,
       1
     ],
     "7bHDVR2zY5c6L9mBXp5wBYcFgyDCkd1836Y3PRXJsfcw": [
@@ -21226,8 +22348,8 @@
       1
     ],
     "7cWpF6NeGueFa6JXDrTQmApinoHjyfsh5kaAXDaeoEy8": [
-      2,
-      1
+      3,
+      2
     ],
     "7dsWYTSw7wzaWGSF2Dei7P1p1LTJGLSGUUnZ4Ba8HEKX": [
       1,
@@ -21242,8 +22364,8 @@
       0
     ],
     "7gU86QKVnSUxsPbMAWii1787LUb9DodYkNMon8hnWUku": [
-      9,
-      5
+      10,
+      6
     ],
     "7hQ5m6CPHWwLmqc1YUq8VYBBGVnKC4HMLGLbvCokt4vz": [
       1,
@@ -21271,6 +22393,10 @@
     ],
     "7nvkh6Mjnnpa12g6QgBvFVyBDhcHtPBEmuNVXF8zTcwm": [
       2,
+      1
+    ],
+    "7o559sixhTVTFZRcupW5CYwfZU9udPDzW2p5S8hWUQ6V": [
+      1,
       1
     ],
     "7pHa4sJa51arwJXfsH578NEPKWmzvsTstbQsfkv5v4XE": [
@@ -21302,7 +22428,7 @@
       1
     ],
     "7u7uENe7xGBuWTk7dfqMAqyJuNVpNTYxEtZx4dB7i6nU": [
-      2,
+      3,
       2
     ],
     "7uGKLH9FfX6EiM3MiXTr7f92fyMdByQut4LSLsUYAGdQ": [
@@ -21366,8 +22492,8 @@
       0
     ],
     "89ooxuy4NTf3UNswCsjXx7fEd2WtJasaqUQbcrMUsPrm": [
-      33,
-      25
+      40,
+      28
     ],
     "8AeB3aLi72ZaKtn1c2wM8wqusCjt3AhWPqTeDonsbmzy": [
       1,
@@ -21402,8 +22528,8 @@
       1
     ],
     "8FWyEHQdKZaJntNCRC8jEYgh56Aymh5eXBmfDUW6SkuA": [
-      8,
-      4
+      9,
+      5
     ],
     "8HqYzz88xMMSn934Jb5Kmvkabzp9X6o1zhP5NWP9Qh9f": [
       2,
@@ -21418,7 +22544,7 @@
       0
     ],
     "8MrJ6EdFkn8TZ8iv5XehKyYi26g9evT9SnjXvE6nMwTB": [
-      1,
+      3,
       1
     ],
     "8NBuVQa8fTr72hysykrXHrFnQEAY5NXpWNm5fSQGKaHa": [
@@ -21430,7 +22556,7 @@
       0
     ],
     "8NZq6z8y5697n1iqAqCHSwAKZeiT4M54JdmQ6rAjCJB1": [
-      7,
+      8,
       1
     ],
     "8P3DiQgQgJvARzrDk8jxwy8mTU4g6JxvJ94khUJoVVRg": [
@@ -21450,11 +22576,11 @@
       0
     ],
     "8RvtT8189KpAq5MkXGVHFn6LdZpxq9PkvDeAvs1g5Yj4": [
-      13,
-      7
+      14,
+      8
     ],
     "8TYZKqAEayX21K8oa9JUnDqcULAPvRhMAp9oH5Vq45yE": [
-      4,
+      5,
       0
     ],
     "8TgbkNefzAWekXjqYy1Q9fQY1z5agYXAutBAXUh4XeHR": [
@@ -21541,6 +22667,10 @@
       1,
       1
     ],
+    "8gWB58bqkevFkjzZxu35Bf1tPe7bmZAEiu5XUYmrCtx1": [
+      1,
+      1
+    ],
     "8gqWZLJh2BmNsH7JxQAWDetT5Y7f2Q9oVhTEjC6CWshz": [
       1,
       0
@@ -21584,6 +22714,10 @@
     "8k7YHKcH3VXV7cGosiDGRVhygAHXyrg9M5rwZNnqfaeY": [
       1,
       1
+    ],
+    "8kDXUZsyPBxHK5FWQxUugAkmeJkBZfstvq5pTqvrQqLE": [
+      1,
+      0
     ],
     "8ki679dZgE8ozmGVKBzBbBqqby5CToRfqzAoKYx49aNX": [
       13,
@@ -21673,6 +22807,10 @@
       4,
       0
     ],
+    "8xu7EywiegCo2nkJCeLroUvV91GVfAJXjRwxwdboAhY": [
+      1,
+      0
+    ],
     "8y83ZUQH8gsbYa9qEyYF6Wdqw3so7L9ThsWREuCVXWTr": [
       1,
       1
@@ -21686,8 +22824,8 @@
       1
     ],
     "8zHNHWf13jhYtabXqXF1QQVrfUrhACoDbxzKZiXxqFBK": [
-      2,
-      2
+      3,
+      3
     ],
     "8zZA4i5ZkKi47gkwCKBvDdUdFX8wf4gQmon5Y6wnp87x": [
       2,
@@ -21754,7 +22892,7 @@
       1
     ],
     "97jv9pjCf5D7VUZEyj6XnXBC5JF23Vsagc3bvSF6GRmL": [
-      19,
+      20,
       2
     ],
     "98g51S3TGLQgdbd5wfHtLSLMMLsgRbgixzvopoh9r9Pw": [
@@ -21802,7 +22940,7 @@
       0
     ],
     "9FQnf1QFTg8TZ6AJEffsfa7CNQJGALecmPtkYoTYUPFj": [
-      2,
+      3,
       0
     ],
     "9GCeXMGow1SaKDUE5VPUTCQNvibmRGcRpS4tiiU59WK1": [
@@ -21930,7 +23068,7 @@
       1
     ],
     "9fvEYx1N7A2Fx8PxrA5vBCAcENY9i1LfLjWGKjYYYjcn": [
-      1,
+      2,
       0
     ],
     "9gF8M9VZNPi2xLDCEcwjKm36hkMPwCy7egc3H4n1oWVm": [
@@ -21946,8 +23084,12 @@
       21
     ],
     "9gpdgZTNxvSrbiBcFM8aWdCUBvQrcprQR4TmsJLU2M9L": [
-      3,
+      4,
       3
+    ],
+    "9hMyL6XCAf7Ja8j5onjocE6y1hbsP5ZRDCN9kmAuxZui": [
+      1,
+      0
     ],
     "9hmsuLF3AZA2jxhMXh325t2JbjPhuuYnzFfCCrueDCC6": [
       1,
@@ -21974,7 +23116,7 @@
       0
     ],
     "9p6f4N7t7eXyFk5Dr6D7iM631Z9pjZi99uuYQ7Eo58LY": [
-      6,
+      7,
       1
     ],
     "9pLLd2ceyWYSFQUc7zjXGAgdDMSqb5ms8yNsBkXccgNR": [
@@ -22038,7 +23180,7 @@
       0
     ],
     "9zpz8FmV6ggsPxKJ7nbtfye2fBpzy9akUmexqUNB7Juu": [
-      1,
+      2,
       0
     ],
     "A143cRZ8nEjum6kkkLvdm9bYzJf7RRr5p4c3Dzk4rrbn": [
@@ -22050,8 +23192,8 @@
       0
     ],
     "A222GV8NCFRu9N3xPYk9HKXEzXJrBqamYxdZqoYAuQhd": [
-      2,
-      1
+      3,
+      2
     ],
     "A2PSWtLvgPnNXuPC5UkVUgTxxKvT98SXQqW9BghuLajw": [
       6,
@@ -22098,7 +23240,7 @@
       0
     ],
     "A9NAH8jSTCQ7d4QmpJRTUVPTSvERzkSXmgSRRBrK6GqE": [
-      12,
+      13,
       4
     ],
     "AAA6HQ9CNV8ZNngzvmYTXLSR3X4dJoiGHgBE2ZDqhVjs": [
@@ -22150,8 +23292,8 @@
       1
     ],
     "AMDEmVocLtN5ji2gBY7BrmSHEyM5vt6TGszBbg4crMXg": [
-      90,
-      31
+      95,
+      33
     ],
     "AMt18WrMo3t1Eb58k1KnXCS1x1MiPMXZbfG5hM5mHwTb": [
       1,
@@ -22198,11 +23340,11 @@
       1
     ],
     "AV7PjXHL5JXZ1YoYRoN9Dsstg1x2UciBupMCXcJP8gUz": [
-      1,
+      2,
       0
     ],
     "AVA1cYQc4HKeR3K6SiJ7u8dwrMubb1JS2KNpm6Smrcu8": [
-      87,
+      105,
       0
     ],
     "AWE8WU5osJMoWFDyMWUCaYhoWc1SP7yhk8vL4PbWKuL2": [
@@ -22222,8 +23364,8 @@
       2
     ],
     "AYvsXsC2tn95aio5ZzRdUjeYcWoSUAnNiwXnJi5Gsu9g": [
-      2,
-      2
+      3,
+      3
     ],
     "AYzgkpUzZJteSfYfq9DM1YKnM2TiZkWJ8HY3XNEf17L7": [
       2,
@@ -22234,8 +23376,8 @@
       1
     ],
     "AaNmgcFtXYxaYQn22RdJroZYS8s6pVG9PvbFaDfTZ2JZ": [
-      2,
-      1
+      3,
+      2
     ],
     "Aaz2sDzEYbJbF9vLswQzen2YDyG9ctLJFXyWfw9UahHv": [
       1,
@@ -22258,6 +23400,14 @@
       0
     ],
     "AdrrXm7t7tjUdtJYbj3BreMgbZmyFCuCGAHyBowuuxhx": [
+      1,
+      0
+    ],
+    "Aek2KuQPcsHzPdhza7ckBtXxEHTmnm7BLcxqW9Lhb5GE": [
+      2,
+      0
+    ],
+    "Af3Gsti3fTJf92hiJE8TbVeF5oqNVpm4y1eHxSvgXTUx": [
       1,
       0
     ],
@@ -22310,6 +23460,10 @@
       0
     ],
     "AqeqPSFcAkNvgEM8fvvSyTqnJrddDw7Ugk2Ni3oiYNCg": [
+      1,
+      0
+    ],
+    "AqsW2qxwaKKntSVKQKYBiyBjjR6UURGkWXzECTvQk116": [
       1,
       0
     ],
@@ -22382,7 +23536,7 @@
       0
     ],
     "B2nYZGBhRT7WvH9zqjMe3CQVwgdpWWxo4mVFphbk87bV": [
-      1,
+      3,
       0
     ],
     "B32QbbdDAyhvUQzjcaM5j6ZVKwjCxAwGH5Xgvb9SJqnC": [
@@ -22410,8 +23564,8 @@
       0
     ],
     "B7v2xGaFp6h6iDAaDs4nDJb46o7v5244x6EkUi4WHBnB": [
-      32,
-      25
+      39,
+      28
     ],
     "B8mgEVDYZGgYYb6r5dxBxP62mqXmJEcLPGF6msEVVTm": [
       1,
@@ -22442,7 +23596,7 @@
       0
     ],
     "BHAYfZo6mA7zCRax9TfxrY7NUpDVfxvk2cp7kUzMUhoY": [
-      1,
+      2,
       0
     ],
     "BJhtjmjEK2gQC3hiGHtbfegwwxZFnFttQopf35rbRkHR": [
@@ -22529,8 +23683,12 @@
       1,
       1
     ],
+    "BYreTDX5ut7YpVXG6Fmgc4s8ccugWNFZCaBHvBTFC8th": [
+      3,
+      0
+    ],
     "BYrx9J3qi3i1ZsqUZGisrLnXvqkKXdQJJVzv4B49F9hU": [
-      1,
+      2,
       0
     ],
     "BZv3cNp1TNrEhjhnrbsyZPacHwayJv8BV4qpNH3LvcPn": [
@@ -22590,7 +23748,7 @@
       1
     ],
     "Bp14WKh7BrAoqBvVZk6c77TuPFb9tYd4EMg1L8JJP37t": [
-      1,
+      2,
       0
     ],
     "BpKUGGJCA4AyQD8H7h6rx6Gr92sU7txVGnr2T8MLvKk7": [
@@ -22614,7 +23772,7 @@
       0
     ],
     "BuXDpuNYTXfGAGYEVQT8LEDevUn6pmNP4swsw9C4D3UJ": [
-      1,
+      3,
       1
     ],
     "BuZPzsSYZa6VQU3HK9j2x3V9aVR7fj3SzVQDnAsuPnQ4": [
@@ -22626,7 +23784,7 @@
       1
     ],
     "BumKLFFvnJ3Q1htS9ibdgGfaoXjpKKPrFVJaFtPVZ6bK": [
-      4,
+      6,
       2
     ],
     "BvH5N6nqVMb1HigcFBYddRZ63CgJPxdV23oZCtJzU3VK": [
@@ -22674,7 +23832,7 @@
       0
     ],
     "C5EMTGGE87SqLyuvhShLDMj2jUBwqBLJAZF6ybK8Jyqw": [
-      16,
+      17,
       4
     ],
     "C6A6hRbNuGRgpUfLwcNULrrD59FXW2jVvpdpj84PGJrY": [
@@ -22699,6 +23857,10 @@
     ],
     "C8BdBLW1GdnCR86nSpcfRMbshvHqwKq9qSTTdSn71AeV": [
       2,
+      0
+    ],
+    "CBKgS8Nj714YomoPPxhVLUWos7vSrWnuL2cVKnJqWo2s": [
+      1,
       0
     ],
     "CBcNrPBRRiMgihLCqbjfUDJGepyeYoeP5B8HrH2PD5vy": [
@@ -22738,8 +23900,8 @@
       0
     ],
     "CHxdVd7Q2T6fsw8kJ6qraxpTNPB5jKRZwbzGA9tHndUb": [
-      2,
-      2
+      3,
+      3
     ],
     "CJBRLNdjMd6TcsLUpdWxgyFNJfJP7PCABDjtEsGTaceS": [
       2,
@@ -22865,12 +24027,16 @@
       5,
       1
     ],
+    "CgoiJHrYC1eZL3nFRpRuX93deo89vvP7detViwh2mGkD": [
+      1,
+      1
+    ],
     "Ci7GofoqzgSLiyncyxT3uQ2dTi2FjPk6ddyhSNFaM88m": [
       2,
       0
     ],
     "CkLT4ADywSJkXPhwjfnQSd2ujWv8eb5FLKxN1FejvELr": [
-      1,
+      2,
       0
     ],
     "Cm1FUibaTJLyG34friLp69qyzTo83zGusCouCtJdg3ib": [
@@ -22906,7 +24072,7 @@
       0
     ],
     "CtMDeCAUTzBWMYp8qJEZYfbHBkhDjQkyrjhsdrnRACa6": [
-      1,
+      3,
       1
     ],
     "CthciZBHSDM5GH6KtnBhz9cqbYWR1WNMbg7VMPbkPQ5e": [
@@ -22948,6 +24114,10 @@
     "D5DSopyeoDFsVdz5vLxpf36GJgdmZ8Tx2kTWgyhs62iC": [
       1,
       0
+    ],
+    "D61dLgQGyvbi2wfuxba3rZZYs2HhYNkZHWV3ARVgG9jt": [
+      1,
+      1
     ],
     "D6dnnGojGRnvXxWuSSNdEPjMGadt6fFTx59YkxYNQkyc": [
       1,
@@ -22994,7 +24164,7 @@
       1
     ],
     "DF9MXmawYzbqskNxL1wTSYRcG2Gv25pqvVxVKD4kvkM4": [
-      5,
+      6,
       0
     ],
     "DFERrU3mRB2jVQgrx8mFxojXpA3ACDicCS8fTUoorCkx": [
@@ -23022,8 +24192,8 @@
       1
     ],
     "DJQwtiowTJmAvAu4vhCaFgPiS3nnKD5r5agZgBQEdHK2": [
-      1,
-      1
+      2,
+      2
     ],
     "DJTj1TKFhp7ipY8dgic22iiyLPpPdoeutYLZTiknGpNi": [
       2,
@@ -23048,6 +24218,10 @@
     "DMs2MWcxPi47F6FL3TWRte1G8q9vNVrWuE9XXb8nV317": [
       1,
       1
+    ],
+    "DNk4U4vhCk589X28q1TAiaKym3h1acrYQ1sDswNNZdy5": [
+      1,
+      0
     ],
     "DPNPVvoGdwNBY849ryx2JZzakWuWbDTfSUYr8aNfKLwA": [
       2,
@@ -23106,16 +24280,20 @@
       1
     ],
     "DYxZhDQLcoMX5gSoKkGXEDrftqh5ybqrmWCpQBEtknrV": [
-      2,
+      3,
       2
     ],
     "Da1Erpm3FoS2f3Sto7FfVVnd8S2acvQyxY52VDmpH2iQ": [
-      2,
-      2
+      4,
+      3
     ],
     "DaVinciQ1rCet62DdtnSfvC1hPt1C2GozWiACaZxuwwz": [
       8,
       1
+    ],
+    "DdVDHSdYwNFzEvvHnDzDsXCY4TX3Un3Mzsv6MCBu7rs2": [
+      1,
+      0
     ],
     "DdjZdXJquvp39hs7iZ7csexsgKWZj3WJR6sckGNuRpHf": [
       2,
@@ -23126,8 +24304,8 @@
       1
     ],
     "DeVWAjYLjiD3m69gvbpDFPq2reG6By4mSXPtoputatYj": [
-      1,
-      1
+      3,
+      2
     ],
     "Deixkjp8MNqX2tc4J9WCt51WKkB9E4P6VknBPA8osKrt": [
       1,
@@ -23145,7 +24323,15 @@
       1,
       1
     ],
+    "DiSKsFsvnuR5iwJLVA18QPe7vusKFMKtT6ZffdsS83V6": [
+      1,
+      0
+    ],
     "DjwvPmZb1fG6GjjZDiRMUtpbefo7PVxYutfRiaKQttMA": [
+      1,
+      0
+    ],
+    "Dk98PkUWHmSpHk2LGJ9h86VTY9H6eF2ZHHJ7wGxU6Lsm": [
       1,
       0
     ],
@@ -23221,6 +24407,10 @@
       1,
       0
     ],
+    "DvZW68rFBisjB1k4cPSVG45A1KjZFVTQioAmh9o4EAiB": [
+      1,
+      0
+    ],
     "DvxQKmGLrbTbwFtBaRDpsZFaN8ekqCkugnLEzku5X64K": [
       3,
       2
@@ -23238,11 +24428,11 @@
       1
     ],
     "DxhpC9c4kGkYJR34xUrfFeDx9vwb6yoHUMWrTCZybwtH": [
-      14,
+      16,
       2
     ],
     "DxijbvL44jYyovPHutBGoFr1cdi99KFjXPMhoDn9r1RQ": [
-      2,
+      4,
       1
     ],
     "Dxis2F7p4LLbmA1XANAY6AVo4LQYoyqrgE42vRzXi9z8": [
@@ -23254,8 +24444,12 @@
       0
     ],
     "E1icorNRLQMDr1C8qWBtA9aadRK2uT2daRYQjtkWUQL1": [
-      1,
+      4,
       0
+    ],
+    "E2f7LYoZrAfNeY4i69y4p1wS2HF3hmNMS6nAuQK9Dfw3": [
+      1,
+      1
     ],
     "E3g6rt9itysaWTZnuo1hJ4jwFqVmYj3SPpfDykNqPFZZ": [
       1,
@@ -23314,7 +24508,7 @@
       0
     ],
     "EBWkQGHPc4teggp5ok1oUmoGnbyx4W4bSYTo2ynMVw2z": [
-      2,
+      3,
       1
     ],
     "ECjHLcab4n739fP6VNVYvdnC2hht2YFWd2y8kpDijZpm": [
@@ -23358,7 +24552,7 @@
       1
     ],
     "EKUEx3fUsNNEezYioLdvzefBU7WkC3L9zocV4DJn4F5Y": [
-      11,
+      13,
       3
     ],
     "EMAozawyYaVAKjJCdVhTiVq4tTpdtFsuE22WVK8WEp25": [
@@ -23374,8 +24568,8 @@
       0
     ],
     "ENskGQev2bXPjaCYPV9bUcPLv3635Y18BWzLN95x4soC": [
-      45,
-      7
+      49,
+      8
     ],
     "EPFGTj4775WB3Y1EU2MBzWWxD7r1B1wRdsjcU9DfSCSf": [
       1,
@@ -23457,6 +24651,10 @@
       1,
       1
     ],
+    "EeYUvv1GDpNn7PRiD8KpsHPLG7zSWN4PhBPZ9gZm1Yjv": [
+      1,
+      0
+    ],
     "EfzEEYV72bPRWWhNvqmDjq5h2R38Wf9E8y56SuLAt9Fi": [
       1,
       0
@@ -23492,6 +24690,10 @@
     "EkNcummjF4Hhv3pNCGz9jf9y6JtmNK2VqmGE3Nar9RvT": [
       1,
       0
+    ],
+    "EknQCjDPxbVu8AUfvrSg9rVTRTFhxefvLq5FkKKx8u4X": [
+      1,
+      1
     ],
     "En55aPorjS587rPgMz1frSR3GQsyMxDYf6XMSUrFNktg": [
       1,
@@ -23569,6 +24771,10 @@
       1,
       0
     ],
+    "F3EGCX6e7ApF1C8qNebwYZCP7fhzrKcArMWM7LPYgUgu": [
+      1,
+      0
+    ],
     "F5F6dMkbNiuLDw8pwhLeeHseti3JJKs7DncXePTt3jiV": [
       1,
       1
@@ -23602,7 +24808,7 @@
       1
     ],
     "FAHMvDeWBEBe6fG653ChW7suaLVMQboS3hiaNqpejuBF": [
-      7,
+      8,
       1
     ],
     "FBCoK3UbccA3JxfqCasTJxuyNFq3tDp5xLGJLGR5jnu4": [
@@ -23642,6 +24848,10 @@
       0
     ],
     "FK2e7g37Lb39ihCPdvTQnmiKfDZK42pZQ7sHhe5i5oez": [
+      1,
+      0
+    ],
+    "FKWdcC81aNnUE5SiRc7smy4PU88SJR74zAkiRmTyZLx9": [
       1,
       0
     ],
@@ -23690,7 +24900,7 @@
       5
     ],
     "FTWptXCiFtFGcsjAwSusPM4wbHusKPB6WfmqRjVJKQgg": [
-      1,
+      2,
       1
     ],
     "FTi85HyLy7anJcZwHvmtEPma9rBebpcvZ9FwWBSkk5n": [
@@ -23802,7 +25012,7 @@
       5
     ],
     "FiFawHqxeTVBhv6YbqbLwDVuvokRpPUM1bNwAyxhGc6W": [
-      35,
+      39,
       14
     ],
     "FjDHLiNfgWHrt2fonLbrzWrrRqsEH3D3mUsriWyE9uYS": [
@@ -23836,6 +25046,10 @@
     "FqNjT91S12drTsHLPC4eTHSv2DJTWEMoeqhNGS5p5kgp": [
       1,
       1
+    ],
+    "FqZbbaWUwFMZj5xXe8acLVcrDCX3Gwi5vEmFJ6KgZ1ev": [
+      1,
+      0
     ],
     "Fqpt9g9kW3Q7U2hvEuNuCxtwC1xenk1bvnRhgwVLKHCX": [
       2,
@@ -23914,7 +25128,7 @@
       0
     ],
     "G51kUjtF3Z7ATe5WZ8wrwxbjVLPfUFWHHiU4ARMh2y7f": [
-      1,
+      2,
       0
     ],
     "G5W2Vr9JUhUfKhvSjVMWT5BWhDcHhJeiEEPnFzHtx53S": [
@@ -23929,6 +25143,10 @@
       6,
       1
     ],
+    "G7NvZKjoVqBDWciSYtWWgUPB7DA1iJavdvH5jty2FAmM": [
+      1,
+      0
+    ],
     "G89VKav7PtYBWWsmoeSvpZctkFDputdmryqpTzvyFhAK": [
       9,
       5
@@ -23937,9 +25155,17 @@
       7,
       7
     ],
+    "G8gTguf7EUwqfwdRhiZ3KCBEgPURVB7LXoDzHif4p6oh": [
+      1,
+      1
+    ],
     "G9sQPg9Eimkwe72w1xH1tPUc9RFNuK6Ufw5AyWy6j7ob": [
-      27,
-      5
+      31,
+      7
+    ],
+    "G9tzNAAoDyUcsQs5KgY16fAVhM8iwFgW24mnZFhjXM3S": [
+      1,
+      1
     ],
     "GB7NgXoir5rUD9xUYHjG6WQXZmwrqxZG51SXrmjMJvZQ": [
       1,
@@ -23958,7 +25184,7 @@
       1
     ],
     "GDhBWZVYmC9s5xXqSoiEVopu9warrpD5X5JQXEAV4dkd": [
-      1,
+      2,
       1
     ],
     "GFA2t9fZVY3jC7wDBPDB8FdsVNzLWgK44J4q7XpP476a": [
@@ -23981,6 +25207,10 @@
       1,
       0
     ],
+    "GLgZJ4dhtRwwuTx9368q5hzRxdrg9Gqef2ZWisM9rp6z": [
+      1,
+      1
+    ],
     "GMKNH8xEAfpMzk4oChsv3iLv6mAw8ksZQd6tbvLMuvLr": [
       5,
       2
@@ -23994,7 +25224,7 @@
       0
     ],
     "GMwXfLtKhgtWdLqq29pF4JbUUQA6asUeEaXtjQSB7gpN": [
-      2,
+      3,
       1
     ],
     "GNEqVgyuJHRb3hR5kbjFeaZW1ZYVtzUMHjiMpkGNUMVT": [
@@ -24038,8 +25268,8 @@
       0
     ],
     "GTnbqqrYg8tv9gsievtfDGxMi9FVGikNu3HiSxb4Wukr": [
-      3,
-      2
+      4,
+      3
     ],
     "GU3GQGgAKWqdVooXqWEwhE9L8s7ShmtxjKHVALTNyczr": [
       1,
@@ -24078,7 +25308,7 @@
       0
     ],
     "GYiB6LUVwqVhFtRK9w1tL9zMeMo979QJcssqa148TGNV": [
-      1,
+      3,
       0
     ],
     "GZkCwNP3o3jiknTuAHhjQTU8me3p49wL3XFHZeLTCH7N": [
@@ -24114,8 +25344,8 @@
       1
     ],
     "Gg3ska7ScdMZX5nPgsM7wBfprRhNp6cuS2zuG7UFXcDv": [
-      2,
-      2
+      3,
+      3
     ],
     "GgGFP5nWXsWuGULVhpgRFz8Psg8RRfGKHZHtn6cWSy6U": [
       5,
@@ -24126,7 +25356,7 @@
       1
     ],
     "GhLTmKbYBZevAeSj57CDZecQEJhevcUNfYydmpxHgScQ": [
-      2,
+      3,
       2
     ],
     "GhhFtcLnbzf2LFyUy4QCmGvp9kvHptLd2ebA2rzkUAtN": [
@@ -24214,7 +25444,7 @@
       0
     ],
     "GuJtPr2zG1uCzAufr2UaBVT8PyWq9t4GvNuCGBnf2tPY": [
-      4,
+      5,
       1
     ],
     "GvE6nrjz6Ya9aZvgpU4D5HteWFHpDfKP6k3eCArwBjP7": [
@@ -24226,12 +25456,16 @@
       1
     ],
     "Gvg5A4gdATsnqFFsX8XedH5YQ2J9bCo4BeKm4R556y6D": [
-      2,
+      3,
       0
     ],
     "Gw2SPwAm3QXQAFHVd9Bcc9XQbHNjXaJPj38eMEvEpWog": [
       1,
       0
+    ],
+    "GwDcTrZFAfRXoLEc9nHV6mXwajKNoTj59qMbc2SZpxLJ": [
+      2,
+      1
     ],
     "GwE2o1rnh2Ch98CSVyDUmrqBSUCxoNMLw7pWZfFY6eQi": [
       1,
@@ -24244,6 +25478,10 @@
     "Gxs6w4rtuSfXjqUzjqp4mW4RzAAhef8UVTYQdDfN17cu": [
       1,
       1
+    ],
+    "Gxu3t54t9m1NkTG4AbB4Lz1iDLc8sLNh7mWNhow3oMnS": [
+      1,
+      0
     ],
     "Gy4be9DN7qha7tSLuEKeoS6zQJVcMxXTHFHfbp9c2e9V": [
       1,
@@ -24322,7 +25560,7 @@
       0
     ],
     "H8bgvrbb1E6WWiyFtKSrWZomkuf54LPcNjVGwoH449bz": [
-      35,
+      37,
       2
     ],
     "H8jj61E2czNQ8hCzjqttVDbK7n1TwB6pDsWFvAJ73YxV": [
@@ -24397,6 +25635,10 @@
       1,
       0
     ],
+    "HPAdpTEne55utzmGxwQSWUn1UxU8EmTDnZs58RzBWZhL": [
+      2,
+      0
+    ],
     "HPj4dTYrLd4dytLMmAB3Axx9RszwNkeFqgjHubutGDGY": [
       4,
       2
@@ -24422,7 +25664,7 @@
       1
     ],
     "HT3mRdoaeqHVEcsLBWgMWaji1xcsPBjdtJtcV2xQYaPd": [
-      1,
+      2,
       0
     ],
     "HTPqhvbuYifepnmw5Dde4hz1QeMD6HXypBLpTSC9uwDS": [
@@ -24430,7 +25672,7 @@
       0
     ],
     "HTgsRpiVPLXsbW6Zud3u7Z4kiv5AkUsSWpJrYuj9isyi": [
-      1,
+      2,
       1
     ],
     "HUSDvQ6vFuaXNgLg98HHfR4gKC21VZS8AV7S7FLdW3zJ": [
@@ -24459,6 +25701,10 @@
     ],
     "HYKRAt4JpcjnJw5E5Th1uFmvL3MP7E2mNEwKawB5CApZ": [
       3,
+      0
+    ],
+    "HYNmLpgin8TDqZ32MmacPZYW2iWqwYzy3ybfC5CJafHr": [
+      1,
       0
     ],
     "HYXE1jcMoCVj983Bxm8wWGGspRdxEs1yLS2ZwaQEqxV1": [
@@ -24530,8 +25776,8 @@
       1
     ],
     "HkRmFTLxzPj56wRofgXLHWCXaF5oBx6fDAPcbSVDYTKh": [
-      9,
-      5
+      10,
+      6
     ],
     "HkSaPToNrabk5swFQi7KhLhnnpDJYVB1QoyHNQbcyZXf": [
       1,
@@ -24574,8 +25820,8 @@
       0
     ],
     "HrANeMUbAoQyVqTKuPJwS7VyrjFA93fNNtFNt7ogZsua": [
-      2,
-      2
+      3,
+      3
     ],
     "HrbgiQLRuVmmHzDsmEoL49on6Y6fo3gLrBXEtvFnbfMq": [
       1,
@@ -24621,6 +25867,10 @@
       1,
       1
     ],
+    "HwkKH4cGQmUZoqdoMeGiLQhCaJ1qY2dqUxjoanMnv69N": [
+      1,
+      0
+    ],
     "HxYLeHuSHEW9kFwF6DyxCTWUjj15YbxB6k71Bh4QgbTN": [
       5,
       1
@@ -24647,6 +25897,10 @@
     ],
     "J3kyA18XmCimrn7TpkbfHLxE1sNmf1PfhNk2FC8GUXi5": [
       2,
+      0
+    ],
+    "J5tRFLBaFz6xnffkVPig7Uz5RhZNKBPCxYC8zUx541FY": [
+      1,
       0
     ],
     "J5vYdxFpGRSp3FhYjHXzB8LqToJVb8rCqL4nh7GeWezk": [
@@ -24718,7 +25972,7 @@
       1
     ],
     "Jew7ypvr4gCkYyeX8TdrsHGBFeqWtkr9cZmvt63zf4p": [
-      2,
+      3,
       2
     ],
     "JpGEtHKG6rEur75WNzxNN15jc7kJGNNqsTNXmjEJVcV": [
@@ -24726,12 +25980,16 @@
       0
     ],
     "KStmjwDWsxaSHtFDAoPM2HzwbQMRTtxjSZuEop1z8ai": [
-      4,
+      6,
       1
     ],
     "LM1o5j6agyQvQ6BCgpHE8z9WsYC5bFcVw1mupWLjKVH": [
       2,
       2
+    ],
+    "LfEcaUf77iEhnz6gFpLqYgDb5Uk6Ekc5n69wu7Qa9Uw": [
+      1,
+      0
     ],
     "LpieurWuRDwZuWRrjpzB4UBa6nuN8auoNeKsLGUukn2": [
       1,
@@ -24750,7 +26008,7 @@
       0
     ],
     "NULLioEUhd89Jo5Acm9sX88bwjNjrsAVy6KWkXD7qZh": [
-      21,
+      22,
       9
     ],
     "NoY2v27H9F498GyyGeXDDNFzHKihqfNgXK38iJtA5jq": [
@@ -24793,6 +26051,10 @@
       1,
       0
     ],
+    "ViTjB3dRqXLkSEyHPnwjVS82Kr5bRkpDbxw7525QRyd": [
+      1,
+      0
+    ],
     "WPhPeyFXAwXLfqnC6TYyeua3TvkVRadZj5opCoAzHKk": [
       1,
       0
@@ -24818,19 +26080,23 @@
       1
     ],
     "YWfoY5WUU5Hij4671phF2i9vseVvAVwSQRo3h23yijP": [
-      2,
-      1
+      3,
+      2
+    ],
+    "aNFpYdS6d9NPsh1epBiBuiiovKKbw2sYPRATYJ22jST": [
+      1,
+      0
     ],
     "apexpDoPm9ypJ97YoUk6eNiZHZWqqq3Ktgfmv94QAov": [
       8,
       1
     ],
     "bwamJzztZsepfkteWRChggmXuiiCQvpLqPietdNfSXa": [
-      18,
+      22,
       4
     ],
     "bwammMmTCz63P1LoCf3eafDhACPSF6tGG6vdrm9T8Hk": [
-      5,
+      6,
       0
     ],
     "cXTDRJ3KTw4hBg9H1stAR62nBG35orkaRHWhPiYVLQS": [
@@ -24849,7 +26115,15 @@
       1,
       0
     ],
+    "eoCxJ3m73BKfiDesBV5QNrMcbetXvdhGc1vT4WspMFE": [
+      1,
+      0
+    ],
     "ibrA5nZJUTMAckXByhZdfHX9XsviFZAsDBwPDHuMGGY": [
+      1,
+      1
+    ],
+    "mJg7FUEz7hRgZhwMkX1RkaDeMMjsM88u9KNWhRo4A7W": [
       1,
       1
     ],
@@ -24968,6 +26242,6 @@
   },
   "rule_version": "golden-buyer-reputation-v1",
   "runner_version": "golden-management-v2-hardened-v1",
-  "updated_at": 1789439606.9227283,
+  "updated_at": 1789440884.025911,
   "version": "golden-management-v2-live-v1"
 }
