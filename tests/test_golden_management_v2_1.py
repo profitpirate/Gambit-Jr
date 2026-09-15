@@ -46,15 +46,18 @@ class TestGoldenManagementV21(unittest.TestCase):
         ft = v21.FlowTracker()
         ft.ingest(v21.FlowEvent(1200, 'BUY', 'whale', 9.0, 100, 0.05))
         ft.ingest(v21.FlowEvent(1500, 'BUY', 'small', 1.0, 100, 0.07))
-        score, reasons = v21.continuation_score(ft.snapshot(2000))
+        _, reasons = v21.continuation_score(ft.snapshot(2000))
         self.assertIn('WHALE_CONCENTRATION', reasons)
 
     def test_sell_pressure_fails_anchor(self):
         ft = v21.FlowTracker()
+        g = v21.FlowAwareGuardian(v2.TIERS['HIGH'], ft)
+        first = g.on_mark(v2.Mark(325, -0.02))
+        self.assertIsNotNone(first)
+        self.assertEqual(first.kind, 'INITIAL')
         ft.ingest(v21.FlowEvent(1100, 'BUY', 'a', 0.2, 100, 0.02))
         ft.ingest(v21.FlowEvent(1500, 'SELL', 'a', 1.0, 100, -0.04))
         ft.ingest(v21.FlowEvent(1900, 'SELL', 'b', 1.0, 100, -0.10))
-        g = v21.FlowAwareGuardian(v2.TIERS['HIGH'], ft)
         action = g.on_mark(v2.Mark(2000, -0.10))
         self.assertIsNotNone(action)
         self.assertEqual(action.kind, 'EXIT')
@@ -82,12 +85,11 @@ class TestGoldenManagementV21(unittest.TestCase):
 
     def test_profit_floor_prevents_full_giveback(self):
         ft = v21.FlowTracker()
+        g = v21.FlowAwareGuardian(v2.TIERS['HIGH'], ft)
+        self.assertEqual(g.on_mark(v2.Mark(325, 0.05)).kind, 'INITIAL')
         ft.ingest(v21.FlowEvent(1500, 'BUY', 'a', 1.0, 100, 0.30))
         ft.ingest(v21.FlowEvent(1800, 'BUY', 'b', 1.0, 100, 0.30))
-        g = v21.FlowAwareGuardian(v2.TIERS['HIGH'], ft)
-        # First 2s decision earns continuation.
         self.assertIsNone(g.on_mark(v2.Mark(2000, 0.30)))
-        # Tape deteriorates and price falls through the 30% peak floor.
         ft.ingest(v21.FlowEvent(2100, 'SELL', 'a', 1.0, 100, 0.12))
         ft.ingest(v21.FlowEvent(2200, 'SELL', 'b', 1.0, 100, 0.12))
         a = g.on_mark(v2.Mark(2300, 0.12))
