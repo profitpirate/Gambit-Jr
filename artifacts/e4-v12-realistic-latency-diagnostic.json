@@ -1,0 +1,387 @@
+{
+  "active_untouched_live_data_used": false,
+  "declared_win_rate_gate_passed_at_observed_latency": false,
+  "diagnostic_id": "e4d-1a55a182a31c7bb52941f1eb4d1e38e8cf52507d3b1aae04f4c50a29305793c7",
+  "economic_robustness_passed": true,
+  "frozen_protocol_changed": false,
+  "identity": {
+    "entry_policy": "first exact trace quote at or after 250ms plus latency",
+    "exit_policy": "stop=0.70|take=3.00|hold=60000|protect=1.15:1.06|trail=1.25:0.15",
+    "fee_model": {
+      "conservative_all_exits_assumed_at_maximum_hold": true,
+      "maximum_concurrent_positions": 2,
+      "position_fraction": 0.0185,
+      "priority_fee_sol": 0.001,
+      "starting_bankroll_sol": 3.0
+    },
+    "latencies_ms": [
+      50,
+      100,
+      200,
+      300,
+      500
+    ],
+    "runtime_evidence": {
+      "artifact_name": "e4-v12-forward-34938012082",
+      "artifact_zip_sha256": "be3fbeccb0fa22b835b1e982bb9b91d88381470f55f908c65ca5b1635a05422e",
+      "direct_copy_closed_positions": 454,
+      "evidence_batches": 49,
+      "launches": 147000,
+      "median_source_to_fill_ms": 297.207515,
+      "workflow_run_id": "34938012082"
+    },
+    "selection_policy": "unchanged frozen development selections",
+    "source_code_fingerprint": "280126d0d85d66131cec067210cf582a0f6082a5bcd41ab012267640892b78b2",
+    "source_experiment_id": "e4x-b1086b70febc39fefa73d35f8451674a126a3c0256ca95a608b57f9c9c6cd1cc"
+  },
+  "latencies": {
+    "100": {
+      "attempted_quotes": 317,
+      "folds": [
+        {
+          "fold": 0,
+          "ledger_hash": "8407ff11df72d644b6976abdab6df5d1877d458fb9bc09db7775a6a6c9b8569e",
+          "maximum_drawdown_fraction": 0.026054591272459238,
+          "net_pnl_sol": 0.5210839587202241,
+          "profit_factor": 2.0437715348527203,
+          "quote_coverage": 1.0,
+          "trades": 89,
+          "win_rate": 0.6067415730337079,
+          "wins": 54
+        },
+        {
+          "fold": 1,
+          "ledger_hash": "5010a48020761fa62d6ecd730a56ca5ba72e4b624c0cbbf29ebbe24a46e6586a",
+          "maximum_drawdown_fraction": 0.03794765644091062,
+          "net_pnl_sol": 0.7050614977561009,
+          "profit_factor": 3.3164031304595154,
+          "quote_coverage": 1.0,
+          "trades": 84,
+          "win_rate": 0.6190476190476191,
+          "wins": 52
+        },
+        {
+          "fold": 2,
+          "ledger_hash": "46079198257c06bf63e46462c114854b4248d2eead73dd195ceb44d9f20baca6",
+          "maximum_drawdown_fraction": 0.030241811212362506,
+          "net_pnl_sol": 0.2537397798018648,
+          "profit_factor": 1.6502234375622586,
+          "quote_coverage": 1.0,
+          "trades": 64,
+          "win_rate": 0.5625,
+          "wins": 36
+        },
+        {
+          "fold": 3,
+          "ledger_hash": "b115edb00cd82f9aa56b31834c1cf1abf82e53d6db86a188d0fdf53c1612b3b7",
+          "maximum_drawdown_fraction": 0.07806353141926022,
+          "net_pnl_sol": 0.05890125762733156,
+          "profit_factor": 1.0826494983956723,
+          "quote_coverage": 1.0,
+          "trades": 80,
+          "win_rate": 0.45,
+          "wins": 36
+        }
+      ],
+      "latency_ms": 100,
+      "ledger_hash": "64fa8bd6ca5091c69290b762b2f27fb2a23059c59332cb2fbdf6f7bcbe691804",
+      "maximum_fold_drawdown_fraction": 0.07806353141926022,
+      "minimum_fold_profit_factor": 1.0826494983956723,
+      "minimum_fold_win_rate": 0.45,
+      "net_pnl_sol": 1.5387864939055214,
+      "positive_folds": 4,
+      "profit_factor": 1.8071232305284386,
+      "quote_coverage": 1.0,
+      "rejected_quotes": 0,
+      "trades": 317,
+      "wilson_95_lower_bound": 0.5064765296048752,
+      "win_rate": 0.5615141955835962,
+      "wins": 178
+    },
+    "200": {
+      "attempted_quotes": 317,
+      "folds": [
+        {
+          "fold": 0,
+          "ledger_hash": "edb30d725f5a55fb4b0561c4f8d94fa900d1065f5cce51439b1895b878e7556e",
+          "maximum_drawdown_fraction": 0.026780254928908825,
+          "net_pnl_sol": 0.6304987263060267,
+          "profit_factor": 2.355368379855018,
+          "quote_coverage": 1.0,
+          "trades": 89,
+          "win_rate": 0.6067415730337079,
+          "wins": 54
+        },
+        {
+          "fold": 1,
+          "ledger_hash": "2c22c47eabab3ab5bce4afd086109cba72aeccba67de9f2198c5f8a6f17308a9",
+          "maximum_drawdown_fraction": 0.04086069590905635,
+          "net_pnl_sol": 0.6383114232411518,
+          "profit_factor": 3.0791304119707985,
+          "quote_coverage": 1.0,
+          "trades": 84,
+          "win_rate": 0.6071428571428571,
+          "wins": 51
+        },
+        {
+          "fold": 2,
+          "ledger_hash": "36f0a0fca3579ee1caf7a0d49cfc627a192d90d3d02d75e9a870763f338ddbe6",
+          "maximum_drawdown_fraction": 0.030420182202621177,
+          "net_pnl_sol": 0.2475401412462177,
+          "profit_factor": 1.6294771220627797,
+          "quote_coverage": 1.0,
+          "trades": 64,
+          "win_rate": 0.5625,
+          "wins": 36
+        },
+        {
+          "fold": 3,
+          "ledger_hash": "f1e51b359849608cf6d4e2839571517e57081a024339e021bf3e48d0658aae4b",
+          "maximum_drawdown_fraction": 0.07677658307807,
+          "net_pnl_sol": 0.07918815982686134,
+          "profit_factor": 1.1144980159050595,
+          "quote_coverage": 1.0,
+          "trades": 80,
+          "win_rate": 0.4375,
+          "wins": 35
+        }
+      ],
+      "latency_ms": 200,
+      "ledger_hash": "c3bc4ffdc2d9b1a24557871166dc40bfe60d2189ce8955768b7e90f6c17b12de",
+      "maximum_fold_drawdown_fraction": 0.07677658307807,
+      "minimum_fold_profit_factor": 1.1144980159050595,
+      "minimum_fold_win_rate": 0.4375,
+      "net_pnl_sol": 1.5955384506202575,
+      "positive_folds": 4,
+      "profit_factor": 1.8591772147006274,
+      "quote_coverage": 1.0,
+      "rejected_quotes": 0,
+      "trades": 317,
+      "wilson_95_lower_bound": 0.5001627665175062,
+      "win_rate": 0.555205047318612,
+      "wins": 176
+    },
+    "300": {
+      "attempted_quotes": 317,
+      "folds": [
+        {
+          "fold": 0,
+          "ledger_hash": "15fc86dbc480623f27f13c236aa1168905e34a3ea37e8fa6064ca12f54025388",
+          "maximum_drawdown_fraction": 0.02552005831885218,
+          "net_pnl_sol": 0.6238665514874628,
+          "profit_factor": 2.342414793827395,
+          "quote_coverage": 1.0,
+          "trades": 89,
+          "win_rate": 0.6067415730337079,
+          "wins": 54
+        },
+        {
+          "fold": 1,
+          "ledger_hash": "a7a5bf9d71d9c946d7201f3b1a4ab338ae62ff03590e750e8fec64ff2df774de",
+          "maximum_drawdown_fraction": 0.02666721068731433,
+          "net_pnl_sol": 0.8322930465409155,
+          "profit_factor": 4.105204591509187,
+          "quote_coverage": 1.0,
+          "trades": 84,
+          "win_rate": 0.6190476190476191,
+          "wins": 52
+        },
+        {
+          "fold": 2,
+          "ledger_hash": "baefac133c7ea42d93cbd5ea61eb66301723b81fe61dd45cd54bfb376b2f55c3",
+          "maximum_drawdown_fraction": 0.031366485125812194,
+          "net_pnl_sol": 0.36942536883906607,
+          "profit_factor": 2.0385825373222475,
+          "quote_coverage": 1.0,
+          "trades": 64,
+          "win_rate": 0.578125,
+          "wins": 37
+        },
+        {
+          "fold": 3,
+          "ledger_hash": "3966d2b68974acb3cbdf5fd97264b3a99c8a08f24eb2b3a4dd8269f4374ec656",
+          "maximum_drawdown_fraction": 0.07840574419540758,
+          "net_pnl_sol": 0.07044198015855807,
+          "profit_factor": 1.1015127321077305,
+          "quote_coverage": 1.0,
+          "trades": 80,
+          "win_rate": 0.425,
+          "wins": 34
+        }
+      ],
+      "latency_ms": 300,
+      "ledger_hash": "942375ae611d151623a70322d5282c3de043310c0d09943987247f0dc563d364",
+      "maximum_fold_drawdown_fraction": 0.07840574419540758,
+      "minimum_fold_profit_factor": 1.1015127321077305,
+      "minimum_fold_win_rate": 0.425,
+      "net_pnl_sol": 1.8960269470260025,
+      "positive_folds": 4,
+      "profit_factor": 2.063755195040829,
+      "quote_coverage": 1.0,
+      "rejected_quotes": 0,
+      "trades": 317,
+      "wilson_95_lower_bound": 0.5033185500834203,
+      "win_rate": 0.5583596214511041,
+      "wins": 177
+    },
+    "50": {
+      "attempted_quotes": 317,
+      "folds": [
+        {
+          "fold": 0,
+          "ledger_hash": "a3ede91b89504a85376c32055aa0fcfe6ab33fe0e4e6963181585450370f2f22",
+          "maximum_drawdown_fraction": 0.04134184721519141,
+          "net_pnl_sol": 0.47231135381142675,
+          "profit_factor": 1.984231785096028,
+          "quote_coverage": 1.0,
+          "trades": 89,
+          "win_rate": 0.651685393258427,
+          "wins": 58
+        },
+        {
+          "fold": 1,
+          "ledger_hash": "29311088b97560ab1a5b19e8d43fb6c03a7664d94feb04362e56fde515479652",
+          "maximum_drawdown_fraction": 0.037649897952630074,
+          "net_pnl_sol": 0.863562563622434,
+          "profit_factor": 3.891666428575747,
+          "quote_coverage": 1.0,
+          "trades": 84,
+          "win_rate": 0.6309523809523809,
+          "wins": 53
+        },
+        {
+          "fold": 2,
+          "ledger_hash": "1d123a742c47d6df53326dc5cc039ac948040d9351d1b20c66d6d0f7a916d131",
+          "maximum_drawdown_fraction": 0.0365559962996184,
+          "net_pnl_sol": 0.36967023065921323,
+          "profit_factor": 1.8700522937555923,
+          "quote_coverage": 1.0,
+          "trades": 64,
+          "win_rate": 0.59375,
+          "wins": 38
+        },
+        {
+          "fold": 3,
+          "ledger_hash": "7b6966cf0ec8e1a97b7f8e9034f6d179b6ad350c9d6fcd5e5e864cbb6897e21b",
+          "maximum_drawdown_fraction": 0.09996918009417873,
+          "net_pnl_sol": -0.001359141940448616,
+          "profit_factor": 0.9982510119313865,
+          "quote_coverage": 1.0,
+          "trades": 80,
+          "win_rate": 0.4875,
+          "wins": 39
+        }
+      ],
+      "latency_ms": 50,
+      "ledger_hash": "2e6ebb5ce391932d0cdaf0b8beee77fde15c33ad04943f9618ffb8da03382f0c",
+      "maximum_fold_drawdown_fraction": 0.09996918009417873,
+      "minimum_fold_profit_factor": 0.9982510119313865,
+      "minimum_fold_win_rate": 0.4875,
+      "net_pnl_sol": 1.7041850061526254,
+      "positive_folds": 3,
+      "profit_factor": 1.86048167566347,
+      "quote_coverage": 1.0,
+      "rejected_quotes": 0,
+      "trades": 317,
+      "wilson_95_lower_bound": 0.5381783454875723,
+      "win_rate": 0.5930599369085173,
+      "wins": 188
+    },
+    "500": {
+      "attempted_quotes": 317,
+      "folds": [
+        {
+          "fold": 0,
+          "ledger_hash": "0794ca69c8d3627dd512f9e0505d6c3e2fa50c46b0a6424077dbaec8fa7740fe",
+          "maximum_drawdown_fraction": 0.025082735561833196,
+          "net_pnl_sol": 0.5167136612648027,
+          "profit_factor": 2.1126499383312596,
+          "quote_coverage": 1.0,
+          "trades": 89,
+          "win_rate": 0.5842696629213483,
+          "wins": 52
+        },
+        {
+          "fold": 1,
+          "ledger_hash": "53e79d938dd8c7f0e5138c00d230d25fe3cd08b3d61662fbcad7da8af1bc7b59",
+          "maximum_drawdown_fraction": 0.02732474045773318,
+          "net_pnl_sol": 0.83614263521872,
+          "profit_factor": 4.137783389978349,
+          "quote_coverage": 1.0,
+          "trades": 84,
+          "win_rate": 0.6309523809523809,
+          "wins": 53
+        },
+        {
+          "fold": 2,
+          "ledger_hash": "9bc31f9da44a0fb10f67e822e7f2906a3e3ba0a87cd74a69e4eb7d71d10589fd",
+          "maximum_drawdown_fraction": 0.03290765020681796,
+          "net_pnl_sol": 0.2995068003182415,
+          "profit_factor": 1.8203067184936537,
+          "quote_coverage": 1.0,
+          "trades": 64,
+          "win_rate": 0.59375,
+          "wins": 38
+        },
+        {
+          "fold": 3,
+          "ledger_hash": "7867aaa5403862f601e1a3a34d86fb2ba8009b2a21b0c67e82a9e56eb5e27efd",
+          "maximum_drawdown_fraction": 0.07872296419569924,
+          "net_pnl_sol": 0.04800471806414164,
+          "profit_factor": 1.0686072734825376,
+          "quote_coverage": 1.0,
+          "trades": 80,
+          "win_rate": 0.4,
+          "wins": 32
+        }
+      ],
+      "latency_ms": 500,
+      "ledger_hash": "06c1c8f882931c2e69366a72f82c7000592074c1aa124e629e5ded85e337515a",
+      "maximum_fold_drawdown_fraction": 0.07872296419569924,
+      "minimum_fold_profit_factor": 1.0686072734825376,
+      "minimum_fold_win_rate": 0.4,
+      "net_pnl_sol": 1.7003678148659058,
+      "positive_folds": 4,
+      "profit_factor": 1.9469143457008355,
+      "quote_coverage": 1.0,
+      "rejected_quotes": 0,
+      "trades": 317,
+      "wilson_95_lower_bound": 0.4970091741881118,
+      "win_rate": 0.5520504731861199,
+      "wins": 175
+    }
+  },
+  "live_confirmation_authorised": false,
+  "observed_latency_bucket_ms": 300,
+  "observed_latency_requirements": {
+    "every_fold_minimum_profit_factor": true,
+    "every_fold_positive": true,
+    "full_quote_coverage": true,
+    "maximum_drawdown": true,
+    "minimum_closed_trades": true,
+    "minimum_profit_factor": true,
+    "minimum_wilson_bound": false,
+    "minimum_win_rate": false,
+    "positive_net_pnl": true
+  },
+  "observed_runtime_evidence": {
+    "artifact_name": "e4-v12-forward-34938012082",
+    "artifact_zip_sha256": "be3fbeccb0fa22b835b1e982bb9b91d88381470f55f908c65ca5b1635a05422e",
+    "direct_copy_closed_positions": 454,
+    "evidence_batches": 49,
+    "launches": 147000,
+    "median_source_to_fill_ms": 297.207515,
+    "workflow_run_id": "34938012082"
+  },
+  "production_deployment_authorised": false,
+  "production_paths_changed": 0,
+  "production_promotion_authorised": false,
+  "source_experiment_id": "e4x-b1086b70febc39fefa73d35f8451674a126a3c0256ca95a608b57f9c9c6cd1cc",
+  "supplemental_failure_classification": "LATENCY_FAILURE",
+  "trace_audit": {
+    "cache_hit": true,
+    "selected_traces": 317
+  },
+  "untouched_holdout_passed": false,
+  "version": "e4-v12-realistic-latency-diagnostic-v1"
+}
