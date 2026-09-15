@@ -1,0 +1,287 @@
+name: Golden Management v2.1 four-arm 100-trade tournament
+
+on:
+  push:
+    branches: [codex/golden-management-v2-1-tournament]
+    paths:
+      - ".github/workflows/golden-management-v2-1-phase3-live.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: golden-management-v2-1-phase3-live
+  cancel-in-progress: false
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONUNBUFFERED: "1"
+  BRANCH: codex/golden-management-v2-1-tournament
+  STATE_PATH: docs/research/golden-v21-tournament-state.json
+  STATUS_PATH: docs/research/golden-v21-tournament-status.json
+  PHASE2_RUN_ID: "34923860752"
+  PHASE2_ARTIFACT: golden-v21-phase2-34923860752
+
+jobs:
+  live-windows:
+    name: tournament-window-${{ matrix.window }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        window: [1, 2, 3, 4, 5, 6, 7, 8]
+    steps:
+      - name: Checkout tournament branch at latest head
+        uses: actions/checkout@v4
+        with:
+          ref: codex/golden-management-v2-1-tournament
+          fetch-depth: 0
+      - name: Checkout production live decoder
+        uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-selection-reconstruction
+          path: production
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install live-paper dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e production -r production/requirements-e4.txt aiohttp
+      - name: Require completed v2.1 stress and bulletproofing gate
+        run: |
+          mkdir -p phase2-proof
+          gh run download "$PHASE2_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$PHASE2_ARTIFACT" --dir phase2-proof
+          python - <<'PY'
+          import json, pathlib
+          p=next(pathlib.Path('phase2-proof').rglob('phase2.json'))
+          d=json.loads(p.read_text())
+          assert d['phase']==2 and d['status']=='COMPLETE', d
+          r=d['requirements']
+          assert r['adversarial_paths'] >= 100000
+          assert r['cluster_fuzz_rounds'] >= 5000
+          assert r['two_consecutive_transport_p95_lt_ms'] == 10
+          assert r['fresh_live_four_arm_smoke'] is True
+          assert r['atomic_matched_entry'] is True
+          assert r['aligned_failure_rollback'] is True
+          assert r['concurrent_equity_accounting'] is True
+          assert r['paper_only'] is True
+          print('V21_PHASE2_PROOF_OK', d)
+          PY
+      - name: Restore exact frozen causal reputation corpus
+        run: |
+          mkdir -p frozen artifacts/v21-live
+          gh run download 34262315056 --repo "$GITHUB_REPOSITORY" --name e4-v12-allout-launch-corpus-34262315056 --dir frozen
+          corpus="$(find frozen -name e4-v12-allout-launch-corpus.jsonl.gz -print -quit)"
+          test -s "$corpus"
+          echo "CORPUS=$corpus" >> "$GITHUB_ENV"
+      - name: Restore matched 3 SOL tournament state if present
+        run: |
+          git fetch origin "$BRANCH"
+          git checkout "$BRANCH"
+          git pull --ff-only origin "$BRANCH"
+          mkdir -p artifacts/v21-live
+          if [ -s "$STATE_PATH" ]; then
+            cp "$STATE_PATH" artifacts/v21-live/resume-state.json
+            cohort="$(python - <<'PY'
+          import json, os
+          s=json.load(open(os.environ['STATE_PATH']))
+          assert s['paper_only'] is True
+          assert abs(float(s['starting_balance_sol'])-3.0) < 1e-12
+          arms=s['arms']
+          names=['FULL_2S_CONTROL','PARTIALS_2S','V2_CURRENT','FLOW_V2_1']
+          rows={n:[r for r in arms[n]['ledger'] if r.get('status')=='CLOSED'] for n in names}
+          lengths={n:len(v) for n,v in rows.items()}
+          assert len(set(lengths.values()))==1, lengths
+          if rows[names[0]]:
+              for i in range(lengths[names[0]]):
+                  m={rows[n][i].get('mint') for n in names}
+                  assert len(m)==1, (i,m)
+                  assert all((rows[n][i].get('post_exit') or {}).get('complete') is True for n in names), (i,m)
+          print(lengths[names[0]])
+          PY
+          )"
+            echo "RESTORED_COHORT=$cohort"
+            echo "COHORT_BEFORE=$cohort" >> "$GITHUB_ENV"
+            echo "RESUME_ARG=--resume-state artifacts/v21-live/resume-state.json" >> "$GITHUB_ENV"
+            if [ "$cohort" -ge 100 ]; then echo "SKIP_LIVE=true" >> "$GITHUB_ENV"; else echo "SKIP_LIVE=false" >> "$GITHUB_ENV"; fi
+          else
+            echo "Starting genuinely fresh matched tournament: four independent 3 SOL paper accounts."
+            echo "COHORT_BEFORE=0" >> "$GITHUB_ENV"
+            echo "RESUME_ARG=" >> "$GITHUB_ENV"
+            echo "SKIP_LIVE=false" >> "$GITHUB_ENV"
+          fi
+      - name: True-online fresh-Solana matched tournament window
+        if: env.SKIP_LIVE != 'true'
+        run: |
+          set +e
+          PYTHONPATH="$PWD:$PWD/tools" python tools/golden_management_v2_1_tournament_hardened.py \
+            --production-root production \
+            --corpus "$CORPUS" \
+            --starting-balance-sol 3 \
+            --execution-delay-ms 6 \
+            --target-closed-trades 100 \
+            --duration-seconds 15900 \
+            --heartbeat-seconds 30 \
+            $RESUME_ARG \
+            --state-output artifacts/v21-live/session-state.json \
+            --status artifacts/v21-live/status.json \
+            --output artifacts/v21-live/final.json
+          rc=$?
+          set -e
+          echo "RUNNER_RC=$rc"
+          if [ "$rc" -eq 2 ]; then echo "::error::Tournament technical/exposure failure"; exit 2; fi
+          if [ "$rc" -ne 0 ] && [ "$rc" -ne 3 ]; then echo "::error::Unexpected runner exit code $rc"; exit "$rc"; fi
+      - name: Prove window was fresh-live, matched, clean and paper-only
+        if: env.SKIP_LIVE != 'true'
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('artifacts/v21-live/final.json'))
+          assert s['paper_only'] is True
+          assert s['real_money_execution'] is False
+          assert s['historical_replay'] is False
+          assert s['market_data_mode']=='LIVE_SOLANA_WEBSOCKET_FRESH_LAUNCHES_ONLY'
+          assert int(s['counts'].get('launches_seen',0)) > 0
+          assert int(s['counts'].get('decoded_events',0)) > 0
+          assert not s.get('task_errors'), s.get('task_errors')
+          assert not s.get('background_errors'), s.get('background_errors')
+          assert int(s.get('active_signals',0))==0
+          assert int(s.get('post_exit_pending',0))==0
+          arms=s['arms']; names=['FULL_2S_CONTROL','PARTIALS_2S','V2_CURRENT','FLOW_V2_1']
+          assert set(arms)==set(names)
+          counts={n:int(arms[n]['closed_trades']) for n in names}
+          assert len(set(counts.values()))==1, counts
+          assert int(s['cohort_closed'])==counts[names[0]]
+          for n in names:
+              assert float(arms[n]['starting_balance_sol'])==3.0
+              lat=arms[n].get('execution_latency_ms') or {}
+              if int(lat.get('count') or 0)>0: assert float(lat.get('p95') or 1e9) < 10.0, (n,lat)
+          print('V21_TRUE_ONLINE_WINDOW_VERIFIED', {'cohort':s['cohort_closed'],'arms':counts,'launches':s['counts'].get('launches_seen')})
+          PY
+      - name: Persist only clean aligned continuation
+        if: env.SKIP_LIVE != 'true'
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open('artifacts/v21-live/session-state.json'))
+          names=['FULL_2S_CONTROL','PARTIALS_2S','V2_CURRENT','FLOW_V2_1']
+          rows={n:[r for r in s['arms'][n]['ledger'] if r.get('status')=='CLOSED'] for n in names}
+          lengths={n:len(v) for n,v in rows.items()}
+          assert len(set(lengths.values()))==1, lengths
+          for i in range(lengths[names[0]]):
+              m={rows[n][i].get('mint') for n in names}; assert len(m)==1, (i,m)
+              assert all((rows[n][i].get('post_exit') or {}).get('complete') is True for n in names), (i,m)
+          print('CLEAN_ALIGNED_STATE', lengths)
+          PY
+          cp artifacts/v21-live/session-state.json "$STATE_PATH"
+          cp artifacts/v21-live/final.json "$STATUS_PATH"
+          git config user.name "gambit-v21-research"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$STATE_PATH" "$STATUS_PATH"
+          if git diff --cached --quiet; then
+            echo "No tournament change to persist."
+          else
+            git commit -m "data(golden-v2.1): persist matched tournament window ${{ matrix.window }} [skip ci]"
+            git pull --rebase origin "$BRANCH"
+            git push origin HEAD:"$BRANCH"
+          fi
+      - name: Window summary
+        run: |
+          git pull --ff-only origin "$BRANCH" || true
+          if [ -s "$STATE_PATH" ]; then
+            python - <<'PY'
+          import json, os
+          s=json.load(open(os.environ['STATE_PATH']))
+          for n,a in s['arms'].items():
+              rows=[r for r in a['ledger'] if r.get('status')=='CLOSED']
+              print(n,'CLOSED',len(rows),'WINS',sum(bool(r.get('win')) for r in rows),'CASH',a.get('cash_sol'))
+          PY
+          fi
+      - uses: actions/upload-artifact@v4
+        if: env.SKIP_LIVE != 'true'
+        with:
+          name: golden-v21-live-window-${{ matrix.window }}-${{ github.run_id }}
+          path: artifacts/v21-live/
+          if-no-files-found: error
+          retention-days: 30
+
+  final-report:
+    name: require-100-and-publish-four-model-report
+    needs: [live-windows]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/golden-management-v2-1-tournament
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch latest persisted tournament state
+        run: |
+          git fetch origin "$BRANCH"
+          git checkout "$BRANCH"
+          git pull --ff-only origin "$BRANCH"
+          test -s "$STATE_PATH"
+      - name: Hard completion requirement — 100 aligned fresh-live trades per model
+        run: |
+          python - <<'PY'
+          import json, os
+          s=json.load(open(os.environ['STATE_PATH']))
+          assert s['paper_only'] is True and abs(float(s['starting_balance_sol'])-3.0)<1e-12
+          names=['FULL_2S_CONTROL','PARTIALS_2S','V2_CURRENT','FLOW_V2_1']
+          rows={n:[r for r in s['arms'][n]['ledger'] if r.get('status')=='CLOSED'] for n in names}
+          lengths={n:len(v) for n,v in rows.items()}; assert min(lengths.values())>=100, lengths; assert len(set(lengths.values()))==1, lengths
+          for i in range(100):
+              m={rows[n][i].get('mint') for n in names}; assert len(m)==1, (i,m)
+              assert all((rows[n][i].get('post_exit') or {}).get('complete') is True for n in names), (i,m)
+          print('V21_100_ALIGNED_TRADE_GATE_OK', lengths)
+          PY
+      - name: Generate full four-model report
+        run: |
+          mkdir -p artifacts/final-report
+          PYTHONPATH="$PWD:$PWD/tools" python tools/golden_management_v2_1_report.py \
+            --state "$STATE_PATH" --minimum-trades 100 \
+            --output-md artifacts/final-report/golden-v21-tournament-100-trade-report.md \
+            --output-json artifacts/final-report/golden-v21-tournament-100-trade-report.json
+          cp artifacts/final-report/golden-v21-tournament-100-trade-report.md docs/research/golden-v21-tournament-final-report.md
+          cp artifacts/final-report/golden-v21-tournament-100-trade-report.json docs/research/golden-v21-tournament-final-report.json
+          python - <<'PY'
+          import json, pathlib, os
+          s=json.load(open(os.environ['STATE_PATH']))
+          names=['FULL_2S_CONTROL','PARTIALS_2S','V2_CURRENT','FLOW_V2_1']
+          count=min(len([r for r in s['arms'][n]['ledger'] if r.get('status')=='CLOSED']) for n in names)
+          marker={
+            'phase':3,'name':'four-model true-online fresh-Solana tournament','status':'COMPLETE',
+            'aligned_cohort_trades':count,'minimum_required':100,'starting_bankroll_sol_per_model':3.0,
+            'models':names,'e4':'OBSERVATIONAL_ONLY_NO_ASSIGNED_BANKROLL',
+            'fresh_live_market_only':True,'historical_replay':False,'real_money_execution':False,
+            'full_report_md':'docs/research/golden-v21-tournament-final-report.md',
+            'full_report_json':'docs/research/golden-v21-tournament-final-report.json'
+          }
+          pathlib.Path('docs/research/golden-v21-tournament-phase3-complete.json').write_text(json.dumps(marker,indent=2,sort_keys=True)+'\n')
+          print(marker)
+          PY
+      - name: Persist final report and completion marker
+        run: |
+          git config user.name "gambit-v21-research"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/research/golden-v21-tournament-final-report.md docs/research/golden-v21-tournament-final-report.json docs/research/golden-v21-tournament-phase3-complete.json
+          git commit -m "research(golden-v2.1): complete 100-trade matched tournament [skip ci]"
+          git pull --rebase origin "$BRANCH"
+          git push origin HEAD:"$BRANCH"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: golden-v21-tournament-final-${{ github.run_id }}
+          path: |
+            artifacts/final-report/
+            docs/research/golden-v21-tournament-phase3-complete.json
+            docs/research/golden-v21-tournament-state.json
+          retention-days: 60
