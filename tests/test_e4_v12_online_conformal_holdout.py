@@ -132,6 +132,48 @@ def test_empty_manifest_is_valid_and_waiting_is_not_a_live_pass() -> None:
     assert report["verdict"]["status"] == "WAITING_FOR_10_STRICTLY_LATER_WINDOWS"
 
 
+def test_completed_final_evaluation_is_immutable_and_cannot_be_reentered(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    manifest_path = tmp_path / "manifest.json"
+    output_path = tmp_path / "final.json"
+    manifest_path.write_text("{}\n", encoding="utf-8")
+    verdict = {"status": "SEALED_TEST_VERDICT"}
+    sealed = {
+        "final_evaluation_complete": True,
+        "manifest_sha256_lf": holdout.precision.sha256_lf(manifest_path),
+        "verdict": verdict,
+    }
+    output_path.write_text(json.dumps(sealed), encoding="utf-8")
+
+    def fail_if_reentered(*_args, **_kwargs):
+        raise AssertionError("completed final evaluation was re-entered")
+
+    monkeypatch.setattr(holdout, "run", fail_if_reentered)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "e4_v12_online_conformal_holdout.py",
+            "--repo-root",
+            str(tmp_path),
+            "--manifest",
+            str(manifest_path),
+            "--output",
+            str(output_path),
+        ],
+    )
+    holdout.main()
+    assert json.loads(capsys.readouterr().out) == verdict
+    assert json.loads(output_path.read_text(encoding="utf-8")) == sealed
+
+    manifest_path.write_text('{"changed": true}\n', encoding="utf-8")
+    with pytest.raises(ValueError, match="already evaluated on another manifest"):
+        holdout.main()
+
+
 def test_manifest_rejects_overlap_pre_freeze_hash_changes_and_extra_windows(
     tmp_path: Path,
 ) -> None:
