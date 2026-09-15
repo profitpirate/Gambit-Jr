@@ -10,6 +10,7 @@ on:
       - "tools/golden_management_v2_1_stress.py"
       - "tools/golden_management_v2_1_report.py"
       - "tests/test_golden_management_v2_1.py"
+      - "tests/test_golden_management_v2_1_tournament.py"
       - ".github/workflows/golden-management-v2-1-phase2.yml"
   workflow_dispatch:
 
@@ -41,7 +42,7 @@ jobs:
       - name: Compile and unit test
         run: |
           PYTHONPATH="$PWD:$PWD/tools" python -m py_compile tools/golden_management_v2_1.py tools/golden_management_v2_1_tournament_live.py tools/golden_management_v2_1_tournament_hardened.py tools/golden_management_v2_1_stress.py tools/golden_management_v2_1_report.py
-          PYTHONPATH="$PWD:$PWD/tools" python -m unittest tests.test_golden_management_v2_1 -v
+          PYTHONPATH="$PWD:$PWD/tools" python -m unittest tests.test_golden_management_v2_1 tests.test_golden_management_v2_1_tournament -v
       - name: 100k adversarial flow paths and cluster fuzz
         run: |
           mkdir -p artifacts
@@ -187,7 +188,7 @@ jobs:
         run: |
           mkdir -p artifacts
           cat > artifacts/phase2.json <<'JSON'
-          {"phase":2,"name":"v2.1 stress/debug/bulletproofing","status":"COMPLETE","requirements":{"adversarial_paths":100000,"cluster_fuzz_rounds":5000,"two_consecutive_transport_p95_lt_ms":10,"fresh_live_four_arm_smoke":true,"atomic_matched_entry":true,"concurrent_equity_accounting":true,"paper_only":true}}
+          {"phase":2,"name":"v2.1 stress/debug/bulletproofing","status":"COMPLETE","requirements":{"adversarial_paths":100000,"cluster_fuzz_rounds":5000,"two_consecutive_transport_p95_lt_ms":10,"fresh_live_four_arm_smoke":true,"atomic_matched_entry":true,"aligned_failure_rollback":true,"concurrent_equity_accounting":true,"paper_only":true}}
           JSON
       - uses: actions/upload-artifact@v4
         with:
