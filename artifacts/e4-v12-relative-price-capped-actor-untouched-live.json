@@ -1,27 +1,1513 @@
 {
-  "captures": [],
-  "data_audit": {},
-  "deterministic_replay": false,
+  "captures": [
+    {
+      "artifact_name": "e4-v12-v11-forward-34790190944",
+      "batch_path": ".tmp-relative-price-capped-actor-holdout/runs/34790190944/e4-v12-v11-forward-batch.json",
+      "batch_sha256": "0062f770ae67c52ebdd56138dd1405babdfa2074f6bd35bc35ad0082c172acbf",
+      "capture_end_ns": 1789351735064352659,
+      "capture_errors": 0,
+      "capture_start_ns": 1789342617134913914,
+      "decoded_events": 290480,
+      "events_path": ".tmp-relative-price-capped-actor-holdout/runs/34790190944/e4-v12-v11-forward-batch-live-events.jsonl",
+      "events_sha256": "36878ec62bc13252d04b4c4ab4f28068255de29de456bf185d9f17a972896c76",
+      "hypothesis_only": true,
+      "launches": 3000,
+      "mainnet_funds_risked_sol": 0,
+      "mainnet_transactions_sent": 0,
+      "registration_version": "e4-v12-relative-price-capture-registration-v1",
+      "role": "untouched_live",
+      "run_id": "34790190944",
+      "source_commit": "87fb227e793239b17885c4fc978f94088063f6e9",
+      "workflow_conclusion": "success",
+      "workflow_run_started_at": "2026-09-13T23:36:27Z",
+      "workflow_run_started_at_epoch_ns": 1789342587000000000
+    },
+    {
+      "artifact_name": "e4-v12-v11-forward-34799149811",
+      "batch_path": ".tmp-relative-price-capped-actor-holdout/runs/34799149811/e4-v12-v11-forward-batch.json",
+      "batch_sha256": "5aa5662d25fecc18f5230d7909e84ffa5ce25d406750cfee1dec398dd05c48fc",
+      "capture_end_ns": 1789365211407347853,
+      "capture_errors": 0,
+      "capture_start_ns": 1789352752804332932,
+      "decoded_events": 294231,
+      "events_path": ".tmp-relative-price-capped-actor-holdout/runs/34799149811/e4-v12-v11-forward-batch-live-events.jsonl",
+      "events_sha256": "7dc71a7951a0495e6bd5b7b066b9c56758c05858139018f77f5661ce937c5fa7",
+      "hypothesis_only": true,
+      "launches": 3000,
+      "mainnet_funds_risked_sol": 0,
+      "mainnet_transactions_sent": 0,
+      "registration_version": "e4-v12-relative-price-capture-registration-v1",
+      "role": "untouched_live",
+      "run_id": "34799149811",
+      "source_commit": "7b5393e28ae746d7d0624ad0527bbb520387aec0",
+      "workflow_conclusion": "success",
+      "workflow_run_started_at": "2026-09-14T02:25:18Z",
+      "workflow_run_started_at_epoch_ns": 1789352718000000000
+    },
+    {
+      "artifact_name": "e4-v12-v11-forward-34811806243",
+      "batch_path": ".tmp-relative-price-capped-actor-holdout/runs/34811806243/e4-v12-v11-forward-batch.json",
+      "batch_sha256": "be581138c92c2830740ebaf17b93f84fc9d9c82eb81f5a1b9f108e4f0bdec4f5",
+      "capture_end_ns": 1789380686564356893,
+      "capture_errors": 0,
+      "capture_start_ns": 1789365777510922070,
+      "decoded_events": 305296,
+      "events_path": ".tmp-relative-price-capped-actor-holdout/runs/34811806243/e4-v12-v11-forward-batch-live-events.jsonl",
+      "events_sha256": "b9feaf54e5412cab1931dc669e049cf61fd1f51a64477573d98ed90a35a92ad8",
+      "hypothesis_only": true,
+      "launches": 3000,
+      "mainnet_funds_risked_sol": 0,
+      "mainnet_transactions_sent": 0,
+      "registration_version": "e4-v12-relative-price-capture-registration-v1",
+      "role": "untouched_live",
+      "run_id": "34811806243",
+      "source_commit": "e4a5ee72f95827f91c5731b55be519e7f6f11511",
+      "workflow_conclusion": "success",
+      "workflow_run_started_at": "2026-09-14T06:02:27Z",
+      "workflow_run_started_at_epoch_ns": 1789365747000000000
+    },
+    {
+      "artifact_name": "e4-v12-v11-forward-34845710248",
+      "batch_path": ".tmp-relative-price-capped-actor-holdout/runs/34845710248/e4-v12-v11-forward-batch.json",
+      "batch_sha256": "488a384858a2581364364d12a3146eda40be4b0d7fd7e490042c1c05a6172a86",
+      "capture_end_ns": 1789399721049115119,
+      "capture_errors": 0,
+      "capture_start_ns": 1789390307827026966,
+      "decoded_events": 305180,
+      "events_path": ".tmp-relative-price-capped-actor-holdout/runs/34845710248/e4-v12-v11-forward-batch-live-events.jsonl",
+      "events_sha256": "151bc3b4234531754a8dca42dbd2063e6f58d86674bfc2c6c2e052d3931f9a0c",
+      "hypothesis_only": true,
+      "launches": 3000,
+      "mainnet_funds_risked_sol": 0,
+      "mainnet_transactions_sent": 0,
+      "registration_version": "e4-v12-relative-price-capture-registration-v1",
+      "role": "untouched_live",
+      "run_id": "34845710248",
+      "source_commit": "6b90b6a375211229a01b7633ad4c9fdc68809f9d",
+      "workflow_conclusion": "success",
+      "workflow_run_started_at": "2026-09-14T12:51:13Z",
+      "workflow_run_started_at_epoch_ns": 1789390273000000000
+    },
+    {
+      "artifact_name": "e4-v12-v11-forward-34863619434",
+      "batch_path": ".tmp-relative-price-capped-actor-holdout/runs/34863619434/e4-v12-v11-forward-batch.json",
+      "batch_sha256": "57f057ba7ed8bcf72b749b5eea977d90a2fe8137bcccdfa892ecd2efb9c796c9",
+      "capture_end_ns": 1789407244087419352,
+      "capture_errors": 0,
+      "capture_start_ns": 1789400412146947057,
+      "decoded_events": 275210,
+      "events_path": ".tmp-relative-price-capped-actor-holdout/runs/34863619434/e4-v12-v11-forward-batch-live-events.jsonl",
+      "events_sha256": "f19e760834db6238b66a45f7b6fae7e53e3bb67d8aac4a20e1cfbac65fcdc769",
+      "hypothesis_only": true,
+      "launches": 3000,
+      "mainnet_funds_risked_sol": 0,
+      "mainnet_transactions_sent": 0,
+      "registration_version": "e4-v12-relative-price-capture-registration-v1",
+      "role": "untouched_live",
+      "run_id": "34863619434",
+      "source_commit": "58bc433feb3157346f2186bd9f79baf365ee488b",
+      "workflow_conclusion": "success",
+      "workflow_run_started_at": "2026-09-14T15:39:39Z",
+      "workflow_run_started_at_epoch_ns": 1789400379000000000
+    },
+    {
+      "artifact_name": "e4-v12-v11-forward-34876702743",
+      "batch_path": ".tmp-relative-price-capped-actor-holdout/runs/34876702743/e4-v12-v11-forward-batch.json",
+      "batch_sha256": "428bee5418754663a84f545aca3814454d5c1513a090650ccdc0928f885f46b7",
+      "capture_end_ns": 1789413681726501002,
+      "capture_errors": 0,
+      "capture_start_ns": 1789407988254280577,
+      "decoded_events": 220229,
+      "events_path": ".tmp-relative-price-capped-actor-holdout/runs/34876702743/e4-v12-v11-forward-batch-live-events.jsonl",
+      "events_sha256": "1cb409390d9a56e471e59de53ca99eb361d8eca1a5d64bbc95c0a13d3961b0f9",
+      "hypothesis_only": true,
+      "launches": 3000,
+      "mainnet_funds_risked_sol": 0,
+      "mainnet_transactions_sent": 0,
+      "registration_version": "e4-v12-relative-price-capture-registration-v1",
+      "role": "untouched_live",
+      "run_id": "34876702743",
+      "source_commit": "6f0e4fbc508ce1b1dfed8d964069d988aaa65ad8",
+      "workflow_conclusion": "success",
+      "workflow_run_started_at": "2026-09-14T17:45:46Z",
+      "workflow_run_started_at_epoch_ns": 1789407946000000000
+    },
+    {
+      "artifact_name": "e4-v12-v11-forward-34887276656",
+      "batch_path": ".tmp-relative-price-capped-actor-holdout/runs/34887276656/e4-v12-v11-forward-batch.json",
+      "batch_sha256": "1baea3072d63a44937c14ffbae8964a0a8d8cd65bacbc545c626a71b5b7e8fd1",
+      "capture_end_ns": 1789419916549493860,
+      "capture_errors": 0,
+      "capture_start_ns": 1789414240670812236,
+      "decoded_events": 237481,
+      "events_path": ".tmp-relative-price-capped-actor-holdout/runs/34887276656/e4-v12-v11-forward-batch-live-events.jsonl",
+      "events_sha256": "8cc58e9d2a3a20e92afb409d178b7481363b3505dec230eec826e254bd487d08",
+      "hypothesis_only": true,
+      "launches": 3000,
+      "mainnet_funds_risked_sol": 0,
+      "mainnet_transactions_sent": 0,
+      "registration_version": "e4-v12-relative-price-capture-registration-v1",
+      "role": "untouched_live",
+      "run_id": "34887276656",
+      "source_commit": "216d0f8675048a781ac86dc2bc3c40cea374bb9d",
+      "workflow_conclusion": "success",
+      "workflow_run_started_at": "2026-09-14T19:30:11Z",
+      "workflow_run_started_at_epoch_ns": 1789414211000000000
+    },
+    {
+      "artifact_name": "e4-v12-v11-forward-34897737567",
+      "batch_path": ".tmp-relative-price-capped-actor-holdout/runs/34897737567/e4-v12-v11-forward-batch.json",
+      "batch_sha256": "0d70ff7b3cd2643b1eaa44dd98c8716621476dc5693e2ee934919a602f60cb17",
+      "capture_end_ns": 1789426887050009122,
+      "capture_errors": 0,
+      "capture_start_ns": 1789420544243538955,
+      "decoded_events": 237800,
+      "events_path": ".tmp-relative-price-capped-actor-holdout/runs/34897737567/e4-v12-v11-forward-batch-live-events.jsonl",
+      "events_sha256": "1984cd529e013ba4c46d49759fe749111d8695120555d566603a3f63ca5e1722",
+      "hypothesis_only": true,
+      "launches": 3000,
+      "mainnet_funds_risked_sol": 0,
+      "mainnet_transactions_sent": 0,
+      "registration_version": "e4-v12-relative-price-capture-registration-v1",
+      "role": "untouched_live",
+      "run_id": "34897737567",
+      "source_commit": "9716cccb5749f422d05e44903d78d200f8880cef",
+      "workflow_conclusion": "success",
+      "workflow_run_started_at": "2026-09-14T21:15:13Z",
+      "workflow_run_started_at_epoch_ns": 1789420513000000000
+    },
+    {
+      "artifact_name": "e4-v12-v11-forward-34907762101",
+      "batch_path": ".tmp-relative-price-capped-actor-holdout/runs/34907762101/e4-v12-v11-forward-batch.json",
+      "batch_sha256": "5ea8753cc83ae4455d5b65193e09ab9087ebee8cd8f37efe8e94ed2de579a8d5",
+      "capture_end_ns": 1789435868442391827,
+      "capture_errors": 0,
+      "capture_start_ns": 1789427583506483434,
+      "decoded_events": 274779,
+      "events_path": ".tmp-relative-price-capped-actor-holdout/runs/34907762101/e4-v12-v11-forward-batch-live-events.jsonl",
+      "events_sha256": "46a2c787829b5d9d169b5d4f9ba676cd84aca1e02e297f7ba90224864ca805b1",
+      "hypothesis_only": true,
+      "launches": 3000,
+      "mainnet_funds_risked_sol": 0,
+      "mainnet_transactions_sent": 0,
+      "registration_version": "e4-v12-relative-price-capture-registration-v1",
+      "role": "untouched_live",
+      "run_id": "34907762101",
+      "source_commit": "cd2241866d941a91ec2250ca16d07bc9c88aa2d3",
+      "workflow_conclusion": "success",
+      "workflow_run_started_at": "2026-09-14T23:12:25Z",
+      "workflow_run_started_at_epoch_ns": 1789427545000000000
+    },
+    {
+      "artifact_name": "e4-v12-v11-forward-34918286614",
+      "batch_path": ".tmp-relative-price-capped-actor-holdout/runs/34918286614/e4-v12-v11-forward-batch.json",
+      "batch_sha256": "90a901b8903ea59865e6a6c41be2be3fc20446bc8e6e86c37c51036f51a81070",
+      "capture_end_ns": 1789445163804856012,
+      "capture_errors": 0,
+      "capture_start_ns": 1789436533822315549,
+      "decoded_events": 250986,
+      "events_path": ".tmp-relative-price-capped-actor-holdout/runs/34918286614/e4-v12-v11-forward-batch-live-events.jsonl",
+      "events_sha256": "07dcbfc0ede8dccbc8276a624b84b2cd0891c60c6fa19a2087049115a2a6753c",
+      "hypothesis_only": true,
+      "launches": 3000,
+      "mainnet_funds_risked_sol": 0,
+      "mainnet_transactions_sent": 0,
+      "registration_version": "e4-v12-relative-price-capture-registration-v1",
+      "role": "untouched_live",
+      "run_id": "34918286614",
+      "source_commit": "cf882327f9c458f4bdb34b43f1591c7d8f62a5d5",
+      "workflow_conclusion": "success",
+      "workflow_run_started_at": "2026-09-15T01:41:43Z",
+      "workflow_run_started_at_epoch_ns": 1789436503000000000
+    }
+  ],
+  "data_audit": {
+    "actor_updates_delayed_ms": 60000,
+    "captures": 64,
+    "future_values_in_features": false,
+    "launches": 192000,
+    "parse_errors": 0,
+    "rows": 191425,
+    "runs": [
+      {
+        "hash_match": true,
+        "insufficient_tail": 17,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2983,
+        "rows_with_known_buyer": 688,
+        "rows_with_known_creator": 1736,
+        "run_id": "33605109571",
+        "sha256": "1bfe30a7a7e2bc159616c2f68a2ee6410a9ec4b26d28eedcd0609b6b35e1dded",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 34,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2966,
+        "rows_with_known_buyer": 745,
+        "rows_with_known_creator": 1844,
+        "run_id": "33627431540",
+        "sha256": "54e96699d70b53357c0f7249f228fa4af83ed43f15b7a5455988ac12cbeef9f5",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 24,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2976,
+        "rows_with_known_buyer": 942,
+        "rows_with_known_creator": 1854,
+        "run_id": "33644544746",
+        "sha256": "2552e11c1d6a36aebc882f3e997ae24ddd85db378e3c75a3997aaf2a664d0553",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 39,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2961,
+        "rows_with_known_buyer": 1035,
+        "rows_with_known_creator": 2021,
+        "run_id": "33656916992",
+        "sha256": "5549961baff426b65700294a7692c7b7d164beae60078596fb2c72018039a70c",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 36,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2964,
+        "rows_with_known_buyer": 868,
+        "rows_with_known_creator": 1851,
+        "run_id": "33669514091",
+        "sha256": "9b8f0ab72e51c649622378ede0fc7cbeb1c120263fb4da3b44b289e23673ec2f",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 53,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2947,
+        "rows_with_known_buyer": 747,
+        "rows_with_known_creator": 1902,
+        "run_id": "33681664773",
+        "sha256": "d70c12f8bed120d5fe0389e06f1be0a655201380b7235a0f93a73600a8f626c2",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 28,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2972,
+        "rows_with_known_buyer": 607,
+        "rows_with_known_creator": 1876,
+        "run_id": "33692043170",
+        "sha256": "f8e5d3ef5120aaa6abfd29c83437a87fbc7636276935c3901af7cd1818d0cceb",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 22,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2978,
+        "rows_with_known_buyer": 781,
+        "rows_with_known_creator": 2242,
+        "run_id": "33704841852",
+        "sha256": "b09a14c770216b8bbaf4f5a44bd295b14cb01d675b188378419ddd9037886f7a",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 19,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2981,
+        "rows_with_known_buyer": 683,
+        "rows_with_known_creator": 2264,
+        "run_id": "33716649440",
+        "sha256": "6c865406cb400819488ba0a7657ebfd51f0d1c5d84cfb2a5de0999dfb4503f70",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 21,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2979,
+        "rows_with_known_buyer": 842,
+        "rows_with_known_creator": 2187,
+        "run_id": "33741470396",
+        "sha256": "99d52116113a13660e41e41a52c77fe4b5cb6b8a671c440f57f06ebc8ac4f713",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 20,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2980,
+        "rows_with_known_buyer": 999,
+        "rows_with_known_creator": 2055,
+        "run_id": "33769636983",
+        "sha256": "9fc5016470fbfb51a2e6c5b0742226773a19e7489fd9f6dd3ac107b905f0cd7e",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 26,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2974,
+        "rows_with_known_buyer": 939,
+        "rows_with_known_creator": 2120,
+        "run_id": "33781389703",
+        "sha256": "2a8a555434665ac1fd8a24e3957ff45ada7d4d4e84d80ada0e649847d4896376",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 22,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2978,
+        "rows_with_known_buyer": 1100,
+        "rows_with_known_creator": 2143,
+        "run_id": "33792881280",
+        "sha256": "d5b33d6515bf74036e5ed9d41b90eff7f2ff2bc7a44768c76e4486736c3f76d6",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 25,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2975,
+        "rows_with_known_buyer": 789,
+        "rows_with_known_creator": 2138,
+        "run_id": "33810753028",
+        "sha256": "6aee91882224fa2edbf819cdbac81a4da2c5e503a51364cbcd0bc94fed3beeea",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 25,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2975,
+        "rows_with_known_buyer": 776,
+        "rows_with_known_creator": 2183,
+        "run_id": "33822988156",
+        "sha256": "07850498561b4f2c81e498dd8a3ec5a37aa5db17ef6983ac623d31a338251a26",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 18,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2982,
+        "rows_with_known_buyer": 619,
+        "rows_with_known_creator": 2313,
+        "run_id": "33835575805",
+        "sha256": "a7e13975d6bc40245b8c8e9fa521420bd9104978f012c6987f5f3dd296640635",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 20,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2980,
+        "rows_with_known_buyer": 670,
+        "rows_with_known_creator": 2240,
+        "run_id": "33852482054",
+        "sha256": "bbe92994201b5cf2237ea10972b0d26c092b70707f5180002acaa73ad86e6498",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 31,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2969,
+        "rows_with_known_buyer": 770,
+        "rows_with_known_creator": 1962,
+        "run_id": "33876345997",
+        "sha256": "f031a6dde6a49f463ef6edb36ffc37370ba6f9870dbb014d6d249b0eac6a9654",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 20,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2980,
+        "rows_with_known_buyer": 820,
+        "rows_with_known_creator": 2058,
+        "run_id": "33897368379",
+        "sha256": "f1354ae240159d771e1514234a419bc42fa344c1160ba03f59e7c8c1cdc58fac",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 49,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2951,
+        "rows_with_known_buyer": 533,
+        "rows_with_known_creator": 1904,
+        "run_id": "33911477030",
+        "sha256": "234bb65b4a19d5831d4f6415bb66b679a1470d761e32b4dac87e91a66aa8e5cd",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 16,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2984,
+        "rows_with_known_buyer": 630,
+        "rows_with_known_creator": 2184,
+        "run_id": "33920757002",
+        "sha256": "8fbdef534c87528049c1b5829bab8320bf04b5393d422be87b77b5fb44aa7d6b",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "insufficient_tail": 10,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 2990,
+        "rows_with_known_buyer": 585,
+        "rows_with_known_creator": 2078,
+        "run_id": "33931301493",
+        "sha256": "1ce3bb3d2f2983f1daca2c7a92c108195adede4c7b5daded39692bcbcab3ae9e",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 594,
+        "rows_with_known_creator": 2151,
+        "run_id": "34063856134",
+        "sha256": "fc77512fc3ed971e0a48ffb5fe2a7ab68499ecc712017681e1edd6c2e4fe86a6",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 887,
+        "rows_with_known_creator": 2225,
+        "run_id": "34073802862",
+        "sha256": "ca31bc7d94ef2c8f6ae00e26604677b7620790fc453496f8ee212c83038d5d8f",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 820,
+        "rows_with_known_creator": 2228,
+        "run_id": "34084120627",
+        "sha256": "c52f8292d99aaa60e38c7fd86c1b848dc2204a64fe821b79cc66354425580ca7",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 844,
+        "rows_with_known_creator": 2231,
+        "run_id": "34099929487",
+        "sha256": "cc8726a6a4d1477f6dd1d1634a09c24274e04476b64b031fe89e29b5ca4434b6",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 981,
+        "rows_with_known_creator": 2044,
+        "run_id": "34123647690",
+        "sha256": "2e091edfb945085fd4af58b82c553178b63ee81ad1f3bd255aa4024970ea4a6f",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 812,
+        "rows_with_known_creator": 2113,
+        "run_id": "34138377553",
+        "sha256": "076da6df38ff4fa07b7551874823ec007ee141b0f1b2848df0f43a26aa1de9f2",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 1021,
+        "rows_with_known_creator": 2086,
+        "run_id": "34150939561",
+        "sha256": "619977ace8de412a511da4b12050a6fe2d0aa6bbfeb7e5d2dc445e938dec5d89",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 886,
+        "rows_with_known_creator": 2145,
+        "run_id": "34159449923",
+        "sha256": "6d9d1121b321e9e26555126cd3533482abfe8c13c55442f38aba07b0aa733bb8",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 790,
+        "rows_with_known_creator": 2195,
+        "run_id": "34167878699",
+        "sha256": "9e25ce0e4bce97b6591b4c417acfb138dd9402df6266dd7d64309bd8163272ca",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 608,
+        "rows_with_known_creator": 2195,
+        "run_id": "34175839320",
+        "sha256": "29549195792cc432f20a72f1502cbff24c1b8bd97b76d827b76655db89b04ede",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 951,
+        "rows_with_known_creator": 2447,
+        "run_id": "34186192299",
+        "sha256": "6aca68ad4f377fc69979bb44b81aaabea6d9406a7e8b78521f3fa2bddc13b040",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 867,
+        "rows_with_known_creator": 2205,
+        "run_id": "34201101121",
+        "sha256": "46c239ec42891937bff75df3b59e1cc2b22d364b211cf8917c24394883726975",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 1145,
+        "rows_with_known_creator": 2262,
+        "run_id": "34244224832",
+        "sha256": "344d03dd1e0c8ef8515c9adf0193fe4c7cc5bb148fb438ac5e977ce0a0758bde",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 872,
+        "rows_with_known_creator": 2216,
+        "run_id": "34281858070",
+        "sha256": "1214575f9c10755f49424d6a295a20ae341c316b8e464065ed85a075d5070858",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 1010,
+        "rows_with_known_creator": 2321,
+        "run_id": "34310065776",
+        "sha256": "a97fc40b90583ab7bbf0b013713c8aa602b00ae0b33598060719c50490c7745a",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 813,
+        "rows_with_known_creator": 2101,
+        "run_id": "34348537141",
+        "sha256": "60c47626d8b28b9b2a98523c95070326e8e6cc9c2f25de530f1f07c416cf96dd",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 761,
+        "rows_with_known_creator": 1895,
+        "run_id": "34388016481",
+        "sha256": "d63fb60eeca248cacf54e751387a6498692581a030eeba9075de2961930b5389",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 998,
+        "rows_with_known_creator": 2303,
+        "run_id": "34425005585",
+        "sha256": "793c1f88229525aad919ecae8cc0760fa9012c21bcd1271b5661e5251fd48c4b",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 711,
+        "rows_with_known_creator": 2125,
+        "run_id": "34470147967",
+        "sha256": "ffca5633616584a60f6b461bcaf057041e88b30ee29e9766c14a56f1da7f86b7",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 746,
+        "rows_with_known_creator": 2109,
+        "run_id": "34512979177",
+        "sha256": "248fa0d572ba65a653ded56092d120fe08a618d6af00883d63d198154dc27a57",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 709,
+        "rows_with_known_creator": 2058,
+        "run_id": "34547229611",
+        "sha256": "b9d590ef3b7e2dde07b09dd174e0333d87e0a59b8a266b5dc0606cb8be544b81",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 633,
+        "rows_with_known_creator": 2221,
+        "run_id": "34586174670",
+        "sha256": "d2d22c70ee08036064fc2bd15fed99da2a8ce39736e8bbcd077af6cfe95ac6d7",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 609,
+        "rows_with_known_creator": 2187,
+        "run_id": "34627236811",
+        "sha256": "480fcc5d437490fdeb4ddf046ef906254a4c0c002fe8092b94d4713918842728",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 694,
+        "rows_with_known_creator": 2300,
+        "run_id": "34660606300",
+        "sha256": "0254a8336858c354bff82814cff9b5c4c7ef4532bd61951578ae2a77544251f1",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 623,
+        "rows_with_known_creator": 2293,
+        "run_id": "34684115937",
+        "sha256": "7dc218abb35c39af30e8ff90c6ba13f62dd010e7c45e88b71056fd79f8d04fb5",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 1033,
+        "rows_with_known_creator": 1520,
+        "run_id": "34709541936",
+        "sha256": "d0763e9bff7db6ad810e70507b0465ad78703a7cefa7a7294ef4b3f41476eae1",
+        "split": "history"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 935,
+        "rows_with_known_creator": 1625,
+        "run_id": "34722511299",
+        "sha256": "4e6c9deb864862ec5f748e20064eea838c92318d17cfab2d1b51df3d0b70d1ba",
+        "split": "quarantine"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 856,
+        "rows_with_known_creator": 1780,
+        "run_id": "34729110702",
+        "sha256": "b351d1c76d603f4aff832ca9e892398e394be5f7f9250b1aff0a4c239f384d73",
+        "split": "untouched_live"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 1114,
+        "rows_with_known_creator": 1499,
+        "run_id": "34749576265",
+        "sha256": "0a977e25fae90e9de97d4cac32ede8694f709674a093e7b6cc58d1fbd802e9b4",
+        "split": "untouched_live"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 894,
+        "rows_with_known_creator": 1675,
+        "run_id": "34760648934",
+        "sha256": "edf589388b2dd19d9ecf3600f9ca6b4741a233322c4b20c374e8439ae5012fa9",
+        "split": "untouched_live"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 1088,
+        "rows_with_known_creator": 1462,
+        "run_id": "34770227385",
+        "sha256": "4a39e70f47d0516fa397a88e23e73ed2525905ed62356405e80ec02f475153c9",
+        "split": "untouched_live"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 832,
+        "rows_with_known_creator": 1645,
+        "run_id": "34779504872",
+        "sha256": "7790819db72fcd00bc94559f1ffd06dd5a91945804697f7282c09447e944d022",
+        "split": "untouched_live"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 1128,
+        "rows_with_known_creator": 1632,
+        "run_id": "34790190944",
+        "sha256": "36878ec62bc13252d04b4c4ab4f28068255de29de456bf185d9f17a972896c76",
+        "split": "untouched_live"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 1133,
+        "rows_with_known_creator": 1512,
+        "run_id": "34799149811",
+        "sha256": "7dc71a7951a0495e6bd5b7b066b9c56758c05858139018f77f5661ce937c5fa7",
+        "split": "untouched_live"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 898,
+        "rows_with_known_creator": 1886,
+        "run_id": "34811806243",
+        "sha256": "b9feaf54e5412cab1931dc669e049cf61fd1f51a64477573d98ed90a35a92ad8",
+        "split": "untouched_live"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 1169,
+        "rows_with_known_creator": 1501,
+        "run_id": "34845710248",
+        "sha256": "151bc3b4234531754a8dca42dbd2063e6f58d86674bfc2c6c2e052d3931f9a0c",
+        "split": "untouched_live"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 1186,
+        "rows_with_known_creator": 1609,
+        "run_id": "34863619434",
+        "sha256": "f19e760834db6238b66a45f7b6fae7e53e3bb67d8aac4a20e1cfbac65fcdc769",
+        "split": "untouched_live"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 1116,
+        "rows_with_known_creator": 1651,
+        "run_id": "34876702743",
+        "sha256": "1cb409390d9a56e471e59de53ca99eb361d8eca1a5d64bbc95c0a13d3961b0f9",
+        "split": "untouched_live"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 1029,
+        "rows_with_known_creator": 1576,
+        "run_id": "34887276656",
+        "sha256": "8cc58e9d2a3a20e92afb409d178b7481363b3505dec230eec826e254bd487d08",
+        "split": "untouched_live"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 832,
+        "rows_with_known_creator": 1616,
+        "run_id": "34897737567",
+        "sha256": "1984cd529e013ba4c46d49759fe749111d8695120555d566603a3f63ca5e1722",
+        "split": "untouched_live"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 1055,
+        "rows_with_known_creator": 1645,
+        "run_id": "34907762101",
+        "sha256": "46a2c787829b5d9d169b5d4f9ba676cd84aca1e02e297f7ba90224864ca805b1",
+        "split": "untouched_live"
+      },
+      {
+        "hash_match": true,
+        "launches": 3000,
+        "parse_errors": 0,
+        "rows": 3000,
+        "rows_with_known_buyer": 1133,
+        "rows_with_known_creator": 1586,
+        "run_id": "34918286614",
+        "sha256": "07dcbfc0ede8dccbc8276a624b84b2cd0891c60c6fa19a2087049115a2a6753c",
+        "split": "untouched_live"
+      }
+    ]
+  },
+  "deterministic_replay": true,
   "experiment_id": "e4x-207b67e8dc16497ba27d4f6699c7a760bb3728290cc91e85a68ff026ac03744c",
-  "final_capture_windows": 0,
-  "final_total_launches": 0,
-  "latencies": {},
+  "final_capture_windows": 10,
+  "final_total_launches": 30000,
+  "latencies": {
+    "0": {
+      "attempted_quotes": 40,
+      "by_capture_window": {
+        "34790190944": {
+          "pnl_sol": -0.004370115380348316,
+          "trades": 8,
+          "wins": 5
+        },
+        "34799149811": {
+          "pnl_sol": -0.19745643898726187,
+          "trades": 6,
+          "wins": 2
+        },
+        "34811806243": {
+          "pnl_sol": -0.01057082175602847,
+          "trades": 2,
+          "wins": 1
+        },
+        "34845710248": {
+          "pnl_sol": -0.08842308292201449,
+          "trades": 10,
+          "wins": 4
+        },
+        "34863619434": {
+          "pnl_sol": 0.07140343554605674,
+          "trades": 1,
+          "wins": 1
+        },
+        "34876702743": {
+          "pnl_sol": -0.07554973496312412,
+          "trades": 3,
+          "wins": 1
+        },
+        "34887276656": {
+          "pnl_sol": -0.005248806971084499,
+          "trades": 3,
+          "wins": 1
+        },
+        "34897737567": {
+          "pnl_sol": 0.02377635532694125,
+          "trades": 4,
+          "wins": 1
+        },
+        "34907762101": {
+          "pnl_sol": -0.030395903207879577,
+          "trades": 1,
+          "wins": 0
+        },
+        "34918286614": {
+          "pnl_sol": 0.28408704992237427,
+          "trades": 2,
+          "wins": 2
+        }
+      },
+      "capture_windows": 10,
+      "exit_reasons": {
+        "INITIAL_STOP": 18,
+        "MAXIMUM_HOLD": 10,
+        "RUNNER_TAKE_PROFIT": 3,
+        "RUNNER_TRAILING_STOP": 9
+      },
+      "largest_winner_contribution": 0.14340936945052532,
+      "latency_ms": 0,
+      "ledger_hash": "4bdcb76d6a3d2cd3d6c644789184bd4bc1e261087ec3d455d91c45e88c818eed",
+      "maximum_drawdown_fraction": 0.16845930131895873,
+      "net_pnl_sol": -0.03274806339236802,
+      "profit_factor": 0.9684179580891614,
+      "quote_coverage": 1.0,
+      "rejected_concurrency": 0,
+      "rejected_quote": 0,
+      "trades": 40,
+      "wilson_95_lower_bound": 0.30705075280944705,
+      "win_rate": 0.45,
+      "wins": 18
+    },
+    "1": {
+      "attempted_quotes": 40,
+      "by_capture_window": {
+        "34790190944": {
+          "pnl_sol": -0.004370115380348316,
+          "trades": 8,
+          "wins": 5
+        },
+        "34799149811": {
+          "pnl_sol": -0.19745643898726187,
+          "trades": 6,
+          "wins": 2
+        },
+        "34811806243": {
+          "pnl_sol": -0.01057082175602847,
+          "trades": 2,
+          "wins": 1
+        },
+        "34845710248": {
+          "pnl_sol": -0.08842308292201449,
+          "trades": 10,
+          "wins": 4
+        },
+        "34863619434": {
+          "pnl_sol": 0.07140343554605674,
+          "trades": 1,
+          "wins": 1
+        },
+        "34876702743": {
+          "pnl_sol": -0.07554973496312412,
+          "trades": 3,
+          "wins": 1
+        },
+        "34887276656": {
+          "pnl_sol": -0.005248806971084499,
+          "trades": 3,
+          "wins": 1
+        },
+        "34897737567": {
+          "pnl_sol": 0.02377635532694125,
+          "trades": 4,
+          "wins": 1
+        },
+        "34907762101": {
+          "pnl_sol": -0.030395903207879577,
+          "trades": 1,
+          "wins": 0
+        },
+        "34918286614": {
+          "pnl_sol": 0.28408704992237427,
+          "trades": 2,
+          "wins": 2
+        }
+      },
+      "capture_windows": 10,
+      "exit_reasons": {
+        "INITIAL_STOP": 18,
+        "MAXIMUM_HOLD": 10,
+        "RUNNER_TAKE_PROFIT": 3,
+        "RUNNER_TRAILING_STOP": 9
+      },
+      "largest_winner_contribution": 0.14340936945052532,
+      "latency_ms": 1,
+      "ledger_hash": "a83000492b77ffd024f5284b27160cbd18d37e8954e8d6befcb68832eae250bf",
+      "maximum_drawdown_fraction": 0.16845930131895873,
+      "net_pnl_sol": -0.03274806339236802,
+      "profit_factor": 0.9684179580891614,
+      "quote_coverage": 1.0,
+      "rejected_concurrency": 0,
+      "rejected_quote": 0,
+      "trades": 40,
+      "wilson_95_lower_bound": 0.30705075280944705,
+      "win_rate": 0.45,
+      "wins": 18
+    },
+    "10": {
+      "attempted_quotes": 40,
+      "by_capture_window": {
+        "34790190944": {
+          "pnl_sol": -0.004370115380348316,
+          "trades": 8,
+          "wins": 5
+        },
+        "34799149811": {
+          "pnl_sol": -0.19745643898726187,
+          "trades": 6,
+          "wins": 2
+        },
+        "34811806243": {
+          "pnl_sol": -0.01057082175602847,
+          "trades": 2,
+          "wins": 1
+        },
+        "34845710248": {
+          "pnl_sol": -0.08842308292201449,
+          "trades": 10,
+          "wins": 4
+        },
+        "34863619434": {
+          "pnl_sol": 0.07140343554605674,
+          "trades": 1,
+          "wins": 1
+        },
+        "34876702743": {
+          "pnl_sol": -0.07554973496312412,
+          "trades": 3,
+          "wins": 1
+        },
+        "34887276656": {
+          "pnl_sol": -0.005448092205229141,
+          "trades": 3,
+          "wins": 1
+        },
+        "34897737567": {
+          "pnl_sol": 0.02377383594099132,
+          "trades": 4,
+          "wins": 1
+        },
+        "34907762101": {
+          "pnl_sol": -0.030393756619843407,
+          "trades": 1,
+          "wins": 0
+        },
+        "34918286614": {
+          "pnl_sol": 0.2840655164898134,
+          "trades": 2,
+          "wins": 2
+        }
+      },
+      "capture_windows": 10,
+      "exit_reasons": {
+        "INITIAL_STOP": 18,
+        "MAXIMUM_HOLD": 10,
+        "RUNNER_TAKE_PROFIT": 3,
+        "RUNNER_TRAILING_STOP": 9
+      },
+      "largest_winner_contribution": 0.14340304185878133,
+      "latency_ms": 10,
+      "ledger_hash": "c253e7ae87439d3c8d3b5ddf781fb3f8f6d5ee3670932feb0b658b64fc82cc05",
+      "maximum_drawdown_fraction": 0.16852315606371526,
+      "net_pnl_sol": -0.032969254856987096,
+      "profit_factor": 0.9682104494282401,
+      "quote_coverage": 1.0,
+      "rejected_concurrency": 0,
+      "rejected_quote": 0,
+      "trades": 40,
+      "wilson_95_lower_bound": 0.30705075280944705,
+      "win_rate": 0.45,
+      "wins": 18
+    },
+    "2": {
+      "attempted_quotes": 40,
+      "by_capture_window": {
+        "34790190944": {
+          "pnl_sol": -0.004370115380348316,
+          "trades": 8,
+          "wins": 5
+        },
+        "34799149811": {
+          "pnl_sol": -0.19745643898726187,
+          "trades": 6,
+          "wins": 2
+        },
+        "34811806243": {
+          "pnl_sol": -0.01057082175602847,
+          "trades": 2,
+          "wins": 1
+        },
+        "34845710248": {
+          "pnl_sol": -0.08842308292201449,
+          "trades": 10,
+          "wins": 4
+        },
+        "34863619434": {
+          "pnl_sol": 0.07140343554605674,
+          "trades": 1,
+          "wins": 1
+        },
+        "34876702743": {
+          "pnl_sol": -0.07554973496312412,
+          "trades": 3,
+          "wins": 1
+        },
+        "34887276656": {
+          "pnl_sol": -0.005248806971084499,
+          "trades": 3,
+          "wins": 1
+        },
+        "34897737567": {
+          "pnl_sol": 0.02377635532694125,
+          "trades": 4,
+          "wins": 1
+        },
+        "34907762101": {
+          "pnl_sol": -0.030395903207879577,
+          "trades": 1,
+          "wins": 0
+        },
+        "34918286614": {
+          "pnl_sol": 0.28408704992237427,
+          "trades": 2,
+          "wins": 2
+        }
+      },
+      "capture_windows": 10,
+      "exit_reasons": {
+        "INITIAL_STOP": 18,
+        "MAXIMUM_HOLD": 10,
+        "RUNNER_TAKE_PROFIT": 3,
+        "RUNNER_TRAILING_STOP": 9
+      },
+      "largest_winner_contribution": 0.14340936945052532,
+      "latency_ms": 2,
+      "ledger_hash": "4cf620bb9d2ff5fb32a478b3c46351813a7cda076e4072d80b8a372fbf519e8f",
+      "maximum_drawdown_fraction": 0.16845930131895873,
+      "net_pnl_sol": -0.03274806339236802,
+      "profit_factor": 0.9684179580891614,
+      "quote_coverage": 1.0,
+      "rejected_concurrency": 0,
+      "rejected_quote": 0,
+      "trades": 40,
+      "wilson_95_lower_bound": 0.30705075280944705,
+      "win_rate": 0.45,
+      "wins": 18
+    },
+    "5": {
+      "attempted_quotes": 40,
+      "by_capture_window": {
+        "34790190944": {
+          "pnl_sol": -0.004370115380348316,
+          "trades": 8,
+          "wins": 5
+        },
+        "34799149811": {
+          "pnl_sol": -0.19745643898726187,
+          "trades": 6,
+          "wins": 2
+        },
+        "34811806243": {
+          "pnl_sol": -0.01057082175602847,
+          "trades": 2,
+          "wins": 1
+        },
+        "34845710248": {
+          "pnl_sol": -0.08842308292201449,
+          "trades": 10,
+          "wins": 4
+        },
+        "34863619434": {
+          "pnl_sol": 0.07140343554605674,
+          "trades": 1,
+          "wins": 1
+        },
+        "34876702743": {
+          "pnl_sol": -0.07554973496312412,
+          "trades": 3,
+          "wins": 1
+        },
+        "34887276656": {
+          "pnl_sol": -0.005248806971084499,
+          "trades": 3,
+          "wins": 1
+        },
+        "34897737567": {
+          "pnl_sol": 0.02377635532694125,
+          "trades": 4,
+          "wins": 1
+        },
+        "34907762101": {
+          "pnl_sol": -0.030395903207879577,
+          "trades": 1,
+          "wins": 0
+        },
+        "34918286614": {
+          "pnl_sol": 0.28408704992237427,
+          "trades": 2,
+          "wins": 2
+        }
+      },
+      "capture_windows": 10,
+      "exit_reasons": {
+        "INITIAL_STOP": 18,
+        "MAXIMUM_HOLD": 10,
+        "RUNNER_TAKE_PROFIT": 3,
+        "RUNNER_TRAILING_STOP": 9
+      },
+      "largest_winner_contribution": 0.14340936945052532,
+      "latency_ms": 5,
+      "ledger_hash": "573be316c3b7ce6acacbd40148bd699ab0f771a31b570eb59156ca3360596223",
+      "maximum_drawdown_fraction": 0.16845930131895873,
+      "net_pnl_sol": -0.03274806339236802,
+      "profit_factor": 0.9684179580891614,
+      "quote_coverage": 1.0,
+      "rejected_concurrency": 0,
+      "rejected_quote": 0,
+      "trades": 40,
+      "wilson_95_lower_bound": 0.30705075280944705,
+      "win_rate": 0.45,
+      "wins": 18
+    }
+  },
   "live_confirmation_authorised": false,
-  "manifest_sha256_lf": "49106e170ac348d2f064e61afd19dd86b101c8384c35e49be4b0dee9a2ca71a0",
+  "manifest_sha256_lf": "9d9e41d3175f1f65c9909da2e401d8e7c471b553072c1a7cf1f051203692046d",
   "production_deployment_authorised": false,
   "production_paths_changed": 0,
   "production_promotion_authorised": false,
   "protocol_sha256_lf": "1f990a15052132a2c8cd160aac1dd504298e78da9388a095980888d8cce4f7ba",
-  "relative_price_threshold": null,
-  "same_size_capped_actor_only_baseline": {},
-  "selection_audit": [],
+  "relative_price_threshold": 1.154185854514367,
+  "same_size_capped_actor_only_baseline": {
+    "attempted_quotes": 48,
+    "by_capture_window": {
+      "34790190944": {
+        "pnl_sol": -0.12800009285833114,
+        "trades": 9,
+        "wins": 5
+      },
+      "34799149811": {
+        "pnl_sol": -0.195656564297495,
+        "trades": 7,
+        "wins": 2
+      },
+      "34811806243": {
+        "pnl_sol": -0.01034155773071549,
+        "trades": 2,
+        "wins": 1
+      },
+      "34845710248": {
+        "pnl_sol": -0.09161666818633464,
+        "trades": 11,
+        "wins": 4
+      },
+      "34863619434": {
+        "pnl_sol": 0.057432327440250105,
+        "trades": 2,
+        "wins": 1
+      },
+      "34876702743": {
+        "pnl_sol": -0.07767640278327595,
+        "trades": 4,
+        "wins": 1
+      },
+      "34887276656": {
+        "pnl_sol": -0.005303243307453437,
+        "trades": 3,
+        "wins": 1
+      },
+      "34897737567": {
+        "pnl_sol": 0.01632365291804555,
+        "trades": 5,
+        "wins": 1
+      },
+      "34907762101": {
+        "pnl_sol": -0.043994159732355154,
+        "trades": 2,
+        "wins": 0
+      },
+      "34918286614": {
+        "pnl_sol": 0.2604421794454565,
+        "trades": 3,
+        "wins": 2
+      }
+    },
+    "capture_windows": 10,
+    "exit_reasons": {
+      "INITIAL_STOP": 18,
+      "MAXIMUM_HOLD": 18,
+      "RUNNER_TAKE_PROFIT": 3,
+      "RUNNER_TRAILING_STOP": 9
+    },
+    "largest_winner_contribution": 0.14131550078143218,
+    "latency_ms": 0,
+    "ledger_hash": "28884b20cca511163f79fc09144aa6f9ff226db784284da2979c3e0e882a76bd",
+    "maximum_drawdown_fraction": 0.21541450061324316,
+    "net_pnl_sol": -0.21839052909220813,
+    "profit_factor": 0.8137558709232503,
+    "quote_coverage": 1.0,
+    "rejected_concurrency": 0,
+    "rejected_quote": 0,
+    "trades": 48,
+    "wilson_95_lower_bound": 0.2521507240406812,
+    "win_rate": 0.375,
+    "wins": 18
+  },
+  "selection_audit": [
+    {
+      "actor_rows": 9,
+      "run_id": "34790190944",
+      "selected_rows": 8
+    },
+    {
+      "actor_rows": 7,
+      "run_id": "34799149811",
+      "selected_rows": 6
+    },
+    {
+      "actor_rows": 2,
+      "run_id": "34811806243",
+      "selected_rows": 2
+    },
+    {
+      "actor_rows": 11,
+      "run_id": "34845710248",
+      "selected_rows": 10
+    },
+    {
+      "actor_rows": 2,
+      "run_id": "34863619434",
+      "selected_rows": 1
+    },
+    {
+      "actor_rows": 4,
+      "run_id": "34876702743",
+      "selected_rows": 3
+    },
+    {
+      "actor_rows": 3,
+      "run_id": "34887276656",
+      "selected_rows": 3
+    },
+    {
+      "actor_rows": 5,
+      "run_id": "34897737567",
+      "selected_rows": 4
+    },
+    {
+      "actor_rows": 2,
+      "run_id": "34907762101",
+      "selected_rows": 1
+    },
+    {
+      "actor_rows": 3,
+      "run_id": "34918286614",
+      "selected_rows": 2
+    }
+  ],
   "untouched_holdout_passed": false,
   "verdict": {
+    "failed_requirements": [
+      "minimum_closed_trades",
+      "minimum_profitable_windows",
+      "minimum_win_rate",
+      "minimum_wilson_bound",
+      "positive_net_pnl",
+      "minimum_profit_factor",
+      "maximum_drawdown",
+      "every_latency_positive",
+      "every_latency_profit_factor"
+    ],
+    "failure_classification": "INSUFFICIENT_LABELS",
     "live_confirmation_authorised": false,
     "production_deployment_authorised": false,
     "production_paths_changed": 0,
     "production_promotion_authorised": false,
-    "status": "WAITING_FOR_10_STRICTLY_LATER_WINDOWS",
+    "requirements": {
+      "beats_capped_actor_baseline_pnl": true,
+      "beats_capped_actor_baseline_profit_factor": true,
+      "beats_capped_actor_baseline_win_rate": true,
+      "every_latency_full_quote_coverage": true,
+      "every_latency_positive": false,
+      "every_latency_profit_factor": false,
+      "largest_winner_limit": true,
+      "maximum_drawdown": false,
+      "minimum_capture_windows_represented": true,
+      "minimum_closed_trades": false,
+      "minimum_profit_factor": false,
+      "minimum_profitable_windows": false,
+      "minimum_wilson_bound": false,
+      "minimum_win_rate": false,
+      "positive_net_pnl": false
+    },
+    "status": "NOT_CONCLUSIVE",
     "untouched_live_gate_passed": false
   },
   "version": "e4-v12-relative-price-capped-actor-holdout-v1"
