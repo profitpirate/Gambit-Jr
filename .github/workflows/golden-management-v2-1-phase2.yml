@@ -40,7 +40,6 @@ jobs:
       - name: Compile and unit test
         run: |
           PYTHONPATH="$PWD:$PWD/tools" python -m py_compile tools/golden_management_v2_1.py tools/golden_management_v2_1_tournament_live.py tools/golden_management_v2_1_stress.py tools/golden_management_v2_1_report.py
-          PYTHONPATH="$PWD:$PWD/tools" python tools/golden_management_v2_1.py
           PYTHONPATH="$PWD:$PWD/tools" python -m unittest tests.test_golden_management_v2_1 -v
       - name: 100k adversarial flow paths and cluster fuzz
         run: |
@@ -170,7 +169,7 @@ jobs:
           assert int(s['counts'].get('decoded_events',0)) > 0
           assert not s.get('task_errors') and int(s['active_signals'])==0 and int(s['post_exit_pending'])==0
           assert set(s['arms'])=={'FULL_2S_CONTROL','PARTIALS_2S','V2_CURRENT','FLOW_V2_1'}
-          for a in s['arms'].values(): assert float(a['starting_balance_sol'])==3.0
+          for arm in s['arms'].values(): assert float(arm['starting_balance_sol'])==3.0
           print('V21_FRESH_LIVE_SMOKE_PASS',s['counts'])
           PY
       - uses: actions/upload-artifact@v4
