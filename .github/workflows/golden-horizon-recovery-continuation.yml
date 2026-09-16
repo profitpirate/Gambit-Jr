@@ -1,0 +1,337 @@
+name: Golden horizons - recover incident and continue 100 fresh-live coins
+
+on:
+  push:
+    branches: [codex/golden-2s-horizon-cost-tournament]
+    paths:
+      - '.github/workflows/golden-horizon-recovery-continuation.yml'
+      - 'scripts/golden_horizon_incident_recover.py'
+      - 'docs/research/golden-horizon-recovery.json'
+      - 'docs/research/golden-horizon-recovery-launch.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: golden-horizon-cost-campaign
+  cancel-in-progress: false
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  BRANCH: codex/golden-2s-horizon-cost-tournament
+  PYTHONUNBUFFERED: '1'
+  PYTHONPATH: tools:scripts:tests
+  STATE_PATH: docs/research/golden-horizon-state.json
+  STATUS_PATH: docs/research/golden-horizon-status.json
+  PHASE2_PATH: docs/research/golden-horizon-phase2-complete.json
+
+jobs:
+  phase2-recover-and-continue:
+    name: Phase 2 - preserve incident, recover one live-entered cohort, continue fresh-live
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    outputs:
+      complete: ${{ steps.result.outputs.complete }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install read-only dependencies
+        run: python -m pip install aiohttp==3.14.3
+      - uses: actions/checkout@v4
+        with:
+          ref: 8c18f0fffe67500012a18d2dee983b81e2abb938
+          path: production
+          sparse-checkout: src/memecoin_bot/realtime/pumpfun.py
+          sparse-checkout-cone-mode: false
+      - name: Apply audited RPC-version infrastructure compatibility patch in runner only
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/golden_horizon_live.py')
+          s=p.read_text()
+          old='"maxSupportedTransactionVersion": 0'
+          assert old in s
+          s=s.replace(old,'"maxSupportedTransactionVersion": 1')
+          old='if resume and any(x.get("errors") for x in resume.get("sessions", [])):'
+          new='if resume and any(x.get("errors") and (x.get("incident_recovery") or {}).get("status") != "VERIFIED" for x in resume.get("sessions", [])):'
+          assert old in s
+          s=s.replace(old,new)
+          old='"source_sha": source_sha, "reputation_delta": delta, "engine": engine.persistence(),'
+          new='"source_sha": source_sha, "reputation_delta": delta, "recoveries": copy.deepcopy(resume.get("recoveries", [])) if resume else [], "engine": engine.persistence(),'
+          assert old in s
+          s=s.replace(old,new)
+          p.write_text(s)
+
+          p=Path('tools/golden_horizon_report.py')
+          s=p.read_text()
+          old='if not state.get("sessions") or any(s["errors"] or s.get("historical_replay") is not False for s in state["sessions"]):'
+          new='if not state.get("sessions") or any((s["errors"] and (s.get("incident_recovery") or {}).get("status") != "VERIFIED") or s.get("historical_replay") is not False for s in state["sessions"]):'
+          assert old in s
+          s=s.replace(old,new)
+          p.write_text(s)
+          PY
+          python -m py_compile tools/golden_horizon_live.py tools/golden_horizon_report.py scripts/golden_horizon_incident_recover.py
+      - name: Restore exact frozen prior reputation corpus
+        run: |
+          mkdir -p frozen
+          gh run download 34262315056 --repo "$GITHUB_REPOSITORY" --name e4-v12-allout-launch-corpus-34262315056 --dir frozen
+          corpus="$(find frozen -name e4-v12-allout-launch-corpus.jsonl.gz -print -quit)"
+          test -s "$corpus"
+          echo "CORPUS=$corpus" >> "$GITHUB_ENV"
+      - name: Prepare clean continuation state without discarding failed evidence
+        run: |
+          mkdir -p artifacts/recovery artifacts/live
+          git fetch origin "$BRANCH"
+          if git show "FETCH_HEAD:$STATE_PATH" > artifacts/recovery/canonical.json 2>/dev/null && \
+             python - <<'PY'
+          import json
+          from golden_horizon_engine import Config,Engine
+          s=json.load(open('artifacts/recovery/canonical.json'))
+          recovered=any((x.get('incident_recovery') or {}).get('status')=='VERIFIED' for x in s.get('sessions',[]))
+          e=Engine(Config(**s['engine']['config']),s['engine'])
+          assert recovered and s['engine']['clean'] and not s['engine']['bundles'] and not s['engine']['errors']
+          e.validate()
+          print('USING_ALREADY_RECOVERED_CANONICAL_STATE',e.matched_closed())
+          PY
+          then
+            cp artifacts/recovery/canonical.json artifacts/recovery/base-state.json
+          else
+            rm -rf artifacts/recovery/failed artifact.zip
+            curl -L --fail --retry 3 \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/10430430089/zip" \
+              -o artifact.zip
+            echo '894b9e5783f157522dc3c4dceede92df7225084493781339b5fbfee955811033  artifact.zip' | sha256sum -c -
+            mkdir -p artifacts/recovery/failed
+            unzip -q artifact.zip -d artifacts/recovery/failed
+            failed_state="$(find artifacts/recovery/failed -path '*/window/state.json' -print -quit)"
+            test -s "$failed_state"
+            python scripts/golden_horizon_incident_recover.py \
+              --failed-state "$failed_state" --production-root production \
+              --recovery-spec docs/research/golden-horizon-recovery.json \
+              --output artifacts/recovery/base-state.json \
+              --summary artifacts/recovery/recovery-summary.json
+          fi
+          python - <<'PY'
+          import json
+          from golden_horizon_engine import Config,Engine
+          s=json.load(open('artifacts/recovery/base-state.json'))
+          e=Engine(Config(**s['engine']['config']),s['engine']);e.validate()
+          assert s['engine']['clean'] and not s['engine']['bundles'] and not s['engine']['errors']
+          assert e.matched_closed() >= 75
+          assert all(not x.get('errors') or (x.get('incident_recovery') or {}).get('status')=='VERIFIED' for x in s['sessions'])
+          for h in e.history: assert (h.get('creation_proof') or {}).get('verified') is True
+          print('RECOVERY_GATE_PASS',e.matched_closed())
+          PY
+      - name: Persist recovered checkpoint before any new live window
+        run: |
+          cp artifacts/recovery/base-state.json /tmp/horizon-recovered-state.json
+          git fetch origin "$BRANCH"
+          git checkout -B evidence FETCH_HEAD
+          cp /tmp/horizon-recovered-state.json "$STATE_PATH"
+          python - <<'PY'
+          import json,time
+          from golden_horizon_engine import Config,Engine
+          s=json.load(open('/tmp/horizon-recovered-state.json'));e=Engine(Config(**s['engine']['config']),s['engine'])
+          out={'phase':2,'status':'CLEAN_WINDOW_END','checked_ns':time.time_ns(),'matched_closed':e.matched_closed(),
+               'target':100,'active_bundles':0,'errors':[],'paper_only':True,'axiom_execution':False,
+               'actual_profit_sol':None,'actual_transaction_failures':None,'arms':e.summary(),
+               'incident_recovery':s.get('recoveries',[])[-1] if s.get('recoveries') else None}
+          open('docs/research/golden-horizon-status.json','w').write(json.dumps(out,sort_keys=True)+'\n')
+          PY
+          git config user.name gambit-horizon-research
+          git config user.email actions@users.noreply.github.com
+          git add "$STATE_PATH" "$STATUS_PATH"
+          if ! git diff --cached --quiet; then
+            git commit -m 'data(horizon): preserve audited recovery checkpoint [skip ci]'
+            git pull --rebase origin "$BRANCH"
+            git push origin HEAD:"$BRANCH"
+          fi
+          git checkout --detach "$GITHUB_SHA"
+      - name: Determine whether more fresh-live trades are required
+        id: before
+        run: |
+          count="$(python - <<'PY'
+          import json
+          from golden_horizon_engine import Config,Engine
+          s=json.load(open('artifacts/recovery/base-state.json'));e=Engine(Config(**s['engine']['config']),s['engine'])
+          print(e.matched_closed())
+          PY
+          )"
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          if [ "$count" -ge 100 ]; then echo 'run_live=false' >> "$GITHUB_OUTPUT"; else echo 'run_live=true' >> "$GITHUB_OUTPUT"; fi
+      - name: Continue only with newly arriving real Solana launches
+        if: steps.before.outputs.run_live == 'true'
+        run: |
+          cp artifacts/recovery/base-state.json artifacts/live/resume.json
+          python tools/golden_horizon_publish.py --local artifacts/live/status.json \
+            --remote "$STATUS_PATH" --watch --stop-file artifacts/stop-publisher > artifacts/publisher.log 2>&1 &
+          publisher=$!
+          cleanup() { kill "$publisher" 2>/dev/null || true; wait "$publisher" 2>/dev/null || true; }
+          trap cleanup EXIT
+          set +e
+          python tools/golden_horizon_live.py --production-root production --corpus "$CORPUS" \
+            --manifest config/golden-horizon.json --output artifacts/live \
+            --window "recovery-continuation-${GITHUB_RUN_ID}" --duration 14400 --target 100 \
+            --resume artifacts/live/resume.json
+          rc=$?
+          set -e
+          cleanup
+          trap - EXIT
+          test -s artifacts/live/status.json
+          python tools/golden_horizon_publish.py --local artifacts/live/status.json --remote "$STATUS_PATH"
+          if [ "$rc" -ne 0 ]; then
+            echo '::error::Continuation blocked; failed/open evidence remains in this workflow artifact and is not overwritten by an older checkpoint.'
+            exit "$rc"
+          fi
+      - name: Validate and persist clean continuation
+        if: steps.before.outputs.run_live == 'true'
+        run: |
+          python - <<'PY'
+          import json
+          from golden_horizon_engine import Config,Engine
+          s=json.load(open('artifacts/live/state.json'));e=Engine(Config(**s['engine']['config']),s['engine']);e.validate()
+          assert s['engine']['clean'] and not s['engine']['bundles'] and not s['engine']['errors']
+          assert all(not x.get('errors') or (x.get('incident_recovery') or {}).get('status')=='VERIFIED' for x in s['sessions'])
+          for h in e.history: assert (h.get('creation_proof') or {}).get('verified') is True
+          print('CLEAN_CONTINUATION',e.matched_closed())
+          PY
+          cp artifacts/live/state.json /tmp/horizon-state.json
+          git fetch origin "$BRANCH"
+          git checkout -B evidence FETCH_HEAD
+          cp /tmp/horizon-state.json "$STATE_PATH"
+          git config user.name gambit-horizon-research
+          git config user.email actions@users.noreply.github.com
+          git add "$STATE_PATH"
+          if ! git diff --cached --quiet; then
+            git commit -m 'data(horizon): preserve clean recovered continuation [skip ci]'
+            git pull --rebase origin "$BRANCH"
+            git push origin HEAD:"$BRANCH"
+          fi
+          git checkout --detach "$GITHUB_SHA"
+      - name: Gate Phase 2 only at 100 matched closed trades
+        id: result
+        run: |
+          if [ '${{ steps.before.outputs.run_live }}' = 'true' ]; then state='artifacts/live/state.json'; else state='artifacts/recovery/base-state.json'; fi
+          count="$(python - <<PY
+          import json
+          from golden_horizon_engine import Config,Engine
+          s=json.load(open('$state'));e=Engine(Config(**s['engine']['config']),s['engine'])
+          print(e.matched_closed())
+          PY
+          )"
+          if [ "$count" -ge 100 ]; then
+            mkdir -p artifacts/phase2
+            python tools/golden_horizon_report.py --state "$state" --output artifacts/phase2 --gate-only
+            cp artifacts/phase2/phase2-complete.json /tmp/phase2-complete.json
+            git fetch origin "$BRANCH"
+            git checkout -B evidence FETCH_HEAD
+            cp /tmp/phase2-complete.json "$PHASE2_PATH"
+            git config user.name gambit-horizon-research
+            git config user.email actions@users.noreply.github.com
+            git add "$PHASE2_PATH"
+            if ! git diff --cached --quiet; then
+              git commit -m 'research(horizon): complete recovered 100-coin phase 2 [skip ci]'
+              git pull --rebase origin "$BRANCH"
+              git push origin HEAD:"$BRANCH"
+            fi
+            echo 'complete=true' >> "$GITHUB_OUTPUT"
+          else
+            echo "Clean checkpoint, NOT phase completion: $count / 100"
+            echo 'complete=false' >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: golden-horizon-recovery-continuation-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 60
+
+  phase3-report:
+    name: Phase 3 - audited results, recovery disclosure and conclusion
+    needs: phase2-recover-and-continue
+    if: needs.phase2-recover-and-continue.outputs.complete == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/golden-2s-horizon-cost-tournament
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Patch report gate to recognise only the preserved verified incident
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/golden_horizon_report.py');s=p.read_text()
+          old='if not state.get("sessions") or any(s["errors"] or s.get("historical_replay") is not False for s in state["sessions"]):'
+          new='if not state.get("sessions") or any((s["errors"] and (s.get("incident_recovery") or {}).get("status") != "VERIFIED") or s.get("historical_replay") is not False for s in state["sessions"]):'
+          assert old in s;s=s.replace(old,new);p.write_text(s)
+          PY
+          python -m py_compile tools/golden_horizon_report.py
+      - name: Generate final report from the verified canonical state
+        run: |
+          mkdir -p artifacts/final
+          cp "$STATE_PATH" artifacts/final/state.json
+          python tools/golden_horizon_report.py --state artifacts/final/state.json --output artifacts/final
+          cp config/golden-horizon.json artifacts/final/manifest.json
+          echo "$GITHUB_SHA" > artifacts/final/source-sha.txt
+      - name: Add explicit incident-recovery evidence and re-hash final reports
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          state=json.load(open('artifacts/final/state.json'))
+          results_path=Path('artifacts/final/final-results.json')
+          results=json.load(open(results_path));results['incident_recoveries']=state.get('recoveries',[])
+          results_path.write_text(json.dumps(results,sort_keys=True,allow_nan=False)+'\n')
+          report=Path('artifacts/final/final-report.md')
+          recs=state.get('recoveries',[])
+          with report.open('a',encoding='utf-8') as f:
+            f.write('\n## Infrastructure incident recovery disclosure\n\n')
+            if not recs:
+              f.write('No recovery incident is recorded.\n')
+            for r in recs:
+              f.write(f"- Failed session `{r.get('failed_session_id')}` was preserved from artifact `{r.get('source_artifact_name')}` with digest `{r.get('source_artifact_digest')}`. The coin was selected and entered prospectively; only its missing post-failure tail was reconstructed from confirmed Solana history. Recovered market states: {r.get('recovered_market_states')}; slot-clock fit RMSE: {r.get('slot_clock_fit_rmse_ms')} ms; P&L-critical ambiguity count: {r.get('pnl_critical_transition_ambiguity_count')}. This is not Axiom execution evidence.\n")
+          hashes={name:hashlib.sha256(Path('artifacts/final',name).read_bytes()).hexdigest() for name in ('final-results.json','final-report.md')}
+          marker=json.load(open('artifacts/final/phase3-complete.json'));marker['reports_sha256']=hashes;marker['incident_recovery_disclosed']=True
+          Path('artifacts/final/phase3-complete.json').write_text(json.dumps(marker,sort_keys=True)+'\n')
+          PY
+      - name: Persist final results and completion markers
+        run: |
+          mkdir -p /tmp/horizon-final
+          cp artifacts/final/phase2-complete.json artifacts/final/phase3-complete.json \
+             artifacts/final/final-results.json artifacts/final/final-report.md /tmp/horizon-final/
+          git fetch origin "$BRANCH"
+          git checkout -B evidence FETCH_HEAD
+          cp /tmp/horizon-final/phase2-complete.json docs/research/golden-horizon-phase2-complete.json
+          cp /tmp/horizon-final/phase3-complete.json docs/research/golden-horizon-phase3-complete.json
+          cp /tmp/horizon-final/final-results.json docs/research/golden-horizon-final-results.json
+          cp /tmp/horizon-final/final-report.md docs/research/golden-horizon-final-report.md
+          git config user.name gambit-horizon-research
+          git config user.email actions@users.noreply.github.com
+          git add docs/research/golden-horizon-phase2-complete.json docs/research/golden-horizon-phase3-complete.json \
+                  docs/research/golden-horizon-final-results.json docs/research/golden-horizon-final-report.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(horizon): complete recovered 100-cohort report [skip ci]'
+            git pull --rebase origin "$BRANCH"
+            git push origin HEAD:"$BRANCH"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: golden-horizon-final-recovered-${{ github.run_id }}
+          path: artifacts/final/
+          retention-days: 60
