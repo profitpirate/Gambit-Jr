@@ -1,0 +1,103 @@
+name: Golden 2s loss-exit A-B - live Solana paper
+on:
+  push:
+    branches: [codex/golden-2s-loss-exit-live]
+    paths:
+      - '.github/workflows/golden-loss2s-live.yml'
+      - 'tools/golden_loss2s_*.py'
+      - 'tests/test_golden_loss2s.py'
+      - 'docs/research/golden-loss2s-experiment-contract.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: golden-loss2s-solana-campaign
+  cancel-in-progress: false
+
+jobs:
+  forward-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 280
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BRANCH: codex/golden-2s-loss-exit-live
+      PYTHONPATH: tools:tests
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/golden-2s-loss-exit-live
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pinned read-only network dependency
+        run: python -m pip install aiohttp==3.14.3
+
+      - name: Verify frozen parents and prepare A-B manifest
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/build
+          git rev-parse HEAD > artifacts/build/source-commit.txt
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          f=json.load(open('docs/research/golden-full3s-v2-freeze.json'))
+          for p,h in f['source_sha256'].items():
+              assert hashlib.sha256(Path(p).read_bytes()).hexdigest()==h,p
+          PY
+          python -m py_compile tools/golden_loss2s_*.py
+          python -m unittest tests.test_golden_loss2s tests.test_golden_top4_eventstream_fix -v 2>&1 | tee artifacts/build/loss2s-tests.log
+          python tools/golden_loss2s_campaign.py --prepare
+          cp config/golden-loss2s-live.json artifacts/build/manifest.json
+          cp docs/research/golden-loss2s-experiment-contract.json artifacts/build/
+
+      - uses: actions/checkout@v4
+        with:
+          ref: 8c18f0fffe67500012a18d2dee983b81e2abb938
+          path: production
+          sparse-checkout: src/memecoin_bot/realtime/pumpfun.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Restore frozen prior reputation corpus - not live outcomes
+        run: |
+          mkdir -p frozen
+          gh run download 34262315056 --repo "$GITHUB_REPOSITORY" --name e4-v12-allout-launch-corpus-34262315056 --dir frozen
+          corpus="$(find frozen -name e4-v12-allout-launch-corpus.jsonl.gz -print -quit)"
+          test -s "$corpus"
+          echo "CORPUS=$corpus" >> "$GITHUB_ENV"
+
+      - name: Fresh Solana and E4 connectivity check - no positions
+        run: |
+          python tools/golden_loss2s_solana.py \
+            --production-root production \
+            --corpus "$CORPUS" \
+            --manifest config/golden-loss2s-live.json \
+            --output artifacts/smoke \
+            --duration 60 \
+            --smoke > artifacts/build/live-preflight.log 2>&1
+          cat artifacts/smoke/readiness.json
+
+      - name: Live six-model forward A-B with isolated evidence
+        run: python tools/golden_loss2s_campaign.py --corpus "$CORPUS" --duration 14400
+
+      - name: Preserve sources and evidence regardless of completion
+        if: always()
+        run: |
+          mkdir -p artifacts/source
+          cp tools/golden_loss2s_*.py artifacts/source/
+          cp config/golden-loss2s-live.json artifacts/source/ 2>/dev/null || true
+          cp docs/research/golden-loss2s-experiment-contract.json artifacts/source/
+          cp .github/workflows/golden-loss2s-live.yml artifacts/source/
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: golden-loss2s-solana-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 60
+          if-no-files-found: error
