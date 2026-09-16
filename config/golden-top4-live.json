@@ -1,0 +1,141 @@
+{
+  "actual_axiom_execution": false,
+  "assumed_token_account_bytes": 200,
+  "campaign_name": "golden-top3-full3sv2-fresh-20260916",
+  "completion": {
+    "cost_reconciliation_required": true,
+    "economic_profitability_required_to_finish_experiment": false,
+    "every_traded_creation_independently_confirmed": true,
+    "minimum_matched_closed": 100,
+    "minimum_verified_forward_per_model": 100,
+    "missing_post_exit_ticks_are_unknown_not_false": true,
+    "no_unresolved_inventory": true,
+    "post_exit_measured_separately_for_each_arm": true,
+    "same_mint_cohort_across_12_arms": false
+  },
+  "cost_provenance": {
+    "actual_axiom_profit_and_fees": {
+      "classification": "UNAVAILABLE_NO_BROADCAST",
+      "value": null
+    },
+    "actual_axiom_transaction_failure_rate": {
+      "classification": "UNMEASURED",
+      "value": null
+    },
+    "axiom_fee": {
+      "classification": "DOCUMENTED_CONFIG_NOT_ACCOUNT_OBSERVATION",
+      "note": "1 percent before cashback, inferred from documented net plus cashback; no unobserved rebate credited",
+      "source": "https://docs.axiom.trade/getting-started/fees/axiom-fees"
+    },
+    "base_fee": {
+      "classification": "DOCUMENTED_CONFIG_NOT_ACTUAL_FEE",
+      "one_signature_assumed": true,
+      "source": "https://solana.com/docs/core/fees/fee-structure"
+    },
+    "checked_date": "2026-09-15",
+    "delay": {
+      "classification": "SENSITIVITY_ASSUMPTION",
+      "note": "250 ms delay for every submission, including every partial and final sell; NOT a certification of Axiom inclusion speed."
+    },
+    "failed_attempts": {
+      "classification": "MODELLED_FAILURE_NOT_REAL_TRANSACTION",
+      "note": "Live quote drift beyond slippage produces a modeled landed failure charged base and priority; in-transaction tip and swap fees roll back. Dropped/revert-protected alternatives are reported in sensitivity, not invented as observations.",
+      "source": "https://solana.com/docs/core/fees/fee-structure"
+    },
+    "priority_tip": {
+      "classification": "DOCUMENTED_DEFAULTS_NOT_USER_PRESET",
+      "note": "Each 0.001 SOL; not a measured fee bid required for a particular trade",
+      "source": "https://docs.axiom.trade/getting-started/fees/solana-fees"
+    },
+    "pump_fee": {
+      "classification": "DOCUMENTED_CONFIG_NOT_ACTUAL_FEE",
+      "note": "SOL bonding curve total protocol and creator fee, no graduated-pool route assumed",
+      "source": "https://pump.fun/docs/fees"
+    },
+    "rent": {
+      "classification": "OBSERVED_RPC_QUOTE_WITH_ASSUMED_ACCOUNT_SIZE",
+      "note": "200 bytes is a cost scenario, not a verified Axiom token-account layout. Refund on final close is a model assumption."
+    },
+    "slippage": {
+      "classification": "CAUSAL_LIVE_RESERVE_MODEL",
+      "note": "Quote-to-fill drift and constant-product price impact, not a made-up realized Axiom fill; 20 percent tolerance is an experimental setting."
+    }
+  },
+  "execution": "PAPER_ONLY",
+  "execution_model": {
+    "base_fee_sol": 5e-06,
+    "feed_stale_ms": 3000,
+    "inclusion_delay_ms": 250,
+    "max_attempts": 5,
+    "max_concurrent": 2,
+    "max_entry_age_ms": 3000,
+    "max_slippage_bps": 2000,
+    "platform_bps": 100.0,
+    "post_seconds": 20,
+    "priority_sol": 0.001,
+    "protocol_bps": 125.0,
+    "reserve_sol": 0.03,
+    "retry_ms": 250,
+    "starting_sol": 3.0,
+    "tip_sol": 0.001
+  },
+  "experiment": "golden-horizon-cost-v1",
+  "families": [
+    "FULL"
+  ],
+  "horizons_seconds": [
+    3,
+    4,
+    7
+  ],
+  "implementation_sha256": {
+    "tools/golden_buyer_reputation_core.py": "1ec9713e159758bca704ee22ddfc1964f5801206ebfcc7e9be4ded191894005c",
+    "tools/golden_horizon_engine.py": "d08244c86c55316a4be01b965901a44e37706d47432bfb4ed2d32fc791dc41a3",
+    "tools/golden_horizon_live.py": "d8c6fac7220234443d6c03634b8323255cb2b38423f1622661cdd7c51e0880aa",
+    "tools/golden_management_v2.py": "178a9c629d4fdc6756b444af78d1f09d12481425238d0c290f0a59790b635dbe",
+    "tools/golden_top4_axiom_guard.py": "839128f2d5a59cc65dce50591512dd94a61679830ededb1ffad8be3a4540377e",
+    "tools/golden_top4_axiom_probe.py": "e98c1bc794298c66adeaf99fefe970ec7e7825d3eebd5828663ece0996b44bc9",
+    "tools/golden_top4_campaign.py": "21c8fad953c595d5dd4eda4f80950b8747f754ec25331552a0ef9ecc0bc43e82",
+    "tools/golden_top4_e4.py": "e0fb74db232419d343df70cca5e0a703f685ed5b71b602815557905ecc3e0ef1",
+    "tools/golden_top4_engine.py": "b7eb4fdc2c5c706e0f6261517273b4d6fb5ac6587df96a7b62d61d6a34ca575a",
+    "tools/golden_top4_live.py": "2ee9e93c7782d28c746589227921da29a1661e356d99e88ee813c7c2dc334785",
+    "tools/golden_top4_operations.py": "e01de74899b043a7ed8fe1f7afd3222b7f8ca9bfcb541226ca7569358d0864f6",
+    "tools/golden_top4_publish.py": "28a2f0e15552a7dffafb98939aafe078fadd76a4a5274f03ade6d41d105625f4",
+    "tools/golden_top4_report.py": "f970df63a77b9d034df7d0338b4ec0d694242b154619f6875e9f20246bf21a1f",
+    "tools/golden_top4_solana.py": "733dad844d36adf4e199b9a5eea0f8312ecb0094955457dc50ed8b5e8f1ac725"
+  },
+  "limitations": [
+    "Axiom is the documented fee reference, not an authenticated market/execution connection.",
+    "Per-arm virtual reserve overlays preserve own partial-sell impact, while holding externally observed trader reserve changes fixed; that counterfactual approximation does not prove actual execution.",
+    "Unmodeled leader admission, MEV, route failure and network drops remain unknown; a zero modeled failure count cannot establish a real zero failure rate.",
+    "Safety and cost-model changes make this a new experiment, not a continuation of the earlier low-cost paper balances.",
+    "Horizon selection on these data is exploratory; the chosen finalists require the separately requested unseen multi-day stress/forward phase."
+  ],
+  "market_source": "DIRECT_SOLANA_NEW_CREATIONS",
+  "model_semantics": "Three fixed controls and independent filtered FULL_3S_V2; at least 100 each, not forced matching",
+  "models": [
+    "FULL_3S",
+    "FULL_4S",
+    "FULL_7S",
+    "FULL_3S_V2"
+  ],
+  "phase_order": [
+    "build_configure_verify",
+    "prospective_live_market_100_matched_closed",
+    "audit_report_conclusion"
+  ],
+  "starting_balance_sol_per_arm": 3,
+  "target_matched_closed_per_arm": 100,
+  "target_per_model": 100,
+  "truth_constraints": {
+    "actual_axiom_fills": false,
+    "all_failed_attempt_costs_retained": true,
+    "axiom_listing_verified": null,
+    "broadcast_transactions": false,
+    "drop_losing_or_unresolved_positions": false,
+    "frozen_historical_corpus_use": "prior reputation features only; never counted as prospective outcomes",
+    "historical_market_replay_in_live_phase": false,
+    "reset_bankroll_on_failure": false,
+    "synthetic_prices_in_live_phase": false
+  }
+}
