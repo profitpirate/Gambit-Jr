@@ -1,0 +1,101 @@
+name: E4 library phase 1 - full wallet history
+on:
+  push:
+    branches: [codex/golden-top3-full3sv2-live]
+    paths:
+      - '.github/workflows/e4-library-phase1.yml'
+      - 'docs/research/e4-library-phase1-launch.txt'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: e4-library-phase1-full-history
+  cancel-in-progress: false
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BRANCH: codex/golden-top3-full3sv2-live
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/golden-top3-full3sv2-live
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned read-only dependency
+        run: python -m pip install aiohttp==3.14.3
+      - name: Download frozen 66k launch/dev corpus
+        run: |
+          mkdir -p frozen
+          gh run download 34262315056 --repo "$GITHUB_REPOSITORY" --name e4-v12-allout-launch-corpus-34262315056 --dir frozen
+          corpus="$(find frozen -name e4-v12-allout-launch-corpus.jsonl.gz -print -quit)"
+          test -s "$corpus"
+          echo "CORPUS=$corpus" >> "$GITHUB_ENV"
+      - name: Compile and prove read-only scanner
+        run: |
+          python -m py_compile tools/e4_library_full_history.py
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('tools/e4_library_full_history.py').read_text()
+          forbidden=('sendTransaction','signTransaction','sendRawTransaction','Keypair.from','secret_key')
+          assert not any(x in s for x in forbidden), 'scanner must stay read-only'
+          PY
+      - name: Scan all RPC-visible E4 history and build library
+        run: |
+          mkdir -p artifacts/e4-library
+          python tools/e4_library_full_history.py --corpus "$CORPUS" --output artifacts/e4-library | tee artifacts/e4-library/run.log
+      - name: Validate phase 1 evidence
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('artifacts/e4-library')
+          sig=json.load(open(root/'e4-signatures-checkpoint.json'))
+          tx=json.load(open(root/'e4-transactions-checkpoint.json'))
+          s=json.load(open(root/'gambit-library-e4-summary.json'))
+          assert sig['complete'] is True
+          assert tx['complete'] is True
+          assert s['phase']=='E4_LIBRARY_PHASE1_COMPLETE'
+          assert s['rpc_visible_signature_count']==len(sig['rows'])
+          assert s['known_basis_cycles']>0
+          assert s['known_wins']+s['known_losses']<=s['known_basis_cycles']
+          marker={'phase':'PHASE_1_COMPLETE','source':'E4','wallet':s['wallet'],'summary':s,'workflow_run_id':int(__import__('os').environ['GITHUB_RUN_ID'])}
+          (root/'phase1-complete.json').write_text(json.dumps(marker,indent=2,sort_keys=True)+'\n')
+          PY
+      - name: Persist compact E4 library to campaign branch
+        run: |
+          mkdir -p /tmp/e4lib
+          cp artifacts/e4-library/gambit-library-e4-summary.json /tmp/e4lib/
+          cp artifacts/e4-library/gambit-library-e4-trades.json /tmp/e4lib/
+          cp artifacts/e4-library/gambit-library-e4-devs.json /tmp/e4lib/
+          cp artifacts/e4-library/phase1-complete.json /tmp/e4lib/e4-library-phase1-complete.json
+          git config user.name gambit-library-research
+          git config user.email actions@users.noreply.github.com
+          git fetch origin "$BRANCH"
+          git checkout -B e4-library-persist FETCH_HEAD
+          cp /tmp/e4lib/gambit-library-e4-summary.json docs/research/
+          cp /tmp/e4lib/gambit-library-e4-trades.json docs/research/
+          cp /tmp/e4lib/gambit-library-e4-devs.json docs/research/
+          cp /tmp/e4lib/e4-library-phase1-complete.json docs/research/
+          git add docs/research/gambit-library-e4-*.json docs/research/e4-library-phase1-complete.json
+          git commit -m 'data(library): E4 full-history phase 1 catalog [skip ci]'
+          for i in 1 2 3 4 5; do
+            git fetch origin "$BRANCH"
+            git rebase FETCH_HEAD || { git rebase --abort; sleep 2; continue; }
+            if git push origin HEAD:"$BRANCH"; then exit 0; fi
+            sleep 2
+          done
+          exit 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-library-phase1-${{ github.run_id }}
+          path: artifacts/e4-library/
+          retention-days: 60
+          if-no-files-found: error
