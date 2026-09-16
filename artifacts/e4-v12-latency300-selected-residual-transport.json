@@ -1,0 +1,1990 @@
+{
+  "active_untouched_live_data_used": false,
+  "candidate_fitted": false,
+  "development_gate_passed": false,
+  "diagnostic_id": "e4d-b6f51e46d55e047afb247db7cab5a1c29e0def896807d17804f0c4f76119ab86",
+  "failure_classification": "VALIDATION_COLLAPSE",
+  "feature_audit": {
+    "active_untouched_live_data_used": false,
+    "base_features": 58,
+    "features": 76,
+    "market_flow_features": 18,
+    "matrix_sha256": "08954bc939b8dde7d97e0ab74c113d4f2d49043613ed0c2fde68b3f2b4dde52f",
+    "outcomes_used_as_features": false,
+    "production_paths_changed": 0
+  },
+  "features": [
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": true,
+      "feature": "creator_bayesian_win_rate",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5459712355003051,
+      "minimum_later_oriented_auc": 0.5319750990379174,
+      "oriented_auc_by_fold": [
+        0.5421836228287842,
+        0.5319750990379174,
+        0.5571581196581197,
+        0.5487804878048781
+      ],
+      "raw_auc_by_fold": [
+        0.45781637717121587,
+        0.4680249009620826,
+        0.4428418803418803,
+        0.45121951219512196
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": true,
+      "feature": "market_prior_creator_seed_mean_30s",
+      "feature_family": "market_flow",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5382191732153245,
+      "minimum_later_oriented_auc": 0.5031126202603282,
+      "oriented_auc_by_fold": [
+        0.5260545905707197,
+        0.5031126202603282,
+        0.5673076923076923,
+        0.5442372070779531
+      ],
+      "raw_auc_by_fold": [
+        0.4739454094292804,
+        0.49688737973967173,
+        0.4326923076923077,
+        0.4557627929220469
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": true,
+      "feature": "prior_prefix_drawdown_median",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5032679738562091,
+      "minimum_later_oriented_auc": 0.5,
+      "oriented_auc_by_fold": [
+        0.5,
+        0.5,
+        0.5,
+        0.5098039215686274
+      ],
+      "raw_auc_by_fold": [
+        0.5,
+        0.5,
+        0.5,
+        0.5098039215686274
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": true,
+      "feature": "sell_count",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5024523674778344,
+      "minimum_later_oriented_auc": 0.5,
+      "oriented_auc_by_fold": [
+        0.5161290322580645,
+        0.5073571024335031,
+        0.5,
+        0.5
+      ],
+      "raw_auc_by_fold": [
+        0.4838709677419355,
+        0.49264289756649693,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": true,
+      "feature": "unique_sellers",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5024523674778344,
+      "minimum_later_oriented_auc": 0.5,
+      "oriented_auc_by_fold": [
+        0.5161290322580645,
+        0.5073571024335031,
+        0.5,
+        0.5
+      ],
+      "raw_auc_by_fold": [
+        0.4838709677419355,
+        0.49264289756649693,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": true,
+      "feature": "public_sell_sol",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5023580456517638,
+      "minimum_later_oriented_auc": 0.5,
+      "oriented_auc_by_fold": [
+        0.5161290322580645,
+        0.5070741369552914,
+        0.5,
+        0.5
+      ],
+      "raw_auc_by_fold": [
+        0.4838709677419355,
+        0.4929258630447086,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": true,
+      "feature": "horizon_ms",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5,
+      "minimum_later_oriented_auc": 0.5,
+      "oriented_auc_by_fold": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "raw_auc_by_fold": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": true,
+      "feature": "mayhem_mode",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5,
+      "minimum_later_oriented_auc": 0.5,
+      "oriented_auc_by_fold": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "raw_auc_by_fold": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": true,
+      "feature": "prior_public_buy_sol_median",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5,
+      "minimum_later_oriented_auc": 0.5,
+      "oriented_auc_by_fold": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "raw_auc_by_fold": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": true,
+      "feature": "prior_buy_acceleration_median",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5,
+      "minimum_later_oriented_auc": 0.5,
+      "oriented_auc_by_fold": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "raw_auc_by_fold": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "metadata_content_addressed",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5092256356605082,
+      "minimum_later_oriented_auc": 0.49519230769230765,
+      "oriented_auc_by_fold": [
+        0.5387717121588089,
+        0.5059422750424448,
+        0.49519230769230765,
+        0.5265423242467719
+      ],
+      "raw_auc_by_fold": [
+        0.5387717121588089,
+        0.5059422750424448,
+        0.49519230769230765,
+        0.5265423242467719
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_prior_launches_120s",
+      "feature_family": "market_flow",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5300213962346483,
+      "minimum_later_oriented_auc": 0.48923959827833574,
+      "oriented_auc_by_fold": [
+        0.5086848635235732,
+        0.5356536502546689,
+        0.5651709401709402,
+        0.48923959827833574
+      ],
+      "raw_auc_by_fold": [
+        0.49131513647642683,
+        0.46434634974533107,
+        0.43482905982905984,
+        0.5107604017216643
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "creator_seed_sol",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5112582761304058,
+      "minimum_later_oriented_auc": 0.4889643463497454,
+      "oriented_auc_by_fold": [
+        0.5936724565756824,
+        0.4889643463497454,
+        0.5534188034188035,
+        0.49139167862266864
+      ],
+      "raw_auc_by_fold": [
+        0.4063275434243176,
+        0.5110356536502546,
+        0.4465811965811966,
+        0.5086083213773314
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "creator_profitable_history",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5116066502019336,
+      "minimum_later_oriented_auc": 0.4844368986983588,
+      "oriented_auc_by_fold": [
+        0.5536600496277916,
+        0.4844368986983588,
+        0.5016025641025641,
+        0.5487804878048781
+      ],
+      "raw_auc_by_fold": [
+        0.4463399503722084,
+        0.5155631013016412,
+        0.49839743589743585,
+        0.45121951219512196
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_prior_public_buy_mean_5s",
+      "feature_family": "market_flow",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5268807406219319,
+      "minimum_later_oriented_auc": 0.4835007173601148,
+      "oriented_auc_by_fold": [
+        0.6020471464019852,
+        0.579513299377476,
+        0.5176282051282051,
+        0.4835007173601148
+      ],
+      "raw_auc_by_fold": [
+        0.3979528535980148,
+        0.420486700622524,
+        0.4823717948717949,
+        0.5164992826398852
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "cashback_enabled",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.4906639531002859,
+      "minimum_later_oriented_auc": 0.4816072439162422,
+      "oriented_auc_by_fold": [
+        0.5065136476426799,
+        0.4816072439162422,
+        0.4903846153846154,
+        0.5
+      ],
+      "raw_auc_by_fold": [
+        0.4934863523573201,
+        0.5183927560837578,
+        0.5096153846153846,
+        0.5
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_prior_mayhem_fraction_30s",
+      "feature_family": "market_flow",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.489422719178153,
+      "minimum_later_oriented_auc": 0.4807583474816073,
+      "oriented_auc_by_fold": [
+        0.5062034739454093,
+        0.4807583474816073,
+        0.49946581196581197,
+        0.4880439980870397
+      ],
+      "raw_auc_by_fold": [
+        0.4937965260545907,
+        0.5192416525183927,
+        0.500534188034188,
+        0.5119560019129603
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "creator_average_pnl",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5191892785400799,
+      "minimum_later_oriented_auc": 0.48047538200339557,
+      "oriented_auc_by_fold": [
+        0.5322580645161291,
+        0.48047538200339557,
+        0.5283119658119659,
+        0.5487804878048781
+      ],
+      "raw_auc_by_fold": [
+        0.4677419354838709,
+        0.5195246179966044,
+        0.4716880341880341,
+        0.45121951219512196
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_prior_buy_count_mean_30s",
+      "feature_family": "market_flow",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5085377777911021,
+      "minimum_later_oriented_auc": 0.47537063605930174,
+      "oriented_auc_by_fold": [
+        0.5955334987593053,
+        0.49575551782682514,
+        0.5544871794871795,
+        0.47537063605930174
+      ],
+      "raw_auc_by_fold": [
+        0.4044665012406948,
+        0.5042444821731749,
+        0.4455128205128205,
+        0.5246293639406983
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "creator_resolved_launches",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5068642576199826,
+      "minimum_later_oriented_auc": 0.47435897435897445,
+      "oriented_auc_by_fold": [
+        0.5539702233250621,
+        0.4974533106960951,
+        0.47435897435897445,
+        0.5487804878048781
+      ],
+      "raw_auc_by_fold": [
+        0.446029776674938,
+        0.5025466893039049,
+        0.5256410256410255,
+        0.45121951219512196
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "creator_prior_launch_count",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5050721429246421,
+      "minimum_later_oriented_auc": 0.47435897435897445,
+      "oriented_auc_by_fold": [
+        0.5561414392059554,
+        0.4920769666100736,
+        0.47435897435897445,
+        0.5487804878048781
+      ],
+      "raw_auc_by_fold": [
+        0.4438585607940447,
+        0.5079230333899264,
+        0.5256410256410255,
+        0.45121951219512196
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "prior_launches_60s",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5389928842279201,
+      "minimum_later_oriented_auc": 0.4725011956001913,
+      "oriented_auc_by_fold": [
+        0.5027915632754343,
+        0.5472552348613469,
+        0.5972222222222222,
+        0.4725011956001913
+      ],
+      "raw_auc_by_fold": [
+        0.49720843672456577,
+        0.4527447651386531,
+        0.4027777777777778,
+        0.5274988043998087
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "prefix_drawdown",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.48577043931208513,
+      "minimum_later_oriented_auc": 0.4708545557441991,
+      "oriented_auc_by_fold": [
+        0.5021712158808933,
+        0.4708545557441991,
+        0.4962606837606838,
+        0.4901960784313726
+      ],
+      "raw_auc_by_fold": [
+        0.49782878411910675,
+        0.5291454442558009,
+        0.5037393162393162,
+        0.5098039215686274
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "relative_prefix_drawdown",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.48577043931208513,
+      "minimum_later_oriented_auc": 0.4708545557441991,
+      "oriented_auc_by_fold": [
+        0.5021712158808933,
+        0.4708545557441991,
+        0.4962606837606838,
+        0.4901960784313726
+      ],
+      "raw_auc_by_fold": [
+        0.49782878411910675,
+        0.5291454442558009,
+        0.5037393162393162,
+        0.5098039215686274
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "creator_severe_loss_rate",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.48368957961487674,
+      "minimum_later_oriented_auc": 0.46153846153846156,
+      "oriented_auc_by_fold": [
+        0.5459057071960298,
+        0.4895302773061686,
+        0.46153846153846156,
+        0.5
+      ],
+      "raw_auc_by_fold": [
+        0.45409429280397023,
+        0.5104697226938314,
+        0.5384615384615384,
+        0.5
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_prior_launches_30s",
+      "feature_family": "market_flow",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5259535961598889,
+      "minimum_later_oriented_auc": 0.45868704018109785,
+      "oriented_auc_by_fold": [
+        0.5099255583126552,
+        0.45868704018109785,
+        0.6538461538461539,
+        0.4653275944524151
+      ],
+      "raw_auc_by_fold": [
+        0.4900744416873449,
+        0.5413129598189022,
+        0.34615384615384615,
+        0.5346724055475849
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "buyer_bayesian_win_rate_max",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.49211079753432624,
+      "minimum_later_oriented_auc": 0.4578381437464629,
+      "oriented_auc_by_fold": [
+        0.5251240694789082,
+        0.4578381437464629,
+        0.4802350427350428,
+        0.538259206121473
+      ],
+      "raw_auc_by_fold": [
+        0.4748759305210918,
+        0.5421618562535371,
+        0.5197649572649572,
+        0.461740793878527
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "buyer_average_pnl_max",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5091941816060218,
+      "minimum_later_oriented_auc": 0.4550454328072693,
+      "oriented_auc_by_fold": [
+        0.5462158808933003,
+        0.5789473684210527,
+        0.4935897435897436,
+        0.4550454328072693
+      ],
+      "raw_auc_by_fold": [
+        0.5462158808933003,
+        0.5789473684210527,
+        0.4935897435897436,
+        0.4550454328072693
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "buyer_history_count_max",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.4753809177559826,
+      "minimum_later_oriented_auc": 0.44763271162123386,
+      "oriented_auc_by_fold": [
+        0.5561414392059554,
+        0.45019807583474813,
+        0.5283119658119658,
+        0.44763271162123386
+      ],
+      "raw_auc_by_fold": [
+        0.5561414392059554,
+        0.45019807583474813,
+        0.5283119658119658,
+        0.44763271162123386
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "known_early_buyer_fraction",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.47110728422934134,
+      "minimum_later_oriented_auc": 0.4468024900962082,
+      "oriented_auc_by_fold": [
+        0.5102357320099256,
+        0.4468024900962082,
+        0.4588675213675213,
+        0.5076518412242946
+      ],
+      "raw_auc_by_fold": [
+        0.48976426799007444,
+        0.5531975099037918,
+        0.5411324786324787,
+        0.49234815877570537
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "buyer_history_count_mean",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5133183685786338,
+      "minimum_later_oriented_auc": 0.4459588713534194,
+      "oriented_auc_by_fold": [
+        0.5589330024813896,
+        0.5186757215619694,
+        0.5753205128205128,
+        0.4459588713534194
+      ],
+      "raw_auc_by_fold": [
+        0.5589330024813896,
+        0.5186757215619694,
+        0.5753205128205128,
+        0.4459588713534194
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "maximum_buy_sol",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.4853259581597498,
+      "minimum_later_oriented_auc": 0.4452415112386418,
+      "oriented_auc_by_fold": [
+        0.6184863523573201,
+        0.4818902093944539,
+        0.5288461538461539,
+        0.4452415112386418
+      ],
+      "raw_auc_by_fold": [
+        0.6184863523573201,
+        0.4818902093944539,
+        0.5288461538461539,
+        0.4452415112386418
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "known_early_buyer_count",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.4942505138185205,
+      "minimum_later_oriented_auc": 0.4451046972269383,
+      "oriented_auc_by_fold": [
+        0.575062034739454,
+        0.4451046972269383,
+        0.5603632478632478,
+        0.47728359636537543
+      ],
+      "raw_auc_by_fold": [
+        0.575062034739454,
+        0.4451046972269383,
+        0.5603632478632478,
+        0.47728359636537543
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_current_seed_vs_prior_mean_30s",
+      "feature_family": "market_flow",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.46450505958541854,
+      "minimum_later_oriented_auc": 0.4412393162393162,
+      "oriented_auc_by_fold": [
+        0.5893300248138957,
+        0.5099037917374081,
+        0.4412393162393162,
+        0.44237207077953133
+      ],
+      "raw_auc_by_fold": [
+        0.4106699751861042,
+        0.4900962082625919,
+        0.5587606837606838,
+        0.5576279292204687
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_prior_price_multiple_mean_30s",
+      "feature_family": "market_flow",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5151878863849034,
+      "minimum_later_oriented_auc": 0.43696581196581197,
+      "oriented_auc_by_fold": [
+        0.5272952853598015,
+        0.5619694397283531,
+        0.43696581196581197,
+        0.5466284074605452
+      ],
+      "raw_auc_by_fold": [
+        0.5272952853598015,
+        0.5619694397283531,
+        0.43696581196581197,
+        0.5466284074605452
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_prior_public_buy_mean_30s",
+      "feature_family": "market_flow",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.48286245062295946,
+      "minimum_later_oriented_auc": 0.4347202295552367,
+      "oriented_auc_by_fold": [
+        0.5818858560794045,
+        0.46151669496321446,
+        0.5523504273504274,
+        0.4347202295552367
+      ],
+      "raw_auc_by_fold": [
+        0.41811414392059554,
+        0.5384833050367855,
+        0.44764957264957267,
+        0.5652797704447633
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_prior_price_multiple_mean_5s",
+      "feature_family": "market_flow",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5103092050447683,
+      "minimum_later_oriented_auc": 0.4340028694404592,
+      "oriented_auc_by_fold": [
+        0.5319478908188586,
+        0.5851726089417091,
+        0.5117521367521368,
+        0.4340028694404592
+      ],
+      "raw_auc_by_fold": [
+        0.46805210918114143,
+        0.41482739105829086,
+        0.4882478632478632,
+        0.5659971305595408
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "same_slot_buyers",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5235593292683101,
+      "minimum_later_oriented_auc": 0.43293718166383705,
+      "oriented_auc_by_fold": [
+        0.6147642679900744,
+        0.43293718166383705,
+        0.5822649572649573,
+        0.5554758488761358
+      ],
+      "raw_auc_by_fold": [
+        0.6147642679900744,
+        0.43293718166383705,
+        0.5822649572649573,
+        0.5554758488761358
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_prior_launches_1s",
+      "feature_family": "market_flow",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.4776984494890851,
+      "minimum_later_oriented_auc": 0.43208828522920206,
+      "oriented_auc_by_fold": [
+        0.5161290322580645,
+        0.43208828522920206,
+        0.5096153846153846,
+        0.49139167862266864
+      ],
+      "raw_auc_by_fold": [
+        0.4838709677419355,
+        0.5679117147707979,
+        0.4903846153846154,
+        0.5086083213773314
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "prior_launches_300s",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.523874005138605,
+      "minimum_later_oriented_auc": 0.43162393162393164,
+      "oriented_auc_by_fold": [
+        0.517059553349876,
+        0.5531975099037917,
+        0.43162393162393164,
+        0.5868005738880918
+      ],
+      "raw_auc_by_fold": [
+        0.517059553349876,
+        0.5531975099037917,
+        0.43162393162393164,
+        0.5868005738880918
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "same_transaction_buyers",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.4651773780181241,
+      "minimum_later_oriented_auc": 0.42948717948717946,
+      "oriented_auc_by_fold": [
+        0.5,
+        0.5,
+        0.42948717948717946,
+        0.4660449545671927
+      ],
+      "raw_auc_by_fold": [
+        0.5,
+        0.5,
+        0.42948717948717946,
+        0.4660449545671927
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_prior_buy_count_mean_5s",
+      "feature_family": "market_flow",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5324798351400354,
+      "minimum_later_oriented_auc": 0.4294595887135342,
+      "oriented_auc_by_fold": [
+        0.5310173697270472,
+        0.5996038483305037,
+        0.5683760683760684,
+        0.4294595887135342
+      ],
+      "raw_auc_by_fold": [
+        0.46898263027295284,
+        0.40039615166949627,
+        0.43162393162393164,
+        0.5705404112864658
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "prior_unique_buyers_median",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.46571795280547074,
+      "minimum_later_oriented_auc": 0.42706838833094213,
+      "oriented_auc_by_fold": [
+        0.5,
+        0.5,
+        0.47008547008547014,
+        0.42706838833094213
+      ],
+      "raw_auc_by_fold": [
+        0.5,
+        0.5,
+        0.47008547008547014,
+        0.42706838833094213
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_current_price_vs_prior_mean_30s",
+      "feature_family": "market_flow",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5093450946192991,
+      "minimum_later_oriented_auc": 0.4227504244482173,
+      "oriented_auc_by_fold": [
+        0.5055831265508685,
+        0.4227504244482173,
+        0.6399572649572649,
+        0.46532759445241506
+      ],
+      "raw_auc_by_fold": [
+        0.5055831265508685,
+        0.4227504244482173,
+        0.6399572649572649,
+        0.46532759445241506
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "buyer_severe_loss_rate_mean",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5026028111894535,
+      "minimum_later_oriented_auc": 0.4204867006225241,
+      "oriented_auc_by_fold": [
+        0.5018610421836228,
+        0.4204867006225241,
+        0.594017094017094,
+        0.4933046389287423
+      ],
+      "raw_auc_by_fold": [
+        0.5018610421836228,
+        0.4204867006225241,
+        0.594017094017094,
+        0.4933046389287423
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "relative_price_multiple",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5139718268967318,
+      "minimum_later_oriented_auc": 0.4182229767968308,
+      "oriented_auc_by_fold": [
+        0.6153846153846154,
+        0.4182229767968308,
+        0.6239316239316239,
+        0.4997608799617408
+      ],
+      "raw_auc_by_fold": [
+        0.6153846153846154,
+        0.4182229767968308,
+        0.6239316239316239,
+        0.4997608799617408
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_interarrival_ms",
+      "feature_family": "market_flow",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.4963937290458545,
+      "minimum_later_oriented_auc": 0.4177350427350428,
+      "oriented_auc_by_fold": [
+        0.5483870967741935,
+        0.5444255800792304,
+        0.4177350427350428,
+        0.5270205643232904
+      ],
+      "raw_auc_by_fold": [
+        0.4516129032258065,
+        0.45557441992076964,
+        0.5822649572649572,
+        0.47297943567670964
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "prior_price_multiple_median",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.4621008892143917,
+      "minimum_later_oriented_auc": 0.4097222222222222,
+      "oriented_auc_by_fold": [
+        0.5669975186104219,
+        0.4275608375778155,
+        0.4097222222222222,
+        0.5490196078431373
+      ],
+      "raw_auc_by_fold": [
+        0.43300248138957814,
+        0.5724391624221845,
+        0.5902777777777778,
+        0.4509803921568627
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "relative_unique_buyers",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5269253186409054,
+      "minimum_later_oriented_auc": 0.4094510469722694,
+      "oriented_auc_by_fold": [
+        0.582196029776675,
+        0.4094510469722694,
+        0.5673076923076923,
+        0.6040172166427547
+      ],
+      "raw_auc_by_fold": [
+        0.582196029776675,
+        0.4094510469722694,
+        0.5673076923076923,
+        0.6040172166427547
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "unique_buyers",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5016971327240538,
+      "minimum_later_oriented_auc": 0.4094510469722694,
+      "oriented_auc_by_fold": [
+        0.582196029776675,
+        0.4094510469722694,
+        0.5844017094017093,
+        0.5112386417981827
+      ],
+      "raw_auc_by_fold": [
+        0.582196029776675,
+        0.4094510469722694,
+        0.5844017094017093,
+        0.5112386417981827
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "buyers_last_250ms",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5016971327240538,
+      "minimum_later_oriented_auc": 0.4094510469722694,
+      "oriented_auc_by_fold": [
+        0.582196029776675,
+        0.4094510469722694,
+        0.5844017094017093,
+        0.5112386417981827
+      ],
+      "raw_auc_by_fold": [
+        0.582196029776675,
+        0.4094510469722694,
+        0.5844017094017093,
+        0.5112386417981827
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "buyers_last_1000ms",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5016971327240538,
+      "minimum_later_oriented_auc": 0.4094510469722694,
+      "oriented_auc_by_fold": [
+        0.582196029776675,
+        0.4094510469722694,
+        0.5844017094017093,
+        0.5112386417981827
+      ],
+      "raw_auc_by_fold": [
+        0.582196029776675,
+        0.4094510469722694,
+        0.5844017094017093,
+        0.5112386417981827
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "early_buyer_count",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5016971327240538,
+      "minimum_later_oriented_auc": 0.4094510469722694,
+      "oriented_auc_by_fold": [
+        0.582196029776675,
+        0.4094510469722694,
+        0.5844017094017093,
+        0.5112386417981827
+      ],
+      "raw_auc_by_fold": [
+        0.582196029776675,
+        0.4094510469722694,
+        0.5844017094017093,
+        0.5112386417981827
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_launch_intensity_ratio_5s_120s",
+      "feature_family": "market_flow",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5043338095365887,
+      "minimum_later_oriented_auc": 0.406517094017094,
+      "oriented_auc_by_fold": [
+        0.5620347394540943,
+        0.5082059988681381,
+        0.406517094017094,
+        0.5982783357245337
+      ],
+      "raw_auc_by_fold": [
+        0.5620347394540943,
+        0.5082059988681381,
+        0.406517094017094,
+        0.5982783357245337
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "buy_count",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.509613553818435,
+      "minimum_later_oriented_auc": 0.40492359932088284,
+      "oriented_auc_by_fold": [
+        0.5800248138957816,
+        0.40492359932088284,
+        0.6009615384615384,
+        0.5229555236728838
+      ],
+      "raw_auc_by_fold": [
+        0.5800248138957816,
+        0.40492359932088284,
+        0.6009615384615384,
+        0.5229555236728838
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_prior_launches_5s",
+      "feature_family": "market_flow",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5050297296788443,
+      "minimum_later_oriented_auc": 0.40491452991452986,
+      "oriented_auc_by_fold": [
+        0.5521091811414393,
+        0.5042444821731749,
+        0.40491452991452986,
+        0.6059301769488282
+      ],
+      "raw_auc_by_fold": [
+        0.5521091811414393,
+        0.5042444821731749,
+        0.40491452991452986,
+        0.6059301769488282
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_current_public_buy_share_30s",
+      "feature_family": "market_flow",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.4881080096187651,
+      "minimum_later_oriented_auc": 0.40459110473457677,
+      "oriented_auc_by_fold": [
+        0.5924317617866005,
+        0.4411431805319751,
+        0.6185897435897436,
+        0.40459110473457677
+      ],
+      "raw_auc_by_fold": [
+        0.5924317617866005,
+        0.4411431805319751,
+        0.6185897435897436,
+        0.40459110473457677
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "buyer_sol_concentration",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5261095040695584,
+      "minimum_later_oriented_auc": 0.4035087719298245,
+      "oriented_auc_by_fold": [
+        0.5874689826302729,
+        0.4035087719298245,
+        0.5801282051282051,
+        0.5946915351506457
+      ],
+      "raw_auc_by_fold": [
+        0.4125310173697271,
+        0.5964912280701755,
+        0.4198717948717949,
+        0.40530846484935434
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "market_prior_price_multiple_max_30s",
+      "feature_family": "market_flow",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.4947822881154367,
+      "minimum_later_oriented_auc": 0.4033119658119658,
+      "oriented_auc_by_fold": [
+        0.5210918114143921,
+        0.5461233729485002,
+        0.4033119658119658,
+        0.5349115255858441
+      ],
+      "raw_auc_by_fold": [
+        0.5210918114143921,
+        0.5461233729485002,
+        0.4033119658119658,
+        0.5349115255858441
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "prefix_max_price_multiple",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5057750813387388,
+      "minimum_later_oriented_auc": 0.400679117147708,
+      "oriented_auc_by_fold": [
+        0.5924317617866005,
+        0.400679117147708,
+        0.6228632478632479,
+        0.49378287900526063
+      ],
+      "raw_auc_by_fold": [
+        0.5924317617866005,
+        0.400679117147708,
+        0.6228632478632479,
+        0.49378287900526063
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "virtual_sol_reserve",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5053237272159077,
+      "minimum_later_oriented_auc": 0.39558573853989815,
+      "oriented_auc_by_fold": [
+        0.5794044665012407,
+        0.39558573853989815,
+        0.6266025641025641,
+        0.49378287900526063
+      ],
+      "raw_auc_by_fold": [
+        0.5794044665012407,
+        0.39558573853989815,
+        0.6266025641025641,
+        0.49378287900526063
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "price_multiple_from_create",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5051456645378449,
+      "minimum_later_oriented_auc": 0.39558573853989815,
+      "oriented_auc_by_fold": [
+        0.5794044665012407,
+        0.39558573853989815,
+        0.6260683760683761,
+        0.49378287900526063
+      ],
+      "raw_auc_by_fold": [
+        0.5794044665012407,
+        0.39558573853989815,
+        0.6260683760683761,
+        0.49378287900526063
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "estimated_price_impact_bps",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5053237272159076,
+      "minimum_later_oriented_auc": 0.3955857385398981,
+      "oriented_auc_by_fold": [
+        0.5794044665012407,
+        0.3955857385398981,
+        0.6266025641025641,
+        0.49378287900526063
+      ],
+      "raw_auc_by_fold": [
+        0.42059553349875933,
+        0.6044142614601019,
+        0.3733974358974359,
+        0.5062171209947394
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "real_token_reserve",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.5051456645378449,
+      "minimum_later_oriented_auc": 0.3955857385398981,
+      "oriented_auc_by_fold": [
+        0.5794044665012407,
+        0.3955857385398981,
+        0.6260683760683761,
+        0.49378287900526063
+      ],
+      "raw_auc_by_fold": [
+        0.42059553349875933,
+        0.6044142614601019,
+        0.3739316239316239,
+        0.5062171209947394
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "distinct_signatures",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.5044981319122191,
+      "minimum_later_oriented_auc": 0.3933220147142048,
+      "oriented_auc_by_fold": [
+        0.5542803970223326,
+        0.3933220147142048,
+        0.6063034188034188,
+        0.5138689622190339
+      ],
+      "raw_auc_by_fold": [
+        0.5542803970223326,
+        0.3933220147142048,
+        0.6063034188034188,
+        0.5138689622190339
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "buyer_positive_expectancy_fraction",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.48096621428485137,
+      "minimum_later_oriented_auc": 0.3930390492359932,
+      "oriented_auc_by_fold": [
+        0.5145781637717122,
+        0.3930390492359932,
+        0.48290598290598297,
+        0.5669536107125778
+      ],
+      "raw_auc_by_fold": [
+        0.48542183622828783,
+        0.6069609507640068,
+        0.517094017094017,
+        0.43304638928742223
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "median_buy_sol",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.43489583772490387,
+      "minimum_later_oriented_auc": 0.3907753254102999,
+      "oriented_auc_by_fold": [
+        0.5272952853598014,
+        0.3907753254102999,
+        0.48397435897435903,
+        0.4299378287900526
+      ],
+      "raw_auc_by_fold": [
+        0.4727047146401986,
+        0.6092246745897001,
+        0.516025641025641,
+        0.5700621712099474
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "public_buy_sol",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.49677258603840024,
+      "minimum_later_oriented_auc": 0.389926428975665,
+      "oriented_auc_by_fold": [
+        0.5825062034739454,
+        0.389926428975665,
+        0.6137820512820513,
+        0.4866092778574845
+      ],
+      "raw_auc_by_fold": [
+        0.5825062034739454,
+        0.389926428975665,
+        0.6137820512820513,
+        0.4866092778574845
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "buy_sol_last_250ms",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.49677258603840024,
+      "minimum_later_oriented_auc": 0.389926428975665,
+      "oriented_auc_by_fold": [
+        0.5825062034739454,
+        0.389926428975665,
+        0.6137820512820513,
+        0.4866092778574845
+      ],
+      "raw_auc_by_fold": [
+        0.5825062034739454,
+        0.389926428975665,
+        0.6137820512820513,
+        0.4866092778574845
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "buy_sol_last_1000ms",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.49677258603840024,
+      "minimum_later_oriented_auc": 0.389926428975665,
+      "oriented_auc_by_fold": [
+        0.5825062034739454,
+        0.389926428975665,
+        0.6137820512820513,
+        0.4866092778574845
+      ],
+      "raw_auc_by_fold": [
+        0.5825062034739454,
+        0.389926428975665,
+        0.6137820512820513,
+        0.4866092778574845
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "buy_acceleration",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.49677258603840024,
+      "minimum_later_oriented_auc": 0.389926428975665,
+      "oriented_auc_by_fold": [
+        0.5825062034739454,
+        0.389926428975665,
+        0.6137820512820513,
+        0.4866092778574845
+      ],
+      "raw_auc_by_fold": [
+        0.5825062034739454,
+        0.389926428975665,
+        0.6137820512820513,
+        0.4866092778574845
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "relative_public_buy_sol",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.49677258603840024,
+      "minimum_later_oriented_auc": 0.389926428975665,
+      "oriented_auc_by_fold": [
+        0.5825062034739454,
+        0.389926428975665,
+        0.6137820512820513,
+        0.4866092778574845
+      ],
+      "raw_auc_by_fold": [
+        0.5825062034739454,
+        0.389926428975665,
+        0.6137820512820513,
+        0.4866092778574845
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "relative_buy_acceleration",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.49677258603840024,
+      "minimum_later_oriented_auc": 0.389926428975665,
+      "oriented_auc_by_fold": [
+        0.5825062034739454,
+        0.389926428975665,
+        0.6137820512820513,
+        0.4866092778574845
+      ],
+      "raw_auc_by_fold": [
+        0.5825062034739454,
+        0.389926428975665,
+        0.6137820512820513,
+        0.4866092778574845
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "log_return_volatility",
+      "feature_family": "base",
+      "fold0_direction": "higher_is_win",
+      "mean_later_oriented_auc": 0.44632347103098535,
+      "minimum_later_oriented_auc": 0.38370118845500845,
+      "oriented_auc_by_fold": [
+        0.5086848635235732,
+        0.38370118845500845,
+        0.5021367521367521,
+        0.4531324725011956
+      ],
+      "raw_auc_by_fold": [
+        0.5086848635235732,
+        0.38370118845500845,
+        0.5021367521367521,
+        0.4531324725011956
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "buyer_bayesian_win_rate_mean",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.4736883180001638,
+      "minimum_later_oriented_auc": 0.34663271080928126,
+      "oriented_auc_by_fold": [
+        0.5266749379652605,
+        0.34663271080928126,
+        0.5074786324786325,
+        0.5669536107125778
+      ],
+      "raw_auc_by_fold": [
+        0.47332506203473945,
+        0.6533672891907187,
+        0.49252136752136755,
+        0.43304638928742223
+      ]
+    },
+    {
+      "all_folds_above_residual_floor": false,
+      "direction_consistent_all_folds": false,
+      "feature": "buyer_average_pnl_mean",
+      "feature_family": "base",
+      "fold0_direction": "lower_is_win",
+      "mean_later_oriented_auc": 0.4726661902656281,
+      "minimum_later_oriented_auc": 0.34125636672325976,
+      "oriented_auc_by_fold": [
+        0.5161290322580645,
+        0.34125636672325976,
+        0.5021367521367521,
+        0.5746054519368723
+      ],
+      "raw_auc_by_fold": [
+        0.4838709677419355,
+        0.6587436332767402,
+        0.49786324786324787,
+        0.4253945480631277
+      ]
+    }
+  ],
+  "finding": "0 of 76 causal features separated wins from executed false positives with oriented AUC >= 0.55 in every chronological fold.",
+  "identity": {
+    "baseline_experiment_id": "e4x-95c8ba6350c7dba06c748fd633680493cb5779c01adc999c91e184f6011dfcf8",
+    "dataset_source_manifest_fingerprint": "22944bba1bf62f95fd5c266c59492cda3c226150d64ac57562fdd461beeb08ee",
+    "diagnostic_family_identifier": "latency300-selected-residual-transport-v12",
+    "evidence_epoch": [
+      "33605109571",
+      "33627431540",
+      "33644544746",
+      "33656916992",
+      "33669514091",
+      "33681664773",
+      "33692043170",
+      "33704841852",
+      "33716649440",
+      "33741470396",
+      "33769636983",
+      "33781389703",
+      "33792881280",
+      "33810753028",
+      "33822988156",
+      "33835575805",
+      "33852482054",
+      "33876345997",
+      "33897368379",
+      "33911477030",
+      "33920757002",
+      "33931301493",
+      "34063856134",
+      "34073802862",
+      "34084120627",
+      "34099929487",
+      "34123647690",
+      "34138377553",
+      "34150939561",
+      "34159449923",
+      "34167878699",
+      "34175839320",
+      "34186192299",
+      "34201101121",
+      "34244224832",
+      "34281858070",
+      "34310065776",
+      "34348537141",
+      "34388016481",
+      "34425005585",
+      "34470147967",
+      "34512979177",
+      "34547229611",
+      "34586174670",
+      "34627236811",
+      "34660606300",
+      "34684115937",
+      "34709541936",
+      "34722511299",
+      "34729110702",
+      "34749576265",
+      "34760648934",
+      "34770227385",
+      "34779504872",
+      "34790190944",
+      "34799149811",
+      "34811806243",
+      "34845710248",
+      "34863619434",
+      "34876702743",
+      "34887276656",
+      "34897737567",
+      "34907762101",
+      "34918286614"
+    ],
+    "feature_set_fingerprint": "c2daa99c85736b0b972a44b049d4210be41b39510c2ca500e39bdbca97726867",
+    "label_matrix_sha256": "1b21575dd37159a825116a940cb67e685e3a3cb784de85482476df5a091de76e",
+    "latency_ms": 300,
+    "orientation_policy": "orient on fold 0 executed trades and freeze for folds 1-3",
+    "residual_auc_floor": 0.55,
+    "source_code_fingerprint": "b7552857f62a8c2d9731be8cc7b279e394d6bee65ae74695b475d2ba1ad15bae"
+  },
+  "label_audit": {
+    "active_untouched_live_data_used": false,
+    "all_source_hashes_verified": true,
+    "capture_windows": 64,
+    "dataset_manifest_sha256": "22944bba1bf62f95fd5c266c59492cda3c226150d64ac57562fdd461beeb08ee",
+    "decision_horizon_ms": 250,
+    "executable_rows": 191425,
+    "executable_sha256": "c0198d3444974eca21caf747a4bab7f3eb43ab90945274687616627eaa3d00d4",
+    "latency_ms": 300,
+    "negative_or_zero_rows": 162568,
+    "no_quote_rows": 0,
+    "pnl_sha256": "1b21575dd37159a825116a940cb67e685e3a3cb784de85482476df5a091de76e",
+    "policy": "stop=0.70|take=3.00|hold=60000|protect=1.15:1.06|trail=1.25:0.15",
+    "policy_index": 12,
+    "production_paths_changed": 0,
+    "profitable_rows": 28857,
+    "rows": 191425,
+    "version": "e4-v12-latency300-labels-v1",
+    "visited_rows": 191425
+  },
+  "live_confirmation_authorised": false,
+  "material_change_required_before_rerun": "A new causal feature family; base/market-flow residual threshold retuning is prohibited.",
+  "production_deployment_authorised": false,
+  "production_paths_changed": 0,
+  "production_promotion_authorised": false,
+  "retired_diagnostic_family": true,
+  "scientific_basis": "A profitable sparse selector can still miss its precision gate if a causal feature separates wins from false positives only inside its selected tail.",
+  "selection_audit": {
+    "concurrency_rejections_preserved": true,
+    "exact_baseline_replayed": true,
+    "executed_trades": 326,
+    "folds": [
+      {
+        "attempted_trades": 83,
+        "calibration_windows": [
+          "33911477030",
+          "33920757002",
+          "33931301493",
+          "34063856134",
+          "34073802862"
+        ],
+        "executed_trades": 83,
+        "fit_windows": [
+          "33605109571",
+          "33627431540",
+          "33644544746",
+          "33656916992",
+          "33669514091",
+          "33681664773",
+          "33692043170",
+          "33704841852",
+          "33716649440",
+          "33741470396",
+          "33769636983",
+          "33781389703",
+          "33792881280",
+          "33810753028",
+          "33822988156",
+          "33835575805",
+          "33852482054",
+          "33876345997",
+          "33897368379"
+        ],
+        "fold": 0,
+        "ledger_hash": "3ea2c4164047a640a30090f088e60fd02a93013fb0b9c903efbc891d3b67ca16",
+        "losses": 31,
+        "test_windows": [
+          "34084120627",
+          "34099929487",
+          "34123647690",
+          "34138377553",
+          "34150939561",
+          "34159449923",
+          "34167878699",
+          "34175839320",
+          "34186192299",
+          "34201101121"
+        ],
+        "threshold_hash": "b2bce3be957bb565e0c09ec14d816784ff06e36f82d4b1c7fb337bb285b19da9",
+        "wins": 52
+      },
+      {
+        "attempted_trades": 90,
+        "calibration_windows": [
+          "34159449923",
+          "34167878699",
+          "34175839320",
+          "34186192299",
+          "34201101121"
+        ],
+        "executed_trades": 88,
+        "fit_windows": [
+          "33605109571",
+          "33627431540",
+          "33644544746",
+          "33656916992",
+          "33669514091",
+          "33681664773",
+          "33692043170",
+          "33704841852",
+          "33716649440",
+          "33741470396",
+          "33769636983",
+          "33781389703",
+          "33792881280",
+          "33810753028",
+          "33822988156",
+          "33835575805",
+          "33852482054",
+          "33876345997",
+          "33897368379",
+          "33911477030",
+          "33920757002",
+          "33931301493",
+          "34063856134",
+          "34073802862",
+          "34084120627",
+          "34099929487",
+          "34123647690",
+          "34138377553",
+          "34150939561"
+        ],
+        "fold": 1,
+        "ledger_hash": "46d8de5a656a1d5743e924d6404db6cb1b367c8c6209746d71f3a08c3d27103b",
+        "losses": 31,
+        "test_windows": [
+          "34244224832",
+          "34281858070",
+          "34310065776",
+          "34348537141",
+          "34388016481",
+          "34425005585",
+          "34470147967",
+          "34512979177",
+          "34547229611",
+          "34586174670"
+        ],
+        "threshold_hash": "2bef8e357cdf73953a2f521203712853ad9c5025e6cce5fca661ded8f4f51400",
+        "wins": 57
+      },
+      {
+        "attempted_trades": 63,
+        "calibration_windows": [
+          "34425005585",
+          "34470147967",
+          "34512979177",
+          "34547229611",
+          "34586174670"
+        ],
+        "executed_trades": 63,
+        "fit_windows": [
+          "33605109571",
+          "33627431540",
+          "33644544746",
+          "33656916992",
+          "33669514091",
+          "33681664773",
+          "33692043170",
+          "33704841852",
+          "33716649440",
+          "33741470396",
+          "33769636983",
+          "33781389703",
+          "33792881280",
+          "33810753028",
+          "33822988156",
+          "33835575805",
+          "33852482054",
+          "33876345997",
+          "33897368379",
+          "33911477030",
+          "33920757002",
+          "33931301493",
+          "34063856134",
+          "34073802862",
+          "34084120627",
+          "34099929487",
+          "34123647690",
+          "34138377553",
+          "34150939561",
+          "34159449923",
+          "34167878699",
+          "34175839320",
+          "34186192299",
+          "34201101121",
+          "34244224832",
+          "34281858070",
+          "34310065776",
+          "34348537141",
+          "34388016481"
+        ],
+        "fold": 2,
+        "ledger_hash": "263e183005e9fc17a0bfa34843b4c0fa3eaa16b137863feb86766ed2cb40c449",
+        "losses": 24,
+        "test_windows": [
+          "34627236811",
+          "34660606300",
+          "34684115937",
+          "34709541936",
+          "34722511299",
+          "34729110702",
+          "34749576265",
+          "34760648934",
+          "34770227385",
+          "34779504872"
+        ],
+        "threshold_hash": "e36d15d0030e7ddbac7323693af200e599d5f312685dac079ed305a941eb45dd",
+        "wins": 39
+      },
+      {
+        "attempted_trades": 94,
+        "calibration_windows": [
+          "34729110702",
+          "34749576265",
+          "34760648934",
+          "34770227385",
+          "34779504872"
+        ],
+        "executed_trades": 92,
+        "fit_windows": [
+          "33605109571",
+          "33627431540",
+          "33644544746",
+          "33656916992",
+          "33669514091",
+          "33681664773",
+          "33692043170",
+          "33704841852",
+          "33716649440",
+          "33741470396",
+          "33769636983",
+          "33781389703",
+          "33792881280",
+          "33810753028",
+          "33822988156",
+          "33835575805",
+          "33852482054",
+          "33876345997",
+          "33897368379",
+          "33911477030",
+          "33920757002",
+          "33931301493",
+          "34063856134",
+          "34073802862",
+          "34084120627",
+          "34099929487",
+          "34123647690",
+          "34138377553",
+          "34150939561",
+          "34159449923",
+          "34167878699",
+          "34175839320",
+          "34186192299",
+          "34201101121",
+          "34244224832",
+          "34281858070",
+          "34310065776",
+          "34348537141",
+          "34388016481",
+          "34425005585",
+          "34470147967",
+          "34512979177",
+          "34547229611",
+          "34586174670",
+          "34627236811",
+          "34660606300",
+          "34684115937",
+          "34709541936",
+          "34722511299"
+        ],
+        "fold": 3,
+        "ledger_hash": "e9eafea180df55d9e687b23dc0d206ea69f9d99b287e15b9d749ff28f61cd462",
+        "losses": 41,
+        "test_windows": [
+          "34790190944",
+          "34799149811",
+          "34811806243",
+          "34845710248",
+          "34863619434",
+          "34876702743",
+          "34887276656",
+          "34897737567",
+          "34907762101",
+          "34918286614"
+        ],
+        "threshold_hash": "f5f077b6085737df2a94fb4819392f9fdc359e3f0fb330e4848704b90f5931e3",
+        "wins": 51
+      }
+    ],
+    "losses": 127,
+    "winner_definition": "fee-net replay ledger pnl_sol > 0",
+    "wins": 199
+  },
+  "stable_residual_feature_count": 0,
+  "stable_residual_features": [],
+  "untouched_holdout_passed": false,
+  "version": "e4-v12-latency300-selected-residual-transport-v1",
+  "veto_candidate_warranted": false
+}
