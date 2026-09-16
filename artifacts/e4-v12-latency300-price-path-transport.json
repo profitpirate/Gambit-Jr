@@ -1,0 +1,1285 @@
+{
+  "active_untouched_live_data_used": false,
+  "all_epoch_auc_52_feature_count": 14,
+  "all_epoch_auc_52_features": [
+    "path_log_total_variation_250ms",
+    "path_max_runup_250ms",
+    "path_late_minus_early_return_250ms",
+    "path_best_log_step_250ms",
+    "path_worst_log_step_250ms",
+    "path_close_location_250ms",
+    "path_up_step_fraction_250ms",
+    "path_new_high_fraction_250ms",
+    "path_directional_efficiency_250ms",
+    "path_log_residual_std_250ms",
+    "path_time_since_peak_ms",
+    "path_peak_time_fraction_250ms",
+    "path_linear_trend_r2_250ms",
+    "path_log_step_skew_250ms"
+  ],
+  "candidate_fitted": false,
+  "development_gate_passed": false,
+  "diagnostic_id": "e4d-b39ee36ae019671a74b6957abba6bf280bf3bdbac10eba04eba1a2607a727c00",
+  "direction_consistent_features": 14,
+  "feature_count": 16,
+  "features": [
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "path_log_total_variation_250ms",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.15565573957873496,
+      "first_to_last_oriented_auc_change": 0.07124073667627984,
+      "mean_later_oriented_auc": 0.6660900186266473,
+      "minimum_later_oriented_auc": 0.6487618490843365,
+      "oriented_auc_by_epoch": [
+        0.626929262874126,
+        0.6487618490843365,
+        0.6513382072451994,
+        0.6981699995504058
+      ],
+      "price_range_tail_all_epochs_above_descriptive_floor": true,
+      "price_range_tail_direction_consistent_all_epochs": true,
+      "price_range_tail_earliest_direction": "lower_is_positive",
+      "price_range_tail_minimum_later_oriented_auc": 0.6877544902431029,
+      "price_range_tail_oriented_auc_by_epoch": [
+        0.6407375580502432,
+        0.7007615649250618,
+        0.6877544902431029,
+        0.6928496995903457
+      ],
+      "price_range_tail_raw_auc_by_epoch": [
+        0.3592624419497568,
+        0.29923843507493814,
+        0.31224550975689713,
+        0.30715030040965424
+      ],
+      "raw_auc_by_epoch": [
+        0.626929262874126,
+        0.6487618490843365,
+        0.6513382072451994,
+        0.6981699995504058
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "path_max_runup_250ms",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.1557104499064556,
+      "first_to_last_oriented_auc_change": 0.07120302316790816,
+      "mean_later_oriented_auc": 0.6660232233537278,
+      "minimum_later_oriented_auc": 0.6486066640106788,
+      "oriented_auc_by_epoch": [
+        0.6268590336607835,
+        0.6486066640106788,
+        0.6514009492218128,
+        0.6980620568286917
+      ],
+      "price_range_tail_all_epochs_above_descriptive_floor": true,
+      "price_range_tail_direction_consistent_all_epochs": true,
+      "price_range_tail_earliest_direction": "lower_is_positive",
+      "price_range_tail_minimum_later_oriented_auc": 0.6940029235786515,
+      "price_range_tail_oriented_auc_by_epoch": [
+        0.6394491061499379,
+        0.7111855880858866,
+        0.6940887092599941,
+        0.6940029235786515
+      ],
+      "price_range_tail_raw_auc_by_epoch": [
+        0.36055089385006206,
+        0.28881441191411333,
+        0.30591129074000584,
+        0.30599707642134855
+      ],
+      "raw_auc_by_epoch": [
+        0.6268590336607835,
+        0.6486066640106788,
+        0.6514009492218128,
+        0.6980620568286917
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "lower_is_positive",
+      "feature": "path_late_minus_early_return_250ms",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.15663423750814565,
+      "first_to_last_oriented_auc_change": 0.07049608023757004,
+      "mean_later_oriented_auc": 0.6652941710769616,
+      "minimum_later_oriented_auc": 0.6477809356389272,
+      "oriented_auc_by_epoch": [
+        0.626909613389755,
+        0.6477809356389272,
+        0.6506958839646324,
+        0.6974056936273251
+      ],
+      "price_range_tail_all_epochs_above_descriptive_floor": true,
+      "price_range_tail_direction_consistent_all_epochs": true,
+      "price_range_tail_earliest_direction": "higher_is_positive",
+      "price_range_tail_minimum_later_oriented_auc": 0.6873662847875223,
+      "price_range_tail_oriented_auc_by_epoch": [
+        0.6369050051731667,
+        0.7117245480789482,
+        0.6873662847875223,
+        0.6968397506958304
+      ],
+      "price_range_tail_raw_auc_by_epoch": [
+        0.6369050051731667,
+        0.7117245480789482,
+        0.6873662847875223,
+        0.6968397506958304
+      ],
+      "raw_auc_by_epoch": [
+        0.37309038661024496,
+        0.35221906436107275,
+        0.3493041160353676,
+        0.3025943063726749
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "path_best_log_step_250ms",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.15592702880956885,
+      "first_to_last_oriented_auc_change": 0.07250375362052275,
+      "mean_later_oriented_auc": 0.6602931256609437,
+      "minimum_later_oriented_auc": 0.6415660498082998,
+      "oriented_auc_by_epoch": [
+        0.6215751083926311,
+        0.6415660498082998,
+        0.6452344651613775,
+        0.6940788620131538
+      ],
+      "price_range_tail_all_epochs_above_descriptive_floor": true,
+      "price_range_tail_direction_consistent_all_epochs": true,
+      "price_range_tail_earliest_direction": "lower_is_positive",
+      "price_range_tail_minimum_later_oriented_auc": 0.7059111829051571,
+      "price_range_tail_oriented_auc_by_epoch": [
+        0.6876176330772921,
+        0.745910821738466,
+        0.7059111829051571,
+        0.70993611554681
+      ],
+      "price_range_tail_raw_auc_by_epoch": [
+        0.31238236692270793,
+        0.25408917826153393,
+        0.2940888170948429,
+        0.29006388445319004
+      ],
+      "raw_auc_by_epoch": [
+        0.6215751083926311,
+        0.6415660498082998,
+        0.6452344651613775,
+        0.6940788620131538
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "path_worst_log_step_250ms",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.14891949533329127,
+      "first_to_last_oriented_auc_change": 0.0788805582804527,
+      "mean_later_oriented_auc": 0.6332106675694731,
+      "minimum_later_oriented_auc": 0.600645024950914,
+      "oriented_auc_by_epoch": [
+        0.596416298254076,
+        0.600645024950914,
+        0.6236901212229765,
+        0.6752968565345288
+      ],
+      "price_range_tail_all_epochs_above_descriptive_floor": true,
+      "price_range_tail_direction_consistent_all_epochs": true,
+      "price_range_tail_earliest_direction": "lower_is_positive",
+      "price_range_tail_minimum_later_oriented_auc": 0.6472792189306233,
+      "price_range_tail_oriented_auc_by_epoch": [
+        0.6239720885611714,
+        0.686166280515254,
+        0.6472792189306233,
+        0.6477482522422934
+      ],
+      "price_range_tail_raw_auc_by_epoch": [
+        0.37602791143882863,
+        0.31383371948474603,
+        0.35272078106937665,
+        0.3522517477577066
+      ],
+      "raw_auc_by_epoch": [
+        0.596416298254076,
+        0.600645024950914,
+        0.6236901212229765,
+        0.6752968565345288
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "path_close_location_250ms",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.15306789850959618,
+      "first_to_last_oriented_auc_change": 0.08541610493500118,
+      "mean_later_oriented_auc": 0.6023289363473937,
+      "minimum_later_oriented_auc": 0.5665789761114812,
+      "oriented_auc_by_epoch": [
+        0.5680179187393386,
+        0.5665789761114812,
+        0.5869738092563599,
+        0.6534340236743398
+      ],
+      "price_range_tail_all_epochs_above_descriptive_floor": false,
+      "price_range_tail_direction_consistent_all_epochs": true,
+      "price_range_tail_earliest_direction": "lower_is_positive",
+      "price_range_tail_minimum_later_oriented_auc": 0.5166778175630748,
+      "price_range_tail_oriented_auc_by_epoch": [
+        0.5159652956878806,
+        0.5166778175630748,
+        0.5176994729032591,
+        0.517451084082496
+      ],
+      "price_range_tail_raw_auc_by_epoch": [
+        0.48403470431211937,
+        0.48332218243692515,
+        0.4823005270967408,
+        0.482548915917504
+      ],
+      "raw_auc_by_epoch": [
+        0.5680179187393386,
+        0.5665789761114812,
+        0.5869738092563599,
+        0.6534340236743398
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "path_up_step_fraction_250ms",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.1534173682495638,
+      "first_to_last_oriented_auc_change": 0.08639236175187737,
+      "mean_later_oriented_auc": 0.6019335631187458,
+      "minimum_later_oriented_auc": 0.5652926789552615,
+      "oriented_auc_by_epoch": [
+        0.5673138008181311,
+        0.5652926789552615,
+        0.5868018478309672,
+        0.6537061625700085
+      ],
+      "price_range_tail_all_epochs_above_descriptive_floor": false,
+      "price_range_tail_direction_consistent_all_epochs": true,
+      "price_range_tail_earliest_direction": "lower_is_positive",
+      "price_range_tail_minimum_later_oriented_auc": 0.5183400119049673,
+      "price_range_tail_oriented_auc_by_epoch": [
+        0.5192321342915344,
+        0.524114329727877,
+        0.5183400119049673,
+        0.5185284654121113
+      ],
+      "price_range_tail_raw_auc_by_epoch": [
+        0.48076786570846564,
+        0.47588567027212303,
+        0.4816599880950327,
+        0.4814715345878887
+      ],
+      "raw_auc_by_epoch": [
+        0.5673138008181311,
+        0.5652926789552615,
+        0.5868018478309672,
+        0.6537061625700085
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "path_new_high_fraction_250ms",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.1528753258287612,
+      "first_to_last_oriented_auc_change": 0.08637004403918225,
+      "mean_later_oriented_auc": 0.6019102298003082,
+      "minimum_later_oriented_auc": 0.5652614442916217,
+      "oriented_auc_by_epoch": [
+        0.5672982863931989,
+        0.5652614442916217,
+        0.5868009146769216,
+        0.6536683304323812
+      ],
+      "price_range_tail_all_epochs_above_descriptive_floor": false,
+      "price_range_tail_direction_consistent_all_epochs": true,
+      "price_range_tail_earliest_direction": "lower_is_positive",
+      "price_range_tail_minimum_later_oriented_auc": 0.5180289083662588,
+      "price_range_tail_oriented_auc_by_epoch": [
+        0.520617919160936,
+        0.5238582721066523,
+        0.5180289083662588,
+        0.5186598913891569
+      ],
+      "price_range_tail_raw_auc_by_epoch": [
+        0.479382080839064,
+        0.47614172789334774,
+        0.48197109163374113,
+        0.48134010861084303
+      ],
+      "raw_auc_by_epoch": [
+        0.5672982863931989,
+        0.5652614442916217,
+        0.5868009146769216,
+        0.6536683304323812
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "path_directional_efficiency_250ms",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.1531517954741334,
+      "first_to_last_oriented_auc_change": 0.08638765665806769,
+      "mean_later_oriented_auc": 0.6019135785599603,
+      "minimum_later_oriented_auc": 0.5652606498205206,
+      "oriented_auc_by_epoch": [
+        0.5673046527943268,
+        0.5652606498205206,
+        0.5867877764069659,
+        0.6536923094523945
+      ],
+      "price_range_tail_all_epochs_above_descriptive_floor": false,
+      "price_range_tail_direction_consistent_all_epochs": true,
+      "price_range_tail_earliest_direction": "lower_is_positive",
+      "price_range_tail_minimum_later_oriented_auc": 0.5185674256819865,
+      "price_range_tail_oriented_auc_by_epoch": [
+        0.5204227154715326,
+        0.5241767953975709,
+        0.5195731034006797,
+        0.5185674256819865
+      ],
+      "price_range_tail_raw_auc_by_epoch": [
+        0.47957728452846743,
+        0.47582320460242916,
+        0.48042689659932025,
+        0.4814325743180135
+      ],
+      "raw_auc_by_epoch": [
+        0.5673046527943268,
+        0.5652606498205206,
+        0.5867877764069659,
+        0.6536923094523945
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "path_log_residual_std_250ms",
+      "first_to_last_ks_pvalue": 2.3938278744345096e-208,
+      "first_to_last_ks_statistic": 0.09997791196317085,
+      "first_to_last_oriented_auc_change": 0.021893578497896082,
+      "mean_later_oriented_auc": 0.5697706596821558,
+      "minimum_later_oriented_auc": 0.5590049052101448,
+      "oriented_auc_by_epoch": [
+        0.5489184004546783,
+        0.5794950948837481,
+        0.5590049052101448,
+        0.5708119789525744
+      ],
+      "price_range_tail_all_epochs_above_descriptive_floor": true,
+      "price_range_tail_direction_consistent_all_epochs": true,
+      "price_range_tail_earliest_direction": "higher_is_positive",
+      "price_range_tail_minimum_later_oriented_auc": 0.5951685109592642,
+      "price_range_tail_oriented_auc_by_epoch": [
+        0.5649071088559019,
+        0.6150111715462163,
+        0.6062232569575045,
+        0.5951685109592642
+      ],
+      "price_range_tail_raw_auc_by_epoch": [
+        0.5649071088559019,
+        0.6150111715462163,
+        0.6062232569575045,
+        0.5951685109592642
+      ],
+      "raw_auc_by_epoch": [
+        0.5489184004546783,
+        0.5794950948837481,
+        0.5590049052101448,
+        0.5708119789525744
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "lower_is_positive",
+      "feature": "path_time_since_peak_ms",
+      "first_to_last_ks_pvalue": 3.4328918643590924e-221,
+      "first_to_last_ks_statistic": 0.10301258513590211,
+      "first_to_last_oriented_auc_change": 0.024466300796305296,
+      "mean_later_oriented_auc": 0.568069057810083,
+      "minimum_later_oriented_auc": 0.5563773539669841,
+      "oriented_auc_by_epoch": [
+        0.5465835836740729,
+        0.5767799349928866,
+        0.5563773539669841,
+        0.5710498844703782
+      ],
+      "price_range_tail_all_epochs_above_descriptive_floor": true,
+      "price_range_tail_direction_consistent_all_epochs": true,
+      "price_range_tail_earliest_direction": "lower_is_positive",
+      "price_range_tail_minimum_later_oriented_auc": 0.6449030780379233,
+      "price_range_tail_oriented_auc_by_epoch": [
+        0.6146404918057471,
+        0.6981178732349577,
+        0.6449030780379233,
+        0.6560291277366992
+      ],
+      "price_range_tail_raw_auc_by_epoch": [
+        0.3853595081942529,
+        0.30188212676504234,
+        0.35509692196207665,
+        0.3439708722633008
+      ],
+      "raw_auc_by_epoch": [
+        0.45341641632592716,
+        0.42322006500711346,
+        0.443622646033016,
+        0.4289501155296218
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "path_peak_time_fraction_250ms",
+      "first_to_last_ks_pvalue": 3.432891864357207e-221,
+      "first_to_last_ks_statistic": 0.10301258513590217,
+      "first_to_last_oriented_auc_change": 0.024466300796305185,
+      "mean_later_oriented_auc": 0.5680690578100829,
+      "minimum_later_oriented_auc": 0.5563773539669841,
+      "oriented_auc_by_epoch": [
+        0.5465835836740729,
+        0.5767799349928866,
+        0.5563773539669841,
+        0.5710498844703781
+      ],
+      "price_range_tail_all_epochs_above_descriptive_floor": true,
+      "price_range_tail_direction_consistent_all_epochs": true,
+      "price_range_tail_earliest_direction": "higher_is_positive",
+      "price_range_tail_minimum_later_oriented_auc": 0.6449030780379232,
+      "price_range_tail_oriented_auc_by_epoch": [
+        0.6146404918057471,
+        0.6981178732349576,
+        0.6449030780379232,
+        0.6560291277366993
+      ],
+      "price_range_tail_raw_auc_by_epoch": [
+        0.6146404918057471,
+        0.6981178732349576,
+        0.6449030780379232,
+        0.6560291277366993
+      ],
+      "raw_auc_by_epoch": [
+        0.5465835836740729,
+        0.5767799349928866,
+        0.5563773539669841,
+        0.5710498844703781
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "path_linear_trend_r2_250ms",
+      "first_to_last_ks_pvalue": 1.510336185630256e-216,
+      "first_to_last_ks_statistic": 0.10192595410018712,
+      "first_to_last_oriented_auc_change": 0.027560259321716574,
+      "mean_later_oriented_auc": 0.5623291079770042,
+      "minimum_later_oriented_auc": 0.55079099526963,
+      "oriented_auc_by_epoch": [
+        0.5389175985712288,
+        0.5697184707684371,
+        0.55079099526963,
+        0.5664778578929454
+      ],
+      "price_range_tail_all_epochs_above_descriptive_floor": true,
+      "price_range_tail_direction_consistent_all_epochs": true,
+      "price_range_tail_earliest_direction": "higher_is_positive",
+      "price_range_tail_minimum_later_oriented_auc": 0.5915765886229922,
+      "price_range_tail_oriented_auc_by_epoch": [
+        0.5906610898281132,
+        0.6438708271900153,
+        0.5915765886229922,
+        0.6127401121432408
+      ],
+      "price_range_tail_raw_auc_by_epoch": [
+        0.5906610898281132,
+        0.6438708271900153,
+        0.5915765886229922,
+        0.6127401121432408
+      ],
+      "raw_auc_by_epoch": [
+        0.5389175985712288,
+        0.5697184707684371,
+        0.55079099526963,
+        0.5664778578929454
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "path_log_step_skew_250ms",
+      "first_to_last_ks_pvalue": 4.4475979956528254e-80,
+      "first_to_last_ks_statistic": 0.061920601574488754,
+      "first_to_last_oriented_auc_change": 0.01786465152601202,
+      "mean_later_oriented_auc": 0.5304111400991524,
+      "minimum_later_oriented_auc": 0.5252021578860531,
+      "oriented_auc_by_epoch": [
+        0.5210351014380973,
+        0.5271315094472948,
+        0.5252021578860531,
+        0.5388997529641093
+      ],
+      "price_range_tail_all_epochs_above_descriptive_floor": false,
+      "price_range_tail_direction_consistent_all_epochs": true,
+      "price_range_tail_earliest_direction": "higher_is_positive",
+      "price_range_tail_minimum_later_oriented_auc": 0.5613634861832134,
+      "price_range_tail_oriented_auc_by_epoch": [
+        0.5106878053082498,
+        0.5613634861832134,
+        0.5663362247450784,
+        0.6174044356526986
+      ],
+      "price_range_tail_raw_auc_by_epoch": [
+        0.5106878053082498,
+        0.5613634861832134,
+        0.5663362247450784,
+        0.6174044356526986
+      ],
+      "raw_auc_by_epoch": [
+        0.5210351014380973,
+        0.5271315094472948,
+        0.5252021578860531,
+        0.5388997529641093
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "path_max_drawdown_250ms",
+      "first_to_last_ks_pvalue": 0.09202585481642955,
+      "first_to_last_ks_statistic": 0.008019853219398465,
+      "first_to_last_oriented_auc_change": -0.002600614963779002,
+      "mean_later_oriented_auc": 0.5004984559533555,
+      "minimum_later_oriented_auc": 0.4995753884974566,
+      "oriented_auc_by_epoch": [
+        0.5021760034612356,
+        0.4996153128943693,
+        0.5023046664682407,
+        0.4995753884974566
+      ],
+      "price_range_tail_all_epochs_above_descriptive_floor": false,
+      "price_range_tail_direction_consistent_all_epochs": true,
+      "price_range_tail_earliest_direction": "higher_is_positive",
+      "price_range_tail_minimum_later_oriented_auc": 0.518667163972867,
+      "price_range_tail_oriented_auc_by_epoch": [
+        0.5203474303020655,
+        0.5243471563149178,
+        0.5197035835676944,
+        0.518667163972867
+      ],
+      "price_range_tail_raw_auc_by_epoch": [
+        0.5203474303020655,
+        0.5243471563149178,
+        0.5197035835676944,
+        0.518667163972867
+      ],
+      "raw_auc_by_epoch": [
+        0.5021760034612356,
+        0.4996153128943693,
+        0.5023046664682407,
+        0.4995753884974566
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "path_terminal_peak_drawdown_250ms",
+      "first_to_last_ks_pvalue": 0.14751831263744208,
+      "first_to_last_ks_statistic": 0.007378716812764141,
+      "first_to_last_oriented_auc_change": -0.0017273928381811854,
+      "mean_later_oriented_auc": 0.4997143415817367,
+      "minimum_later_oriented_auc": 0.4979427671415537,
+      "oriented_auc_by_epoch": [
+        0.5012047718331457,
+        0.4979427671415537,
+        0.5017228786086919,
+        0.4994773789949645
+      ],
+      "price_range_tail_all_epochs_above_descriptive_floor": false,
+      "price_range_tail_direction_consistent_all_epochs": true,
+      "price_range_tail_earliest_direction": "higher_is_positive",
+      "price_range_tail_minimum_later_oriented_auc": 0.5166179331194013,
+      "price_range_tail_oriented_auc_by_epoch": [
+        0.516002938272614,
+        0.5166179331194013,
+        0.5178666169188564,
+        0.5174895248821062
+      ],
+      "price_range_tail_raw_auc_by_epoch": [
+        0.516002938272614,
+        0.5166179331194013,
+        0.5178666169188564,
+        0.5174895248821062
+      ],
+      "raw_auc_by_epoch": [
+        0.5012047718331457,
+        0.4979427671415537,
+        0.5017228786086919,
+        0.4994773789949645
+      ]
+    }
+  ],
+  "finding": "14 of 16 new causal sub-250ms price-path features preserved epoch-0 direction with oriented AUC >=0.52 in all four epochs. This is a transport diagnostic, not a fitted candidate or approval.",
+  "identity": {
+    "causal_horizon_ms": 250,
+    "dataset_source_manifest_fingerprint": "22944bba1bf62f95fd5c266c59492cda3c226150d64ac57562fdd461beeb08ee",
+    "descriptive_auc_floor": 0.52,
+    "diagnostic_family_identifier": "latency300-causal-price-path-geometry-v12",
+    "evidence_epoch": [
+      "33605109571",
+      "33627431540",
+      "33644544746",
+      "33656916992",
+      "33669514091",
+      "33681664773",
+      "33692043170",
+      "33704841852",
+      "33716649440",
+      "33741470396",
+      "33769636983",
+      "33781389703",
+      "33792881280",
+      "33810753028",
+      "33822988156",
+      "33835575805",
+      "33852482054",
+      "33876345997",
+      "33897368379",
+      "33911477030",
+      "33920757002",
+      "33931301493",
+      "34063856134",
+      "34073802862",
+      "34084120627",
+      "34099929487",
+      "34123647690",
+      "34138377553",
+      "34150939561",
+      "34159449923",
+      "34167878699",
+      "34175839320",
+      "34186192299",
+      "34201101121",
+      "34244224832",
+      "34281858070",
+      "34310065776",
+      "34348537141",
+      "34388016481",
+      "34425005585",
+      "34470147967",
+      "34512979177",
+      "34547229611",
+      "34586174670",
+      "34627236811",
+      "34660606300",
+      "34684115937",
+      "34709541936",
+      "34722511299",
+      "34729110702",
+      "34749576265",
+      "34760648934",
+      "34770227385",
+      "34779504872",
+      "34790190944",
+      "34799149811",
+      "34811806243",
+      "34845710248",
+      "34863619434",
+      "34876702743",
+      "34887276656",
+      "34897737567",
+      "34907762101",
+      "34918286614"
+    ],
+    "feature_set_fingerprint": "8640ece03cec8a857038e650cd83e729878774c5d2123b0bd15db511cd84d387",
+    "label_matrix_sha256": "1b21575dd37159a825116a940cb67e685e3a3cb784de85482476df5a091de76e",
+    "latency_ms": 300,
+    "microstructure_matrix_sha256": "08d0f6c7d302652775a62ef0da24b246f0706b7b98e1c2e0bf361507c1af62dc",
+    "orientation_policy": "orient each new feature once from epoch 0, then freeze direction for epochs 1-3",
+    "price_path_matrix_sha256": "733352c4ab992d0ac430e6f6b19b9b78d9aa96e11cb92a5bb58a96c5f04859e0",
+    "price_range_tail_fraction": 0.05,
+    "price_range_tail_policy": "within each chronological diagnostic epoch, audit the fixed top-five-percent price-range stratum; descriptive incrementality only",
+    "source_code_fingerprint": "64911aacf1556a24a96ce354353e629c8a89a173dc6651667b868e8aaef31c72"
+  },
+  "label_audit": {
+    "active_untouched_live_data_used": false,
+    "all_source_hashes_verified": true,
+    "capture_windows": 64,
+    "dataset_manifest_sha256": "22944bba1bf62f95fd5c266c59492cda3c226150d64ac57562fdd461beeb08ee",
+    "decision_horizon_ms": 250,
+    "executable_rows": 191425,
+    "executable_sha256": "c0198d3444974eca21caf747a4bab7f3eb43ab90945274687616627eaa3d00d4",
+    "latency_ms": 300,
+    "negative_or_zero_rows": 162568,
+    "no_quote_rows": 0,
+    "pnl_sha256": "1b21575dd37159a825116a940cb67e685e3a3cb784de85482476df5a091de76e",
+    "policy": "stop=0.70|take=3.00|hold=60000|protect=1.15:1.06|trail=1.25:0.15",
+    "policy_index": 12,
+    "production_paths_changed": 0,
+    "profitable_rows": 28857,
+    "rows": 191425,
+    "version": "e4-v12-latency300-labels-v1",
+    "visited_rows": 191425
+  },
+  "live_confirmation_authorised": false,
+  "price_path_cache_audit": {
+    "active_untouched_live_data_used": false,
+    "cached_later_rows": 48000,
+    "cached_later_runs": [
+      {
+        "rows": 3000,
+        "run_id": "34722511299"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34729110702"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34749576265"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34760648934"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34770227385"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34779504872"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34790190944"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34799149811"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34811806243"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34845710248"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34863619434"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34876702743"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34887276656"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34897737567"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34907762101"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34918286614"
+      }
+    ],
+    "dataset_manifest_sha256": "22944bba1bf62f95fd5c266c59492cda3c226150d64ac57562fdd461beeb08ee",
+    "feature_names": [
+      "path_log_total_variation_250ms",
+      "path_directional_efficiency_250ms",
+      "path_terminal_peak_drawdown_250ms",
+      "path_max_drawdown_250ms",
+      "path_close_location_250ms",
+      "path_up_step_fraction_250ms",
+      "path_new_high_fraction_250ms",
+      "path_peak_time_fraction_250ms",
+      "path_time_since_peak_ms",
+      "path_max_runup_250ms",
+      "path_worst_log_step_250ms",
+      "path_best_log_step_250ms",
+      "path_log_step_skew_250ms",
+      "path_late_minus_early_return_250ms",
+      "path_linear_trend_r2_250ms",
+      "path_log_residual_std_250ms"
+    ],
+    "features": 16,
+    "future_values_in_features": false,
+    "matrix_sha256": "733352c4ab992d0ac430e6f6b19b9b78d9aa96e11cb92a5bb58a96c5f04859e0",
+    "production_paths_changed": 0,
+    "raw_capture_bytes": 11789578939,
+    "raw_capture_runs": 48,
+    "raw_run_audits": [
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 17,
+        "rows": 2983,
+        "run_id": "33605109571",
+        "sha256": "1bfe30a7a7e2bc159616c2f68a2ee6410a9ec4b26d28eedcd0609b6b35e1dded"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 34,
+        "rows": 2966,
+        "run_id": "33627431540",
+        "sha256": "54e96699d70b53357c0f7249f228fa4af83ed43f15b7a5455988ac12cbeef9f5"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 24,
+        "rows": 2976,
+        "run_id": "33644544746",
+        "sha256": "2552e11c1d6a36aebc882f3e997ae24ddd85db378e3c75a3997aaf2a664d0553"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 39,
+        "rows": 2961,
+        "run_id": "33656916992",
+        "sha256": "5549961baff426b65700294a7692c7b7d164beae60078596fb2c72018039a70c"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 36,
+        "rows": 2964,
+        "run_id": "33669514091",
+        "sha256": "9b8f0ab72e51c649622378ede0fc7cbeb1c120263fb4da3b44b289e23673ec2f"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 53,
+        "rows": 2947,
+        "run_id": "33681664773",
+        "sha256": "d70c12f8bed120d5fe0389e06f1be0a655201380b7235a0f93a73600a8f626c2"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 28,
+        "rows": 2972,
+        "run_id": "33692043170",
+        "sha256": "f8e5d3ef5120aaa6abfd29c83437a87fbc7636276935c3901af7cd1818d0cceb"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 22,
+        "rows": 2978,
+        "run_id": "33704841852",
+        "sha256": "b09a14c770216b8bbaf4f5a44bd295b14cb01d675b188378419ddd9037886f7a"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 19,
+        "rows": 2981,
+        "run_id": "33716649440",
+        "sha256": "6c865406cb400819488ba0a7657ebfd51f0d1c5d84cfb2a5de0999dfb4503f70"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 21,
+        "rows": 2979,
+        "run_id": "33741470396",
+        "sha256": "99d52116113a13660e41e41a52c77fe4b5cb6b8a671c440f57f06ebc8ac4f713"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 20,
+        "rows": 2980,
+        "run_id": "33769636983",
+        "sha256": "9fc5016470fbfb51a2e6c5b0742226773a19e7489fd9f6dd3ac107b905f0cd7e"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 26,
+        "rows": 2974,
+        "run_id": "33781389703",
+        "sha256": "2a8a555434665ac1fd8a24e3957ff45ada7d4d4e84d80ada0e649847d4896376"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 22,
+        "rows": 2978,
+        "run_id": "33792881280",
+        "sha256": "d5b33d6515bf74036e5ed9d41b90eff7f2ff2bc7a44768c76e4486736c3f76d6"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 25,
+        "rows": 2975,
+        "run_id": "33810753028",
+        "sha256": "6aee91882224fa2edbf819cdbac81a4da2c5e503a51364cbcd0bc94fed3beeea"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 25,
+        "rows": 2975,
+        "run_id": "33822988156",
+        "sha256": "07850498561b4f2c81e498dd8a3ec5a37aa5db17ef6983ac623d31a338251a26"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 18,
+        "rows": 2982,
+        "run_id": "33835575805",
+        "sha256": "a7e13975d6bc40245b8c8e9fa521420bd9104978f012c6987f5f3dd296640635"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 20,
+        "rows": 2980,
+        "run_id": "33852482054",
+        "sha256": "bbe92994201b5cf2237ea10972b0d26c092b70707f5180002acaa73ad86e6498"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 31,
+        "rows": 2969,
+        "run_id": "33876345997",
+        "sha256": "f031a6dde6a49f463ef6edb36ffc37370ba6f9870dbb014d6d249b0eac6a9654"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 20,
+        "rows": 2980,
+        "run_id": "33897368379",
+        "sha256": "f1354ae240159d771e1514234a419bc42fa344c1160ba03f59e7c8c1cdc58fac"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 49,
+        "rows": 2951,
+        "run_id": "33911477030",
+        "sha256": "234bb65b4a19d5831d4f6415bb66b679a1470d761e32b4dac87e91a66aa8e5cd"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 16,
+        "rows": 2984,
+        "run_id": "33920757002",
+        "sha256": "8fbdef534c87528049c1b5829bab8320bf04b5393d422be87b77b5fb44aa7d6b"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 10,
+        "rows": 2990,
+        "run_id": "33931301493",
+        "sha256": "1ce3bb3d2f2983f1daca2c7a92c108195adede4c7b5daded39692bcbcab3ae9e"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34063856134",
+        "sha256": "fc77512fc3ed971e0a48ffb5fe2a7ab68499ecc712017681e1edd6c2e4fe86a6"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34073802862",
+        "sha256": "ca31bc7d94ef2c8f6ae00e26604677b7620790fc453496f8ee212c83038d5d8f"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34084120627",
+        "sha256": "c52f8292d99aaa60e38c7fd86c1b848dc2204a64fe821b79cc66354425580ca7"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34099929487",
+        "sha256": "cc8726a6a4d1477f6dd1d1634a09c24274e04476b64b031fe89e29b5ca4434b6"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34123647690",
+        "sha256": "2e091edfb945085fd4af58b82c553178b63ee81ad1f3bd255aa4024970ea4a6f"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34138377553",
+        "sha256": "076da6df38ff4fa07b7551874823ec007ee141b0f1b2848df0f43a26aa1de9f2"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34150939561",
+        "sha256": "619977ace8de412a511da4b12050a6fe2d0aa6bbfeb7e5d2dc445e938dec5d89"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34159449923",
+        "sha256": "6d9d1121b321e9e26555126cd3533482abfe8c13c55442f38aba07b0aa733bb8"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34167878699",
+        "sha256": "9e25ce0e4bce97b6591b4c417acfb138dd9402df6266dd7d64309bd8163272ca"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34175839320",
+        "sha256": "29549195792cc432f20a72f1502cbff24c1b8bd97b76d827b76655db89b04ede"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34186192299",
+        "sha256": "6aca68ad4f377fc69979bb44b81aaabea6d9406a7e8b78521f3fa2bddc13b040"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34201101121",
+        "sha256": "46c239ec42891937bff75df3b59e1cc2b22d364b211cf8917c24394883726975"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34244224832",
+        "sha256": "344d03dd1e0c8ef8515c9adf0193fe4c7cc5bb148fb438ac5e977ce0a0758bde"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34281858070",
+        "sha256": "1214575f9c10755f49424d6a295a20ae341c316b8e464065ed85a075d5070858"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34310065776",
+        "sha256": "a97fc40b90583ab7bbf0b013713c8aa602b00ae0b33598060719c50490c7745a"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34348537141",
+        "sha256": "60c47626d8b28b9b2a98523c95070326e8e6cc9c2f25de530f1f07c416cf96dd"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34388016481",
+        "sha256": "d63fb60eeca248cacf54e751387a6498692581a030eeba9075de2961930b5389"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34425005585",
+        "sha256": "793c1f88229525aad919ecae8cc0760fa9012c21bcd1271b5661e5251fd48c4b"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34470147967",
+        "sha256": "ffca5633616584a60f6b461bcaf057041e88b30ee29e9766c14a56f1da7f86b7"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34512979177",
+        "sha256": "248fa0d572ba65a653ded56092d120fe08a618d6af00883d63d198154dc27a57"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34547229611",
+        "sha256": "b9d590ef3b7e2dde07b09dd174e0333d87e0a59b8a266b5dc0606cb8be544b81"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34586174670",
+        "sha256": "d2d22c70ee08036064fc2bd15fed99da2a8ce39736e8bbcd077af6cfe95ac6d7"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34627236811",
+        "sha256": "480fcc5d437490fdeb4ddf046ef906254a4c0c002fe8092b94d4713918842728"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34660606300",
+        "sha256": "0254a8336858c354bff82814cff9b5c4c7ef4532bd61951578ae2a77544251f1"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34684115937",
+        "sha256": "7dc218abb35c39af30e8ff90c6ba13f62dd010e7c45e88b71056fd79f8d04fb5"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34709541936",
+        "sha256": "d0763e9bff7db6ad810e70507b0465ad78703a7cefa7a7294ef4b3f41476eae1"
+      }
+    ],
+    "raw_source_hashes_verified": true,
+    "rows": 191425,
+    "version": "e4-v12-latency300-price-path-cache-v1"
+  },
+  "price_range_tail_all_epoch_auc_52_feature_count": 9,
+  "price_range_tail_all_epoch_auc_52_features": [
+    "path_log_total_variation_250ms",
+    "path_max_runup_250ms",
+    "path_late_minus_early_return_250ms",
+    "path_best_log_step_250ms",
+    "path_worst_log_step_250ms",
+    "path_log_residual_std_250ms",
+    "path_time_since_peak_ms",
+    "path_peak_time_fraction_250ms",
+    "path_linear_trend_r2_250ms"
+  ],
+  "price_range_tail_audit": [
+    {
+      "epoch": 0,
+      "positive_rate": 0.20722992854140396,
+      "price_range_threshold": 0.7288257288185052,
+      "profitable_rows": 493,
+      "rows": 2379
+    },
+    {
+      "epoch": 1,
+      "positive_rate": 0.21562891767655662,
+      "price_range_threshold": 0.7436351368928469,
+      "profitable_rows": 516,
+      "rows": 2393
+    },
+    {
+      "epoch": 2,
+      "positive_rate": 0.20166666666666666,
+      "price_range_threshold": 0.7148989636775858,
+      "profitable_rows": 484,
+      "rows": 2400
+    },
+    {
+      "epoch": 3,
+      "positive_rate": 0.21208333333333335,
+      "price_range_threshold": 0.6282468852031033,
+      "profitable_rows": 509,
+      "rows": 2400
+    }
+  ],
+  "production_deployment_authorised": false,
+  "production_paths_changed": 0,
+  "production_promotion_authorised": false,
+  "untouched_holdout_passed": false,
+  "version": "e4-v12-latency300-price-path-transport-v1"
+}
