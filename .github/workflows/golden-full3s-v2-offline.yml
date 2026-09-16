@@ -4,12 +4,13 @@ on:
     branches: [codex/golden-full-3s-v2]
     paths:
       - 'tools/golden_full3s_*.py'
+      - 'tools/maintenance/golden_full3s_hardening_once.py'
       - 'tests/test_golden_full3s*.py'
       - 'config/golden-full3s-v2.json'
       - '.github/workflows/golden-full3s-v2-offline.yml'
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: full3s-v2-offline
   cancel-in-progress: true
@@ -24,18 +25,34 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
-          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Compile and test - no credentials, live feed or execution
+      - name: Apply reviewed source repairs and enforce frozen research config
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p artifacts/full3s-v2/source/tools artifacts/full3s-v2/source/tests
+          python tools/maintenance/golden_full3s_hardening_once.py
+          python - <<'PY'
+          import json
+          from dataclasses import asdict
+          from golden_full3s_v2 import Config
+          from golden_full3s_policy import PolicyConfig
+          m=json.load(open('config/golden-full3s-v2.json'))
+          assert m['cost_model']==asdict(Config())
+          assert m['selection']==asdict(PolicyConfig())
+          assert m['live_testing_enabled'] is False and m['automatic_live_launch'] is False
+          assert m['real_money_execution'] is False
+          PY
+      - name: Compile and test - no wallet credentials, live feed or execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/full3s-v2/source/tools artifacts/full3s-v2/source/tests artifacts/full3s-v2/source/config
           cp tools/golden_full3s_*.py tools/golden_horizon_engine.py artifacts/full3s-v2/source/tools/
           cp tests/test_golden_full3s*.py artifacts/full3s-v2/source/tests/
-          echo "$GITHUB_SHA" > artifacts/full3s-v2/source-sha.txt
+          cp config/golden-full3s-v2.json artifacts/full3s-v2/source/config/
+          echo "$GITHUB_SHA" > artifacts/full3s-v2/build-input-sha.txt
           python -m py_compile tools/golden_full3s_*.py
           python -m unittest discover -s tests -p 'test_golden_full3s*.py' -v 2>&1 | tee artifacts/full3s-v2/unit-tests.log
       - name: Randomized stress, actual process kills, local latency
@@ -43,6 +60,50 @@ jobs:
         run: |
           set -euo pipefail
           python tools/golden_full3s_certify.py --paths 10000 --crash-repetitions 10 --probes 3000 --output artifacts/full3s-v2 2>&1 | tee artifacts/full3s-v2/stress.log
+      - name: Freeze only the exact tested sources - never launch a live test
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os,re,time
+          from pathlib import Path
+          from golden_full3s_v2 import IMPLEMENTATION_DIGEST
+          r=json.load(open('artifacts/full3s-v2/certification.json'))
+          assert r['status']=='OFFLINE_BUILD_STRESS_PASS'
+          assert r['stress']['synthetic_paths']==10000
+          assert r['chaos']['actual_process_terminations']==120
+          log=Path('artifacts/full3s-v2/unit-tests.log').read_text()
+          match=re.search(r'Ran (\d+) tests',log)
+          assert match and int(match.group(1))>=54 and log.rstrip().endswith('OK')
+          assert r['live_testing_started'] is False and r['live_trades']==0
+          paths=sorted(list(Path('tools').glob('golden_full3s_*.py'))+
+                       list(Path('tests').glob('test_golden_full3s*.py'))+
+                       [Path('tools/golden_horizon_engine.py'),Path('config/golden-full3s-v2.json')])
+          hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+          frozen={'model':'FULL_3S_V2','status':'FROZEN_OFFLINE_VERIFIED_PENDING_LIVE_TEST',
+            'baseline_commit':r['baseline_commit'],'build_input_commit':os.environ['GITHUB_SHA'],
+            'verification_run_id':os.environ['GITHUB_RUN_ID'],'unit_tests_passed':int(match.group(1)),
+            'implementation_digest':IMPLEMENTATION_DIGEST,'source_sha256':hashes,
+            'configuration':'config/golden-full3s-v2.json','offline_evidence':r,
+            'live_testing_started':False,'live_trades':0,'actual_axiom_execution':False,
+            'actual_profit_sol':None,'profitability_validated':False,'frozen_at_ns':time.time_ns(),
+            'limitations':['A freeze is a pinned commit and hashes, not branch-protection administration.',
+              'Synthetic stress and local crash recovery do not prove profitable selection or real-money safety.',
+              'No live feed, wallet, Axiom signing, or funded execution was used by this build.',
+              'Measured local tick work excludes network/validator latency; configured 250ms inclusion remains an assumption.',
+              'The durable adapter is a correctness-first single-host reference; multi-day loaded-history throughput and distributed recovery still need validation.']}
+          out=Path('docs/research/golden-full3s-v2-freeze.json');out.parent.mkdir(parents=True,exist_ok=True)
+          out.write_text(json.dumps(frozen,indent=2,sort_keys=True)+'\n')
+          Path('artifacts/full3s-v2/freeze.json').write_text(out.read_text())
+          PY
+          git fetch origin codex/golden-full-3s-v2
+          test "$(git rev-parse FETCH_HEAD)" = "$GITHUB_SHA"
+          git config user.name gambit-full3s-offline-build
+          git config user.email actions@users.noreply.github.com
+          git add tools/golden_full3s_policy.py tools/golden_full3s_v2.py tools/golden_full3s_certify.py docs/research/golden-full3s-v2-freeze.json
+          git commit -m 'freeze(full3s-v2): persist offline verified hardened research candidate [skip ci]'
+          git push origin HEAD:codex/golden-full-3s-v2
+          git rev-parse HEAD > artifacts/full3s-v2/frozen-source-sha.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
