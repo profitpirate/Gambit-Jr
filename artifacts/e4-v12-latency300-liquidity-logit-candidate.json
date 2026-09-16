@@ -1,0 +1,1795 @@
+{
+  "aggregate": {
+    "capture_windows": 40,
+    "largest_winner_contribution": 0.05524615863504784,
+    "ledger_hash": "ca61818443937d38bf2823f6751d74027070134dcdf01e4c49b0b0376999c852",
+    "maximum_fold_drawdown_fraction": 0.25337590213421207,
+    "minimum_fold_profit_factor": 0.5185999923706015,
+    "minimum_fold_profitable_windows": 4,
+    "minimum_fold_win_rate": 0.3564356435643564,
+    "net_pnl_sol": 0.38462970281274433,
+    "positive_folds": 3,
+    "profit_factor": 1.1150651495570534,
+    "profitable_capture_windows": 22,
+    "rejected_concurrency": 1,
+    "trades": 377,
+    "wilson_95_lower_bound": 0.45898138142582934,
+    "win_rate": 0.5092838196286472,
+    "wins": 192
+  },
+  "anti_lookahead": {
+    "active_untouched_live_data_used": false,
+    "calibration_precedes_test": true,
+    "conditional_threshold_uses_prior_scores_only": true,
+    "fit_gate_uses_fit_only": true,
+    "liquidity_events_at_or_before_250ms_only": true,
+    "scaler_and_model_use_fit_only": true
+  },
+  "development_gate_passed": false,
+  "experiment_id": "e4x-c932507629eb6315cf606d0e321df21af01f2e739dffd7f2a87ed9cdbffe41bb",
+  "failure_classification": "VALIDATION_COLLAPSE",
+  "failure_reason": "Liquidity absorption logit failed at least one frozen gate: 192/377 wins (50.93%), Wilson 45.90%, final-fold WR 35.64%.",
+  "folds": [
+    {
+      "attempted_trades": 137,
+      "calibration_gate_rows": 729,
+      "calibration_gate_threshold_hash": "d1432378f1805bf9a7c3ef89bc4330ff58365b6ea059906d56c4671bdf47b131",
+      "calibration_windows": [
+        "33911477030",
+        "33920757002",
+        "33931301493",
+        "34063856134",
+        "34073802862"
+      ],
+      "capture_windows": 10,
+      "conditional_threshold_hash": "5004f2076b78633787c1e7b087394969f05987325ac835451cbae79919301605",
+      "conditional_threshold_maximum": 0.7192059644018943,
+      "conditional_threshold_minimum": 0.6888017953447031,
+      "conservative_exit_offset_ms": 60000,
+      "fit_gate_rows": 2825,
+      "fit_gate_threshold": 0.7339170742389183,
+      "fit_windows": [
+        "33605109571",
+        "33627431540",
+        "33644544746",
+        "33656916992",
+        "33669514091",
+        "33681664773",
+        "33692043170",
+        "33704841852",
+        "33716649440",
+        "33741470396",
+        "33769636983",
+        "33781389703",
+        "33792881280",
+        "33810753028",
+        "33822988156",
+        "33835575805",
+        "33852482054",
+        "33876345997",
+        "33897368379"
+      ],
+      "fold": 0,
+      "largest_winner_contribution": 0.07845876081567715,
+      "ledger_hash": "042e9c7e173c6d8b6f53e5687d982e909f3a77ef0544557ea7926ba8c1ed254a",
+      "maximum_drawdown_fraction": 0.10562126240261198,
+      "net_pnl_sol": 0.579105462922525,
+      "profit_factor": 1.5144226622236738,
+      "profitable_capture_windows": 7,
+      "rejected_concurrency": 0,
+      "standardized_coefficients": {
+        "liquidity_last50_sol_growth_250ms": -0.05907313824504066,
+        "liquidity_late_minus_early_sol_growth_250ms": 0.3098691649800633,
+        "liquidity_log_virtual_sol_growth_250ms": -0.21826456491883395,
+        "liquidity_log_virtual_sol_variation_250ms": -0.5000904324925795,
+        "liquidity_log_virtual_to_real_tokens_250ms": -3.0470973224531184,
+        "liquidity_log_virtual_token_depletion_250ms": -0.19576581971375792,
+        "liquidity_max_reserve_drawdown_250ms": 0.3962232103594263,
+        "liquidity_price_reserve_elasticity_250ms": -0.28184164166143394,
+        "liquidity_public_sol_to_final_reserve_250ms": 0.40159247511207186,
+        "liquidity_real_token_depletion_fraction_250ms": 0.5502023744463114,
+        "liquidity_real_token_remaining_fraction_250ms": -0.550202374446314,
+        "liquidity_reserve_delta_per_public_sol_250ms": 0.3027595818988782,
+        "liquidity_reserve_step_cv_250ms": 0.04611815150093546,
+        "liquidity_terminal_reserve_drawdown_250ms": -0.43541631822280746,
+        "liquidity_time_to_half_reserve_growth_ms": -0.05425979593001179,
+        "liquidity_virtual_sol_efficiency_250ms": 0.022923462606355693
+      },
+      "test_gate_rows": 1515,
+      "test_gate_threshold_hash": "64d1b2e39ff8f8b0c0b5cc8a34cd320011d558f90cd99b2ba0cc5fee459c9e0c",
+      "test_windows": [
+        "34084120627",
+        "34099929487",
+        "34123647690",
+        "34138377553",
+        "34150939561",
+        "34159449923",
+        "34167878699",
+        "34175839320",
+        "34186192299",
+        "34201101121"
+      ],
+      "trades": 137,
+      "wilson_95_lower_bound": 0.5369397166630846,
+      "win_rate": 0.6204379562043796,
+      "wins": 85
+    },
+    {
+      "attempted_trades": 65,
+      "calibration_gate_rows": 739,
+      "calibration_gate_threshold_hash": "a326d98dbb05c71d5cdf8fe5e304178858a71c91b6e52d7accdfcb8e1fa699d7",
+      "calibration_windows": [
+        "34159449923",
+        "34167878699",
+        "34175839320",
+        "34186192299",
+        "34201101121"
+      ],
+      "capture_windows": 10,
+      "conditional_threshold_hash": "3fdce83f4fc39ff6efc8631ea07f690966a45e3931d8f7c53c6b2ab04e42f06d",
+      "conditional_threshold_maximum": 0.7452911059687681,
+      "conditional_threshold_minimum": 0.7403353598829264,
+      "conservative_exit_offset_ms": 60000,
+      "fit_gate_rows": 4322,
+      "fit_gate_threshold": 0.7354652646846178,
+      "fit_windows": [
+        "33605109571",
+        "33627431540",
+        "33644544746",
+        "33656916992",
+        "33669514091",
+        "33681664773",
+        "33692043170",
+        "33704841852",
+        "33716649440",
+        "33741470396",
+        "33769636983",
+        "33781389703",
+        "33792881280",
+        "33810753028",
+        "33822988156",
+        "33835575805",
+        "33852482054",
+        "33876345997",
+        "33897368379",
+        "33911477030",
+        "33920757002",
+        "33931301493",
+        "34063856134",
+        "34073802862",
+        "34084120627",
+        "34099929487",
+        "34123647690",
+        "34138377553",
+        "34150939561"
+      ],
+      "fold": 1,
+      "largest_winner_contribution": 0.0811852804779774,
+      "ledger_hash": "2b1777d84afc13a5d71be81573cc991a79ce0c8f4791aa9d201dc55fa761dfcf",
+      "maximum_drawdown_fraction": 0.03721649542202702,
+      "net_pnl_sol": 0.20865635684383488,
+      "profit_factor": 1.75899142948473,
+      "profitable_capture_windows": 5,
+      "rejected_concurrency": 1,
+      "standardized_coefficients": {
+        "liquidity_last50_sol_growth_250ms": -0.014589781423586355,
+        "liquidity_late_minus_early_sol_growth_250ms": 0.35270384070434135,
+        "liquidity_log_virtual_sol_growth_250ms": -0.9118121364999453,
+        "liquidity_log_virtual_sol_variation_250ms": -0.22650566346458095,
+        "liquidity_log_virtual_to_real_tokens_250ms": -3.492469709333104,
+        "liquidity_log_virtual_token_depletion_250ms": 0.43937225340716696,
+        "liquidity_max_reserve_drawdown_250ms": 0.292050076805001,
+        "liquidity_price_reserve_elasticity_250ms": -0.02339345170908818,
+        "liquidity_public_sol_to_final_reserve_250ms": 0.5126271955388342,
+        "liquidity_real_token_depletion_fraction_250ms": 0.410521665924303,
+        "liquidity_real_token_remaining_fraction_250ms": -0.4105216659242998,
+        "liquidity_reserve_delta_per_public_sol_250ms": 0.48358197812609205,
+        "liquidity_reserve_step_cv_250ms": 0.06256520580755712,
+        "liquidity_terminal_reserve_drawdown_250ms": -0.20878572873337203,
+        "liquidity_time_to_half_reserve_growth_ms": 0.005810100912337377,
+        "liquidity_virtual_sol_efficiency_250ms": 0.1643858279473243
+      },
+      "test_gate_rows": 1435,
+      "test_gate_threshold_hash": "b39ca66fd984fa27cbaca7fc653721d7a7a168e8c9e73f9b937765ef92d7d221",
+      "test_windows": [
+        "34244224832",
+        "34281858070",
+        "34310065776",
+        "34348537141",
+        "34388016481",
+        "34425005585",
+        "34470147967",
+        "34512979177",
+        "34547229611",
+        "34586174670"
+      ],
+      "trades": 64,
+      "wilson_95_lower_bound": 0.4257338252067978,
+      "win_rate": 0.546875,
+      "wins": 35
+    },
+    {
+      "attempted_trades": 75,
+      "calibration_gate_rows": 695,
+      "calibration_gate_threshold_hash": "cea4e644931264567f3a2dab0fca4eeaeddb2883df113e7a0b03c4d0145af8ff",
+      "calibration_windows": [
+        "34425005585",
+        "34470147967",
+        "34512979177",
+        "34547229611",
+        "34586174670"
+      ],
+      "capture_windows": 10,
+      "conditional_threshold_hash": "e98d6ed4589102527efcc7b688ea97a92ec59250f58cbf66037e1a18d2606421",
+      "conditional_threshold_maximum": 0.7327031366853348,
+      "conditional_threshold_minimum": 0.7182734495099908,
+      "conservative_exit_offset_ms": 60000,
+      "fit_gate_rows": 5822,
+      "fit_gate_threshold": 0.7451062946801537,
+      "fit_windows": [
+        "33605109571",
+        "33627431540",
+        "33644544746",
+        "33656916992",
+        "33669514091",
+        "33681664773",
+        "33692043170",
+        "33704841852",
+        "33716649440",
+        "33741470396",
+        "33769636983",
+        "33781389703",
+        "33792881280",
+        "33810753028",
+        "33822988156",
+        "33835575805",
+        "33852482054",
+        "33876345997",
+        "33897368379",
+        "33911477030",
+        "33920757002",
+        "33931301493",
+        "34063856134",
+        "34073802862",
+        "34084120627",
+        "34099929487",
+        "34123647690",
+        "34138377553",
+        "34150939561",
+        "34159449923",
+        "34167878699",
+        "34175839320",
+        "34186192299",
+        "34201101121",
+        "34244224832",
+        "34281858070",
+        "34310065776",
+        "34348537141",
+        "34388016481"
+      ],
+      "fold": 2,
+      "largest_winner_contribution": 0.2476828583620416,
+      "ledger_hash": "0950f604011c990431bf04247d5fe9b871a988343bb1269f09352770f3b1e174",
+      "maximum_drawdown_fraction": 0.08123125521387801,
+      "net_pnl_sol": 0.25365294661509674,
+      "profit_factor": 1.4390447967138353,
+      "profitable_capture_windows": 6,
+      "rejected_concurrency": 0,
+      "standardized_coefficients": {
+        "liquidity_last50_sol_growth_250ms": -0.0212564317478801,
+        "liquidity_late_minus_early_sol_growth_250ms": 0.1582747789398331,
+        "liquidity_log_virtual_sol_growth_250ms": -0.9888190077904006,
+        "liquidity_log_virtual_sol_variation_250ms": -0.370136541607158,
+        "liquidity_log_virtual_to_real_tokens_250ms": -3.8503691240862272,
+        "liquidity_log_virtual_token_depletion_250ms": 0.04277341710039751,
+        "liquidity_max_reserve_drawdown_250ms": 0.3423732204793744,
+        "liquidity_price_reserve_elasticity_250ms": -0.005200766038558952,
+        "liquidity_public_sol_to_final_reserve_250ms": 0.5073208935760736,
+        "liquidity_real_token_depletion_fraction_250ms": 0.6230868130683561,
+        "liquidity_real_token_remaining_fraction_250ms": -0.6230868130683641,
+        "liquidity_reserve_delta_per_public_sol_250ms": 0.6296536078001586,
+        "liquidity_reserve_step_cv_250ms": 0.09599562609241301,
+        "liquidity_terminal_reserve_drawdown_250ms": -0.22057339228870598,
+        "liquidity_time_to_half_reserve_growth_ms": 0.0045594255833345376,
+        "liquidity_virtual_sol_efficiency_250ms": 0.14593815874765162
+      },
+      "test_gate_rows": 1530,
+      "test_gate_threshold_hash": "a9af5b06df9e83f7ce16771fe863ac02b1d69a57d9c7f082c71aafa319ce3a40",
+      "test_windows": [
+        "34627236811",
+        "34660606300",
+        "34684115937",
+        "34709541936",
+        "34722511299",
+        "34729110702",
+        "34749576265",
+        "34760648934",
+        "34770227385",
+        "34779504872"
+      ],
+      "trades": 75,
+      "wilson_95_lower_bound": 0.37068921756788065,
+      "win_rate": 0.48,
+      "wins": 36
+    },
+    {
+      "attempted_trades": 101,
+      "calibration_gate_rows": 876,
+      "calibration_gate_threshold_hash": "3b8bbc10fcc554176c314d74cc9dee8ba5ea1522665edf4c9b0eeb43ec93a421",
+      "calibration_windows": [
+        "34729110702",
+        "34749576265",
+        "34760648934",
+        "34770227385",
+        "34779504872"
+      ],
+      "capture_windows": 10,
+      "conditional_threshold_hash": "b2457241aafd1da22ee964219dddc5567fc6b16c6c6aa7e9f19119045d3e03df",
+      "conditional_threshold_maximum": 0.7281561091929716,
+      "conditional_threshold_minimum": 0.7198702285471421,
+      "conservative_exit_offset_ms": 60000,
+      "fit_gate_rows": 7381,
+      "fit_gate_threshold": 0.726831017074434,
+      "fit_windows": [
+        "33605109571",
+        "33627431540",
+        "33644544746",
+        "33656916992",
+        "33669514091",
+        "33681664773",
+        "33692043170",
+        "33704841852",
+        "33716649440",
+        "33741470396",
+        "33769636983",
+        "33781389703",
+        "33792881280",
+        "33810753028",
+        "33822988156",
+        "33835575805",
+        "33852482054",
+        "33876345997",
+        "33897368379",
+        "33911477030",
+        "33920757002",
+        "33931301493",
+        "34063856134",
+        "34073802862",
+        "34084120627",
+        "34099929487",
+        "34123647690",
+        "34138377553",
+        "34150939561",
+        "34159449923",
+        "34167878699",
+        "34175839320",
+        "34186192299",
+        "34201101121",
+        "34244224832",
+        "34281858070",
+        "34310065776",
+        "34348537141",
+        "34388016481",
+        "34425005585",
+        "34470147967",
+        "34512979177",
+        "34547229611",
+        "34586174670",
+        "34627236811",
+        "34660606300",
+        "34684115937",
+        "34709541936",
+        "34722511299"
+      ],
+      "fold": 3,
+      "largest_winner_contribution": 0.08504501023163534,
+      "ledger_hash": "176e72056315ed44eac0d92b420a1e2d4c6f3e8e311c254b385c39c8899b20f7",
+      "maximum_drawdown_fraction": 0.25337590213421207,
+      "net_pnl_sol": -0.6567850635687122,
+      "profit_factor": 0.5185999923706015,
+      "profitable_capture_windows": 4,
+      "rejected_concurrency": 0,
+      "standardized_coefficients": {
+        "liquidity_last50_sol_growth_250ms": -0.03520811003286234,
+        "liquidity_late_minus_early_sol_growth_250ms": 0.18167063258820584,
+        "liquidity_log_virtual_sol_growth_250ms": -0.9347678546404841,
+        "liquidity_log_virtual_sol_variation_250ms": -0.09968063533183849,
+        "liquidity_log_virtual_to_real_tokens_250ms": -4.07640334791154,
+        "liquidity_log_virtual_token_depletion_250ms": -0.2575725420982881,
+        "liquidity_max_reserve_drawdown_250ms": 0.22751158553579537,
+        "liquidity_price_reserve_elasticity_250ms": -0.008026151054450044,
+        "liquidity_public_sol_to_final_reserve_250ms": 0.4717429917157082,
+        "liquidity_real_token_depletion_fraction_250ms": 0.614006749255498,
+        "liquidity_real_token_remaining_fraction_250ms": -0.6140067492554989,
+        "liquidity_reserve_delta_per_public_sol_250ms": 0.716315705243935,
+        "liquidity_reserve_step_cv_250ms": 0.09677545472981894,
+        "liquidity_terminal_reserve_drawdown_250ms": -0.13250356339289,
+        "liquidity_time_to_half_reserve_growth_ms": -0.014341897461890856,
+        "liquidity_virtual_sol_efficiency_250ms": 0.1522191543106767
+      },
+      "test_gate_rows": 1491,
+      "test_gate_threshold_hash": "7ac7392d43117a171818ce8d8158d722e6d931171ae57da894b8672246bcf194",
+      "test_windows": [
+        "34790190944",
+        "34799149811",
+        "34811806243",
+        "34845710248",
+        "34863619434",
+        "34876702743",
+        "34887276656",
+        "34897737567",
+        "34907762101",
+        "34918286614"
+      ],
+      "trades": 101,
+      "wilson_95_lower_bound": 0.2698650717934931,
+      "win_rate": 0.3564356435643564,
+      "wins": 36
+    }
+  ],
+  "identity": {
+    "bankroll_sol": 3.0,
+    "candidate_risk_set_policy": "causal rolling top-five-percent price-range gate followed by a fixed standardized balanced linear logit over all sixteen liquidity-path features and a causal conditional output guard preserving 0.27 percent total output",
+    "causal_horizon_ms": 250,
+    "chronological_split": [
+      {
+        "calibration": [
+          "33911477030",
+          "33920757002",
+          "33931301493",
+          "34063856134",
+          "34073802862"
+        ],
+        "fit": [
+          "33605109571",
+          "33627431540",
+          "33644544746",
+          "33656916992",
+          "33669514091",
+          "33681664773",
+          "33692043170",
+          "33704841852",
+          "33716649440",
+          "33741470396",
+          "33769636983",
+          "33781389703",
+          "33792881280",
+          "33810753028",
+          "33822988156",
+          "33835575805",
+          "33852482054",
+          "33876345997",
+          "33897368379"
+        ],
+        "test": [
+          "34084120627",
+          "34099929487",
+          "34123647690",
+          "34138377553",
+          "34150939561",
+          "34159449923",
+          "34167878699",
+          "34175839320",
+          "34186192299",
+          "34201101121"
+        ]
+      },
+      {
+        "calibration": [
+          "34159449923",
+          "34167878699",
+          "34175839320",
+          "34186192299",
+          "34201101121"
+        ],
+        "fit": [
+          "33605109571",
+          "33627431540",
+          "33644544746",
+          "33656916992",
+          "33669514091",
+          "33681664773",
+          "33692043170",
+          "33704841852",
+          "33716649440",
+          "33741470396",
+          "33769636983",
+          "33781389703",
+          "33792881280",
+          "33810753028",
+          "33822988156",
+          "33835575805",
+          "33852482054",
+          "33876345997",
+          "33897368379",
+          "33911477030",
+          "33920757002",
+          "33931301493",
+          "34063856134",
+          "34073802862",
+          "34084120627",
+          "34099929487",
+          "34123647690",
+          "34138377553",
+          "34150939561"
+        ],
+        "test": [
+          "34244224832",
+          "34281858070",
+          "34310065776",
+          "34348537141",
+          "34388016481",
+          "34425005585",
+          "34470147967",
+          "34512979177",
+          "34547229611",
+          "34586174670"
+        ]
+      },
+      {
+        "calibration": [
+          "34425005585",
+          "34470147967",
+          "34512979177",
+          "34547229611",
+          "34586174670"
+        ],
+        "fit": [
+          "33605109571",
+          "33627431540",
+          "33644544746",
+          "33656916992",
+          "33669514091",
+          "33681664773",
+          "33692043170",
+          "33704841852",
+          "33716649440",
+          "33741470396",
+          "33769636983",
+          "33781389703",
+          "33792881280",
+          "33810753028",
+          "33822988156",
+          "33835575805",
+          "33852482054",
+          "33876345997",
+          "33897368379",
+          "33911477030",
+          "33920757002",
+          "33931301493",
+          "34063856134",
+          "34073802862",
+          "34084120627",
+          "34099929487",
+          "34123647690",
+          "34138377553",
+          "34150939561",
+          "34159449923",
+          "34167878699",
+          "34175839320",
+          "34186192299",
+          "34201101121",
+          "34244224832",
+          "34281858070",
+          "34310065776",
+          "34348537141",
+          "34388016481"
+        ],
+        "test": [
+          "34627236811",
+          "34660606300",
+          "34684115937",
+          "34709541936",
+          "34722511299",
+          "34729110702",
+          "34749576265",
+          "34760648934",
+          "34770227385",
+          "34779504872"
+        ]
+      },
+      {
+        "calibration": [
+          "34729110702",
+          "34749576265",
+          "34760648934",
+          "34770227385",
+          "34779504872"
+        ],
+        "fit": [
+          "33605109571",
+          "33627431540",
+          "33644544746",
+          "33656916992",
+          "33669514091",
+          "33681664773",
+          "33692043170",
+          "33704841852",
+          "33716649440",
+          "33741470396",
+          "33769636983",
+          "33781389703",
+          "33792881280",
+          "33810753028",
+          "33822988156",
+          "33835575805",
+          "33852482054",
+          "33876345997",
+          "33897368379",
+          "33911477030",
+          "33920757002",
+          "33931301493",
+          "34063856134",
+          "34073802862",
+          "34084120627",
+          "34099929487",
+          "34123647690",
+          "34138377553",
+          "34150939561",
+          "34159449923",
+          "34167878699",
+          "34175839320",
+          "34186192299",
+          "34201101121",
+          "34244224832",
+          "34281858070",
+          "34310065776",
+          "34348537141",
+          "34388016481",
+          "34425005585",
+          "34470147967",
+          "34512979177",
+          "34547229611",
+          "34586174670",
+          "34627236811",
+          "34660606300",
+          "34684115937",
+          "34709541936",
+          "34722511299"
+        ],
+        "test": [
+          "34790190944",
+          "34799149811",
+          "34811806243",
+          "34845710248",
+          "34863619434",
+          "34876702743",
+          "34887276656",
+          "34897737567",
+          "34907762101",
+          "34918286614"
+        ]
+      }
+    ],
+    "dataset_source_manifest_fingerprint": "22944bba1bf62f95fd5c266c59492cda3c226150d64ac57562fdd461beeb08ee",
+    "evidence_epoch": [
+      "33605109571",
+      "33627431540",
+      "33644544746",
+      "33656916992",
+      "33669514091",
+      "33681664773",
+      "33692043170",
+      "33704841852",
+      "33716649440",
+      "33741470396",
+      "33769636983",
+      "33781389703",
+      "33792881280",
+      "33810753028",
+      "33822988156",
+      "33835575805",
+      "33852482054",
+      "33876345997",
+      "33897368379",
+      "33911477030",
+      "33920757002",
+      "33931301493",
+      "34063856134",
+      "34073802862",
+      "34084120627",
+      "34099929487",
+      "34123647690",
+      "34138377553",
+      "34150939561",
+      "34159449923",
+      "34167878699",
+      "34175839320",
+      "34186192299",
+      "34201101121",
+      "34244224832",
+      "34281858070",
+      "34310065776",
+      "34348537141",
+      "34388016481",
+      "34425005585",
+      "34470147967",
+      "34512979177",
+      "34547229611",
+      "34586174670",
+      "34627236811",
+      "34660606300",
+      "34684115937",
+      "34709541936",
+      "34722511299",
+      "34729110702",
+      "34749576265",
+      "34760648934",
+      "34770227385",
+      "34779504872",
+      "34790190944",
+      "34799149811",
+      "34811806243",
+      "34845710248",
+      "34863619434",
+      "34876702743",
+      "34887276656",
+      "34897737567",
+      "34907762101",
+      "34918286614"
+    ],
+    "execution_policy": "paper replay at exact 300 ms entry delay; compound 1.85% of current bankroll; maximum two concurrent positions",
+    "exit_policy": "stop=0.70|take=3.00|hold=60000|protect=1.15:1.06|trail=1.25:0.15",
+    "feature_set_fingerprint": "e9800a9b21578a425bcdbc5ee1c29a59782b4753587529390e496e6ff6ae935c",
+    "fee_model": {
+      "base_transaction_fee_sol": 5e-06,
+      "priority_fee_sol": 0.001,
+      "protocol_and_creator_fee_bps": 175.0,
+      "tip_sol": 0.001
+    },
+    "full_parameters": {
+      "adaptive_exit_policy_index": 12,
+      "conditional_score_fraction": 0.054,
+      "features": "all_sixteen_fixed_liquidity_path_features",
+      "implied_total_score_fraction": 0.0027,
+      "label_matrix_sha256": "1b21575dd37159a825116a940cb67e685e3a3cb784de85482476df5a091de76e",
+      "model": {
+        "C": 1.0,
+        "class_weight": "balanced",
+        "max_iter": 2000,
+        "solver": "lbfgs",
+        "tol": 1e-08
+      },
+      "range_gate_fraction": 0.05,
+      "rolling_history_rows": 10000,
+      "threshold_refresh_rows": 100
+    },
+    "latency_assumptions_ms": [
+      300
+    ],
+    "liquidity_path_matrix_sha256": "44ee057327e1a2cf63ab6210a135098f0c2953ba3e577c416c166c63fc7fbffd",
+    "microstructure_matrix_sha256": "08d0f6c7d302652775a62ef0da24b246f0706b7b98e1c2e0bf361507c1af62dc",
+    "model_family": "standardized_balanced_linear_logistic_regression",
+    "output_guard": {
+      "conditional_score_fraction": 0.054,
+      "range_gate_fraction": 0.05,
+      "refresh_rows": 100,
+      "rolling_history_rows": 10000,
+      "thresholds_use_prior_scores_only": true
+    },
+    "position_sizing": {
+      "fraction_of_current_bankroll": 0.0185,
+      "maximum_concurrent_positions": 2
+    },
+    "source_code_fingerprint": "0f830335a97731431bb9d8e071a2d893a4fb93f0b5c493972deeccc58c2c8377",
+    "thesis_family_identifier": "latency300-causal-liquidity-absorption-logit-v12"
+  },
+  "label_audit": {
+    "active_untouched_live_data_used": false,
+    "all_source_hashes_verified": true,
+    "capture_windows": 64,
+    "dataset_manifest_sha256": "22944bba1bf62f95fd5c266c59492cda3c226150d64ac57562fdd461beeb08ee",
+    "decision_horizon_ms": 250,
+    "executable_rows": 191425,
+    "executable_sha256": "c0198d3444974eca21caf747a4bab7f3eb43ab90945274687616627eaa3d00d4",
+    "latency_ms": 300,
+    "negative_or_zero_rows": 162568,
+    "no_quote_rows": 0,
+    "pnl_sha256": "1b21575dd37159a825116a940cb67e685e3a3cb784de85482476df5a091de76e",
+    "policy": "stop=0.70|take=3.00|hold=60000|protect=1.15:1.06|trail=1.25:0.15",
+    "policy_index": 12,
+    "production_paths_changed": 0,
+    "profitable_rows": 28857,
+    "rows": 191425,
+    "version": "e4-v12-latency300-labels-v1",
+    "visited_rows": 191425
+  },
+  "liquidity_path_cache_audit": {
+    "active_untouched_live_data_used": false,
+    "cached_later_rows": 48000,
+    "cached_later_runs": [
+      {
+        "rows": 3000,
+        "run_id": "34722511299"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34729110702"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34749576265"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34760648934"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34770227385"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34779504872"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34790190944"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34799149811"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34811806243"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34845710248"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34863619434"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34876702743"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34887276656"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34897737567"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34907762101"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34918286614"
+      }
+    ],
+    "dataset_manifest_sha256": "22944bba1bf62f95fd5c266c59492cda3c226150d64ac57562fdd461beeb08ee",
+    "feature_names": [
+      "liquidity_log_virtual_sol_growth_250ms",
+      "liquidity_log_virtual_sol_variation_250ms",
+      "liquidity_virtual_sol_efficiency_250ms",
+      "liquidity_terminal_reserve_drawdown_250ms",
+      "liquidity_max_reserve_drawdown_250ms",
+      "liquidity_late_minus_early_sol_growth_250ms",
+      "liquidity_last50_sol_growth_250ms",
+      "liquidity_log_virtual_token_depletion_250ms",
+      "liquidity_real_token_depletion_fraction_250ms",
+      "liquidity_real_token_remaining_fraction_250ms",
+      "liquidity_price_reserve_elasticity_250ms",
+      "liquidity_reserve_delta_per_public_sol_250ms",
+      "liquidity_public_sol_to_final_reserve_250ms",
+      "liquidity_log_virtual_to_real_tokens_250ms",
+      "liquidity_time_to_half_reserve_growth_ms",
+      "liquidity_reserve_step_cv_250ms"
+    ],
+    "features": 16,
+    "future_values_in_features": false,
+    "matrix_sha256": "44ee057327e1a2cf63ab6210a135098f0c2953ba3e577c416c166c63fc7fbffd",
+    "production_paths_changed": 0,
+    "raw_capture_bytes": 11789578939,
+    "raw_capture_runs": 48,
+    "raw_run_audits": [
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 17,
+        "rows": 2983,
+        "run_id": "33605109571",
+        "sha256": "1bfe30a7a7e2bc159616c2f68a2ee6410a9ec4b26d28eedcd0609b6b35e1dded"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 34,
+        "rows": 2966,
+        "run_id": "33627431540",
+        "sha256": "54e96699d70b53357c0f7249f228fa4af83ed43f15b7a5455988ac12cbeef9f5"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 24,
+        "rows": 2976,
+        "run_id": "33644544746",
+        "sha256": "2552e11c1d6a36aebc882f3e997ae24ddd85db378e3c75a3997aaf2a664d0553"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 39,
+        "rows": 2961,
+        "run_id": "33656916992",
+        "sha256": "5549961baff426b65700294a7692c7b7d164beae60078596fb2c72018039a70c"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 36,
+        "rows": 2964,
+        "run_id": "33669514091",
+        "sha256": "9b8f0ab72e51c649622378ede0fc7cbeb1c120263fb4da3b44b289e23673ec2f"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 53,
+        "rows": 2947,
+        "run_id": "33681664773",
+        "sha256": "d70c12f8bed120d5fe0389e06f1be0a655201380b7235a0f93a73600a8f626c2"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 28,
+        "rows": 2972,
+        "run_id": "33692043170",
+        "sha256": "f8e5d3ef5120aaa6abfd29c83437a87fbc7636276935c3901af7cd1818d0cceb"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 22,
+        "rows": 2978,
+        "run_id": "33704841852",
+        "sha256": "b09a14c770216b8bbaf4f5a44bd295b14cb01d675b188378419ddd9037886f7a"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 19,
+        "rows": 2981,
+        "run_id": "33716649440",
+        "sha256": "6c865406cb400819488ba0a7657ebfd51f0d1c5d84cfb2a5de0999dfb4503f70"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 21,
+        "rows": 2979,
+        "run_id": "33741470396",
+        "sha256": "99d52116113a13660e41e41a52c77fe4b5cb6b8a671c440f57f06ebc8ac4f713"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 20,
+        "rows": 2980,
+        "run_id": "33769636983",
+        "sha256": "9fc5016470fbfb51a2e6c5b0742226773a19e7489fd9f6dd3ac107b905f0cd7e"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 26,
+        "rows": 2974,
+        "run_id": "33781389703",
+        "sha256": "2a8a555434665ac1fd8a24e3957ff45ada7d4d4e84d80ada0e649847d4896376"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 22,
+        "rows": 2978,
+        "run_id": "33792881280",
+        "sha256": "d5b33d6515bf74036e5ed9d41b90eff7f2ff2bc7a44768c76e4486736c3f76d6"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 25,
+        "rows": 2975,
+        "run_id": "33810753028",
+        "sha256": "6aee91882224fa2edbf819cdbac81a4da2c5e503a51364cbcd0bc94fed3beeea"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 25,
+        "rows": 2975,
+        "run_id": "33822988156",
+        "sha256": "07850498561b4f2c81e498dd8a3ec5a37aa5db17ef6983ac623d31a338251a26"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 18,
+        "rows": 2982,
+        "run_id": "33835575805",
+        "sha256": "a7e13975d6bc40245b8c8e9fa521420bd9104978f012c6987f5f3dd296640635"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 20,
+        "rows": 2980,
+        "run_id": "33852482054",
+        "sha256": "bbe92994201b5cf2237ea10972b0d26c092b70707f5180002acaa73ad86e6498"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 31,
+        "rows": 2969,
+        "run_id": "33876345997",
+        "sha256": "f031a6dde6a49f463ef6edb36ffc37370ba6f9870dbb014d6d249b0eac6a9654"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 20,
+        "rows": 2980,
+        "run_id": "33897368379",
+        "sha256": "f1354ae240159d771e1514234a419bc42fa344c1160ba03f59e7c8c1cdc58fac"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 49,
+        "rows": 2951,
+        "run_id": "33911477030",
+        "sha256": "234bb65b4a19d5831d4f6415bb66b679a1470d761e32b4dac87e91a66aa8e5cd"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 16,
+        "rows": 2984,
+        "run_id": "33920757002",
+        "sha256": "8fbdef534c87528049c1b5829bab8320bf04b5393d422be87b77b5fb44aa7d6b"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 10,
+        "rows": 2990,
+        "run_id": "33931301493",
+        "sha256": "1ce3bb3d2f2983f1daca2c7a92c108195adede4c7b5daded39692bcbcab3ae9e"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34063856134",
+        "sha256": "fc77512fc3ed971e0a48ffb5fe2a7ab68499ecc712017681e1edd6c2e4fe86a6"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34073802862",
+        "sha256": "ca31bc7d94ef2c8f6ae00e26604677b7620790fc453496f8ee212c83038d5d8f"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34084120627",
+        "sha256": "c52f8292d99aaa60e38c7fd86c1b848dc2204a64fe821b79cc66354425580ca7"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34099929487",
+        "sha256": "cc8726a6a4d1477f6dd1d1634a09c24274e04476b64b031fe89e29b5ca4434b6"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34123647690",
+        "sha256": "2e091edfb945085fd4af58b82c553178b63ee81ad1f3bd255aa4024970ea4a6f"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34138377553",
+        "sha256": "076da6df38ff4fa07b7551874823ec007ee141b0f1b2848df0f43a26aa1de9f2"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34150939561",
+        "sha256": "619977ace8de412a511da4b12050a6fe2d0aa6bbfeb7e5d2dc445e938dec5d89"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34159449923",
+        "sha256": "6d9d1121b321e9e26555126cd3533482abfe8c13c55442f38aba07b0aa733bb8"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34167878699",
+        "sha256": "9e25ce0e4bce97b6591b4c417acfb138dd9402df6266dd7d64309bd8163272ca"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34175839320",
+        "sha256": "29549195792cc432f20a72f1502cbff24c1b8bd97b76d827b76655db89b04ede"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34186192299",
+        "sha256": "6aca68ad4f377fc69979bb44b81aaabea6d9406a7e8b78521f3fa2bddc13b040"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34201101121",
+        "sha256": "46c239ec42891937bff75df3b59e1cc2b22d364b211cf8917c24394883726975"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34244224832",
+        "sha256": "344d03dd1e0c8ef8515c9adf0193fe4c7cc5bb148fb438ac5e977ce0a0758bde"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34281858070",
+        "sha256": "1214575f9c10755f49424d6a295a20ae341c316b8e464065ed85a075d5070858"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34310065776",
+        "sha256": "a97fc40b90583ab7bbf0b013713c8aa602b00ae0b33598060719c50490c7745a"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34348537141",
+        "sha256": "60c47626d8b28b9b2a98523c95070326e8e6cc9c2f25de530f1f07c416cf96dd"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34388016481",
+        "sha256": "d63fb60eeca248cacf54e751387a6498692581a030eeba9075de2961930b5389"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34425005585",
+        "sha256": "793c1f88229525aad919ecae8cc0760fa9012c21bcd1271b5661e5251fd48c4b"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34470147967",
+        "sha256": "ffca5633616584a60f6b461bcaf057041e88b30ee29e9766c14a56f1da7f86b7"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34512979177",
+        "sha256": "248fa0d572ba65a653ded56092d120fe08a618d6af00883d63d198154dc27a57"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34547229611",
+        "sha256": "b9d590ef3b7e2dde07b09dd174e0333d87e0a59b8a266b5dc0606cb8be544b81"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34586174670",
+        "sha256": "d2d22c70ee08036064fc2bd15fed99da2a8ce39736e8bbcd077af6cfe95ac6d7"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34627236811",
+        "sha256": "480fcc5d437490fdeb4ddf046ef906254a4c0c002fe8092b94d4713918842728"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34660606300",
+        "sha256": "0254a8336858c354bff82814cff9b5c4c7ef4532bd61951578ae2a77544251f1"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34684115937",
+        "sha256": "7dc218abb35c39af30e8ff90c6ba13f62dd010e7c45e88b71056fd79f8d04fb5"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34709541936",
+        "sha256": "d0763e9bff7db6ad810e70507b0465ad78703a7cefa7a7294ef4b3f41476eae1"
+      }
+    ],
+    "raw_source_hashes_verified": true,
+    "rows": 191425,
+    "version": "e4-v12-latency300-liquidity-path-cache-v1"
+  },
+  "live_confirmation_authorised": false,
+  "material_change_required_before_rerun": "A genuinely new causal feature or model family; liquidity-subset, regularization, range-gate, threshold, and fraction variants are prohibited.",
+  "microstructure_cache_audit": {
+    "active_untouched_live_data_used": false,
+    "cached_later_rows": 48000,
+    "cached_later_runs": [
+      {
+        "rows": 3000,
+        "run_id": "34722511299"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34729110702"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34749576265"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34760648934"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34770227385"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34779504872"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34790190944"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34799149811"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34811806243"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34845710248"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34863619434"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34876702743"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34887276656"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34897737567"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34907762101"
+      },
+      {
+        "rows": 3000,
+        "run_id": "34918286614"
+      }
+    ],
+    "dataset_manifest_sha256": "22944bba1bf62f95fd5c266c59492cda3c226150d64ac57562fdd461beeb08ee",
+    "feature_names": [
+      "micro_trade_count_250ms",
+      "micro_trade_count_100ms",
+      "micro_trade_count_50ms",
+      "micro_buy_count_50ms",
+      "micro_sell_count_50ms",
+      "micro_signed_sol_250ms",
+      "micro_signed_sol_100ms",
+      "micro_signed_sol_50ms",
+      "micro_flow_imbalance_250ms",
+      "micro_flow_imbalance_50ms",
+      "micro_log_return_250ms",
+      "micro_log_return_100ms",
+      "micro_log_return_50ms",
+      "micro_log_velocity_delta_50_100ms",
+      "micro_log_price_range_250ms",
+      "micro_trade_interarrival_median_ms",
+      "micro_trade_interarrival_min_ms",
+      "micro_last_trade_age_ms",
+      "micro_unique_traders_50ms",
+      "micro_log_virtual_sol_to_50ms_flow"
+    ],
+    "features": 20,
+    "future_values_in_features": false,
+    "matrix_sha256": "08d0f6c7d302652775a62ef0da24b246f0706b7b98e1c2e0bf361507c1af62dc",
+    "production_paths_changed": 0,
+    "raw_capture_bytes": 11789578939,
+    "raw_capture_runs": 48,
+    "raw_run_audits": [
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 17,
+        "rows": 2983,
+        "run_id": "33605109571",
+        "sha256": "1bfe30a7a7e2bc159616c2f68a2ee6410a9ec4b26d28eedcd0609b6b35e1dded"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 34,
+        "rows": 2966,
+        "run_id": "33627431540",
+        "sha256": "54e96699d70b53357c0f7249f228fa4af83ed43f15b7a5455988ac12cbeef9f5"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 24,
+        "rows": 2976,
+        "run_id": "33644544746",
+        "sha256": "2552e11c1d6a36aebc882f3e997ae24ddd85db378e3c75a3997aaf2a664d0553"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 39,
+        "rows": 2961,
+        "run_id": "33656916992",
+        "sha256": "5549961baff426b65700294a7692c7b7d164beae60078596fb2c72018039a70c"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 36,
+        "rows": 2964,
+        "run_id": "33669514091",
+        "sha256": "9b8f0ab72e51c649622378ede0fc7cbeb1c120263fb4da3b44b289e23673ec2f"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 53,
+        "rows": 2947,
+        "run_id": "33681664773",
+        "sha256": "d70c12f8bed120d5fe0389e06f1be0a655201380b7235a0f93a73600a8f626c2"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 28,
+        "rows": 2972,
+        "run_id": "33692043170",
+        "sha256": "f8e5d3ef5120aaa6abfd29c83437a87fbc7636276935c3901af7cd1818d0cceb"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 22,
+        "rows": 2978,
+        "run_id": "33704841852",
+        "sha256": "b09a14c770216b8bbaf4f5a44bd295b14cb01d675b188378419ddd9037886f7a"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 19,
+        "rows": 2981,
+        "run_id": "33716649440",
+        "sha256": "6c865406cb400819488ba0a7657ebfd51f0d1c5d84cfb2a5de0999dfb4503f70"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 21,
+        "rows": 2979,
+        "run_id": "33741470396",
+        "sha256": "99d52116113a13660e41e41a52c77fe4b5cb6b8a671c440f57f06ebc8ac4f713"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 20,
+        "rows": 2980,
+        "run_id": "33769636983",
+        "sha256": "9fc5016470fbfb51a2e6c5b0742226773a19e7489fd9f6dd3ac107b905f0cd7e"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 26,
+        "rows": 2974,
+        "run_id": "33781389703",
+        "sha256": "2a8a555434665ac1fd8a24e3957ff45ada7d4d4e84d80ada0e649847d4896376"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 22,
+        "rows": 2978,
+        "run_id": "33792881280",
+        "sha256": "d5b33d6515bf74036e5ed9d41b90eff7f2ff2bc7a44768c76e4486736c3f76d6"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 25,
+        "rows": 2975,
+        "run_id": "33810753028",
+        "sha256": "6aee91882224fa2edbf819cdbac81a4da2c5e503a51364cbcd0bc94fed3beeea"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 25,
+        "rows": 2975,
+        "run_id": "33822988156",
+        "sha256": "07850498561b4f2c81e498dd8a3ec5a37aa5db17ef6983ac623d31a338251a26"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 18,
+        "rows": 2982,
+        "run_id": "33835575805",
+        "sha256": "a7e13975d6bc40245b8c8e9fa521420bd9104978f012c6987f5f3dd296640635"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 20,
+        "rows": 2980,
+        "run_id": "33852482054",
+        "sha256": "bbe92994201b5cf2237ea10972b0d26c092b70707f5180002acaa73ad86e6498"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 31,
+        "rows": 2969,
+        "run_id": "33876345997",
+        "sha256": "f031a6dde6a49f463ef6edb36ffc37370ba6f9870dbb014d6d249b0eac6a9654"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 20,
+        "rows": 2980,
+        "run_id": "33897368379",
+        "sha256": "f1354ae240159d771e1514234a419bc42fa344c1160ba03f59e7c8c1cdc58fac"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 49,
+        "rows": 2951,
+        "run_id": "33911477030",
+        "sha256": "234bb65b4a19d5831d4f6415bb66b679a1470d761e32b4dac87e91a66aa8e5cd"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 16,
+        "rows": 2984,
+        "run_id": "33920757002",
+        "sha256": "8fbdef534c87528049c1b5829bab8320bf04b5393d422be87b77b5fb44aa7d6b"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 10,
+        "rows": 2990,
+        "run_id": "33931301493",
+        "sha256": "1ce3bb3d2f2983f1daca2c7a92c108195adede4c7b5daded39692bcbcab3ae9e"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34063856134",
+        "sha256": "fc77512fc3ed971e0a48ffb5fe2a7ab68499ecc712017681e1edd6c2e4fe86a6"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34073802862",
+        "sha256": "ca31bc7d94ef2c8f6ae00e26604677b7620790fc453496f8ee212c83038d5d8f"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34084120627",
+        "sha256": "c52f8292d99aaa60e38c7fd86c1b848dc2204a64fe821b79cc66354425580ca7"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34099929487",
+        "sha256": "cc8726a6a4d1477f6dd1d1634a09c24274e04476b64b031fe89e29b5ca4434b6"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34123647690",
+        "sha256": "2e091edfb945085fd4af58b82c553178b63ee81ad1f3bd255aa4024970ea4a6f"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34138377553",
+        "sha256": "076da6df38ff4fa07b7551874823ec007ee141b0f1b2848df0f43a26aa1de9f2"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34150939561",
+        "sha256": "619977ace8de412a511da4b12050a6fe2d0aa6bbfeb7e5d2dc445e938dec5d89"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34159449923",
+        "sha256": "6d9d1121b321e9e26555126cd3533482abfe8c13c55442f38aba07b0aa733bb8"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34167878699",
+        "sha256": "9e25ce0e4bce97b6591b4c417acfb138dd9402df6266dd7d64309bd8163272ca"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34175839320",
+        "sha256": "29549195792cc432f20a72f1502cbff24c1b8bd97b76d827b76655db89b04ede"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34186192299",
+        "sha256": "6aca68ad4f377fc69979bb44b81aaabea6d9406a7e8b78521f3fa2bddc13b040"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34201101121",
+        "sha256": "46c239ec42891937bff75df3b59e1cc2b22d364b211cf8917c24394883726975"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34244224832",
+        "sha256": "344d03dd1e0c8ef8515c9adf0193fe4c7cc5bb148fb438ac5e977ce0a0758bde"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34281858070",
+        "sha256": "1214575f9c10755f49424d6a295a20ae341c316b8e464065ed85a075d5070858"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34310065776",
+        "sha256": "a97fc40b90583ab7bbf0b013713c8aa602b00ae0b33598060719c50490c7745a"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34348537141",
+        "sha256": "60c47626d8b28b9b2a98523c95070326e8e6cc9c2f25de530f1f07c416cf96dd"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34388016481",
+        "sha256": "d63fb60eeca248cacf54e751387a6498692581a030eeba9075de2961930b5389"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34425005585",
+        "sha256": "793c1f88229525aad919ecae8cc0760fa9012c21bcd1271b5661e5251fd48c4b"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34470147967",
+        "sha256": "ffca5633616584a60f6b461bcaf057041e88b30ee29e9766c14a56f1da7f86b7"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34512979177",
+        "sha256": "248fa0d572ba65a653ded56092d120fe08a618d6af00883d63d198154dc27a57"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34547229611",
+        "sha256": "b9d590ef3b7e2dde07b09dd174e0333d87e0a59b8a266b5dc0606cb8be544b81"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34586174670",
+        "sha256": "d2d22c70ee08036064fc2bd15fed99da2a8ce39736e8bbcd077af6cfe95ac6d7"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34627236811",
+        "sha256": "480fcc5d437490fdeb4ddf046ef906254a4c0c002fe8092b94d4713918842728"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34660606300",
+        "sha256": "0254a8336858c354bff82814cff9b5c4c7ef4532bd61951578ae2a77544251f1"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34684115937",
+        "sha256": "7dc218abb35c39af30e8ff90c6ba13f62dd010e7c45e88b71056fd79f8d04fb5"
+      },
+      {
+        "invalid_rows": 0,
+        "launches": 3000,
+        "missing_rows": 0,
+        "rows": 3000,
+        "run_id": "34709541936",
+        "sha256": "d0763e9bff7db6ad810e70507b0465ad78703a7cefa7a7294ef4b3f41476eae1"
+      }
+    ],
+    "raw_source_hashes_verified": true,
+    "rows": 191425,
+    "version": "e4-v12-latency300-microstructure-cache-v1"
+  },
+  "production_deployment_authorised": false,
+  "production_paths_changed": 0,
+  "production_promotion_authorised": false,
+  "ready_for_new_strictly_later_holdout": false,
+  "requirements": {
+    "every_fold_minimum_profit_factor": false,
+    "every_fold_minimum_trades": true,
+    "every_fold_minimum_win_rate": false,
+    "every_fold_positive": false,
+    "every_fold_six_profitable_windows": false,
+    "full_quote_coverage": true,
+    "largest_winner_limit": true,
+    "maximum_drawdown": false,
+    "minimum_closed_trades": true,
+    "minimum_profit_factor": false,
+    "minimum_wilson_bound": false,
+    "minimum_win_rate": false,
+    "positive_net_pnl": true
+  },
+  "retired": true,
+  "scientific_basis": "Five non-redundant causal liquidity-absorption features transported inside the high-range stratum, including reserve-step CV, absorption efficiency, and time to half reserve growth.",
+  "thesis_family": "latency300-causal-liquidity-absorption-logit-v12",
+  "untouched_holdout_passed": false,
+  "version": "e4-v12-latency300-liquidity-logit-candidate-v1"
+}
