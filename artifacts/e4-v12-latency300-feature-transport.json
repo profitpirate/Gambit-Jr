@@ -1,0 +1,1662 @@
+{
+  "active_untouched_live_data_used": false,
+  "all_epoch_auc_52_feature_count": 24,
+  "all_epoch_auc_52_features": [
+    "real_token_reserve",
+    "price_multiple_from_create",
+    "prefix_max_price_multiple",
+    "creator_seed_sol",
+    "creator_severe_loss_rate",
+    "mayhem_mode",
+    "relative_price_multiple",
+    "virtual_sol_reserve",
+    "estimated_price_impact_bps",
+    "public_buy_sol",
+    "buy_sol_last_250ms",
+    "buy_sol_last_1000ms",
+    "buy_acceleration",
+    "relative_public_buy_sol",
+    "relative_buy_acceleration",
+    "maximum_buy_sol",
+    "median_buy_sol",
+    "log_return_volatility",
+    "creator_resolved_launches",
+    "creator_prior_launch_count",
+    "buyer_sol_concentration",
+    "buy_count",
+    "metadata_content_addressed",
+    "creator_profitable_history"
+  ],
+  "candidate_fitted": false,
+  "development_gate_passed": false,
+  "diagnostic_id": "e4d-47450dc1977f5d168b89df62411d5ccfbc184021801cb9912a925305f6c75726",
+  "direction_consistent_features": 32,
+  "epochs": [
+    {
+      "epoch": 0,
+      "positive_rate": 0.1667192196926699,
+      "profitable_rows": 7931,
+      "rows": 47571,
+      "window_indices": [
+        0,
+        15
+      ],
+      "windows": [
+        "33605109571",
+        "33627431540",
+        "33644544746",
+        "33656916992",
+        "33669514091",
+        "33681664773",
+        "33692043170",
+        "33704841852",
+        "33716649440",
+        "33741470396",
+        "33769636983",
+        "33781389703",
+        "33792881280",
+        "33810753028",
+        "33822988156",
+        "33835575805"
+      ]
+    },
+    {
+      "epoch": 1,
+      "positive_rate": 0.16119864588122204,
+      "profitable_rows": 7714,
+      "rows": 47854,
+      "window_indices": [
+        16,
+        31
+      ],
+      "windows": [
+        "33852482054",
+        "33876345997",
+        "33897368379",
+        "33911477030",
+        "33920757002",
+        "33931301493",
+        "34063856134",
+        "34073802862",
+        "34084120627",
+        "34099929487",
+        "34123647690",
+        "34138377553",
+        "34150939561",
+        "34159449923",
+        "34167878699",
+        "34175839320"
+      ]
+    },
+    {
+      "epoch": 2,
+      "positive_rate": 0.15191666666666667,
+      "profitable_rows": 7292,
+      "rows": 48000,
+      "window_indices": [
+        32,
+        47
+      ],
+      "windows": [
+        "34186192299",
+        "34201101121",
+        "34244224832",
+        "34281858070",
+        "34310065776",
+        "34348537141",
+        "34388016481",
+        "34425005585",
+        "34470147967",
+        "34512979177",
+        "34547229611",
+        "34586174670",
+        "34627236811",
+        "34660606300",
+        "34684115937",
+        "34709541936"
+      ]
+    },
+    {
+      "epoch": 3,
+      "positive_rate": 0.12333333333333334,
+      "profitable_rows": 5920,
+      "rows": 48000,
+      "window_indices": [
+        48,
+        63
+      ],
+      "windows": [
+        "34722511299",
+        "34729110702",
+        "34749576265",
+        "34760648934",
+        "34770227385",
+        "34779504872",
+        "34790190944",
+        "34799149811",
+        "34811806243",
+        "34845710248",
+        "34863619434",
+        "34876702743",
+        "34887276656",
+        "34897737567",
+        "34907762101",
+        "34918286614"
+      ]
+    }
+  ],
+  "feature_count": 58,
+  "features": [
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "lower_is_positive",
+      "earliest_oriented_auc": 0.6269402605418251,
+      "feature": "real_token_reserve",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.15590747251476744,
+      "first_to_last_oriented_auc_change": 0.07121124543777624,
+      "later_oriented_auc": [
+        0.6487294646982902,
+        0.6516211196759756,
+        0.6981515059796013
+      ],
+      "mean_later_oriented_auc": 0.666167363451289,
+      "minimum_later_oriented_auc": 0.6487294646982902,
+      "raw_auc_by_epoch": [
+        0.37305973945817494,
+        0.35127053530170976,
+        0.3483788803240245,
+        0.30184849402039876
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.6268418779353356,
+      "feature": "price_multiple_from_create",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.15694732216056004,
+      "first_to_last_oriented_auc_change": 0.07126749666324106,
+      "later_oriented_auc": [
+        0.6486777191160985,
+        0.6515598043807278,
+        0.6981093745985767
+      ],
+      "mean_later_oriented_auc": 0.6661156326984677,
+      "minimum_later_oriented_auc": 0.6486777191160985,
+      "raw_auc_by_epoch": [
+        0.6268418779353356,
+        0.6486777191160985,
+        0.6515598043807278,
+        0.6981093745985767
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.6268514585499733,
+      "feature": "prefix_max_price_multiple",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.1557104499064556,
+      "first_to_last_oriented_auc_change": 0.07118558960797572,
+      "later_oriented_auc": [
+        0.6486061311337205,
+        0.6513952576558922,
+        0.698037048157949
+      ],
+      "mean_later_oriented_auc": 0.6660128123158539,
+      "minimum_later_oriented_auc": 0.6486061311337205,
+      "raw_auc_by_epoch": [
+        0.6268514585499733,
+        0.6486061311337205,
+        0.6513952576558922,
+        0.698037048157949
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.6169304871698013,
+      "feature": "creator_seed_sol",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.24692630226398435,
+      "first_to_last_oriented_auc_change": 0.05553426786565252,
+      "later_oriented_auc": [
+        0.6303137133850553,
+        0.6411216324997085,
+        0.6724647550354538
+      ],
+      "mean_later_oriented_auc": 0.6479667003067392,
+      "minimum_later_oriented_auc": 0.6303137133850553,
+      "raw_auc_by_epoch": [
+        0.6169304871698013,
+        0.6303137133850553,
+        0.6411216324997085,
+        0.6724647550354538
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.60352535287643,
+      "feature": "creator_severe_loss_rate",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.12804177440037,
+      "first_to_last_oriented_auc_change": 0.04426507887839981,
+      "later_oriented_auc": [
+        0.6199734669259098,
+        0.6165159773355545,
+        0.6477904317548299
+      ],
+      "mean_later_oriented_auc": 0.6280932920054313,
+      "minimum_later_oriented_auc": 0.6165159773355545,
+      "raw_auc_by_epoch": [
+        0.60352535287643,
+        0.6199734669259098,
+        0.6165159773355545,
+        0.6477904317548299
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.6154028005930565,
+      "feature": "mayhem_mode",
+      "first_to_last_ks_pvalue": 1.7411507474243602e-146,
+      "first_to_last_ks_statistic": 0.08382206070925569,
+      "first_to_last_oriented_auc_change": 0.05852845004922069,
+      "later_oriented_auc": [
+        0.6089759151241333,
+        0.6416663064310255,
+        0.6739312506422772
+      ],
+      "mean_later_oriented_auc": 0.6415244907324786,
+      "minimum_later_oriented_auc": 0.6089759151241333,
+      "raw_auc_by_epoch": [
+        0.6154028005930565,
+        0.6089759151241333,
+        0.6416663064310255,
+        0.6739312506422772
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5895009791184587,
+      "feature": "relative_price_multiple",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.20598156702612935,
+      "first_to_last_oriented_auc_change": 0.06746175595501791,
+      "later_oriented_auc": [
+        0.6154407654619256,
+        0.6051285132340244,
+        0.6569627350734766
+      ],
+      "mean_later_oriented_auc": 0.6258440045898089,
+      "minimum_later_oriented_auc": 0.6051285132340244,
+      "raw_auc_by_epoch": [
+        0.5895009791184587,
+        0.6154407654619256,
+        0.6051285132340244,
+        0.6569627350734766
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.6270772407473592,
+      "feature": "virtual_sol_reserve",
+      "first_to_last_ks_pvalue": 1.2029085297788204e-173,
+      "first_to_last_ks_statistic": 0.09127083333333333,
+      "first_to_last_oriented_auc_change": -0.03092386533951308,
+      "later_oriented_auc": [
+        0.6489143374776304,
+        0.6266386336635842,
+        0.5961533754078461
+      ],
+      "mean_later_oriented_auc": 0.6239021155163536,
+      "minimum_later_oriented_auc": 0.5961533754078461,
+      "raw_auc_by_epoch": [
+        0.6270772407473592,
+        0.6489143374776304,
+        0.6266386336635842,
+        0.5961533754078461
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "lower_is_positive",
+      "earliest_oriented_auc": 0.6270772407473593,
+      "feature": "estimated_price_impact_bps",
+      "first_to_last_ks_pvalue": 1.2029085297779434e-173,
+      "first_to_last_ks_statistic": 0.09127083333333341,
+      "first_to_last_oriented_auc_change": -0.03092386533951319,
+      "later_oriented_auc": [
+        0.6489143374776305,
+        0.6266386336635841,
+        0.5961533754078461
+      ],
+      "mean_later_oriented_auc": 0.6239021155163536,
+      "minimum_later_oriented_auc": 0.5961533754078461,
+      "raw_auc_by_epoch": [
+        0.3729227592526408,
+        0.3510856625223695,
+        0.3733613663364159,
+        0.4038466245921539
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.553435622086612,
+      "feature": "public_buy_sol",
+      "first_to_last_ks_pvalue": 4.0476969827552656e-66,
+      "first_to_last_ks_statistic": 0.05623726377414817,
+      "first_to_last_oriented_auc_change": 0.015783180098415284,
+      "later_oriented_auc": [
+        0.5867414173545299,
+        0.5641041170702591,
+        0.5692188021850273
+      ],
+      "mean_later_oriented_auc": 0.5733547788699388,
+      "minimum_later_oriented_auc": 0.5641041170702591,
+      "raw_auc_by_epoch": [
+        0.553435622086612,
+        0.5867414173545299,
+        0.5641041170702591,
+        0.5692188021850273
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.553435622086612,
+      "feature": "buy_sol_last_250ms",
+      "first_to_last_ks_pvalue": 4.0476969827552656e-66,
+      "first_to_last_ks_statistic": 0.05623726377414817,
+      "first_to_last_oriented_auc_change": 0.015783180098415284,
+      "later_oriented_auc": [
+        0.5867414173545299,
+        0.5641041170702591,
+        0.5692188021850273
+      ],
+      "mean_later_oriented_auc": 0.5733547788699388,
+      "minimum_later_oriented_auc": 0.5641041170702591,
+      "raw_auc_by_epoch": [
+        0.553435622086612,
+        0.5867414173545299,
+        0.5641041170702591,
+        0.5692188021850273
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.553435622086612,
+      "feature": "buy_sol_last_1000ms",
+      "first_to_last_ks_pvalue": 4.0476969827552656e-66,
+      "first_to_last_ks_statistic": 0.05623726377414817,
+      "first_to_last_oriented_auc_change": 0.015783180098415284,
+      "later_oriented_auc": [
+        0.5867414173545299,
+        0.5641041170702591,
+        0.5692188021850273
+      ],
+      "mean_later_oriented_auc": 0.5733547788699388,
+      "minimum_later_oriented_auc": 0.5641041170702591,
+      "raw_auc_by_epoch": [
+        0.553435622086612,
+        0.5867414173545299,
+        0.5641041170702591,
+        0.5692188021850273
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.553435622086612,
+      "feature": "buy_acceleration",
+      "first_to_last_ks_pvalue": 4.0476969827552656e-66,
+      "first_to_last_ks_statistic": 0.05623726377414817,
+      "first_to_last_oriented_auc_change": 0.015783180098415284,
+      "later_oriented_auc": [
+        0.5867414173545299,
+        0.5641041170702591,
+        0.5692188021850273
+      ],
+      "mean_later_oriented_auc": 0.5733547788699388,
+      "minimum_later_oriented_auc": 0.5641041170702591,
+      "raw_auc_by_epoch": [
+        0.553435622086612,
+        0.5867414173545299,
+        0.5641041170702591,
+        0.5692188021850273
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5529437631280186,
+      "feature": "relative_public_buy_sol",
+      "first_to_last_ks_pvalue": 1.984649693452119e-52,
+      "first_to_last_ks_statistic": 0.050038324294212955,
+      "first_to_last_oriented_auc_change": 0.01627640791041518,
+      "later_oriented_auc": [
+        0.5862588875802723,
+        0.5637304528819598,
+        0.5692201710384338
+      ],
+      "mean_later_oriented_auc": 0.5730698371668886,
+      "minimum_later_oriented_auc": 0.5637304528819598,
+      "raw_auc_by_epoch": [
+        0.5529437631280186,
+        0.5862588875802723,
+        0.5637304528819598,
+        0.5692201710384338
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5529437631280186,
+      "feature": "relative_buy_acceleration",
+      "first_to_last_ks_pvalue": 1.984649693452119e-52,
+      "first_to_last_ks_statistic": 0.050038324294212955,
+      "first_to_last_oriented_auc_change": 0.01627640791041518,
+      "later_oriented_auc": [
+        0.5862588875802723,
+        0.5637304528819598,
+        0.5692201710384338
+      ],
+      "mean_later_oriented_auc": 0.5730698371668886,
+      "minimum_later_oriented_auc": 0.5637304528819598,
+      "raw_auc_by_epoch": [
+        0.5529437631280186,
+        0.5862588875802723,
+        0.5637304528819598,
+        0.5692201710384338
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5526583772296401,
+      "feature": "maximum_buy_sol",
+      "first_to_last_ks_pvalue": 3.618241680777703e-66,
+      "first_to_last_ks_statistic": 0.05625809710748153,
+      "first_to_last_oriented_auc_change": 0.014767142693800528,
+      "later_oriented_auc": [
+        0.5854573825032143,
+        0.5631066309805204,
+        0.5674255199234406
+      ],
+      "mean_later_oriented_auc": 0.5719965111357251,
+      "minimum_later_oriented_auc": 0.5631066309805204,
+      "raw_auc_by_epoch": [
+        0.5526583772296401,
+        0.5854573825032143,
+        0.5631066309805204,
+        0.5674255199234406
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5480138991434826,
+      "feature": "median_buy_sol",
+      "first_to_last_ks_pvalue": 2.5864114431107556e-66,
+      "first_to_last_ks_statistic": 0.05632040923041359,
+      "first_to_last_oriented_auc_change": 0.016993326475672532,
+      "later_oriented_auc": [
+        0.5820321236961792,
+        0.5590047081360954,
+        0.5650072256191552
+      ],
+      "mean_later_oriented_auc": 0.5686813524838099,
+      "minimum_later_oriented_auc": 0.5590047081360954,
+      "raw_auc_by_epoch": [
+        0.5480138991434826,
+        0.5820321236961792,
+        0.5590047081360954,
+        0.5650072256191552
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5456886041324385,
+      "feature": "log_return_volatility",
+      "first_to_last_ks_pvalue": 6.804015296372773e-213,
+      "first_to_last_ks_statistic": 0.10106264320699598,
+      "first_to_last_oriented_auc_change": 0.023863851052665974,
+      "later_oriented_auc": [
+        0.5759132267682762,
+        0.5561344627277657,
+        0.5695524551851044
+      ],
+      "mean_later_oriented_auc": 0.5672000482270487,
+      "minimum_later_oriented_auc": 0.5561344627277657,
+      "raw_auc_by_epoch": [
+        0.5456886041324385,
+        0.5759132267682762,
+        0.5561344627277657,
+        0.5695524551851044
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5613217975141549,
+      "feature": "creator_resolved_launches",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.14841986189064765,
+      "first_to_last_oriented_auc_change": 0.036893466526025986,
+      "later_oriented_auc": [
+        0.5530109970302282,
+        0.5662346863020424,
+        0.5982152640401809
+      ],
+      "mean_later_oriented_auc": 0.5724869824574839,
+      "minimum_later_oriented_auc": 0.5530109970302282,
+      "raw_auc_by_epoch": [
+        0.5613217975141549,
+        0.5530109970302282,
+        0.5662346863020424,
+        0.5982152640401809
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5531693131259129,
+      "feature": "creator_prior_launch_count",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.1633264896155221,
+      "first_to_last_oriented_auc_change": 0.04082740764726045,
+      "later_oriented_auc": [
+        0.5476265983240666,
+        0.5602505530066264,
+        0.5939967207731733
+      ],
+      "mean_later_oriented_auc": 0.5672912907012888,
+      "minimum_later_oriented_auc": 0.5476265983240666,
+      "raw_auc_by_epoch": [
+        0.5531693131259129,
+        0.5476265983240666,
+        0.5602505530066264,
+        0.5939967207731733
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5364253887051297,
+      "feature": "buyer_sol_concentration",
+      "first_to_last_ks_pvalue": 1.3493506276786856e-52,
+      "first_to_last_ks_statistic": 0.05011883947152673,
+      "first_to_last_oriented_auc_change": 0.013137471371558296,
+      "later_oriented_auc": [
+        0.56425336381002,
+        0.5468447306050974,
+        0.549562860076688
+      ],
+      "mean_later_oriented_auc": 0.5535536514972684,
+      "minimum_later_oriented_auc": 0.5468447306050974,
+      "raw_auc_by_epoch": [
+        0.5364253887051297,
+        0.56425336381002,
+        0.5468447306050974,
+        0.549562860076688
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.577467494933916,
+      "feature": "buy_count",
+      "first_to_last_ks_pvalue": 0.0005781626293954252,
+      "first_to_last_ks_statistic": 0.013051710863761556,
+      "first_to_last_oriented_auc_change": -0.03195915656941095,
+      "later_oriented_auc": [
+        0.6064557219940216,
+        0.5718457904255404,
+        0.5455083383645051
+      ],
+      "mean_later_oriented_auc": 0.5746032835946892,
+      "minimum_later_oriented_auc": 0.5455083383645051,
+      "raw_auc_by_epoch": [
+        0.577467494933916,
+        0.6064557219940216,
+        0.5718457904255404,
+        0.5455083383645051
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5469721059068878,
+      "feature": "metadata_content_addressed",
+      "first_to_last_ks_pvalue": 0.018414456724893752,
+      "first_to_last_ks_statistic": 0.009897674003069123,
+      "first_to_last_oriented_auc_change": 0.027183941775775877,
+      "later_oriented_auc": [
+        0.5338089050263408,
+        0.553706795102441,
+        0.5741560476826637
+      ],
+      "mean_later_oriented_auc": 0.5538905826038152,
+      "minimum_later_oriented_auc": 0.5338089050263408,
+      "raw_auc_by_epoch": [
+        0.5469721059068878,
+        0.5338089050263408,
+        0.553706795102441,
+        0.5741560476826637
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5453866048375615,
+      "feature": "creator_profitable_history",
+      "first_to_last_ks_pvalue": 7.217524428547696e-41,
+      "first_to_last_ks_statistic": 0.04412916088583374,
+      "first_to_last_oriented_auc_change": -0.009093764944436478,
+      "later_oriented_auc": [
+        0.5450887314415104,
+        0.5330813821901978,
+        0.536292839893125
+      ],
+      "mean_later_oriented_auc": 0.538154317841611,
+      "minimum_later_oriented_auc": 0.5330813821901978,
+      "raw_auc_by_epoch": [
+        0.5453866048375615,
+        0.5450887314415104,
+        0.5330813821901978,
+        0.536292839893125
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5174750967635716,
+      "feature": "prior_price_multiple_median",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.4877201971789536,
+      "first_to_last_oriented_auc_change": 0.021518751825987503,
+      "later_oriented_auc": [
+        0.5219856587631648,
+        0.5337766122732409,
+        0.5389938485895591
+      ],
+      "mean_later_oriented_auc": 0.531585373208655,
+      "minimum_later_oriented_auc": 0.5219856587631648,
+      "raw_auc_by_epoch": [
+        0.5174750967635716,
+        0.5219856587631648,
+        0.5337766122732409,
+        0.5389938485895591
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5297261168827352,
+      "feature": "buyer_positive_expectancy_fraction",
+      "first_to_last_ks_pvalue": 1.4567658492374074e-09,
+      "first_to_last_ks_statistic": 0.020975871591936257,
+      "first_to_last_oriented_auc_change": -0.011956286170963448,
+      "later_oriented_auc": [
+        0.5395581807335204,
+        0.528014842512434,
+        0.5177698307117717
+      ],
+      "mean_later_oriented_auc": 0.5284476179859087,
+      "minimum_later_oriented_auc": 0.5177698307117717,
+      "raw_auc_by_epoch": [
+        0.5297261168827352,
+        0.5395581807335204,
+        0.528014842512434,
+        0.5177698307117717
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5458541226097289,
+      "feature": "distinct_signatures",
+      "first_to_last_ks_pvalue": 0.045402178982033914,
+      "first_to_last_ks_statistic": 0.00889341326648585,
+      "first_to_last_oriented_auc_change": -0.03158422726880805,
+      "later_oriented_auc": [
+        0.5741427753704658,
+        0.5403277730872282,
+        0.5142698953409208
+      ],
+      "mean_later_oriented_auc": 0.542913481266205,
+      "minimum_later_oriented_auc": 0.5142698953409208,
+      "raw_auc_by_epoch": [
+        0.5458541226097289,
+        0.5741427753704658,
+        0.5403277730872282,
+        0.5142698953409208
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.51880330648259,
+      "feature": "buyer_average_pnl_max",
+      "first_to_last_ks_pvalue": 1.472143028974787e-170,
+      "first_to_last_ks_statistic": 0.09045514730613188,
+      "first_to_last_oriented_auc_change": 0.043962538095947745,
+      "later_oriented_auc": [
+        0.509233469091005,
+        0.5217795745555991,
+        0.5627658445785377
+      ],
+      "mean_later_oriented_auc": 0.5312596294083806,
+      "minimum_later_oriented_auc": 0.509233469091005,
+      "raw_auc_by_epoch": [
+        0.51880330648259,
+        0.509233469091005,
+        0.5217795745555991,
+        0.5627658445785377
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "lower_is_positive",
+      "earliest_oriented_auc": 0.5249100863133223,
+      "feature": "prior_launches_60s",
+      "first_to_last_ks_pvalue": 2.63165e-318,
+      "first_to_last_ks_statistic": 0.12354775362090348,
+      "first_to_last_oriented_auc_change": -0.009751016314735295,
+      "later_oriented_auc": [
+        0.5059608795324738,
+        0.5316919848764633,
+        0.515159069998587
+      ],
+      "mean_later_oriented_auc": 0.5176039781358414,
+      "minimum_later_oriented_auc": 0.5059608795324738,
+      "raw_auc_by_epoch": [
+        0.4750899136866778,
+        0.4940391204675262,
+        0.4683080151235367,
+        0.48484093000141304
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "lower_is_positive",
+      "earliest_oriented_auc": 0.5002432241961794,
+      "feature": "same_transaction_buyers",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.230486242931618,
+      "first_to_last_oriented_auc_change": 0.06192284180744312,
+      "later_oriented_auc": [
+        0.5012944889283669,
+        0.5066410265804855,
+        0.5621660660036225
+      ],
+      "mean_later_oriented_auc": 0.5233671938374916,
+      "minimum_later_oriented_auc": 0.5012944889283669,
+      "raw_auc_by_epoch": [
+        0.4997567758038206,
+        0.4987055110716331,
+        0.49335897341951457,
+        0.4378339339963775
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "lower_is_positive",
+      "earliest_oriented_auc": 0.501679968092609,
+      "feature": "prior_prefix_drawdown_median",
+      "first_to_last_ks_pvalue": 0.9889635287616964,
+      "first_to_last_ks_statistic": 0.0028707208698577347,
+      "first_to_last_oriented_auc_change": -0.0005244450701805681,
+      "later_oriented_auc": [
+        0.5005756589039736,
+        0.5017242244391656,
+        0.5011555230224284
+      ],
+      "mean_later_oriented_auc": 0.5011518021218558,
+      "minimum_later_oriented_auc": 0.5005756589039736,
+      "raw_auc_by_epoch": [
+        0.498320031907391,
+        0.49942434109602646,
+        0.49827577556083436,
+        0.4988444769775716
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5,
+      "feature": "horizon_ms",
+      "first_to_last_ks_pvalue": 1.0,
+      "first_to_last_ks_statistic": 0.0,
+      "first_to_last_oriented_auc_change": 0.0,
+      "later_oriented_auc": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "mean_later_oriented_auc": 0.5,
+      "minimum_later_oriented_auc": 0.5,
+      "raw_auc_by_epoch": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5021357788753427,
+      "feature": "public_sell_sol",
+      "first_to_last_ks_pvalue": 0.0967194087912614,
+      "first_to_last_ks_statistic": 0.007954722940446968,
+      "first_to_last_oriented_auc_change": -0.0027094428583608887,
+      "later_oriented_auc": [
+        0.4982938749249289,
+        0.5010672014557904,
+        0.4994263360169818
+      ],
+      "mean_later_oriented_auc": 0.499595804132567,
+      "minimum_later_oriented_auc": 0.4982938749249289,
+      "raw_auc_by_epoch": [
+        0.5021357788753427,
+        0.4982938749249289,
+        0.5010672014557904,
+        0.4994263360169818
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5012047718331457,
+      "feature": "prefix_drawdown",
+      "first_to_last_ks_pvalue": 0.14751831263744208,
+      "first_to_last_ks_statistic": 0.007378716812764141,
+      "first_to_last_oriented_auc_change": -0.0017273928381811854,
+      "later_oriented_auc": [
+        0.4979427671415537,
+        0.5017228786086919,
+        0.4994773789949645
+      ],
+      "mean_later_oriented_auc": 0.4997143415817367,
+      "minimum_later_oriented_auc": 0.4979427671415537,
+      "raw_auc_by_epoch": [
+        0.5012047718331457,
+        0.4979427671415537,
+        0.5017228786086919,
+        0.4994773789949645
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5012054684316204,
+      "feature": "relative_prefix_drawdown",
+      "first_to_last_ks_pvalue": 0.16015164237613322,
+      "first_to_last_ks_statistic": 0.007261210874272228,
+      "first_to_last_oriented_auc_change": -0.0017296509732400156,
+      "later_oriented_auc": [
+        0.4979422310350382,
+        0.5017234142458518,
+        0.4994758174583804
+      ],
+      "mean_later_oriented_auc": 0.4997138209130901,
+      "minimum_later_oriented_auc": 0.4979422310350382,
+      "raw_auc_by_epoch": [
+        0.5012054684316204,
+        0.4979422310350382,
+        0.5017234142458518,
+        0.4994758174583804
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.50201790582523,
+      "feature": "sell_count",
+      "first_to_last_ks_pvalue": 0.9886629919107477,
+      "first_to_last_ks_statistic": 0.0028774857581299607,
+      "first_to_last_oriented_auc_change": -0.004232347349096999,
+      "later_oriented_auc": [
+        0.4981088745780744,
+        0.5009188720723825,
+        0.497785558476133
+      ],
+      "mean_later_oriented_auc": 0.49893776837553,
+      "minimum_later_oriented_auc": 0.497785558476133,
+      "raw_auc_by_epoch": [
+        0.50201790582523,
+        0.4981088745780744,
+        0.5009188720723825,
+        0.497785558476133
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5020109239364086,
+      "feature": "unique_sellers",
+      "first_to_last_ks_pvalue": 0.9886629919107477,
+      "first_to_last_ks_statistic": 0.0028774857581299607,
+      "first_to_last_oriented_auc_change": -0.004229164931681351,
+      "later_oriented_auc": [
+        0.49810450498701775,
+        0.5009126078126432,
+        0.4977817590047272
+      ],
+      "mean_later_oriented_auc": 0.4989329572681294,
+      "minimum_later_oriented_auc": 0.4977817590047272,
+      "raw_auc_by_epoch": [
+        0.5020109239364086,
+        0.49810450498701775,
+        0.5009126078126432,
+        0.4977817590047272
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "lower_is_positive",
+      "earliest_oriented_auc": 0.5000416416389543,
+      "feature": "prior_public_buy_sol_median",
+      "first_to_last_ks_pvalue": 3.231702662485649e-08,
+      "first_to_last_ks_statistic": 0.019369010268861397,
+      "first_to_last_oriented_auc_change": 0.00018329389246585226,
+      "later_oriented_auc": [
+        0.4977075035793185,
+        0.49896008066709097,
+        0.5002249355314201
+      ],
+      "mean_later_oriented_auc": 0.4989641732592765,
+      "minimum_later_oriented_auc": 0.4977075035793185,
+      "raw_auc_by_epoch": [
+        0.49995835836104574,
+        0.5022924964206815,
+        0.501039919332909,
+        0.49977506446857983
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "lower_is_positive",
+      "earliest_oriented_auc": 0.5000416416389543,
+      "feature": "prior_buy_acceleration_median",
+      "first_to_last_ks_pvalue": 3.231702662485649e-08,
+      "first_to_last_ks_statistic": 0.019369010268861397,
+      "first_to_last_oriented_auc_change": 0.00018329389246585226,
+      "later_oriented_auc": [
+        0.4977075035793185,
+        0.49896008066709097,
+        0.5002249355314201
+      ],
+      "mean_later_oriented_auc": 0.4989641732592765,
+      "minimum_later_oriented_auc": 0.4977075035793185,
+      "raw_auc_by_epoch": [
+        0.49995835836104574,
+        0.5022924964206815,
+        0.501039919332909,
+        0.49977506446857983
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "lower_is_positive",
+      "earliest_oriented_auc": 0.500118995877791,
+      "feature": "prior_unique_buyers_median",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.14164599887536522,
+      "first_to_last_oriented_auc_change": 0.003326309798013183,
+      "later_oriented_auc": [
+        0.49750783458310743,
+        0.5000476295973771,
+        0.5034453056758041
+      ],
+      "mean_later_oriented_auc": 0.5003335899520963,
+      "minimum_later_oriented_auc": 0.49750783458310743,
+      "raw_auc_by_epoch": [
+        0.499881004122209,
+        0.5024921654168926,
+        0.49995237040262286,
+        0.49655469432419586
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "lower_is_positive",
+      "earliest_oriented_auc": 0.5052425031054296,
+      "feature": "cashback_enabled",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.2504467007210276,
+      "first_to_last_oriented_auc_change": -0.005242503105429619,
+      "later_oriented_auc": [
+        0.4945224091877547,
+        0.5145555119799192,
+        0.5
+      ],
+      "mean_later_oriented_auc": 0.503025973722558,
+      "minimum_later_oriented_auc": 0.4945224091877547,
+      "raw_auc_by_epoch": [
+        0.4947574968945704,
+        0.5054775908122453,
+        0.4854444880200807,
+        0.5
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5473656570081433,
+      "feature": "buyer_bayesian_win_rate_max",
+      "first_to_last_ks_pvalue": 3.6316225045781544e-88,
+      "first_to_last_ks_statistic": 0.06498587111895904,
+      "first_to_last_oriented_auc_change": -0.05299935986499249,
+      "later_oriented_auc": [
+        0.5783121742426267,
+        0.5444119676891807,
+        0.49436629714315083
+      ],
+      "mean_later_oriented_auc": 0.5390301463583195,
+      "minimum_later_oriented_auc": 0.49436629714315083,
+      "raw_auc_by_epoch": [
+        0.5473656570081433,
+        0.5783121742426267,
+        0.5444119676891807,
+        0.49436629714315083
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5470499547624497,
+      "feature": "buyer_bayesian_win_rate_mean",
+      "first_to_last_ks_pvalue": 3.6316225045781544e-88,
+      "first_to_last_ks_statistic": 0.06498587111895904,
+      "first_to_last_oriented_auc_change": -0.053227273062213254,
+      "later_oriented_auc": [
+        0.5788681312321575,
+        0.5436619998678357,
+        0.4938226817002364
+      ],
+      "mean_later_oriented_auc": 0.53878427093341,
+      "minimum_later_oriented_auc": 0.4938226817002364,
+      "raw_auc_by_epoch": [
+        0.5470499547624497,
+        0.5788681312321575,
+        0.5436619998678357,
+        0.4938226817002364
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5532504557153582,
+      "feature": "unique_buyers",
+      "first_to_last_ks_pvalue": 9.267046241950534e-196,
+      "first_to_last_ks_statistic": 0.0969106151857223,
+      "first_to_last_oriented_auc_change": -0.061413123269437875,
+      "later_oriented_auc": [
+        0.5854993522153923,
+        0.5474137760271822,
+        0.49183733244592037
+      ],
+      "mean_later_oriented_auc": 0.541583486896165,
+      "minimum_later_oriented_auc": 0.49183733244592037,
+      "raw_auc_by_epoch": [
+        0.5532504557153582,
+        0.5854993522153923,
+        0.5474137760271822,
+        0.49183733244592037
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5532504557153582,
+      "feature": "buyers_last_250ms",
+      "first_to_last_ks_pvalue": 9.267046241950534e-196,
+      "first_to_last_ks_statistic": 0.0969106151857223,
+      "first_to_last_oriented_auc_change": -0.061413123269437875,
+      "later_oriented_auc": [
+        0.5854993522153923,
+        0.5474137760271822,
+        0.49183733244592037
+      ],
+      "mean_later_oriented_auc": 0.541583486896165,
+      "minimum_later_oriented_auc": 0.49183733244592037,
+      "raw_auc_by_epoch": [
+        0.5532504557153582,
+        0.5854993522153923,
+        0.5474137760271822,
+        0.49183733244592037
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5532504557153582,
+      "feature": "buyers_last_1000ms",
+      "first_to_last_ks_pvalue": 9.267046241950534e-196,
+      "first_to_last_ks_statistic": 0.0969106151857223,
+      "first_to_last_oriented_auc_change": -0.061413123269437875,
+      "later_oriented_auc": [
+        0.5854993522153923,
+        0.5474137760271822,
+        0.49183733244592037
+      ],
+      "mean_later_oriented_auc": 0.541583486896165,
+      "minimum_later_oriented_auc": 0.49183733244592037,
+      "raw_auc_by_epoch": [
+        0.5532504557153582,
+        0.5854993522153923,
+        0.5474137760271822,
+        0.49183733244592037
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5532504557153582,
+      "feature": "early_buyer_count",
+      "first_to_last_ks_pvalue": 9.267046241950534e-196,
+      "first_to_last_ks_statistic": 0.0969106151857223,
+      "first_to_last_oriented_auc_change": -0.061413123269437875,
+      "later_oriented_auc": [
+        0.5854993522153923,
+        0.5474137760271822,
+        0.49183733244592037
+      ],
+      "mean_later_oriented_auc": 0.541583486896165,
+      "minimum_later_oriented_auc": 0.49183733244592037,
+      "raw_auc_by_epoch": [
+        0.5532504557153582,
+        0.5854993522153923,
+        0.5474137760271822,
+        0.49183733244592037
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5527025794246313,
+      "feature": "same_slot_buyers",
+      "first_to_last_ks_pvalue": 2.0149778026762568e-196,
+      "first_to_last_ks_statistic": 0.09707452676000083,
+      "first_to_last_oriented_auc_change": -0.0618508916805659,
+      "later_oriented_auc": [
+        0.5829035599927088,
+        0.5465009559809474,
+        0.4908516877440654
+      ],
+      "mean_later_oriented_auc": 0.5400854012392405,
+      "minimum_later_oriented_auc": 0.4908516877440654,
+      "raw_auc_by_epoch": [
+        0.5527025794246313,
+        0.5829035599927088,
+        0.5465009559809474,
+        0.4908516877440654
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "lower_is_positive",
+      "earliest_oriented_auc": 0.5020262379699987,
+      "feature": "prior_launches_300s",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.13480137583822077,
+      "first_to_last_oriented_auc_change": -0.004150919239909401,
+      "later_oriented_auc": [
+        0.49072925212882734,
+        0.5093563212542281,
+        0.4978753187300893
+      ],
+      "mean_later_oriented_auc": 0.49932029737104827,
+      "minimum_later_oriented_auc": 0.49072925212882734,
+      "raw_auc_by_epoch": [
+        0.49797376203000127,
+        0.5092707478711727,
+        0.49064367874577186,
+        0.5021246812699107
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5527368368016727,
+      "feature": "relative_unique_buyers",
+      "first_to_last_ks_pvalue": 9.267046241950534e-196,
+      "first_to_last_ks_statistic": 0.0969106151857223,
+      "first_to_last_oriented_auc_change": -0.06580514579805019,
+      "later_oriented_auc": [
+        0.5849311810400698,
+        0.5470885398388189,
+        0.48693169100362255
+      ],
+      "mean_later_oriented_auc": 0.5396504706275037,
+      "minimum_later_oriented_auc": 0.48693169100362255,
+      "raw_auc_by_epoch": [
+        0.5527368368016727,
+        0.5849311810400698,
+        0.5470885398388189,
+        0.48693169100362255
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5424717887160208,
+      "feature": "creator_bayesian_win_rate",
+      "first_to_last_ks_pvalue": 1.047e-321,
+      "first_to_last_ks_statistic": 0.12418992006684737,
+      "first_to_last_oriented_auc_change": -0.057199968951864855,
+      "later_oriented_auc": [
+        0.5515915113152708,
+        0.5402448790257748,
+        0.4852718197641559
+      ],
+      "mean_later_oriented_auc": 0.5257027367017338,
+      "minimum_later_oriented_auc": 0.4852718197641559,
+      "raw_auc_by_epoch": [
+        0.5424717887160208,
+        0.5515915113152708,
+        0.5402448790257748,
+        0.4852718197641559
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5417310802900038,
+      "feature": "known_early_buyer_count",
+      "first_to_last_ks_pvalue": 3.6316225045781544e-88,
+      "first_to_last_ks_statistic": 0.06498587111895904,
+      "first_to_last_oriented_auc_change": -0.05650777052289352,
+      "later_oriented_auc": [
+        0.5722434759389583,
+        0.5406814906867049,
+        0.4852233097671103
+      ],
+      "mean_later_oriented_auc": 0.5327160921309245,
+      "minimum_later_oriented_auc": 0.4852233097671103,
+      "raw_auc_by_epoch": [
+        0.5417310802900038,
+        0.5722434759389583,
+        0.5406814906867049,
+        0.4852233097671103
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5217499800562901,
+      "feature": "creator_average_pnl",
+      "first_to_last_ks_pvalue": 0.0,
+      "first_to_last_ks_statistic": 0.1269506986924807,
+      "first_to_last_oriented_auc_change": -0.04059257034441577,
+      "later_oriented_auc": [
+        0.5255371900319326,
+        0.4985642397528637,
+        0.4811574097118744
+      ],
+      "mean_later_oriented_auc": 0.5017529464988901,
+      "minimum_later_oriented_auc": 0.4811574097118744,
+      "raw_auc_by_epoch": [
+        0.5217499800562901,
+        0.5255371900319326,
+        0.4985642397528637,
+        0.4811574097118744
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5382860652568363,
+      "feature": "buyer_history_count_max",
+      "first_to_last_ks_pvalue": 1.2469459080001615e-242,
+      "first_to_last_ks_statistic": 0.10788666808559833,
+      "first_to_last_oriented_auc_change": -0.05779791246228788,
+      "later_oriented_auc": [
+        0.5663064273099634,
+        0.5343945387971359,
+        0.48048815279454843
+      ],
+      "mean_later_oriented_auc": 0.5270630396338826,
+      "minimum_later_oriented_auc": 0.48048815279454843,
+      "raw_auc_by_epoch": [
+        0.5382860652568363,
+        0.5663064273099634,
+        0.5343945387971359,
+        0.48048815279454843
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5370349457690134,
+      "feature": "buyer_history_count_mean",
+      "first_to_last_ks_pvalue": 7.721637474525822e-259,
+      "first_to_last_ks_statistic": 0.11142856467175377,
+      "first_to_last_oriented_auc_change": -0.058350893593620334,
+      "later_oriented_auc": [
+        0.5639868865762675,
+        0.5323223742284872,
+        0.4786840521753931
+      ],
+      "mean_later_oriented_auc": 0.5249977709933825,
+      "minimum_later_oriented_auc": 0.4786840521753931,
+      "raw_auc_by_epoch": [
+        0.5370349457690134,
+        0.5639868865762675,
+        0.5323223742284872,
+        0.4786840521753931
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5354375118723917,
+      "feature": "buyer_severe_loss_rate_mean",
+      "first_to_last_ks_pvalue": 6.274312667250393e-62,
+      "first_to_last_ks_statistic": 0.05441512817683036,
+      "first_to_last_oriented_auc_change": -0.057571897550251216,
+      "later_oriented_auc": [
+        0.5622474631504281,
+        0.5275453632794976,
+        0.47786561432214053
+      ],
+      "mean_later_oriented_auc": 0.5225528135840221,
+      "minimum_later_oriented_auc": 0.47786561432214053,
+      "raw_auc_by_epoch": [
+        0.5354375118723917,
+        0.5622474631504281,
+        0.5275453632794976,
+        0.47786561432214053
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "higher_is_positive",
+      "earliest_oriented_auc": 0.5306485770751542,
+      "feature": "known_early_buyer_fraction",
+      "first_to_last_ks_pvalue": 4.427433439118892e-111,
+      "first_to_last_ks_statistic": 0.07297176194530286,
+      "first_to_last_oriented_auc_change": -0.06180038893929973,
+      "later_oriented_auc": [
+        0.560666531864944,
+        0.5282387674798954,
+        0.4688481881358545
+      ],
+      "mean_later_oriented_auc": 0.5192511624935646,
+      "minimum_later_oriented_auc": 0.4688481881358545,
+      "raw_auc_by_epoch": [
+        0.5306485770751542,
+        0.560666531864944,
+        0.5282387674798954,
+        0.4688481881358545
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": false,
+      "direction_consistent_all_epochs": false,
+      "earliest_epoch_direction": "lower_is_positive",
+      "earliest_oriented_auc": 0.5056256497609745,
+      "feature": "buyer_average_pnl_mean",
+      "first_to_last_ks_pvalue": 3.052321912052337e-158,
+      "first_to_last_ks_statistic": 0.08712492511193798,
+      "first_to_last_oriented_auc_change": -0.054870622737158814,
+      "later_oriented_auc": [
+        0.5222153319616757,
+        0.4985688634132519,
+        0.45075502702381565
+      ],
+      "mean_later_oriented_auc": 0.49051307413291445,
+      "minimum_later_oriented_auc": 0.45075502702381565,
+      "raw_auc_by_epoch": [
+        0.49437435023902554,
+        0.4777846680383243,
+        0.5014311365867481,
+        0.5492449729761844
+      ]
+    }
+  ],
+  "finding": "24 of 58 existing causal features preserved their epoch-0 direction with oriented AUC >= 0.52 in all four epochs. This is descriptive transport evidence, not a fitted candidate or approval.",
+  "identity": {
+    "chronological_epochs": [
+      [
+        "33605109571",
+        "33627431540",
+        "33644544746",
+        "33656916992",
+        "33669514091",
+        "33681664773",
+        "33692043170",
+        "33704841852",
+        "33716649440",
+        "33741470396",
+        "33769636983",
+        "33781389703",
+        "33792881280",
+        "33810753028",
+        "33822988156",
+        "33835575805"
+      ],
+      [
+        "33852482054",
+        "33876345997",
+        "33897368379",
+        "33911477030",
+        "33920757002",
+        "33931301493",
+        "34063856134",
+        "34073802862",
+        "34084120627",
+        "34099929487",
+        "34123647690",
+        "34138377553",
+        "34150939561",
+        "34159449923",
+        "34167878699",
+        "34175839320"
+      ],
+      [
+        "34186192299",
+        "34201101121",
+        "34244224832",
+        "34281858070",
+        "34310065776",
+        "34348537141",
+        "34388016481",
+        "34425005585",
+        "34470147967",
+        "34512979177",
+        "34547229611",
+        "34586174670",
+        "34627236811",
+        "34660606300",
+        "34684115937",
+        "34709541936"
+      ],
+      [
+        "34722511299",
+        "34729110702",
+        "34749576265",
+        "34760648934",
+        "34770227385",
+        "34779504872",
+        "34790190944",
+        "34799149811",
+        "34811806243",
+        "34845710248",
+        "34863619434",
+        "34876702743",
+        "34887276656",
+        "34897737567",
+        "34907762101",
+        "34918286614"
+      ]
+    ],
+    "dataset_source_manifest_fingerprint": "22944bba1bf62f95fd5c266c59492cda3c226150d64ac57562fdd461beeb08ee",
+    "descriptive_auc_floor": 0.52,
+    "diagnostic_family_identifier": "latency300-causal-feature-transport-v12",
+    "evidence_epoch": [
+      "33605109571",
+      "33627431540",
+      "33644544746",
+      "33656916992",
+      "33669514091",
+      "33681664773",
+      "33692043170",
+      "33704841852",
+      "33716649440",
+      "33741470396",
+      "33769636983",
+      "33781389703",
+      "33792881280",
+      "33810753028",
+      "33822988156",
+      "33835575805",
+      "33852482054",
+      "33876345997",
+      "33897368379",
+      "33911477030",
+      "33920757002",
+      "33931301493",
+      "34063856134",
+      "34073802862",
+      "34084120627",
+      "34099929487",
+      "34123647690",
+      "34138377553",
+      "34150939561",
+      "34159449923",
+      "34167878699",
+      "34175839320",
+      "34186192299",
+      "34201101121",
+      "34244224832",
+      "34281858070",
+      "34310065776",
+      "34348537141",
+      "34388016481",
+      "34425005585",
+      "34470147967",
+      "34512979177",
+      "34547229611",
+      "34586174670",
+      "34627236811",
+      "34660606300",
+      "34684115937",
+      "34709541936",
+      "34722511299",
+      "34729110702",
+      "34749576265",
+      "34760648934",
+      "34770227385",
+      "34779504872",
+      "34790190944",
+      "34799149811",
+      "34811806243",
+      "34845710248",
+      "34863619434",
+      "34876702743",
+      "34887276656",
+      "34897737567",
+      "34907762101",
+      "34918286614"
+    ],
+    "feature_set_fingerprint": "3a272d18e1aa124b8d4855947f5faae125ae15a50bd15fc0e93bba9b904779cc",
+    "label_matrix_sha256": "1b21575dd37159a825116a940cb67e685e3a3cb784de85482476df5a091de76e",
+    "latency_ms": 300,
+    "orientation_policy": "orient each feature once from epoch 0, then freeze direction for epochs 1-3",
+    "source_code_fingerprint": "edc6e78d4194544896a32359a2ba55b204610a28aecf4e6e7013cfbc4b0122e6"
+  },
+  "label_audit": {
+    "active_untouched_live_data_used": false,
+    "all_source_hashes_verified": true,
+    "capture_windows": 64,
+    "dataset_manifest_sha256": "22944bba1bf62f95fd5c266c59492cda3c226150d64ac57562fdd461beeb08ee",
+    "decision_horizon_ms": 250,
+    "executable_rows": 191425,
+    "executable_sha256": "c0198d3444974eca21caf747a4bab7f3eb43ab90945274687616627eaa3d00d4",
+    "latency_ms": 300,
+    "negative_or_zero_rows": 162568,
+    "no_quote_rows": 0,
+    "pnl_sha256": "1b21575dd37159a825116a940cb67e685e3a3cb784de85482476df5a091de76e",
+    "policy": "stop=0.70|take=3.00|hold=60000|protect=1.15:1.06|trail=1.25:0.15",
+    "policy_index": 12,
+    "production_paths_changed": 0,
+    "profitable_rows": 28857,
+    "rows": 191425,
+    "version": "e4-v12-latency300-labels-v1",
+    "visited_rows": 191425
+  },
+  "live_confirmation_authorised": false,
+  "production_deployment_authorised": false,
+  "production_paths_changed": 0,
+  "production_promotion_authorised": false,
+  "untouched_holdout_passed": false,
+  "version": "e4-v12-latency300-feature-transport-v1"
+}
