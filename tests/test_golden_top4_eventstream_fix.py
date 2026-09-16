@@ -10,8 +10,6 @@ class EventStreamFixTests(unittest.TestCase):
         e=fix.EventStreamSingleEngine(Config())
         d=decision();s=state(T0)
         self.assertTrue(e.submit(d,s,T0))
-        # Global stream remains healthy, but this coin has no reserve-changing
-        # event after entry. The last reserve snapshot remains current.
         for ms in range(0,4501,50):
             now=T0+ms*1_000_000
             e.tick(now,{},now)
@@ -24,7 +22,7 @@ class EventStreamFixTests(unittest.TestCase):
         e=fix.EventStreamSingleEngine(Config())
         d=decision();s=state(T0)
         self.assertTrue(e.submit(d,s,T0))
-        now=T0+1000_000_000
+        now=T0+(e.c.feed_stale_ms+1000)*1_000_000
         e.tick(now,{},T0)
         self.assertIn(d['mint'],e.uncertain_mints)
 
