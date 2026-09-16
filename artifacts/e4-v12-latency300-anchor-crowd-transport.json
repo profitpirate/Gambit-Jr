@@ -1,0 +1,333 @@
+{
+  "active_untouched_live_data_used": false,
+  "all_epoch_auc_52_feature_count": 8,
+  "all_epoch_auc_52_features": [
+    "anchor_crowd_range_x_effective_count",
+    "anchor_crowd_range_x_entropy",
+    "anchor_crowd_range_x_effective_count_x_largest_share",
+    "anchor_crowd_range_x_flow_per_trader",
+    "anchor_crowd_range_x_effective_count_x_hhi",
+    "anchor_crowd_range_x_flow_per_trader_x_largest_share",
+    "anchor_crowd_range_x_largest_share",
+    "anchor_crowd_range_x_hhi"
+  ],
+  "benchmark": {
+    "auc_by_epoch": [
+      0.6268692901985987,
+      0.6486955672646386,
+      0.6513214845856966,
+      0.6981831782768987
+    ],
+    "feature": "micro_log_price_range_250ms",
+    "mean_later_auc": 0.6660667433757447,
+    "minimum_later_auc": 0.6486955672646386
+  },
+  "candidate_fitted": false,
+  "candidate_warranted": false,
+  "development_gate_passed": false,
+  "diagnostic_id": "e4d-8812e664b8f58811314025804127def897658f2572f227484445d5406a13e804",
+  "direction_consistent_features": 8,
+  "feature_count": 8,
+  "features": [
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "anchor_crowd_range_x_effective_count",
+      "first_to_last_ks_pvalue": 4.940820843248856e-104,
+      "first_to_last_ks_statistic": 0.07061217968930655,
+      "first_to_last_oriented_auc_change": 0.017312825396698317,
+      "mean_later_auc_delta_vs_price_range": -0.09219553723850549,
+      "mean_later_oriented_auc": 0.5738712061372392,
+      "minimum_later_auc_delta_vs_price_range": -0.08454580312825088,
+      "minimum_later_oriented_auc": 0.5641497641363877,
+      "oriented_auc_by_epoch": [
+        0.5534764891971254,
+        0.5866745396815058,
+        0.5641497641363877,
+        0.5707893145938238
+      ],
+      "raw_auc_by_epoch": [
+        0.5534764891971254,
+        0.5866745396815058,
+        0.5641497641363877,
+        0.5707893145938238
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "anchor_crowd_range_x_entropy",
+      "first_to_last_ks_pvalue": 9.404512633591107e-99,
+      "first_to_last_ks_statistic": 0.0687913250719977,
+      "first_to_last_oriented_auc_change": 0.0200705662461933,
+      "mean_later_auc_delta_vs_price_range": -0.09371194015080542,
+      "mean_later_oriented_auc": 0.5723548032249393,
+      "minimum_later_auc_delta_vs_price_range": -0.08468471338273675,
+      "minimum_later_oriented_auc": 0.5640108538819019,
+      "oriented_auc_by_epoch": [
+        0.5510600765609436,
+        0.5819229129857788,
+        0.5640108538819019,
+        0.5711306428071369
+      ],
+      "raw_auc_by_epoch": [
+        0.5510600765609436,
+        0.5819229129857788,
+        0.5640108538819019,
+        0.5711306428071369
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "anchor_crowd_range_x_effective_count_x_largest_share",
+      "first_to_last_ks_pvalue": 1.558531059678299e-103,
+      "first_to_last_ks_statistic": 0.07044213123541665,
+      "first_to_last_oriented_auc_change": 0.017232315521442,
+      "mean_later_auc_delta_vs_price_range": -0.09309736680149894,
+      "mean_later_oriented_auc": 0.5729693765742457,
+      "minimum_later_auc_delta_vs_price_range": -0.08516105483513459,
+      "minimum_later_oriented_auc": 0.563534512429504,
+      "oriented_auc_by_epoch": [
+        0.5527337561823911,
+        0.5854075455894,
+        0.563534512429504,
+        0.5699660717038331
+      ],
+      "raw_auc_by_epoch": [
+        0.5527337561823911,
+        0.5854075455894,
+        0.563534512429504,
+        0.5699660717038331
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "anchor_crowd_range_x_flow_per_trader",
+      "first_to_last_ks_pvalue": 1.147141386401047e-83,
+      "first_to_last_ks_statistic": 0.06329899124466587,
+      "first_to_last_oriented_auc_change": 0.017194569741843968,
+      "mean_later_auc_delta_vs_price_range": -0.09331454847390197,
+      "mean_later_oriented_auc": 0.5727521949018427,
+      "minimum_later_auc_delta_vs_price_range": -0.08530064390023462,
+      "minimum_later_oriented_auc": 0.563394923364404,
+      "oriented_auc_by_epoch": [
+        0.5518888283544461,
+        0.5857782632448343,
+        0.563394923364404,
+        0.56908339809629
+      ],
+      "raw_auc_by_epoch": [
+        0.5518888283544461,
+        0.5857782632448343,
+        0.563394923364404,
+        0.56908339809629
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "anchor_crowd_range_x_effective_count_x_hhi",
+      "first_to_last_ks_pvalue": 7.713249616908338e-104,
+      "first_to_last_ks_statistic": 0.07054629790208322,
+      "first_to_last_oriented_auc_change": 0.01801398043612601,
+      "mean_later_auc_delta_vs_price_range": -0.09375070776873085,
+      "mean_later_oriented_auc": 0.5723160356070138,
+      "minimum_later_auc_delta_vs_price_range": -0.08582068357538408,
+      "minimum_later_oriented_auc": 0.5628748836892545,
+      "oriented_auc_by_epoch": [
+        0.5515802368205794,
+        0.5844790058750815,
+        0.5628748836892545,
+        0.5695942172567054
+      ],
+      "raw_auc_by_epoch": [
+        0.5515802368205794,
+        0.5844790058750815,
+        0.5628748836892545,
+        0.5695942172567054
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "anchor_crowd_range_x_flow_per_trader_x_largest_share",
+      "first_to_last_ks_pvalue": 6.959868853502647e-84,
+      "first_to_last_ks_statistic": 0.06338138519265935,
+      "first_to_last_oriented_auc_change": 0.016806783325822083,
+      "mean_later_auc_delta_vs_price_range": -0.09503425986438685,
+      "mean_later_oriented_auc": 0.5710324835113578,
+      "minimum_later_auc_delta_vs_price_range": -0.08676225285131212,
+      "minimum_later_oriented_auc": 0.5619333144133265,
+      "oriented_auc_by_epoch": [
+        0.5505162733037636,
+        0.5838410794911613,
+        0.5619333144133265,
+        0.5673230566295857
+      ],
+      "raw_auc_by_epoch": [
+        0.5505162733037636,
+        0.5838410794911613,
+        0.5619333144133265,
+        0.5673230566295857
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "anchor_crowd_range_x_largest_share",
+      "first_to_last_ks_pvalue": 2.8396704786855615e-103,
+      "first_to_last_ks_statistic": 0.07035316159004446,
+      "first_to_last_oriented_auc_change": 0.017437149412502517,
+      "mean_later_auc_delta_vs_price_range": -0.09594450262013843,
+      "mean_later_oriented_auc": 0.5701222407556062,
+      "minimum_later_auc_delta_vs_price_range": -0.08801407900346037,
+      "minimum_later_oriented_auc": 0.5606814882611783,
+      "oriented_auc_by_epoch": [
+        0.5500904925949992,
+        0.5821575919981387,
+        0.5606814882611783,
+        0.5675276420075017
+      ],
+      "raw_auc_by_epoch": [
+        0.5500904925949992,
+        0.5821575919981387,
+        0.5606814882611783,
+        0.5675276420075017
+      ]
+    },
+    {
+      "all_epochs_above_descriptive_floor": true,
+      "direction_consistent_all_epochs": true,
+      "earliest_epoch_direction": "higher_is_positive",
+      "feature": "anchor_crowd_range_x_hhi",
+      "first_to_last_ks_pvalue": 1.413773305133275e-103,
+      "first_to_last_ks_statistic": 0.07045657674843919,
+      "first_to_last_oriented_auc_change": 0.018396619178577267,
+      "mean_later_auc_delta_vs_price_range": -0.09731344522092955,
+      "mean_later_oriented_auc": 0.5687532981548151,
+      "minimum_later_auc_delta_vs_price_range": -0.08955352546645223,
+      "minimum_later_oriented_auc": 0.5591420417981864,
+      "oriented_auc_by_epoch": [
+        0.5481896089518821,
+        0.5805316245357995,
+        0.5591420417981864,
+        0.5665862281304593
+      ],
+      "raw_auc_by_epoch": [
+        0.5481896089518821,
+        0.5805316245357995,
+        0.5591420417981864,
+        0.5665862281304593
+      ]
+    }
+  ],
+  "finding": "8 of 8 predeclared causal anchor-and-crowd interactions preserved epoch-0 direction with oriented AUC >=0.52 in all four epochs, but only 0 improved the minimum later-era AUC of the strongest constituent price-range signal. This is a transport diagnostic, not a fitted candidate or approval.",
+  "identity": {
+    "causal_horizon_ms": 250,
+    "dataset_source_manifest_fingerprint": "22944bba1bf62f95fd5c266c59492cda3c226150d64ac57562fdd461beeb08ee",
+    "descriptive_auc_floor": 0.52,
+    "diagnostic_family_identifier": "latency300-causal-anchor-crowd-transport-v12",
+    "evidence_epoch": [
+      "33605109571",
+      "33627431540",
+      "33644544746",
+      "33656916992",
+      "33669514091",
+      "33681664773",
+      "33692043170",
+      "33704841852",
+      "33716649440",
+      "33741470396",
+      "33769636983",
+      "33781389703",
+      "33792881280",
+      "33810753028",
+      "33822988156",
+      "33835575805",
+      "33852482054",
+      "33876345997",
+      "33897368379",
+      "33911477030",
+      "33920757002",
+      "33931301493",
+      "34063856134",
+      "34073802862",
+      "34084120627",
+      "34099929487",
+      "34123647690",
+      "34138377553",
+      "34150939561",
+      "34159449923",
+      "34167878699",
+      "34175839320",
+      "34186192299",
+      "34201101121",
+      "34244224832",
+      "34281858070",
+      "34310065776",
+      "34348537141",
+      "34388016481",
+      "34425005585",
+      "34470147967",
+      "34512979177",
+      "34547229611",
+      "34586174670",
+      "34627236811",
+      "34660606300",
+      "34684115937",
+      "34709541936",
+      "34722511299",
+      "34729110702",
+      "34749576265",
+      "34760648934",
+      "34770227385",
+      "34779504872",
+      "34790190944",
+      "34799149811",
+      "34811806243",
+      "34845710248",
+      "34863619434",
+      "34876702743",
+      "34887276656",
+      "34897737567",
+      "34907762101",
+      "34918286614"
+    ],
+    "feature_set_fingerprint": "7d5acf909522af1ae06f89366c20e014f20c49148ca972142c2980a1080cf6b6",
+    "interaction_matrix_sha256": "53e9f690abf09564fd47873e061d97266f5e1c51f8644330d5bb5a7748178c6e",
+    "label_matrix_sha256": "1b21575dd37159a825116a940cb67e685e3a3cb784de85482476df5a091de76e",
+    "latency_ms": 300,
+    "microstructure_matrix_sha256": "08d0f6c7d302652775a62ef0da24b246f0706b7b98e1c2e0bf361507c1af62dc",
+    "orientation_policy": "orient each fixed interaction once from epoch 0, then freeze direction for epochs 1-3",
+    "participant_matrix_sha256": "01baae8c306efa6faaf60f391d0581bda7c71d4e6e9c824a953a006e7f8c11e3",
+    "source_code_fingerprint": "e098ee0a8c814028dbd83588b7ed7e430a77e147bf536e7078f89794834027e0"
+  },
+  "interactions_improving_minimum_later_auc": [],
+  "interactions_improving_minimum_later_auc_count": 0,
+  "live_confirmation_authorised": false,
+  "production_deployment_authorised": false,
+  "production_paths_changed": 0,
+  "production_promotion_authorised": false,
+  "source_audit": {
+    "active_untouched_live_data_used": false,
+    "future_values_in_features": false,
+    "interaction_matrix_sha256": "53e9f690abf09564fd47873e061d97266f5e1c51f8644330d5bb5a7748178c6e",
+    "microstructure_matrix_sha256": "08d0f6c7d302652775a62ef0da24b246f0706b7b98e1c2e0bf361507c1af62dc",
+    "participant_matrix_sha256": "01baae8c306efa6faaf60f391d0581bda7c71d4e6e9c824a953a006e7f8c11e3",
+    "raw_capture_bytes": 11789578939,
+    "raw_source_hashes_verified": true,
+    "rows": 191425,
+    "windows": 64
+  },
+  "untouched_holdout_passed": false,
+  "version": "e4-v12-latency300-anchor-crowd-transport-v1"
+}
