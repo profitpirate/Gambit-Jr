@@ -1,0 +1,100 @@
+{
+  "status": "INTERIM_DESCRIPTIVE_RESEARCH_NOT_VALIDATION",
+  "sample": {
+    "fully_forward_observed_matched_coins": 74,
+    "source_run_id": 35059294272,
+    "source_artifact_id": 10431319876,
+    "source_zip_sha256": "4a65fce580f37e52efaf1c12f62daf75ec9e4576759f1d7e98d2f9aa057fd806",
+    "source_member": "recovery/base-state.json",
+    "incident_recovered_mint_excluded_from_this_analysis": "4oob3pFS13HWzUnjFpTPBuyZhWFLLeP1PvdGu54Hpump",
+    "original_campaign_ledger_balances_and_costs_unchanged": true,
+    "paper_execution_only": true,
+    "not_a_new_74_trade_compounded_account": true,
+    "later_in_progress_positions_not_in_this_artifact": true
+  },
+  "FULL_3S": {
+    "wins": 41,
+    "losses": 33,
+    "net_pnl_sum_sol": 1.1841926540021823,
+    "average_winning_pnl_sol": 0.08277165828877196,
+    "average_losing_pnl_sol": -0.06695288896477175,
+    "losers_with_positive_gross_but_negative_net_pnl": 7,
+    "losers_with_approximately_flat_gross_pnl": 2,
+    "losers_with_positive_net_mark_before_exit": 10,
+    "losers_with_higher_spot_after_exit_within_20s": 20,
+    "losers_with_positive_delayed_final_net_mark_within_20s": 12,
+    "losers_positive_at_one_or_more_tested_4_5_7_10s_full_exit_horizons": 7,
+    "losers_with_no_observed_positive_net_mark_before_or_within_20s_after_exit": 16,
+    "average_winner_entry_budget_sol": 0.3408380267759841,
+    "average_loser_entry_budget_sol": 0.37548572708363537,
+    "mean_prior_buyer_associated_win_rate_winners": 0.7776114765695338,
+    "mean_prior_buyer_associated_win_rate_losers": 0.77560818032679,
+    "loss_diagnostics_overlap_not_additive": true
+  },
+  "FULL_2S": {
+    "wins": 40,
+    "losses": 34,
+    "losers_with_higher_spot_after_exit_within_20s": 22,
+    "losers_with_positive_delayed_final_net_mark_within_20s": 14,
+    "losers_positive_gross_negative_net": 9
+  },
+  "PARTIALS_2S": {
+    "wins": 38,
+    "losses": 36,
+    "losers_with_higher_spot_after_exit_within_20s": 24,
+    "losers_with_positive_delayed_final_net_mark_within_20s": 16,
+    "losers_positive_gross_negative_net": 11
+  },
+  "horizon_sign_transitions_at_independently_compounded_account_stakes": {
+    "FULL_2S_to_FULL_3S": {"losers_became_winners": 6, "winners_became_losers": 5},
+    "PARTIALS_2S_to_PARTIALS_3S": {"losers_became_winners": 4, "winners_became_losers": 6},
+    "coins_negative_at_every_tested_FULL_horizon_2_3_4_5_7_10s": 23
+  },
+  "repeated_exact_three_buyer_set_FULL_3S": {
+    "wallets": [
+      "2o7X9WDFfvycFjX8QKxVhwK9cjWdAYveT8JLVSurHPV2",
+      "89ooxuy4NTf3UNswCsjXx7fEd2WtJasaqUQbcrMUsPrm",
+      "B7v2xGaFp6h6iDAaDs4nDJb46o7v5244x6EkUi4WHBnB"
+    ],
+    "trades": 20,
+    "wins": 12,
+    "losses": 8,
+    "net_pnl_sol": -0.173441,
+    "average_winner_sol": 0.056226062572660884,
+    "average_loser_sol": -0.10601921220704526,
+    "interpretation": "Repeated co-appearance, not proof of common ownership or coordination. Post-hoc group findings do not validate blacklisting."
+  },
+  "reputation_target_mismatch": {
+    "code_location": "tools/golden_horizon_live.py:settle",
+    "benchmark_stake_sol": 0.0555,
+    "benchmark_hold_ms": 2000,
+    "benchmark_protocol_fee_bps": 125,
+    "benchmark_priority_and_tip_sol": 0.00015,
+    "benchmark_uses_current_250ms_submission_delay": false,
+    "benchmark_uses_current_100bps_platform_fee": false,
+    "buyer_prior_is_wallet_actual_realized_win_rate": false,
+    "current_execution_delay_ms_assumption": 250,
+    "current_platform_fee_bps_assumption": 100,
+    "current_priority_sol_assumption": 0.001,
+    "current_tip_sol_assumption": 0.001,
+    "interpretation": "The frozen buyer reputation labels describe a different two-second benchmark, not a calibrated probability that our present execution and cost model produces a net winner. Keeping these labels frozen preserves the current experiment; rebuilding labels is a separate next experiment."
+  },
+  "delayed_final_net_mark_method": "Replace only the final successful modeled sell with a mark at each later recorded live reserve state inside the arm's own 20-second observation window. Preserve original quantity, earlier partials, additive own-reserve overlays, and preceding fees including failed attempts. Subtract the configured final sell percentage and fixed fees. Reproduces original final sell PnL within 1e-8 SOL. Later marks are hindsight diagnostics with no additional submission delay or future failure assumptions: not executable profit or validated exit rules.",
+  "next_research_priorities_not_implemented": [
+    "Align causal reputation outcome labels with net costs, size and execution delay of the actual candidate being evaluated.",
+    "Evaluate recurring buyer cohorts and creator cohorts using prior net expectancy, downside, sample size and recency, not just winning frequency or wallet count.",
+    "Separate fee-erased small gains, no-follow-through losses, giveback losses, delayed recoveries and execution-gap losses.",
+    "Test executable-quote and slippage-adjusted edge filters using only information available at decision time. A confirmation delay is a separate entry-timing policy, not a free filter.",
+    "Compare a small predeclared set of simple entry vetoes and continuation rules on time-ordered, group-aware development folds, then a new untouched prospective cohort.",
+    "Report prevented-loss SOL and sacrificed-winner SOL, coverage, net return, mark-to-market drawdown and concentration for every proposed filter."
+  ],
+  "limitations": [
+    "All figures are research-model outcomes, not Axiom transactions or actual wallet income.",
+    "74-coin interim subset; not all currently collected campaign rows were available in a completed artifact.",
+    "Removing a reconstructed cohort from the diagnostic does not remove its effect on subsequent actual modeled stakes; this is not an independently rerun account.",
+    "Different account stakes and independent compounding mean horizon differences do not isolate exit timing alone at equal notional.",
+    "The post-exit horizon is only 20 seconds. Later minutes/hours, missing ticks and migration-route coverage must not be guessed.",
+    "Higher post-exit spot is not the same as positive net trade PnL. Positive post-exit net marks are not proof an order could fill there.",
+    "No trading selection, sizing, costs, workflow or exit rule was changed by this audit."
+  ]
+}
