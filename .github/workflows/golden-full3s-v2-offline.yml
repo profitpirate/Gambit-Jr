@@ -1,0 +1,52 @@
+name: FULL 3S v2 - offline build stress freeze
+on:
+  push:
+    branches: [codex/golden-full-3s-v2]
+    paths:
+      - 'tools/golden_full3s_*.py'
+      - 'tests/test_golden_full3s*.py'
+      - 'config/golden-full3s-v2.json'
+      - '.github/workflows/golden-full3s-v2-offline.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: full3s-v2-offline
+  cancel-in-progress: true
+jobs:
+  offline-certify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: tools:tests
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile and test - no credentials, live feed or execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/full3s-v2/source/tools artifacts/full3s-v2/source/tests
+          cp tools/golden_full3s_*.py tools/golden_horizon_engine.py artifacts/full3s-v2/source/tools/
+          cp tests/test_golden_full3s*.py artifacts/full3s-v2/source/tests/
+          echo "$GITHUB_SHA" > artifacts/full3s-v2/source-sha.txt
+          python -m py_compile tools/golden_full3s_*.py
+          python -m unittest discover -s tests -p 'test_golden_full3s*.py' -v 2>&1 | tee artifacts/full3s-v2/unit-tests.log
+      - name: Randomized stress, actual process kills, local latency
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/golden_full3s_certify.py --paths 10000 --crash-repetitions 10 --probes 3000 --output artifacts/full3s-v2 2>&1 | tee artifacts/full3s-v2/stress.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: full3s-v2-offline-${{ github.run_id }}
+          path: artifacts/full3s-v2/
+          retention-days: 60
+          if-no-files-found: error
