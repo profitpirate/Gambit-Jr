@@ -1,0 +1,1158 @@
+{
+  "aggregate": {
+    "capture_windows": 40,
+    "largest_winner_contribution": 0.051085386155696355,
+    "ledger_hash": "a71a5e0c1ae4c896da45d81c71272a7e0bc0fac8c705b842e7a02021c9d1c46c",
+    "maximum_fold_drawdown_fraction": 0.16339840382811235,
+    "minimum_fold_profit_factor": 0.5126541213083451,
+    "minimum_fold_profitable_windows": 1,
+    "minimum_fold_win_rate": 0.23255813953488372,
+    "net_pnl_sol": -0.8845802514481731,
+    "positive_folds": 1,
+    "profit_factor": 0.7185321819288985,
+    "profitable_capture_windows": 11,
+    "rejected_concurrency": 15,
+    "trades": 321,
+    "wilson_95_lower_bound": 0.22532274668631827,
+    "win_rate": 0.27102803738317754,
+    "wins": 87
+  },
+  "anti_lookahead": {
+    "active_untouched_live_data_used": false,
+    "calibration_precedes_test": true,
+    "creator_outcomes_delayed_ms": 60300,
+    "equal_timestamp_creator_counts_batched": true,
+    "equal_timestamp_market_context_batched": true,
+    "fit_precedes_calibration": true,
+    "strict_creation_event_only": true,
+    "threshold_uses_prior_scores_only": true
+  },
+  "baseline_comparison": {
+    "baseline_decision_horizon_ms": 250,
+    "baseline_experiment_id": "e4x-95c8ba6350c7dba06c748fd633680493cb5779c01adc999c91e184f6011dfcf8",
+    "candidate_minus_baseline_net_pnl_sol": -3.221779325693887,
+    "candidate_minus_baseline_profit_factor": -1.4551686988897354,
+    "candidate_minus_baseline_trades": -5,
+    "candidate_minus_baseline_win_rate": -0.3394014104695832
+  },
+  "corpus_audit": {
+    "active_untouched_live_data_used": false,
+    "cached_later_runs": 16,
+    "capture_windows": 64,
+    "creator_updates_delayed_ms": 60300,
+    "future_values_in_features": false,
+    "global_creator_counts_use_all_launches": true,
+    "launches": 192000,
+    "production_paths_changed": 0,
+    "raw_capture_bytes": 11789578939,
+    "raw_capture_runs": 48,
+    "raw_source_hashes_verified": true,
+    "rows": 191425,
+    "runs": [
+      {
+        "eligible": 2983,
+        "launches": 3000,
+        "run_id": "33605109571",
+        "sha256": "1bfe30a7a7e2bc159616c2f68a2ee6410a9ec4b26d28eedcd0609b6b35e1dded"
+      },
+      {
+        "eligible": 2966,
+        "launches": 3000,
+        "run_id": "33627431540",
+        "sha256": "54e96699d70b53357c0f7249f228fa4af83ed43f15b7a5455988ac12cbeef9f5"
+      },
+      {
+        "eligible": 2976,
+        "launches": 3000,
+        "run_id": "33644544746",
+        "sha256": "2552e11c1d6a36aebc882f3e997ae24ddd85db378e3c75a3997aaf2a664d0553"
+      },
+      {
+        "eligible": 2961,
+        "launches": 3000,
+        "run_id": "33656916992",
+        "sha256": "5549961baff426b65700294a7692c7b7d164beae60078596fb2c72018039a70c"
+      },
+      {
+        "eligible": 2964,
+        "launches": 3000,
+        "run_id": "33669514091",
+        "sha256": "9b8f0ab72e51c649622378ede0fc7cbeb1c120263fb4da3b44b289e23673ec2f"
+      },
+      {
+        "eligible": 2947,
+        "launches": 3000,
+        "run_id": "33681664773",
+        "sha256": "d70c12f8bed120d5fe0389e06f1be0a655201380b7235a0f93a73600a8f626c2"
+      },
+      {
+        "eligible": 2972,
+        "launches": 3000,
+        "run_id": "33692043170",
+        "sha256": "f8e5d3ef5120aaa6abfd29c83437a87fbc7636276935c3901af7cd1818d0cceb"
+      },
+      {
+        "eligible": 2978,
+        "launches": 3000,
+        "run_id": "33704841852",
+        "sha256": "b09a14c770216b8bbaf4f5a44bd295b14cb01d675b188378419ddd9037886f7a"
+      },
+      {
+        "eligible": 2981,
+        "launches": 3000,
+        "run_id": "33716649440",
+        "sha256": "6c865406cb400819488ba0a7657ebfd51f0d1c5d84cfb2a5de0999dfb4503f70"
+      },
+      {
+        "eligible": 2979,
+        "launches": 3000,
+        "run_id": "33741470396",
+        "sha256": "99d52116113a13660e41e41a52c77fe4b5cb6b8a671c440f57f06ebc8ac4f713"
+      },
+      {
+        "eligible": 2980,
+        "launches": 3000,
+        "run_id": "33769636983",
+        "sha256": "9fc5016470fbfb51a2e6c5b0742226773a19e7489fd9f6dd3ac107b905f0cd7e"
+      },
+      {
+        "eligible": 2974,
+        "launches": 3000,
+        "run_id": "33781389703",
+        "sha256": "2a8a555434665ac1fd8a24e3957ff45ada7d4d4e84d80ada0e649847d4896376"
+      },
+      {
+        "eligible": 2978,
+        "launches": 3000,
+        "run_id": "33792881280",
+        "sha256": "d5b33d6515bf74036e5ed9d41b90eff7f2ff2bc7a44768c76e4486736c3f76d6"
+      },
+      {
+        "eligible": 2975,
+        "launches": 3000,
+        "run_id": "33810753028",
+        "sha256": "6aee91882224fa2edbf819cdbac81a4da2c5e503a51364cbcd0bc94fed3beeea"
+      },
+      {
+        "eligible": 2975,
+        "launches": 3000,
+        "run_id": "33822988156",
+        "sha256": "07850498561b4f2c81e498dd8a3ec5a37aa5db17ef6983ac623d31a338251a26"
+      },
+      {
+        "eligible": 2982,
+        "launches": 3000,
+        "run_id": "33835575805",
+        "sha256": "a7e13975d6bc40245b8c8e9fa521420bd9104978f012c6987f5f3dd296640635"
+      },
+      {
+        "eligible": 2980,
+        "launches": 3000,
+        "run_id": "33852482054",
+        "sha256": "bbe92994201b5cf2237ea10972b0d26c092b70707f5180002acaa73ad86e6498"
+      },
+      {
+        "eligible": 2969,
+        "launches": 3000,
+        "run_id": "33876345997",
+        "sha256": "f031a6dde6a49f463ef6edb36ffc37370ba6f9870dbb014d6d249b0eac6a9654"
+      },
+      {
+        "eligible": 2980,
+        "launches": 3000,
+        "run_id": "33897368379",
+        "sha256": "f1354ae240159d771e1514234a419bc42fa344c1160ba03f59e7c8c1cdc58fac"
+      },
+      {
+        "eligible": 2951,
+        "launches": 3000,
+        "run_id": "33911477030",
+        "sha256": "234bb65b4a19d5831d4f6415bb66b679a1470d761e32b4dac87e91a66aa8e5cd"
+      },
+      {
+        "eligible": 2984,
+        "launches": 3000,
+        "run_id": "33920757002",
+        "sha256": "8fbdef534c87528049c1b5829bab8320bf04b5393d422be87b77b5fb44aa7d6b"
+      },
+      {
+        "eligible": 2990,
+        "launches": 3000,
+        "run_id": "33931301493",
+        "sha256": "1ce3bb3d2f2983f1daca2c7a92c108195adede4c7b5daded39692bcbcab3ae9e"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34063856134",
+        "sha256": "fc77512fc3ed971e0a48ffb5fe2a7ab68499ecc712017681e1edd6c2e4fe86a6"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34073802862",
+        "sha256": "ca31bc7d94ef2c8f6ae00e26604677b7620790fc453496f8ee212c83038d5d8f"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34084120627",
+        "sha256": "c52f8292d99aaa60e38c7fd86c1b848dc2204a64fe821b79cc66354425580ca7"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34099929487",
+        "sha256": "cc8726a6a4d1477f6dd1d1634a09c24274e04476b64b031fe89e29b5ca4434b6"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34123647690",
+        "sha256": "2e091edfb945085fd4af58b82c553178b63ee81ad1f3bd255aa4024970ea4a6f"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34138377553",
+        "sha256": "076da6df38ff4fa07b7551874823ec007ee141b0f1b2848df0f43a26aa1de9f2"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34150939561",
+        "sha256": "619977ace8de412a511da4b12050a6fe2d0aa6bbfeb7e5d2dc445e938dec5d89"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34159449923",
+        "sha256": "6d9d1121b321e9e26555126cd3533482abfe8c13c55442f38aba07b0aa733bb8"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34167878699",
+        "sha256": "9e25ce0e4bce97b6591b4c417acfb138dd9402df6266dd7d64309bd8163272ca"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34175839320",
+        "sha256": "29549195792cc432f20a72f1502cbff24c1b8bd97b76d827b76655db89b04ede"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34186192299",
+        "sha256": "6aca68ad4f377fc69979bb44b81aaabea6d9406a7e8b78521f3fa2bddc13b040"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34201101121",
+        "sha256": "46c239ec42891937bff75df3b59e1cc2b22d364b211cf8917c24394883726975"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34244224832",
+        "sha256": "344d03dd1e0c8ef8515c9adf0193fe4c7cc5bb148fb438ac5e977ce0a0758bde"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34281858070",
+        "sha256": "1214575f9c10755f49424d6a295a20ae341c316b8e464065ed85a075d5070858"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34310065776",
+        "sha256": "a97fc40b90583ab7bbf0b013713c8aa602b00ae0b33598060719c50490c7745a"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34348537141",
+        "sha256": "60c47626d8b28b9b2a98523c95070326e8e6cc9c2f25de530f1f07c416cf96dd"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34388016481",
+        "sha256": "d63fb60eeca248cacf54e751387a6498692581a030eeba9075de2961930b5389"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34425005585",
+        "sha256": "793c1f88229525aad919ecae8cc0760fa9012c21bcd1271b5661e5251fd48c4b"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34470147967",
+        "sha256": "ffca5633616584a60f6b461bcaf057041e88b30ee29e9766c14a56f1da7f86b7"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34512979177",
+        "sha256": "248fa0d572ba65a653ded56092d120fe08a618d6af00883d63d198154dc27a57"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34547229611",
+        "sha256": "b9d590ef3b7e2dde07b09dd174e0333d87e0a59b8a266b5dc0606cb8be544b81"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34586174670",
+        "sha256": "d2d22c70ee08036064fc2bd15fed99da2a8ce39736e8bbcd077af6cfe95ac6d7"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34627236811",
+        "sha256": "480fcc5d437490fdeb4ddf046ef906254a4c0c002fe8092b94d4713918842728"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34660606300",
+        "sha256": "0254a8336858c354bff82814cff9b5c4c7ef4532bd61951578ae2a77544251f1"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34684115937",
+        "sha256": "7dc218abb35c39af30e8ff90c6ba13f62dd010e7c45e88b71056fd79f8d04fb5"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34709541936",
+        "sha256": "d0763e9bff7db6ad810e70507b0465ad78703a7cefa7a7294ef4b3f41476eae1"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34722511299",
+        "sha256": "bound-by-combined-cache-manifest"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34729110702",
+        "sha256": "bound-by-combined-cache-manifest"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34749576265",
+        "sha256": "bound-by-combined-cache-manifest"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34760648934",
+        "sha256": "bound-by-combined-cache-manifest"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34770227385",
+        "sha256": "bound-by-combined-cache-manifest"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34779504872",
+        "sha256": "bound-by-combined-cache-manifest"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34790190944",
+        "sha256": "bound-by-combined-cache-manifest"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34799149811",
+        "sha256": "bound-by-combined-cache-manifest"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34811806243",
+        "sha256": "bound-by-combined-cache-manifest"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34845710248",
+        "sha256": "bound-by-combined-cache-manifest"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34863619434",
+        "sha256": "bound-by-combined-cache-manifest"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34876702743",
+        "sha256": "bound-by-combined-cache-manifest"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34887276656",
+        "sha256": "bound-by-combined-cache-manifest"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34897737567",
+        "sha256": "bound-by-combined-cache-manifest"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34907762101",
+        "sha256": "bound-by-combined-cache-manifest"
+      },
+      {
+        "eligible": 3000,
+        "launches": 3000,
+        "run_id": "34918286614",
+        "sha256": "bound-by-combined-cache-manifest"
+      }
+    ],
+    "same_timestamp_creator_counts_batched": true,
+    "same_timestamp_market_context_batched": true
+  },
+  "development_gate_passed": false,
+  "experiment_id": "e4x-ac8f73c0432e3cd996630a5982ced3002584a88b470f71d00be17c68de541310",
+  "failure_classification": "VALIDATION_COLLAPSE",
+  "failure_reason": "Creation-time transport failed minimum_win_rate, minimum_wilson_bound, positive_net_pnl, minimum_profit_factor, every_fold_minimum_win_rate, every_fold_positive, every_fold_minimum_profit_factor, every_fold_six_profitable_windows, maximum_drawdown: 87/321 wins (27.10%), Wilson 22.53%, net -0.884580 SOL, PF 0.719.",
+  "feature_audit": {
+    "active_untouched_live_data_used": false,
+    "full_matrix_sha256": "a9e429923ce5bfff066b5a4b50403c46ac8b87604d4800a91d02a2780e8d3fb0",
+    "same_timestamp_creator_counts_batched": true,
+    "same_timestamp_market_context_batched": true,
+    "selected_feature_count": 10,
+    "selected_features": [
+      "creator_severe_loss_rate",
+      "mayhem_mode",
+      "creator_resolved_launches",
+      "creator_prior_launch_count",
+      "metadata_content_addressed",
+      "creator_profitable_history",
+      "market_interarrival_ms",
+      "market_prior_launches_1s",
+      "market_launch_intensity_ratio_5s_120s",
+      "market_prior_launches_5s"
+    ],
+    "selected_matrix_sha256": "25a71c843723031325d9c2e6c89084fd1b90f675eb07744309c82cae2997aa43",
+    "strict_creation_event_only": true
+  },
+  "folds": [
+    {
+      "attempted_trades": 88,
+      "calibration_windows": [
+        "33911477030",
+        "33920757002",
+        "33931301493",
+        "34063856134",
+        "34073802862"
+      ],
+      "capture_windows": 10,
+      "conservative_exit_offset_ms": 60000,
+      "fit_windows": [
+        "33605109571",
+        "33627431540",
+        "33644544746",
+        "33656916992",
+        "33669514091",
+        "33681664773",
+        "33692043170",
+        "33704841852",
+        "33716649440",
+        "33741470396",
+        "33769636983",
+        "33781389703",
+        "33792881280",
+        "33810753028",
+        "33822988156",
+        "33835575805",
+        "33852482054",
+        "33876345997",
+        "33897368379"
+      ],
+      "fold": 0,
+      "largest_winner_contribution": 0.17328733265638174,
+      "ledger_hash": "0b62cb9edb4cb51ab2abeaa70f99ecc9d5237ff5f9de26ba1ef8471d64c8ca82",
+      "maximum_drawdown_fraction": 0.15585093633408661,
+      "net_pnl_sol": -0.3369301619383358,
+      "profit_factor": 0.6632033646963978,
+      "profitable_capture_windows": 2,
+      "rejected_concurrency": 2,
+      "test_windows": [
+        "34084120627",
+        "34099929487",
+        "34123647690",
+        "34138377553",
+        "34150939561",
+        "34159449923",
+        "34167878699",
+        "34175839320",
+        "34186192299",
+        "34201101121"
+      ],
+      "threshold_hash": "99bdf25fe920bf5d56cef68cc85df83105ed388ffa6ed9f828bcd3bba2df732d",
+      "threshold_maximum": 0.6848158462956085,
+      "threshold_minimum": 0.6803760503183512,
+      "trades": 86,
+      "wilson_95_lower_bound": 0.1558899158392809,
+      "win_rate": 0.23255813953488372,
+      "wins": 20
+    },
+    {
+      "attempted_trades": 75,
+      "calibration_windows": [
+        "34159449923",
+        "34167878699",
+        "34175839320",
+        "34186192299",
+        "34201101121"
+      ],
+      "capture_windows": 10,
+      "conservative_exit_offset_ms": 60000,
+      "fit_windows": [
+        "33605109571",
+        "33627431540",
+        "33644544746",
+        "33656916992",
+        "33669514091",
+        "33681664773",
+        "33692043170",
+        "33704841852",
+        "33716649440",
+        "33741470396",
+        "33769636983",
+        "33781389703",
+        "33792881280",
+        "33810753028",
+        "33822988156",
+        "33835575805",
+        "33852482054",
+        "33876345997",
+        "33897368379",
+        "33911477030",
+        "33920757002",
+        "33931301493",
+        "34063856134",
+        "34073802862",
+        "34084120627",
+        "34099929487",
+        "34123647690",
+        "34138377553",
+        "34150939561"
+      ],
+      "fold": 1,
+      "largest_winner_contribution": 0.30316184305367977,
+      "ledger_hash": "f1733e811c648b806b89b16c148124ac32f06d82d88c93ffd745618e1222c5a0",
+      "maximum_drawdown_fraction": 0.10126516638373258,
+      "net_pnl_sol": -0.21899937482522258,
+      "profit_factor": 0.5354437164236133,
+      "profitable_capture_windows": 2,
+      "rejected_concurrency": 1,
+      "test_windows": [
+        "34244224832",
+        "34281858070",
+        "34310065776",
+        "34348537141",
+        "34388016481",
+        "34425005585",
+        "34470147967",
+        "34512979177",
+        "34547229611",
+        "34586174670"
+      ],
+      "threshold_hash": "a79121dae4042034ca62deef79238b99f701c5e904ba0638388e5a2ee3c29ef4",
+      "threshold_maximum": 0.7018004190518807,
+      "threshold_minimum": 0.6810705889425451,
+      "trades": 74,
+      "wilson_95_lower_bound": 0.1597637123272753,
+      "win_rate": 0.24324324324324326,
+      "wins": 18
+    },
+    {
+      "attempted_trades": 85,
+      "calibration_windows": [
+        "34425005585",
+        "34470147967",
+        "34512979177",
+        "34547229611",
+        "34586174670"
+      ],
+      "capture_windows": 10,
+      "conservative_exit_offset_ms": 60000,
+      "fit_windows": [
+        "33605109571",
+        "33627431540",
+        "33644544746",
+        "33656916992",
+        "33669514091",
+        "33681664773",
+        "33692043170",
+        "33704841852",
+        "33716649440",
+        "33741470396",
+        "33769636983",
+        "33781389703",
+        "33792881280",
+        "33810753028",
+        "33822988156",
+        "33835575805",
+        "33852482054",
+        "33876345997",
+        "33897368379",
+        "33911477030",
+        "33920757002",
+        "33931301493",
+        "34063856134",
+        "34073802862",
+        "34084120627",
+        "34099929487",
+        "34123647690",
+        "34138377553",
+        "34150939561",
+        "34159449923",
+        "34167878699",
+        "34175839320",
+        "34186192299",
+        "34201101121",
+        "34244224832",
+        "34281858070",
+        "34310065776",
+        "34348537141",
+        "34388016481"
+      ],
+      "fold": 2,
+      "largest_winner_contribution": 0.13698721739051808,
+      "ledger_hash": "151b0d15a477a300e9940c11d54fd7f940b3a9a56ee1dcb45fa6af5aabdd53be",
+      "maximum_drawdown_fraction": 0.04362462073037573,
+      "net_pnl_sol": 0.1468197152046744,
+      "profit_factor": 1.2111617016039484,
+      "profitable_capture_windows": 6,
+      "rejected_concurrency": 0,
+      "test_windows": [
+        "34627236811",
+        "34660606300",
+        "34684115937",
+        "34709541936",
+        "34722511299",
+        "34729110702",
+        "34749576265",
+        "34760648934",
+        "34770227385",
+        "34779504872"
+      ],
+      "threshold_hash": "cbe90300f9ef3af1fda119502cbb711ae9b967d73f56dab9bafcb58727359fb3",
+      "threshold_maximum": 0.6837289672480142,
+      "threshold_minimum": 0.6803960527871852,
+      "trades": 85,
+      "wilson_95_lower_bound": 0.2702916275231961,
+      "win_rate": 0.36470588235294116,
+      "wins": 31
+    },
+    {
+      "attempted_trades": 88,
+      "calibration_windows": [
+        "34729110702",
+        "34749576265",
+        "34760648934",
+        "34770227385",
+        "34779504872"
+      ],
+      "capture_windows": 10,
+      "conservative_exit_offset_ms": 60000,
+      "fit_windows": [
+        "33605109571",
+        "33627431540",
+        "33644544746",
+        "33656916992",
+        "33669514091",
+        "33681664773",
+        "33692043170",
+        "33704841852",
+        "33716649440",
+        "33741470396",
+        "33769636983",
+        "33781389703",
+        "33792881280",
+        "33810753028",
+        "33822988156",
+        "33835575805",
+        "33852482054",
+        "33876345997",
+        "33897368379",
+        "33911477030",
+        "33920757002",
+        "33931301493",
+        "34063856134",
+        "34073802862",
+        "34084120627",
+        "34099929487",
+        "34123647690",
+        "34138377553",
+        "34150939561",
+        "34159449923",
+        "34167878699",
+        "34175839320",
+        "34186192299",
+        "34201101121",
+        "34244224832",
+        "34281858070",
+        "34310065776",
+        "34348537141",
+        "34388016481",
+        "34425005585",
+        "34470147967",
+        "34512979177",
+        "34547229611",
+        "34586174670",
+        "34627236811",
+        "34660606300",
+        "34684115937",
+        "34709541936",
+        "34722511299"
+      ],
+      "fold": 3,
+      "largest_winner_contribution": 0.2221151475604517,
+      "ledger_hash": "e694322016905d73a1e8946b4737dc3ac82b62e94d496adbdd0ac2636a3fc0ec",
+      "maximum_drawdown_fraction": 0.16339840382811235,
+      "net_pnl_sol": -0.4754704298892891,
+      "profit_factor": 0.5126541213083451,
+      "profitable_capture_windows": 1,
+      "rejected_concurrency": 12,
+      "test_windows": [
+        "34790190944",
+        "34799149811",
+        "34811806243",
+        "34845710248",
+        "34863619434",
+        "34876702743",
+        "34887276656",
+        "34897737567",
+        "34907762101",
+        "34918286614"
+      ],
+      "threshold_hash": "9bb1c6bdf17d39f8c7d69081d49ce35397c6114b84c27e531f861995a5250279",
+      "threshold_maximum": 0.6925377674050522,
+      "threshold_minimum": 0.6848726542632974,
+      "trades": 76,
+      "wilson_95_lower_bound": 0.15539206970596958,
+      "win_rate": 0.23684210526315788,
+      "wins": 18
+    }
+  ],
+  "identity": {
+    "bankroll_sol": 3.0,
+    "candidate_risk_set_policy": "use only the ten creation-time features frozen by four-epoch transport; accept above the unchanged causal rolling 99.73rd percentile of prior scores",
+    "causal_horizon_ms": 0,
+    "chronological_split": [
+      {
+        "calibration": [
+          "33911477030",
+          "33920757002",
+          "33931301493",
+          "34063856134",
+          "34073802862"
+        ],
+        "fit": [
+          "33605109571",
+          "33627431540",
+          "33644544746",
+          "33656916992",
+          "33669514091",
+          "33681664773",
+          "33692043170",
+          "33704841852",
+          "33716649440",
+          "33741470396",
+          "33769636983",
+          "33781389703",
+          "33792881280",
+          "33810753028",
+          "33822988156",
+          "33835575805",
+          "33852482054",
+          "33876345997",
+          "33897368379"
+        ],
+        "test": [
+          "34084120627",
+          "34099929487",
+          "34123647690",
+          "34138377553",
+          "34150939561",
+          "34159449923",
+          "34167878699",
+          "34175839320",
+          "34186192299",
+          "34201101121"
+        ]
+      },
+      {
+        "calibration": [
+          "34159449923",
+          "34167878699",
+          "34175839320",
+          "34186192299",
+          "34201101121"
+        ],
+        "fit": [
+          "33605109571",
+          "33627431540",
+          "33644544746",
+          "33656916992",
+          "33669514091",
+          "33681664773",
+          "33692043170",
+          "33704841852",
+          "33716649440",
+          "33741470396",
+          "33769636983",
+          "33781389703",
+          "33792881280",
+          "33810753028",
+          "33822988156",
+          "33835575805",
+          "33852482054",
+          "33876345997",
+          "33897368379",
+          "33911477030",
+          "33920757002",
+          "33931301493",
+          "34063856134",
+          "34073802862",
+          "34084120627",
+          "34099929487",
+          "34123647690",
+          "34138377553",
+          "34150939561"
+        ],
+        "test": [
+          "34244224832",
+          "34281858070",
+          "34310065776",
+          "34348537141",
+          "34388016481",
+          "34425005585",
+          "34470147967",
+          "34512979177",
+          "34547229611",
+          "34586174670"
+        ]
+      },
+      {
+        "calibration": [
+          "34425005585",
+          "34470147967",
+          "34512979177",
+          "34547229611",
+          "34586174670"
+        ],
+        "fit": [
+          "33605109571",
+          "33627431540",
+          "33644544746",
+          "33656916992",
+          "33669514091",
+          "33681664773",
+          "33692043170",
+          "33704841852",
+          "33716649440",
+          "33741470396",
+          "33769636983",
+          "33781389703",
+          "33792881280",
+          "33810753028",
+          "33822988156",
+          "33835575805",
+          "33852482054",
+          "33876345997",
+          "33897368379",
+          "33911477030",
+          "33920757002",
+          "33931301493",
+          "34063856134",
+          "34073802862",
+          "34084120627",
+          "34099929487",
+          "34123647690",
+          "34138377553",
+          "34150939561",
+          "34159449923",
+          "34167878699",
+          "34175839320",
+          "34186192299",
+          "34201101121",
+          "34244224832",
+          "34281858070",
+          "34310065776",
+          "34348537141",
+          "34388016481"
+        ],
+        "test": [
+          "34627236811",
+          "34660606300",
+          "34684115937",
+          "34709541936",
+          "34722511299",
+          "34729110702",
+          "34749576265",
+          "34760648934",
+          "34770227385",
+          "34779504872"
+        ]
+      },
+      {
+        "calibration": [
+          "34729110702",
+          "34749576265",
+          "34760648934",
+          "34770227385",
+          "34779504872"
+        ],
+        "fit": [
+          "33605109571",
+          "33627431540",
+          "33644544746",
+          "33656916992",
+          "33669514091",
+          "33681664773",
+          "33692043170",
+          "33704841852",
+          "33716649440",
+          "33741470396",
+          "33769636983",
+          "33781389703",
+          "33792881280",
+          "33810753028",
+          "33822988156",
+          "33835575805",
+          "33852482054",
+          "33876345997",
+          "33897368379",
+          "33911477030",
+          "33920757002",
+          "33931301493",
+          "34063856134",
+          "34073802862",
+          "34084120627",
+          "34099929487",
+          "34123647690",
+          "34138377553",
+          "34150939561",
+          "34159449923",
+          "34167878699",
+          "34175839320",
+          "34186192299",
+          "34201101121",
+          "34244224832",
+          "34281858070",
+          "34310065776",
+          "34348537141",
+          "34388016481",
+          "34425005585",
+          "34470147967",
+          "34512979177",
+          "34547229611",
+          "34586174670",
+          "34627236811",
+          "34660606300",
+          "34684115937",
+          "34709541936",
+          "34722511299"
+        ],
+        "test": [
+          "34790190944",
+          "34799149811",
+          "34811806243",
+          "34845710248",
+          "34863619434",
+          "34876702743",
+          "34887276656",
+          "34897737567",
+          "34907762101",
+          "34918286614"
+        ]
+      }
+    ],
+    "dataset_source_manifest_fingerprint": "22944bba1bf62f95fd5c266c59492cda3c226150d64ac57562fdd461beeb08ee",
+    "discovery_diagnostic_id": "e4d-ae12f07816c91f832d630d020a6487a6b86da5af2aff3e16445e2eaca7880a5a",
+    "evidence_epoch": [
+      "33605109571",
+      "33627431540",
+      "33644544746",
+      "33656916992",
+      "33669514091",
+      "33681664773",
+      "33692043170",
+      "33704841852",
+      "33716649440",
+      "33741470396",
+      "33769636983",
+      "33781389703",
+      "33792881280",
+      "33810753028",
+      "33822988156",
+      "33835575805",
+      "33852482054",
+      "33876345997",
+      "33897368379",
+      "33911477030",
+      "33920757002",
+      "33931301493",
+      "34063856134",
+      "34073802862",
+      "34084120627",
+      "34099929487",
+      "34123647690",
+      "34138377553",
+      "34150939561",
+      "34159449923",
+      "34167878699",
+      "34175839320",
+      "34186192299",
+      "34201101121",
+      "34244224832",
+      "34281858070",
+      "34310065776",
+      "34348537141",
+      "34388016481",
+      "34425005585",
+      "34470147967",
+      "34512979177",
+      "34547229611",
+      "34586174670",
+      "34627236811",
+      "34660606300",
+      "34684115937",
+      "34709541936",
+      "34722511299",
+      "34729110702",
+      "34749576265",
+      "34760648934",
+      "34770227385",
+      "34779504872",
+      "34790190944",
+      "34799149811",
+      "34811806243",
+      "34845710248",
+      "34863619434",
+      "34876702743",
+      "34887276656",
+      "34897737567",
+      "34907762101",
+      "34918286614"
+    ],
+    "execution_policy": "paper replay at exact 300 ms entry delay; compound 1.85% of current bankroll; maximum two concurrent positions",
+    "exit_policy": "stop=0.70|take=3.00|hold=60000|protect=1.15:1.06|trail=1.25:0.15",
+    "feature_set_fingerprint": "9087a98e9eeb23fe5bd531fda88e400667202ec012d66cab0d15d404e1bab351",
+    "fee_model": {
+      "base_transaction_fee_sol": 5e-06,
+      "priority_fee_sol": 0.001,
+      "protocol_and_creator_fee_bps": 175.0,
+      "tip_sol": 0.001
+    },
+    "full_parameters": {
+      "adaptive_exit_policy_index": 12,
+      "label_sha256": "f2ec4c1e326950f30c0d94fd230db33207a5541dafad1b2a18b66c20d5f76d6b",
+      "model": {
+        "class_weight": "balanced",
+        "l2_regularization": 2.0,
+        "learning_rate": 0.05,
+        "max_iter": 100,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 100
+      },
+      "random_seed_base": 172120,
+      "rolling_history_rows": 10000,
+      "score_fraction": 0.0027,
+      "stable_features": [
+        "creator_severe_loss_rate",
+        "mayhem_mode",
+        "creator_resolved_launches",
+        "creator_prior_launch_count",
+        "metadata_content_addressed",
+        "creator_profitable_history",
+        "market_interarrival_ms",
+        "market_prior_launches_1s",
+        "market_launch_intensity_ratio_5s_120s",
+        "market_prior_launches_5s"
+      ],
+      "threshold_refresh_rows": 100
+    },
+    "latency_assumptions_ms": [
+      300
+    ],
+    "model_family": "histogram_boosting_on_creation_time_transport",
+    "output_guard": {
+      "refresh_rows": 100,
+      "rolling_history_rows": 10000,
+      "score_fraction": 0.0027,
+      "threshold_uses_prior_scores_only": true
+    },
+    "position_sizing": {
+      "fraction_of_current_bankroll": 0.0185,
+      "maximum_concurrent_positions": 2
+    },
+    "source_code_fingerprint": "b3ccca905711a87cc3e6b66090569046e7f10bcb13a5d606f06d641cc12c68b4",
+    "thesis_family_identifier": "horizon0-causal-transport-v12"
+  },
+  "label_audit": {
+    "active_untouched_live_data_used": false,
+    "all_values_finite": true,
+    "pnl_sha256": "f2ec4c1e326950f30c0d94fd230db33207a5541dafad1b2a18b66c20d5f76d6b",
+    "positive_rate": 0.15419093639806714,
+    "production_paths_changed": 0,
+    "profitable_rows": 29516,
+    "rows": 191425
+  },
+  "live_confirmation_authorised": false,
+  "material_change_required_before_rerun": "A genuinely new causal feature or model family; creation-time feature subsets, threshold variants, and model-parameter variants are prohibited.",
+  "production_deployment_authorised": false,
+  "production_paths_changed": 0,
+  "production_promotion_authorised": false,
+  "ready_for_new_strictly_later_holdout": false,
+  "requirements": {
+    "every_fold_minimum_profit_factor": false,
+    "every_fold_minimum_trades": true,
+    "every_fold_minimum_win_rate": false,
+    "every_fold_positive": false,
+    "every_fold_six_profitable_windows": false,
+    "full_quote_coverage": true,
+    "largest_winner_limit": true,
+    "maximum_drawdown": false,
+    "minimum_closed_trades": true,
+    "minimum_profit_factor": false,
+    "minimum_wilson_bound": false,
+    "minimum_win_rate": false,
+    "positive_net_pnl": false
+  },
+  "retired": true,
+  "scientific_basis": "The frozen early-horizon frontier measured the highest raw exact-300ms positive rate at a creation-time decision, which requires a separately built causal feature corpus before any candidate fit.",
+  "thesis_family": "horizon0-causal-transport-v12",
+  "untouched_holdout_passed": false,
+  "version": "e4-v12-horizon0-latency300-candidate-v1"
+}
