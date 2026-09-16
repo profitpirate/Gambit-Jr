@@ -1,0 +1,115 @@
+{
+  "actual_axiom_execution": false,
+  "actual_profit_sol": null,
+  "baseline_commit": "03dd2d24cc18e6152f76db6b7617a9bc821f061c",
+  "build_input_commit": "5d685b998d4487ac6204ee4dd3e7386d597037fa",
+  "configuration": "config/golden-full3s-v2.json",
+  "frozen_at_ns": 1789553533013815855,
+  "implementation_digest": "a0ea1e991caa1265514aaa631efe9a1c29af31f0c0317eb1fef94bf03f245f15",
+  "limitations": [
+    "A freeze is a pinned commit and hashes, not branch-protection administration.",
+    "Synthetic stress and local crash recovery do not prove profitable selection or real-money safety.",
+    "No live feed, wallet, Axiom signing, or funded execution was used by this build.",
+    "Measured local tick work excludes network/validator latency; configured 250ms inclusion remains an assumption.",
+    "The durable adapter is a correctness-first single-host reference; multi-day loaded-history throughput and distributed recovery still need validation."
+  ],
+  "live_testing_started": false,
+  "live_trades": 0,
+  "model": "FULL_3S_V2",
+  "offline_evidence": {
+    "baseline_commit": "03dd2d24cc18e6152f76db6b7617a9bc821f061c",
+    "chaos": {
+      "actual_process_terminations": 120,
+      "commit_fault_points": 3,
+      "lifecycle_boundaries": 4,
+      "scope": "SQLite journal on one host, not validator or server failover",
+      "status": "PASS"
+    },
+    "latency": {
+      "configured_inclusion_delay_ms": 250,
+      "cost_aligned_selection_ms": {
+        "count": 3000,
+        "maximum": 0.479421,
+        "median": 0.3130855,
+        "p95": 0.325189,
+        "p99": 0.35551550000000004
+      },
+      "durable_active_runtime_tick_ms": {
+        "count": 100,
+        "maximum": 9.38663,
+        "median": 3.9094665,
+        "p95": 5.38909275,
+        "p99": 5.65774352000002
+      },
+      "durable_empty_runtime_snapshot_commit_ms": {
+        "count": 300,
+        "maximum": 1.235538,
+        "median": 0.488915,
+        "p95": 0.6563880500000001,
+        "p99": 0.7311190999999996
+      },
+      "local_tick_median_speedup_vs_twelve_arms": 5.3929274189014444,
+      "measured_axiom_execution_ms": null,
+      "measured_chain_execution_ms": null,
+      "measurement": "LOCAL_CPU_AND_LOCAL_DURABLE_COMMIT_ONLY",
+      "new_single_arm_tick_ms": {
+        "count": 3000,
+        "maximum": 0.168103,
+        "median": 0.017787,
+        "p95": 0.021746499999999978,
+        "p99": 0.02794379999999996
+      },
+      "note": "Workload reduction is twelve arms to one; not a like-for-like 12x algorithm or network speed claim.",
+      "old_twelve_arm_tick_ms": {
+        "count": 3000,
+        "maximum": 0.258478,
+        "median": 0.095924,
+        "p95": 0.10559995,
+        "p99": 0.11382510999999991
+      }
+    },
+    "live_testing_started": false,
+    "live_trades": 0,
+    "model": "FULL_3S_V2",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "profitability_validated": false,
+    "python": "3.12.14 (main, Aug 13 2026, 02:47:42) [GCC 13.3.0]",
+    "sources": {
+      "tools/golden_full3s_certify.py": "522fe9ecc87a9042cfd6f2b24177c5e52e3afce07eae675b15bb5b45e4cc7059",
+      "tools/golden_full3s_diagnostics.py": "412451786f0e62bbb47a7c2925bfdb2ff6d98fe64ae10f5a47875508d8cfc515",
+      "tools/golden_full3s_policy.py": "9f1e4bc0f4b729317bfcd1f3d54276fa4e133f1c35d3cc5aa9afe309e3294917",
+      "tools/golden_full3s_service.py": "a3a4136fe00e0a524f4409ae671e9f313ef8ee5c6dd14c54d95ff9f655165109",
+      "tools/golden_full3s_store.py": "0e26dc77246d2ccfd8efe3a537025f742d1a180bfe4a709eb6bb908b23929ecc",
+      "tools/golden_full3s_v2.py": "9fe032f1a9c5e1048f8bb22ee5bad0b6f5c6cf3e0d328341d7723d5e9d2611f5"
+    },
+    "sqlite": "3.45.1",
+    "status": "OFFLINE_BUILD_STRESS_PASS",
+    "stress": {
+      "elapsed_seconds": 13.144833584000025,
+      "expected_fail_closed_migration_or_exhaustion_paths": 2000,
+      "live_coins_or_trades": 0,
+      "modeled_failed_attempts_in_closed_fixtures": 5000,
+      "seed": 31720260916,
+      "status": "PASS",
+      "synthetic_closed_positions": 8000,
+      "synthetic_event_ticks": 974000,
+      "synthetic_paths": 10000
+    }
+  },
+  "profitability_validated": false,
+  "source_sha256": {
+    "config/golden-full3s-v2.json": "99893d6edf69474bf89e3cb01ffa6dc74aa36433b9d9f7c37c61113e0d2404de",
+    "tests/test_golden_full3s_integration.py": "d2260dea9e5a5df566b0c990def9e160d28f76547751660a311300bbbd570929",
+    "tests/test_golden_full3s_v2.py": "4c8309267c588abdde1f9c416f0bc033737a8e55203830701406409c9d934e4b",
+    "tools/golden_full3s_certify.py": "522fe9ecc87a9042cfd6f2b24177c5e52e3afce07eae675b15bb5b45e4cc7059",
+    "tools/golden_full3s_diagnostics.py": "412451786f0e62bbb47a7c2925bfdb2ff6d98fe64ae10f5a47875508d8cfc515",
+    "tools/golden_full3s_policy.py": "9f1e4bc0f4b729317bfcd1f3d54276fa4e133f1c35d3cc5aa9afe309e3294917",
+    "tools/golden_full3s_service.py": "a3a4136fe00e0a524f4409ae671e9f313ef8ee5c6dd14c54d95ff9f655165109",
+    "tools/golden_full3s_store.py": "0e26dc77246d2ccfd8efe3a537025f742d1a180bfe4a709eb6bb908b23929ecc",
+    "tools/golden_full3s_v2.py": "9fe032f1a9c5e1048f8bb22ee5bad0b6f5c6cf3e0d328341d7723d5e9d2611f5",
+    "tools/golden_horizon_engine.py": "d08244c86c55316a4be01b965901a44e37706d47432bfb4ed2d32fc791dc41a3"
+  },
+  "status": "FROZEN_OFFLINE_VERIFIED_PENDING_LIVE_TEST",
+  "unit_tests_passed": 54,
+  "verification_run_id": "35083644550"
+}

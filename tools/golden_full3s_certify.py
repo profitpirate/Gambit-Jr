@@ -28,17 +28,19 @@ def stress(paths: int) -> dict:
         e=SingleEngine();mint=f"fixture-{i}";d=decision(mint,tier=rng.choice(tuple(base.TIERS)))
         assert e.submit(d,state(),T0)
         x=30.0;y=1e9
-        scenario=i%8
-        for dt in range(0,24501,250):
+        scenario=i%10
+        for dt in range(0,30001,250):
             ns=T0+dt*1_000_000
             if dt and dt<=4000:
                 r=rng.uniform(-.075,.075)
                 if scenario==1 and dt==500:r=-.40
                 if scenario==2 and dt==500:r=.65
-                if scenario==3 and dt==3250:r=-.45
-                if scenario==4:r=0
+                if scenario==3 and dt==3500:r=-.45
+                if scenario==4:r=.65 if dt==250 else 0
+                if scenario==8 and 3500<=dt<=5000:r=-.40
                 x=max(.01,x*(1+r));y=max(1.0,y/(1+r))
             s=state(ns,x,y)
+            if scenario==9 and dt==250:s["rtok"]=1.0
             # Synthetic outages are fed explicitly, never backfilled as live.
             feed=ns-4_000_000_000 if scenario==5 and 2500<=dt<=4250 else ns
             if scenario==6 and dt==750:
@@ -150,7 +152,18 @@ def latency(probes: int) -> dict:
         for i in range(300):
             a=time.perf_counter_ns();store.apply(str(i),{"counter":i},lambda s:s);commit.append((time.perf_counter_ns()-a)/1e6)
         store.verify();store.close()
-    return {"measurement":"LOCAL_CPU_AND_LOCAL_DURABLE_COMMIT_ONLY","old_twelve_arm_tick_ms":base.quantiles(old),
+    active_commit=[]
+    from golden_full3s_service import PaperService
+    with tempfile.TemporaryDirectory() as tmp:
+        svc=PaperService(Path(tmp)/"active.db",Runtime(fixture_mode=True))
+        svc.process("submit",{"kind":"SUBMIT","decision":decision(),"state":state(),"now":T0})
+        for i in range(100):
+            t=T0+250_000_000+i*1000
+            ans=svc.process(str(i),{"kind":"TICK","now":t,"last_feed_ns":t,"states":{"fixture-coin":state(t)}})
+            active_commit.append(ans["local_processing_and_durable_commit_ms"])
+        svc.store.verify();svc.close()
+    return {"measurement":"LOCAL_CPU_AND_LOCAL_DURABLE_COMMIT_ONLY",
+            "durable_active_runtime_tick_ms":base.quantiles(active_commit),"old_twelve_arm_tick_ms":base.quantiles(old),
             "new_single_arm_tick_ms":base.quantiles(new),"cost_aligned_selection_ms":base.quantiles(times),
             "durable_empty_runtime_snapshot_commit_ms":base.quantiles(commit),
             "local_tick_median_speedup_vs_twelve_arms":base.quantiles(old)["median"]/base.quantiles(new)["median"],
@@ -185,3 +198,5 @@ def main() -> int:
 
 
 if __name__=="__main__":raise SystemExit(main())
+
+# FULL3S_HARDENING_20260916_1

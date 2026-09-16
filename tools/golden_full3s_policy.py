@@ -191,6 +191,7 @@ class Selector:
     def __init__(self, evidence: EvidenceIndex):
         self.e = evidence
         self.c = evidence.c
+        self.policy_hash = self.c.digest()
 
     def evaluate(self, decision: Mapping[str, Any], quote: Mapping[str, Any], budget_sol: float, asof_ns: int) -> dict[str, Any]:
         reasons: list[str] = []; notes: list[str] = []
@@ -228,7 +229,9 @@ class Selector:
             else: notes.append(label + "_QUALITY_UNKNOWN")
         return {"accept": baseline and not reasons, "baseline_accept": baseline,
                 "vetoes": reasons, "notes": notes, "asof_ns": asof_ns,
-                "cost_hash": self.e.cost_hash, "policy_hash": self.c.digest(),
+                "cost_hash": self.e.cost_hash, "policy_hash": self.policy_hash,
                 "budget_sol": budget_sol, "size_bucket": size_bucket(budget_sol),
                 "pooled_unique_coin_stats": pooled, "exact_cohort_stats": cohort, "creator_stats": creator,
                 "no_wallet_ownership_inference": True, "future_performance_proven": False}
+
+# FULL3S_HARDENING_20260916_1

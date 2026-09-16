@@ -45,6 +45,11 @@ def _load_base():
 
 base = _load_base()
 Config = base.Config
+IMPLEMENTATION_DIGEST = hashlib.sha256(b"".join(
+    name.encode() + hashlib.sha256(Path(__file__).with_name(name).read_bytes()).digest()
+    for name in ("golden_full3s_v2.py", "golden_full3s_policy.py", "golden_full3s_store.py",
+                 "golden_full3s_service.py", "golden_full3s_diagnostics.py", "golden_horizon_engine.py")
+)).hexdigest()
 
 
 class MonotonicClock:
@@ -76,6 +81,15 @@ class SingleEngine(base.Engine):
             raw = state["engine"]
             self.accounts = copy.deepcopy(raw["accounts"])
             self.bundles = copy.deepcopy(raw["bundles"])
+            # JSON cannot preserve object aliases. A closed position may still
+            # be in the post-exit bundle AND the ledger; reconnect both views.
+            ledger_index = {p["signal_id"]: p for p in self.accounts[ARM]["ledger"]}
+            for bundle in self.bundles.values():
+                p = bundle["positions"][ARM]
+                if p["status"] == "CLOSED":
+                    if p["signal_id"] not in ledger_index:
+                        raise ValueError("closed bundle missing ledger position")
+                    bundle["positions"][ARM] = ledger_index[p["signal_id"]]
             self.history = copy.deepcopy(raw["history"])
             self.errors = list(raw["errors"]); self.rejections = copy.deepcopy(raw["rejections"])
             self.sequence = raw["sequence"]
@@ -211,6 +225,8 @@ class Runtime:
         self.decisions: dict[str, Any] = {}
         self.evaluations: dict[str, Any] = {}
         self.labelled: set[str] = set()
+        self.label_cursor = 0
+        self.next_prune_ns = 0
         self.last_ns = 0
         self.fixture_mode = fixture_mode
         self.halt_new_entries = False
@@ -246,7 +262,10 @@ class Runtime:
         # stop the exit engine. Selection does not inspect future post-exit data.
         self.candidate.tick(now, states, last_feed_ns)
         self.observer.tick(now, states, last_feed_ns)
-        for p in self.observer.accounts[ARM]["ledger"]:
+        rows = self.observer.accounts[ARM]["ledger"]
+        fresh_rows = rows[self.label_cursor:]
+        self.label_cursor = len(rows)
+        for p in fresh_rows:
             if p["mint"] in self.labelled: continue
             self.labelled.add(p["mint"])
             if p["mint"] in self.observer.uncertain_mints: continue
@@ -257,6 +276,9 @@ class Runtime:
                 decision_ns=d["decision_ns"], closed_ns=p["exit_ns"], available_ns=now,
                 budget_sol=p["budget"], net_pnl_sol=p["net_pnl_sol"], gross_pnl_sol=p["gross_pnl_sol"],
                 cost_hash=self.c.fingerprint(), source="SYNTHETIC_FIXTURE" if self.fixture_mode else "FORWARD_OBSERVED_PAPER"))
+        if now >= self.next_prune_ns:
+            self.evidence.prune(now)
+            self.next_prune_ns = now + 3_600_000_000_000
         if self.candidate.errors or self.observer.errors: self.halt_new_entries = True
 
     def summary(self) -> dict[str, Any]:
@@ -269,23 +291,34 @@ class Runtime:
                 "policy_hash": self.pc.digest(), "live_profitability_proven": False}
 
     def snapshot(self) -> dict[str, Any]:
-        return copy.deepcopy({"model": MODEL, "config": asdict(self.c), "policy": asdict(self.pc),
+        return copy.deepcopy({"model": MODEL, "implementation_digest": IMPLEMENTATION_DIGEST, "config": asdict(self.c), "policy": asdict(self.pc),
             "fixture_mode": self.fixture_mode, "candidate": self.candidate.snapshot(), "observer": self.observer.snapshot(),
             "evidence": self.evidence.snapshot(), "decisions": self.decisions, "evaluations": self.evaluations,
             "labelled": sorted(self.labelled), "last_ns": self.last_ns,
+            "label_cursor": self.label_cursor, "next_prune_ns": self.next_prune_ns,
             "halt_new_entries": self.halt_new_entries, "interrupted": self.interrupted})
 
     @classmethod
     def restore(cls, data: Mapping[str, Any], *, process_restart: bool = True) -> Runtime:
         if data["model"] != MODEL: raise ValueError("wrong model snapshot")
+        if data.get("implementation_digest") != IMPLEMENTATION_DIGEST:
+            raise ValueError("changed implementation on resume; explicit migration required")
         r = cls(Config(**data["config"]), PolicyConfig(**data["policy"]), fixture_mode=data["fixture_mode"])
         r.evidence = EvidenceIndex.restore(data["evidence"]); r.selector = Selector(r.evidence)
         r.candidate = SingleEngine(r.c, data["candidate"], quote_age_ms=r.pc.max_quote_age_ms)
         r.observer = SingleEngine(r.c, data["observer"], quote_age_ms=r.pc.max_quote_age_ms)
         r.decisions = copy.deepcopy(data["decisions"]); r.evaluations = copy.deepcopy(data["evaluations"])
         r.labelled = set(data["labelled"]); r.last_ns = data["last_ns"]
+        r.label_cursor = data.get("label_cursor", len(r.observer.accounts[ARM]["ledger"]))
+        r.next_prune_ns = data.get("next_prune_ns", 0)
+        if not 0 <= r.label_cursor <= len(r.observer.accounts[ARM]["ledger"]):
+            raise ValueError("invalid label cursor")
+        if r.evidence.cost_hash != r.c.fingerprint() or r.evidence.fixture_mode != r.fixture_mode or r.evidence.c.digest() != r.pc.digest():
+            raise ValueError("snapshot evidence/cost/policy mode mismatch")
         r.halt_new_entries = data["halt_new_entries"]; r.interrupted = data["interrupted"]
         if process_restart and (r.candidate.bundles or r.observer.bundles):
             r.candidate.mark_interrupted(); r.observer.mark_interrupted()
             r.interrupted = True; r.halt_new_entries = True
         return r
+
+# FULL3S_HARDENING_20260916_1
