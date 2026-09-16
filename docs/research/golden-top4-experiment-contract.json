@@ -1,0 +1,71 @@
+{
+  "schema": "golden-top4-contract-1",
+  "campaign_name": "golden-top3-full3sv2-fresh-20260916",
+  "status": "BUILD_AND_SOURCE_VERIFICATION_PENDING_NOT_LAUNCHED",
+  "execution": "PAPER_ONLY",
+  "real_money_execution_authorized": false,
+  "models": ["FULL_3S", "FULL_4S", "FULL_7S", "FULL_3S_V2"],
+  "starting_sol_per_model": 3.0,
+  "starting_state": "NEW_SEPARATE_ACCOUNTS_NO_PREVIOUS_CAMPAIGN_PNL_IMPORTED",
+  "previous_campaign_must_remain_stopped": true,
+  "selection_basis": "Top three by net modelled profit in the stopped 84-trade horizon experiment, plus new frozen V2",
+  "v2_frozen_commit": "620d2219504e6470d06f2ee2d77aecc4ee4d4f0b",
+  "target_closed_forward_trades_per_model": 100,
+  "comparison": {
+    "shared_prospective_candidate_stream": true,
+    "controls_use_identical_golden_entries": true,
+    "v2_may_reject_candidates": true,
+    "v2_rejections_are_not_trades": true,
+    "never_loosen_filters_to_reach_target": true,
+    "report_full_campaign_and_common_coin_subset_separately": true
+  },
+  "market_evidence": {
+    "fresh_creation_observed_after_session_start": true,
+    "creation_transaction_must_be_confirmed": true,
+    "axiom_market_visibility_required": true,
+    "axiom_connection_verified": false,
+    "direct_solana_data_is_not_axiom_listing_proof": true,
+    "no_replay_or_synthetic_prices_in_live_results": true,
+    "incident_reconstructed_exits_excluded_from_forward_completion_count": true,
+    "preserve_all_incident_costs_and_inventory": true
+  },
+  "per_attempt_reporting": {
+    "events": ["ENTRY_INTENT", "BUY_FILL", "EXIT_INTENT", "SELL_FILL", "FAILED_ATTEMPT", "RETRY", "ABORT", "RECONCILIATION"],
+    "fields": ["campaign_id", "event_id", "model", "coin_name", "mint", "launch_signature", "axiom_market_evidence", "decision_time", "quote_time", "fill_time", "reason", "tier", "stake_sol", "token_quantity", "slippage", "price_impact", "fees_by_category", "cash", "equity", "gross_pnl", "net_pnl", "cumulative_pnl", "wins", "losses", "win_rate"],
+    "durable_journal_required": true,
+    "externally_accessible_feed_with_delivery_acknowledgement_required": true,
+    "delivery_destination_verified": false,
+    "chatgpt_chat_is_not_a_subsecond_stream": true,
+    "reporting_outage_blocks_new_entries_but_never_stops_exit_management": true
+  },
+  "costs": {
+    "categories": ["protocol", "platform", "base_network", "priority", "tip", "failed_attempts", "rent_locked_or_refunded"],
+    "slippage_and_price_impact_embedded_in_fill_not_double_debited": true,
+    "cost_sources_must_be_labelled": ["OBSERVED", "CONFIGURED_DOCUMENTED", "SENSITIVITY_ASSUMPTION"],
+    "no_unobserved_cashback_credit": true,
+    "actual_axiom_fees_sol": null,
+    "actual_axiom_execution_ms": null,
+    "actual_gambit_wallet_profit_sol": null
+  },
+  "e4": {
+    "wallet": "E4EzXdwf7NNdqM2XGswWaWHfxgucVCo24PTCcrimTKBz",
+    "independent_read_only_benchmark": true,
+    "not_an_entry_signal": true,
+    "include_nonoverlapping_coins_and_failed_transaction_fees": true,
+    "retain_open_positions_transfers_and_unknown_cost_basis_separately": true,
+    "monitor_started": false
+  },
+  "completion": {
+    "minimum_100_closed_forward_trades_each": true,
+    "confirmed_creation_proofs": true,
+    "axiom_visibility_proofs": true,
+    "no_unresolved_inventory_or_post_exit_tracking": true,
+    "reconciled_accounts_and_attempt_costs": true,
+    "published_entry_exit_event_completeness": true,
+    "no_unresolved_invalidating_errors": true
+  },
+  "final_report": ["per-model trades wins losses WR", "gross and net modelled SOL PnL", "ending balances", "cost breakdown", "profit factor", "drawdown", "measured local versus assumed execution timing", "failed attempts and costs", "every coin entry and exit with rationale", "winners and losers analysis", "post-exit paths and missed opportunity analysis without hindsight claims", "V2 prevented losses and sacrificed winners", "outlier and cost sensitivity", "same-window independently reconciled E4 audit", "research conclusion and limitations"],
+  "live_testing_started": false,
+  "current_new_campaign_trades": 0,
+  "note": "This contract is a requirement record, not evidence of implementation, successful tests, Axiom connectivity, live deployment or profitability."
+}
