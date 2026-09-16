@@ -1,0 +1,24 @@
+{
+  "status": "BLOCKED_FIRST_PARTY_AXIOM_ACCESS",
+  "checked_ns": 1789559125994670938,
+  "source_probe_commit": "326f4c85d91c5a4cd8aaa012588f8cdbb13a35e0",
+  "source_probe_run_id": 35092014126,
+  "source_artifact_id": 10444716986,
+  "source_artifact_sha256": "9050826f972b2790b97121ae3c8da15978c1f25aa8d22e47fe8b6436242f3fed",
+  "requests": [
+    {"url":"https://axiom.trade/","method":"GET","authenticated":false,"http_status":403,"rtt_ms":136.159314},
+    {"url":"https://axiom.trade/pulse","method":"GET","authenticated":false,"http_status":403,"rtt_ms":73.155199},
+    {"url":"https://docs.axiom.trade/llms.txt","method":"GET","authenticated":false,"http_status":200,"rtt_ms":212.320616}
+  ],
+  "public_scripts_discovered": 0,
+  "axiom_live_feed_verified": false,
+  "axiom_coin_proofs": 0,
+  "wallet_credentials_used": false,
+  "challenge_bypass_attempted": false,
+  "third_party_unofficial_package_installed": false,
+  "live_testing_started": false,
+  "new_campaign_trades": 0,
+  "e4_monitor_started": false,
+  "interpretation": "The hosted runner cannot obtain Axiom's public application pages anonymously. Documentation is reachable but is not a live market-data feed. HTTP 403 alone does not establish whether the cause is authentication, network policy or anti-bot rules. A verified and approved read-only Axiom data connection is still needed.",
+  "next_required_dependency": "Establish approved first-party read-only market-data access; do not request wallet keys or session cookies in chat. Complete collector, reporting and full readiness validation only after this is available."
+}

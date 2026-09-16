@@ -1,7 +1,7 @@
-"""Explicitly authorized fresh-live market PAPER experiment, four models + E4.
+"""Four-model fresh-live PAPER experiment, blocked pending approved Axiom data.
 
-Uses the existing read-only Solana collector; no Axiom credentials, wallet
-signers, funded swaps, historical price reconstruction, or auto-relaxed filters.
+Direct Solana observations alone cannot satisfy the selected Axiom requirement.
+No credentials, signers, funded swaps, historical reconstruction or loose filters.
 """
 from __future__ import annotations
 import argparse
@@ -13,7 +13,7 @@ import time
 from pathlib import Path
 import aiohttp
 import golden_horizon_live as collector
-from golden_top4_engine import CampaignEngine, ARMS, VERSION, write_json
+from golden_top4_axiom_guard import CampaignEngine, ARMS, VERSION, write_json, load_live_axiom_source, AxiomAccessBlocked
 from golden_top4_e4 import Observer, WALLET
 
 async def verify_creation(rpc, decoder, decision, session_started):
@@ -48,8 +48,17 @@ def verify_manifest(path):
     return m
 
 async def run(args):
-    m = verify_manifest(args.manifest)
     args.output.mkdir(parents=True, exist_ok=True)
+    try:
+        load_live_axiom_source()
+    except AxiomAccessBlocked as exc:
+        write_json(args.output/"status.json", {"status":"BLOCKED_AXIOM_DATA_ACCESS", "reason":str(exc),
+            "checked_ns":time.time_ns(), "models":list(ARMS), "starting_sol_per_model":3,
+            "live_testing_started":False, "new_campaign_trades":0, "e4_monitor_started":False,
+            "paper_only":True, "axiom_feed_verified":False, "actual_profit_sol":None,
+            "note":"Startup interlock, not a zero-trade performance test or passing completion."})
+        raise
+    m = verify_manifest(args.manifest)
     if args.resume:
         previous = json.loads(args.resume.read_text())
         if previous.get("top4_campaign") != m["campaign_name"]:
@@ -99,7 +108,7 @@ async def run(args):
                         verified_forward_counts=engine.forward_counts(),
                         matched_closed_field_semantics="minimum verified per-model count; not identical selection",
                         v2_live_adapter_enabled=not args.smoke,
-                        collector_scope="DIRECT_SOLANA_NEW_CREATIONS_NOT_AUTHENTICATED_AXIOM",
+                        collector_scope="DIRECT_SOLANA_WITH_REQUIRED_AXIOM_ADMISSION",
                         axiom_listing_verified=None,
                         local_four_model_tick_ms=collector.quantiles(engine.local_ticks),
                         local_four_model_selection_ms=collector.quantiles(engine.local_selection),
@@ -131,7 +140,7 @@ async def run(args):
     if args.smoke:
         if not observer or observer.checked_ns == 0 or not observer.complete_pages:
             raise RuntimeError("E4 read-only monitor preflight did not pass")
-        write_json(args.output/"top4-readiness.json", {"status":"LIVE_FEED_AND_E4_PREFLIGHT_PASS",
+        write_json(args.output/"top4-readiness.json", {"status":"SOLANA_AND_E4_CHECK_ONLY_AXIOM_CERTIFICATION_REQUIRED",
             "synthetic_data":False, "funded_execution":False,
             "paper_trades_in_smoke":0, "models":list(ARMS),
             "actual_axiom_data_access":False, "axiom_listing_verified":None,

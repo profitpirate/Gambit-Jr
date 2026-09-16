@@ -30,17 +30,53 @@ jobs:
         run: |
           mkdir -p artifacts/top4-axiom-preflight/source/tools artifacts/top4-axiom-preflight/source/tests artifacts/top4-axiom-preflight/source/config
           cp tools/golden_top4_*.py tools/golden_full3s_*.py tools/golden_horizon_*.py tools/golden_buyer_reputation_core.py tools/golden_management_v2.py artifacts/top4-axiom-preflight/source/tools/
-          cp tests/test_golden_full3s*.py artifacts/top4-axiom-preflight/source/tests/
+          cp tests/test_golden_full3s*.py tests/test_golden_top4*.py artifacts/top4-axiom-preflight/source/tests/
           cp config/golden-full3s-v2.json config/golden-horizon.json artifacts/top4-axiom-preflight/source/config/
-          cp docs/research/golden-full3s-v2-freeze.json artifacts/top4-axiom-preflight/
+          cp docs/research/golden-full3s-v2-freeze.json docs/research/golden-top4-axiom-source-check.json artifacts/top4-axiom-preflight/
           echo "$GITHUB_SHA" > artifacts/top4-axiom-preflight/source-sha.txt
-      - name: Compile adapters and rerun frozen unit tests
+      - name: Compile adapters and verify frozen hashes
+        run: |
+          python -m py_compile tools/golden_top4_*.py
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          frozen=json.load(open('docs/research/golden-full3s-v2-freeze.json'))
+          for path,digest in frozen['source_sha256'].items():
+              assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==digest,path
+          print('FROZEN_FULL3S_V2_SOURCES_UNCHANGED')
+          PY
+      - name: Frozen candidate regression tests
         shell: bash
         run: |
           set -euo pipefail
-          python -m py_compile tools/golden_top4_*.py
           python -m unittest discover -s tests -p 'test_golden_full3s*.py' -v 2>&1 | tee artifacts/top4-axiom-preflight/frozen-tests.log
-      - name: Bounded first-party public-source probe - no login or trades
+      - name: Axiom interlock tests - synthetic only
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p 'test_golden_top4*.py' -v 2>&1 | tee artifacts/top4-axiom-preflight/axiom-guard-tests.log
+          python - <<'PY'
+          import json,os,re,time
+          from pathlib import Path
+          root=Path('artifacts/top4-axiom-preflight')
+          logs=[(root/n).read_text() for n in ('frozen-tests.log','axiom-guard-tests.log')]
+          assert all(x.rstrip().endswith('OK') for x in logs)
+          counts=[int(re.search(r'Ran (\d+) tests',x).group(1)) for x in logs]
+          row={'status':'BLOCKED_AXIOM_DATA_ACCESS','offline_interlock_tests_passed':counts,
+               'total_unit_integration_tests':sum(counts),'checked_ns':time.time_ns(),
+               'source_commit':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID'],
+               'axiom_source_check':'golden-top4-axiom-source-check.json',
+               'axiom_live_feed_verified':False,'live_testing_started':False,'e4_monitor_started':False,
+               'new_campaign_trades':0,'actual_profit_sol':None,
+               'models':['FULL_3S','FULL_4S','FULL_7S','FULL_3S_V2'],'starting_sol_per_model':3,
+               'not_a_full_campaign_certification':True,
+               'remaining':['approved Axiom market-data transport','live publisher delivery verification','full four-model readiness and final-report validation'],
+               'note':'Unit-test PASS is not source readiness or a launched trading test. No alternate source was silently substituted.'}
+          (root/'readiness.json').write_text(json.dumps(row,indent=2)+'\n')
+          print(json.dumps(row))
+          PY
+      - name: Repeat anonymous source probe only on manual dispatch
+        if: github.event_name == 'workflow_dispatch'
         run: python tools/golden_top4_axiom_probe.py
       - uses: actions/upload-artifact@v4
         if: always()
