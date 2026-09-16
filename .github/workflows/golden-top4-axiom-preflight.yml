@@ -1,0 +1,51 @@
+name: Golden top4 - Axiom source and offline preflight
+on:
+  push:
+    branches: [codex/golden-top3-full3sv2-live]
+    paths:
+      - 'tools/golden_top4_*.py'
+      - 'tests/test_golden_top4*.py'
+      - '.github/workflows/golden-top4-axiom-preflight.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: golden-top4-axiom-preflight
+  cancel-in-progress: false
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PYTHONPATH: tools:tests
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preserve exact source - no account or wallet credentials
+        run: |
+          mkdir -p artifacts/top4-axiom-preflight/source/tools artifacts/top4-axiom-preflight/source/tests artifacts/top4-axiom-preflight/source/config
+          cp tools/golden_top4_*.py tools/golden_full3s_*.py tools/golden_horizon_*.py tools/golden_buyer_reputation_core.py tools/golden_management_v2.py artifacts/top4-axiom-preflight/source/tools/
+          cp tests/test_golden_full3s*.py artifacts/top4-axiom-preflight/source/tests/
+          cp config/golden-full3s-v2.json config/golden-horizon.json artifacts/top4-axiom-preflight/source/config/
+          cp docs/research/golden-full3s-v2-freeze.json artifacts/top4-axiom-preflight/
+          echo "$GITHUB_SHA" > artifacts/top4-axiom-preflight/source-sha.txt
+      - name: Compile adapters and rerun frozen unit tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile tools/golden_top4_*.py
+          python -m unittest discover -s tests -p 'test_golden_full3s*.py' -v 2>&1 | tee artifacts/top4-axiom-preflight/frozen-tests.log
+      - name: Bounded first-party public-source probe - no login or trades
+        run: python tools/golden_top4_axiom_probe.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: golden-top4-axiom-preflight-${{ github.run_id }}
+          path: artifacts/top4-axiom-preflight/
+          retention-days: 30
+          if-no-files-found: error
