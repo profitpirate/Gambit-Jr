@@ -1,0 +1,2390 @@
+{
+  "active_untouched_live_data_used": false,
+  "candidate_frozen": false,
+  "candidate_warranted": false,
+  "diagnostic_id": "e4d-eb7074e56e20d697da124be9bc1dbab8634178fad6aab89183ef2d3cb923f4b7",
+  "failure_classification": "EXIT_FAILURE",
+  "final_fold_feasible_policies": 0,
+  "final_fold_oracle_best": {
+    "exit_reasons": {
+      "MAXIMUM_HOLD": 17,
+      "NET_STOP": 21,
+      "NET_TAKE": 42
+    },
+    "fold_gate_passed": false,
+    "largest_winner_contribution": 0.05213492227078302,
+    "ledger_hash": "7a2a2fb77deaa00035103ca560d935f1d7ffcf99067e84ff5b4f6b709c59cab3",
+    "maximum_drawdown_fraction": 0.1086994874401223,
+    "net_pnl_sol": -0.257583848345432,
+    "policy": "net_take=0.05|net_stop=0.30|hold=60000",
+    "profit_factor": 0.5273948074068823,
+    "rejected_concurrency": 0,
+    "requirements": {
+      "largest_winner_limit": true,
+      "maximum_drawdown": true,
+      "minimum_profit_factor": false,
+      "minimum_trades": true,
+      "minimum_win_rate": false,
+      "positive_net_pnl": false
+    },
+    "stop_fraction": 0.3,
+    "take_fraction": 0.05,
+    "trades": 80,
+    "wilson_95_lower_bound": 0.4290416436680269,
+    "win_rate": 0.5375,
+    "wins": 43
+  },
+  "finding": "No member of the bounded fee-net take/stop family passes the final chronological fold, so parameter tuning or causal selection within this family cannot repair the 300 ms thesis.",
+  "folds": [
+    {
+      "feasible_policies": 11,
+      "fold": 0,
+      "oracle_best": {
+        "exit_reasons": {
+          "MAXIMUM_HOLD": 8,
+          "NET_STOP": 17,
+          "NET_TAKE": 64
+        },
+        "fold_gate_passed": true,
+        "largest_winner_contribution": 0.11365772022422214,
+        "ledger_hash": "956fb43ff4fc17ae62272a3680c9e602043e5fc081b876ff8c15174cf2612765",
+        "maximum_drawdown_fraction": 0.007967940717491887,
+        "net_pnl_sol": 0.11829294090500575,
+        "policy": "net_take=0.05|net_stop=0.10|hold=60000",
+        "profit_factor": 1.6853250718361878,
+        "rejected_concurrency": 0,
+        "requirements": {
+          "largest_winner_limit": true,
+          "maximum_drawdown": true,
+          "minimum_profit_factor": true,
+          "minimum_trades": true,
+          "minimum_win_rate": true,
+          "positive_net_pnl": true
+        },
+        "stop_fraction": 0.1,
+        "take_fraction": 0.05,
+        "trades": 89,
+        "wilson_95_lower_bound": 0.641968636926015,
+        "win_rate": 0.7415730337078652,
+        "wins": 66
+      },
+      "policies": [
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 8,
+            "NET_STOP": 17,
+            "NET_TAKE": 64
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.11365772022422214,
+          "ledger_hash": "956fb43ff4fc17ae62272a3680c9e602043e5fc081b876ff8c15174cf2612765",
+          "maximum_drawdown_fraction": 0.007967940717491887,
+          "net_pnl_sol": 0.11829294090500575,
+          "policy": "net_take=0.05|net_stop=0.10|hold=60000",
+          "profit_factor": 1.6853250718361878,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.1,
+          "take_fraction": 0.05,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.641968636926015,
+          "win_rate": 0.7415730337078652,
+          "wins": 66
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 11,
+            "NET_STOP": 16,
+            "NET_TAKE": 62
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.07022847106171257,
+          "ledger_hash": "1d62522a9f2895a41feff3b9da97d643fcba34ebdc075bd0dbcb0192ab8544ae",
+          "maximum_drawdown_fraction": 0.01752765752331431,
+          "net_pnl_sol": 0.10518526724567101,
+          "policy": "net_take=0.10|net_stop=0.30|hold=60000",
+          "profit_factor": 1.2877375476870228,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.3,
+          "take_fraction": 0.1,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.641968636926015,
+          "win_rate": 0.7415730337078652,
+          "wins": 66
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 10,
+            "NET_STOP": 18,
+            "NET_TAKE": 61
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.07083141963250282,
+          "ledger_hash": "ce24ab65625206b1b6891127eb63d7e0c8e6868af6ec7dc1f9f2c8e68dc429c0",
+          "maximum_drawdown_fraction": 0.01712462524761893,
+          "net_pnl_sol": 0.15052723707055682,
+          "policy": "net_take=0.10|net_stop=0.20|hold=60000",
+          "profit_factor": 1.474373293340627,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.2,
+          "take_fraction": 0.1,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.6300316256093157,
+          "win_rate": 0.7303370786516854,
+          "wins": 65
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 10,
+            "NET_STOP": 19,
+            "NET_TAKE": 60
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.07164603539362065,
+          "ledger_hash": "ae82b0a10e2ef730fb6dce42cfcda2c9d946df23a8479dc78c8524a424240ada",
+          "maximum_drawdown_fraction": 0.00899281054480087,
+          "net_pnl_sol": 0.2770984327778687,
+          "policy": "net_take=0.10|net_stop=0.10|hold=60000",
+          "profit_factor": 2.458286989711957,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.1,
+          "take_fraction": 0.1,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.6181638937135869,
+          "win_rate": 0.7191011235955056,
+          "wins": 64
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 13,
+            "NET_STOP": 18,
+            "NET_TAKE": 58
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.05435288864823603,
+          "ledger_hash": "a763b03071691fb0e65125a3646f33b523baeadc935bd9432ed2608c8fb2a684",
+          "maximum_drawdown_fraction": 0.017868495065476164,
+          "net_pnl_sol": 0.2094353888959768,
+          "policy": "net_take=0.15|net_stop=0.30|hold=60000",
+          "profit_factor": 1.514303427258993,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.3,
+          "take_fraction": 0.15,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.6181638937135869,
+          "win_rate": 0.7191011235955056,
+          "wins": 64
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 14,
+            "NET_STOP": 17,
+            "NET_TAKE": 58
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.05481216968533136,
+          "ledger_hash": "ba11f0d309261abc2597ed6a97386feee390ccb96a669af00f8cec8c2c49c52b",
+          "maximum_drawdown_fraction": 0.023286375157619183,
+          "net_pnl_sol": 0.11265866034894456,
+          "policy": "net_take=0.15|net_stop=0.40|hold=60000",
+          "profit_factor": 1.227989036226087,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.4,
+          "take_fraction": 0.15,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.6181638937135869,
+          "win_rate": 0.7191011235955056,
+          "wins": 64
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 12,
+            "NET_STOP": 20,
+            "NET_TAKE": 57
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.054877911235398175,
+          "ledger_hash": "ff0fce5dfbabc67722a51e420163cb32827ac33386e759405c04ce79fdd39cbf",
+          "maximum_drawdown_fraction": 0.014212758674707318,
+          "net_pnl_sol": 0.2629404193469953,
+          "policy": "net_take=0.15|net_stop=0.20|hold=60000",
+          "profit_factor": 1.7545822009652723,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.2,
+          "take_fraction": 0.15,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.6063629876750216,
+          "win_rate": 0.7078651685393258,
+          "wins": 63
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 12,
+            "NET_STOP": 21,
+            "NET_TAKE": 56
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.055171220818395365,
+          "ledger_hash": "49b3b57370dc3872c1cce6a040aef9c1ebd3251b232511d48daac827540512f5",
+          "maximum_drawdown_fraction": 0.007081747097278305,
+          "net_pnl_sol": 0.40686624308396135,
+          "policy": "net_take=0.15|net_stop=0.10|hold=60000",
+          "profit_factor": 2.962593998288111,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.1,
+          "take_fraction": 0.15,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.5946267078910946,
+          "win_rate": 0.6966292134831461,
+          "wins": 62
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 14,
+            "NET_STOP": 24,
+            "NET_TAKE": 51
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.04820214363466705,
+          "ledger_hash": "828f367648307f61a0c8117955a639e2426294acc26ad688da298a22e938f718",
+          "maximum_drawdown_fraction": 0.024538327275996846,
+          "net_pnl_sol": 0.1790689003958459,
+          "policy": "net_take=0.20|net_stop=0.30|hold=60000",
+          "profit_factor": 1.3425612261591329,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.3,
+          "take_fraction": 0.2,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.5482912406815136,
+          "win_rate": 0.651685393258427,
+          "wins": 58
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 13,
+            "NET_STOP": 26,
+            "NET_TAKE": 50
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.04854671910070608,
+          "ledger_hash": "fd7b869ad4b1fa3de2d3ff8e4930f6e8bed2c61b6d39706492f2fd19de31d80a",
+          "maximum_drawdown_fraction": 0.01806803588590696,
+          "net_pnl_sol": 0.26330986400747536,
+          "policy": "net_take=0.20|net_stop=0.20|hold=60000",
+          "profit_factor": 1.609161472633315,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.2,
+          "take_fraction": 0.2,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.5368521850687317,
+          "win_rate": 0.6404494382022472,
+          "wins": 57
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 13,
+            "NET_STOP": 27,
+            "NET_TAKE": 49
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.04896734589412094,
+          "ledger_hash": "abc9064439a145c342bc231f6af81ff40a02898092298b65f51cf22806a5dcc7",
+          "maximum_drawdown_fraction": 0.010228888341537937,
+          "net_pnl_sol": 0.4192548390540036,
+          "policy": "net_take=0.20|net_stop=0.10|hold=60000",
+          "profit_factor": 2.5130183773740735,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.1,
+          "take_fraction": 0.2,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.5254685409761142,
+          "win_rate": 0.6292134831460674,
+          "wins": 56
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 9,
+            "NET_STOP": 14,
+            "NET_TAKE": 66
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.11263324416982023,
+          "ledger_hash": "326e54bf2a8539e56b3094a6d36053454290209174437173a4dbab562c7ab675",
+          "maximum_drawdown_fraction": 0.04004052143389947,
+          "net_pnl_sol": -0.022929065288867623,
+          "policy": "net_take=0.05|net_stop=0.30|hold=60000",
+          "profit_factor": 0.9271944978570528,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.3,
+          "take_fraction": 0.05,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.6660617969546637,
+          "win_rate": 0.7640449438202247,
+          "wins": 68
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 10,
+            "NET_STOP": 13,
+            "NET_TAKE": 66
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.11268471470841467,
+          "ledger_hash": "5b61c67e3934243a815578938408e2b6205f8299f42e02c5e97507539fa6c26b",
+          "maximum_drawdown_fraction": 0.05440499699424187,
+          "net_pnl_sol": -0.08707572037656286,
+          "policy": "net_take=0.05|net_stop=0.40|hold=60000",
+          "profit_factor": 0.7691702464450088,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.4,
+          "take_fraction": 0.05,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.6660617969546637,
+          "win_rate": 0.7640449438202247,
+          "wins": 68
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 8,
+            "NET_STOP": 16,
+            "NET_TAKE": 65
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.11323660218689047,
+          "ledger_hash": "ad00d1d76abef72cd126d27b8fe62cea2e80de3e059afd678922fad9a83a65a2",
+          "maximum_drawdown_fraction": 0.031669302204278584,
+          "net_pnl_sol": 0.012903025000069679,
+          "policy": "net_take=0.05|net_stop=0.20|hold=60000",
+          "profit_factor": 1.0465303571806568,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.2,
+          "take_fraction": 0.05,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.6539776698770603,
+          "win_rate": 0.7528089887640449,
+          "wins": 67
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 12,
+            "NET_STOP": 15,
+            "NET_TAKE": 62
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.07012302433417747,
+          "ledger_hash": "66819137e949a38121d30566a0e65312697b57009ef2ead6cf4819552ec215f5",
+          "maximum_drawdown_fraction": 0.03486365285695111,
+          "net_pnl_sol": 0.027251177793173653,
+          "policy": "net_take=0.10|net_stop=0.40|hold=60000",
+          "profit_factor": 1.0618429854248712,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.4,
+          "take_fraction": 0.1,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.641968636926015,
+          "win_rate": 0.7415730337078652,
+          "wins": 66
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 15,
+            "NET_STOP": 23,
+            "NET_TAKE": 51
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.048889070928598316,
+          "ledger_hash": "c2b724c6ea672c1a7793b745d6801cba131dd980eb3011db4c773d3536f459ae",
+          "maximum_drawdown_fraction": 0.03545216188890669,
+          "net_pnl_sol": 0.04614267382457182,
+          "policy": "net_take=0.20|net_stop=0.40|hold=60000",
+          "profit_factor": 1.072047019686093,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.4,
+          "take_fraction": 0.2,
+          "trades": 89,
+          "wilson_95_lower_bound": 0.5482912406815136,
+          "win_rate": 0.651685393258427,
+          "wins": 58
+        }
+      ],
+      "policies_evaluated": 16
+    },
+    {
+      "feasible_policies": 16,
+      "fold": 1,
+      "oracle_best": {
+        "exit_reasons": {
+          "MAXIMUM_HOLD": 13,
+          "NET_STOP": 8,
+          "NET_TAKE": 63
+        },
+        "fold_gate_passed": true,
+        "largest_winner_contribution": 0.06883179073338129,
+        "ledger_hash": "9dc3517d35c62a3459d4d43effa6a421800e73f3ac1f945cd3629cb40980d137",
+        "maximum_drawdown_fraction": 0.019036410213479016,
+        "net_pnl_sol": 0.2723407268356097,
+        "policy": "net_take=0.10|net_stop=0.30|hold=60000",
+        "profit_factor": 2.463981993608842,
+        "rejected_concurrency": 0,
+        "requirements": {
+          "largest_winner_limit": true,
+          "maximum_drawdown": true,
+          "minimum_profit_factor": true,
+          "minimum_trades": true,
+          "minimum_win_rate": true,
+          "positive_net_pnl": true
+        },
+        "stop_fraction": 0.3,
+        "take_fraction": 0.1,
+        "trades": 84,
+        "wilson_95_lower_bound": 0.6865046833134146,
+        "win_rate": 0.7857142857142857,
+        "wins": 66
+      },
+      "policies": [
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 13,
+            "NET_STOP": 8,
+            "NET_TAKE": 63
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.06883179073338129,
+          "ledger_hash": "9dc3517d35c62a3459d4d43effa6a421800e73f3ac1f945cd3629cb40980d137",
+          "maximum_drawdown_fraction": 0.019036410213479016,
+          "net_pnl_sol": 0.2723407268356097,
+          "policy": "net_take=0.10|net_stop=0.30|hold=60000",
+          "profit_factor": 2.463981993608842,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.3,
+          "take_fraction": 0.1,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.6865046833134146,
+          "win_rate": 0.7857142857142857,
+          "wins": 66
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 13,
+            "NET_STOP": 8,
+            "NET_TAKE": 63
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.06917323951372698,
+          "ledger_hash": "b98405f966324e02dc188f3c8ffc097d1a3819dec882f22ef6b2aff81353b305",
+          "maximum_drawdown_fraction": 0.024751686996962768,
+          "net_pnl_sol": 0.21468788156903384,
+          "policy": "net_take=0.10|net_stop=0.40|hold=60000",
+          "profit_factor": 1.902659308605124,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.4,
+          "take_fraction": 0.1,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.6865046833134146,
+          "win_rate": 0.7857142857142857,
+          "wins": 66
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 13,
+            "NET_STOP": 8,
+            "NET_TAKE": 63
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.11030903707416671,
+          "ledger_hash": "f2f040cacf863897f0be15793b0b743ca043f771e5173e3fac59cffc63af4aa8",
+          "maximum_drawdown_fraction": 0.0189717348671663,
+          "net_pnl_sol": 0.09903539614463241,
+          "policy": "net_take=0.05|net_stop=0.30|hold=60000",
+          "profit_factor": 1.5401327027209586,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.3,
+          "take_fraction": 0.05,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.6865046833134146,
+          "win_rate": 0.7857142857142857,
+          "wins": 66
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 13,
+            "NET_STOP": 8,
+            "NET_TAKE": 63
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.10902960273507208,
+          "ledger_hash": "269498da145ef5a447b48fdccfc75aeae6c1c444e70ff57876cc4753a4ecd624",
+          "maximum_drawdown_fraction": 0.024665416748478552,
+          "net_pnl_sol": 0.05431781126994961,
+          "policy": "net_take=0.05|net_stop=0.40|hold=60000",
+          "profit_factor": 1.2366312340117613,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.4,
+          "take_fraction": 0.05,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.6865046833134146,
+          "win_rate": 0.7857142857142857,
+          "wins": 66
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 13,
+            "NET_STOP": 10,
+            "NET_TAKE": 61
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.07118061738246455,
+          "ledger_hash": "9f5ef8b48c54d2a52b9861e60e036e8e391c7f414e1739956b6c8a004d7b0561",
+          "maximum_drawdown_fraction": 0.01427997618718472,
+          "net_pnl_sol": 0.2679085473888443,
+          "policy": "net_take=0.10|net_stop=0.20|hold=60000",
+          "profit_factor": 2.500677056866485,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.2,
+          "take_fraction": 0.1,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.6606473307381485,
+          "win_rate": 0.7619047619047619,
+          "wins": 64
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 13,
+            "NET_STOP": 10,
+            "NET_TAKE": 61
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.112620643100007,
+          "ledger_hash": "e2e4b3ef96ebc5a151bc3c6111c204d1af7050834fc55b739277b805383faf49",
+          "maximum_drawdown_fraction": 0.014233271688230372,
+          "net_pnl_sol": 0.10305767559968526,
+          "policy": "net_take=0.05|net_stop=0.20|hold=60000",
+          "profit_factor": 1.5871284069668676,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.2,
+          "take_fraction": 0.05,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.6606473307381485,
+          "win_rate": 0.7619047619047619,
+          "wins": 64
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 14,
+            "NET_STOP": 12,
+            "NET_TAKE": 58
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.05354332333546518,
+          "ledger_hash": "ed7bb2b0e81b2d3c57426f5d59481cdadc990e8b01474d52c52a428ed5277071",
+          "maximum_drawdown_fraction": 0.02487199923737086,
+          "net_pnl_sol": 0.3234984310442468,
+          "policy": "net_take=0.15|net_stop=0.30|hold=60000",
+          "profit_factor": 2.206770793372749,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.3,
+          "take_fraction": 0.15,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.635148614904332,
+          "win_rate": 0.7380952380952381,
+          "wins": 62
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 10,
+            "NET_STOP": 15,
+            "NET_TAKE": 59
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.0739650587749474,
+          "ledger_hash": "47bbeee2a3cc189c695e26e5c6349b0d5c69c965da19e0ce9045f1a622e9aadb",
+          "maximum_drawdown_fraction": 0.01212028639118031,
+          "net_pnl_sol": 0.2751384545431197,
+          "policy": "net_take=0.10|net_stop=0.10|hold=60000",
+          "profit_factor": 2.75631497541808,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.1,
+          "take_fraction": 0.1,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.635148614904332,
+          "win_rate": 0.7380952380952381,
+          "wins": 62
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 14,
+            "NET_STOP": 12,
+            "NET_TAKE": 58
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.05375983661078521,
+          "ledger_hash": "acce18d31ed4158adb35496bb5307bfafa5e09ec0bec9766762913d5853efdc9",
+          "maximum_drawdown_fraction": 0.0325030628186059,
+          "net_pnl_sol": 0.2459567887249392,
+          "policy": "net_take=0.15|net_stop=0.40|hold=60000",
+          "profit_factor": 1.728404359251807,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.4,
+          "take_fraction": 0.15,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.635148614904332,
+          "win_rate": 0.7380952380952381,
+          "wins": 62
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 10,
+            "NET_STOP": 15,
+            "NET_TAKE": 59
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.1180208642372644,
+          "ledger_hash": "679ec0be30fe7a506ba5ee88a9b05365f46fe631d40a7b40db6d74cd1ee8c969",
+          "maximum_drawdown_fraction": 0.013649341955427404,
+          "net_pnl_sol": 0.11413673109633216,
+          "policy": "net_take=0.05|net_stop=0.10|hold=60000",
+          "profit_factor": 1.7457741550241488,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.1,
+          "take_fraction": 0.05,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.635148614904332,
+          "win_rate": 0.7380952380952381,
+          "wins": 62
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 14,
+            "NET_STOP": 14,
+            "NET_TAKE": 56
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.055237413831266964,
+          "ledger_hash": "1e9d65a1cf13fd18cf374134ea44ecd6f415a016ff2c6524b6d5a46696ab9b91",
+          "maximum_drawdown_fraction": 0.018646243801157425,
+          "net_pnl_sol": 0.340691580617146,
+          "policy": "net_take=0.15|net_stop=0.20|hold=60000",
+          "profit_factor": 2.4327335100991347,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.2,
+          "take_fraction": 0.15,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.6099775866784931,
+          "win_rate": 0.7142857142857143,
+          "wins": 60
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 10,
+            "NET_STOP": 19,
+            "NET_TAKE": 55
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.05653700163324354,
+          "ledger_hash": "885185aef02ac73cd5aafbf95dee7848a97774338e048cef5a04d3b9231de26f",
+          "maximum_drawdown_fraction": 0.01467498469011567,
+          "net_pnl_sol": 0.38404484993736654,
+          "policy": "net_take=0.15|net_stop=0.10|hold=60000",
+          "profit_factor": 3.074791006086584,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.1,
+          "take_fraction": 0.15,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.5851099007733378,
+          "win_rate": 0.6904761904761905,
+          "wins": 58
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 14,
+            "NET_STOP": 16,
+            "NET_TAKE": 54
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.04405202896620845,
+          "ledger_hash": "41863a9a95196b39f68e577f8f9c4bd90bcdbdb57f248d0e06b4d3144628daa3",
+          "maximum_drawdown_fraction": 0.030717879731290882,
+          "net_pnl_sol": 0.36538484715282005,
+          "policy": "net_take=0.20|net_stop=0.30|hold=60000",
+          "profit_factor": 2.070263387702344,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.3,
+          "take_fraction": 0.2,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.5851099007733378,
+          "win_rate": 0.6904761904761905,
+          "wins": 58
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 14,
+            "NET_STOP": 16,
+            "NET_TAKE": 54
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.044348775185569005,
+          "ledger_hash": "631c0894a26e60db8675e23ea7f242cc0359408b2edcfbd9f95193765796f0a1",
+          "maximum_drawdown_fraction": 0.040151067360197835,
+          "net_pnl_sol": 0.26278998785689955,
+          "policy": "net_take=0.20|net_stop=0.40|hold=60000",
+          "profit_factor": 1.6134575387870578,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.4,
+          "take_fraction": 0.2,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.5851099007733378,
+          "win_rate": 0.6904761904761905,
+          "wins": 58
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 14,
+            "NET_STOP": 18,
+            "NET_TAKE": 52
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.04556818561642565,
+          "ledger_hash": "fb2ccc391f884cabcd5eafb9b8fdcad0d3b8e1394581cac04bfded7278443965",
+          "maximum_drawdown_fraction": 0.023026875074685076,
+          "net_pnl_sol": 0.40229884679740646,
+          "policy": "net_take=0.20|net_stop=0.20|hold=60000",
+          "profit_factor": 2.384834018319683,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.2,
+          "take_fraction": 0.2,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.5605262279543911,
+          "win_rate": 0.6666666666666666,
+          "wins": 56
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 11,
+            "NET_STOP": 22,
+            "NET_TAKE": 51
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.04686771930080416,
+          "ledger_hash": "5b530418c343b66c1ea179eef323ba8ff186e05443d039c30bc8383a0f682cc3",
+          "maximum_drawdown_fraction": 0.017317959360006203,
+          "net_pnl_sol": 0.47244893732578985,
+          "policy": "net_take=0.20|net_stop=0.10|hold=60000",
+          "profit_factor": 3.2523464656273284,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.1,
+          "take_fraction": 0.2,
+          "trades": 84,
+          "wilson_95_lower_bound": 0.5362111603479549,
+          "win_rate": 0.6428571428571429,
+          "wins": 54
+        }
+      ],
+      "policies_evaluated": 16
+    },
+    {
+      "feasible_policies": 14,
+      "fold": 2,
+      "oracle_best": {
+        "exit_reasons": {
+          "MAXIMUM_HOLD": 6,
+          "NET_STOP": 8,
+          "NET_TAKE": 50
+        },
+        "fold_gate_passed": true,
+        "largest_winner_contribution": 0.10077424605836038,
+        "ledger_hash": "ed43ccfe84f1a57cdcddd7c0274636a81d587d0cf7204f717210400b76769a4e",
+        "maximum_drawdown_fraction": 0.0164169568418077,
+        "net_pnl_sol": 0.082288290364255,
+        "policy": "net_take=0.05|net_stop=0.30|hold=60000",
+        "profit_factor": 1.3749073128261233,
+        "rejected_concurrency": 0,
+        "requirements": {
+          "largest_winner_limit": true,
+          "maximum_drawdown": true,
+          "minimum_profit_factor": true,
+          "minimum_trades": true,
+          "minimum_win_rate": true,
+          "positive_net_pnl": true
+        },
+        "stop_fraction": 0.3,
+        "take_fraction": 0.05,
+        "trades": 64,
+        "wilson_95_lower_bound": 0.6828613244878341,
+        "win_rate": 0.796875,
+        "wins": 51
+      },
+      "policies": [
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 6,
+            "NET_STOP": 8,
+            "NET_TAKE": 50
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.10077424605836038,
+          "ledger_hash": "ed43ccfe84f1a57cdcddd7c0274636a81d587d0cf7204f717210400b76769a4e",
+          "maximum_drawdown_fraction": 0.0164169568418077,
+          "net_pnl_sol": 0.082288290364255,
+          "policy": "net_take=0.05|net_stop=0.30|hold=60000",
+          "profit_factor": 1.3749073128261233,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.3,
+          "take_fraction": 0.05,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.6828613244878341,
+          "win_rate": 0.796875,
+          "wins": 51
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 6,
+            "NET_STOP": 8,
+            "NET_TAKE": 50
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.10101780269331184,
+          "ledger_hash": "343507e45b5a31fffeba5868b35509fd4a83303fb465b298f11fecb013782fd1",
+          "maximum_drawdown_fraction": 0.020583705971723987,
+          "net_pnl_sol": 0.055133990596075044,
+          "policy": "net_take=0.05|net_stop=0.40|hold=60000",
+          "profit_factor": 1.2245698527887563,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.4,
+          "take_fraction": 0.05,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.6828613244878341,
+          "win_rate": 0.796875,
+          "wins": 51
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 6,
+            "NET_STOP": 10,
+            "NET_TAKE": 48
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.10415321567783876,
+          "ledger_hash": "dd4e25131052a21966c7f00ae8e33140a1e4c4abf84da5dfe2b31c685f01584d",
+          "maximum_drawdown_fraction": 0.0224825452753817,
+          "net_pnl_sol": 0.0569661677564266,
+          "policy": "net_take=0.05|net_stop=0.20|hold=60000",
+          "profit_factor": 1.2415936031475077,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.2,
+          "take_fraction": 0.05,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.6486650974929234,
+          "win_rate": 0.765625,
+          "wins": 49
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 6,
+            "NET_STOP": 12,
+            "NET_TAKE": 46
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.08106407946959693,
+          "ledger_hash": "7d35f415844327d9b61030b999cbfbcd73421c51b31a706c575d34ac87583110",
+          "maximum_drawdown_fraction": 0.019728220352079145,
+          "net_pnl_sol": 0.08485823141698345,
+          "policy": "net_take=0.10|net_stop=0.30|hold=60000",
+          "profit_factor": 1.2907914081460143,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.3,
+          "take_fraction": 0.1,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.615168937427648,
+          "win_rate": 0.734375,
+          "wins": 47
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 8,
+            "NET_STOP": 10,
+            "NET_TAKE": 46
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.08138826081683222,
+          "ledger_hash": "652959018d6ef11a624c4b69b60f9e972cfea00645c607cf7546c056280dd829",
+          "maximum_drawdown_fraction": 0.02505014330016353,
+          "net_pnl_sol": 0.042940142172288365,
+          "policy": "net_take=0.10|net_stop=0.40|hold=60000",
+          "profit_factor": 1.1297438148187975,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.4,
+          "take_fraction": 0.1,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.615168937427648,
+          "win_rate": 0.734375,
+          "wins": 47
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 6,
+            "NET_STOP": 13,
+            "NET_TAKE": 45
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.08225045825258102,
+          "ledger_hash": "94ac4fdc3b906865b9c213ba7c6feda8c504b32f302787db583e43a2a3c836ab",
+          "maximum_drawdown_fraction": 0.023044478038525867,
+          "net_pnl_sol": 0.09367797517428267,
+          "policy": "net_take=0.10|net_stop=0.20|hold=60000",
+          "profit_factor": 1.3360964819476138,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.2,
+          "take_fraction": 0.1,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.598658376004965,
+          "win_rate": 0.71875,
+          "wins": 46
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 5,
+            "NET_STOP": 16,
+            "NET_TAKE": 43
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.11223866964788624,
+          "ledger_hash": "86c5fafecaf8a10cfe7475b0b12d45f244b69365aa26ef9863171ccf1d5f11bd",
+          "maximum_drawdown_fraction": 0.02357913387494544,
+          "net_pnl_sol": 0.033712231025252226,
+          "policy": "net_take=0.05|net_stop=0.10|hold=60000",
+          "profit_factor": 1.1422922350947708,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.1,
+          "take_fraction": 0.05,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.5660743364084738,
+          "win_rate": 0.6875,
+          "wins": 44
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 6,
+            "NET_STOP": 17,
+            "NET_TAKE": 41
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.06780797426389343,
+          "ledger_hash": "49ee3560b430764261177e9cbf2b188375ab411dc36daf52eeb8e26d7f644323",
+          "maximum_drawdown_fraction": 0.02311321631011672,
+          "net_pnl_sol": 0.12043088613227804,
+          "policy": "net_take=0.15|net_stop=0.20|hold=60000",
+          "profit_factor": 1.3671611435837616,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.2,
+          "take_fraction": 0.15,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.5340341181762039,
+          "win_rate": 0.65625,
+          "wins": 42
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 5,
+            "NET_STOP": 18,
+            "NET_TAKE": 41
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.08940030046662686,
+          "ledger_hash": "b08baa950addd083320f4caed27ae26775273dbd5535cb64a69a08b50f1f4b10",
+          "maximum_drawdown_fraction": 0.021759612205271377,
+          "net_pnl_sol": 0.08881941139990301,
+          "policy": "net_take=0.10|net_stop=0.10|hold=60000",
+          "profit_factor": 1.3483025307001817,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.1,
+          "take_fraction": 0.1,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.5340341181762039,
+          "win_rate": 0.65625,
+          "wins": 42
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 6,
+            "NET_STOP": 17,
+            "NET_TAKE": 41
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.06803710977853475,
+          "ledger_hash": "3292f73c25be7ae200c46fc6b397472dc7e4e2253ba911224b161bc03ad089bd",
+          "maximum_drawdown_fraction": 0.02756148914394485,
+          "net_pnl_sol": 0.06337071927701343,
+          "policy": "net_take=0.15|net_stop=0.30|hold=60000",
+          "profit_factor": 1.1670971032992823,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.3,
+          "take_fraction": 0.15,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.5340341181762039,
+          "win_rate": 0.65625,
+          "wins": 42
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 7,
+            "NET_STOP": 18,
+            "NET_TAKE": 39
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.059557367667376696,
+          "ledger_hash": "3102f15e743895806bf0c4e4a3604c5a628b7bc73082f7632e0c32e042b5a600",
+          "maximum_drawdown_fraction": 0.024368006187710883,
+          "net_pnl_sol": 0.16357089455030183,
+          "policy": "net_take=0.20|net_stop=0.20|hold=60000",
+          "profit_factor": 1.4644660576717838,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.2,
+          "take_fraction": 0.2,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.5025015331382643,
+          "win_rate": 0.625,
+          "wins": 40
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 7,
+            "NET_STOP": 19,
+            "NET_TAKE": 38
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.060922436279837275,
+          "ledger_hash": "c81d649dda25aacff82e6e33b20f4b4ff7b576d58832fccc26b70ecaed7401d7",
+          "maximum_drawdown_fraction": 0.03034269141718937,
+          "net_pnl_sol": 0.0767850972860038,
+          "policy": "net_take=0.20|net_stop=0.30|hold=60000",
+          "profit_factor": 1.1815260072997733,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.3,
+          "take_fraction": 0.2,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.48691694294402404,
+          "win_rate": 0.609375,
+          "wins": 39
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 5,
+            "NET_STOP": 22,
+            "NET_TAKE": 37
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.07479632040880943,
+          "ledger_hash": "0dca7a1681098f40563d4cc408fd1a1a8862788d5b8b433c44be01b92343cce9",
+          "maximum_drawdown_fraction": 0.023042797506298267,
+          "net_pnl_sol": 0.1253348662288123,
+          "policy": "net_take=0.15|net_stop=0.10|hold=60000",
+          "profit_factor": 1.4400125196957563,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.1,
+          "take_fraction": 0.15,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.4714498650454971,
+          "win_rate": 0.59375,
+          "wins": 38
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 5,
+            "NET_STOP": 23,
+            "NET_TAKE": 36
+          },
+          "fold_gate_passed": true,
+          "largest_winner_contribution": 0.06426796399363188,
+          "ledger_hash": "ac447fa1bf8002da6356a537cf9d4539a452aabb065e672ddea8f98fc82e50e8",
+          "maximum_drawdown_fraction": 0.019935311800157358,
+          "net_pnl_sol": 0.1885174703417496,
+          "policy": "net_take=0.20|net_stop=0.10|hold=60000",
+          "profit_factor": 1.6409123139247437,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": true,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": true
+          },
+          "stop_fraction": 0.1,
+          "take_fraction": 0.2,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.4560981205252726,
+          "win_rate": 0.578125,
+          "wins": 37
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 8,
+            "NET_STOP": 15,
+            "NET_TAKE": 41
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.06801324145761184,
+          "ledger_hash": "b96ee5abbc6d329cc33dbee82eef5b4824d2ea0c33188805904a41f285e785e4",
+          "maximum_drawdown_fraction": 0.03437780316550132,
+          "net_pnl_sol": -0.007210565023730187,
+          "policy": "net_take=0.15|net_stop=0.40|hold=60000",
+          "profit_factor": 0.9838471209923296,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.4,
+          "take_fraction": 0.15,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.5340341181762039,
+          "win_rate": 0.65625,
+          "wins": 42
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 9,
+            "NET_STOP": 17,
+            "NET_TAKE": 38
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.061323480844459835,
+          "ledger_hash": "52bd25bba3cd236119865afa119f43557a4cb7f6e7f0d236b0b2c93645aab56e",
+          "maximum_drawdown_fraction": 0.0374419063149527,
+          "net_pnl_sol": -0.0023450883810589573,
+          "policy": "net_take=0.20|net_stop=0.40|hold=60000",
+          "profit_factor": 0.995260925372878,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": true,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.4,
+          "take_fraction": 0.2,
+          "trades": 64,
+          "wilson_95_lower_bound": 0.48691694294402404,
+          "win_rate": 0.609375,
+          "wins": 39
+        }
+      ],
+      "policies_evaluated": 16
+    },
+    {
+      "feasible_policies": 0,
+      "fold": 3,
+      "oracle_best": {
+        "exit_reasons": {
+          "MAXIMUM_HOLD": 17,
+          "NET_STOP": 21,
+          "NET_TAKE": 42
+        },
+        "fold_gate_passed": false,
+        "largest_winner_contribution": 0.05213492227078302,
+        "ledger_hash": "7a2a2fb77deaa00035103ca560d935f1d7ffcf99067e84ff5b4f6b709c59cab3",
+        "maximum_drawdown_fraction": 0.1086994874401223,
+        "net_pnl_sol": -0.257583848345432,
+        "policy": "net_take=0.05|net_stop=0.30|hold=60000",
+        "profit_factor": 0.5273948074068823,
+        "rejected_concurrency": 0,
+        "requirements": {
+          "largest_winner_limit": true,
+          "maximum_drawdown": true,
+          "minimum_profit_factor": false,
+          "minimum_trades": true,
+          "minimum_win_rate": false,
+          "positive_net_pnl": false
+        },
+        "stop_fraction": 0.3,
+        "take_fraction": 0.05,
+        "trades": 80,
+        "wilson_95_lower_bound": 0.4290416436680269,
+        "win_rate": 0.5375,
+        "wins": 43
+      },
+      "policies": [
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 17,
+            "NET_STOP": 21,
+            "NET_TAKE": 42
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.05213492227078302,
+          "ledger_hash": "7a2a2fb77deaa00035103ca560d935f1d7ffcf99067e84ff5b4f6b709c59cab3",
+          "maximum_drawdown_fraction": 0.1086994874401223,
+          "net_pnl_sol": -0.257583848345432,
+          "policy": "net_take=0.05|net_stop=0.30|hold=60000",
+          "profit_factor": 0.5273948074068823,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": false,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.3,
+          "take_fraction": 0.05,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.4290416436680269,
+          "win_rate": 0.5375,
+          "wins": 43
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 17,
+            "NET_STOP": 21,
+            "NET_TAKE": 42
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.053313990733661484,
+          "ledger_hash": "fa50a8718b486067b144538f7e6902c2f2ae6b777c1c5e95b9610862f2edda80",
+          "maximum_drawdown_fraction": 0.14301114820769692,
+          "net_pnl_sol": -0.36051883064815593,
+          "policy": "net_take=0.05|net_stop=0.40|hold=60000",
+          "profit_factor": 0.43810076592704417,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": false,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.4,
+          "take_fraction": 0.05,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.4290416436680269,
+          "win_rate": 0.5375,
+          "wins": 43
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 17,
+            "NET_STOP": 22,
+            "NET_TAKE": 41
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.05307440940714573,
+          "ledger_hash": "a85e6aaebfa99c06506f42303a6a6ccd83d52c89b93176a99932e40d16826b06",
+          "maximum_drawdown_fraction": 0.10125959009942287,
+          "net_pnl_sol": -0.23526415632333375,
+          "policy": "net_take=0.05|net_stop=0.20|hold=60000",
+          "profit_factor": 0.5454902467544365,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": false,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.2,
+          "take_fraction": 0.05,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.4169545118032875,
+          "win_rate": 0.525,
+          "wins": 42
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 18,
+            "NET_STOP": 23,
+            "NET_TAKE": 39
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.04525157649258545,
+          "ledger_hash": "de961ad5f8ef19aeda8ef91d52a6fed28adf6aef7f60ac6f42926fff9803791f",
+          "maximum_drawdown_fraction": 0.1028001038143304,
+          "net_pnl_sol": -0.26388705837035564,
+          "policy": "net_take=0.10|net_stop=0.30|hold=60000",
+          "profit_factor": 0.5543609779376354,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": false,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.3,
+          "take_fraction": 0.1,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.392972274311075,
+          "win_rate": 0.5,
+          "wins": 40
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 18,
+            "NET_STOP": 23,
+            "NET_TAKE": 39
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.04617682489360718,
+          "ledger_hash": "e58c9c124443285eac6d57e8911244507a71620087c8ed2a28b69c06ca842699",
+          "maximum_drawdown_fraction": 0.13790654881462552,
+          "net_pnl_sol": -0.3800150876434678,
+          "policy": "net_take=0.10|net_stop=0.40|hold=60000",
+          "profit_factor": 0.4574496435945102,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": false,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.4,
+          "take_fraction": 0.1,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.392972274311075,
+          "win_rate": 0.5,
+          "wins": 40
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 17,
+            "NET_STOP": 25,
+            "NET_TAKE": 38
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.04567474129027458,
+          "ledger_hash": "3650c926f11126cac920181d916bc69158056f683d1a3f4b5a94399fadc18d95",
+          "maximum_drawdown_fraction": 0.09316232364068606,
+          "net_pnl_sol": -0.23497371784942267,
+          "policy": "net_take=0.10|net_stop=0.20|hold=60000",
+          "profit_factor": 0.5805536054968267,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": false,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.2,
+          "take_fraction": 0.1,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.3810769394436833,
+          "win_rate": 0.4875,
+          "wins": 39
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 16,
+            "NET_STOP": 27,
+            "NET_TAKE": 37
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.05588619459105308,
+          "ledger_hash": "fcdb7a277b4a3d43d44721ace579acdc1dd9230af082df89e1305c12d4a96e65",
+          "maximum_drawdown_fraction": 0.0815821749824724,
+          "net_pnl_sol": -0.17623191097248236,
+          "policy": "net_take=0.05|net_stop=0.10|hold=60000",
+          "profit_factor": 0.6034237122394492,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": false,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.1,
+          "take_fraction": 0.05,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.36924549861651623,
+          "win_rate": 0.475,
+          "wins": 38
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 18,
+            "NET_STOP": 25,
+            "NET_TAKE": 37
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.03918386985674124,
+          "ledger_hash": "9966c204670a2725aedd28a3a9f5db265d94c0a2538bd09d72c3c5430d064f1c",
+          "maximum_drawdown_fraction": 0.09679729722082724,
+          "net_pnl_sol": -0.24587863858984615,
+          "policy": "net_take=0.15|net_stop=0.30|hold=60000",
+          "profit_factor": 0.6065808064998319,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": false,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.3,
+          "take_fraction": 0.15,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.36924549861651623,
+          "win_rate": 0.475,
+          "wins": 38
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 18,
+            "NET_STOP": 25,
+            "NET_TAKE": 37
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.03971286832405491,
+          "ledger_hash": "cca9acd2f17cb8d7a97c23f75c10b66e2f3d2dcbd0d48b9a9346b79d883bb701",
+          "maximum_drawdown_fraction": 0.13412740869922235,
+          "net_pnl_sol": -0.36867766729725826,
+          "policy": "net_take=0.15|net_stop=0.40|hold=60000",
+          "profit_factor": 0.5026192016917602,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": false,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.4,
+          "take_fraction": 0.15,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.36924549861651623,
+          "win_rate": 0.475,
+          "wins": 38
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 18,
+            "NET_STOP": 26,
+            "NET_TAKE": 36
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.03736724131396408,
+          "ledger_hash": "faf086d21d5107d80ee957d328c641b13342da823ebe709e16929e9991577f94",
+          "maximum_drawdown_fraction": 0.08978775081026713,
+          "net_pnl_sol": -0.20745374564038022,
+          "policy": "net_take=0.20|net_stop=0.30|hold=60000",
+          "profit_factor": 0.6775330658181286,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": false,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.3,
+          "take_fraction": 0.2,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.3574781238878701,
+          "win_rate": 0.4625,
+          "wins": 37
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 17,
+            "NET_STOP": 27,
+            "NET_TAKE": 36
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.03965493607898733,
+          "ledger_hash": "53ab8c6b42c4faddd79a4ffd64e69233e1472e57978c2a5b2cdf93c41fa6c492",
+          "maximum_drawdown_fraction": 0.08476903760586237,
+          "net_pnl_sol": -0.20979385974495157,
+          "policy": "net_take=0.15|net_stop=0.20|hold=60000",
+          "profit_factor": 0.6410040467989582,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": false,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.2,
+          "take_fraction": 0.15,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.3574781238878701,
+          "win_rate": 0.4625,
+          "wins": 37
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 18,
+            "NET_STOP": 26,
+            "NET_TAKE": 36
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.03707896243453788,
+          "ledger_hash": "561c01e1be427d888bc3c0cd5e47ec5acd28664e85fd587741c6eeb716bffdd8",
+          "maximum_drawdown_fraction": 0.12644420710574789,
+          "net_pnl_sol": -0.3418890345257233,
+          "policy": "net_take=0.20|net_stop=0.40|hold=60000",
+          "profit_factor": 0.5521315975478457,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": false,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.4,
+          "take_fraction": 0.2,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.3574781238878701,
+          "win_rate": 0.4625,
+          "wins": 37
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 17,
+            "NET_STOP": 28,
+            "NET_TAKE": 35
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.03853854738036861,
+          "ledger_hash": "f107d1f060a687297a76979566063220cdf7776d3613a10f9cc8407dbae0134f",
+          "maximum_drawdown_fraction": 0.07206590747253871,
+          "net_pnl_sol": -0.17111853470594873,
+          "policy": "net_take=0.20|net_stop=0.20|hold=60000",
+          "profit_factor": 0.7149077279666296,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": false,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.2,
+          "take_fraction": 0.2,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.34577510374379766,
+          "win_rate": 0.45,
+          "wins": 36
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 16,
+            "NET_STOP": 30,
+            "NET_TAKE": 34
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.04887217075173012,
+          "ledger_hash": "206b878bda57cedefe9bd5fef97fe91d8e8667ee1d5d0fb3a2316011bf8b9253",
+          "maximum_drawdown_fraction": 0.07303031735860532,
+          "net_pnl_sol": -0.16141828168421402,
+          "policy": "net_take=0.10|net_stop=0.10|hold=60000",
+          "profit_factor": 0.654232248526301,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": false,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.1,
+          "take_fraction": 0.1,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.3341368457196414,
+          "win_rate": 0.4375,
+          "wins": 35
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 16,
+            "NET_STOP": 32,
+            "NET_TAKE": 32
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.04361071205758516,
+          "ledger_hash": "39f8ac3529a4e47fbe0eefbdfb0270e35c456fa64510e22bef84f252c5974ee4",
+          "maximum_drawdown_fraction": 0.06518391266970729,
+          "net_pnl_sol": -0.1378790676175199,
+          "policy": "net_take=0.15|net_stop=0.10|hold=60000",
+          "profit_factor": 0.7128410269426514,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": false,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.1,
+          "take_fraction": 0.15,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.31105686511513087,
+          "win_rate": 0.4125,
+          "wins": 33
+        },
+        {
+          "exit_reasons": {
+            "MAXIMUM_HOLD": 16,
+            "NET_STOP": 33,
+            "NET_TAKE": 31
+          },
+          "fold_gate_passed": false,
+          "largest_winner_contribution": 0.04327809192804887,
+          "ledger_hash": "a9ec43dca972641e5cc354f27599377d0a832df170411828b2f6ca43739cb7cc",
+          "maximum_drawdown_fraction": 0.05782906976888228,
+          "net_pnl_sol": -0.10445244920374375,
+          "policy": "net_take=0.20|net_stop=0.10|hold=60000",
+          "profit_factor": 0.7877064267573078,
+          "rejected_concurrency": 0,
+          "requirements": {
+            "largest_winner_limit": true,
+            "maximum_drawdown": true,
+            "minimum_profit_factor": false,
+            "minimum_trades": true,
+            "minimum_win_rate": false,
+            "positive_net_pnl": false
+          },
+          "stop_fraction": 0.1,
+          "take_fraction": 0.2,
+          "trades": 80,
+          "wilson_95_lower_bound": 0.29961659273441493,
+          "win_rate": 0.4,
+          "wins": 32
+        }
+      ],
+      "policies_evaluated": 16
+    }
+  ],
+  "identity": {
+    "causal_horizon_ms": 250,
+    "chronological_folds": {
+      "development_folds": [
+        {
+          "calibration": [
+            "33911477030",
+            "33920757002",
+            "33931301493",
+            "34063856134",
+            "34073802862"
+          ],
+          "fit": [
+            "33605109571",
+            "33627431540",
+            "33644544746",
+            "33656916992",
+            "33669514091",
+            "33681664773",
+            "33692043170",
+            "33704841852",
+            "33716649440",
+            "33741470396",
+            "33769636983",
+            "33781389703",
+            "33792881280",
+            "33810753028",
+            "33822988156",
+            "33835575805",
+            "33852482054",
+            "33876345997",
+            "33897368379"
+          ],
+          "test": [
+            "34084120627",
+            "34099929487",
+            "34123647690",
+            "34138377553",
+            "34150939561",
+            "34159449923",
+            "34167878699",
+            "34175839320",
+            "34186192299",
+            "34201101121"
+          ]
+        },
+        {
+          "calibration": [
+            "34159449923",
+            "34167878699",
+            "34175839320",
+            "34186192299",
+            "34201101121"
+          ],
+          "fit": [
+            "33605109571",
+            "33627431540",
+            "33644544746",
+            "33656916992",
+            "33669514091",
+            "33681664773",
+            "33692043170",
+            "33704841852",
+            "33716649440",
+            "33741470396",
+            "33769636983",
+            "33781389703",
+            "33792881280",
+            "33810753028",
+            "33822988156",
+            "33835575805",
+            "33852482054",
+            "33876345997",
+            "33897368379",
+            "33911477030",
+            "33920757002",
+            "33931301493",
+            "34063856134",
+            "34073802862",
+            "34084120627",
+            "34099929487",
+            "34123647690",
+            "34138377553",
+            "34150939561"
+          ],
+          "test": [
+            "34244224832",
+            "34281858070",
+            "34310065776",
+            "34348537141",
+            "34388016481",
+            "34425005585",
+            "34470147967",
+            "34512979177",
+            "34547229611",
+            "34586174670"
+          ]
+        },
+        {
+          "calibration": [
+            "34425005585",
+            "34470147967",
+            "34512979177",
+            "34547229611",
+            "34586174670"
+          ],
+          "fit": [
+            "33605109571",
+            "33627431540",
+            "33644544746",
+            "33656916992",
+            "33669514091",
+            "33681664773",
+            "33692043170",
+            "33704841852",
+            "33716649440",
+            "33741470396",
+            "33769636983",
+            "33781389703",
+            "33792881280",
+            "33810753028",
+            "33822988156",
+            "33835575805",
+            "33852482054",
+            "33876345997",
+            "33897368379",
+            "33911477030",
+            "33920757002",
+            "33931301493",
+            "34063856134",
+            "34073802862",
+            "34084120627",
+            "34099929487",
+            "34123647690",
+            "34138377553",
+            "34150939561",
+            "34159449923",
+            "34167878699",
+            "34175839320",
+            "34186192299",
+            "34201101121",
+            "34244224832",
+            "34281858070",
+            "34310065776",
+            "34348537141",
+            "34388016481"
+          ],
+          "test": [
+            "34627236811",
+            "34660606300",
+            "34684115937",
+            "34709541936",
+            "34722511299",
+            "34729110702",
+            "34749576265",
+            "34760648934",
+            "34770227385",
+            "34779504872"
+          ]
+        },
+        {
+          "calibration": [
+            "34729110702",
+            "34749576265",
+            "34760648934",
+            "34770227385",
+            "34779504872"
+          ],
+          "fit": [
+            "33605109571",
+            "33627431540",
+            "33644544746",
+            "33656916992",
+            "33669514091",
+            "33681664773",
+            "33692043170",
+            "33704841852",
+            "33716649440",
+            "33741470396",
+            "33769636983",
+            "33781389703",
+            "33792881280",
+            "33810753028",
+            "33822988156",
+            "33835575805",
+            "33852482054",
+            "33876345997",
+            "33897368379",
+            "33911477030",
+            "33920757002",
+            "33931301493",
+            "34063856134",
+            "34073802862",
+            "34084120627",
+            "34099929487",
+            "34123647690",
+            "34138377553",
+            "34150939561",
+            "34159449923",
+            "34167878699",
+            "34175839320",
+            "34186192299",
+            "34201101121",
+            "34244224832",
+            "34281858070",
+            "34310065776",
+            "34348537141",
+            "34388016481",
+            "34425005585",
+            "34470147967",
+            "34512979177",
+            "34547229611",
+            "34586174670",
+            "34627236811",
+            "34660606300",
+            "34684115937",
+            "34709541936",
+            "34722511299"
+          ],
+          "test": [
+            "34790190944",
+            "34799149811",
+            "34811806243",
+            "34845710248",
+            "34863619434",
+            "34876702743",
+            "34887276656",
+            "34897737567",
+            "34907762101",
+            "34918286614"
+          ]
+        }
+      ],
+      "frozen_live_training": {
+        "calibration": [
+          "34876702743",
+          "34887276656",
+          "34897737567",
+          "34907762101",
+          "34918286614"
+        ],
+        "fit": [
+          "33605109571",
+          "33627431540",
+          "33644544746",
+          "33656916992",
+          "33669514091",
+          "33681664773",
+          "33692043170",
+          "33704841852",
+          "33716649440",
+          "33741470396",
+          "33769636983",
+          "33781389703",
+          "33792881280",
+          "33810753028",
+          "33822988156",
+          "33835575805",
+          "33852482054",
+          "33876345997",
+          "33897368379",
+          "33911477030",
+          "33920757002",
+          "33931301493",
+          "34063856134",
+          "34073802862",
+          "34084120627",
+          "34099929487",
+          "34123647690",
+          "34138377553",
+          "34150939561",
+          "34159449923",
+          "34167878699",
+          "34175839320",
+          "34186192299",
+          "34201101121",
+          "34244224832",
+          "34281858070",
+          "34310065776",
+          "34348537141",
+          "34388016481",
+          "34425005585",
+          "34470147967",
+          "34512979177",
+          "34547229611",
+          "34586174670",
+          "34627236811",
+          "34660606300",
+          "34684115937",
+          "34709541936",
+          "34722511299",
+          "34729110702",
+          "34749576265",
+          "34760648934",
+          "34770227385",
+          "34779504872",
+          "34790190944",
+          "34799149811",
+          "34811806243",
+          "34845710248",
+          "34863619434"
+        ],
+        "untouched_live": "exactly ten strictly future capture windows"
+      }
+    },
+    "dataset_source_manifest_fingerprint": "22944bba1bf62f95fd5c266c59492cda3c226150d64ac57562fdd461beeb08ee",
+    "diagnostic_family": "latency300-fee-net-take-stop-oracle-v12",
+    "fee_model": {
+      "base_transaction_fee_sol": 5e-06,
+      "priority_fee_sol": 0.001,
+      "protocol_and_creator_fee_bps": 175.0,
+      "tip_sol": 0.001
+    },
+    "latency_ms": 300,
+    "maximum_concurrent_positions": 2,
+    "policy_grid": [
+      "net_take=0.05|net_stop=0.10|hold=60000",
+      "net_take=0.05|net_stop=0.20|hold=60000",
+      "net_take=0.05|net_stop=0.30|hold=60000",
+      "net_take=0.05|net_stop=0.40|hold=60000",
+      "net_take=0.10|net_stop=0.10|hold=60000",
+      "net_take=0.10|net_stop=0.20|hold=60000",
+      "net_take=0.10|net_stop=0.30|hold=60000",
+      "net_take=0.10|net_stop=0.40|hold=60000",
+      "net_take=0.15|net_stop=0.10|hold=60000",
+      "net_take=0.15|net_stop=0.20|hold=60000",
+      "net_take=0.15|net_stop=0.30|hold=60000",
+      "net_take=0.15|net_stop=0.40|hold=60000",
+      "net_take=0.20|net_stop=0.10|hold=60000",
+      "net_take=0.20|net_stop=0.20|hold=60000",
+      "net_take=0.20|net_stop=0.30|hold=60000",
+      "net_take=0.20|net_stop=0.40|hold=60000"
+    ],
+    "position_sizing_fraction": 0.0185,
+    "source_code_fingerprint": "09c860d71a79c0b0ef7acc08a811a40886a7443155013c6463b87c3b97b766b9",
+    "source_experiment_id": "e4x-b1086b70febc39fefa73d35f8451674a126a3c0256ca95a608b57f9c9c6cd1cc"
+  },
+  "live_confirmation_authorised": false,
+  "material_change_required_before_rerun": "A new exit mechanic beyond single full-position fee-net take/stop, or a materially different causal risk-set selector.",
+  "production_deployment_authorised": false,
+  "production_paths_changed": 0,
+  "production_promotion_authorised": false,
+  "retired_family": true,
+  "source_experiment_id": "e4x-b1086b70febc39fefa73d35f8451674a126a3c0256ca95a608b57f9c9c6cd1cc",
+  "trace_audit": {
+    "cache_hit": true,
+    "selected_traces": 317
+  },
+  "untouched_holdout_passed": false,
+  "version": "e4-v12-latency300-net-exit-oracle-v1"
+}
