@@ -1,0 +1,106 @@
+name: Gambit library phase 2 - HG backfill
+on:
+  push:
+    branches: [codex/golden-top3-full3sv2-live]
+    paths:
+      - 'docs/research/e4-library-phase1-complete.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: gambit-library-phase2-hg
+  cancel-in-progress: false
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BRANCH: codex/golden-top3-full3sv2-live
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/golden-top3-full3sv2-live
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Require completed E4 phase
+        run: |
+          test -s docs/research/e4-library-phase1-complete.json
+          test -s docs/research/gambit-library-e4-devs.json
+          python - <<'PY'
+          import json
+          m=json.load(open('docs/research/e4-library-phase1-complete.json'))
+          assert m['phase']=='PHASE_1_COMPLETE'
+          PY
+      - name: Download frozen launch/dev corpus
+        run: |
+          mkdir -p frozen
+          gh run download 34262315056 --repo "$GITHUB_REPOSITORY" --name e4-v12-allout-launch-corpus-34262315056 --dir frozen
+          corpus="$(find frozen -name e4-v12-allout-launch-corpus.jsonl.gz -print -quit)"
+          test -s "$corpus"
+          echo "CORPUS=$corpus" >> "$GITHUB_ENV"
+      - name: Build HG library from retained live-test evidence
+        run: |
+          python -m py_compile tools/hg_library_backfill.py
+          mkdir -p artifacts/gambit-library-phase2
+          python tools/hg_library_backfill.py \
+            --corpus "$CORPUS" \
+            --research docs/research \
+            --e4-devs docs/research/gambit-library-e4-devs.json \
+            --output artifacts/gambit-library-phase2 \
+            | tee artifacts/gambit-library-phase2/run.log
+      - name: Validate HG phase 2 evidence
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          root=Path('artifacts/gambit-library-phase2')
+          s=json.load(open(root/'gambit-library-master-summary.json'))
+          t=json.load(open(root/'gambit-library-hg-trades.json'))
+          d=json.load(open(root/'gambit-library-hg-devs.json'))
+          m=json.load(open(root/'gambit-library-devs.json'))
+          assert s['phase']=='HG_LIBRARY_PHASE2_COMPLETE'
+          assert s['trade_records']==len(t['trades'])
+          assert s['rejections']==len(t['rejections'])
+          assert s['hg_devs']==len(d['devs'])
+          assert s['master_devs']==len(m['devs'])
+          marker={'phase':'PHASE_2_COMPLETE','source':'HG','summary':s,'workflow_run_id':int(os.environ['GITHUB_RUN_ID'])}
+          (root/'phase2-complete.json').write_text(json.dumps(marker,indent=2,sort_keys=True)+'\n')
+          PY
+      - name: Persist HG and master library to campaign branch
+        run: |
+          mkdir -p /tmp/hglib
+          cp artifacts/gambit-library-phase2/gambit-library-hg-trades.json /tmp/hglib/
+          cp artifacts/gambit-library-phase2/gambit-library-hg-devs.json /tmp/hglib/
+          cp artifacts/gambit-library-phase2/gambit-library-devs.json /tmp/hglib/
+          cp artifacts/gambit-library-phase2/gambit-library-master-summary.json /tmp/hglib/
+          cp artifacts/gambit-library-phase2/phase2-complete.json /tmp/hglib/gambit-library-phase2-complete.json
+          git config user.name gambit-library-research
+          git config user.email actions@users.noreply.github.com
+          git fetch origin "$BRANCH"
+          git checkout -B gambit-library-phase2-persist FETCH_HEAD
+          cp /tmp/hglib/gambit-library-hg-trades.json docs/research/
+          cp /tmp/hglib/gambit-library-hg-devs.json docs/research/
+          cp /tmp/hglib/gambit-library-devs.json docs/research/
+          cp /tmp/hglib/gambit-library-master-summary.json docs/research/
+          cp /tmp/hglib/gambit-library-phase2-complete.json docs/research/
+          git add docs/research/gambit-library-hg-*.json docs/research/gambit-library-devs.json docs/research/gambit-library-master-summary.json docs/research/gambit-library-phase2-complete.json
+          git commit -m 'data(library): HG phase 2 catalog [skip ci]'
+          for i in 1 2 3 4 5; do
+            git fetch origin "$BRANCH"
+            git rebase FETCH_HEAD || { git rebase --abort; sleep 2; continue; }
+            if git push origin HEAD:"$BRANCH"; then exit 0; fi
+            sleep 2
+          done
+          exit 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gambit-library-phase2-${{ github.run_id }}
+          path: artifacts/gambit-library-phase2/
+          retention-days: 60
+          if-no-files-found: error
