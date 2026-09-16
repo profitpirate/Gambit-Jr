@@ -1,0 +1,143 @@
+{
+  "actual_axiom_execution": false,
+  "assumed_token_account_bytes": 200,
+  "campaign_name": "golden-loss2s-ab-fresh-20260916",
+  "completion": {
+    "cost_reconciliation_required": true,
+    "economic_profitability_required_to_finish_experiment": false,
+    "every_traded_creation_independently_confirmed": true,
+    "minimum_matched_closed": 100,
+    "minimum_verified_forward_per_model": 100,
+    "missing_post_exit_ticks_are_unknown_not_false": true,
+    "no_unresolved_inventory": true,
+    "post_exit_measured_separately_for_each_arm": true,
+    "same_mint_cohort_across_12_arms": false
+  },
+  "cost_provenance": {
+    "actual_axiom_profit_and_fees": {
+      "classification": "UNAVAILABLE_NO_BROADCAST",
+      "value": null
+    },
+    "actual_axiom_transaction_failure_rate": {
+      "classification": "UNMEASURED",
+      "value": null
+    },
+    "axiom_fee": {
+      "classification": "DOCUMENTED_CONFIG_NOT_ACCOUNT_OBSERVATION",
+      "note": "1 percent before cashback, inferred from documented net plus cashback; no unobserved rebate credited",
+      "source": "https://docs.axiom.trade/getting-started/fees/axiom-fees"
+    },
+    "base_fee": {
+      "classification": "DOCUMENTED_CONFIG_NOT_ACTUAL_FEE",
+      "one_signature_assumed": true,
+      "source": "https://solana.com/docs/core/fees/fee-structure"
+    },
+    "checked_date": "2026-09-15",
+    "delay": {
+      "classification": "SENSITIVITY_ASSUMPTION",
+      "note": "250 ms delay for every submission, including every partial and final sell; NOT a certification of Axiom inclusion speed."
+    },
+    "failed_attempts": {
+      "classification": "MODELLED_FAILURE_NOT_REAL_TRANSACTION",
+      "note": "Live quote drift beyond slippage produces a modeled landed failure charged base and priority; in-transaction tip and swap fees roll back. Dropped/revert-protected alternatives are reported in sensitivity, not invented as observations.",
+      "source": "https://solana.com/docs/core/fees/fee-structure"
+    },
+    "priority_tip": {
+      "classification": "DOCUMENTED_DEFAULTS_NOT_USER_PRESET",
+      "note": "Each 0.001 SOL; not a measured fee bid required for a particular trade",
+      "source": "https://docs.axiom.trade/getting-started/fees/solana-fees"
+    },
+    "pump_fee": {
+      "classification": "DOCUMENTED_CONFIG_NOT_ACTUAL_FEE",
+      "note": "SOL bonding curve total protocol and creator fee, no graduated-pool route assumed",
+      "source": "https://pump.fun/docs/fees"
+    },
+    "rent": {
+      "classification": "OBSERVED_RPC_QUOTE_WITH_ASSUMED_ACCOUNT_SIZE",
+      "note": "200 bytes is a cost scenario, not a verified Axiom token-account layout. Refund on final close is a model assumption."
+    },
+    "slippage": {
+      "classification": "CAUSAL_LIVE_RESERVE_MODEL",
+      "note": "Quote-to-fill drift and constant-product price impact, not a made-up realized Axiom fill; 20 percent tolerance is an experimental setting."
+    }
+  },
+  "execution": "PAPER_ONLY",
+  "execution_model": {
+    "base_fee_sol": 5e-06,
+    "feed_stale_ms": 3000,
+    "inclusion_delay_ms": 250,
+    "max_attempts": 5,
+    "max_concurrent": 2,
+    "max_entry_age_ms": 3000,
+    "max_slippage_bps": 2000,
+    "platform_bps": 100.0,
+    "post_seconds": 20,
+    "priority_sol": 0.001,
+    "protocol_bps": 125.0,
+    "reserve_sol": 0.03,
+    "retry_ms": 250,
+    "starting_sol": 3.0,
+    "tip_sol": 0.001
+  },
+  "experiment": "golden-loss2s-forward-ab-v1",
+  "families": [
+    "FULL"
+  ],
+  "horizons_seconds": [
+    3,
+    4,
+    7
+  ],
+  "implementation_sha256": {
+    "tools/golden_horizon_engine.py": "d08244c86c55316a4be01b965901a44e37706d47432bfb4ed2d32fc791dc41a3",
+    "tools/golden_horizon_live.py": "d8c6fac7220234443d6c03634b8323255cb2b38423f1622661cdd7c51e0880aa",
+    "tools/golden_loss2s_campaign.py": "794aaa1ab3355713ab392374b57ab3dd50ff99400365e2b63d18558bf91a25fa",
+    "tools/golden_loss2s_engine.py": "07f25057eb98c4401eb561927f5620373e9c6ee09099622f5f23a0cc8ae7204e",
+    "tools/golden_loss2s_prepare.py": "4d1b4f5d9a4fee2224589e62e5d4c48ea1abebabfe9c0992144a062c074cfa15",
+    "tools/golden_loss2s_publish.py": "457820ff8c0c2020f0f02b5e731315e2472329c5cb644439352eb8ab5f7374c6",
+    "tools/golden_loss2s_report.py": "c044d242fccd8bd881dd900174372c611e24547f5b9857f1cb662eb4b11b3383",
+    "tools/golden_loss2s_solana.py": "04cbb7cf228e2fee19594c23cd933a865575a3e837050241088b64a0cc4c4dc0",
+    "tools/golden_top4_engine.py": "b7eb4fdc2c5c706e0f6261517273b4d6fb5ac6587df96a7b62d61d6a34ca575a",
+    "tools/golden_top4_solana.py": "733dad844d36adf4e199b9a5eea0f8312ecb0094955457dc50ed8b5e8f1ac725",
+    "tools/golden_top4_v2_eventstream.py": "d6aa6efda799440c8434ef84703a0b4259ae6d3bdfce81bdaca5241ef0eb4af2"
+  },
+  "limitations": [
+    "Axiom is the documented fee reference, not an authenticated market/execution connection.",
+    "Per-arm virtual reserve overlays preserve own partial-sell impact, while holding externally observed trader reserve changes fixed; that counterfactual approximation does not prove actual execution.",
+    "Unmodeled leader admission, MEV, route failure and network drops remain unknown; a zero modeled failure count cannot establish a real zero failure rate.",
+    "Safety and cost-model changes make this a new experiment, not a continuation of the earlier low-cost paper balances.",
+    "Horizon selection on these data is exploratory; the chosen finalists require the separately requested unseen multi-day stress/forward phase.",
+    "The 2s rule is causal: it can only classify a trade by its observed net mark at the checkpoint, not by its eventual hindsight outcome.",
+    "A 2000ms exit decision still uses the campaign's modeled inclusion delay; it is not a claim of an on-chain fill exactly at 2000ms.",
+    "Shadow arms start with separate 3 SOL paper accounts; later admission divergence caused by their own bankroll/concurrency is retained as a policy consequence."
+  ],
+  "market_source": "DIRECT_SOLANA_NEW_CREATIONS",
+  "model_semantics": "Fresh six-account forward A/B: the four existing top4 models are unchanged; FULL_3S_2S_LOSS_EXIT and FULL_3S_V2_2S_LOSS_EXIT use one causal 2000ms net-after-costs loss checkpoint, then retain the parent 3000ms horizon when the checkpoint is non-negative.",
+  "models": [
+    "FULL_3S",
+    "FULL_4S",
+    "FULL_7S",
+    "FULL_3S_V2",
+    "FULL_3S_2S_LOSS_EXIT",
+    "FULL_3S_V2_2S_LOSS_EXIT"
+  ],
+  "phase_order": [
+    "build_configure_verify",
+    "prospective_live_market_100_matched_closed",
+    "audit_report_conclusion"
+  ],
+  "starting_balance_sol_per_arm": 3,
+  "target_matched_closed_per_arm": 100,
+  "target_per_model": 100,
+  "truth_constraints": {
+    "actual_axiom_fills": false,
+    "all_failed_attempt_costs_retained": true,
+    "axiom_listing_verified": null,
+    "broadcast_transactions": false,
+    "drop_losing_or_unresolved_positions": false,
+    "frozen_historical_corpus_use": "prior reputation features only; never counted as prospective outcomes",
+    "historical_market_replay_in_live_phase": false,
+    "reset_bankroll_on_failure": false,
+    "synthetic_prices_in_live_phase": false
+  }
+}
