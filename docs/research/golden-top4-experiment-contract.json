@@ -1,5 +1,5 @@
 {
-  "schema": "golden-top4-contract-1",
+  "schema": "golden-top4-contract-2",
   "campaign_name": "golden-top3-full3sv2-fresh-20260916",
   "status": "BUILD_AND_SOURCE_VERIFICATION_PENDING_NOT_LAUNCHED",
   "execution": "PAPER_ONLY",
@@ -20,9 +20,11 @@
     "report_full_campaign_and_common_coin_subset_separately": true
   },
   "market_evidence": {
+    "source": "DIRECT_SOLANA_NEW_CREATIONS",
+    "source_change_authorization": "User explicitly requested: for now just start live testing on live solana launches like before",
     "fresh_creation_observed_after_session_start": true,
     "creation_transaction_must_be_confirmed": true,
-    "axiom_market_visibility_required": true,
+    "axiom_market_visibility_required": false,
     "axiom_connection_verified": false,
     "direct_solana_data_is_not_axiom_listing_proof": true,
     "no_replay_or_synthetic_prices_in_live_results": true,
@@ -31,7 +33,7 @@
   },
   "per_attempt_reporting": {
     "events": ["ENTRY_INTENT", "BUY_FILL", "EXIT_INTENT", "SELL_FILL", "FAILED_ATTEMPT", "RETRY", "ABORT", "RECONCILIATION"],
-    "fields": ["campaign_id", "event_id", "model", "coin_name", "mint", "launch_signature", "axiom_market_evidence", "decision_time", "quote_time", "fill_time", "reason", "tier", "stake_sol", "token_quantity", "slippage", "price_impact", "fees_by_category", "cash", "equity", "gross_pnl", "net_pnl", "cumulative_pnl", "wins", "losses", "win_rate"],
+    "fields": ["campaign_id", "event_id", "model", "coin_name", "mint", "launch_signature", "market_data_source", "decision_time", "quote_time", "fill_time", "reason", "tier", "stake_sol", "token_quantity", "slippage", "price_impact", "fees_by_category", "cash", "equity", "gross_pnl", "net_pnl", "cumulative_pnl", "wins", "losses", "win_rate"],
     "durable_journal_required": true,
     "externally_accessible_feed_with_delivery_acknowledgement_required": true,
     "delivery_destination_verified": false,
@@ -58,7 +60,7 @@
   "completion": {
     "minimum_100_closed_forward_trades_each": true,
     "confirmed_creation_proofs": true,
-    "axiom_visibility_proofs": true,
+    "axiom_visibility_proofs": false,
     "no_unresolved_inventory_or_post_exit_tracking": true,
     "reconciled_accounts_and_attempt_costs": true,
     "published_entry_exit_event_completeness": true,
@@ -67,5 +69,5 @@
   "final_report": ["per-model trades wins losses WR", "gross and net modelled SOL PnL", "ending balances", "cost breakdown", "profit factor", "drawdown", "measured local versus assumed execution timing", "failed attempts and costs", "every coin entry and exit with rationale", "winners and losers analysis", "post-exit paths and missed opportunity analysis without hindsight claims", "V2 prevented losses and sacrificed winners", "outlier and cost sensitivity", "same-window independently reconciled E4 audit", "research conclusion and limitations"],
   "live_testing_started": false,
   "current_new_campaign_trades": 0,
-  "note": "This contract is a requirement record, not evidence of implementation, successful tests, Axiom connectivity, live deployment or profitability."
+  "note": "This revision records the authorized source change only. It does not modify the runner, remove its existing code interlock, validate the event publisher or launch a workflow. Those implementation steps must be completed and verified separately. Real launches and modelled executions/costs must remain clearly distinguished."
 }
