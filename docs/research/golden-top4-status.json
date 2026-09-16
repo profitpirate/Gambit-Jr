@@ -1,0 +1,29 @@
+{
+  "status": "BLOCKED_AXIOM_DATA_ACCESS",
+  "offline_interlock_tests_passed": [54, 16],
+  "total_unit_integration_tests": 70,
+  "checked_ns": 1789559499498632840,
+  "source_commit": "3c87d91ace800c56ce11d1fc5e9db889de55fb9d",
+  "run_id": "35092575163",
+  "artifact_id": 10444308311,
+  "artifact_sha256": "62e9ee78290c7f535169e4b12c7fe3d85a3a5bd2a27a8b66079e64903ce7f613",
+  "artifact_downloaded_and_hash_verified": true,
+  "axiom_source_check": "docs/research/golden-top4-axiom-source-check.json",
+  "axiom_live_feed_verified": false,
+  "live_testing_started": false,
+  "e4_monitor_started": false,
+  "new_campaign_trades": 0,
+  "actual_profit_sol": null,
+  "models": ["FULL_3S", "FULL_4S", "FULL_7S", "FULL_3S_V2"],
+  "starting_sol_per_model": 3,
+  "target_closed_forward_trades_per_model": 100,
+  "previous_campaign_unchanged": true,
+  "frozen_v2_sources_hash_verified_unchanged": true,
+  "not_a_full_campaign_certification": true,
+  "remaining": [
+    "Approved first-party Axiom market-data transport and real per-coin observations; anonymous runner application-page requests returned HTTP 403.",
+    "Live publisher delivery verification after each entry and exit.",
+    "Full four-model readiness and final-report validation before launching."
+  ],
+  "note": "Unit-test PASS is not source readiness or a launched trading test. The Axiom loader remains deliberately unavailable, so both startup and the entry wrapper block unverified live data. No alternate source was silently substituted."
+}
