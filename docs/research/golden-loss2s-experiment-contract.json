@@ -1,0 +1,48 @@
+{
+  "schema": "golden-loss2s-contract-1",
+  "campaign_name": "golden-loss2s-ab-fresh-20260916",
+  "status": "AUTHORIZED_FRESH_FORWARD_AB",
+  "execution": "PAPER_ONLY",
+  "real_money_execution_authorized": false,
+  "starting_sol_per_model": 3.0,
+  "target_closed_forward_trades_per_model": 100,
+  "models": [
+    "FULL_3S",
+    "FULL_4S",
+    "FULL_7S",
+    "FULL_3S_V2",
+    "FULL_3S_2S_LOSS_EXIT",
+    "FULL_3S_V2_2S_LOSS_EXIT"
+  ],
+  "test_question": "Does a one-shot 2s net-loss exit improve or reduce forward paper expectancy versus the unchanged FULL_3S and FULL_3S_V2 parents?",
+  "checkpoint": {
+    "clock_origin": "MODELLED_BUY_FILL",
+    "decision_ms": 2000,
+    "loss_definition": "current liquidation mark is net negative after modeled exit percentage/fixed costs and fees already paid",
+    "negative_action": "full remaining exit intent",
+    "non_negative_action": "checkpoint permanently passes; retain parent 3000ms horizon",
+    "execution_delay_unchanged": true,
+    "hindsight_final_outcome_not_used": true
+  },
+  "comparison": {
+    "existing_top4_campaign_is_not_modified": true,
+    "fresh_accounts_no_previous_pnl_imported": true,
+    "parent_strategy_sources_unchanged": true,
+    "same_direct_solana_market_observations": true,
+    "shadow_only_receives_signal_after_parent_admission": true,
+    "primary_metric": "paired verified shadow_minus_parent_net_pnl_sol",
+    "secondary_diagnostics": [
+      "checkpoint_triggered_count",
+      "eventual_parent_winners_cut_at_2s",
+      "eventual_parent_losses_cut_at_2s",
+      "win_rate",
+      "drawdown"
+    ]
+  },
+  "evidence": {
+    "fresh_confirmed_creations_only": true,
+    "synthetic_prices_in_live_results": false,
+    "post_exit_observation_required": true,
+    "unresolved_or_uncertain_positions_excluded_from_verified_count": true
+  }
+}
