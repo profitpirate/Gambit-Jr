@@ -37,15 +37,20 @@ jobs:
           corpus="$(find frozen -name e4-v12-allout-launch-corpus.jsonl.gz -print -quit)"
           test -s "$corpus"
           echo "CORPUS=$corpus" >> "$GITHUB_ENV"
-      - name: Compile and prove read-only scanner
+      - name: Harden archival RPC fallback then prove scanner is read-only
         run: |
-          python -m py_compile tools/e4_library_full_history.py
           python - <<'PY'
           from pathlib import Path
-          s=Path('tools/e4_library_full_history.py').read_text()
+          p=Path('tools/e4_library_full_history.py')
+          s=p.read_text()
+          s=s.replace('RPCS = ("https://api.mainnet-beta.solana.com", "https://solana-rpc.publicnode.com")',
+                      'RPCS = ("https://api.mainnet-beta.solana.com", "https://solana-rpc.publicnode.com", "https://rpc.ankr.com/solana")')
+          s=s.replace('if code in (-32005, -32603, -32701):', 'if code in (-32005, -32603, -32701, -32020):')
+          p.write_text(s)
           forbidden=('sendTransaction','signTransaction','sendRawTransaction','Keypair.from','secret_key')
           assert not any(x in s for x in forbidden), 'scanner must stay read-only'
           PY
+          python -m py_compile tools/e4_library_full_history.py
       - name: Scan all RPC-visible E4 history and build library
         run: |
           mkdir -p artifacts/e4-library
