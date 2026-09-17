@@ -1,6 +1,10 @@
 name: Golden live campaign watchdog
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/golden-live-watchdog.yml'
   workflow_run:
     workflows:
       - Golden top4 - live Solana paper and E4
@@ -96,10 +100,8 @@ jobs:
             )
             echo "[$KEY] active run=$active_id run_age=${run_age}s heartbeat_age=${heartbeat_age}s"
 
-            # Give setup/preflight a generous grace period. Once a live segment is mature,
-            # a missing heartbeat means the collector is stale even if Actions still says running.
             if (( run_age >= 600 && heartbeat_age > 300 )); then
-              echo "[$KEY] stale collector detected; cancelling this stale attempt so the completion hook/schedule can recover it"
+              echo "[$KEY] stale collector detected; cancelling stale attempt so the completion hook/schedule can recover it"
               gh run cancel "$active_id" --repo "$GITHUB_REPOSITORY" || true
             else
               echo "[$KEY] active segment is healthy or still inside startup grace"
