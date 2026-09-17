@@ -10,7 +10,7 @@ permissions:
   actions: read
 concurrency:
   group: gambit-library-phase3-forward
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   forward-paper:
     runs-on: ubuntu-latest
@@ -38,14 +38,15 @@ jobs:
           m=json.load(open('docs/research/gambit-library-phase2-complete.json'))
           assert m['phase']=='PHASE_2_COMPLETE'
           PY
-          PYTHONPATH=tools python -m py_compile tools/gambit_library_policy.py tools/gambit_library_competitor.py tools/gambit_library_phase3_stress.py
+          PYTHONPATH=tools python -m py_compile tools/gambit_library_policy.py tools/gambit_library_competitor.py tools/gambit_library_competitor_v2.py tools/gambit_library_phase3_stress.py tools/gambit_library_phase3_horizon_test.py
           PYTHONPATH=tools python tools/gambit_library_phase3_stress.py | tee /tmp/library-phase3-stress.json
+          PYTHONPATH=tools python tools/gambit_library_phase3_horizon_test.py | tee /tmp/library-phase3-horizon-test.json
       - name: Run independent forward-paper competitor and publish live status
         run: |
           set -euo pipefail
           OUT=artifacts/gambit-library-phase3
           mkdir -p "$OUT"
-          PYTHONPATH=tools python tools/gambit_library_competitor.py \
+          PYTHONPATH=tools python tools/gambit_library_competitor_v2.py \
             --master-devs docs/research/gambit-library-devs.json \
             --execution-manifest config/golden-top4-live.json \
             --decoder src/memecoin_bot/realtime/pumpfun.py \
@@ -130,5 +131,6 @@ jobs:
           path: |
             artifacts/gambit-library-phase3/
             /tmp/library-phase3-stress.json
+            /tmp/library-phase3-horizon-test.json
           retention-days: 60
           if-no-files-found: warn
