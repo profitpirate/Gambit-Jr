@@ -28,7 +28,7 @@ import golden_buyer_reputation_core as core
 import golden_management_v2 as v2
 import golden_management_v2_1 as v21
 
-VERSION = "golden-sevenmodel-forward-v1"
+VERSION = "golden-sevenmodel-forward-v2-library-active"
 MODELS = (
     "FULL_3S",
     "FULL_4S",
@@ -650,16 +650,20 @@ async def process(args: argparse.Namespace) -> int:
             "FULL_3S": bool(qualifies),
             "FULL_4S": bool(qualifies),
             "FULL_3S_V2_1": bool(qualifies),
-            "FULL_3S_LIBRARY": bool(qualifies and not lib["strong_negative"]),
-            "FULL_3S_V2_1_LIBRARY": bool(qualifies and not lib["strong_negative"]),
+            "FULL_3S_LIBRARY": bool((qualifies or lib["positive"]) and not lib["strong_negative"]),
+            "FULL_3S_V2_1_LIBRARY": bool((qualifies or lib["positive"]) and not lib["strong_negative"]),
             "E4_PREARMED": bool(prearm["qualifies"]),
-            "E4_PREARMED_CONVICTION_LIBRARY": bool(prearm["qualifies"]),
+            "E4_PREARMED_CONVICTION_LIBRARY": bool(prearm["qualifies"] and not lib["strong_negative"]),
         }
         audit["launches"] += 1
         audit["golden_qualified"] += int(qualifies)
         audit["e4_prearmed_qualified"] += int(prearm["qualifies"])
         audit["library_positive"] += int(lib["positive"])
         audit["library_strong_negative"] += int(lib["strong_negative"])
+        audit["library_positive_golden_overlap"] += int(lib["positive"] and qualifies)
+        audit["library_positive_standalone"] += int(lib["positive"] and not qualifies)
+        audit["library_negative_golden_veto"] += int(lib["strong_negative"] and qualifies)
+        audit["library_negative_e4_veto"] += int(lib["strong_negative"] and prearm["qualifies"])
 
         for name, selected in selections.items():
             acc = accounts[name]
@@ -685,6 +689,16 @@ async def process(args: argparse.Namespace) -> int:
             else:
                 conv, kind = prearm_conv, "e4"
 
+            if name in {"FULL_3S_LIBRARY", "FULL_3S_V2_1_LIBRARY"}:
+                selection_source = ("GOLDEN_PLUS_LIBRARY_POSITIVE" if qualifies and lib["positive"] else
+                                    "LIBRARY_POSITIVE" if lib["positive"] else "GOLDEN")
+            elif name == "E4_PREARMED_CONVICTION_LIBRARY":
+                selection_source = "E4_PREARMED_WITH_LIBRARY_FILTER_AND_SIZING"
+            elif name == "E4_PREARMED":
+                selection_source = "E4_PREARMED"
+            else:
+                selection_source = "GOLDEN"
+
             fraction = finite(conv.get("position_fraction"), 0.05)
             budget = acc.budget(fraction)
             if budget <= BUY_FIXED + 1e-6:
@@ -705,7 +719,7 @@ async def process(args: argparse.Namespace) -> int:
                 continue
             trade.update({
                 "model": name, "mint": mint, "creator": creator, "decision_ns": model_decision_ns,
-                "position_fraction": fraction, "conviction": conv,
+                "position_fraction": fraction, "conviction": conv, "selection_source": selection_source,
                 "library_stats_at_decision": lib if "LIBRARY" in name else None,
                 "prearmed_e4": prearm if name.startswith("E4_") else None,
                 "paper_only": True, "real_money_execution": False,
