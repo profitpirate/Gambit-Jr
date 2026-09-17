@@ -1,45 +1,45 @@
 {
   "active_positions": 0,
-  "cash_sol": 2.197374790075512,
-  "checked_ns": 1789619805539154046,
-  "closed_trades": 46,
+  "cash_sol": 2.1583616165887727,
+  "checked_ns": 1789619867220825146,
+  "closed_trades": 49,
   "collector_active": true,
   "counts": {
-    "closed_trades": 46,
-    "creation_proof_confirmed": 454,
-    "decisions": 454,
-    "entries": 46,
-    "fresh_launches": 454,
+    "closed_trades": 49,
+    "creation_proof_confirmed": 466,
+    "decisions": 466,
+    "entries": 49,
+    "fresh_launches": 466,
     "modelled_landed_failures": 3,
-    "observation_resolved": 448,
-    "observation_unknown": 6,
+    "observation_resolved": 459,
+    "observation_unknown": 7,
     "rejected_concurrency": 5,
-    "rejected_dev_rule": 403,
+    "rejected_dev_rule": 412,
     "rejected_nonfresh_or_unquotable_create": 28,
-    "selected": 46
+    "selected": 49
   },
-  "equity_sol": 2.197374790075512,
+  "equity_sol": 2.1583616165887727,
   "errors": [],
   "feed_stats": {
     "wss://api.mainnet-beta.solana.com": {
-      "connections": 1,
-      "disconnects": 6,
+      "connections": 2,
+      "disconnects": 48,
       "last_error": "WSServerHandshakeError:413, message='Invalid response status', url='wss://api.mainnet-beta.solana.com'",
-      "last_receive_ns": 1789619801649711900,
-      "messages": 593334
+      "last_receive_ns": 1789619867206290201,
+      "messages": 611389
     },
     "wss://solana-rpc.publicnode.com": {
       "connections": 2,
       "disconnects": 1,
-      "last_receive_ns": 1789619805538916022,
-      "messages": 261201
+      "last_receive_ns": 1789619867220609594,
+      "messages": 272016
     }
   },
   "frozen_four_campaign_touched": false,
-  "losses": 40,
-  "maximum_mark_to_market_drawdown": 0.267541736641496,
+  "losses": 43,
+  "maximum_mark_to_market_drawdown": 0.28054612780374244,
   "model": "FULL_3S_V2_LIBRARY",
-  "net_pnl_sol": -0.8026252099244879,
+  "net_pnl_sol": -0.8416383834112273,
   "note": "Independent read-only Solana observer and paper account; no blockchain submission path.",
   "paper_only": true,
   "real_execution": false,
@@ -54,6 +54,6 @@
   },
   "started_ns": 1789618554415076085,
   "version": "gambit-library-forward-paper-v2-causal-horizon",
-  "win_rate": 0.13043478260869565,
+  "win_rate": 0.12244897959183673,
   "wins": 6
 }
