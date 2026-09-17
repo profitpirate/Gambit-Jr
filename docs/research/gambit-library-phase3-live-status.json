@@ -1,43 +1,44 @@
 {
-  "active_positions": 0,
-  "cash_sol": 2.3971854635207515,
-  "checked_ns": 1789619428326033898,
-  "closed_trades": 27,
+  "active_positions": 2,
+  "cash_sol": 2.1333326668123433,
+  "checked_ns": 1789619489496530052,
+  "closed_trades": 30,
   "collector_active": true,
   "counts": {
-    "closed_trades": 27,
-    "creation_proof_confirmed": 314,
-    "decisions": 317,
-    "entries": 27,
-    "fresh_launches": 317,
+    "closed_trades": 30,
+    "creation_proof_confirmed": 348,
+    "decisions": 349,
+    "entries": 32,
+    "fresh_launches": 349,
     "modelled_landed_failures": 3,
-    "observation_resolved": 309,
+    "observation_resolved": 343,
     "observation_unknown": 4,
-    "rejected_dev_rule": 290,
-    "rejected_nonfresh_or_unquotable_create": 22,
-    "selected": 27
+    "rejected_concurrency": 2,
+    "rejected_dev_rule": 315,
+    "rejected_nonfresh_or_unquotable_create": 23,
+    "selected": 32
   },
-  "equity_sol": 2.3971854635207515,
+  "equity_sol": 2.3522385660098433,
   "errors": [],
   "feed_stats": {
     "wss://api.mainnet-beta.solana.com": {
       "connections": 1,
       "disconnects": 0,
-      "last_receive_ns": 1789619428129945970,
-      "messages": 379917
+      "last_receive_ns": 1789619489496240503,
+      "messages": 405054
     },
     "wss://solana-rpc.publicnode.com": {
       "connections": 1,
       "disconnects": 0,
-      "last_receive_ns": 1789619428325874121,
-      "messages": 183930
+      "last_receive_ns": 1789619489215435489,
+      "messages": 196955
     }
   },
   "frozen_four_campaign_touched": false,
-  "losses": 22,
+  "losses": 25,
   "maximum_mark_to_market_drawdown": 0.2366765203135084,
   "model": "FULL_3S_V2_LIBRARY",
-  "net_pnl_sol": -0.6028145364792485,
+  "net_pnl_sol": -0.8666673331876567,
   "note": "Independent read-only Solana observer and paper account; no blockchain submission path.",
   "paper_only": true,
   "real_execution": false,
@@ -52,6 +53,6 @@
   },
   "started_ns": 1789618554415076085,
   "version": "gambit-library-forward-paper-v2-causal-horizon",
-  "win_rate": 0.18518518518518517,
+  "win_rate": 0.16666666666666666,
   "wins": 5
 }
