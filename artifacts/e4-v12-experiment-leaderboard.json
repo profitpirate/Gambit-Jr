@@ -680,12 +680,12 @@
       "dataset": "rolling-runs:35154160151,35111912496,35059255779,35033061375,34997947877,34938012082,34908603039,34869885137,34809168521,34779504872,34770227385,34760648934,34749576265,34729110702,34722511299,34709541936,34684115937,34660606300,34627236811",
       "drawdown": null,
       "experiment_id": "e4x-263f598323ce98a3e1d32536241f6b3293cc1ef7b0f19b3d5fa601401ca842ea",
-      "failure_reason": null,
+      "failure_reason": "INFRASTRUCTURE_FAILURE",
       "has_chronological_holdout": false,
       "holdout_wr": null,
       "latency_coverage": null,
       "live_status": null,
-      "next_required_change": null,
+      "next_required_change": "retry after backoff without changing scientific identity",
       "pnl": null,
       "profit_factor": null,
       "rank": 46,
@@ -1760,12 +1760,12 @@
       "dataset": "rolling-runs:35154160151,35111912496,35059255779,35033061375,34997947877,34938012082,34908603039,34869885137,34809168521,34779504872,34770227385,34760648934,34749576265,34729110702,34722511299,34709541936,34684115937,34660606300,34627236811",
       "drawdown": null,
       "experiment_id": "e4x-5f14ec5e59dfb7f1f788b428a4a8b9d7342069c9c9e5654ea0d2f1728f5bc635",
-      "failure_reason": null,
+      "failure_reason": "HOLDOUT_COLLAPSE",
       "has_chronological_holdout": false,
       "holdout_wr": null,
       "latency_coverage": null,
       "live_status": null,
-      "next_required_change": null,
+      "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
       "rank": 118,
@@ -1910,12 +1910,12 @@
       "dataset": "rolling-runs:35154160151,35111912496,35059255779,35033061375,34997947877,34938012082,34908603039,34869885137,34809168521,34779504872,34770227385,34760648934,34749576265,34729110702,34722511299,34709541936,34684115937,34660606300,34627236811",
       "drawdown": null,
       "experiment_id": "e4x-649852d0f514a7c370b7137eda39f6be37a0a920d32bbcc3674fa79450552a65",
-      "failure_reason": null,
+      "failure_reason": "NO_TRAIN_SURVIVOR",
       "has_chronological_holdout": false,
       "holdout_wr": null,
       "latency_coverage": null,
       "live_status": null,
-      "next_required_change": null,
+      "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
       "rank": 128,
@@ -2672,6 +2672,21 @@
       "thesis_family": "bayesian-source-confidence"
     },
     {
+      "dataset": "rolling-runs:35154160151,35111912496,35059255779,35033061375,34997947877,34938012082,34908603039,34869885137,34809168521,34779504872,34770227385,34760648934,34749576265,34729110702,34722511299,34709541936,34684115937,34660606300,34627236811",
+      "drawdown": null,
+      "experiment_id": "e4x-82d8083da69e3a093a8c38fda1351d74ba81547f4e4f6f7ec4ec31acdb39cdc9",
+      "failure_reason": null,
+      "has_chronological_holdout": false,
+      "holdout_wr": null,
+      "latency_coverage": null,
+      "live_status": null,
+      "next_required_change": null,
+      "pnl": null,
+      "profit_factor": null,
+      "rank": 179,
+      "thesis_family": "failed-aware-preimpact-v3"
+    },
+    {
       "dataset": "rolling-runs:35111912496,35059255779,35033061375,34997947877,34938012082,34908603039,34869885137,34809168521,34779504872,34770227385,34760648934,34749576265,34729110702,34722511299,34709541936,34684115937,34660606300,34627236811,34586174670",
       "drawdown": null,
       "experiment_id": "e4x-8405ecc47712a48ba2a3409d3b3c338e7c522e88ee36ceb3b9b6317609152844",
@@ -2683,7 +2698,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 179,
+      "rank": 180,
       "thesis_family": "reactive-independent"
     },
     {
@@ -2698,7 +2713,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 180,
+      "rank": 181,
       "thesis_family": "market-only"
     },
     {
@@ -2713,7 +2728,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 181,
+      "rank": 182,
       "thesis_family": "reactive-profit"
     },
     {
@@ -2728,7 +2743,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 182,
+      "rank": 183,
       "thesis_family": "failed-aware-preimpact-v3"
     },
     {
@@ -2743,7 +2758,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 183,
+      "rank": 184,
       "thesis_family": "parallel-master"
     },
     {
@@ -2758,7 +2773,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 184,
+      "rank": 185,
       "thesis_family": "parallel-master"
     },
     {
@@ -2773,7 +2788,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 185,
+      "rank": 186,
       "thesis_family": "reactive-lattice"
     },
     {
@@ -2788,7 +2803,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 186,
+      "rank": 187,
       "thesis_family": "market-only"
     },
     {
@@ -2803,7 +2818,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 187,
+      "rank": 188,
       "thesis_family": "social"
     },
     {
@@ -2818,7 +2833,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 188,
+      "rank": 189,
       "thesis_family": "failed-aware-preimpact-v3"
     },
     {
@@ -2833,7 +2848,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 189,
+      "rank": 190,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -2848,7 +2863,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 190,
+      "rank": 191,
       "thesis_family": "market-only"
     },
     {
@@ -2863,7 +2878,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 191,
+      "rank": 192,
       "thesis_family": "market-only"
     },
     {
@@ -2878,7 +2893,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 192,
+      "rank": 193,
       "thesis_family": "market-only"
     },
     {
@@ -2893,7 +2908,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 193,
+      "rank": 194,
       "thesis_family": "social"
     },
     {
@@ -2908,7 +2923,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 194,
+      "rank": 195,
       "thesis_family": "reactive-lattice"
     },
     {
@@ -2923,7 +2938,7 @@
       "next_required_change": "change source or transport latency assumptions/code",
       "pnl": null,
       "profit_factor": null,
-      "rank": 195,
+      "rank": 196,
       "thesis_family": "reactive-confidence"
     },
     {
@@ -2938,7 +2953,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 196,
+      "rank": 197,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -2953,7 +2968,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 197,
+      "rank": 198,
       "thesis_family": "reactive-independent"
     },
     {
@@ -2968,7 +2983,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 198,
+      "rank": 199,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -2983,7 +2998,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 199,
+      "rank": 200,
       "thesis_family": "failed-aware-preimpact-v3"
     },
     {
@@ -2998,7 +3013,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 200,
+      "rank": 201,
       "thesis_family": "reactive-independent"
     },
     {
@@ -3013,7 +3028,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 201,
+      "rank": 202,
       "thesis_family": "reactive-profit"
     },
     {
@@ -3028,7 +3043,22 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 202,
+      "rank": 203,
+      "thesis_family": "social"
+    },
+    {
+      "dataset": "rolling-runs:35154160151,35111912496,35059255779,35033061375,34997947877,34938012082,34908603039,34869885137,34809168521,34779504872,34770227385,34760648934,34749576265,34729110702,34722511299,34709541936,34684115937,34660606300,34627236811",
+      "drawdown": null,
+      "experiment_id": "e4x-9d5f5f5eb31c128f2c22427c4762cfcfeaddcb6486f7ed4315b8658e33eedf09",
+      "failure_reason": null,
+      "has_chronological_holdout": false,
+      "holdout_wr": null,
+      "latency_coverage": null,
+      "live_status": null,
+      "next_required_change": null,
+      "pnl": null,
+      "profit_factor": null,
+      "rank": 204,
       "thesis_family": "social"
     },
     {
@@ -3043,7 +3073,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 203,
+      "rank": 205,
       "thesis_family": "social"
     },
     {
@@ -3058,7 +3088,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 204,
+      "rank": 206,
       "thesis_family": "market-only"
     },
     {
@@ -3073,7 +3103,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 205,
+      "rank": 207,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -3088,7 +3118,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 206,
+      "rank": 208,
       "thesis_family": "reactive-independent"
     },
     {
@@ -3103,7 +3133,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 207,
+      "rank": 209,
       "thesis_family": "reactive-profit"
     },
     {
@@ -3118,7 +3148,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 208,
+      "rank": 210,
       "thesis_family": "reactive-independent"
     },
     {
@@ -3133,7 +3163,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 209,
+      "rank": 211,
       "thesis_family": "market-only"
     },
     {
@@ -3148,7 +3178,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 210,
+      "rank": 212,
       "thesis_family": "failed-aware-preimpact-v3"
     },
     {
@@ -3163,7 +3193,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 211,
+      "rank": 213,
       "thesis_family": "parallel-master"
     },
     {
@@ -3178,7 +3208,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 212,
+      "rank": 214,
       "thesis_family": "reactive-profit"
     },
     {
@@ -3193,7 +3223,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 213,
+      "rank": 215,
       "thesis_family": "parallel-master"
     },
     {
@@ -3208,7 +3238,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 214,
+      "rank": 216,
       "thesis_family": "reactive-lattice"
     },
     {
@@ -3223,7 +3253,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 215,
+      "rank": 217,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -3238,7 +3268,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 216,
+      "rank": 218,
       "thesis_family": "parallel-master"
     },
     {
@@ -3253,7 +3283,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 217,
+      "rank": 219,
       "thesis_family": "parallel-master"
     },
     {
@@ -3268,7 +3298,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 218,
+      "rank": 220,
       "thesis_family": "failed-aware-preimpact-v3"
     },
     {
@@ -3283,7 +3313,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 219,
+      "rank": 221,
       "thesis_family": "reactive-lattice"
     },
     {
@@ -3298,7 +3328,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 220,
+      "rank": 222,
       "thesis_family": "reactive-lattice"
     },
     {
@@ -3313,7 +3343,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 221,
+      "rank": 223,
       "thesis_family": "reactive-independent"
     },
     {
@@ -3328,7 +3358,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 222,
+      "rank": 224,
       "thesis_family": "parallel-master"
     },
     {
@@ -3343,7 +3373,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 223,
+      "rank": 225,
       "thesis_family": "market-only"
     },
     {
@@ -3358,7 +3388,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 224,
+      "rank": 226,
       "thesis_family": "reactive-independent"
     },
     {
@@ -3373,7 +3403,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 225,
+      "rank": 227,
       "thesis_family": "reactive-independent"
     },
     {
@@ -3388,7 +3418,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 226,
+      "rank": 228,
       "thesis_family": "reactive-independent"
     },
     {
@@ -3403,7 +3433,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 227,
+      "rank": 229,
       "thesis_family": "reactive-independent"
     },
     {
@@ -3418,7 +3448,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 228,
+      "rank": 230,
       "thesis_family": "market-only"
     },
     {
@@ -3433,7 +3463,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 229,
+      "rank": 231,
       "thesis_family": "reactive-lattice"
     },
     {
@@ -3448,7 +3478,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 230,
+      "rank": 232,
       "thesis_family": "reactive-profit"
     },
     {
@@ -3463,7 +3493,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 231,
+      "rank": 233,
       "thesis_family": "social"
     },
     {
@@ -3478,7 +3508,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 232,
+      "rank": 234,
       "thesis_family": "reactive-lattice"
     },
     {
@@ -3493,7 +3523,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 233,
+      "rank": 235,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -3508,7 +3538,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 234,
+      "rank": 236,
       "thesis_family": "parallel-master"
     },
     {
@@ -3523,7 +3553,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 235,
+      "rank": 237,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -3538,7 +3568,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 236,
+      "rank": 238,
       "thesis_family": "reactive-profit"
     },
     {
@@ -3553,7 +3583,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 237,
+      "rank": 239,
       "thesis_family": "reactive-profit"
     },
     {
@@ -3568,7 +3598,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 238,
+      "rank": 240,
       "thesis_family": "failed-aware-preimpact-v3"
     },
     {
@@ -3583,7 +3613,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 239,
+      "rank": 241,
       "thesis_family": "failed-aware-preimpact-v3"
     },
     {
@@ -3598,7 +3628,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 240,
+      "rank": 242,
       "thesis_family": "reactive-independent"
     },
     {
@@ -3613,7 +3643,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 241,
+      "rank": 243,
       "thesis_family": "market-only"
     },
     {
@@ -3628,7 +3658,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 242,
+      "rank": 244,
       "thesis_family": "reactive-profit"
     },
     {
@@ -3643,7 +3673,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 243,
+      "rank": 245,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -3658,7 +3688,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 244,
+      "rank": 246,
       "thesis_family": "reactive-independent"
     },
     {
@@ -3673,7 +3703,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 245,
+      "rank": 247,
       "thesis_family": "failed-aware-preimpact-v3"
     },
     {
@@ -3688,7 +3718,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 246,
+      "rank": 248,
       "thesis_family": "reactive-profit"
     },
     {
@@ -3703,7 +3733,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 247,
+      "rank": 249,
       "thesis_family": "social"
     },
     {
@@ -3718,7 +3748,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 248,
+      "rank": 250,
       "thesis_family": "market-only"
     },
     {
@@ -3733,7 +3763,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 249,
+      "rank": 251,
       "thesis_family": "reactive-profit"
     },
     {
@@ -3748,7 +3778,7 @@
       "next_required_change": "change source or transport latency assumptions/code",
       "pnl": null,
       "profit_factor": null,
-      "rank": 250,
+      "rank": 252,
       "thesis_family": "prelaunch-social"
     },
     {
@@ -3763,7 +3793,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 251,
+      "rank": 253,
       "thesis_family": "market-only"
     },
     {
@@ -3778,7 +3808,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 252,
+      "rank": 254,
       "thesis_family": "parallel-master"
     },
     {
@@ -3793,7 +3823,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 253,
+      "rank": 255,
       "thesis_family": "market-only"
     },
     {
@@ -3808,7 +3838,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 254,
+      "rank": 256,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -3823,7 +3853,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 255,
+      "rank": 257,
       "thesis_family": "social"
     },
     {
@@ -3838,7 +3868,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 256,
+      "rank": 258,
       "thesis_family": "reactive-independent"
     },
     {
@@ -3853,7 +3883,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 257,
+      "rank": 259,
       "thesis_family": "market-only"
     },
     {
@@ -3868,7 +3898,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 258,
+      "rank": 260,
       "thesis_family": "market-only"
     },
     {
@@ -3883,7 +3913,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 259,
+      "rank": 261,
       "thesis_family": "reactive-profit"
     },
     {
@@ -3898,7 +3928,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 260,
+      "rank": 262,
       "thesis_family": "reactive-independent"
     },
     {
@@ -3913,7 +3943,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 261,
+      "rank": 263,
       "thesis_family": "parallel-master"
     },
     {
@@ -3928,7 +3958,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 262,
+      "rank": 264,
       "thesis_family": "parallel-master"
     },
     {
@@ -3943,7 +3973,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 263,
+      "rank": 265,
       "thesis_family": "reactive-independent"
     },
     {
@@ -3958,7 +3988,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 264,
+      "rank": 266,
       "thesis_family": "market-only"
     },
     {
@@ -3973,7 +4003,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 265,
+      "rank": 267,
       "thesis_family": "reactive-independent"
     },
     {
@@ -3988,7 +4018,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 266,
+      "rank": 268,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -4003,7 +4033,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 267,
+      "rank": 269,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -4018,7 +4048,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 268,
+      "rank": 270,
       "thesis_family": "social"
     },
     {
@@ -4033,7 +4063,7 @@
       "next_required_change": "change source or transport latency assumptions/code",
       "pnl": null,
       "profit_factor": null,
-      "rank": 269,
+      "rank": 271,
       "thesis_family": "recurrence-shape-v3"
     },
     {
@@ -4048,7 +4078,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 270,
+      "rank": 272,
       "thesis_family": "reactive-profit"
     },
     {
@@ -4063,7 +4093,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 271,
+      "rank": 273,
       "thesis_family": "reactive-profit"
     },
     {
@@ -4078,7 +4108,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 272,
+      "rank": 274,
       "thesis_family": "failed-aware-preimpact-v3"
     },
     {
@@ -4093,7 +4123,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 273,
+      "rank": 275,
       "thesis_family": "reactive-independent"
     },
     {
@@ -4108,7 +4138,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 274,
+      "rank": 276,
       "thesis_family": "reactive-profit"
     },
     {
@@ -4123,7 +4153,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 275,
+      "rank": 277,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -4138,7 +4168,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 276,
+      "rank": 278,
       "thesis_family": "failed-aware-preimpact-v3"
     },
     {
@@ -4153,7 +4183,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 277,
+      "rank": 279,
       "thesis_family": "parallel-master"
     },
     {
@@ -4168,7 +4198,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 278,
+      "rank": 280,
       "thesis_family": "reactive-profit"
     },
     {
@@ -4183,7 +4213,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 279,
+      "rank": 281,
       "thesis_family": "parallel-master"
     },
     {
@@ -4198,7 +4228,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 280,
+      "rank": 282,
       "thesis_family": "parallel-master"
     },
     {
@@ -4213,7 +4243,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 281,
+      "rank": 283,
       "thesis_family": "failed-aware-preimpact-v3"
     },
     {
@@ -4228,22 +4258,22 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 282,
+      "rank": 284,
       "thesis_family": "social"
     },
     {
       "dataset": "rolling-runs:35154160151,35111912496,35059255779,35033061375,34997947877,34938012082,34908603039,34869885137,34809168521,34779504872,34770227385,34760648934,34749576265,34729110702,34722511299,34709541936,34684115937,34660606300,34627236811",
       "drawdown": null,
       "experiment_id": "e4x-e4a28915a5a8da217985f517dd78020f79bcda47c5b006ea8492e510a803f56b",
-      "failure_reason": null,
+      "failure_reason": "NO_TRAIN_SURVIVOR",
       "has_chronological_holdout": false,
       "holdout_wr": null,
       "latency_coverage": null,
       "live_status": null,
-      "next_required_change": null,
+      "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 283,
+      "rank": 285,
       "thesis_family": "market-only"
     },
     {
@@ -4258,7 +4288,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 284,
+      "rank": 286,
       "thesis_family": "market-only"
     },
     {
@@ -4273,7 +4303,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 285,
+      "rank": 287,
       "thesis_family": "reactive-lattice"
     },
     {
@@ -4288,7 +4318,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 286,
+      "rank": 288,
       "thesis_family": "reactive-lattice"
     },
     {
@@ -4303,7 +4333,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 287,
+      "rank": 289,
       "thesis_family": "reactive-profit"
     },
     {
@@ -4318,7 +4348,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 288,
+      "rank": 290,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -4333,22 +4363,22 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 289,
+      "rank": 291,
       "thesis_family": "reactive-profit"
     },
     {
       "dataset": "rolling-runs:35154160151,35111912496,35059255779,35033061375,34997947877,34938012082,34908603039,34869885137,34809168521,34779504872,34770227385,34760648934,34749576265,34729110702,34722511299,34709541936,34684115937,34660606300,34627236811",
       "drawdown": null,
       "experiment_id": "e4x-ea3f0e68b3bdd42e0f7eb1bcf3c715c15276c1fa2eee1f599820039cf7c2f73f",
-      "failure_reason": null,
+      "failure_reason": "HOLDOUT_COLLAPSE",
       "has_chronological_holdout": false,
       "holdout_wr": null,
       "latency_coverage": null,
       "live_status": null,
-      "next_required_change": null,
+      "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 290,
+      "rank": 292,
       "thesis_family": "reactive-profit"
     },
     {
@@ -4363,7 +4393,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 291,
+      "rank": 293,
       "thesis_family": "parallel-master"
     },
     {
@@ -4378,7 +4408,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 292,
+      "rank": 294,
       "thesis_family": "reactive-lattice"
     },
     {
@@ -4393,7 +4423,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 293,
+      "rank": 295,
       "thesis_family": "reactive-profit"
     },
     {
@@ -4408,7 +4438,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 294,
+      "rank": 296,
       "thesis_family": "parallel-master"
     },
     {
@@ -4423,7 +4453,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 295,
+      "rank": 297,
       "thesis_family": "failed-aware-preimpact-v3"
     },
     {
@@ -4438,22 +4468,22 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 296,
+      "rank": 298,
       "thesis_family": "reactive-profit"
     },
     {
       "dataset": "rolling-runs:35154160151,35111912496,35059255779,35033061375,34997947877,34938012082,34908603039,34869885137,34809168521,34779504872,34770227385,34760648934,34749576265,34729110702,34722511299,34709541936,34684115937,34660606300,34627236811",
       "drawdown": null,
       "experiment_id": "e4x-efedde396057a6abfb157a68afb7116962190257e49486b358c307776656d68c",
-      "failure_reason": null,
+      "failure_reason": "NO_TRAIN_SURVIVOR",
       "has_chronological_holdout": false,
       "holdout_wr": null,
       "latency_coverage": null,
       "live_status": null,
-      "next_required_change": null,
+      "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 297,
+      "rank": 299,
       "thesis_family": "reactive-lattice"
     },
     {
@@ -4468,7 +4498,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 298,
+      "rank": 300,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -4483,7 +4513,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 299,
+      "rank": 301,
       "thesis_family": "reactive-independent"
     },
     {
@@ -4498,7 +4528,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 300,
+      "rank": 302,
       "thesis_family": "social"
     },
     {
@@ -4513,7 +4543,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 301,
+      "rank": 303,
       "thesis_family": "reactive-independent"
     },
     {
@@ -4528,7 +4558,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 302,
+      "rank": 304,
       "thesis_family": "reactive-independent"
     },
     {
@@ -4543,7 +4573,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 303,
+      "rank": 305,
       "thesis_family": "social"
     },
     {
@@ -4558,7 +4588,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 304,
+      "rank": 306,
       "thesis_family": "market-only"
     },
     {
@@ -4573,7 +4603,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 305,
+      "rank": 307,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -4588,7 +4618,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 306,
+      "rank": 308,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -4603,7 +4633,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 307,
+      "rank": 309,
       "thesis_family": "reactive-lattice"
     },
     {
@@ -4618,7 +4648,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 308,
+      "rank": 310,
       "thesis_family": "reactive-profit"
     },
     {
@@ -4633,7 +4663,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 309,
+      "rank": 311,
       "thesis_family": "market-only"
     },
     {
@@ -4648,7 +4678,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 310,
+      "rank": 312,
       "thesis_family": "parallel-master"
     },
     {
@@ -4663,7 +4693,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 311,
+      "rank": 313,
       "thesis_family": "reactive-lattice"
     },
     {
@@ -4678,7 +4708,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 312,
+      "rank": 314,
       "thesis_family": "bayesian-source-confidence"
     },
     {
@@ -4693,7 +4723,7 @@
       "next_required_change": "change the thesis or add a genuinely new evidence epoch",
       "pnl": null,
       "profit_factor": null,
-      "rank": 313,
+      "rank": 315,
       "thesis_family": "parallel-master"
     },
     {
@@ -4708,7 +4738,7 @@
       "next_required_change": null,
       "pnl": null,
       "profit_factor": null,
-      "rank": 314,
+      "rank": 316,
       "thesis_family": "market-only"
     },
     {
@@ -4723,7 +4753,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 315,
+      "rank": 317,
       "thesis_family": "failed-aware-preimpact-v3"
     },
     {
@@ -4738,7 +4768,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 316,
+      "rank": 318,
       "thesis_family": "market-only"
     },
     {
@@ -4753,7 +4783,7 @@
       "next_required_change": "change features, model family, parameters, or evidence",
       "pnl": null,
       "profit_factor": null,
-      "rank": 317,
+      "rank": 319,
       "thesis_family": "failed-aware-preimpact-v3"
     }
   ],
