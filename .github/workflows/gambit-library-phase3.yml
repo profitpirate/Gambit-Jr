@@ -1,0 +1,134 @@
+name: Gambit library phase 3 - forward library competitor
+on:
+  push:
+    branches: [codex/golden-top3-full3sv2-live]
+    paths:
+      - '.github/workflows/gambit-library-phase3.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: gambit-library-phase3-forward
+  cancel-in-progress: false
+jobs:
+  forward-paper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BRANCH: codex/golden-top3-full3sv2-live
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/golden-top3-full3sv2-live
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install read-only network dependency
+        run: python -m pip install --disable-pip-version-check 'aiohttp==3.12.15'
+      - name: Require phase 2 and regression/stress gate
+        run: |
+          test -s docs/research/gambit-library-phase2-complete.json
+          test -s docs/research/gambit-library-devs.json
+          python - <<'PY'
+          import json
+          m=json.load(open('docs/research/gambit-library-phase2-complete.json'))
+          assert m['phase']=='PHASE_2_COMPLETE'
+          PY
+          PYTHONPATH=tools python -m py_compile tools/gambit_library_policy.py tools/gambit_library_competitor.py tools/gambit_library_phase3_stress.py
+          PYTHONPATH=tools python tools/gambit_library_phase3_stress.py | tee /tmp/library-phase3-stress.json
+      - name: Run independent forward-paper competitor and publish live status
+        run: |
+          set -euo pipefail
+          OUT=artifacts/gambit-library-phase3
+          mkdir -p "$OUT"
+          PYTHONPATH=tools python tools/gambit_library_competitor.py \
+            --master-devs docs/research/gambit-library-devs.json \
+            --execution-manifest config/golden-top4-live.json \
+            --decoder src/memecoin_bot/realtime/pumpfun.py \
+            --output "$OUT" --duration 14400 --target 100 >"$OUT/run.log" 2>&1 &
+          runner=$!
+          publish_one() {
+            src="$1"; dest="$2"
+            [ -s "$src" ] || return 0
+            sha="$(gh api "repos/$GITHUB_REPOSITORY/contents/$dest?ref=$BRANCH" --jq .sha 2>/dev/null || true)"
+            SRC="$src" DEST="$dest" SHA="$sha" python - <<'PY'
+          import base64,json,os
+          from pathlib import Path
+          payload={'message':'data(library): phase3 live checkpoint [skip ci]',
+                   'content':base64.b64encode(Path(os.environ['SRC']).read_bytes()).decode(),
+                   'branch':os.environ['BRANCH']}
+          if os.environ.get('SHA'): payload['sha']=os.environ['SHA']
+          Path('/tmp/library-live-payload.json').write_text(json.dumps(payload))
+          PY
+            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$dest" --input /tmp/library-live-payload.json >/dev/null
+          }
+          while kill -0 "$runner" 2>/dev/null; do
+            publish_one "$OUT/status.json" docs/research/gambit-library-phase3-live-status.json || true
+            publish_one "$OUT/library-runtime.json" docs/research/gambit-library-live-runtime.json || true
+            sleep 60
+          done
+          wait "$runner"
+          publish_one "$OUT/status.json" docs/research/gambit-library-phase3-live-status.json || true
+          publish_one "$OUT/library-runtime.json" docs/research/gambit-library-live-runtime.json || true
+      - name: Validate completed forward-paper evidence
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('artifacts/gambit-library-phase3')
+          f=json.load(open(root/'final.json'))
+          t=json.load(open(root/'paper-trades.json'))
+          r=json.load(open(root/'rejections.json'))
+          runtime=json.load(open(root/'library-runtime.json'))
+          assert f['model']=='FULL_3S_V2_LIBRARY'
+          assert f['paper_only'] is True and f['real_execution'] is False
+          assert f['frozen_four_campaign_touched'] is False
+          assert t['model']=='FULL_3S_V2_LIBRARY' and t['paper_only'] is True
+          assert runtime['model']=='FULL_3S_V2_LIBRARY'
+          assert (root/'library-events.jsonl').exists()
+          lines=sum(1 for _ in open(root/'library-events.jsonl'))
+          marker={'phase':'PHASE_3_COMPLETE','model':'FULL_3S_V2_LIBRARY','paper_only':True,
+                  'real_execution':False,'frozen_four_campaign_touched':False,
+                  'workflow_run_id':int(__import__('os').environ['GITHUB_RUN_ID']),
+                  'event_records':lines,'closed_trades':len(t['trades']),
+                  'rejections':len(r['rejections']),'final_status':f}
+          (root/'phase3-complete.json').write_text(json.dumps(marker,indent=2,sort_keys=True)+'\n')
+          PY
+      - name: Persist append-only session and phase 3 completion
+        run: |
+          set -euo pipefail
+          OUT=artifacts/gambit-library-phase3
+          mkdir -p /tmp/libphase3
+          cp "$OUT/final.json" /tmp/libphase3/gambit-library-phase3-final.json
+          cp "$OUT/library-runtime.json" /tmp/libphase3/gambit-library-live-runtime.json
+          cp "$OUT/paper-trades.json" /tmp/libphase3/gambit-library-phase3-paper-trades.json
+          cp "$OUT/rejections.json" /tmp/libphase3/gambit-library-phase3-rejections.json
+          cp "$OUT/library-events.jsonl" "/tmp/libphase3/gambit-library-live-events-${GITHUB_RUN_ID}.jsonl"
+          cp "$OUT/phase3-complete.json" /tmp/libphase3/gambit-library-phase3-complete.json
+          git config user.name gambit-library-research
+          git config user.email actions@users.noreply.github.com
+          git fetch origin "$BRANCH"
+          git checkout -B gambit-library-phase3-persist FETCH_HEAD
+          cp /tmp/libphase3/* docs/research/
+          git add docs/research/gambit-library-phase3-*.json docs/research/gambit-library-live-runtime.json "docs/research/gambit-library-live-events-${GITHUB_RUN_ID}.jsonl"
+          git commit -m 'data(library): phase 3 forward paper evidence [skip ci]'
+          for i in 1 2 3 4 5; do
+            git fetch origin "$BRANCH"
+            git rebase FETCH_HEAD || { git rebase --abort; sleep 2; continue; }
+            if git push origin HEAD:"$BRANCH"; then exit 0; fi
+            sleep 2
+          done
+          exit 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gambit-library-phase3-${{ github.run_id }}
+          path: |
+            artifacts/gambit-library-phase3/
+            /tmp/library-phase3-stress.json
+          retention-days: 60
+          if-no-files-found: warn
