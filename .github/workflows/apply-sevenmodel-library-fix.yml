@@ -1,0 +1,81 @@
+name: Apply seven-model library activation fix
+
+on:
+  push:
+    branches: [codex/golden-sevenmodel-live]
+    paths:
+      - '.github/workflows/apply-sevenmodel-library-fix.yml'
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/golden-sevenmodel-live
+          fetch-depth: 0
+
+      - name: Wait until pre-fix runner is stopped
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 30); do
+            status="$(gh api repos/${GITHUB_REPOSITORY}/actions/runs/35269925488 --jq .status)"
+            if [ "$status" = "completed" ]; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo 'pre-fix run did not stop in time' >&2
+          exit 1
+
+      - name: Activate library selection overlay and reset evidence
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('tools/golden_sevenmodel_live.py')
+          s = p.read_text()
+          replacements = {
+              'VERSION = "golden-sevenmodel-forward-v1"': 'VERSION = "golden-sevenmodel-forward-v2-library-active"',
+              '"FULL_3S_LIBRARY": bool(qualifies and not lib["strong_negative"]),': '"FULL_3S_LIBRARY": bool((qualifies or lib["positive"]) and not lib["strong_negative"]),',
+              '"FULL_3S_V2_1_LIBRARY": bool(qualifies and not lib["strong_negative"]),': '"FULL_3S_V2_1_LIBRARY": bool((qualifies or lib["positive"]) and not lib["strong_negative"]),',
+              '"E4_PREARMED_CONVICTION_LIBRARY": bool(prearm["qualifies"]),': '"E4_PREARMED_CONVICTION_LIBRARY": bool(prearm["qualifies"] and not lib["strong_negative"]),',
+              '        audit["library_strong_negative"] += int(lib["strong_negative"])\n': '        audit["library_strong_negative"] += int(lib["strong_negative"])\n        audit["library_positive_golden_overlap"] += int(lib["positive"] and qualifies)\n        audit["library_positive_standalone"] += int(lib["positive"] and not qualifies)\n        audit["library_negative_golden_veto"] += int(lib["strong_negative"] and qualifies)\n        audit["library_negative_e4_veto"] += int(lib["strong_negative"] and prearm["qualifies"])\n',
+              '            fraction = finite(conv.get("position_fraction"), 0.05)\n': '            if name in {"FULL_3S_LIBRARY", "FULL_3S_V2_1_LIBRARY"}:\n                selection_source = ("GOLDEN_PLUS_LIBRARY_POSITIVE" if qualifies and lib["positive"] else\n                                    "LIBRARY_POSITIVE" if lib["positive"] else "GOLDEN")\n            elif name == "E4_PREARMED_CONVICTION_LIBRARY":\n                selection_source = "E4_PREARMED_WITH_LIBRARY_FILTER_AND_SIZING"\n            elif name == "E4_PREARMED":\n                selection_source = "E4_PREARMED"\n            else:\n                selection_source = "GOLDEN"\n\n            fraction = finite(conv.get("position_fraction"), 0.05)\n',
+              '                "position_fraction": fraction, "conviction": conv,\n': '                "position_fraction": fraction, "conviction": conv, "selection_source": selection_source,\n',
+          }
+          for old, new in replacements.items():
+              if old not in s:
+                  raise SystemExit(f'missing patch target: {old[:100]}')
+              s = s.replace(old, new, 1)
+          p.write_text(s)
+          PY
+          python -m py_compile tools/golden_sevenmodel_live.py
+
+          mkdir -p docs/research/archive/golden-sevenmodel-prefix-v1
+          if [ -f docs/research/golden-sevenmodel-state.json ]; then
+            git mv docs/research/golden-sevenmodel-state.json docs/research/archive/golden-sevenmodel-prefix-v1/state.json
+          fi
+          if [ -f docs/research/golden-sevenmodel-status.json ]; then
+            git mv docs/research/golden-sevenmodel-status.json docs/research/archive/golden-sevenmodel-prefix-v1/status.json
+          fi
+          cat > docs/research/archive/golden-sevenmodel-prefix-v1/README.md <<'EOF'
+          # Seven-model pre-fix evidence
+
+          Archived because the library arms were wired only as post-qualification sizing/veto overlays. Library-positive creators that failed the Golden buyer gate could never enter, which made the library variants identical to their parents in the observed sample. This evidence must not be mixed with the v2 library-active campaign.
+          EOF
+
+      - name: Commit repaired clean campaign
+        run: |
+          set -euo pipefail
+          git config user.name sevenmodel-library-fix
+          git config user.email actions@users.noreply.github.com
+          git rm -f .github/workflows/cancel-sevenmodel-prefx.yml .github/workflows/apply-sevenmodel-library-fix.yml
+          git add tools/golden_sevenmodel_live.py docs/research/archive/golden-sevenmodel-prefix-v1
+          git commit -m 'fix(sevenmodel): make library causally affect selection and reset forward test'
+          git push origin HEAD:codex/golden-sevenmodel-live
