@@ -1,0 +1,52 @@
+{
+  "active_positions": 0,
+  "cash_sol": 3.0,
+  "checked_ns": 1789611540439533908,
+  "closed_trades": 0,
+  "collector_active": true,
+  "counts": {
+    "creation_proof_confirmed": 25,
+    "decisions": 25,
+    "fresh_launches": 25,
+    "observation_unknown": 25,
+    "rejected_dev_rule": 25,
+    "rejected_nonfresh_or_unquotable_create": 3
+  },
+  "equity_sol": 3.0,
+  "errors": [],
+  "feed_stats": {
+    "wss://api.mainnet-beta.solana.com": {
+      "connections": 1,
+      "disconnects": 0,
+      "last_receive_ns": 1789611540439378477,
+      "messages": 7292
+    },
+    "wss://solana-rpc.publicnode.com": {
+      "connections": 1,
+      "disconnects": 0,
+      "last_receive_ns": 1789611540438102373,
+      "messages": 3856
+    }
+  },
+  "frozen_four_campaign_touched": false,
+  "losses": 0,
+  "maximum_mark_to_market_drawdown": 0.0,
+  "model": "FULL_3S_V2_LIBRARY",
+  "net_pnl_sol": 0.0,
+  "note": "Independent read-only Solana observer and paper account; no blockchain submission path.",
+  "paper_only": true,
+  "real_execution": false,
+  "rule": {
+    "horizon_ms": 3000,
+    "min_mean_return": 0.0,
+    "min_resolved": 3,
+    "min_win_rate": 0.6666666666666666,
+    "min_wins": 2,
+    "observation_stake_sol": 0.1,
+    "position_fraction": 0.05
+  },
+  "started_ns": 1789611479679693099,
+  "version": "gambit-library-forward-paper-v1",
+  "win_rate": null,
+  "wins": 0
+}
