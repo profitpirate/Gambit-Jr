@@ -1,0 +1,41 @@
+{
+  "phase": "PHASE_1_COMPLETE",
+  "source": "E4",
+  "summary": {
+    "built_at_ns": 1789601762317965581,
+    "categories": {
+      "golden_bunch": 0,
+      "losses": 60,
+      "losses_after_exit": 0,
+      "wins": 138,
+      "wins_after_exit": 0
+    },
+    "complete_cycles": 199,
+    "creator_coverage": 0,
+    "golden_devs": 0,
+    "known_basis_cycles": 198,
+    "known_losses": 60,
+    "known_net_pnl_sol": 44.87801766300001,
+    "known_wins": 138,
+    "limits": [
+      "RPC-visible history only; missing/pruned RPC history is not invented.",
+      "Only conservative single-token SOL cashflow cycles are called trades; ambiguous multi-asset activity remains unclassified.",
+      "Corpus post-exit views use fixed launch horizons and are not exact relative-to-exit ticks.",
+      "Creator/dev is known only where the retained launch corpus maps the mint; unknown creators remain UNKNOWN."
+    ],
+    "open_or_unknown_cycles": 2,
+    "phase": "E4_LIBRARY_PHASE1_COMPLETE",
+    "rpc_visible_signature_count": 171612,
+    "schema": "gambit-library-e4-v1",
+    "transaction_counts": {
+      "FAILED_TRANSACTION": 1136,
+      "MISSING_TRANSACTION": 169489,
+      "TRADE_BUY": 199,
+      "TRADE_SELL": 664,
+      "UNCLASSIFIED": 124
+    },
+    "wallet": "E4EzXdwf7NNdqM2XGswWaWHfxgucVCo24PTCcrimTKBz"
+  },
+  "wallet": "E4EzXdwf7NNdqM2XGswWaWHfxgucVCo24PTCcrimTKBz",
+  "workflow_run_id": 35131493766
+}
