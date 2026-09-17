@@ -42,7 +42,8 @@ jobs:
           for p,h in f['source_sha256'].items():
               assert hashlib.sha256(Path(p).read_bytes()).hexdigest()==h,p
           PY
-          python -m py_compile tools/golden_top4_*.py
+          python -m py_compile tools/golden_top4_*.py tools/migration_route_bridge.py
+          python tools/migration_route_bridge.py self-test
           python tools/golden_top4_campaign.py --prepare
           cp config/golden-top4-live.json artifacts/build/manifest.json
           cp docs/research/golden-full3s-v2-freeze.json artifacts/build/
@@ -71,13 +72,14 @@ jobs:
         run: |
           python tools/golden_top4_solana.py --production-root production --corpus "$CORPUS" --manifest config/golden-top4-live.json --output artifacts/smoke --duration 60 --smoke > artifacts/build/live-preflight.log 2>&1
           cat artifacts/smoke/readiness.json
-      - name: Live four-model campaign with per-action cost reporting
-        run: python tools/golden_top4_campaign.py --corpus "$CORPUS" --duration 14400
+      - name: Live four-model campaign with migration-route bridge and per-action cost reporting
+        run: python tools/migration_route_bridge.py campaign --kind top4 --corpus "$CORPUS" --duration 14400
       - name: Preserve sources and evidence regardless of completion
         if: always()
         run: |
           mkdir -p artifacts/source
           cp tools/golden_top4_*.py artifacts/source/
+          cp tools/migration_route_bridge.py artifacts/source/
           cp config/golden-top4-live.json artifacts/source/ 2>/dev/null || true
           cp .github/workflows/golden-top4-solana-live.yml artifacts/source/
       - uses: actions/upload-artifact@v4
