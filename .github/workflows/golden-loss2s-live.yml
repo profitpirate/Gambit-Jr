@@ -4,10 +4,7 @@ on:
     branches: [codex/golden-2s-loss-exit-live]
     paths:
       - '.github/workflows/golden-loss2s-live.yml'
-      - 'tools/golden_loss2s_*.py'
-      - 'tools/migration_route_bridge.py'
-      - 'tests/test_golden_loss2s.py'
-      - 'docs/research/golden-loss2s-experiment-contract.json'
+      - 'docs/research/golden-loss2s-launch.txt'
   workflow_dispatch:
 permissions:
   contents: write
@@ -19,12 +16,13 @@ concurrency:
 jobs:
   forward-live:
     runs-on: ubuntu-latest
-    timeout-minutes: 280
+    timeout-minutes: 75
     env:
       GH_TOKEN: ${{ github.token }}
       BRANCH: codex/golden-2s-loss-exit-live
       PYTHONPATH: tools:tests
       PYTHONUNBUFFERED: '1'
+      LIVE_SEGMENT_SECONDS: '2700'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,6 +35,26 @@ jobs:
 
       - name: Install pinned read-only network dependency
         run: python -m pip install aiohttp==3.14.3
+
+      - name: Install live heartbeat lease shim
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/migration_route_bridge.py')
+          s=p.read_text()
+          needle="                    data=dict(data)\n                    data.update("
+          replacement=(
+              "                    data=dict(data)\n"
+              "                    data['heartbeat_ns']=time.time_ns()\n"
+              "                    data['lease_expires_ns']=data['heartbeat_ns']+90_000_000_000\n"
+              "                    data['liveness_contract']='collector_active is valid only while heartbeat lease is unexpired; Actions run state is authoritative'\n"
+              "                    data.update("
+          )
+          if s.count(needle) != 1:
+              raise SystemExit('heartbeat lease injection point changed')
+          p.write_text(s.replace(needle,replacement))
+          PY
+          python -m py_compile tools/migration_route_bridge.py
 
       - name: Verify frozen parents and prepare A-B manifest
         run: |
@@ -84,8 +102,8 @@ jobs:
             --smoke > artifacts/build/live-preflight.log 2>&1
           cat artifacts/smoke/readiness.json
 
-      - name: Live six-model forward A-B with migration-route bridge and isolated evidence
-        run: python tools/migration_route_bridge.py campaign --kind loss2s --corpus "$CORPUS" --duration 14400
+      - name: Resumable live six-model A-B segment with migration-route bridge
+        run: python tools/migration_route_bridge.py campaign --kind loss2s --corpus "$CORPUS" --duration "$LIVE_SEGMENT_SECONDS"
 
       - name: Preserve sources and evidence regardless of completion
         if: always()
@@ -100,7 +118,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: golden-loss2s-solana-${{ github.run_id }}
+          name: golden-loss2s-solana-${{ github.run_id }}-${{ github.run_attempt }}
           path: artifacts/
           retention-days: 60
           if-no-files-found: error
