@@ -1,0 +1,164 @@
+name: Golden seven-model live 100-trade tournament
+
+on:
+  push:
+    branches: [codex/golden-sevenmodel-live]
+    paths:
+      - '.github/workflows/golden-sevenmodel-live.yml'
+      - 'tools/golden_sevenmodel_live.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: golden-sevenmodel-live-100
+  cancel-in-progress: false
+
+env:
+  PYTHONUNBUFFERED: '1'
+  GH_TOKEN: ${{ github.token }}
+  BRANCH: codex/golden-sevenmodel-live
+
+jobs:
+  forward:
+    runs-on: ubuntu-latest
+    timeout-minutes: 130
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/golden-sevenmodel-live
+          fetch-depth: 0
+
+      - name: Checkout frozen E4 prearmed model only
+        uses: actions/checkout@v4
+        with:
+          repository: profitpirate/Gambit-Jr
+          ref: codex/e4-v12-flow-survival-hazard-v12
+          path: e4freeze
+          sparse-checkout: |
+            research/e4-v12-prearmed-axiom-frozen-model.json
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install capture and evaluation dependencies
+        run: |
+          python -m pip install --disable-pip-version-check -e .
+          python -m pip install --disable-pip-version-check -r requirements-e4.txt numpy 'aiohttp>=3.12,<4'
+          cd tools/e4-builder && npm install --omit=dev
+
+      - name: Freeze roster and compile evaluator
+        run: |
+          python -m py_compile tools/golden_sevenmodel_live.py
+          PYTHONPATH=tools:scripts python - <<'PY'
+          import golden_sevenmodel_live as m
+          assert m.MODELS == (
+              'FULL_3S','FULL_4S','FULL_3S_V2_1','FULL_3S_LIBRARY',
+              'FULL_3S_V2_1_LIBRARY','E4_PREARMED','E4_PREARMED_CONVICTION_LIBRARY')
+          assert m.ENTRY_LATENCY_MS == 20.0
+          print('SEVEN_MODEL_ROSTER_OK')
+          PY
+
+      - name: Restore frozen Golden reputation corpus
+        run: |
+          rm -rf /tmp/golden-corpus
+          mkdir -p /tmp/golden-corpus
+          gh run download 34262315056 --repo "$GITHUB_REPOSITORY" \
+            --name e4-v12-allout-launch-corpus-34262315056 \
+            --dir /tmp/golden-corpus
+          corpus="$(find /tmp/golden-corpus -type f -name '*.jsonl.gz' | head -1)"
+          test -n "$corpus" -a -s "$corpus"
+          echo "CORPUS=$corpus" >> "$GITHUB_ENV"
+
+      - name: Check cumulative completion
+        id: progress
+        run: |
+          complete=false
+          if [ -s docs/research/golden-sevenmodel-status.json ]; then
+            complete="$(jq -r '.complete // false' docs/research/golden-sevenmodel-status.json)"
+          fi
+          echo "complete=$complete" >> "$GITHUB_OUTPUT"
+
+      - name: Capture next untouched future Solana window
+        if: steps.progress.outputs.complete != 'true'
+        run: |
+          set -euo pipefail
+          OUT="artifacts/golden-sevenmodel-${GITHUB_RUN_ID}"
+          mkdir -p "$OUT"
+          echo "OUT=$OUT" >> "$GITHUB_ENV"
+          export E4_HOLDOUT_PROGRESS_PATH="$OUT/capture-progress.json"
+          python scripts/e4_300_launch_holdout_v12_sub10ms.py \
+            --target-launches 400 \
+            --capture-seconds 3600 \
+            --tail-seconds 75 \
+            --heartbeat-seconds 30 \
+            --minimum-launches 50 \
+            --wallet-signatures 200 \
+            --builder-probes 0 \
+            --testnet-route-probes 0 \
+            --stress-iterations 0 \
+            --output "$OUT/batch.json"
+          test -s "$OUT/batch.json"
+          test -s "$OUT/batch-live-events.jsonl"
+
+      - name: Evaluate exactly seven models on the same future window
+        if: steps.progress.outputs.complete != 'true'
+        run: |
+          set -euo pipefail
+          PYTHONPATH=tools:scripts python tools/golden_sevenmodel_live.py \
+            --run-id "$GITHUB_RUN_ID" \
+            --batch "$OUT/batch.json" \
+            --events "$OUT/batch-live-events.jsonl" \
+            --corpus "$CORPUS" \
+            --library-runtime docs/research/gambit-library-live-runtime.json \
+            --e4-model e4freeze/research/e4-v12-prearmed-axiom-frozen-model.json \
+            --state docs/research/golden-sevenmodel-state.json \
+            --status docs/research/golden-sevenmodel-status.json \
+            --target 100
+
+      - name: Persist cumulative clean state
+        if: steps.progress.outputs.complete != 'true'
+        run: |
+          set -euo pipefail
+          git config user.name sevenmodel-forward-research
+          git config user.email actions@users.noreply.github.com
+          git add docs/research/golden-sevenmodel-state.json docs/research/golden-sevenmodel-status.json
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'data(sevenmodel): accumulate untouched forward window [skip ci]'
+          for i in 1 2 3 4 5; do
+            git fetch origin "$BRANCH"
+            git rebase "origin/$BRANCH" || { git rebase --abort; sleep 2; continue; }
+            if git push origin HEAD:"$BRANCH"; then exit 0; fi
+            sleep 2
+          done
+          exit 1
+
+      - name: Upload immutable raw window evidence
+        if: always() && steps.progress.outputs.complete != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-sevenmodel-live-${{ github.run_id }}
+          path: |
+            artifacts/golden-sevenmodel-${{ github.run_id }}/
+            docs/research/golden-sevenmodel-status.json
+          if-no-files-found: warn
+          retention-days: 60
+
+      - name: Continue until every model has 100 closed forward trades
+        if: steps.progress.outputs.complete != 'true'
+        run: |
+          complete="$(jq -r '.complete // false' docs/research/golden-sevenmodel-status.json 2>/dev/null || echo false)"
+          if [ "$complete" != "true" ]; then
+            gh workflow run golden-sevenmodel-live.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
+          fi
