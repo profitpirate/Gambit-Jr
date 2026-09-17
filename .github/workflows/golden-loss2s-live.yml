@@ -54,7 +54,7 @@ jobs:
               raise SystemExit('heartbeat lease injection point changed')
           p.write_text(s.replace(needle,replacement))
           PY
-          python -m py_compile tools/migration_route_bridge.py
+          python -m py_compile tools/migration_route_bridge.py tools/golden_live_checkpoint.py
 
       - name: Verify frozen parents and prepare A-B manifest
         run: |
@@ -68,7 +68,7 @@ jobs:
           for p,h in f['source_sha256'].items():
               assert hashlib.sha256(Path(p).read_bytes()).hexdigest()==h,p
           PY
-          python -m py_compile tools/golden_loss2s_*.py tools/migration_route_bridge.py
+          python -m py_compile tools/golden_loss2s_*.py tools/migration_route_bridge.py tools/golden_live_checkpoint.py
           python tools/migration_route_bridge.py self-test
           python -m unittest tests.test_golden_loss2s tests.test_golden_top4_eventstream_fix -v 2>&1 | tee artifacts/build/loss2s-tests.log
           python tools/golden_loss2s_campaign.py --prepare
@@ -102,8 +102,22 @@ jobs:
             --smoke > artifacts/build/live-preflight.log 2>&1
           cat artifacts/smoke/readiness.json
 
-      - name: Resumable live six-model A-B segment with migration-route bridge
-        run: python tools/migration_route_bridge.py campaign --kind loss2s --corpus "$CORPUS" --duration "$LIVE_SEGMENT_SECONDS"
+      - name: Resumable live six-model A-B segment with durable clean checkpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/live artifacts/build
+          rm -f artifacts/live/stop-checkpoint-publisher
+          python tools/golden_live_checkpoint.py \
+            --kind loss2s --root artifacts/live --branch "$BRANCH" \
+            > artifacts/build/checkpoint-publisher.log 2>&1 &
+          checkpoint_pid=$!
+          cleanup_checkpoint() {
+            touch artifacts/live/stop-checkpoint-publisher
+            wait "$checkpoint_pid" || true
+          }
+          trap cleanup_checkpoint EXIT
+          python tools/migration_route_bridge.py campaign --kind loss2s --corpus "$CORPUS" --duration "$LIVE_SEGMENT_SECONDS"
 
       - name: Preserve sources and evidence regardless of completion
         if: always()
@@ -111,6 +125,7 @@ jobs:
           mkdir -p artifacts/source
           cp tools/golden_loss2s_*.py artifacts/source/
           cp tools/migration_route_bridge.py artifacts/source/
+          cp tools/golden_live_checkpoint.py artifacts/source/
           cp config/golden-loss2s-live.json artifacts/source/ 2>/dev/null || true
           cp docs/research/golden-loss2s-experiment-contract.json artifacts/source/
           cp .github/workflows/golden-loss2s-live.yml artifacts/source/
