@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/golden-loss2s-live.yml'
       - 'tools/golden_loss2s_*.py'
+      - 'tools/migration_route_bridge.py'
       - 'tests/test_golden_loss2s.py'
       - 'docs/research/golden-loss2s-experiment-contract.json'
   workflow_dispatch:
@@ -49,7 +50,8 @@ jobs:
           for p,h in f['source_sha256'].items():
               assert hashlib.sha256(Path(p).read_bytes()).hexdigest()==h,p
           PY
-          python -m py_compile tools/golden_loss2s_*.py
+          python -m py_compile tools/golden_loss2s_*.py tools/migration_route_bridge.py
+          python tools/migration_route_bridge.py self-test
           python -m unittest tests.test_golden_loss2s tests.test_golden_top4_eventstream_fix -v 2>&1 | tee artifacts/build/loss2s-tests.log
           python tools/golden_loss2s_campaign.py --prepare
           cp config/golden-loss2s-live.json artifacts/build/manifest.json
@@ -82,14 +84,15 @@ jobs:
             --smoke > artifacts/build/live-preflight.log 2>&1
           cat artifacts/smoke/readiness.json
 
-      - name: Live six-model forward A-B with isolated evidence
-        run: python tools/golden_loss2s_campaign.py --corpus "$CORPUS" --duration 14400
+      - name: Live six-model forward A-B with migration-route bridge and isolated evidence
+        run: python tools/migration_route_bridge.py campaign --kind loss2s --corpus "$CORPUS" --duration 14400
 
       - name: Preserve sources and evidence regardless of completion
         if: always()
         run: |
           mkdir -p artifacts/source
           cp tools/golden_loss2s_*.py artifacts/source/
+          cp tools/migration_route_bridge.py artifacts/source/
           cp config/golden-loss2s-live.json artifacts/source/ 2>/dev/null || true
           cp docs/research/golden-loss2s-experiment-contract.json artifacts/source/
           cp .github/workflows/golden-loss2s-live.yml artifacts/source/
