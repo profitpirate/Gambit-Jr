@@ -1,42 +1,44 @@
 {
   "active_positions": 1,
-  "cash_sol": 2.9134880311324998,
-  "checked_ns": 1789618443265188991,
+  "cash_sol": 2.6324863670758747,
+  "checked_ns": 1789618508846682377,
   "closed_trades": 1,
   "collector_active": true,
   "counts": {
     "closed_trades": 1,
-    "creation_proof_confirmed": 24,
-    "decisions": 25,
-    "entries": 1,
-    "fresh_launches": 25,
+    "creation_proof_confirmed": 55,
+    "decisions": 55,
+    "entries": 3,
+    "fresh_launches": 55,
     "modelled_landed_failures": 1,
-    "observation_resolved": 23,
-    "rejected_dev_rule": 23,
-    "rejected_nonfresh_or_unquotable_create": 4,
-    "selected": 2
+    "observation_resolved": 54,
+    "observation_unknown": 1,
+    "rejected_dev_rule": 52,
+    "rejected_nonfresh_or_unquotable_create": 8,
+    "selected": 3,
+    "unresolved_exit": 1
   },
-  "equity_sol": 2.9134880311324998,
+  "equity_sol": 2.7729986191683746,
   "errors": [],
   "feed_stats": {
     "wss://api.mainnet-beta.solana.com": {
       "connections": 1,
       "disconnects": 0,
-      "last_receive_ns": 1789618443080986915,
-      "messages": 28179
+      "last_receive_ns": 1789618508846505362,
+      "messages": 59154
     },
     "wss://solana-rpc.publicnode.com": {
       "connections": 1,
       "disconnects": 0,
-      "last_receive_ns": 1789618443265106818,
-      "messages": 16621
+      "last_receive_ns": 1789618508845658495,
+      "messages": 31895
     }
   },
   "frozen_four_campaign_touched": false,
   "losses": 1,
-  "maximum_mark_to_market_drawdown": 0.02883732295583341,
+  "maximum_mark_to_market_drawdown": 0.07963592943387503,
   "model": "FULL_3S_V2_LIBRARY",
-  "net_pnl_sol": -0.08651196886750023,
+  "net_pnl_sol": -0.3675136329241253,
   "note": "Independent read-only Solana observer and paper account; no blockchain submission path.",
   "paper_only": true,
   "real_execution": false,
