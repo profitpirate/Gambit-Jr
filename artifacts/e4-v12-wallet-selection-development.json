@@ -1,0 +1,2633 @@
+{
+  "development_audit": {
+    "e4_events_excluded_from_features": true,
+    "failed_attempts": 213,
+    "landed_attempts": 110,
+    "launches": 36000,
+    "production_paths_changed": 0,
+    "runs": [
+      {
+        "hash_match": true,
+        "landed": 8,
+        "launches": 3000,
+        "parse_errors": 0,
+        "run_id": "33605109571",
+        "selected": 30,
+        "sha256": "1bfe30a7a7e2bc159616c2f68a2ee6410a9ec4b26d28eedcd0609b6b35e1dded",
+        "split": "train"
+      },
+      {
+        "hash_match": true,
+        "landed": 8,
+        "launches": 3000,
+        "parse_errors": 0,
+        "run_id": "33627431540",
+        "selected": 20,
+        "sha256": "54e96699d70b53357c0f7249f228fa4af83ed43f15b7a5455988ac12cbeef9f5",
+        "split": "train"
+      },
+      {
+        "hash_match": true,
+        "landed": 14,
+        "launches": 3000,
+        "parse_errors": 0,
+        "run_id": "33644544746",
+        "selected": 36,
+        "sha256": "2552e11c1d6a36aebc882f3e997ae24ddd85db378e3c75a3997aaf2a664d0553",
+        "split": "train"
+      },
+      {
+        "hash_match": true,
+        "landed": 16,
+        "launches": 3000,
+        "parse_errors": 0,
+        "run_id": "33656916992",
+        "selected": 42,
+        "sha256": "5549961baff426b65700294a7692c7b7d164beae60078596fb2c72018039a70c",
+        "split": "train"
+      },
+      {
+        "hash_match": true,
+        "landed": 4,
+        "launches": 3000,
+        "parse_errors": 0,
+        "run_id": "33669514091",
+        "selected": 14,
+        "sha256": "9b8f0ab72e51c649622378ede0fc7cbeb1c120263fb4da3b44b289e23673ec2f",
+        "split": "train"
+      },
+      {
+        "hash_match": true,
+        "landed": 15,
+        "launches": 3000,
+        "parse_errors": 0,
+        "run_id": "33681664773",
+        "selected": 32,
+        "sha256": "d70c12f8bed120d5fe0389e06f1be0a655201380b7235a0f93a73600a8f626c2",
+        "split": "train"
+      },
+      {
+        "hash_match": true,
+        "landed": 8,
+        "launches": 3000,
+        "parse_errors": 0,
+        "run_id": "33692043170",
+        "selected": 29,
+        "sha256": "f8e5d3ef5120aaa6abfd29c83437a87fbc7636276935c3901af7cd1818d0cceb",
+        "split": "train"
+      },
+      {
+        "hash_match": true,
+        "landed": 6,
+        "launches": 3000,
+        "parse_errors": 0,
+        "run_id": "33704841852",
+        "selected": 19,
+        "sha256": "b09a14c770216b8bbaf4f5a44bd295b14cb01d675b188378419ddd9037886f7a",
+        "split": "train"
+      },
+      {
+        "hash_match": true,
+        "landed": 10,
+        "launches": 3000,
+        "parse_errors": 0,
+        "run_id": "33716649440",
+        "selected": 30,
+        "sha256": "6c865406cb400819488ba0a7657ebfd51f0d1c5d84cfb2a5de0999dfb4503f70",
+        "split": "validation"
+      },
+      {
+        "hash_match": true,
+        "landed": 5,
+        "launches": 3000,
+        "parse_errors": 0,
+        "run_id": "33741470396",
+        "selected": 20,
+        "sha256": "99d52116113a13660e41e41a52c77fe4b5cb6b8a671c440f57f06ebc8ac4f713",
+        "split": "validation"
+      },
+      {
+        "hash_match": true,
+        "landed": 9,
+        "launches": 3000,
+        "parse_errors": 0,
+        "run_id": "33769636983",
+        "selected": 32,
+        "sha256": "9fc5016470fbfb51a2e6c5b0742226773a19e7489fd9f6dd3ac107b905f0cd7e",
+        "split": "validation"
+      },
+      {
+        "hash_match": true,
+        "landed": 7,
+        "launches": 3000,
+        "parse_errors": 0,
+        "run_id": "33781389703",
+        "selected": 19,
+        "sha256": "2a8a555434665ac1fd8a24e3957ff45ada7d4d4e84d80ada0e649847d4896376",
+        "split": "validation"
+      }
+    ],
+    "schema_version": "e4-v12-wallet-selection-v1",
+    "selected_attempts": 323
+  },
+  "experiment_id": "e4-wallet-15d38353459dff6d353e97871db8ccba85f179436323b301e59bbb0cee51076c",
+  "holdout_rows_read_before_this_revision": 30000,
+  "horizon_reconstruction": [
+    {
+      "conditional_landing_models": {
+        "extra_trees": {
+          "average_precision": 0.26865416391326313,
+          "roc_auc": 0.419815668202765
+        },
+        "hgb": {
+          "average_precision": 0.3370536263867854,
+          "roc_auc": 0.5580645161290323
+        },
+        "logistic": {
+          "average_precision": 0.34023172932129814,
+          "roc_auc": 0.53963133640553
+        }
+      },
+      "horizon_ms": 0,
+      "model_family": "extra_trees",
+      "validation_average_precision": 0.4680110117481724,
+      "validation_roc_auc": 0.9334971987828247
+    },
+    {
+      "conditional_landing_models": {
+        "extra_trees": {
+          "average_precision": 0.26865416391326313,
+          "roc_auc": 0.419815668202765
+        },
+        "hgb": {
+          "average_precision": 0.3370536263867854,
+          "roc_auc": 0.5580645161290323
+        },
+        "logistic": {
+          "average_precision": 0.34023172932129814,
+          "roc_auc": 0.53963133640553
+        }
+      },
+      "horizon_ms": 0,
+      "model_family": "logistic",
+      "validation_average_precision": 0.339812526056717,
+      "validation_roc_auc": 0.8993009646371813
+    },
+    {
+      "conditional_landing_models": {
+        "extra_trees": {
+          "average_precision": 0.26865416391326313,
+          "roc_auc": 0.419815668202765
+        },
+        "hgb": {
+          "average_precision": 0.3370536263867854,
+          "roc_auc": 0.5580645161290323
+        },
+        "logistic": {
+          "average_precision": 0.34023172932129814,
+          "roc_auc": 0.53963133640553
+        }
+      },
+      "horizon_ms": 0,
+      "model_family": "hgb",
+      "validation_average_precision": 0.33302043888199057,
+      "validation_roc_auc": 0.9311282502315279
+    },
+    {
+      "conditional_landing_models": {
+        "extra_trees": {
+          "average_precision": 0.36589367572444453,
+          "roc_auc": 0.5529953917050691
+        },
+        "hgb": {
+          "average_precision": 0.5230281690632231,
+          "roc_auc": 0.6976958525345622
+        },
+        "logistic": {
+          "average_precision": 0.37135033680959384,
+          "roc_auc": 0.6
+        }
+      },
+      "horizon_ms": 5,
+      "model_family": "hgb",
+      "validation_average_precision": 0.44331860316627647,
+      "validation_roc_auc": 0.9533466078770243
+    },
+    {
+      "conditional_landing_models": {
+        "extra_trees": {
+          "average_precision": 0.36589367572444453,
+          "roc_auc": 0.5529953917050691
+        },
+        "hgb": {
+          "average_precision": 0.5230281690632231,
+          "roc_auc": 0.6976958525345622
+        },
+        "logistic": {
+          "average_precision": 0.37135033680959384,
+          "roc_auc": 0.6
+        }
+      },
+      "horizon_ms": 5,
+      "model_family": "extra_trees",
+      "validation_average_precision": 0.43868514527123476,
+      "validation_roc_auc": 0.9551642995209682
+    },
+    {
+      "conditional_landing_models": {
+        "extra_trees": {
+          "average_precision": 0.36589367572444453,
+          "roc_auc": 0.5529953917050691
+        },
+        "hgb": {
+          "average_precision": 0.5230281690632231,
+          "roc_auc": 0.6976958525345622
+        },
+        "logistic": {
+          "average_precision": 0.37135033680959384,
+          "roc_auc": 0.6
+        }
+      },
+      "horizon_ms": 5,
+      "model_family": "logistic",
+      "validation_average_precision": 0.32045202028213676,
+      "validation_roc_auc": 0.9216778346462263
+    },
+    {
+      "conditional_landing_models": {
+        "extra_trees": {
+          "average_precision": 0.3587024787361176,
+          "roc_auc": 0.5124423963133641
+        },
+        "hgb": {
+          "average_precision": 0.40921951709250437,
+          "roc_auc": 0.6027649769585254
+        },
+        "logistic": {
+          "average_precision": 0.3898598386865217,
+          "roc_auc": 0.5981566820276497
+        }
+      },
+      "horizon_ms": 20,
+      "model_family": "extra_trees",
+      "validation_average_precision": 0.44256559438966275,
+      "validation_roc_auc": 0.9579418022481296
+    },
+    {
+      "conditional_landing_models": {
+        "extra_trees": {
+          "average_precision": 0.3587024787361176,
+          "roc_auc": 0.5124423963133641
+        },
+        "hgb": {
+          "average_precision": 0.40921951709250437,
+          "roc_auc": 0.6027649769585254
+        },
+        "logistic": {
+          "average_precision": 0.3898598386865217,
+          "roc_auc": 0.5981566820276497
+        }
+      },
+      "horizon_ms": 20,
+      "model_family": "hgb",
+      "validation_average_precision": 0.44152782123373974,
+      "validation_roc_auc": 0.9580291712674083
+    },
+    {
+      "conditional_landing_models": {
+        "extra_trees": {
+          "average_precision": 0.3587024787361176,
+          "roc_auc": 0.5124423963133641
+        },
+        "hgb": {
+          "average_precision": 0.40921951709250437,
+          "roc_auc": 0.6027649769585254
+        },
+        "logistic": {
+          "average_precision": 0.3898598386865217,
+          "roc_auc": 0.5981566820276497
+        }
+      },
+      "horizon_ms": 20,
+      "model_family": "logistic",
+      "validation_average_precision": 0.3310066741454673,
+      "validation_roc_auc": 0.9258969261914847
+    },
+    {
+      "conditional_landing_models": {
+        "extra_trees": {
+          "average_precision": 0.31989262868716895,
+          "roc_auc": 0.5271889400921659
+        },
+        "hgb": {
+          "average_precision": 0.45001625341255147,
+          "roc_auc": 0.6465437788018433
+        },
+        "logistic": {
+          "average_precision": 0.4122059243107812,
+          "roc_auc": 0.6221198156682028
+        }
+      },
+      "horizon_ms": 250,
+      "model_family": "hgb",
+      "validation_average_precision": 0.5228726267176248,
+      "validation_roc_auc": 0.9595423194727238
+    },
+    {
+      "conditional_landing_models": {
+        "extra_trees": {
+          "average_precision": 0.31989262868716895,
+          "roc_auc": 0.5271889400921659
+        },
+        "hgb": {
+          "average_precision": 0.45001625341255147,
+          "roc_auc": 0.6465437788018433
+        },
+        "logistic": {
+          "average_precision": 0.4122059243107812,
+          "roc_auc": 0.6221198156682028
+        }
+      },
+      "horizon_ms": 250,
+      "model_family": "extra_trees",
+      "validation_average_precision": 0.5089297803919196,
+      "validation_roc_auc": 0.9566761995974369
+    },
+    {
+      "conditional_landing_models": {
+        "extra_trees": {
+          "average_precision": 0.31989262868716895,
+          "roc_auc": 0.5271889400921659
+        },
+        "hgb": {
+          "average_precision": 0.45001625341255147,
+          "roc_auc": 0.6465437788018433
+        },
+        "logistic": {
+          "average_precision": 0.4122059243107812,
+          "roc_auc": 0.6221198156682028
+        }
+      },
+      "horizon_ms": 250,
+      "model_family": "logistic",
+      "validation_average_precision": 0.3531473994119871,
+      "validation_roc_auc": 0.9309476875916856
+    }
+  ],
+  "identity": {
+    "decision_horizon_ms": 0,
+    "e4_transactions_excluded_from_features": true,
+    "exit_policy": {
+      "first_fraction": 0.3,
+      "first_take": 1.15,
+      "hold_ms": 2000,
+      "key": "stop=0.70|first=1.15:0.30|hold=2000|trail=0.25",
+      "stop": 0.7,
+      "trail_retrace": 0.25
+    },
+    "failed_fills_are_positive_labels": true,
+    "failed_fills_are_separated_by_conditional_landing_model": true,
+    "feature_fingerprint": "0324efae9d341a707167a1a3f601a0144d6e59bca028ba399b5d211c07ca4407",
+    "landing_model_family": "logistic",
+    "manifest_fingerprint": "e2218156bc054af75f0dcc8c2debbfd04c2245343ba516850d4167e3a117dca1",
+    "model_family": "extra_trees",
+    "schema_version": "e4-v12-wallet-selection-v1",
+    "source_fingerprint": "d826a8ca959c3f6e5fdfd5f3da7ca89f35fa4fb9100137272833aaedf4ff04a1",
+    "threshold": 0.2828562828701222
+  },
+  "production_paths_changed": 0,
+  "schema_version": "e4-v12-wallet-selection-v1",
+  "scientific_warning": "the final ten captures were opened by the first sealed 250ms model; this faster-horizon revision is exploratory and needs a new future epoch",
+  "status": "EXPLORATORY_POST_HOLDOUT_REVISION",
+  "wallet_oracle_development": {
+    "best_by_label": {
+      "landed": {
+        "decision_horizon_ms": 0,
+        "economics": {
+          "capture_windows": 4,
+          "decision_horizon_ms": 0,
+          "e4_overlap": 31,
+          "ending_bankroll_sol": 17.305044128484816,
+          "latency_ms": 0,
+          "ledger": [
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "Negyq6HJiLutY322Sh5xtCV93Y9jmhND5XJ9yPJpump",
+              "pnl_sol": 0.1277499243590247,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "GgGhY3gXoXUujYrGHjePQJrk5upZU6Prt8DDdhSvpump",
+              "pnl_sol": 0.3644193510479715,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "2pi47iqPKBqMytsmA19L3kMRU7PY5W2K5oECxkpypump",
+              "pnl_sol": 0.01434017759654952,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "KfRnjHzxu4ZU1k44nvx46qydqzDeWtRyjq3fHh5pump",
+              "pnl_sol": 0.2600214575744467,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "9HC7yDTyznLNsedzNu1ra82FE3384tJdsBjk2UHPpump",
+              "pnl_sol": 0.25356232656034156,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "3vkkXdEnpwiJTbFL9Dg5HuJxLkjFKaiyvQbrsXLFpump",
+              "pnl_sol": 0.1049299438163537,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "8nLN2B1xG2QTzffYFyjUxvum6V7MKwdKNE9rnQ4qpump",
+              "pnl_sol": 0.30560923543313945,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "2QzVZrXSvNHxKwUMqi4dSBaMoHvzLrhfLnH65LKYpump",
+              "pnl_sol": 0.47434677921896534,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "8g6PEMwhJwdkDMw4LSLboJ3SgjFUbQkWCcgQupctpump",
+              "pnl_sol": 0.3057971418012346,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "A9XBcoqANKWQBPWsM8wJR9v7JaAEBrc3LsfjTQ6hpump",
+              "pnl_sol": 0.18092465343324887,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "HL8Pk5kSR2xKagGrCvmHFzURXdq6mu9idp6JTfbupump",
+              "pnl_sol": 0.4013831434830089,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "TRAILING_OR_STOP",
+              "mint": "CZ2KXbeAiFJhx4hGPeTGUg1Ut99Mw19z5Argqg6Cpump",
+              "pnl_sol": 0.45002593515440864,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "EwCg1ioPASquSWzUWgTB8MuFFzUD3yDsV2r3VWNUpump",
+              "pnl_sol": 0.0964270375270673,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "4EHeTEFHCCmBaXmEXLvrRM8QKtvEvBNP2tfeiiu5pPq7",
+              "pnl_sol": 0.14939130056859565,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "BboJZTNCu66bDQDTCt2aG3DEDLX9TtyqADFu6Fvfpump",
+              "pnl_sol": 0.2271676862016791,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "C4gY32XosgdJg71vUUJynhUPReEcPDoZ8tm4ZVkxpump",
+              "pnl_sol": 0.12464227103042294,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "GjJmSEyH7KhHeJDggqf4iLgiaz5fsArRBCfZpNE4pump",
+              "pnl_sol": 0.09141410146902021,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "6JaEJQCDz2TKoWbK9fk1pn9PTVtUehP2o89sGaHTpump",
+              "pnl_sol": 0.3304019566532707,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "JCkDUdMDKU9DRYfu3hWoVzLWcJueEuWHTuA4HjCbpump",
+              "pnl_sol": 0.6644701792682769,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "5C9dUn2hDzJVXPELZCRmUdhKSS3VTe1X3HekP4Apump",
+              "pnl_sol": 1.0252841312357461,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "H9ofC5xgVKMLsyEpX22mCVQtrfjfiMmhqDvZmDDPpump",
+              "pnl_sol": 0.40247219313384813,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "Gh8PeTNnrMF2hSKNrVCG2qV6xAwMTq2hr8EM2CrVpump",
+              "pnl_sol": 0.08253591677771979,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "GF8EWdG3XK1hsbTp15UorBzZTfXFf854DnB8AhUopump",
+              "pnl_sol": 0.5236327168691083,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "TRAILING_OR_STOP",
+              "mint": "J1N1WqBvY3oxp6Yr9Vh5DmEVrh1i8USUw3Vty5HgMgn6",
+              "pnl_sol": 0.6704948874026232,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "TRAILING_OR_STOP",
+              "mint": "Hb5ZBFqWEFLxorimUjrjyqZD9RpyiAg579tEKeUnpump",
+              "pnl_sol": 2.148684209482954,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "5HTAViH8YeaRqxXxLBZMXzRovQhoB4eAUJpvo1EZpump",
+              "pnl_sol": 0.8304481667758373,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "AmWCcDf6tG7zB3VPeDVjeXL5N567fXAiHcTKw3xXpump",
+              "pnl_sol": 0.7059303740181245,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "EViNjEuqSVBqMWPF8AeXeLa862YsDwUvn8Tkydonpump",
+              "pnl_sol": 1.2620631991789255,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "EDUBrnbhLfZmcKUGJg3Zi8hN5PtnDBqV8tk4mU8Jpump",
+              "pnl_sol": 0.9190749353992415,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "6siRXrYPyERgg9hQ3W3mgDx3oSKHjCN26BU29HaRJKoF",
+              "pnl_sol": 1.0187744822124754,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "HDFF66PqzYzmy8pZmrb8rZE1SbVSqz3cgJS1okhSpump",
+              "pnl_sol": -0.2113756861988185,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": false
+            }
+          ],
+          "ledger_hash": "7aaffca51067cfee9de11770536864e3fe6a163528953bcfd4cffd87dab07ee3",
+          "maximum_drawdown_fraction": 0.07045856206627239,
+          "net_pnl_sol": 14.305044128484816,
+          "profit_factor": 68.67592047000896,
+          "rejected": {},
+          "trades": 31,
+          "wilson_lower_bound": 0.8380554282383037,
+          "win_rate": 0.967741935483871,
+          "wins": 30
+        },
+        "label": "landed",
+        "policy": {
+          "first_fraction": 0.2,
+          "first_take": 1.6,
+          "hold_ms": 2000,
+          "key": "stop=0.70|first=1.60:0.20|hold=2000|trail=0.25",
+          "stop": 0.7,
+          "trail_retrace": 0.25
+        }
+      },
+      "selected": {
+        "decision_horizon_ms": 0,
+        "economics": {
+          "capture_windows": 4,
+          "decision_horizon_ms": 0,
+          "e4_overlap": 101,
+          "ending_bankroll_sol": 107.72040805626054,
+          "latency_ms": 0,
+          "ledger": [
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "3zcnzbQ71tqtbeoNkKPomP5CB9akRtTTGvxy2SL4pump",
+              "pnl_sol": 0.24755855396061505,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "9g8JFxY1dU35vNEypv6h52RXDtpUVt2PPUPyE2Uapump",
+              "pnl_sol": 0.019704156388340922,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "DtY5Jzc27xkhXzuHuUQQgsJB4FyLMzGy1nspo4MSpump",
+              "pnl_sol": 0.028144602727571945,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "8BbdR6q4bwYgmXYKDskEWsUKJLYWAM9ZTHMYLqjkpump",
+              "pnl_sol": 0.13330767473054175,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "Negyq6HJiLutY322Sh5xtCV93Y9jmhND5XJ9yPJpump",
+              "pnl_sol": 0.1561761998591225,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "fykYrkNRJde24qMbX1EG32axbgiFPv9oJSKweV3pump",
+              "pnl_sol": 0.1471022915865177,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "TRAILING_OR_STOP",
+              "mint": "9ZmpfSq4BjF3Ni5yfdSd9GJZqXAE2MZftzoxXXnzpump",
+              "pnl_sol": 0.14883584089153418,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "8R8kBS53H9TvwoJivjxugz8Un6iwCQbwFpX6vx49pump",
+              "pnl_sol": 0.2795113405779965,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "Cnte2GpDMvhHJkAbpvCRiBfc3kd4LcuhVCa9puF9pump",
+              "pnl_sol": 0.32742997155416664,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "4FA8vmfy8MTPhoxNq2JNVT7TrNGdukJt4VZpJBW1pump",
+              "pnl_sol": 0.284844244025189,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "GgGhY3gXoXUujYrGHjePQJrk5upZU6Prt8DDdhSvpump",
+              "pnl_sol": 0.512490605690799,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "3FXiN5c58rnkS8e57NirH7QTgN3esTehbYkgNrZfpump",
+              "pnl_sol": 0.13050157427281442,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "2pi47iqPKBqMytsmA19L3kMRU7PY5W2K5oECxkpypump",
+              "pnl_sol": 0.018106714654108548,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "KfRnjHzxu4ZU1k44nvx46qydqzDeWtRyjq3fHh5pump",
+              "pnl_sol": 0.38345146793539403,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "Fh7UsfpiRm2DPGFvk8x7HJSbYkJypFK6T1edndgfpump",
+              "pnl_sol": 0.4160203211620099,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "TRAILING_OR_STOP",
+              "mint": "9gou28XyjqZhPtTnWLYsSPLGwV1t2QmA5Qr8cYYapump",
+              "pnl_sol": 0.38766863939221513,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "TRAILING_OR_STOP",
+              "mint": "eyMiMA4QA6Y7nueF1QqyQ2xk4SroAHNs9V8ggpFpump",
+              "pnl_sol": 0.32203235692356197,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "5rngYwsGJNeDDqdbkMEnyn17w9ZX2P3DgWmFPMi7pump",
+              "pnl_sol": 0.30879161945038064,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "EDd95BKbF2E4xZHHsN2HtgpgLZRyMMZAhjesYCh7pump",
+              "pnl_sol": 0.1930062238153202,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "HPKa8Drjz68ft39afgEspgvWzcQhJqfeEq42nt8upump",
+              "pnl_sol": 0.5138022413951577,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "3x1EqKpcZtCyB1UoA4mjEj668XPrRPEwcZwNuN8zpump",
+              "pnl_sol": 0.15153721384102173,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "9HC7yDTyznLNsedzNu1ra82FE3384tJdsBjk2UHPpump",
+              "pnl_sol": 0.5229556301551923,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "3vkkXdEnpwiJTbFL9Dg5HuJxLkjFKaiyvQbrsXLFpump",
+              "pnl_sol": 0.19559359019597158,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "8nLN2B1xG2QTzffYFyjUxvum6V7MKwdKNE9rnQ4qpump",
+              "pnl_sol": 0.6041580107610395,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "2QzVZrXSvNHxKwUMqi4dSBaMoHvzLrhfLnH65LKYpump",
+              "pnl_sol": 0.9336533121171381,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "TRAILING_OR_STOP",
+              "mint": "W4r8siVCemJBF5fExs852cvB2S8AghZhguVVkRZpump",
+              "pnl_sol": 1.4646888509415172,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "3XKKKYzFjD975qx7mH3V5kjTq51YuauWnbx8roBdpump",
+              "pnl_sol": 0.7236672646522028,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "8g6PEMwhJwdkDMw4LSLboJ3SgjFUbQkWCcgQupctpump",
+              "pnl_sol": 0.7001033222042955,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "377Gxw3uYBBx1t2iPbdTBreAA4pccrh45twNqSnXpump",
+              "pnl_sol": 0.45772963542178996,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "A9XBcoqANKWQBPWsM8wJR9v7JaAEBrc3LsfjTQ6hpump",
+              "pnl_sol": 0.4397150041520486,
+              "run_id": "33716649440",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "FCHGT4mhN5o2WpbaczBMzjLHU7oHPvTxV4uBaziWpump",
+              "pnl_sol": 0.38073390991301787,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "HL8Pk5kSR2xKagGrCvmHFzURXdq6mu9idp6JTfbupump",
+              "pnl_sol": 0.9542424233128511,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "TRAILING_OR_STOP",
+              "mint": "BTgFwsBBS3oSYDkuYdCGSCfkYhVNYSC1bwuAYA8spump",
+              "pnl_sol": 1.7952058836142717,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "Hj87aMxqYz3hRaGgY9PxdDrRfzMoRhxH5NGPD7jipump",
+              "pnl_sol": 0.43088217636803644,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "TRAILING_OR_STOP",
+              "mint": "CZ2KXbeAiFJhx4hGPeTGUg1Ut99Mw19z5Argqg6Cpump",
+              "pnl_sol": 1.1910290261736904,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "TRAILING_OR_STOP",
+              "mint": "pEkLtsaQXopEGtpsU3gUX72DAa6ZB1Z4dU5k9j7pump",
+              "pnl_sol": 1.1735208453793287,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "4HQ6TpYDx5kENBBepnv56WyyvEcDWoCkLWjWEejnpump",
+              "pnl_sol": 0.25165293002645855,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "4xGLW7ZzQXj1UfA1HtsjwDvQf8XoGvvhMYYx9x33pump",
+              "pnl_sol": 1.0753183333723295,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "EwCg1ioPASquSWzUWgTB8MuFFzUD3yDsV2r3VWNUpump",
+              "pnl_sol": 0.12442968577662053,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "HxAnBntTz4kLcN295sYMGGcZZRALr8UPdUA4L3Tspump",
+              "pnl_sol": 1.0533045107317895,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "CahoLMbXxyfX7C5UVeRKFrNSUysiXdq2x2u27D66pump",
+              "pnl_sol": 3.0883988811077723,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "CPsKFx5ZE8YaDuTovyobrDzW8JLUinyMqerTSCgKpump",
+              "pnl_sol": 0.6951160996301847,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "6rAEiFMeEv4Rsjet67zhkSLWaZPLZvD5UWUBAStcpump",
+              "pnl_sol": 0.9714923005830719,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "H6fALhwKH1kTp6iQqJdyPaVfEALPD5Hc2kUWotb9pump",
+              "pnl_sol": 0.797386147314251,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "4EHeTEFHCCmBaXmEXLvrRM8QKtvEvBNP2tfeiiu5pPq7",
+              "pnl_sol": 0.22205237386857005,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "9udxhNZEKbx8HXyqrqwhZcoXrnzooqjW4kjzzWLfpump",
+              "pnl_sol": 1.178830073412914,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "BboJZTNCu66bDQDTCt2aG3DEDLX9TtyqADFu6Fvfpump",
+              "pnl_sol": 0.697738767956973,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "QWmopwxPBozGNggfbmwF1HoWNDn2FAMFaM9sWHzpump",
+              "pnl_sol": -0.1432520808602695,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": false
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "8KikspFaxgKgysEptAbuzPyQefp6jFaN51DHbHSGpump",
+              "pnl_sol": 2.5097048318508755,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "GZJ9nnYGP8Ne3mXnRh6G4hNyMfSBP2FKujvVgDr3pump",
+              "pnl_sol": 0.9625935878150172,
+              "run_id": "33741470396",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "C4gY32XosgdJg71vUUJynhUPReEcPDoZ8tm4ZVkxpump",
+              "pnl_sol": 0.1456536922317571,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "F1TxUmLxarRufdepe4xubzXSitjBPMGzbnbDgZ1Dpump",
+              "pnl_sol": 1.3119396646024777,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "GjJmSEyH7KhHeJDggqf4iLgiaz5fsArRBCfZpNE4pump",
+              "pnl_sol": -0.10575882968320902,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": false
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "6JaEJQCDz2TKoWbK9fk1pn9PTVtUehP2o89sGaHTpump",
+              "pnl_sol": 1.093568533871215,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "TRAILING_OR_STOP",
+              "mint": "9gR4srWmpr5RnBuDJ9oPATpYdFFyxVg2KqkBJBJEpump",
+              "pnl_sol": 0.5564626885781753,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "JCkDUdMDKU9DRYfu3hWoVzLWcJueEuWHTuA4HjCbpump",
+              "pnl_sol": 2.3382763162893956,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "EXRtmMsrha1XFtE9cKv58KTS2nv2yUEVhgDrZ3kepump",
+              "pnl_sol": 2.848753274109652,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "2ajpfg7Zu6YyLjcazxT5XJintvxJrfnLrot1HCa4pump",
+              "pnl_sol": 0.4200565822180598,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "hSMXLgrwe3UzZyWcMxBpVnnVjWiqotNiTH9PTmdpump",
+              "pnl_sol": 0.8340196389594344,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "5C9dUn2hDzJVXPELZCRmUdhKSS3VTe1X3HekP4Apump",
+              "pnl_sol": 3.7323395520846327,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "UocFGkactPEGAQK4ScCgurtnArVjDBf5eYmB46kpump",
+              "pnl_sol": 1.1032069166711072,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "H9ofC5xgVKMLsyEpX22mCVQtrfjfiMmhqDvZmDDPpump",
+              "pnl_sol": 1.1511153646975156,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "C8yiLu78KjtmUw9G2XYdwsmFtELGku2LmK3nWpmSpump",
+              "pnl_sol": 5.449420201648929,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "HACY2rDRZnbjENqmxw1st9KEJAMwMiaYmrB5iq23pump",
+              "pnl_sol": 6.16762871955183,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "AnP2yjKWoTP23msGxtWxr14Kdb2DQgqGRDaChtRpump",
+              "pnl_sol": 1.7034880418178604,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "4QQuGEBMR4CXUjSyXN6QqqigfWcX5NVk99tEBU7Lpump",
+              "pnl_sol": 2.130248528817079,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "974W16Waca3QQjR6MJu5mvcBeyuipMCyvFTZ5wbMpump",
+              "pnl_sol": 0.8831142620896549,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "Gh8PeTNnrMF2hSKNrVCG2qV6xAwMTq2hr8EM2CrVpump",
+              "pnl_sol": -1.1532166724190485,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": false
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "DB7tAEBDLAxGkwUQZxmkSMkpig5Ht5eGEhbfyoBEpump",
+              "pnl_sol": -1.4986079584118497,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": false
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "GF8EWdG3XK1hsbTp15UorBzZTfXFf854DnB8AhUopump",
+              "pnl_sol": 1.4417610837601167,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "Aem5BAaKwfXSZqvc2qvunbxTxjnJLQxvB74n4Yi1pump",
+              "pnl_sol": 2.6257033902447535,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "GBQra2zSJNR4r8fnPS5DHFeGTTmt67cUUa6FL4NNpump",
+              "pnl_sol": -1.248552992664489,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": false
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "DKiavzYiRstwaPiNYf6woQa4q1DCpwwev91nGuqApump",
+              "pnl_sol": 2.565758814589401,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "9xp5YD3Lq5dvHTfz5U6cPE7Ky51QFA5QHpKQjMTbpump",
+              "pnl_sol": -0.3006729888132775,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": false
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "9bxkyQ5ocvPAFz94rJ1AE3WAQRrc18Byg2dHTwrzpump",
+              "pnl_sol": 2.9901618178376,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "Ebq7CaMyebf3DmhczgjGoHFHwJvQKsdxBe56Aekpump",
+              "pnl_sol": 0.6237989155453666,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "TRAILING_OR_STOP",
+              "mint": "J1N1WqBvY3oxp6Yr9Vh5DmEVrh1i8USUw3Vty5HgMgn6",
+              "pnl_sol": 1.7775843220753895,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "58Vaxwp91bagsmgi1bEUpw8AY1hD8N4EjsXFHXN4pump",
+              "pnl_sol": 1.247306625533949,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "FneivJXEeZVrQ6PkNQJRVAFxdc9KFn1W7LdvDXbRpump",
+              "pnl_sol": 2.600313136297033,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "FdBALdSyHmPeQsLfTYUBX6dB6nm9pC7sTvCE51Phpump",
+              "pnl_sol": 14.74135856663542,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "ALHzYBU5i6dnS2EHDE9m4srZMc9Zx41iQrXmrz2xpump",
+              "pnl_sol": 1.3451873519250048,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "TRAILING_OR_STOP",
+              "mint": "7ZkeeJVt3RxAv5rkceKaXCtw54eu5dYhVHWusg6hpump",
+              "pnl_sol": 0.23243828284290752,
+              "run_id": "33769636983",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "8KvEa7FyAEA6FN3usP2H9bu1wAYJbeXeGRxAWDkBpump",
+              "pnl_sol": 6.888525491588795,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "TRAILING_OR_STOP",
+              "mint": "Hb5ZBFqWEFLxorimUjrjyqZD9RpyiAg579tEKeUnpump",
+              "pnl_sol": 8.089125405740452,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "GVmg7gEAHG8iqNorEa1u2kQGF1VKfJiGTUBzS1LKpump",
+              "pnl_sol": -0.544736650360451,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": false
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "TRAILING_OR_STOP",
+              "mint": "CLFy7jfkChjSc48brHbyRNzb69JE7Wv45ofnTQfnpump",
+              "pnl_sol": -0.5175447344395118,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": false
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "4mi62mNHpCZ4KRb6tVoLf5gBkUjZcSadtqnDyrDnTLWj",
+              "pnl_sol": -3.0468043509628395,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": false
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "GfSzdPEXMdcx7aLXP8rdY9c2ZASD6C9wvzPMA9NEpump",
+              "pnl_sol": -0.8877394500938544,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": false
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "TRAILING_OR_STOP",
+              "mint": "6YpgDCFVHqHggxVQAfdQ8F34nZtQiq3fv5i7Y6Kgpump",
+              "pnl_sol": 5.477916095694504,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "BEdwbeDB2qm3o1aagy5vBrHa5x7g7vWgnvzdj426pump",
+              "pnl_sol": -0.989733536666141,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": false
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "DrfzdyfMdnt8XzoGF7vcrKuTg6ZKxdXnEddoTaNFpump",
+              "pnl_sol": 0.4154385527263101,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "8XA7adN6P5JPrvsjxCrrTpxBsJZF1QWq4ty3sLzjEBbB",
+              "pnl_sol": 1.9519335780033265,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "DEF1HPjjnEAyWcPbv7FDKbrpQxsF3zPqpspKC8hqpump",
+              "pnl_sol": -4.778773109696698,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": false
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "5HTAViH8YeaRqxXxLBZMXzRovQhoB4eAUJpvo1EZpump",
+              "pnl_sol": 1.1749220210572355,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "AmWCcDf6tG7zB3VPeDVjeXL5N567fXAiHcTKw3xXpump",
+              "pnl_sol": 0.9347743664513742,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "EViNjEuqSVBqMWPF8AeXeLa862YsDwUvn8Tkydonpump",
+              "pnl_sol": 2.9518028985031064,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "EDUBrnbhLfZmcKUGJg3Zi8hN5PtnDBqV8tk4mU8Jpump",
+              "pnl_sol": 0.8378001121949171,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "6siRXrYPyERgg9hQ3W3mgDx3oSKHjCN26BU29HaRJKoF",
+              "pnl_sol": 0.9910564437166719,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "WYwcHf34yTzvu4p4o6bxUa6FjRDUoZy5gLsfPwcpump",
+              "pnl_sol": 1.0061299670919501,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": true
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": true,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "HDFF66PqzYzmy8pZmrb8rZE1SbVSqz3cgJS1okhSpump",
+              "pnl_sol": -4.990850415697575,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": false
+            },
+            {
+              "e4_attempted": true,
+              "e4_landed": false,
+              "exit_reason": "MAXIMUM_HOLD",
+              "mint": "AeqQizzYr3qdtvwyMwUgRRAWTvCNUDGMk6KUaVdkpump",
+              "pnl_sol": -0.5593586549081743,
+              "run_id": "33781389703",
+              "score": 1.0,
+              "win": false
+            }
+          ],
+          "ledger_hash": "ed1428fded4eccd45b19f4c88c909645d47a81dacd1f412eaba923b88258077e",
+          "maximum_drawdown_fraction": 1.85006969020192,
+          "net_pnl_sol": 104.72040805626054,
+          "profit_factor": 6.042974718940498,
+          "rejected": {},
+          "trades": 101,
+          "wilson_lower_bound": 0.7806876109575833,
+          "win_rate": 0.8613861386138614,
+          "wins": 87
+        },
+        "label": "selected",
+        "policy": {
+          "first_fraction": 0.3,
+          "first_take": 1.6,
+          "hold_ms": 2000,
+          "key": "stop=0.70|first=1.60:0.30|hold=2000|trail=0.25",
+          "stop": 0.7,
+          "trail_retrace": 0.25
+        }
+      }
+    },
+    "purpose": "non-deployable exact-wallet-choice ceiling",
+    "uses_future_e4_selection_label": true
+  },
+  "winner": {
+    "horizon_ms": 0,
+    "intent": {
+      "average_precision": 0.32796083520968383,
+      "e4_attempts": 101,
+      "e4_landed": 31,
+      "launches": 12000,
+      "precision": 0.4875,
+      "predicted": 80,
+      "recall": 0.38613861386138615,
+      "roc_auc": 0.9154634011178242,
+      "true_positive_attempts": 39,
+      "true_positive_landed": 12
+    },
+    "landing_model_family": "logistic",
+    "model_family": "extra_trees",
+    "policy": {
+      "first_fraction": 0.3,
+      "first_take": 1.15,
+      "hold_ms": 2000,
+      "key": "stop=0.70|first=1.15:0.30|hold=2000|trail=0.25",
+      "stop": 0.7,
+      "trail_retrace": 0.25
+    },
+    "target_predictions": 80,
+    "threshold": 0.2828562828701222,
+    "validation_economics": {
+      "capture_windows": 4,
+      "decision_horizon_ms": 0,
+      "e4_overlap": 39,
+      "ending_bankroll_sol": 31.145400302213776,
+      "latency_ms": 0,
+      "ledger": [
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "3zcnzbQ71tqtbeoNkKPomP5CB9akRtTTGvxy2SL4pump",
+          "pnl_sol": 0.20667193187131866,
+          "run_id": "33716649440",
+          "score": 0.36848551685492364,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "6svxFAqXRnt3z2G5wPyDJfypri79dePGZC9u1noZpump",
+          "pnl_sol": -0.019646837069174382,
+          "run_id": "33716649440",
+          "score": 0.3141642223483008,
+          "win": false
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "6EdsKe7TXiZsgW9mWi5XceAkS27C4GUKMXVfaz6yuZoY",
+          "pnl_sol": -0.013676498098750066,
+          "run_id": "33716649440",
+          "score": 0.3875875813187159,
+          "win": false
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "4WdxzeVB6wyr4aSCurJsj6RdFCST4iNcc9xVDRjwpump",
+          "pnl_sol": -0.02135432461626221,
+          "run_id": "33716649440",
+          "score": 0.3397607109081785,
+          "win": false
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "4fL2K6McgStxEoaDLLAFWHF4eGNWBQWPHfVztXaDpump",
+          "pnl_sol": -0.021314160345188758,
+          "run_id": "33716649440",
+          "score": 0.37482599762181473,
+          "win": false
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CnPBSDWM7rRmcpnswySQcUmddc75Pvv78aDmrV4tpump",
+          "pnl_sol": -0.021030474324930902,
+          "run_id": "33716649440",
+          "score": 0.2904497122725734,
+          "win": false
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5JBSnkq2RxxCMFmcL4cSMnau3wDc2xkmbbbiWBjVpump",
+          "pnl_sol": -0.020885881759788526,
+          "run_id": "33716649440",
+          "score": 0.3014629569288728,
+          "win": false
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "91YkEcTdDaV1VEkYwrTDMtZEaiD3nMc273GwAhKokcxw",
+          "pnl_sol": 0.1286058965981125,
+          "run_id": "33716649440",
+          "score": 0.39368238008890644,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "B4Fzsn6XoomFHQtUQSBxxNLun4KvjhnBy7fs7vQWpump",
+          "pnl_sol": 0.03851488241583724,
+          "run_id": "33716649440",
+          "score": 0.29722266655806856,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "TRAILING_OR_STOP",
+          "mint": "9ZmpfSq4BjF3Ni5yfdSd9GJZqXAE2MZftzoxXXnzpump",
+          "pnl_sol": 0.11932622968923969,
+          "run_id": "33716649440",
+          "score": 0.28549025998873734,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "4FA8vmfy8MTPhoxNq2JNVT7TrNGdukJt4VZpJBW1pump",
+          "pnl_sol": 0.17166397149040058,
+          "run_id": "33716649440",
+          "score": 0.41592043966744535,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": true,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "GgGhY3gXoXUujYrGHjePQJrk5upZU6Prt8DDdhSvpump",
+          "pnl_sol": 0.36233216102235843,
+          "run_id": "33716649440",
+          "score": 0.5047901734549367,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5rqDFzWL51cwdVDaZNg5JvNimGTUQLivYRHYGVVrpump",
+          "pnl_sol": 0.02901888756141731,
+          "run_id": "33716649440",
+          "score": 0.5656864309813745,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "3FXiN5c58rnkS8e57NirH7QTgN3esTehbYkgNrZfpump",
+          "pnl_sol": 0.09108931292710933,
+          "run_id": "33716649440",
+          "score": 0.3888392604090059,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": true,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "2pi47iqPKBqMytsmA19L3kMRU7PY5W2K5oECxkpypump",
+          "pnl_sol": 0.0213147208181821,
+          "run_id": "33716649440",
+          "score": 0.3179255631232935,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": true,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "KfRnjHzxu4ZU1k44nvx46qydqzDeWtRyjq3fHh5pump",
+          "pnl_sol": 0.2469279993811953,
+          "run_id": "33716649440",
+          "score": 0.5493846109312133,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "TRAILING_OR_STOP",
+          "mint": "9gou28XyjqZhPtTnWLYsSPLGwV1t2QmA5Qr8cYYapump",
+          "pnl_sol": 0.23368404019418326,
+          "run_id": "33716649440",
+          "score": 0.45658978559471064,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9PnSM13FKs7WeVA2Xxxjgn1C4J5Cetmg2XrhyRj1pump",
+          "pnl_sol": -0.03188700874904273,
+          "run_id": "33716649440",
+          "score": 0.28812386056984657,
+          "win": false
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "TRAILING_OR_STOP",
+          "mint": "eyMiMA4QA6Y7nueF1QqyQ2xk4SroAHNs9V8ggpFpump",
+          "pnl_sol": 0.15844269984146542,
+          "run_id": "33716649440",
+          "score": 0.38159777453431987,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "HPKa8Drjz68ft39afgEspgvWzcQhJqfeEq42nt8upump",
+          "pnl_sol": 0.2701388647632567,
+          "run_id": "33716649440",
+          "score": 0.41000091739305833,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": true,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9HC7yDTyznLNsedzNu1ra82FE3384tJdsBjk2UHPpump",
+          "pnl_sol": 0.2567310764846475,
+          "run_id": "33716649440",
+          "score": 0.5927518621024459,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": true,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "8nLN2B1xG2QTzffYFyjUxvum6V7MKwdKNE9rnQ4qpump",
+          "pnl_sol": 0.31210966934772083,
+          "run_id": "33716649440",
+          "score": 0.37934251109414485,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "TRAILING_OR_STOP",
+          "mint": "W4r8siVCemJBF5fExs852cvB2S8AghZhguVVkRZpump",
+          "pnl_sol": 0.5951741518923933,
+          "run_id": "33716649440",
+          "score": 0.5466680454687501,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "3XKKKYzFjD975qx7mH3V5kjTq51YuauWnbx8roBdpump",
+          "pnl_sol": 0.3349171377073125,
+          "run_id": "33716649440",
+          "score": 0.530625493869544,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "H7SZTgJ3MSZUQU7ahtixSrM6E6Kh43j8yPKYY7Fopump",
+          "pnl_sol": 0.017324606863432804,
+          "run_id": "33716649440",
+          "score": 0.4374571480317489,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "2cQH39rbN9syMY9nRuSQf6TNZ3azSAM7X8QdAyeApump",
+          "pnl_sol": -0.04607921484473262,
+          "run_id": "33716649440",
+          "score": 0.3681319195162354,
+          "win": false
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "377Gxw3uYBBx1t2iPbdTBreAA4pccrh45twNqSnXpump",
+          "pnl_sol": 0.2101008243502372,
+          "run_id": "33716649440",
+          "score": 0.5225336132187222,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": true,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "A9XBcoqANKWQBPWsM8wJR9v7JaAEBrc3LsfjTQ6hpump",
+          "pnl_sol": 0.1721731717356027,
+          "run_id": "33716649440",
+          "score": 0.6081120384009452,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "GTmRSuqENCavU5BZvaZoSYJnhCmWmKk7GeMmv75CRH4H",
+          "pnl_sol": 0.06524419258737398,
+          "run_id": "33716649440",
+          "score": 0.3420876681699937,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "HsWg9dfozTEyoabLPjhFRHAQza1RhF6r3EDKzstTpump",
+          "pnl_sol": 0.011336675170998602,
+          "run_id": "33716649440",
+          "score": 0.4426418193474734,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "FCHGT4mhN5o2WpbaczBMzjLHU7oHPvTxV4uBaziWpump",
+          "pnl_sol": 0.17916480001767693,
+          "run_id": "33741470396",
+          "score": 0.5795985965029111,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "Gvv8UACsciVw5Cg7gkSSxi7hACiJXuYVuvPCDJYCpump",
+          "pnl_sol": 0.21712216164096793,
+          "run_id": "33741470396",
+          "score": 0.7992511651644965,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "47AaMNx2XvL2eoH7YjdmsDmZt7TEj7m8WedvUnwwpump",
+          "pnl_sol": 0.2764366842782115,
+          "run_id": "33741470396",
+          "score": 0.6909975442888193,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CHw8gs7KtL6kGWrDP8BCXBpkstVczcYjBwrt5yBNpump",
+          "pnl_sol": 0.3809183050445815,
+          "run_id": "33741470396",
+          "score": 0.4739373951042536,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9zuujRcn4RPCwBxjAoGay1nahkZDJWqvsBQyMJzKpump",
+          "pnl_sol": 0.7214457531914659,
+          "run_id": "33741470396",
+          "score": 0.45498091701071675,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BDHCQxkZMQyWeHzzRAp4PKF13YCfQN2bWQ68PCtspump",
+          "pnl_sol": 0.17417718014960976,
+          "run_id": "33741470396",
+          "score": 0.38487025450633133,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "TRAILING_OR_STOP",
+          "mint": "BTgFwsBBS3oSYDkuYdCGSCfkYhVNYSC1bwuAYA8spump",
+          "pnl_sol": 0.8141890790400923,
+          "run_id": "33741470396",
+          "score": 0.46778560428407845,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "Hj87aMxqYz3hRaGgY9PxdDrRfzMoRhxH5NGPD7jipump",
+          "pnl_sol": 0.2847457549502361,
+          "run_id": "33741470396",
+          "score": 0.4073719531176993,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "EqFi1L3z43vbE7TRArwDMVMpuB1zjYmzjZq58XE8pump",
+          "pnl_sol": 0.017722107542188982,
+          "run_id": "33741470396",
+          "score": 0.387890105706456,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "4xGLW7ZzQXj1UfA1HtsjwDvQf8XoGvvhMYYx9x33pump",
+          "pnl_sol": 0.4864772421111819,
+          "run_id": "33741470396",
+          "score": 0.47167941923739926,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "HNw2Fg6RndvK9Wz5qYmSEzp1au3J2rRJ7gBfvBNfSNs2",
+          "pnl_sol": 0.029701921857606076,
+          "run_id": "33741470396",
+          "score": 0.45237939202509353,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "6tu7nQtNfRZg7NQ5oLmWczDi9vhhkNefGribYj6zpump",
+          "pnl_sol": 0.19906746904764844,
+          "run_id": "33741470396",
+          "score": 0.4313407263490406,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "HxAnBntTz4kLcN295sYMGGcZZRALr8UPdUA4L3Tspump",
+          "pnl_sol": 0.518286454544533,
+          "run_id": "33741470396",
+          "score": 0.5604277644281939,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "FmWGECTYS4iBVLqZpLziAn7ZrMsX72w2sCgddRp8pump",
+          "pnl_sol": 0.772026317686522,
+          "run_id": "33741470396",
+          "score": 0.6226367627386603,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "D4Mvr7ZurcxHT2znmVHLkWL7KV5pb75kHsSe5FQMpump",
+          "pnl_sol": 0.20542556470158907,
+          "run_id": "33741470396",
+          "score": 0.29512390073474304,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "7YKWFcCaSiPCsfQRSYW7j1z3rNq7RbSfQXQ1Z2nTpump",
+          "pnl_sol": 0.11491959850680862,
+          "run_id": "33741470396",
+          "score": 0.6625777532740956,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CahoLMbXxyfX7C5UVeRKFrNSUysiXdq2x2u27D66pump",
+          "pnl_sol": 1.4518327976382877,
+          "run_id": "33741470396",
+          "score": 0.43865948365871466,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "EJPRjFW2Xrvaw6y2XxpuHeKvNHTvesUMCEX9XyxApump",
+          "pnl_sol": 0.7143915365320886,
+          "run_id": "33741470396",
+          "score": 0.4797106354024693,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "CPsKFx5ZE8YaDuTovyobrDzW8JLUinyMqerTSCgKpump",
+          "pnl_sol": 0.3267193412470036,
+          "run_id": "33741470396",
+          "score": 0.40195493822492484,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "H6fALhwKH1kTp6iQqJdyPaVfEALPD5Hc2kUWotb9pump",
+          "pnl_sol": 0.4472240801623471,
+          "run_id": "33741470396",
+          "score": 0.3905835013583612,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BTUPVvj36BTjRwPc64YSAaALxe76SuGbwVccZ9dypump",
+          "pnl_sol": 0.6901745276006069,
+          "run_id": "33741470396",
+          "score": 0.294226271793607,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": true,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "4EHeTEFHCCmBaXmEXLvrRM8QKtvEvBNP2tfeiiu5pPq7",
+          "pnl_sol": 0.24196635363610502,
+          "run_id": "33741470396",
+          "score": 0.41357656069334403,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "9udxhNZEKbx8HXyqrqwhZcoXrnzooqjW4kjzzWLfpump",
+          "pnl_sol": 0.6476863263678457,
+          "run_id": "33741470396",
+          "score": 0.5147232460003363,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "DNGkg2vXQyVMkptkFDchWCt5zGVvYTkfGqojVGASpump",
+          "pnl_sol": 0.6047673000922523,
+          "run_id": "33741470396",
+          "score": 0.5730135725690381,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": true,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "BboJZTNCu66bDQDTCt2aG3DEDLX9TtyqADFu6Fvfpump",
+          "pnl_sol": 0.32513325260578957,
+          "run_id": "33741470396",
+          "score": 0.5299320269893917,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "TRAILING_OR_STOP",
+          "mint": "65GKhKnsz6tem2iTP91xvf8px9aSgvXSMhxZG9dtpump",
+          "pnl_sol": -0.05713916687235325,
+          "run_id": "33741470396",
+          "score": 0.5245903691900058,
+          "win": false
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5t6t4g1YUgzSJMpq2aaWS8wDBByDY7Ri7MxWtTdpump",
+          "pnl_sol": 0.15696649883802732,
+          "run_id": "33741470396",
+          "score": 0.31848329080672005,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "8KikspFaxgKgysEptAbuzPyQefp6jFaN51DHbHSGpump",
+          "pnl_sol": 1.5865723028631944,
+          "run_id": "33741470396",
+          "score": 0.48375094723107404,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5FoKgfCgoCoYrkSWrN8si585tRU8JKF8Hyqwhyp9pump",
+          "pnl_sol": 0.46974249299559384,
+          "run_id": "33741470396",
+          "score": 0.3050829948489512,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "TRAILING_OR_STOP",
+          "mint": "662A7sj87ZVTCNGyfuRoYNh4Q6HpttDqcQDFnJmcz1hi",
+          "pnl_sol": -0.12440856911714719,
+          "run_id": "33741470396",
+          "score": 0.3278169784596809,
+          "win": false
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "3hHrHHjWADvrUf23cLY7ZBKTsUY1EjDd9uUqKtc2pump",
+          "pnl_sol": -0.06570480854860487,
+          "run_id": "33741470396",
+          "score": 0.296111748991208,
+          "win": false
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": true,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "6JaEJQCDz2TKoWbK9fk1pn9PTVtUehP2o89sGaHTpump",
+          "pnl_sol": 0.5780813977134535,
+          "run_id": "33769636983",
+          "score": 0.4757679607511428,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "TRAILING_OR_STOP",
+          "mint": "9gR4srWmpr5RnBuDJ9oPATpYdFFyxVg2KqkBJBJEpump",
+          "pnl_sol": 0.22185578682971935,
+          "run_id": "33769636983",
+          "score": 0.3151180556380022,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": true,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "JCkDUdMDKU9DRYfu3hWoVzLWcJueEuWHTuA4HjCbpump",
+          "pnl_sol": 1.2854349545464614,
+          "run_id": "33769636983",
+          "score": 0.45312362545301804,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "hSMXLgrwe3UzZyWcMxBpVnnVjWiqotNiTH9PTmdpump",
+          "pnl_sol": 0.45132504855948424,
+          "run_id": "33769636983",
+          "score": 0.36277212044652385,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "HUiSpMutcsNRGMA3bMFfGGzhumvAYGTAkbton3rTpump",
+          "pnl_sol": -0.05715212744590874,
+          "run_id": "33769636983",
+          "score": 0.41797977223986815,
+          "win": false
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": true,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "5C9dUn2hDzJVXPELZCRmUdhKSS3VTe1X3HekP4Apump",
+          "pnl_sol": 2.031294541388715,
+          "run_id": "33769636983",
+          "score": 0.2828562828701222,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "4QQuGEBMR4CXUjSyXN6QqqigfWcX5NVk99tEBU7Lpump",
+          "pnl_sol": 1.084604838479065,
+          "run_id": "33769636983",
+          "score": 0.30502030283005976,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "TRAILING_OR_STOP",
+          "mint": "9GzHBCG317ZBfbNNGNQNjktDy5D1qihhV9i6wQiRpump",
+          "pnl_sol": -0.20500262184905343,
+          "run_id": "33769636983",
+          "score": 0.36887781283825805,
+          "win": false
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "Aem5BAaKwfXSZqvc2qvunbxTxjnJLQxvB74n4Yi1pump",
+          "pnl_sol": 1.3420351741818348,
+          "run_id": "33769636983",
+          "score": 0.5760947057697837,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "FKuNkuG4Hd4myCyGjNp6dWLDGq3WH3H2RnDJWy1fpump",
+          "pnl_sol": 0.07524856287897215,
+          "run_id": "33769636983",
+          "score": 0.38498149043280194,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "ALHzYBU5i6dnS2EHDE9m4srZMc9Zx41iQrXmrz2xpump",
+          "pnl_sol": 0.8469193625887975,
+          "run_id": "33769636983",
+          "score": 0.5162437887983905,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "TRAILING_OR_STOP",
+          "mint": "DPtvNDB1VP9A2n5yid5nyd9UyY5XTL2at4iuzvCRpump",
+          "pnl_sol": 0.0824632253418583,
+          "run_id": "33781389703",
+          "score": 0.3304747490771004,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "6YarvUaqipR2WhWE8jHSJtrn3hyYorgMMCiFCiuqpump",
+          "pnl_sol": 1.365609369387947,
+          "run_id": "33781389703",
+          "score": 0.3960663447183869,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "TRAILING_OR_STOP",
+          "mint": "CLFy7jfkChjSc48brHbyRNzb69JE7Wv45ofnTQfnpump",
+          "pnl_sol": 0.6940645355106266,
+          "run_id": "33781389703",
+          "score": 0.3288526860577139,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "3PTyc6mVnXHuENPhdDQxPyygsnpdnwGyQqMdDgQ9wGym",
+          "pnl_sol": 0.009581440487351836,
+          "run_id": "33781389703",
+          "score": 0.3452161096043527,
+          "win": true
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "FRVFkxrxJGCKsXUSqhuR5BbPk43wD8FFJEXBBUzBu48q",
+          "pnl_sol": -0.07326400904444867,
+          "run_id": "33781389703",
+          "score": 0.2971000998446718,
+          "win": false
+        },
+        {
+          "e4_attempted": false,
+          "e4_landed": false,
+          "exit_reason": "TRAILING_OR_STOP",
+          "mint": "6p9WGN8tXxNvG5S6i3tofViJXFDmX1YQrRBoAUcLpump",
+          "pnl_sol": -0.21323838808250256,
+          "run_id": "33781389703",
+          "score": 0.3705019319165927,
+          "win": false
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": false,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "DrfzdyfMdnt8XzoGF7vcrKuTg6ZKxdXnEddoTaNFpump",
+          "pnl_sol": 0.8688942102215839,
+          "run_id": "33781389703",
+          "score": 0.47897599370884564,
+          "win": true
+        },
+        {
+          "e4_attempted": true,
+          "e4_landed": true,
+          "exit_reason": "MAXIMUM_HOLD",
+          "mint": "EDUBrnbhLfZmcKUGJg3Zi8hN5PtnDBqV8tk4mU8Jpump",
+          "pnl_sol": 1.0919256352619366,
+          "run_id": "33781389703",
+          "score": 0.3164706310888572,
+          "win": true
+        }
+      ],
+      "ledger_hash": "acd34bfa7d53c7728d8f79bee351c18b4067d371207a591b06560f3490bb9b39",
+      "maximum_drawdown_fraction": 0.09550079904231623,
+      "net_pnl_sol": 28.145400302213776,
+      "profit_factor": 29.378555941971403,
+      "rejected": {},
+      "trades": 80,
+      "wilson_lower_bound": 0.7134147429619243,
+      "win_rate": 0.8125,
+      "wins": 65
+    }
+  }
+}
