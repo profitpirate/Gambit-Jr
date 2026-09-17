@@ -1,0 +1,113 @@
+{
+  "audit_counts": {
+    "e4_prearmed_qualified": 0,
+    "golden_qualified": 3,
+    "launches": 400,
+    "library_positive": 31,
+    "library_strong_negative": 4
+  },
+  "checked_ns": 1789666100601166656,
+  "closed_trades": {
+    "E4_PREARMED": 0,
+    "E4_PREARMED_CONVICTION_LIBRARY": 0,
+    "FULL_3S": 2,
+    "FULL_3S_LIBRARY": 2,
+    "FULL_3S_V2_1": 2,
+    "FULL_3S_V2_1_LIBRARY": 2,
+    "FULL_4S": 2
+  },
+  "complete": false,
+  "entry_latency_ms_common": 20.0,
+  "market_data": "STRICTLY_FUTURE_LIVE_SOLANA_CAPTURE_REPLAYED_CAUSALLY",
+  "minimum_closed": 0,
+  "models": [
+    "FULL_3S",
+    "FULL_4S",
+    "FULL_3S_V2_1",
+    "FULL_3S_LIBRARY",
+    "FULL_3S_V2_1_LIBRARY",
+    "E4_PREARMED",
+    "E4_PREARMED_CONVICTION_LIBRARY"
+  ],
+  "paper_only": true,
+  "processed_runs": [
+    "35251717258"
+  ],
+  "real_money_execution": false,
+  "results": {
+    "E4_PREARMED": {
+      "closed_trades": 0,
+      "expectancy_sol": null,
+      "losses": 0,
+      "maximum_drawdown_fraction": 0.0,
+      "net_pnl_sol": 0,
+      "profit_factor": null,
+      "win_rate": null,
+      "wins": 0
+    },
+    "E4_PREARMED_CONVICTION_LIBRARY": {
+      "closed_trades": 0,
+      "expectancy_sol": null,
+      "losses": 0,
+      "maximum_drawdown_fraction": 0.0,
+      "net_pnl_sol": 0,
+      "profit_factor": null,
+      "win_rate": null,
+      "wins": 0
+    },
+    "FULL_3S": {
+      "closed_trades": 2,
+      "expectancy_sol": -0.08419334816350516,
+      "losses": 2,
+      "maximum_drawdown_fraction": 0.056128898775670066,
+      "net_pnl_sol": -0.1683866963270103,
+      "profit_factor": 0.0,
+      "win_rate": 0.0,
+      "wins": 0
+    },
+    "FULL_3S_LIBRARY": {
+      "closed_trades": 2,
+      "expectancy_sol": -0.08419334816350516,
+      "losses": 2,
+      "maximum_drawdown_fraction": 0.056128898775670066,
+      "net_pnl_sol": -0.1683866963270103,
+      "profit_factor": 0.0,
+      "win_rate": 0.0,
+      "wins": 0
+    },
+    "FULL_3S_V2_1": {
+      "closed_trades": 2,
+      "expectancy_sol": -0.01707920529590788,
+      "losses": 2,
+      "maximum_drawdown_fraction": 0.011386136863938598,
+      "net_pnl_sol": -0.03415841059181576,
+      "profit_factor": 0.0,
+      "win_rate": 0.0,
+      "wins": 0
+    },
+    "FULL_3S_V2_1_LIBRARY": {
+      "closed_trades": 2,
+      "expectancy_sol": -0.01707920529590788,
+      "losses": 2,
+      "maximum_drawdown_fraction": 0.011386136863938598,
+      "net_pnl_sol": -0.03415841059181576,
+      "profit_factor": 0.0,
+      "win_rate": 0.0,
+      "wins": 0
+    },
+    "FULL_4S": {
+      "closed_trades": 2,
+      "expectancy_sol": -0.05709084396212763,
+      "losses": 2,
+      "maximum_drawdown_fraction": 0.038060562641418404,
+      "net_pnl_sol": -0.11418168792425526,
+      "profit_factor": 0.0,
+      "win_rate": 0.0,
+      "wins": 0
+    }
+  },
+  "social_evidence": "immutable launch metadata/status timestamp; live X transport latency not claimed",
+  "status": "COLLECTING",
+  "target_per_model": 100,
+  "version": "golden-sevenmodel-forward-v1"
+}
