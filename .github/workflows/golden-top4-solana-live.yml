@@ -15,12 +15,13 @@ concurrency:
 jobs:
   forward-live:
     runs-on: ubuntu-latest
-    timeout-minutes: 280
+    timeout-minutes: 75
     env:
       GH_TOKEN: ${{ github.token }}
       BRANCH: codex/golden-top3-full3sv2-live
       PYTHONPATH: tools:tests
       PYTHONUNBUFFERED: '1'
+      LIVE_SEGMENT_SECONDS: '2700'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,6 +32,25 @@ jobs:
           python-version: '3.12'
       - name: Install pinned read-only network dependency
         run: python -m pip install aiohttp==3.14.3
+      - name: Install live heartbeat lease shim
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/migration_route_bridge.py')
+          s=p.read_text()
+          needle="                    data=dict(data)\n                    data.update("
+          replacement=(
+              "                    data=dict(data)\n"
+              "                    data['heartbeat_ns']=time.time_ns()\n"
+              "                    data['lease_expires_ns']=data['heartbeat_ns']+90_000_000_000\n"
+              "                    data['liveness_contract']='collector_active is valid only while heartbeat lease is unexpired; Actions run state is authoritative'\n"
+              "                    data.update("
+          )
+          if s.count(needle) != 1:
+              raise SystemExit('heartbeat lease injection point changed')
+          p.write_text(s.replace(needle,replacement))
+          PY
+          python -m py_compile tools/migration_route_bridge.py
       - name: Preserve tested source identity and verify original freeze
         run: |
           mkdir -p artifacts/build
@@ -72,8 +92,8 @@ jobs:
         run: |
           python tools/golden_top4_solana.py --production-root production --corpus "$CORPUS" --manifest config/golden-top4-live.json --output artifacts/smoke --duration 60 --smoke > artifacts/build/live-preflight.log 2>&1
           cat artifacts/smoke/readiness.json
-      - name: Live four-model campaign with migration-route bridge and per-action cost reporting
-        run: python tools/migration_route_bridge.py campaign --kind top4 --corpus "$CORPUS" --duration 14400
+      - name: Resumable live four-model segment with migration-route bridge
+        run: python tools/migration_route_bridge.py campaign --kind top4 --corpus "$CORPUS" --duration "$LIVE_SEGMENT_SECONDS"
       - name: Preserve sources and evidence regardless of completion
         if: always()
         run: |
@@ -85,7 +105,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: golden-top4-solana-${{ github.run_id }}
+          name: golden-top4-solana-${{ github.run_id }}-${{ github.run_attempt }}
           path: artifacts/
           retention-days: 60
           if-no-files-found: error
