@@ -50,7 +50,7 @@ jobs:
               raise SystemExit('heartbeat lease injection point changed')
           p.write_text(s.replace(needle,replacement))
           PY
-          python -m py_compile tools/migration_route_bridge.py
+          python -m py_compile tools/migration_route_bridge.py tools/golden_live_checkpoint.py
       - name: Preserve tested source identity and verify original freeze
         run: |
           mkdir -p artifacts/build
@@ -62,7 +62,7 @@ jobs:
           for p,h in f['source_sha256'].items():
               assert hashlib.sha256(Path(p).read_bytes()).hexdigest()==h,p
           PY
-          python -m py_compile tools/golden_top4_*.py tools/migration_route_bridge.py
+          python -m py_compile tools/golden_top4_*.py tools/migration_route_bridge.py tools/golden_live_checkpoint.py
           python tools/migration_route_bridge.py self-test
           python tools/golden_top4_campaign.py --prepare
           cp config/golden-top4-live.json artifacts/build/manifest.json
@@ -92,14 +92,29 @@ jobs:
         run: |
           python tools/golden_top4_solana.py --production-root production --corpus "$CORPUS" --manifest config/golden-top4-live.json --output artifacts/smoke --duration 60 --smoke > artifacts/build/live-preflight.log 2>&1
           cat artifacts/smoke/readiness.json
-      - name: Resumable live four-model segment with migration-route bridge
-        run: python tools/migration_route_bridge.py campaign --kind top4 --corpus "$CORPUS" --duration "$LIVE_SEGMENT_SECONDS"
+      - name: Resumable live four-model segment with durable clean checkpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/live artifacts/build
+          rm -f artifacts/live/stop-checkpoint-publisher
+          python tools/golden_live_checkpoint.py \
+            --kind top4 --root artifacts/live --branch "$BRANCH" \
+            > artifacts/build/checkpoint-publisher.log 2>&1 &
+          checkpoint_pid=$!
+          cleanup_checkpoint() {
+            touch artifacts/live/stop-checkpoint-publisher
+            wait "$checkpoint_pid" || true
+          }
+          trap cleanup_checkpoint EXIT
+          python tools/migration_route_bridge.py campaign --kind top4 --corpus "$CORPUS" --duration "$LIVE_SEGMENT_SECONDS"
       - name: Preserve sources and evidence regardless of completion
         if: always()
         run: |
           mkdir -p artifacts/source
           cp tools/golden_top4_*.py artifacts/source/
           cp tools/migration_route_bridge.py artifacts/source/
+          cp tools/golden_live_checkpoint.py artifacts/source/
           cp config/golden-top4-live.json artifacts/source/ 2>/dev/null || true
           cp .github/workflows/golden-top4-solana-live.yml artifacts/source/
       - uses: actions/upload-artifact@v4
