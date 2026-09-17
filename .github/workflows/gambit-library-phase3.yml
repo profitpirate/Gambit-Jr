@@ -4,6 +4,11 @@ on:
     branches: [codex/golden-top3-full3sv2-live]
     paths:
       - '.github/workflows/gambit-library-phase3.yml'
+      - 'tools/gambit_library_policy.py'
+      - 'tools/gambit_library_competitor.py'
+      - 'tools/gambit_library_competitor_v2.py'
+      - 'tools/gambit_library_phase3_stress.py'
+      - 'tools/gambit_library_phase3_horizon_test.py'
   workflow_dispatch:
 permissions:
   contents: write
@@ -90,13 +95,21 @@ jobs:
           assert f['frozen_four_campaign_touched'] is False
           assert t['model']=='FULL_3S_V2_LIBRARY' and t['paper_only'] is True
           assert runtime['model']=='FULL_3S_V2_LIBRARY'
+          counts=f.get('counts',{})
+          resolved=int(counts.get('observation_resolved',0))
+          unknown=int(counts.get('observation_unknown',0))
+          assert resolved > 0, 'no causal developer outcomes resolved'
+          assert resolved > unknown, (resolved, unknown)
+          assert len(runtime.get('developers',{})) > 0
           assert (root/'library-events.jsonl').exists()
           lines=sum(1 for _ in open(root/'library-events.jsonl'))
           marker={'phase':'PHASE_3_COMPLETE','model':'FULL_3S_V2_LIBRARY','paper_only':True,
                   'real_execution':False,'frozen_four_campaign_touched':False,
                   'workflow_run_id':int(__import__('os').environ['GITHUB_RUN_ID']),
                   'event_records':lines,'closed_trades':len(t['trades']),
-                  'rejections':len(r['rejections']),'final_status':f}
+                  'rejections':len(r['rejections']),'resolved_observations':resolved,
+                  'unknown_observations':unknown,'developer_count':len(runtime.get('developers',{})),
+                  'final_status':f}
           (root/'phase3-complete.json').write_text(json.dumps(marker,indent=2,sort_keys=True)+'\n')
           PY
       - name: Persist append-only session and phase 3 completion
