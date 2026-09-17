@@ -1,15 +1,15 @@
 {
   "audit_counts": {
-    "e4_prearmed_qualified": 0,
+    "e4_prearmed_qualified": 2,
     "golden_qualified": 0,
     "launches": 400,
-    "library_positive": 5,
+    "library_positive": 8,
     "library_strong_negative": 0
   },
-  "checked_ns": 1789672417477910166,
+  "checked_ns": 1789673417336381706,
   "closed_trades": {
-    "E4_PREARMED": 2,
-    "E4_PREARMED_CONVICTION_LIBRARY": 2,
+    "E4_PREARMED": 3,
+    "E4_PREARMED_CONVICTION_LIBRARY": 3,
     "FULL_3S": 12,
     "FULL_3S_LIBRARY": 12,
     "FULL_3S_V2_1": 13,
@@ -19,7 +19,7 @@
   "complete": false,
   "entry_latency_ms_common": 20.0,
   "market_data": "STRICTLY_FUTURE_LIVE_SOLANA_CAPTURE_REPLAYED_CAUSALLY",
-  "minimum_closed": 2,
+  "minimum_closed": 3,
   "models": [
     "FULL_3S",
     "FULL_4S",
@@ -37,29 +37,30 @@
     "35256564440",
     "35258020460",
     "35260068507",
-    "35261849014"
+    "35261849014",
+    "35263616700"
   ],
   "real_money_execution": false,
   "results": {
     "E4_PREARMED": {
-      "closed_trades": 2,
-      "expectancy_sol": -0.009463840417600455,
+      "closed_trades": 3,
+      "expectancy_sol": 0.031924000800996034,
       "losses": 1,
       "maximum_drawdown_fraction": 0.014333915943042156,
-      "net_pnl_sol": -0.01892768083520091,
-      "profit_factor": 0.5598392672220504,
-      "win_rate": 0.5,
-      "wins": 1
+      "net_pnl_sol": 0.09577200240298811,
+      "profit_factor": 3.227165341826377,
+      "win_rate": 0.6666666666666666,
+      "wins": 2
     },
     "E4_PREARMED_CONVICTION_LIBRARY": {
-      "closed_trades": 2,
-      "expectancy_sol": -0.03094814276070118,
+      "closed_trades": 3,
+      "expectancy_sol": 0.035398894883696665,
       "losses": 1,
       "maximum_drawdown_fraction": 0.03852313447926011,
-      "net_pnl_sol": -0.06189628552140236,
-      "profit_factor": 0.4644232497511694,
-      "win_rate": 0.5,
-      "wins": 1
+      "net_pnl_sol": 0.10619668465109,
+      "profit_factor": 1.9188996524349435,
+      "win_rate": 0.6666666666666666,
+      "wins": 2
     },
     "FULL_3S": {
       "closed_trades": 12,
