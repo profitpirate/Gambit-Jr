@@ -5,7 +5,9 @@ The v1 runner required a market event at/after the 3s horizon. Quiet coins there
 became UNKNOWN even when the last observed bonding-curve state was still the valid
 state at 3s. This wrapper preserves the tiny frozen policy and paper-only execution,
 but records event states while each 3s observation is active and selects the latest
-valid state at or before the horizon. It never uses a post-horizon state.
+valid state at or before the horizon. It never uses a post-horizon state. Quiet paper
+positions are also advanced by the maintenance clock when their market state has not
+changed, so a lack of a new swap event is not mistaken for a failed fill or exit.
 """
 from __future__ import annotations
 
@@ -104,6 +106,23 @@ class Runner(base.Runner):
             })
         finally:
             self.latest.end(mint)
+
+    def maintenance(self) -> None:
+        """Advance timers on unchanged states, then apply v1 stale-path safeguards."""
+        now = base.time.time_ns()
+        for mint, p in list(self.positions.items()):
+            if p.get("status") not in ("PENDING", "OPEN", "EXIT_PENDING"):
+                continue
+            state = self.latest.get(mint)
+            if not base.valid(state):
+                continue
+            try:
+                self.tick_position(mint, state, now)
+            except ValueError:
+                # A curve that can no longer quote remains subject to the v1
+                # unknown/unresolved safeguards below; never fabricate a fill.
+                pass
+        super().maintenance()
 
 
 def main() -> int:
