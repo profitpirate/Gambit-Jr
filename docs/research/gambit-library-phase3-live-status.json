@@ -1,43 +1,43 @@
 {
   "active_positions": 0,
-  "cash_sol": 2.898225329515,
-  "checked_ns": 1789618676227009862,
-  "closed_trades": 1,
+  "cash_sol": 2.713147086694596,
+  "checked_ns": 1789618737467056763,
+  "closed_trades": 8,
   "collector_active": true,
   "counts": {
-    "closed_trades": 1,
-    "creation_proof_confirmed": 48,
-    "decisions": 48,
-    "entries": 1,
-    "fresh_launches": 48,
+    "closed_trades": 8,
+    "creation_proof_confirmed": 69,
+    "decisions": 69,
+    "entries": 8,
+    "fresh_launches": 69,
     "modelled_landed_failures": 1,
-    "observation_resolved": 46,
+    "observation_resolved": 68,
     "observation_unknown": 1,
-    "rejected_dev_rule": 47,
-    "rejected_nonfresh_or_unquotable_create": 5,
-    "selected": 1
+    "rejected_dev_rule": 61,
+    "rejected_nonfresh_or_unquotable_create": 6,
+    "selected": 8
   },
-  "equity_sol": 2.898225329515,
+  "equity_sol": 2.713147086694596,
   "errors": [],
   "feed_stats": {
     "wss://api.mainnet-beta.solana.com": {
       "connections": 1,
       "disconnects": 0,
-      "last_receive_ns": 1789618675860416091,
-      "messages": 54846
+      "last_receive_ns": 1789618737466865516,
+      "messages": 69835
     },
     "wss://solana-rpc.publicnode.com": {
       "connections": 1,
       "disconnects": 0,
-      "last_receive_ns": 1789618676226822603,
-      "messages": 24493
+      "last_receive_ns": 1789618737440992944,
+      "messages": 31165
     }
   },
   "frozen_four_campaign_touched": false,
-  "losses": 1,
-  "maximum_mark_to_market_drawdown": 0.03392489016166674,
+  "losses": 7,
+  "maximum_mark_to_market_drawdown": 0.10069933345763464,
   "model": "FULL_3S_V2_LIBRARY",
-  "net_pnl_sol": -0.10177467048500022,
+  "net_pnl_sol": -0.28685291330540386,
   "note": "Independent read-only Solana observer and paper account; no blockchain submission path.",
   "paper_only": true,
   "real_execution": false,
@@ -52,6 +52,6 @@
   },
   "started_ns": 1789618554415076085,
   "version": "gambit-library-forward-paper-v2-causal-horizon",
-  "win_rate": 0.0,
-  "wins": 0
+  "win_rate": 0.125,
+  "wins": 1
 }
