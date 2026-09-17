@@ -1,0 +1,95 @@
+name: E4 V12 trade library
+on:
+  push:
+    branches: [codex/e4-v12-trade-library]
+    paths:
+      - '.github/workflows/e4-v12-trade-library.yml'
+      - 'scripts/e4_trade_library.py'
+      - 'src/memecoin_bot/full3s_v2_library.py'
+      - 'tests/test_e4_trade_library.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: e4-v12-trade-library
+  cancel-in-progress: false
+
+jobs:
+  build-library:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONPATH: .
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-trade-library
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Fetch terminal HG checkpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/library-input
+          git fetch origin \
+            codex/golden-top3-full3sv2-live:refs/remotes/origin/codex/golden-top3-full3sv2-live \
+            codex/golden-2s-loss-exit-live:refs/remotes/origin/codex/golden-2s-loss-exit-live
+          git show 'origin/codex/golden-top3-full3sv2-live:docs/research/golden-top4-state.json' > artifacts/library-input/top4-state.json
+          git show 'origin/codex/golden-2s-loss-exit-live:docs/research/golden-loss2s-state.json' > artifacts/library-input/loss2s-state.json
+          TOP4_RUN="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/golden-top4-solana-live.yml/runs?branch=codex%2Fgolden-top3-full3sv2-live&per_page=1" --jq '.workflow_runs[0].id')"
+          LOSS2S_RUN="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/golden-loss2s-live.yml/runs?branch=codex%2Fgolden-2s-loss-exit-live&per_page=1" --jq '.workflow_runs[0].id')"
+          test -n "$TOP4_RUN" && test -n "$LOSS2S_RUN"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${TOP4_RUN}" > artifacts/library-input/top4-run.json
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${LOSS2S_RUN}" > artifacts/library-input/loss2s-run.json
+          python - <<'PY'
+          import json
+          for name in ('top4','loss2s'):
+              run=json.load(open(f'artifacts/library-input/{name}-run.json'))
+              assert run['status']=='completed', (name,run['status'])
+              print(name, run['id'], run['conclusion'], run['head_sha'])
+          PY
+
+      - name: Build unified library
+        run: |
+          python scripts/e4_trade_library.py \
+            --hg-checkpoint 'top4|artifacts/library-input/top4-state.json|artifacts/library-input/top4-run.json' \
+            --hg-checkpoint 'loss2s|artifacts/library-input/loss2s-state.json|artifacts/library-input/loss2s-run.json' \
+            --output-dir models/e4/library
+
+      - name: Verify library invariants
+        run: |
+          python -m unittest tests.test_e4_trade_library -v
+          python - <<'PY'
+          import json
+          p='models/e4/library/e4-hg-trade-library.json'
+          d=json.load(open(p))
+          c=d['counts']
+          assert c['e4_trades']==316, c
+          assert c['e4_wins']==242, c
+          assert c['e4_losses']==74, c
+          assert c['golden_bunch_developers']==22, c
+          assert c['hg_trades']>0, c
+          assert c['hg_rejections']>0, c
+          assert all(x['terminal_checkpoint'] for x in d['hg_checkpoints'])
+          print(json.dumps(c,sort_keys=True))
+          PY
+
+      - name: Commit generated checkpoint snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'gambit-v12-library'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -- models/e4/library/e4-hg-trade-library.json models/e4/library/e4-hg-developer-index.json
+          if git diff --cached --quiet; then
+            echo 'LIBRARY_ALREADY_CURRENT'
+          else
+            git commit -m 'data(v12): refresh E4 HG trade library [skip ci]'
+            git push origin HEAD:codex/e4-v12-trade-library
+          fi
