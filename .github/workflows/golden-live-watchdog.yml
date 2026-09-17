@@ -1,0 +1,117 @@
+name: Golden live campaign watchdog
+
+on:
+  workflow_run:
+    workflows:
+      - Golden top4 - live Solana paper and E4
+      - Golden 2s loss-exit A-B - live Solana paper
+    types: [completed]
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: golden-live-campaign-watchdog
+  cancel-in-progress: false
+
+jobs:
+  heal:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - key: top4
+            workflow_name: Golden top4 - live Solana paper and E4
+            branch: codex/golden-top3-full3sv2-live
+            status_path: docs/research/golden-top4-status.json
+            stop_path: docs/research/golden-top4-operator-stop.json
+          - key: loss2s
+            workflow_name: Golden 2s loss-exit A-B - live Solana paper
+            branch: codex/golden-2s-loss-exit-live
+            status_path: docs/research/golden-loss2s-status.json
+            stop_path: docs/research/golden-loss2s-operator-stop.json
+    steps:
+      - name: Keep campaign alive until verified target
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KEY: ${{ matrix.key }}
+          WORKFLOW_NAME: ${{ matrix.workflow_name }}
+          BRANCH: ${{ matrix.branch }}
+          STATUS_PATH: ${{ matrix.status_path }}
+          STOP_PATH: ${{ matrix.stop_path }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fetch_branch_file() {
+            gh api --method GET "repos/${GITHUB_REPOSITORY}/contents/$1" \
+              -f ref="$BRANCH" --jq '.content' 2>/dev/null \
+              | tr -d '\n' | base64 -d 2>/dev/null || true
+          }
+
+          status_json="$(fetch_branch_file "$STATUS_PATH")"
+          if [[ -z "$status_json" ]]; then
+            echo "[$KEY] status file unavailable; refusing blind restart"
+            exit 1
+          fi
+
+          verified="$(jq -r '.min_verified_closed_per_model // 0' <<<"$status_json")"
+          target="$(jq -r '.target // 100' <<<"$status_json")"
+          echo "[$KEY] verified=$verified target=$target"
+          if (( verified >= target )); then
+            echo "[$KEY] target reached; watchdog idle"
+            exit 0
+          fi
+
+          stop_json="$(fetch_branch_file "$STOP_PATH")"
+          if [[ -n "$stop_json" ]] && [[ "$(jq -r '.stop // false' <<<"$stop_json")" == "true" ]]; then
+            echo "[$KEY] explicit operator stop is set; watchdog idle"
+            exit 0
+          fi
+
+          runs_json="$(gh api --method GET "repos/${GITHUB_REPOSITORY}/actions/runs" \
+            -f branch="$BRANCH" -f per_page=100)"
+          active_id="$(jq -r --arg n "$WORKFLOW_NAME" '[.workflow_runs[] | select(.name==$n and (.status=="in_progress" or .status=="queued"))][0].id // empty' <<<"$runs_json")"
+
+          if [[ -n "$active_id" ]]; then
+            active_created="$(jq -r --arg n "$WORKFLOW_NAME" '[.workflow_runs[] | select(.name==$n and (.status=="in_progress" or .status=="queued"))][0].created_at // empty' <<<"$runs_json")"
+            read -r run_age heartbeat_age < <(python - "$active_created" "$(jq -r '.heartbeat_ns // .checked_ns // 0' <<<"$status_json")" <<'PY'
+          import datetime, sys, time
+          created = sys.argv[1]
+          hb = int(float(sys.argv[2] or 0))
+          now = time.time()
+          if created:
+              dt = datetime.datetime.fromisoformat(created.replace('Z', '+00:00'))
+              run_age = max(0, int(now - dt.timestamp()))
+          else:
+              run_age = 0
+          heartbeat_age = 10**9 if hb <= 0 else max(0, int(now - hb / 1_000_000_000))
+          print(run_age, heartbeat_age)
+          PY
+            )
+            echo "[$KEY] active run=$active_id run_age=${run_age}s heartbeat_age=${heartbeat_age}s"
+
+            # Give setup/preflight a generous grace period. Once a live segment is mature,
+            # a missing heartbeat means the collector is stale even if Actions still says running.
+            if (( run_age >= 600 && heartbeat_age > 300 )); then
+              echo "[$KEY] stale collector detected; cancelling this stale attempt so the completion hook/schedule can recover it"
+              gh run cancel "$active_id" --repo "$GITHUB_REPOSITORY" || true
+            else
+              echo "[$KEY] active segment is healthy or still inside startup grace"
+            fi
+            exit 0
+          fi
+
+          latest_id="$(jq -r --arg n "$WORKFLOW_NAME" '[.workflow_runs[] | select(.name==$n)][0].id // empty' <<<"$runs_json")"
+          if [[ -z "$latest_id" ]]; then
+            echo "[$KEY] no prior run exists to resume"
+            exit 1
+          fi
+
+          echo "[$KEY] no active run and target incomplete; re-running latest checkpointed workflow $latest_id"
+          gh run rerun "$latest_id" --repo "$GITHUB_REPOSITORY"
