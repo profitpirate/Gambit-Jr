@@ -1,15 +1,15 @@
 {
   "audit_counts": {
-    "e4_prearmed_qualified": 0,
+    "e4_prearmed_qualified": 1,
     "golden_qualified": 0,
     "launches": 400,
-    "library_positive": 18,
+    "library_positive": 16,
     "library_strong_negative": 0
   },
-  "checked_ns": 1789675317791481198,
+  "checked_ns": 1789676250691821046,
   "closed_trades": {
-    "E4_PREARMED": 3,
-    "E4_PREARMED_CONVICTION_LIBRARY": 3,
+    "E4_PREARMED": 4,
+    "E4_PREARMED_CONVICTION_LIBRARY": 4,
     "FULL_3S": 12,
     "FULL_3S_LIBRARY": 12,
     "FULL_3S_V2_1": 13,
@@ -19,7 +19,7 @@
   "complete": false,
   "entry_latency_ms_common": 20.0,
   "market_data": "STRICTLY_FUTURE_LIVE_SOLANA_CAPTURE_REPLAYED_CAUSALLY",
-  "minimum_closed": 3,
+  "minimum_closed": 4,
   "models": [
     "FULL_3S",
     "FULL_4S",
@@ -40,28 +40,29 @@
     "35261849014",
     "35263616700",
     "35265275794",
-    "35266768811"
+    "35266768811",
+    "35268380621"
   ],
   "real_money_execution": false,
   "results": {
     "E4_PREARMED": {
-      "closed_trades": 3,
-      "expectancy_sol": 0.031924000800996034,
-      "losses": 1,
-      "maximum_drawdown_fraction": 0.014333915943042156,
-      "net_pnl_sol": 0.09577200240298811,
-      "profit_factor": 3.227165341826377,
-      "win_rate": 0.6666666666666666,
+      "closed_trades": 4,
+      "expectancy_sol": 0.008197278102615967,
+      "losses": 2,
+      "maximum_drawdown_fraction": 0.020344808966434254,
+      "net_pnl_sol": 0.032789112410463866,
+      "profit_factor": 1.3093760858591683,
+      "win_rate": 0.5,
       "wins": 2
     },
     "E4_PREARMED_CONVICTION_LIBRARY": {
-      "closed_trades": 3,
-      "expectancy_sol": 0.035398894883696665,
-      "losses": 1,
+      "closed_trades": 4,
+      "expectancy_sol": 0.0024893754606548635,
+      "losses": 2,
       "maximum_drawdown_fraction": 0.03852313447926011,
-      "net_pnl_sol": 0.10619668465109,
-      "profit_factor": 1.9188996524349435,
-      "win_rate": 0.6666666666666666,
+      "net_pnl_sol": 0.009957501842619454,
+      "profit_factor": 1.047011795031967,
+      "win_rate": 0.5,
       "wins": 2
     },
     "FULL_3S": {
