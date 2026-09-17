@@ -1,43 +1,43 @@
 {
-  "active_positions": 1,
-  "cash_sol": 2.464125032248987,
-  "checked_ns": 1789618925118135706,
-  "closed_trades": 15,
+  "active_positions": 0,
+  "cash_sol": 2.4891363855980377,
+  "checked_ns": 1789618986032305233,
+  "closed_trades": 17,
   "collector_active": true,
   "counts": {
-    "closed_trades": 15,
-    "creation_proof_confirmed": 135,
-    "decisions": 137,
-    "entries": 16,
-    "fresh_launches": 137,
+    "closed_trades": 17,
+    "creation_proof_confirmed": 161,
+    "decisions": 164,
+    "entries": 17,
+    "fresh_launches": 164,
     "modelled_landed_failures": 2,
-    "observation_resolved": 134,
+    "observation_resolved": 160,
     "observation_unknown": 1,
-    "rejected_dev_rule": 121,
-    "rejected_nonfresh_or_unquotable_create": 13,
-    "selected": 16
+    "rejected_dev_rule": 147,
+    "rejected_nonfresh_or_unquotable_create": 15,
+    "selected": 17
   },
-  "equity_sol": 2.5842597299089873,
+  "equity_sol": 2.4891363855980377,
   "errors": [],
   "feed_stats": {
     "wss://api.mainnet-beta.solana.com": {
       "connections": 1,
       "disconnects": 0,
-      "last_receive_ns": 1789618925117830246,
-      "messages": 142625
+      "last_receive_ns": 1789618986030376569,
+      "messages": 177434
     },
     "wss://solana-rpc.publicnode.com": {
       "connections": 1,
       "disconnects": 0,
-      "last_receive_ns": 1789618925117943217,
-      "messages": 67672
+      "last_receive_ns": 1789618986032165433,
+      "messages": 83659
     }
   },
   "frozen_four_campaign_touched": false,
-  "losses": 12,
-  "maximum_mark_to_market_drawdown": 0.1552269656183379,
+  "losses": 14,
+  "maximum_mark_to_market_drawdown": 0.17028787146732074,
   "model": "FULL_3S_V2_LIBRARY",
-  "net_pnl_sol": -0.5358749677510128,
+  "net_pnl_sol": -0.5108636144019623,
   "note": "Independent read-only Solana observer and paper account; no blockchain submission path.",
   "paper_only": true,
   "real_execution": false,
@@ -52,6 +52,6 @@
   },
   "started_ns": 1789618554415076085,
   "version": "gambit-library-forward-paper-v2-causal-horizon",
-  "win_rate": 0.2,
+  "win_rate": 0.17647058823529413,
   "wins": 3
 }
