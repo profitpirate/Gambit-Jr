@@ -58,17 +58,20 @@ jobs:
           persist_one() {
             src="$1"
             dest="$2"
-            content="$(base64 -w0 "$src")"
             sha="$(gh api "repos/$GITHUB_REPOSITORY/contents/$dest?ref=$BRANCH" --jq .sha 2>/dev/null || true)"
-            if [ -n "$sha" ]; then
-              gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$dest" \
-                -f message='data(library): persist E4 phase 1 evidence [skip ci]' \
-                -f content="$content" -f branch="$BRANCH" -f sha="$sha" >/dev/null
-            else
-              gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$dest" \
-                -f message='data(library): persist E4 phase 1 evidence [skip ci]' \
-                -f content="$content" -f branch="$BRANCH" >/dev/null
-            fi
+            SRC="$src" DEST="$dest" SHA="$sha" python - <<'PY'
+          import base64, json, os
+          from pathlib import Path
+          payload={
+              'message':'data(library): persist E4 phase 1 evidence [skip ci]',
+              'content':base64.b64encode(Path(os.environ['SRC']).read_bytes()).decode(),
+              'branch':os.environ['BRANCH'],
+          }
+          if os.environ.get('SHA'):
+              payload['sha']=os.environ['SHA']
+          Path('/tmp/e4-payload.json').write_text(json.dumps(payload))
+          PY
+            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$dest" --input /tmp/e4-payload.json >/dev/null
           }
           persist_one artifacts/e4-library/gambit-library-e4-summary.json docs/research/gambit-library-e4-summary.json
           persist_one artifacts/e4-library/gambit-library-e4-trades.json docs/research/gambit-library-e4-trades.json
