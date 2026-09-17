@@ -31,11 +31,13 @@ jobs:
         include:
           - key: top4
             workflow_name: Golden top4 - live Solana paper and E4
+            workflow_file: golden-top4-solana-live.yml
             branch: codex/golden-top3-full3sv2-live
             status_path: docs/research/golden-top4-status.json
             stop_path: docs/research/golden-top4-operator-stop.json
           - key: loss2s
             workflow_name: Golden 2s loss-exit A-B - live Solana paper
+            workflow_file: golden-loss2s-live.yml
             branch: codex/golden-2s-loss-exit-live
             status_path: docs/research/golden-loss2s-status.json
             stop_path: docs/research/golden-loss2s-operator-stop.json
@@ -45,6 +47,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           KEY: ${{ matrix.key }}
           WORKFLOW_NAME: ${{ matrix.workflow_name }}
+          WORKFLOW_FILE: ${{ matrix.workflow_file }}
           BRANCH: ${{ matrix.branch }}
           STATUS_PATH: ${{ matrix.status_path }}
           STOP_PATH: ${{ matrix.stop_path }}
@@ -109,11 +112,5 @@ jobs:
             exit 0
           fi
 
-          latest_id="$(jq -r --arg n "$WORKFLOW_NAME" '[.workflow_runs[] | select(.name==$n)][0].id // empty' <<<"$runs_json")"
-          if [[ -z "$latest_id" ]]; then
-            echo "[$KEY] no prior run exists to resume"
-            exit 1
-          fi
-
-          echo "[$KEY] no active run and target incomplete; re-running latest checkpointed workflow $latest_id"
-          gh run rerun "$latest_id" --repo "$GITHUB_REPOSITORY"
+          echo "[$KEY] no active run and target incomplete; dispatching current $WORKFLOW_FILE from branch head $BRANCH"
+          gh workflow run "$WORKFLOW_FILE" --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
