@@ -1,24 +1,24 @@
 {
   "audit_counts": {
     "e4_prearmed_qualified": 0,
-    "golden_qualified": 2,
+    "golden_qualified": 1,
     "launches": 400,
     "library_negative_e4_veto": 0,
     "library_negative_golden_veto": 0,
-    "library_positive": 10,
+    "library_positive": 5,
     "library_positive_golden_overlap": 0,
-    "library_positive_standalone": 10,
+    "library_positive_standalone": 5,
     "library_strong_negative": 0
   },
-  "checked_ns": 1789709610215595883,
+  "checked_ns": 1789711251200192712,
   "closed_trades": {
     "E4_PREARMED": 5,
     "E4_PREARMED_CONVICTION_LIBRARY": 5,
-    "FULL_3S": 11,
+    "FULL_3S": 12,
     "FULL_3S_LIBRARY": 100,
-    "FULL_3S_V2_1": 13,
+    "FULL_3S_V2_1": 14,
     "FULL_3S_V2_1_LIBRARY": 100,
-    "FULL_4S": 11
+    "FULL_4S": 12
   },
   "complete": false,
   "entry_latency_ms_common": 20.0,
@@ -61,7 +61,8 @@
     "35304887201",
     "35306556447",
     "35307937092",
-    "35309616380"
+    "35309616380",
+    "35311275499"
   ],
   "real_money_execution": false,
   "results": {
@@ -86,14 +87,14 @@
       "wins": 2
     },
     "FULL_3S": {
-      "closed_trades": 11,
-      "expectancy_sol": -0.0005835408843031368,
+      "closed_trades": 12,
+      "expectancy_sol": 0.0038868585404453183,
       "losses": 6,
       "maximum_drawdown_fraction": 0.0509677334907797,
-      "net_pnl_sol": -0.006418949727334505,
-      "profit_factor": 0.9774279720561485,
-      "win_rate": 0.45454545454545453,
-      "wins": 5
+      "net_pnl_sol": 0.04664230248534382,
+      "profit_factor": 1.164016139678032,
+      "win_rate": 0.5,
+      "wins": 6
     },
     "FULL_3S_LIBRARY": {
       "closed_trades": 100,
@@ -106,14 +107,14 @@
       "wins": 16
     },
     "FULL_3S_V2_1": {
-      "closed_trades": 13,
-      "expectancy_sol": -0.0028076479482127994,
+      "closed_trades": 14,
+      "expectancy_sol": 0.0011834551442228222,
       "losses": 8,
       "maximum_drawdown_fraction": 0.05130639985372401,
-      "net_pnl_sol": -0.036499423326766395,
-      "profit_factor": 0.8646705529206345,
-      "win_rate": 0.38461538461538464,
-      "wins": 5
+      "net_pnl_sol": 0.01656837201911951,
+      "profit_factor": 1.0614307958862568,
+      "win_rate": 0.42857142857142855,
+      "wins": 6
     },
     "FULL_3S_V2_1_LIBRARY": {
       "closed_trades": 100,
@@ -126,14 +127,14 @@
       "wins": 17
     },
     "FULL_4S": {
-      "closed_trades": 11,
-      "expectancy_sol": 0.009617707492651563,
+      "closed_trades": 12,
+      "expectancy_sol": 0.015621940074795046,
       "losses": 6,
       "maximum_drawdown_fraction": 0.052367306490204574,
-      "net_pnl_sol": 0.10579478241916719,
-      "profit_factor": 1.3412238325016568,
-      "win_rate": 0.45454545454545453,
-      "wins": 5
+      "net_pnl_sol": 0.18746328089754055,
+      "profit_factor": 1.6046322672865985,
+      "win_rate": 0.5,
+      "wins": 6
     }
   },
   "social_evidence": "immutable launch metadata/status timestamp; live X transport latency not claimed",
