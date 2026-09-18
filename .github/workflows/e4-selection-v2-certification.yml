@@ -6,11 +6,13 @@ on:
     paths:
       - 'src/memecoin_bot/e4_selection_v2.py'
       - 'src/memecoin_bot/e4_production.py'
+      - 'src/memecoin_bot/e4_hardening_v6.py'
       - 'src/memecoin_bot/e4_exec/**'
       - 'scripts/e4_selection_v2_stress.py'
       - 'scripts/e4_selection_v2_audit.py'
       - 'scripts/run_pytest_isolated.py'
       - 'tests/test_e4_selection_v2.py'
+      - 'tests/test_e4_production.py'
       - '.github/workflows/e4-selection-v2-certification.yml'
   workflow_dispatch:
 
@@ -35,11 +37,11 @@ jobs:
 
       - name: Compile production paths
         run: |
-          python -m py_compile src/memecoin_bot/e4_selection_v2.py src/memecoin_bot/e4_production.py src/memecoin_bot/e4_exec/__init__.py src/memecoin_bot/e4_exec/__main__.py scripts/e4_selection_v2_stress.py scripts/e4_selection_v2_audit.py scripts/run_pytest_isolated.py
+          python -m py_compile src/memecoin_bot/e4_selection_v2.py src/memecoin_bot/e4_production.py src/memecoin_bot/e4_hardening_v6.py src/memecoin_bot/e4_exec/__init__.py src/memecoin_bot/e4_exec/__main__.py scripts/e4_selection_v2_stress.py scripts/e4_selection_v2_audit.py scripts/run_pytest_isolated.py
 
       - name: Static audit
         run: |
-          ruff check src/memecoin_bot/e4_selection_v2.py src/memecoin_bot/e4_production.py src/memecoin_bot/e4_exec/__init__.py src/memecoin_bot/e4_exec/__main__.py scripts/e4_selection_v2_stress.py scripts/e4_selection_v2_audit.py scripts/run_pytest_isolated.py tests/test_e4_selection_v2.py
+          ruff check src/memecoin_bot/e4_selection_v2.py src/memecoin_bot/e4_production.py src/memecoin_bot/e4_hardening_v6.py src/memecoin_bot/e4_exec/__init__.py src/memecoin_bot/e4_exec/__main__.py scripts/e4_selection_v2_stress.py scripts/e4_selection_v2_audit.py scripts/run_pytest_isolated.py tests/test_e4_selection_v2.py tests/test_e4_production.py
 
       - name: Selection unit and integration tests
         run: pytest -q tests/test_e4_selection_v2.py

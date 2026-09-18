@@ -635,7 +635,7 @@ class UnifiedE4Policy(core.E4Policy):
                         if isinstance(value, (int, float, bool))
                     }
             except Exception:  # noqa: BLE001 - legacy adapter fails closed to local extractor
-                continue
+                return self._fallback_features(state)
         return self._fallback_features(state)
 
     def _public_buyers(
