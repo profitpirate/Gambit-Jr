@@ -827,26 +827,43 @@ class UnifiedE4Policy(core.E4Policy):
         }
 
 
-def install(core_module: Any = core) -> None:
-    """Install production selection and causal learning exactly once."""
-    if getattr(core_module, "_e4_selection_v2_installed", False):
+def install(core_module: Any = core, *, force: bool = False) -> None:
+    """Install selection after every legacy/final execution patch is loaded.
+
+    The historical E4 stack is import-time monkey-patched. Checking the current
+    class and wrapped sell function makes this installer resilient to boot order:
+    if a later hardening module overwrites either path, calling install() again
+    restores the authoritative production selector without double-wrapping.
+    """
+    policy_current = core_module.E4Policy is UnifiedE4Policy
+    sell_current = bool(
+        getattr(core_module.Engine.execute_sell, "_e4_selection_v2_learning_wrapper", False)
+    )
+    if not force and policy_current and sell_current:
+        core_module._e4_selection_v2_installed = True
         return
+
     core_module.E4Policy = UnifiedE4Policy
-    original_execute_sell = core_module.Engine.execute_sell
 
-    async def execute_sell_with_learning(
-        self: Any, position: core.Position, fraction: float, reason: str
-    ) -> None:
-        was_closed = position.status == core_module.PositionStatus.CLOSED
-        await original_execute_sell(self, position, fraction, reason)
-        if was_closed or position.status != core_module.PositionStatus.CLOSED:
-            return
-        policy = getattr(self, "policy", None)
-        observe = getattr(policy, "observe_outcome", None)
-        if not callable(observe) or position.entry_sol <= 0:
-            return
-        realised_return = position.realized_sol / position.entry_sol - 1.0
-        observe(position.mint, realised_return)
+    if not sell_current:
+        original_execute_sell = core_module.Engine.execute_sell
 
-    core_module.Engine.execute_sell = execute_sell_with_learning
+        async def execute_sell_with_learning(
+            self: Any, position: core.Position, fraction: float, reason: str
+        ) -> None:
+            was_closed = position.status == core_module.PositionStatus.CLOSED
+            await original_execute_sell(self, position, fraction, reason)
+            if was_closed or position.status != core_module.PositionStatus.CLOSED:
+                return
+            policy = getattr(self, "policy", None)
+            observe = getattr(policy, "observe_outcome", None)
+            if not callable(observe) or position.entry_sol <= 0:
+                return
+            realised_return = position.realized_sol / position.entry_sol - 1.0
+            observe(position.mint, realised_return)
+
+        execute_sell_with_learning._e4_selection_v2_learning_wrapper = True  # type: ignore[attr-defined]
+        execute_sell_with_learning._e4_selection_v2_wrapped = original_execute_sell  # type: ignore[attr-defined]
+        core_module.Engine.execute_sell = execute_sell_with_learning
+
     core_module._e4_selection_v2_installed = True

@@ -9,12 +9,9 @@ from typing import Any
 
 from . import e4_live as core
 from .e4_runner import _save_position
-from .e4_selection_v2 import install as _install_e4_selection_v2
 
 # Correct the position persistence path before any engine is constructed.
 core.Store.save_position = _save_position
-# Replace the thin fallback selector with the audited causal selection stack.
-_install_e4_selection_v2(core)
 
 _original_from_row = core.Event.from_row.__func__
 
