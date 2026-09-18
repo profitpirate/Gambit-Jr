@@ -40,7 +40,7 @@ jobs:
 
       - name: Static audit of hardened runtime
         run: |
-          ruff check             src/memecoin_bot/config.py             src/memecoin_bot/database/store.py             src/memecoin_bot/alpha_engine.py             src/memecoin_bot/service.py             src/memecoin_bot/providers/base.py             src/memecoin_bot/providers/launch_events.py             src/memecoin_bot/realtime/events.py             src/memecoin_bot/realtime/fabric.py             src/memecoin_bot/realtime/providers.py             tests/test_fullbot_runtime_hardening.py             scripts/fullbot_stress.py             scripts/fullbot_audit.py
+          ruff check             src/memecoin_bot/config.py             src/memecoin_bot/database/store.py             src/memecoin_bot/discord/bot_runtime.py             src/memecoin_bot/alpha_engine.py             src/memecoin_bot/service.py             src/memecoin_bot/providers/base.py             src/memecoin_bot/providers/launch_events.py             src/memecoin_bot/realtime/events.py             src/memecoin_bot/realtime/fabric.py             src/memecoin_bot/realtime/providers.py             tests/test_fullbot_runtime_hardening.py             scripts/fullbot_stress.py             scripts/fullbot_audit.py
 
       - name: Builder syntax and local contract
         run: |
