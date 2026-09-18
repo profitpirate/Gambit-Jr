@@ -6,11 +6,13 @@ Boot order is deliberate:
 3. install Unified Selection v2 last so no legacy module can overwrite it.
 """
 
-from memecoin_bot import e4_hardening_v9 as _legacy_v9  # noqa: F401
-from memecoin_bot import e4_final as _final
-from memecoin_bot.e4_selection_v2 import install as _install_selection_v2
+import importlib
 
-_install_selection_v2(_final.core, force=True)
+_legacy_v9 = importlib.import_module("memecoin_bot.e4_hardening_v9")
+_final = importlib.import_module("memecoin_bot.e4_final")
+_selection = importlib.import_module("memecoin_bot.e4_selection_v2")
+
+_selection.install(_final.core, force=True)
 
 main = _final.main
 
