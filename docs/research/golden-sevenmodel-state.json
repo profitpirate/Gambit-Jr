@@ -3,14 +3,14 @@
   "e4_model_sha256": "3dd21ecb3be8953368a05b7c6821e37e13d5d2a78588a0879d81bb11e6a5b752",
   "entry_latency_ms_common": 20.0,
   "last_audit_counts": {
-    "e4_prearmed_qualified": 0,
+    "e4_prearmed_qualified": 1,
     "golden_qualified": 1,
     "launches": 400,
     "library_negative_e4_veto": 0,
     "library_negative_golden_veto": 0,
-    "library_positive": 19,
+    "library_positive": 23,
     "library_positive_golden_overlap": 0,
-    "library_positive_standalone": 19,
+    "library_positive_standalone": 23,
     "library_strong_negative": 0
   },
   "library_fingerprint": "430f637dd4914318fe2f54743173bf5400d7fcf26fecc1a4ea86a3f81349d606",
@@ -318,6 +318,15 @@
       "twitter": "https://x.com/MahaveerESV/status/2100690619660136937?s=20",
       "website": "https://usepaid.app/token/Awxf8CcM7jHLULqt7Kxqn1GPnwyzMKGF1fFQz5rZzvTg"
     },
+    "https://meta.uxento.io/data/3ba35714-c6b4-4989-bbc7-1fc0f2537acc": {
+      "createdOn": "https://pump.fun",
+      "description": "The BIGGEST meme in november is obviously NO NUT NOVEMBER!?\n\nIf were running BLUE we need to run WHITE with fees to an official sperm bank X!\n\nIts a NO NUT NOVEMBER! \ud83d\udca6\nFees to @SpermBank via UsePaid\n\nMany bonders, Many more overlooked..",
+      "image": "https://desperate-moccasin-minnow.myfilebase.com/ipfs/QmaPthHAehu5qMadBuNx5XiywkJGLoTjm7Qht24vcU5hYe",
+      "name": "WHITECOIN",
+      "symbol": "WHITE",
+      "twitter": "https://x.com/Devilantesol/status/2100774751882928190",
+      "website": "https://usepaid.app/token/CA6UpfYLrBamJj8UfoBtS4Cg6LguFC8KbnBggYcApump"
+    },
     "https://metadata.j7tracker.io/m/VeYH7F7neo": {
       "coin_community": "https://coincommunities.org/communities/ANYHzo9NmiZpoCYy1P1qSy3UiKEZoMpuQ6QpcLTice6R",
       "createdOn": "pump.fun",
@@ -560,7 +569,7 @@
   },
   "models": {
     "E4_PREARMED": {
-      "cash_sol": 3.0115005395980883,
+      "cash_sol": 3.010495539598088,
       "ledger": [
         {
           "balance_after_sol": 3.0374593093600284,
@@ -675,11 +684,11 @@
         }
       ],
       "rejections": {
-        "ENTRY_OUTPUT_GUARD": 1
+        "ENTRY_OUTPUT_GUARD": 2
       }
     },
     "E4_PREARMED_CONVICTION_LIBRARY": {
-      "cash_sol": 2.9722357107962436,
+      "cash_sol": 2.9712307107962435,
       "ledger": [
         {
           "balance_after_sol": 3.0552516870631137,
@@ -851,11 +860,11 @@
         }
       ],
       "rejections": {
-        "ENTRY_OUTPUT_GUARD": 1
+        "ENTRY_OUTPUT_GUARD": 2
       }
     },
     "FULL_3S": {
-      "cash_sol": 3.0784964474251395,
+      "cash_sol": 2.9709707544430866,
       "ledger": [
         {
           "balance_after_sol": 3.0158175379199927,
@@ -1091,6 +1100,40 @@
           "position_fraction": 0.08,
           "prearmed_e4": null,
           "proceeds_sol": 0.19841197554371437,
+          "real_money_execution": false,
+          "selection_source": "GOLDEN",
+          "win": false
+        },
+        {
+          "balance_after_sol": 2.9709707544430866,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "conviction_score": 65.765,
+            "conviction_tier": "MEDIUM",
+            "initial_fraction": 0.3,
+            "management_version": "golden-management-v2-aggressive-5-8-15-25",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "buyer_count": 3,
+              "prior_appearances": 20,
+              "prior_win_rate": 0.75
+            }
+          },
+          "creator": "522HdcLHBvcQKwFooJ7R4hJP7KcNETtMMZ8voGUEu4ch",
+          "decision_ns": 1789698467899647021,
+          "entry_cost_sol": 0.24627971579401117,
+          "exit_ns": 1789698472275131905,
+          "exit_reason": "FULL_3000MS",
+          "fill_ns": 1789698468320275601,
+          "library_stats_at_decision": null,
+          "mint": "Ff7RSghukL6j9NJRYF8jX9HN8JaG6HTAC3KhGVtvpump",
+          "model": "FULL_3S",
+          "output_ratio": 0.9802452720653706,
+          "paper_only": true,
+          "pnl_sol": -0.10752569298205295,
+          "position_fraction": 0.08,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.13875402281195823,
           "real_money_execution": false,
           "selection_source": "GOLDEN",
           "win": false
@@ -6313,7 +6356,7 @@
       }
     },
     "FULL_3S_V2_1": {
-      "cash_sol": 2.994249936320927,
+      "cash_sol": 2.9595964919902533,
       "ledger": [
         {
           "actions": [
@@ -7010,6 +7053,83 @@
           "position_fraction": 0.08,
           "prearmed_e4": null,
           "proceeds_sol": 0.2100471230980004,
+          "real_money_execution": false,
+          "selection_source": "GOLDEN",
+          "win": false
+        },
+        {
+          "actions": [
+            {
+              "fraction": 0.3,
+              "kind": "INITIAL",
+              "proceeds_sol": 0.06164651329839748,
+              "reason": "PATH_AWARE_INITIAL_30PCT_SCORE_-3",
+              "t_ms": 350.0
+            },
+            {
+              "fraction": 0.7000000000000001,
+              "kind": "EXIT",
+              "proceeds_sol": 0.14324003727660276,
+              "reason": "EARLY_FLOW_INVALIDATION_-5",
+              "t_ms": 886.475958
+            }
+          ],
+          "balance_after_sol": 2.9595964919902533,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "cluster_profile": {
+              "clusters": [
+                [
+                  "9rpbChmAPjBU1L73XGvFgX1MvSJiwNf89oyquEk8LEQY"
+                ],
+                [
+                  "HCRHocE2XbMG297g74g7iXqqUWaSykzfjCYGgbXkgcSK"
+                ],
+                [
+                  "4zqCpUNBvaagUV9dQ3XgadWGHgSaF4nLArhQ6ZdWHHZ"
+                ]
+              ],
+              "independent_groups": 3,
+              "largest_cluster": 1,
+              "raw_buyer_count": 3,
+              "redundant_wallets": 0
+            },
+            "conviction_score": 68.765,
+            "conviction_tier": "MEDIUM",
+            "creator_profile": {
+              "appearances": 0,
+              "win_rate": null,
+              "wins": 0
+            },
+            "initial_fraction": 0.3,
+            "management_version": "golden-management-v2.1-flow-cluster-loss-hardened-v2",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "cluster_penalty": 0.0,
+              "creator_component": 0.0,
+              "early_vsol_delta": 7.802469131999999,
+              "independent_groups": 3,
+              "prior_appearances": 20,
+              "prior_win_rate": 0.75,
+              "raw_buyer_count": 3,
+              "reserve_component": 3.0
+            }
+          },
+          "creator": "522HdcLHBvcQKwFooJ7R4hJP7KcNETtMMZ8voGUEu4ch",
+          "decision_ns": 1789698467899647021,
+          "entry_cost_sol": 0.23953999490567415,
+          "exit_ns": 1789698469206751559,
+          "exit_reason": "EARLY_FLOW_INVALIDATION_-5",
+          "fill_ns": 1789698468320275601,
+          "library_stats_at_decision": null,
+          "mint": "Ff7RSghukL6j9NJRYF8jX9HN8JaG6HTAC3KhGVtvpump",
+          "model": "FULL_3S_V2_1",
+          "output_ratio": 0.9802436530765205,
+          "paper_only": true,
+          "pnl_sol": -0.03465344433067391,
+          "position_fraction": 0.08,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.20488655057500024,
           "real_money_execution": false,
           "selection_source": "GOLDEN",
           "win": false
@@ -16154,7 +16274,7 @@
       }
     },
     "FULL_4S": {
-      "cash_sol": 3.1860866153691765,
+      "cash_sol": 3.0702655954654534,
       "ledger": [
         {
           "balance_after_sol": 3.012176632122044,
@@ -16393,6 +16513,40 @@
           "real_money_execution": false,
           "selection_source": "GOLDEN",
           "win": false
+        },
+        {
+          "balance_after_sol": 3.0702655954654534,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "conviction_score": 65.765,
+            "conviction_tier": "MEDIUM",
+            "initial_fraction": 0.3,
+            "management_version": "golden-management-v2-aggressive-5-8-15-25",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "buyer_count": 3,
+              "prior_appearances": 20,
+              "prior_win_rate": 0.75
+            }
+          },
+          "creator": "522HdcLHBvcQKwFooJ7R4hJP7KcNETtMMZ8voGUEu4ch",
+          "decision_ns": 1789698467899647021,
+          "entry_cost_sol": 0.2548869292295341,
+          "exit_ns": 1789698472614317950,
+          "exit_reason": "FULL_4000MS",
+          "fill_ns": 1789698468320275601,
+          "library_stats_at_decision": null,
+          "mint": "Ff7RSghukL6j9NJRYF8jX9HN8JaG6HTAC3KhGVtvpump",
+          "model": "FULL_4S",
+          "output_ratio": 0.9802473388781937,
+          "paper_only": true,
+          "pnl_sol": -0.11582101990372298,
+          "position_fraction": 0.08,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.13906590932581112,
+          "real_money_execution": false,
+          "selection_source": "GOLDEN",
+          "win": false
         }
       ],
       "rejections": {
@@ -16421,7 +16575,8 @@
     "35293694911",
     "35294731199",
     "35296170929",
-    "35297621900"
+    "35297621900",
+    "35299239933"
   ],
   "real_money_execution": false,
   "reputation_delta": {
@@ -16450,7 +16605,7 @@
       0
     ],
     "16MeFNrKZFGgqe5deaZSXhVTDhXTduCbR4wGox7J1iL": [
-      10,
+      12,
       4
     ],
     "1uVqKCwP2XNYaJrzYjf5jBDJArZdb46h6VQ5b3mzgyf": [
@@ -16482,8 +16637,8 @@
       1
     ],
     "24678QKx2Dy8ZCw6Ra8o9DeTqPLL5GR9ZQKxt5FddHmq": [
-      44,
-      10
+      51,
+      11
     ],
     "24BFC8GbamqkXsJVTBogE11eNkYtuqqz9qZt2Vnd21Kk": [
       1,
@@ -16517,6 +16672,10 @@
       2,
       0
     ],
+    "28fnnkZjtWyqPkBQJPKeofcQgrAvLPWQo2gDZpaMATj1": [
+      1,
+      0
+    ],
     "29yFzeBZgxf5zqrAkKXwgZtQehRf4pL8WbV2nRJikbw8": [
       7,
       1
@@ -16537,8 +16696,12 @@
       1,
       0
     ],
+    "2CMMjKtY1oXKdBU5WTRXkDXCe91dAWoSb1ForTBiddVq": [
+      1,
+      0
+    ],
     "2CQgjcdNEo7WtbQLpJTAVcC3Ga61pNvRDTgP5grzctFG": [
-      58,
+      69,
       9
     ],
     "2D4Ljw9gBo4nk6bmaSwvsdWRJAJqvx3wXeqck7TiAWat": [
@@ -16554,7 +16717,7 @@
       0
     ],
     "2EsRiaPazhbDCEsx8pztTfRPSkVG4TU8UpmGSYrWAnHJ": [
-      10,
+      11,
       1
     ],
     "2F6p8TXy3DXDx8zygmMJXXvpCJVBPznq9jaqbNVQpT18": [
@@ -16586,6 +16749,10 @@
       0
     ],
     "2K9BFbgXKeQryQX76qgaFnJBFLZ3FrrYCpn4iVES3JKa": [
+      1,
+      0
+    ],
+    "2Kh1EpCyR4Mc4WSp6e5vAogVBbF4AGbZwUDKsNv7D8jF": [
       1,
       0
     ],
@@ -16633,6 +16800,10 @@
       3,
       2
     ],
+    "2Q3qo4jXMt86n46M36kHUKQFVgCCsRETim3uXxXvoYnm": [
+      1,
+      0
+    ],
     "2QHNiNWus2gRffGCakou7izYvVUgJvhv3R5nZLVSUaVj": [
       1,
       0
@@ -16670,7 +16841,7 @@
       0
     ],
     "2UXbym9NM2FbT2B7PYiimDiZmqkhuBJUHY9m6DpoMr3d": [
-      1,
+      3,
       0
     ],
     "2UZr8mYVpY6ZC9vdMRe7ppq4noAg1Shafs5SYt48FUVT": [
@@ -16721,6 +16892,10 @@
       1,
       0
     ],
+    "2XhiKAhVDiHykc1ey8jaiuZSfLPnV2Mg9hpSEwV81DDv": [
+      1,
+      0
+    ],
     "2Xtmbm2qV2sfZ3DGqWdFLEZjyb3nTWybs7zmuBxXCJcs": [
       32,
       3
@@ -16738,7 +16913,7 @@
       0
     ],
     "2aBgJZa6T6dRRSKkNpMDwTGH8dejaCjHbxuq3wqB6een": [
-      21,
+      23,
       7
     ],
     "2aKvjec65S5Pydjm1rjzJi6Zwi5cbD2mnS6F3ip4vMSa": [
@@ -16842,7 +17017,7 @@
       0
     ],
     "2kmEadyftaiyp143Kjfa5jucYohKJSsSiwC9Ge2LXZHZ": [
-      9,
+      10,
       1
     ],
     "2m1BNQ3pE2TGx6Tv7xX4bvmeBhNL8CoaVvuRMFGns9MB": [
@@ -16858,7 +17033,7 @@
       4
     ],
     "2nU1AogLMqD6iLr8u2itPPimAozyZoyZ24f9TmbRW7vM": [
-      7,
+      8,
       0
     ],
     "2nr4tEjRtAxvD8G5XEcLZU82mWjMJWNyhJJ4uYEv3SsT": [
@@ -16890,7 +17065,7 @@
       0
     ],
     "2rvMKdGryq4yAemjbkgx7i6rTVZxje5fZXgmYjQJwWna": [
-      3,
+      4,
       0
     ],
     "2sWHzTkA7vD7SZe7wf8jFxHRkhdNKQ2GTXxkxQNiFund": [
@@ -16914,7 +17089,7 @@
       0
     ],
     "2vzVZeQvwqcDFcUCr71dFzhHARVhs4Km2zMgPtxqL2u5": [
-      13,
+      16,
       3
     ],
     "2wMYf8sWSWhihhma17zMW4CPBfmZFFAB1MVe9SpqzT14": [
@@ -16954,7 +17129,7 @@
       0
     ],
     "32aSDG4ojHNjxScefUBNfX8ZX2mo2rFjmwnrQhErseYC": [
-      13,
+      14,
       1
     ],
     "3333uN7Nygx9KGUY3qGrZ7S247itt4xRFNN2H9p5Kokz": [
@@ -17049,6 +17224,10 @@
       1,
       1
     ],
+    "3G1CHACxsg8ZuesKCUKFpFxVRwWPcQSput216uTMgDyp": [
+      1,
+      1
+    ],
     "3G3jTxig14omXFn379Scc6b27GUiehGCC7grE7xee994": [
       1,
       0
@@ -17117,6 +17296,10 @@
       1,
       0
     ],
+    "3QqFbp6VFTe73y1BYuFgd2TMrTkmHCTffU76Bjmk1Dxh": [
+      1,
+      0
+    ],
     "3Sfme9Wt5S3NPzhc7xZpxwByn3EVYUXgkbHXi9im93An": [
       5,
       0
@@ -17146,6 +17329,10 @@
       0
     ],
     "3Uyjgiw3HRp9JrPXw5TD87pbYTMWe4rd8X7y4xnBax1L": [
+      1,
+      0
+    ],
+    "3VWjwKMN8K59nnpJmZ6H9j2Cbz8tqmSTf3MC3K33EmFK": [
       1,
       0
     ],
@@ -17221,6 +17408,10 @@
       1,
       0
     ],
+    "3guWc5NL8JSvmksCCVmvorsxZc8Vyu96wRavY3ofpKBn": [
+      1,
+      0
+    ],
     "3hPYVKBXzxeQMtaeRQhH3AKPrEfcpZ5154JJeRfAAMZX": [
       1,
       0
@@ -17286,7 +17477,7 @@
       1
     ],
     "3pk5yRhwwFdvDBrBuuC5CRorVafHG2EQmzNEYy8Ny2K6": [
-      5,
+      6,
       1
     ],
     "3q3eaU4auo7rTvFct1bffpozFgaa3ZBG1cHwij78XZWf": [
@@ -17330,7 +17521,7 @@
       1
     ],
     "3uuGdtp8Yves8TfbnjRJbv5VPNabTRnTv9g4GFmbGckw": [
-      4,
+      5,
       1
     ],
     "3vLWM9qSiMZzjTW4pSEViQxVdaMP1aEWp2MMBhSmtDWp": [
@@ -17366,7 +17557,7 @@
       0
     ],
     "45QxzD7igix7XvHrLLKVTsUrLE2JbWJxMGCYYd9CvX4k": [
-      20,
+      21,
       5
     ],
     "45oYzQoeiQk17VkdBB3dLwYvN3gHvFBAEbSWTi84uSrn": [
@@ -17410,7 +17601,7 @@
       0
     ],
     "4Bh9jR9bK6RZjnZZqnkCypYkM9e4vdBoLdEgSt2sG5W7": [
-      9,
+      10,
       2
     ],
     "4CStzuk2LrNCSnCmQp4tP8UyaTA5VXtPZGq1mBTh9gSY": [
@@ -17510,8 +17701,8 @@
       0
     ],
     "4TnayWRQizk4RpxYLusVLKumJooSWRDRAzzwKRELbCRK": [
-      19,
-      0
+      20,
+      1
     ],
     "4U2rcvmTbFDv9NKrBcanQcohddykpBVbp8y9SEARsJkm": [
       3,
@@ -17586,8 +17777,8 @@
       0
     ],
     "4kgP66iRUa4fv7Td77cuuii2baAzZtzPEy13QvTQ9TGq": [
-      21,
-      7
+      22,
+      8
     ],
     "4kjM7pGAzDvRD3UTZqpneV7Px1BBTLCTXdRHvKzvtnLC": [
       1,
@@ -17714,7 +17905,7 @@
       1
     ],
     "4zqCpUNBvaagUV9dQ3XgadWGHgSaF4nLArhQ6ZdWHHZ": [
-      7,
+      8,
       5
     ],
     "51c6pi68GiyKidcnMV5Fyp5UUf5R4LCE3RB3mXHELnb5": [
@@ -17726,7 +17917,7 @@
       1
     ],
     "52dE7JqEv42rkE3RRkwS4kEJdgwUA8hnf6kTXs34p31W": [
-      1,
+      2,
       0
     ],
     "53n5vUV8SjuA1iiACkNW4RopEwz2KTJnkQATWErigJYV": [
@@ -17738,19 +17929,19 @@
       0
     ],
     "54md8NmG6WMNpdDP3YsicvsNCsMM7RRsAr4wUwJKJ4Sg": [
-      21,
+      23,
       7
     ],
     "556FY1aMvA8bEa4V8WmTAqMvnaUeAVu3kfSAApUBQHEC": [
-      2,
-      1
+      3,
+      2
     ],
     "55PjUMnDfh5FMdAKSAgUUsMiG8xMwPpu1EJqr3PgThM9": [
       1,
       0
     ],
     "55mTsu1FCfC2CPUWVGczAtsVrwE99Nfy7gZHsdFUipfs": [
-      24,
+      25,
       11
     ],
     "56CNiRtDgHRWWNJ9Wt59jPRzqYqHbfjw9qrwBQsRmbJf": [
@@ -17766,7 +17957,7 @@
       2
     ],
     "57EbP7QnBBGN82ctTXygN5idhEFTYpbwD5jSwy6ubvLc": [
-      1,
+      3,
       0
     ],
     "58q12MS9fmSGnYqnoGyYuhgqA9UmTu3uSAQNzr2d7peS": [
@@ -17806,7 +17997,7 @@
       0
     ],
     "5DLzjo8WVMu7Vh9qRHh2YLAKZTeQap3vuMSEVKydmfo3": [
-      8,
+      9,
       0
     ],
     "5DjsxWmE9NyNjjtJYxVkVU6bdn1XXYDfQRAijmW49pcL": [
@@ -17826,7 +18017,7 @@
       0
     ],
     "5Evyn77ib4bxpKAMNvzoNDgLhBjFSLxeePaZpWeCqTWW": [
-      27,
+      29,
       12
     ],
     "5Fq8QzSJ6JpvWr9rx8CNWig1FEF5cTB4Zus5q3iCjj1j": [
@@ -17842,10 +18033,14 @@
       0
     ],
     "5J1MoDgGekru4ftaobkPyxm1n9rbqjMBhsGGWd3jWZBa": [
-      4,
-      0
+      7,
+      1
     ],
     "5JDyk7jBj7TzZwJtwP4QKEpczbAdDkTbborFcKNPf9jZ": [
+      1,
+      0
+    ],
+    "5JiNC1wd19UYQAgJ73WxKStV2FQ42px6TZGhGcjT43e1": [
       1,
       0
     ],
@@ -17905,13 +18100,17 @@
       1,
       0
     ],
+    "5RXY95aP399Jm25qbmLVSpAd6KofszNpDPoi5A2S8QW7": [
+      1,
+      0
+    ],
     "5RxEQd3TQZguuqigFHQ35bxrd8ejsFhLVqUYqhqRCRQt": [
       1,
       1
     ],
     "5Szx8xj4GDTFVXsbD55WedZ4KAze5jRTx1MQAhQihSQf": [
-      1,
-      0
+      2,
+      1
     ],
     "5TPipEi7LagF98hxsBahV8mx6LYc6VTuHuioUsbvYaRu": [
       1,
@@ -17969,6 +18168,10 @@
       3,
       0
     ],
+    "5c8JcUrfFhaYRT1HP9sPtgvMp4M3JLVRSxR3aN8Vxj1w": [
+      1,
+      1
+    ],
     "5cCHAXk6SxDqVTNzG3JKSt763H4e9VM3P2dRDzHT5r1R": [
       1,
       0
@@ -18014,7 +18217,7 @@
       1
     ],
     "5hutVmgHCgBB5s87xSzwHAYVk1SDrRjnsio5hvcr58j2": [
-      7,
+      8,
       0
     ],
     "5ijhMz5HBpmhVozmMj4EtLrCHkk2NYSkGZejXGBryxqR": [
@@ -18036,6 +18239,10 @@
     "5jqDeHjfK6AKPdn4s2Q33GvMXFuJZD7Z3pnFDW8Eiy9i": [
       1,
       1
+    ],
+    "5jxoaDJtemtpxgXPWGkChL7Wj3sWXE5a6UphLP2siWti": [
+      1,
+      0
     ],
     "5kTfix6dceRuznzExRBjZoxUxwfNb6ShpwFE8qcN5VuJ": [
       1,
@@ -18066,7 +18273,7 @@
       1
     ],
     "5q2WSmsRbFLBSAJw3d9AbWoPTC8i1PeMLnXWYxFHe98c": [
-      5,
+      6,
       1
     ],
     "5qf6HrdHJYbzsE94hUqz4nfycCXJVEvWNhk9X2nve3Do": [
@@ -18098,6 +18305,10 @@
       0
     ],
     "5t9xBNuDdGTGpjaPTx6hKd7sdRJbvtKS8Mhq6qVbo8Qz": [
+      1,
+      0
+    ],
+    "5tBT9a7mUWLVDcJEMcuhxV8GpGnJpeZQ1wW7dnTBY3B7": [
       1,
       0
     ],
@@ -18145,6 +18356,10 @@
       1,
       0
     ],
+    "64BVJQNc3xFEZ5RT3d8itjcSan1vppgcZjHqS72mRBoM": [
+      1,
+      0
+    ],
     "64J7BwLw4cLVHfwRQLxzy14o78hpdDsf2fPLHqxKpQxn": [
       2,
       2
@@ -18178,7 +18393,7 @@
       0
     ],
     "67LwNGrukVFFcA1XZQ9U8ddZGCBuPvPHgMxw81AeRtQ7": [
-      10,
+      12,
       3
     ],
     "68Bua5d66Equ15mG6AHcMWzKsoLV74kuXBCoJx5ifPfE": [
@@ -18194,7 +18409,7 @@
       1
     ],
     "68XsDvRRJ4fQqng9i6Y2RNtAFB7fhsfzqYWB7MVKY5oS": [
-      4,
+      6,
       1
     ],
     "68iBd7iRAjovjD1FHKu5Vx5bVFNs3znuCjNzmvjsjLMt": [
@@ -18230,7 +18445,7 @@
       0
     ],
     "69nfXaN7qkvX1MegsdjFrjgMu1LjjM8pY8wA4XT3fjzN": [
-      5,
+      6,
       1
     ],
     "6AH4TCNecDbpETQMbmgxyJnXAQuXTCyM8eCNdsB9KTu7": [
@@ -18273,12 +18488,16 @@
       1,
       0
     ],
+    "6GXjs47faV5xTep3AAthdUzpSKAEtaK3eYsjH2axxLEE": [
+      1,
+      0
+    ],
     "6Gk7xoodXowut2Ts84vJpbEcSem716c4NNniJcsrgTd8": [
       19,
       6
     ],
     "6GyNVzC8fnrRQkJCi5QsF4fdw1EUF2URbgjLrV77h77a": [
-      5,
+      6,
       0
     ],
     "6HBBnYugntKz8JjBV6aLg94FhesvU8XqGF4xndU67poR": [
@@ -18290,7 +18509,7 @@
       0
     ],
     "6HMrpCQ5nMZkHPh5oi6LS12JVF3t8gQjCU7oJJStCc7F": [
-      1,
+      2,
       0
     ],
     "6HTHs2XNxZhsvkibpHm9t6MKaWeRXKfxuHiMiAhxMW34": [
@@ -18306,7 +18525,7 @@
       0
     ],
     "6Jd9EcGwPMXSoQsCAEh9wxTuRdehseLQb2CidwUapTQh": [
-      9,
+      10,
       2
     ],
     "6K3b4tfPAXcXwYwNzzd1xoT9GQKSdA7wi2dJ4gdoDBuE": [
@@ -18326,7 +18545,7 @@
       0
     ],
     "6LWrLhQB9fgYBKK5biPCWLT4yCsZQmfas6TvrgMmTFkp": [
-      13,
+      14,
       1
     ],
     "6M9Txx5uRce3HEMERLYY9e51cykCpoToAWohyRD4Kfwb": [
@@ -18341,8 +18560,12 @@
       1,
       0
     ],
+    "6NgAajGnZXF35oD8rYNMqdDCnh6H7YPepVmVk5VYrZQK": [
+      1,
+      1
+    ],
     "6NkDwXofeu2ijHbAb9Qgwc3JUX53b1Cz1RmNBLpJaBRn": [
-      13,
+      14,
       1
     ],
     "6Nv9VFfUeMfcPV8xn2wwbMhksyveX99umbnFccFADJp7": [
@@ -18405,12 +18628,16 @@
       1,
       0
     ],
+    "6UMjzh6TrEK3yrFSPs6B2tZuu9aAzFoNwsv9FYyV1Rsr": [
+      1,
+      1
+    ],
     "6UgZ8GDBiEMssiTgnJ8wtwbV7J71FagKnHtQdE29Nnu8": [
       1,
       0
     ],
     "6Un3uNTAhd9NLz5WjaPJAWrSxUAC2wRVgWNJqeo6bfa8": [
-      4,
+      6,
       1
     ],
     "6UzpLdTz3NUa1mCPThanSmBRXdShLVtzrE3TEkTQiY7k": [
@@ -18482,8 +18709,8 @@
       0
     ],
     "6cDQSx75wKbVGUp9FHg7bZ7sx2xtyEmYNh1yv8a2GDCG": [
-      4,
-      0
+      7,
+      1
     ],
     "6cyXoJPA7HeJHhDWpe91xN8uF1PsPv6SKbKw7b8RQuwf": [
       2,
@@ -18574,7 +18801,7 @@
       0
     ],
     "6mPj5tM2Btb1BspTrnYbZwM1bzs1NzDctmoekTEuc7mU": [
-      1,
+      2,
       0
     ],
     "6mTRygVj7qbsS2T1yY1cAGjwni8G5a61DoVjAvTeSUUA": [
@@ -18662,7 +18889,7 @@
       0
     ],
     "6zRQpJqfS9EfjFGSx3xNAtLzfJz46mCsz9kMYvtjzbiX": [
-      1,
+      2,
       0
     ],
     "6zSSzLF7wZQjRqNZqgnBxHdr4e9isB6t8h7oZyk2vaxi": [
@@ -18670,15 +18897,15 @@
       0
     ],
     "6zXLbQu7TPC18FANiiTVpFmokLHUgp33nC6NR8WFWknA": [
-      6,
+      7,
       1
     ],
     "71AT54LtePtYbkE3n8jbaumemP52cwSAVErzXHPnxkeR": [
-      2,
-      1
+      3,
+      2
     ],
     "71kNdNXjLiz2y4kSrntNPuAppoZJ8L2E6JuTgQMK75k7": [
-      5,
+      6,
       1
     ],
     "71qEGi3DJhKUnMKmY8spZRAT1LmU4nnb4NM6DUqPMsvw": [
@@ -18742,7 +18969,7 @@
       0
     ],
     "79nAh7NzYKoSdgH6wh6vr975spfoq1WdnQmp2aHBS3H9": [
-      1,
+      3,
       0
     ],
     "7A4jWgoadm91HHVDS3Bw8dkvViHBjCLHTXuaczVFgSXR": [
@@ -18817,12 +19044,20 @@
       2,
       1
     ],
+    "7E4nSnsXM6UBLvEqxpJt26CTPTy5uDSa5rzTJ9AESm8W": [
+      1,
+      0
+    ],
     "7E6Ha6uV9fsJzk6RfzjhDzC8Kk67Y11gkGufx6NFg8VR": [
       1,
       1
     ],
     "7Ec9br6S1fTVnNKCCWf595wqaCsAdYeYiH2dm2vgd2m2": [
       2,
+      0
+    ],
+    "7FCUNmgFWo3nZMD86r98KcmbNTQcTZP8E5UTgYMTrSEf": [
+      1,
       0
     ],
     "7Fc1VT4hnUzPkYadZ2ZebtvwoEFxtZAqqZwZjSQPKKKh": [
@@ -18870,8 +19105,8 @@
       2
     ],
     "7KjtLirkehkm6EhtYEXepTajJ4eKNKt5Vr2yKQkR9XVN": [
-      2,
-      1
+      3,
+      2
     ],
     "7L2voekZuXTPh8jCMcJziEtU2ExNGf1rMcmBZLNyhHru": [
       7,
@@ -18922,7 +19157,7 @@
       0
     ],
     "7QZa7vBBhm64jaRFbs4KV7fB6ptJLMEHndBugAf2FioK": [
-      6,
+      9,
       1
     ],
     "7QjjD8MuxMMX8FKfV6Mkpm9V17qouFhJtPvh416PMb8D": [
@@ -18962,8 +19197,8 @@
       1
     ],
     "7U6QgKGoGn9YgQqf8bWb2tpiDhrbgXBzzozHzWr1kc5N": [
-      1,
-      0
+      2,
+      1
     ],
     "7UTQ1iXCzsmzJFP7b3otwwDmcT6FEPjTEynDisXmMHS3": [
       1,
@@ -19054,7 +19289,7 @@
       1
     ],
     "7cWpF6NeGueFa6JXDrTQmApinoHjyfsh5kaAXDaeoEy8": [
-      4,
+      5,
       1
     ],
     "7cayU5GACSogMZyFmwnmksb5BVAFv9jyjUsUcKR8jPGp": [
@@ -19106,11 +19341,11 @@
       3
     ],
     "7k3eu77qF5WxTSKk3MAtfkJBxwjknSrzFEZbQvQ9Uf5r": [
-      4,
-      0
+      7,
+      1
     ],
     "7k4R3Gnj9uVjVSGk8iFgrUidPSQy16BuxM23yUNMKwF3": [
-      5,
+      6,
       1
     ],
     "7kYUWTAUDRzVD2di5yfB1qPvP5gdeDbExi5A7pHK4vbY": [
@@ -19382,7 +19617,7 @@
       0
     ],
     "8MrJ6EdFkn8TZ8iv5XehKyYi26g9evT9SnjXvE6nMwTB": [
-      2,
+      4,
       0
     ],
     "8N1KH4w9wsvF5qLBz6gt2MJ2kD4KLfAywHv77zvnHQeu": [
@@ -19390,7 +19625,7 @@
       0
     ],
     "8NZq6z8y5697n1iqAqCHSwAKZeiT4M54JdmQ6rAjCJB1": [
-      13,
+      16,
       2
     ],
     "8PRKEUv2R9uoinpMmxJCPDNqb2jWZd5wzV5mQVqvSUsG": [
@@ -19402,8 +19637,8 @@
       0
     ],
     "8R5YPvrsEbd81hZ1QvYtmMq9aFC88JGi7bWdydMqRPeX": [
-      1,
-      0
+      2,
+      1
     ],
     "8RNkDLN53VyetT4LkKtpVaQ2qavKiHtvYMak4cqgWWzb": [
       1,
@@ -19414,7 +19649,7 @@
       0
     ],
     "8RnxheoP4AJdA1XXZvNDTpNi2ks6GtUCyNAf7rSbXkiH": [
-      7,
+      8,
       0
     ],
     "8RvtT8189KpAq5MkXGVHFn6LdZpxq9PkvDeAvs1g5Yj4": [
@@ -19434,7 +19669,7 @@
       1
     ],
     "8TYZKqAEayX21K8oa9JUnDqcULAPvRhMAp9oH5Vq45yE": [
-      1,
+      2,
       0
     ],
     "8Tp13TpP3GKiK15boZpjChe3Vzz7Te5sd3PRqm14mQbe": [
@@ -19494,7 +19729,7 @@
       0
     ],
     "8ZTb2pS7rdAWyrTJjLX5Vx422wZN2Asw8TusvtoWGLyU": [
-      1,
+      2,
       0
     ],
     "8ZUm1sUGyz9D84j8qSFPW4YGTrXmS1XToV5HiAvhbGvr": [
@@ -19502,7 +19737,7 @@
       0
     ],
     "8ZatX3uYfVxH1emrDQd3erxwGsX8tdrqxH1mHiKh3GCw": [
-      7,
+      8,
       2
     ],
     "8bSqmfatAmpAm4AWCZPfoePPYEon9yqH9qTS9cvatPsc": [
@@ -19578,7 +19813,7 @@
       3
     ],
     "8ik9TbDMMm7iXErRA7ohCEGf3X4KjnbBfsJiCCSCFxdX": [
-      1,
+      2,
       0
     ],
     "8j5pYvSaSAwMKrMZspNo6y5voBYu8K9jAdBakLVWXdPp": [
@@ -19586,7 +19821,7 @@
       1
     ],
     "8j7ncUtHtAyGthicjWvTyquzTfJXnbWMXijq99TWvmqp": [
-      1,
+      2,
       0
     ],
     "8jAsUGVffQL53TB2Qcsfp49L1eNrMNSPvNnZJzwkr1hC": [
@@ -19606,8 +19841,8 @@
       0
     ],
     "8ki679dZgE8ozmGVKBzBbBqqby5CToRfqzAoKYx49aNX": [
-      28,
-      7
+      29,
+      8
     ],
     "8kjh4f1M4aqj41XVYHht3N6XXxBjJYzUcVDzmmGgtxPu": [
       1,
@@ -19626,7 +19861,7 @@
       0
     ],
     "8oeEQ2h8fWPGaMCmE3VA67vUnfXLZFoymr47pnhmDG7": [
-      1,
+      3,
       0
     ],
     "8omXg7Zvj3ko4omBf5EkU3P2CU4bW4UxS8hZj2WTRmBX": [
@@ -19660,6 +19895,10 @@
     "8qxGygDUVErQUQc9yUdtgvGVE4PXFSjFyN47FXjsHGyn": [
       1,
       1
+    ],
+    "8r7kbk1HQeEj4M8kdJK6LUCid3Sgjsgca5tTkdetFjPj": [
+      1,
+      0
     ],
     "8tAd59H4kDMu5vGDmDYxyY5CHvNoMPGNRw9pVipBmrZb": [
       1,
@@ -19814,7 +20053,7 @@
       2
     ],
     "95ZjLC6bhNCevmbq2kSZ1fMo3vWjec3P4cY5X1mPUNRB": [
-      1,
+      3,
       0
     ],
     "96SeyM455cT8RC3rPjQvgFE8tGBVZ9kjPWrQEkQWrH4L": [
@@ -19826,7 +20065,7 @@
       1
     ],
     "97jv9pjCf5D7VUZEyj6XnXBC5JF23Vsagc3bvSF6GRmL": [
-      4,
+      5,
       0
     ],
     "97zk5WHTAFTdK4BdbDg1AzzgxLoWx2pdGMrcTTc8cV5V": [
@@ -19890,8 +20129,8 @@
       1
     ],
     "9FQnf1QFTg8TZ6AJEffsfa7CNQJGALecmPtkYoTYUPFj": [
-      5,
-      1
+      7,
+      2
     ],
     "9FR5MeR4nDu7nDp6ohxq8ampRFZQRmrHLWbjuF1Zb5PJ": [
       1,
@@ -19914,8 +20153,8 @@
       1
     ],
     "9Hdw38NzbqPnWsiihgeNh84xQHhDhCD1gLHZV7kppCsV": [
-      2,
-      1
+      3,
+      2
     ],
     "9Hm8fJPN1BCG7ycLrjwKTFhj9qAb1byUVs3GJ9M7vnGM": [
       1,
@@ -20038,7 +20277,7 @@
       0
     ],
     "9gYpkT6B9YZcXXkpN1zkLgtBFgzK23pzHwEq8DaoG3Jx": [
-      18,
+      19,
       5
     ],
     "9gjtCVWUPNbM7r5zZ7d8opKUCECTU3fdQA8j9GhZXEui": [
@@ -20066,7 +20305,7 @@
       0
     ],
     "9mLDPKjx2YJaknojHsrQz3QuUhNrZG1dPDGU9r2oi1Uz": [
-      4,
+      5,
       2
     ],
     "9miFEHqMNkasxtcYefUSEWvUZZZka19PsN4VATP6YW4U": [
@@ -20094,7 +20333,7 @@
       0
     ],
     "9p6f4N7t7eXyFk5Dr6D7iM631Z9pjZi99uuYQ7Eo58LY": [
-      7,
+      8,
       1
     ],
     "9pLLE2nufaRGyRDUExMFnQkFhnEoNAUDBKatj1cV4gkz": [
@@ -20138,7 +20377,7 @@
       0
     ],
     "9rpbChmAPjBU1L73XGvFgX1MvSJiwNf89oyquEk8LEQY": [
-      6,
+      7,
       5
     ],
     "9srzbVHMnpCW2iVkCoQpMtiroF7FPJkgyF5aYFq9dxZj": [
@@ -20182,7 +20421,7 @@
       0
     ],
     "9ygmSiDMic7iW3vT7mYu4L9VhY2aBWERJFou4UXxT4Eb": [
-      6,
+      9,
       1
     ],
     "9zBdfmSRhk84TRRfJ6pGeGbwU8VdvApfGr14KFywt4rP": [
@@ -20238,6 +20477,18 @@
       0
     ],
     "A3WfsKCg1QBrJ7amkdXSHqRmJHMj1dxBRAW1t6DZoNbs": [
+      1,
+      0
+    ],
+    "A3b6qDTXA9HEh4tosoQLeh68LZRhgYUS28sySxFndtBk": [
+      1,
+      1
+    ],
+    "A3wxzJhFh3NuR6u4jS3n8zKgjxEmmpdMgdEMscVJZH1m": [
+      1,
+      0
+    ],
+    "A51koSEbh4AbkjWL8upMHGCjxEKkhN6DWs9AVs12Bscz": [
       1,
       0
     ],
@@ -20326,7 +20577,7 @@
       1
     ],
     "AFD9jnuUoRomyXM6745WPkou7ur5HZ5eWkrNkbTYNR8P": [
-      4,
+      6,
       1
     ],
     "AHB8q6ivcAbRrqKAbw3BRYtfD5ifoutZQKa7y1FmtDLE": [
@@ -20337,6 +20588,10 @@
       1,
       1
     ],
+    "AHxU1qgPbsuqvHrvzCG2Y8B1wRbgj15HZtPuUVWjGuzw": [
+      1,
+      0
+    ],
     "AJ8v1iLu9Cc6vXF7YwZpzcnfw2fCSWvCo467NqBaRnbd": [
       1,
       0
@@ -20346,7 +20601,7 @@
       0
     ],
     "AJufZXkNt8dxFjPX7YqtPUcd6nXMkF89oAmvcLFYKcbk": [
-      3,
+      4,
       0
     ],
     "AK2WtrcFApergjcvMiyaXb5MLDTww9EL2xGmkJ3L1VHZ": [
@@ -20362,11 +20617,11 @@
       1
     ],
     "ALEXXXvtdxQ81BVFbCEdYsmKZpe8ihfnryCoRgcRyRAX": [
-      30,
+      31,
       2
     ],
     "AMDEmVocLtN5ji2gBY7BrmSHEyM5vt6TGszBbg4crMXg": [
-      76,
+      79,
       16
     ],
     "AMHswPpjoG7JVa3p21bqzLD57vrGUeRPvpnuP5SoNZUR": [
@@ -20418,7 +20673,7 @@
       1
     ],
     "AV7PjXHL5JXZ1YoYRoN9Dsstg1x2UciBupMCXcJP8gUz": [
-      1,
+      2,
       0
     ],
     "AWU3kVYfgBddjACB3VnQLaNUvDiASw2cp4pPzXnyrWLj": [
@@ -20462,7 +20717,7 @@
       0
     ],
     "AaNmgcFtXYxaYQn22RdJroZYS8s6pVG9PvbFaDfTZ2JZ": [
-      4,
+      5,
       1
     ],
     "Aanv53VYxVzbBPM7K5JGzf8hGAG2Tnc8PsPbQjPraFAM": [
@@ -20470,7 +20725,7 @@
       1
     ],
     "Aaz2sDzEYbJbF9vLswQzen2YDyG9ctLJFXyWfw9UahHv": [
-      5,
+      6,
       1
     ],
     "Ab6ZDux65f9CRK3uNRhK9yXGgFc1Jf9yTyfKCmXjtr7h": [
@@ -20478,8 +20733,8 @@
       1
     ],
     "AcEDxrXbh294JEjtR6tVHKDTTPg9M6qNPUmA7zMfQdUZ": [
-      1,
-      0
+      2,
+      1
     ],
     "AcU7BK4Ec6WLx9nxXA4Dtx6E6S2MqCwratn1WjxsX3ae": [
       3,
@@ -20546,7 +20801,7 @@
       0
     ],
     "AgqvEVgkMSMibDaSUYTQz9WvARjEH11rEj34V4YxXbhs": [
-      7,
+      8,
       1
     ],
     "AhpDeSLiW2K29THsrFtiPxDdE8Vib8SAmoS4wWESPKBq": [
@@ -20586,7 +20841,7 @@
       2
     ],
     "AkefHZVkGeRyczf4QaJzPJV26VMAZ11GC4VniNMYcEVF": [
-      6,
+      9,
       1
     ],
     "AmiGTWibR8NmKE5FGgtcLGFr5ou7DgDq9eg3i82esoBm": [
@@ -20666,8 +20921,8 @@
       0
     ],
     "AufzvhHHWLs6BRFUhHKA2BhzV5T98f2LPYwNw8b92RN6": [
-      4,
-      0
+      7,
+      1
     ],
     "Av8zxNc8wxjFpXMb2n12fCroAxHqyD9HvF1XJMDj3ybo": [
       1,
@@ -20866,7 +21121,7 @@
       0
     ],
     "BNeW3qk7X3ZfUaA3MwrGKpFNaFpjPe3gaM4GbrEnzm5f": [
-      1,
+      2,
       0
     ],
     "BNxrtv2jFcKPoBMVYHsfFth5hsb7LjpbzvqyrzHxYPMH": [
@@ -20958,8 +21213,8 @@
       0
     ],
     "BYreTDX5ut7YpVXG6Fmgc4s8ccugWNFZCaBHvBTFC8th": [
-      2,
-      0
+      4,
+      1
     ],
     "Ba1GpFzBa4gwu6Ff9C3v2QTy568r6kgUfCKL1VxsRqjg": [
       1,
@@ -21078,8 +21333,8 @@
       0
     ],
     "Bt8YtkajBtCbTaA4Pvgzd51v4W31iqoqk1kHxVwgC89f": [
-      2,
-      1
+      3,
+      2
     ],
     "Bt9P9wT2tR7Db2BzoRbnpMLcq4zEREQNR2bwvteEaEgk": [
       1,
@@ -21094,7 +21349,7 @@
       0
     ],
     "BuXDpuNYTXfGAGYEVQT8LEDevUn6pmNP4swsw9C4D3UJ": [
-      9,
+      11,
       0
     ],
     "BuoGf2whZpszKMYJVa4oERA5rLxFNGTcdJnNBVT99kjL": [
@@ -21154,7 +21409,7 @@
       0
     ],
     "C5EMTGGE87SqLyuvhShLDMj2jUBwqBLJAZF6ybK8Jyqw": [
-      28,
+      30,
       5
     ],
     "C6ccQBA6STzJh5NRoAtsbpoooxe1GZyyCxc16qaZeCgF": [
@@ -21233,9 +21488,13 @@
       9,
       2
     ],
+    "CGcbvoobbnPzAN1mduBYapAUak6FUe3PHLACkEZWv42P": [
+      1,
+      0
+    ],
     "CGj5ksNAQ4zUYrRFdqLzhQteL7iY4NeYKKEeX3jeM8bD": [
-      23,
-      5
+      30,
+      6
     ],
     "CGr5k74mbukgoLpHnb5WKXTj6PupNj9Wq71F4GfwRnKD": [
       1,
@@ -21302,7 +21561,7 @@
       1
     ],
     "CSkYjaWv6RmCwPg9UARpaJEbig8pQrSwwmJ2jX352Mx3": [
-      10,
+      11,
       0
     ],
     "CSvBeFk3DJqUnadmtv6FPdfmJvxR7mY9AUJSfrQ4W4Xj": [
@@ -21338,7 +21597,7 @@
       1
     ],
     "CWUqhP2gq49fxJqW99zjQptZStvTWDV1XwrtmSKTf49p": [
-      11,
+      12,
       2
     ],
     "CXwyxhHAvPhZhtnrEAQRrEyYkQrzeb66vVBLw8crFZVy": [
@@ -21454,7 +21713,7 @@
       1
     ],
     "CpQf4h5Jc7SX9yDJjxGR6jC2DLSGApejXb9YHxguBN9A": [
-      2,
+      3,
       0
     ],
     "CpTkqFcCvXZAR9FqRWYPaqUg92DXomiT9v6pqrc4iFHe": [
@@ -21506,7 +21765,7 @@
       1
     ],
     "CtMDeCAUTzBWMYp8qJEZYfbHBkhDjQkyrjhsdrnRACa6": [
-      9,
+      11,
       0
     ],
     "CtN6S2PM7BvPQAppAKubSbi7bn7nDWrRuJH1o2bLpZ1o": [
@@ -21520,6 +21779,10 @@
     "Cu1cXMvtXdEafDoPjtvjxgvyXHAK7Yh8AFvuKUVDy6yG": [
       10,
       1
+    ],
+    "CuDe51GPh5qGsmYBJDxSsufhQQhA618uDbkaXFZ4pztL": [
+      1,
+      0
     ],
     "CuS11F4n4xGjbymENEN3MFsY7zxUnKgfRiJFnAqD8JTj": [
       1,
@@ -21730,7 +21993,7 @@
       1
     ],
     "DJ6jFZj7YKAFQ63tQrUD7j8JwCNK1TnhMm1zVBn9yQwD": [
-      5,
+      6,
       1
     ],
     "DJQwtiowTJmAvAu4vhCaFgPiS3nnKD5r5agZgBQEdHK2": [
@@ -21766,15 +22029,15 @@
       1
     ],
     "DN5ZegZBEgnw2rg2nWq6sYqa2iS2aEJswEC1pzwpa8vj": [
-      1,
-      0
+      2,
+      1
     ],
     "DN9LKrJffsCiTfFSKQR9CzBN6xNRot4SesZd9Fp34YHE": [
       15,
       3
     ],
     "DNk4U4vhCk589X28q1TAiaKym3h1acrYQ1sDswNNZdy5": [
-      5,
+      6,
       1
     ],
     "DPWGVLxMNshPZ31FGdCkhgLPxVS8YbknH1747qTGL8be": [
@@ -21826,8 +22089,12 @@
       1
     ],
     "DVVc44kdvH6BGLuH6UZ4hidxRGwyZQoi3oKW4NiZy3VU": [
-      23,
-      5
+      30,
+      6
+    ],
+    "DWGHCJxsjFRSYvTpHhu11BWX23mKhFgVdkXWZnyDfPn1": [
+      1,
+      0
     ],
     "DWmK3GhiTpAYiNwtNT8akgho6edyezJMLmxBCvA9u9LD": [
       1,
@@ -21957,6 +22224,10 @@
       1,
       0
     ],
+    "Dn8txFbGGXpWVZwCgVMtiKUxQbCgXguHYX2Y59mcsFgN": [
+      1,
+      0
+    ],
     "DnkLKQtYXi4LHRhKTnWeExNfSE2LZyadAiUnQVdHnBNg": [
       4,
       2
@@ -21970,7 +22241,7 @@
       0
     ],
     "DpBUrt6HsNvdPXV7eXGvfDZsUD9QLQZvYdno52YqtffV": [
-      20,
+      21,
       5
     ],
     "DpFDXQahaD9oWoHD81q3gfMx3GWwuPi5AoFzX5ePd3Ji": [
@@ -22022,11 +22293,11 @@
       0
     ],
     "DxhpC9c4kGkYJR34xUrfFeDx9vwb6yoHUMWrTCZybwtH": [
-      41,
+      43,
       10
     ],
     "Dxis2F7p4LLbmA1XANAY6AVo4LQYoyqrgE42vRzXi9z8": [
-      11,
+      12,
       7
     ],
     "DyBPbnH6TPsypCNBj6gViYqCgKMyV4BgXUpAJyxxWV3z": [
@@ -22066,8 +22337,8 @@
       0
     ],
     "E1icorNRLQMDr1C8qWBtA9aadRK2uT2daRYQjtkWUQL1": [
-      2,
-      0
+      4,
+      1
     ],
     "E22QEwZ7J9Xfxe8ZHC47FVN5tkQQqdjmWBTEfKFt3L24": [
       1,
@@ -22098,7 +22369,7 @@
       1
     ],
     "E6e4Ni9zLnaaMfv8zCuTh36YcEWTdhYKQpNTv7GY1Pjt": [
-      2,
+      3,
       0
     ],
     "E7Goe4BqN9rSqzCwwWHs2s6Cf6XDYU6JxqGGWd2a4cHt": [
@@ -22144,6 +22415,10 @@
     "EEJdWSjv2h8NkNwssHxeFmVNCbqSd89Kx6hSX1Q9Nxjc": [
       2,
       1
+    ],
+    "EEWw5HobE3dUAABZGagE6fhVJyut6BUjrmbErKXCuFpC": [
+      1,
+      0
     ],
     "EEqHF5WtrP9JYbbhuhmzqeLmPCpg19JxSxzPGTJpRRWg": [
       1,
@@ -22209,6 +22484,10 @@
       1,
       0
     ],
+    "EQ5WSWiean8KrS5Z1mpsoyRwViESb9RVA6F1AdtP4Y8D": [
+      1,
+      0
+    ],
     "EQwjz8sy4YaZ7wvRpBgAQALQPQqxzUvMLBhpK551VTEj": [
       2,
       1
@@ -22233,6 +22512,10 @@
       1,
       0
     ],
+    "EUP7z1Ga4pTjtHQHM52TxsqnMyiC9pKNX16BcCdw6LaV": [
+      1,
+      0
+    ],
     "EWvxcX736G7KyyT1ajC6DVs1gTxSzBETJZTLKNTWxpnG": [
       1,
       0
@@ -22254,7 +22537,7 @@
       0
     ],
     "EZQfQ91S1WxbpPjW8DLTP1Ej98Ueeognq3ci3eDS6QNr": [
-      2,
+      3,
       0
     ],
     "EZsM3qqNzt2A589BY4rzA5wVFWBtyydhCpiHQeTP7w9F": [
@@ -22334,6 +22617,10 @@
       1
     ],
     "EjptKFMJBFXQaJDQKPRBJCHtt3Wt8oANT3iVBmU7B8Zg": [
+      1,
+      0
+    ],
+    "EktkWuMXWCpHRzDXX5gW48LhvZp9HSJFEFLHpUUv43yt": [
       1,
       0
     ],
@@ -22435,6 +22722,10 @@
     ],
     "Eu8cTZZAo5JCaRaq8f28YdiCfJnrJ9v7Pw8KPJvq9Ce1": [
       3,
+      0
+    ],
+    "EuGc5AePTihkBybckz6C7n62zMg24pFj2Ey5SyyXTh5s": [
+      1,
       0
     ],
     "EvGg5skWyGa5JSU6rm4CSmz6htxuM7WcNyFHvUgQt1XV": [
@@ -22558,7 +22849,7 @@
       0
     ],
     "FAHMvDeWBEBe6fG653ChW7suaLVMQboS3hiaNqpejuBF": [
-      13,
+      16,
       2
     ],
     "FASqTHRxR37w3MqATns1jSWQxyt6XiesYHFA3eC3eEVr": [
@@ -22594,8 +22885,8 @@
       1
     ],
     "FCmEK7BEg8Cn13NTCJrTeoT4ZropVP5vUZY88BVVasqP": [
-      2,
-      1
+      3,
+      2
     ],
     "FDgFACRyj38Y6GeRWaBi6kE59z1T5ukN7iEYwvXfKeQN": [
       11,
@@ -22686,7 +22977,7 @@
       0
     ],
     "FSEXGWdLEMYfMg77w5H7FcCi6LDZineYyyP1zmFXcnh4": [
-      6,
+      9,
       1
     ],
     "FU5wjiFrP6KHhJotv2XRzJiV6DAxpuLwuC5ypn5K8shJ": [
@@ -22696,6 +22987,10 @@
     "FUeRbAxedqNsEBJQkPxVC7EoDTDSurs84MVEoVwYxhJ9": [
       1,
       1
+    ],
+    "FVKw7u84H3vEJmARNvKiuRyVu8sfgbdTmBpLEs5W8fFm": [
+      1,
+      0
     ],
     "FWSRcaWZZuMV3oSepkqUxCkv2RJJWEW7us3ioQbJCkQp": [
       1,
@@ -22773,6 +23068,10 @@
       2,
       0
     ],
+    "Fd6VLGGy7KRnvFnfdPLgwCt6yE4pqdmk4N5at2K9C12A": [
+      1,
+      0
+    ],
     "Fdah2PNrPhGArFdsmukbL3yfzTkmmk6yKxFTcmopHGm": [
       1,
       1
@@ -22794,8 +23093,8 @@
       1
     ],
     "FepdTeDw5dTveciEK1o718UAU5kqiJBv1etn8fZKvbV4": [
-      28,
-      5
+      29,
+      6
     ],
     "Fev2anmUmfZ9bAigaGiJUgKoPXoA5kaa7vdJ6w9wjW2W": [
       1,
@@ -22825,12 +23124,16 @@
       1,
       0
     ],
+    "Fi9KHjKn1oBzvNXgTQjPBkSCcUYpm2wnfQpfCYdLpUX": [
+      1,
+      0
+    ],
     "Fi9fjEmzM7ieUEwT5LtFiYBrnz8EFYFYSqgZg5F2T8T8": [
       23,
       4
     ],
     "FiFawHqxeTVBhv6YbqbLwDVuvokRpPUM1bNwAyxhGc6W": [
-      15,
+      17,
       0
     ],
     "FjEUGBb9pHM4fvUoZTSqeD563VXgQ9HN1MtMayuLEcK4": [
@@ -23017,6 +23320,10 @@
       1,
       0
     ],
+    "G3MhTNt2zVH3S3tU134Hn9JcAU4BcYb1igYbTCQrKWJf": [
+      1,
+      0
+    ],
     "G3fk9NykrzmcXr4YYmToftFayrC6Y6ACiuc6WCKq3f8B": [
       10,
       1
@@ -23038,7 +23345,7 @@
       0
     ],
     "G7NvZKjoVqBDWciSYtWWgUPB7DA1iJavdvH5jty2FAmM": [
-      1,
+      2,
       0
     ],
     "G7nE2WwhA7KcxHDwsXUt51y1RMW63bXc5AAWzV3rsY5q": [
@@ -23074,8 +23381,8 @@
       0
     ],
     "G9sQPg9Eimkwe72w1xH1tPUc9RFNuK6Ufw5AyWy6j7ob": [
-      19,
-      3
+      22,
+      4
     ],
     "GA866wZxvhk6j6UJ22JmBrQ5HfLTeYLVJLZ78vaYtBAm": [
       2,
@@ -23086,7 +23393,7 @@
       0
     ],
     "GAvy6uYm9xxjw97G8jkEgsYMNM2rz96df57jNRGKiVqU": [
-      20,
+      22,
       3
     ],
     "GB3RScLih8EgPavY4KTNSitH3xdaQHUmxeCEsAfUahEP": [
@@ -23162,11 +23469,11 @@
       0
     ],
     "GMKNH8xEAfpMzk4oChsv3iLv6mAw8ksZQd6tbvLMuvLr": [
-      5,
+      6,
       1
     ],
     "GMwXfLtKhgtWdLqq29pF4JbUUQA6asUeEaXtjQSB7gpN": [
-      7,
+      8,
       2
     ],
     "GMxt3aYJDjXuDHrQB7mzR379R6Mor58MNVzKLmJ3tfL9": [
@@ -23194,7 +23501,7 @@
       0
     ],
     "GQifDbeCBC7YqYyoyEoCK7Rvfw6kzecW9Lp1tkarFKTT": [
-      15,
+      17,
       2
     ],
     "GR5XaSVsAoHh7poyA2D2t1VYN2zdzaCNmQBmELX9hfNm": [
@@ -23206,7 +23513,7 @@
       1
     ],
     "GS8W1qohUC7CAcX1WCmqdSXdtmeNPWirDxBoKLycfPRk": [
-      2,
+      3,
       0
     ],
     "GSBaedtpVHYP6u8kPhyMUW4DHazAsF8FnoHG8xedYbvn": [
@@ -23238,7 +23545,7 @@
       0
     ],
     "GXXMNCdMzTqjkwhqntLzuKW5uEXdR8BkSDhvRysMY3XT": [
-      7,
+      8,
       0
     ],
     "GXekeLvWpfaetWTSA3dWM3ESB7hPMkSLhSMRXgFd5wR3": [
@@ -23254,10 +23561,14 @@
       0
     ],
     "GZ6L5jrbrYpcwHrRF15LJdps4GWA3K1bwQ47YZ8V79B7": [
-      31,
+      32,
       13
     ],
     "GZAW7eAKAuRETckkYYKbCsq5w3dF4uRXgV5hUcpkM8yC": [
+      1,
+      1
+    ],
+    "GZfA5ihmjRLvz7fZznC3RstH4LFB2Bggs4XPkDS9EnbB": [
       1,
       1
     ],
@@ -23390,7 +23701,7 @@
       0
     ],
     "GuJtPr2zG1uCzAufr2UaBVT8PyWq9t4GvNuCGBnf2tPY": [
-      30,
+      35,
       6
     ],
     "GweEvyfBETvLLam1J8v5dmqnPSXzb2kwah6iEz2hGfrx": [
@@ -23498,7 +23809,7 @@
       1
     ],
     "H8bgvrbb1E6WWiyFtKSrWZomkuf54LPcNjVGwoH449bz": [
-      23,
+      24,
       3
     ],
     "H9G2sNMned4TPAVstto7aSyksCJZzzGqDS11aBdPMUtM": [
@@ -23554,7 +23865,7 @@
       1
     ],
     "HCRHocE2XbMG297g74g7iXqqUWaSykzfjCYGgbXkgcSK": [
-      7,
+      8,
       5
     ],
     "HELPMEVB4s3zAzZVZgKwGugRRc5waeS8X2eSQikDQAFK": [
@@ -23590,7 +23901,7 @@
       0
     ],
     "HJdB5R4CDYfVfFZruZf5xJXVQdV2n5VGH7SsK4xogPXk": [
-      5,
+      6,
       2
     ],
     "HJztLC2Sr8vpztFeXvF9RAjGeEuZCkYeRYpNDxQdKtW2": [
@@ -23726,7 +24037,7 @@
       1
     ],
     "HgP56YsLX9eMR1MbNBTHLs7gbwnEu2d6jYLb7MHcg2am": [
-      23,
+      24,
       6
     ],
     "HiTbTLMa8XZD7S2Pb9cqhxeMyZEbap8dNqyaJjMg211H": [
@@ -23834,7 +24145,7 @@
       0
     ],
     "HthdeE1STfUeTusG9opRyYAbp79XvLHRpH2zHTGLsZjf": [
-      1,
+      2,
       0
     ],
     "Hub3BYgwAqXagjgaNK7MpbHc4P1pquG4Zt652vjJyZ1E": [
@@ -23866,7 +24177,7 @@
       0
     ],
     "HxcdEi6CWzQtPCmM8E2maEZ3oYVGZxESqCWU1iPzmhVW": [
-      17,
+      18,
       3
     ],
     "HxrU5CFtS23q6yaMB6hKEZFpm1szXaKPq1r2CZanyy1p": [
@@ -23914,7 +24225,7 @@
       0
     ],
     "J7B2FGTFdh4VXu4dxxFCF28JKwQt7CKECuR2qx4P443k": [
-      21,
+      23,
       7
     ],
     "J7nMGgD42raiSHYnYhcFiJemrSGuYVuQs94SffrbCq3A": [
@@ -23950,7 +24261,7 @@
       0
     ],
     "JC1pZZMKAFRLP3FmC2hWH8KfepRjBHxLE1MXmNM9ryb5": [
-      18,
+      21,
       5
     ],
     "JCWXcjG6bTR8y6h9grgV4HucppwvmHLuJadPbi48tMkR": [
@@ -24046,11 +24357,11 @@
       1
     ],
     "RAREfqSpByfRrCx65aH7d1SRVWF1hP87xC2imd3Rk47": [
-      1,
-      0
+      2,
+      1
     ],
     "SLURahzredh2LEoFXnteqzvLh16ZjNu9ZLGLUNA3X64": [
-      10,
+      11,
       0
     ],
     "SVGz8tzL2MEBwN3Q7rjNNHBhpU6XfEkorjky3ez3N7K": [
@@ -24074,7 +24385,7 @@
       0
     ],
     "UoRxGDgwQtRSCG1UP6k4K5Ck4Eb9kUR2hC94kJbfxrN": [
-      1,
+      2,
       1
     ],
     "V4xEUTzrhJWYS9Mzc8vFA3APWDn6CDGUutaPKspWWQM": [
@@ -24090,7 +24401,7 @@
       1
     ],
     "ViTjB3dRqXLkSEyHPnwjVS82Kr5bRkpDbxw7525QRyd": [
-      9,
+      11,
       2
     ],
     "VsgdPSj1SyNa8WewGNd3GafWkJwyJkgbs8BaRwhppUP": [
@@ -24146,7 +24457,7 @@
       0
     ],
     "bwamJzztZsepfkteWRChggmXuiiCQvpLqPietdNfSXa": [
-      20,
+      22,
       2
     ],
     "cP2J49Fc4k4ntmvosKxMMQRF1AdKiNjihneZQeE19uC": [
@@ -24322,7 +24633,7 @@
       0
     ],
     "whamNNP9tHoxLg92yHvJPdYhghEoCg1qYTsh5a2oLbx": [
-      6,
+      7,
       2
     ],
     "wiz3V7adNrXvHzvTLx9LyQApeEFuCEGe4CNGpfPVQvA": [
@@ -24366,7 +24677,7 @@
       1
     ],
     "ytSGYuowbzaKQUUKSzpF82ro71gp1zAoCc6YyK9vN9t": [
-      1,
+      3,
       0
     ],
     "zW3pPxK93hR3X6Bx346tdQSeHPmmM46iXDFcSyrKUhM": [
@@ -24384,6 +24695,6 @@
   },
   "starting_sol_per_model": 3.0,
   "target_per_model": 100,
-  "updated_ns": 1789698304960940621,
+  "updated_ns": 1789699543340361610,
   "version": "golden-sevenmodel-forward-v2-library-active"
 }
