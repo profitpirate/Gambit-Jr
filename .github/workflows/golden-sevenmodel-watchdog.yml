@@ -30,6 +30,11 @@ jobs:
       - name: Ensure unfinished seven-model test has an active runner
         run: |
           set -euo pipefail
+          stop="$(gh api "repos/$GITHUB_REPOSITORY/contents/docs/research/golden-sevenmodel-operator-stop.json?ref=$BRANCH" --jq '.content' 2>/dev/null | base64 -d | jq -r '.stop // false' 2>/dev/null || echo false)"
+          if [ "$stop" = "true" ]; then
+            echo 'Seven-model campaign stopped by operator.'
+            exit 0
+          fi
           complete="$(gh api "repos/$GITHUB_REPOSITORY/contents/docs/research/golden-sevenmodel-status.json?ref=$BRANCH" --jq '.content' 2>/dev/null | base64 -d | jq -r '.complete // false' 2>/dev/null || echo false)"
           if [ "$complete" = "true" ]; then
             echo 'Seven-model target complete.'
