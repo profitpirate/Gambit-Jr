@@ -363,16 +363,20 @@ class CanonicalEventFabric:
         current_is_latest = (
             existing_event_at is None or _timestamp(event.source_timestamp) >= existing_event_at
         )
+        migration_advanced = False
         if row:
             existing_migration_state = str(row["migration_state"] or "PRE_MIGRATION")
             ranks = {"PRE_MIGRATION": 0, "MIGRATING": 1, "MIGRATED": 2}
-            if (
-                not current_is_latest
-                or ranks.get(existing_migration_state, 0) > ranks.get(migration_state, 0)
+            existing_rank = ranks.get(existing_migration_state, 0)
+            incoming_rank = ranks.get(migration_state, 0)
+            if existing_rank > incoming_rank or (
+                existing_rank == incoming_rank and not current_is_latest
             ):
                 migration_state = existing_migration_state
                 migration_started = row["migration_started_at"]
                 migration_completed = row["migration_completed_at"]
+            else:
+                migration_advanced = incoming_rank > existing_rank
 
         evidence = _loads(row["evidence_json"], {}) if row else {}
         evidence_key = str(event.event_type)
@@ -448,7 +452,7 @@ class CanonicalEventFabric:
                 migration_completed,
                 (
                     event.pool_identity or (row["pool_identity"] if row else None)
-                    if current_is_latest
+                    if current_is_latest or migration_advanced
                     else row["pool_identity"]
                 ),
                 row["monitoring_temperature"] if row else "GENESIS",

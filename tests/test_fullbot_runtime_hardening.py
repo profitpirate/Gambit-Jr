@@ -183,6 +183,40 @@ def test_migration_state_never_regresses_on_stale_event(db: Store) -> None:
     assert row["migration_completed_at"] == completed.source_timestamp
 
 
+def test_out_of_order_completion_can_still_advance_migration(db: Store) -> None:
+    fabric = CanonicalEventFabric(db)
+    token = "LateCompletionMint"
+    created = canonical(token, seconds=0, payload={"creator": "creator"})
+    newer_trade = canonical(
+        token,
+        seconds=20,
+        source="trade-feed",
+        kind=CanonicalEventType.TRADE_BUY,
+        payload={"real_token_reserves": 100.0},
+        signature="NewerTradeSig",
+    )
+    late_completion = canonical(
+        token,
+        seconds=10,
+        source="amm",
+        kind=CanonicalEventType.MIGRATION_COMPLETED,
+        pool="LatePool",
+    )
+    for event in (created, newer_trade, late_completion):
+        fabric.publish(event)
+        fabric.project(event)
+    token_id = db.token_id(token, "solana")
+    row = db.conn.execute(
+        "SELECT migration_state,pool_identity,last_event_at,migration_completed_at "
+        "FROM token_realtime_state WHERE token_id=?",
+        (token_id,),
+    ).fetchone()
+    assert row["migration_state"] == "MIGRATED"
+    assert row["pool_identity"] == "LatePool"
+    assert row["last_event_at"] == newer_trade.source_timestamp
+    assert row["migration_completed_at"] == late_completion.source_timestamp
+
+
 def test_stale_processing_claim_hits_attempt_ceiling(db: Store) -> None:
     fabric = CanonicalEventFabric(db)
     event = canonical("PoisonMint")
