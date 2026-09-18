@@ -4,6 +4,7 @@ import sqlite3
 import tempfile
 import time
 import unittest
+import unittest.mock
 from pathlib import Path
 
 from memecoin_bot import e4_live
