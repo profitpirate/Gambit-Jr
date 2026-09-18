@@ -1,19 +1,19 @@
 {
   "audit_counts": {
-    "e4_prearmed_qualified": 1,
-    "golden_qualified": 1,
+    "e4_prearmed_qualified": 2,
+    "golden_qualified": 0,
     "launches": 400,
     "library_negative_e4_veto": 0,
     "library_negative_golden_veto": 0,
-    "library_positive": 23,
+    "library_positive": 38,
     "library_positive_golden_overlap": 0,
-    "library_positive_standalone": 23,
+    "library_positive_standalone": 38,
     "library_strong_negative": 0
   },
-  "checked_ns": 1789699543340689621,
+  "checked_ns": 1789700764368212294,
   "closed_trades": {
-    "E4_PREARMED": 3,
-    "E4_PREARMED_CONVICTION_LIBRARY": 3,
+    "E4_PREARMED": 4,
+    "E4_PREARMED_CONVICTION_LIBRARY": 4,
     "FULL_3S": 8,
     "FULL_3S_LIBRARY": 100,
     "FULL_3S_V2_1": 10,
@@ -23,7 +23,7 @@
   "complete": false,
   "entry_latency_ms_common": 20.0,
   "market_data": "STRICTLY_FUTURE_LIVE_SOLANA_CAPTURE_REPLAYED_CAUSALLY",
-  "minimum_closed": 3,
+  "minimum_closed": 4,
   "models": [
     "FULL_3S",
     "FULL_4S",
@@ -54,28 +54,29 @@
     "35294731199",
     "35296170929",
     "35297621900",
-    "35299239933"
+    "35299239933",
+    "35300627753"
   ],
   "real_money_execution": false,
   "results": {
     "E4_PREARMED": {
-      "closed_trades": 3,
-      "expectancy_sol": 0.004168513199362807,
-      "losses": 1,
-      "maximum_drawdown_fraction": 0.015271344844321917,
-      "net_pnl_sol": 0.012505539598088422,
-      "profit_factor": 1.2676787362644721,
-      "win_rate": 0.6666666666666666,
+      "closed_trades": 4,
+      "expectancy_sol": -0.005922892175497282,
+      "losses": 2,
+      "maximum_drawdown_fraction": 0.027103465751098774,
+      "net_pnl_sol": -0.02369156870198913,
+      "profit_factor": 0.7142687695769716,
+      "win_rate": 0.5,
       "wins": 2
     },
     "E4_PREARMED_CONVICTION_LIBRARY": {
-      "closed_trades": 3,
-      "expectancy_sol": -0.008919763067918715,
-      "losses": 1,
-      "maximum_drawdown_fraction": 0.041411239007102675,
-      "net_pnl_sol": -0.026759289203756143,
-      "profit_factor": 0.7916667395303002,
-      "win_rate": 0.6666666666666666,
+      "closed_trades": 4,
+      "expectancy_sol": -0.011236728863883369,
+      "losses": 2,
+      "maximum_drawdown_fraction": 0.04727502731417993,
+      "net_pnl_sol": -0.044946915455533476,
+      "profit_factor": 0.6934718481871626,
+      "win_rate": 0.5,
       "wins": 2
     },
     "FULL_3S": {
