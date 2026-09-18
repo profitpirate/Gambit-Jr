@@ -74,7 +74,10 @@ def main() -> int:
             if not result.is_new:
                 raise AssertionError("first publish unexpectedly deduplicated")
 
-            if index % 2 == 0:
+            # Keep conflict probes disjoint from high-confidence matching
+            # confirmations so this stress check can attribute any confidence
+            # increase on those rows to the conflict path itself.
+            if index % 2 == 0 and index % 20 != 0:
                 confirmation = event(
                     index,
                     source="confirm",
