@@ -1,7 +1,7 @@
 {
   "audit_counts": {
-    "e4_prearmed_qualified": 0,
-    "golden_qualified": 0,
+    "e4_prearmed_qualified": 1,
+    "golden_qualified": 2,
     "launches": 400,
     "library_negative_e4_veto": 0,
     "library_negative_golden_veto": 0,
@@ -10,20 +10,20 @@
     "library_positive_standalone": 13,
     "library_strong_negative": 0
   },
-  "checked_ns": 1789706499491969160,
+  "checked_ns": 1789708080496112543,
   "closed_trades": {
-    "E4_PREARMED": 4,
-    "E4_PREARMED_CONVICTION_LIBRARY": 4,
-    "FULL_3S": 8,
+    "E4_PREARMED": 5,
+    "E4_PREARMED_CONVICTION_LIBRARY": 5,
+    "FULL_3S": 10,
     "FULL_3S_LIBRARY": 100,
-    "FULL_3S_V2_1": 10,
+    "FULL_3S_V2_1": 12,
     "FULL_3S_V2_1_LIBRARY": 100,
-    "FULL_4S": 8
+    "FULL_4S": 10
   },
   "complete": false,
   "entry_latency_ms_common": 20.0,
   "market_data": "STRICTLY_FUTURE_LIVE_SOLANA_CAPTURE_REPLAYED_CAUSALLY",
-  "minimum_closed": 4,
+  "minimum_closed": 5,
   "models": [
     "FULL_3S",
     "FULL_4S",
@@ -59,39 +59,40 @@
     "35301919984",
     "35303402391",
     "35304887201",
-    "35306556447"
+    "35306556447",
+    "35307937092"
   ],
   "real_money_execution": false,
   "results": {
     "E4_PREARMED": {
-      "closed_trades": 4,
-      "expectancy_sol": -0.005922892175497282,
-      "losses": 2,
-      "maximum_drawdown_fraction": 0.027103465751098774,
-      "net_pnl_sol": -0.02369156870198913,
-      "profit_factor": 0.7142687695769716,
-      "win_rate": 0.5,
+      "closed_trades": 5,
+      "expectancy_sol": -0.012608402979912347,
+      "losses": 3,
+      "maximum_drawdown_fraction": 0.03996635063365442,
+      "net_pnl_sol": -0.06304201489956174,
+      "profit_factor": 0.4843864607695041,
+      "win_rate": 0.4,
       "wins": 2
     },
     "E4_PREARMED_CONVICTION_LIBRARY": {
-      "closed_trades": 4,
-      "expectancy_sol": -0.011236728863883369,
-      "losses": 2,
-      "maximum_drawdown_fraction": 0.04727502731417993,
-      "net_pnl_sol": -0.044946915455533476,
-      "profit_factor": 0.6934718481871626,
-      "win_rate": 0.5,
+      "closed_trades": 5,
+      "expectancy_sol": -0.030351688364334918,
+      "losses": 3,
+      "maximum_drawdown_fraction": 0.08171163661637774,
+      "net_pnl_sol": -0.15175844182167458,
+      "profit_factor": 0.4012145873246643,
+      "win_rate": 0.4,
       "wins": 2
     },
     "FULL_3S": {
-      "closed_trades": 8,
-      "expectancy_sol": -0.003628655694614239,
+      "closed_trades": 10,
+      "expectancy_sol": -0.0004984394613898352,
       "losses": 5,
       "maximum_drawdown_fraction": 0.0509677334907797,
-      "net_pnl_sol": -0.029029245556913913,
-      "profit_factor": 0.897402039935259,
-      "win_rate": 0.375,
-      "wins": 3
+      "net_pnl_sol": -0.004984394613898352,
+      "profit_factor": 0.9823836717168196,
+      "win_rate": 0.5,
+      "wins": 5
     },
     "FULL_3S_LIBRARY": {
       "closed_trades": 100,
@@ -104,14 +105,14 @@
       "wins": 16
     },
     "FULL_3S_V2_1": {
-      "closed_trades": 10,
-      "expectancy_sol": -0.004040350800974715,
+      "closed_trades": 12,
+      "expectancy_sol": -0.0018734465836264165,
       "losses": 7,
       "maximum_drawdown_fraction": 0.05130639985372401,
-      "net_pnl_sol": -0.04040350800974715,
-      "profit_factor": 0.8419823566215322,
-      "win_rate": 0.3,
-      "wins": 3
+      "net_pnl_sol": -0.022481359003517,
+      "profit_factor": 0.9120756700427092,
+      "win_rate": 0.4166666666666667,
+      "wins": 5
     },
     "FULL_3S_V2_1_LIBRARY": {
       "closed_trades": 100,
@@ -124,14 +125,14 @@
       "wins": 17
     },
     "FULL_4S": {
-      "closed_trades": 8,
-      "expectancy_sol": 0.008783199433181758,
+      "closed_trades": 10,
+      "expectancy_sol": 0.012300925331961875,
       "losses": 5,
       "maximum_drawdown_fraction": 0.052367306490204574,
-      "net_pnl_sol": 0.07026559546545406,
-      "profit_factor": 1.2399530133197199,
-      "win_rate": 0.375,
-      "wins": 3
+      "net_pnl_sol": 0.12300925331961875,
+      "profit_factor": 1.4200696059675886,
+      "win_rate": 0.5,
+      "wins": 5
     }
   },
   "social_evidence": "immutable launch metadata/status timestamp; live X transport latency not claimed",
