@@ -191,8 +191,8 @@ def test_out_of_order_completion_can_still_advance_migration(db: Store) -> None:
         token,
         seconds=20,
         source="trade-feed",
-        kind=CanonicalEventType.TRADE_BUY,
-        payload={"real_token_reserves": 100.0},
+        kind=CanonicalEventType.TOKEN_TRADE,
+        payload={"side": "buy", "real_token_reserves": 100.0},
         signature="NewerTradeSig",
     )
     late_completion = canonical(
