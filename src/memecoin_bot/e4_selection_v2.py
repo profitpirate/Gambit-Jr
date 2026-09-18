@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import sys
 import threading
 import time
 from collections import deque
@@ -13,7 +14,7 @@ from typing import Any
 
 from . import e4_live as core
 
-VERSION = "e4-unified-selection-v2"
+VERSION = "e4-unified-selection-v2.2"
 _MEMORY_VERSION = "e4-selection-memory-v2"
 
 
@@ -34,12 +35,6 @@ def _int(value: Any, default: int = 0) -> int:
         return int(value)
     except (TypeError, ValueError):
         return default
-
-
-def _saturating(value: float, scale: float) -> float:
-    if value <= 0 or scale <= 0:
-        return 0.0
-    return 1.0 - math.exp(-value / scale)
 
 
 def _wilson(wins: int, trials: int, z: float = 1.96) -> tuple[float, float]:
@@ -108,12 +103,20 @@ class RegimeAssessment:
 
 
 @dataclass(frozen=True, slots=True)
+class CoreCandidate:
+    score: float
+    family: str
+    minimum_tier: str
+
+
+@dataclass(frozen=True, slots=True)
 class SelectionDecision:
     accepted: bool
     score: float
     threshold: float
     fraction: float
     tier: str
+    family: str
     reason: str
     components: dict[str, float]
     creator: CreatorAssessment
@@ -122,12 +125,7 @@ class SelectionDecision:
 
 
 class OnlineMemory:
-    """Restart-safe causal memory.
-
-    It only learns after a trade has resolved. Pending entry evidence is persisted
-    before execution so a process restart cannot silently turn future outcome
-    updates into look-ahead or lose the buyer/creator context used at decision time.
-    """
+    """Restart-safe causal memory updated only after a position resolves."""
 
     def __init__(self, path: Path, *, persist: bool = True, recent_limit: int = 100) -> None:
         self.path = path
@@ -209,6 +207,15 @@ class OnlineMemory:
                 "decision_ns": int(decision_ns),
             }
             self._save()
+
+    def discard_pending(self, mint: str) -> bool:
+        if not mint:
+            return False
+        with self.lock:
+            existed = self.pending.pop(mint, None) is not None
+            if existed:
+                self._save()
+            return existed
 
     def _update_stat(self, table: dict[str, dict[str, Any]], key: str, result: float) -> None:
         if not key:
@@ -320,11 +327,7 @@ class OnlineMemory:
 
 
 class CreatorLibrary:
-    """Confidence-calibrated creator context.
-
-    Historical creator data can boost, penalise or veto. It never grants entry
-    permission on its own. Tiny samples are deliberately shrunk toward neutral.
-    """
+    """Confidence-calibrated creator context; never independent entry authority."""
 
     def __init__(
         self,
@@ -399,7 +402,6 @@ class CreatorLibrary:
         if robust_positive:
             delta += min(0.16, (posterior - 0.50) * 0.32 * max(0.45, confidence))
         elif trades > 0:
-            # Tiny histories are context only. Three wins cannot become permission.
             delta += max(-0.03, min(0.03, (posterior - 0.50) * 0.10 * confidence))
 
         if robust_negative:
@@ -442,26 +444,24 @@ class CreatorLibrary:
 
 @dataclass(frozen=True, slots=True)
 class SelectionConfig:
-    threshold: float = 0.62
-    minimum_flow_buy_sol: float = 0.06
-    minimum_flow_buyers: int = 2
-    minimum_flow_ratio: float = 1.10
-    prearmed_minimum_buy_sol: float = 0.02
-    prearmed_minimum_buyers: int = 1
+    threshold: float = 0.70
+    maximum_entry_fdv_usd: float = 8_500.0
+    maximum_entry_age_ms: float = 350.0
+    minimum_creator_seed_sol: float = 0.025
     maximum_position_fraction: float = 0.10
 
     @classmethod
     def from_env(cls) -> SelectionConfig:
         return cls(
-            threshold=_finite(os.getenv("E4_SELECTION_V2_THRESHOLD"), 0.62),
-            minimum_flow_buy_sol=_finite(os.getenv("E4_SELECTION_V2_MIN_FLOW_SOL"), 0.06),
-            minimum_flow_buyers=_int(os.getenv("E4_SELECTION_V2_MIN_BUYERS"), 2),
-            minimum_flow_ratio=_finite(os.getenv("E4_SELECTION_V2_MIN_RATIO"), 1.10),
-            prearmed_minimum_buy_sol=_finite(
-                os.getenv("E4_SELECTION_V2_PREARMED_MIN_FLOW_SOL"), 0.02
+            threshold=_finite(os.getenv("E4_SELECTION_V2_THRESHOLD"), 0.70),
+            maximum_entry_fdv_usd=_finite(
+                os.getenv("E4_SELECTION_V2_MAX_ENTRY_FDV_USD"), 8_500.0
             ),
-            prearmed_minimum_buyers=_int(
-                os.getenv("E4_SELECTION_V2_PREARMED_MIN_BUYERS"), 1
+            maximum_entry_age_ms=_finite(
+                os.getenv("E4_SELECTION_V2_MAX_ENTRY_AGE_MS"), 350.0
+            ),
+            minimum_creator_seed_sol=_finite(
+                os.getenv("E4_SELECTION_V2_MIN_CREATOR_SEED_SOL"), 0.025
             ),
             maximum_position_fraction=_finite(
                 os.getenv("E4_SELECTION_V2_MAX_POSITION_FRACTION"), 0.10
@@ -470,7 +470,9 @@ class SelectionConfig:
 
 
 class UnifiedE4Policy(core.E4Policy):
-    """Actual production E4 signal + causal memory + calibrated creator context."""
+    """Evidence-backed E4 families + causal memory + calibrated creator context."""
+
+    _TIER_ORDER = ("probe", "standard", "strong", "high", "elite", "exceptional")
 
     def __init__(self, settings: core.Settings):
         super().__init__(settings)
@@ -529,7 +531,116 @@ class UnifiedE4Policy(core.E4Policy):
             if 0 < value <= 0.20:
                 self.size_tiers[name] = value
 
-    def _public_buyers(self, state: core.TokenState, milliseconds: int = 1000) -> list[str]:
+    @staticmethod
+    def _legacy_context(state: core.TokenState) -> Mapping[str, Any]:
+        module = sys.modules.get("memecoin_bot.e4_hardening_v6")
+        table = getattr(module, "_CONTEXT_BY_MINT", None) if module else None
+        if isinstance(table, Mapping):
+            row = table.get(state.mint)
+            if isinstance(row, Mapping):
+                return row
+        return {}
+
+    def _creator(self, state: core.TokenState) -> str:
+        context = self._legacy_context(state)
+        creator = str(state.creator or context.get("creator") or "")
+        if not creator:
+            create = next(
+                (
+                    event
+                    for event in state.events
+                    if event.kind == core.EventKind.CREATE and (event.creator or event.trader)
+                ),
+                None,
+            )
+            if create is not None:
+                creator = str(create.creator or create.trader or "")
+        if creator and not state.creator:
+            state.creator = creator
+        return creator
+
+    def _fallback_features(self, state: core.TokenState) -> dict[str, float]:
+        creator = self._creator(state)
+        events = list(state.events)
+        buys = [
+            event
+            for event in events
+            if event.kind in {core.EventKind.BUY, core.EventKind.PUMPSWAP_BUY}
+        ]
+        sells = [
+            event
+            for event in events
+            if event.kind in {core.EventKind.SELL, core.EventKind.PUMPSWAP_SELL}
+        ]
+        creator_buys = [event for event in buys if creator and event.trader == creator]
+        noncreator = [event for event in buys if not creator or event.trader != creator]
+        signatures: dict[str, int] = {}
+        for event in buys:
+            if event.signature:
+                signatures[event.signature] = signatures.get(event.signature, 0) + 1
+        bundled = sum(count for count in signatures.values() if count > 1)
+        first_price = next(
+            (event.price_sol for event in events if event.price_sol and event.price_sol > 0),
+            None,
+        )
+        price_multiple = (
+            (state.price_sol or 0.0) / first_price
+            if first_price and state.price_sol and state.price_sol > 0
+            else 0.0
+        )
+        context = self._legacy_context(state)
+        created_ns = state.created_ns or state.latest_ns
+        return {
+            "age_ms": max(0.0, (state.latest_ns - created_ns) / 1_000_000),
+            "fdv_usd": _finite(state.fdv_usd),
+            "buy_sol": sum(max(0.0, event.sol_amount) for event in buys),
+            "sell_sol": sum(max(0.0, event.sol_amount) for event in sells),
+            "buy_count": float(len(buys)),
+            "sell_count": float(len(sells)),
+            "unique_buyers": float(len({event.trader for event in buys if event.trader})),
+            "creator_buy_sol": sum(max(0.0, event.sol_amount) for event in creator_buys),
+            "noncreator_buyers": float(
+                len({event.trader for event in noncreator if event.trader})
+            ),
+            "noncreator_buy_sol": sum(max(0.0, event.sol_amount) for event in noncreator),
+            "bundled_buys": float(bundled),
+            "price_multiple": price_multiple,
+            "creator_score": _finite(context.get("creator_score")),
+            "source_score": 0.70
+            if str(context.get("metadata_host") or "").lower() == "metadata.j7tracker.io"
+            or str(context.get("launch_source") or "").lower() == "j7tracker"
+            else 0.0,
+            "prearmed": 1.0 if context.get("prearmed") else 0.0,
+            "mayhem": 1.0 if context.get("mayhem") else 0.0,
+        }
+
+    def _legacy_features(self, state: core.TokenState) -> dict[str, float]:
+        # Prefer the newest identity-enriched causal feature extractor when the
+        # production hardening chain is loaded. Fall back through V6 and finally
+        # to a local extractor for isolated tests/tools.
+        for module_name, function_name in (
+            ("memecoin_bot.e4_hardening_v8", "_identity_features"),
+            ("memecoin_bot.e4_hardening_v6", "_entry_features"),
+        ):
+            module = sys.modules.get(module_name)
+            feature_fn = getattr(module, function_name, None) if module else None
+            if not callable(feature_fn):
+                continue
+            try:
+                raw = feature_fn(state)
+                if isinstance(raw, Mapping):
+                    return {
+                        str(key): _finite(value)
+                        for key, value in raw.items()
+                        if isinstance(value, (int, float, bool))
+                    }
+            except Exception:  # noqa: BLE001 - legacy adapter fails closed to local extractor
+                continue
+        return self._fallback_features(state)
+
+    def _public_buyers(
+        self, state: core.TokenState, creator: str, milliseconds: int = 1000
+    ) -> list[str]:
         cutoff = state.latest_ns - milliseconds * 1_000_000
         buyers: list[str] = []
         for event in reversed(state.events):
@@ -538,197 +649,428 @@ class UnifiedE4Policy(core.E4Policy):
             if event.kind not in {core.EventKind.BUY, core.EventKind.PUMPSWAP_BUY}:
                 continue
             wallet = str(event.trader or "")
-            if not wallet or wallet == state.creator or wallet == self.settings.wallet:
+            if not wallet or wallet == creator or wallet == self.settings.wallet:
                 continue
             if wallet not in buyers:
                 buyers.append(wallet)
         return buyers
 
-    def _model_score(self, features: Mapping[str, float], fdv: float) -> float:
-        if self.model:
-            logit = float(self.model.get("intercept", 0.0)) + sum(
-                float(coef) * _finite(features.get(name))
-                for name, coef in self.model.get("coefficients", {}).items()
+    def _identity_score(
+        self, features: Mapping[str, float], context: Mapping[str, Any]
+    ) -> float:
+        social = max(
+            _finite(context.get("social_authority_score")),
+            _finite(context.get("community_score")),
+        )
+        if not context.get("prelaunch_social"):
+            social *= 0.25
+        funder = _finite(context.get("funder_score"))
+        return _clamp(
+            max(
+                _finite(features.get("creator_score")),
+                _finite(features.get("source_score")),
+                social,
+                funder,
+                1.0 if _finite(features.get("prearmed")) >= 1.0 else 0.0,
             )
-            return 1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, logit))))
-        flow = _finite(features.get("buy_sol_1000ms"))
-        buyers = _finite(features.get("buyers_1000ms"))
-        ratio = _finite(features.get("ratio_1000ms"))
-        fdv_score = max(
+        )
+
+    @staticmethod
+    def _fdv_fit(fdv: float, target: float = 4_878.0) -> float:
+        if fdv <= 0:
+            return 0.0
+        return math.exp(-abs(math.log(fdv / target)))
+
+    def _core_candidate(
+        self,
+        features: Mapping[str, float],
+        context: Mapping[str, Any],
+        identity_score: float,
+        creator: CreatorAssessment,
+    ) -> CoreCandidate | None:
+        fdv_score = self._fdv_fit(_finite(features.get("fdv_usd")))
+        creator_seed_score = min(1.0, _finite(features.get("creator_buy_sol")) / 3.0)
+        buyer_score = min(1.0, _finite(features.get("noncreator_buyers")) / 6.0)
+        capital_score = min(1.0, _finite(features.get("noncreator_buy_sol")) / 12.0)
+        acceleration_score = min(
+            1.0, max(0.0, _finite(features.get("price_multiple")) - 1.0) / 0.70
+        )
+        bundle_score = min(1.0, _finite(features.get("bundled_buys")) / 6.0)
+        age = _finite(features.get("age_ms"))
+        candidates: list[CoreCandidate] = []
+
+        if (
+            age <= 300
+            and _finite(features.get("noncreator_buyers")) >= 3
+            and _finite(features.get("buy_sol")) >= 8.0
+            and _finite(features.get("noncreator_buy_sol")) >= 5.0
+            and _finite(features.get("price_multiple")) >= 1.15
+        ):
+            score = min(
+                0.965,
+                0.54
+                + 0.08 * fdv_score
+                + 0.08 * creator_seed_score
+                + 0.10 * buyer_score
+                + 0.11 * capital_score
+                + 0.09 * acceleration_score,
+            )
+            candidates.append(CoreCandidate(score, "public_capital_burst", "standard"))
+
+        if (
+            age <= 120
+            and _finite(features.get("unique_buyers")) >= 5
+            and _finite(features.get("buy_sol")) >= 10.0
+            and _finite(features.get("bundled_buys")) >= 3
+            and _finite(features.get("price_multiple")) >= 1.25
+        ):
+            score = min(
+                0.975,
+                0.60
+                + 0.08 * fdv_score
+                + 0.09 * creator_seed_score
+                + 0.09 * buyer_score
+                + 0.08 * capital_score
+                + 0.06 * bundle_score,
+            )
+            candidates.append(
+                CoreCandidate(score, "coordinated_capital_burst", "high")
+            )
+
+        if (
+            age <= 100
+            and identity_score >= 0.55
+            and (
+                _finite(features.get("creator_buy_sol")) >= 2.0
+                or _finite(features.get("creator_score")) >= 0.72
+            )
+        ):
+            score = min(
+                0.985,
+                0.62
+                + 0.15 * identity_score
+                + 0.10 * creator_seed_score
+                + 0.08 * fdv_score
+                + 0.05 * acceleration_score,
+            )
+            candidates.append(
+                CoreCandidate(score, "known_creator_or_launch_source", "high")
+            )
+
+        # Repeat-creator history is useful only after confidence calibration and
+        # live confirmation. This replaces V9's unsafe 1/1 or 2/2 fast-path.
+        if (
+            creator.robust_positive
+            and creator.confidence >= 0.55
+            and age <= 110
+            and _finite(features.get("noncreator_buyers")) >= 1
+            and (
+                _finite(features.get("noncreator_buy_sol")) >= 0.10
+                or _finite(features.get("price_multiple")) >= 1.05
+            )
+        ):
+            score = min(
+                0.982,
+                0.78
+                + 0.10 * creator.posterior_mean
+                + 0.04 * creator.confidence
+                + 0.03 * fdv_score
+                + 0.03 * creator_seed_score,
+            )
+            candidates.append(
+                CoreCandidate(score, "robust_repeat_e4_creator", "strong")
+            )
+
+        # Pre-launch social/community evidence is independent of the developer
+        # outcome library. Require causal pre-launch provenance and at least a
+        # minimal on-chain confirmation so post-launch metadata cannot authorize.
+        social = max(
+            _finite(features.get("social_authority_score")),
+            _finite(features.get("community_score")),
+            _finite(context.get("social_authority_score")),
+            _finite(context.get("community_score")),
+        )
+        prelaunch_social = bool(
+            _finite(features.get("prelaunch_social")) >= 1.0
+            or context.get("prelaunch_social")
+        )
+        if (
+            prelaunch_social
+            and social >= 0.70
+            and age <= 120
+            and _finite(features.get("noncreator_buyers")) >= 1
+        ):
+            score = min(
+                0.965,
+                0.73
+                + 0.13 * social
+                + 0.04 * fdv_score
+                + 0.03 * creator_seed_score
+                + 0.02 * acceleration_score,
+            )
+            candidates.append(
+                CoreCandidate(score, "preannounced_social_community_launch", "strong")
+            )
+
+        funder = max(
+            _finite(features.get("funder_score")),
+            _finite(context.get("funder_score")),
+        )
+        public_confirm = min(
+            1.0,
+            0.45 * min(1.0, _finite(features.get("noncreator_buyers")) / 4.0)
+            + 0.35 * min(1.0, _finite(features.get("noncreator_buy_sol")) / 8.0)
+            + 0.20 * min(
+                1.0,
+                max(0.0, _finite(features.get("price_multiple")) - 1.0) / 0.40,
+            ),
+        )
+        if funder >= 0.80 and public_confirm >= 0.30 and age <= 160:
+            score = min(
+                0.95,
+                0.72
+                + 0.12 * funder
+                + 0.06 * public_confirm
+                + 0.025 * fdv_score,
+            )
+            candidates.append(
+                CoreCandidate(score, "trusted_funder_with_confirmation", "standard")
+            )
+
+        if age <= 80 and _finite(features.get("prearmed")) >= 1.0:
+            score = min(
+                0.995,
+                0.82
+                + 0.06 * identity_score
+                + 0.05 * fdv_score
+                + 0.04 * creator_seed_score
+                + 0.03 * acceleration_score,
+            )
+            candidates.append(CoreCandidate(score, "authorized_prearmed_launch", "elite"))
+
+        return max(candidates, key=lambda item: item.score) if candidates else None
+
+    def _optional_model_delta(self, state_features: Mapping[str, float]) -> float:
+        if not self.model:
+            return 0.0
+        logit = _finite(self.model.get("intercept"))
+        for name, coefficient in (self.model.get("coefficients") or {}).items():
+            logit += _finite(coefficient) * _finite(state_features.get(str(name)))
+        probability = 1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, logit))))
+        return max(-0.04, min(0.04, (probability - 0.50) * 0.08))
+
+    def _tier_at_least(self, score: float, minimum: str) -> str:
+        if score >= 0.975:
+            tier = "exceptional"
+        elif score >= 0.93:
+            tier = "elite"
+        elif score >= 0.88:
+            tier = "high"
+        elif score >= 0.82:
+            tier = "strong"
+        elif score >= 0.76:
+            tier = "standard"
+        else:
+            tier = "probe"
+        return self._TIER_ORDER[
+            max(self._TIER_ORDER.index(tier), self._TIER_ORDER.index(minimum))
+        ]
+
+    def _reject(
+        self,
+        *,
+        score: float,
+        threshold: float,
+        family: str,
+        reason: str,
+        components: dict[str, float],
+        creator: CreatorAssessment,
+        buyers: BuyerAssessment,
+        regime: RegimeAssessment,
+    ) -> SelectionDecision:
+        return SelectionDecision(
+            False,
+            score,
+            threshold,
             0.0,
-            1.0
-            - abs(fdv - self.settings.target_entry_fdv_usd)
-            / max(self.settings.target_entry_fdv_usd, 1.0),
+            "none",
+            family,
+            reason,
+            components,
+            creator,
+            buyers,
+            regime,
         )
-        return _clamp(
-            0.28 * fdv_score
-            + 0.24 * _saturating(buyers, 4.0)
-            + 0.30 * _saturating(flow, 1.0)
-            + 0.18 * _clamp(math.log1p(max(ratio, 0.0)) / math.log(6.0))
-        )
-
-    def _flow_score(self, state: core.TokenState, buyers: Sequence[str]) -> float:
-        flow250 = state.flow(250)
-        flow1s = state.flow(1000)
-        ratio1s = 8.0 if math.isinf(flow1s.ratio) else max(0.0, flow1s.ratio)
-        ratio250 = 8.0 if math.isinf(flow250.ratio) else max(0.0, flow250.ratio)
-        return _clamp(
-            0.28 * _saturating(len(buyers), 4.0)
-            + 0.28 * _saturating(flow1s.buy_sol, 1.0)
-            + 0.16 * _saturating(max(flow250.net, 0.0), 0.25)
-            + 0.16 * _clamp(math.log1p(ratio1s) / math.log(6.0))
-            + 0.12 * _clamp(math.log1p(ratio250) / math.log(6.0))
-        )
-
-    def _fdv_score(self, fdv: float) -> float:
-        target = max(self.settings.target_entry_fdv_usd, 1.0)
-        distance = abs(math.log(max(fdv, 1.0) / target))
-        return math.exp(-distance)
-
-    def _tier(self, score: float) -> str:
-        if score >= 0.90:
-            return "exceptional"
-        if score >= 0.83:
-            return "elite"
-        if score >= 0.76:
-            return "high"
-        if score >= 0.70:
-            return "strong"
-        if score >= 0.65:
-            return "standard"
-        return "probe"
 
     def decision(self, state: core.TokenState) -> SelectionDecision:
-        neutral_creator = self.library.assess(str(state.creator or ""))
-        neutral_buyers = BuyerAssessment(0, 0, 0.5, 0.0, 0.0, 0)
         regime = self.memory.regime()
-        threshold = _clamp(self.config.threshold + regime.threshold_add, 0.50, 0.90)
+        threshold = _clamp(self.config.threshold + regime.threshold_add, 0.55, 0.92)
+        empty_creator = self.library.assess("")
+        empty_buyers = BuyerAssessment(0, 0, 0.5, 0.0, 0.0, 0)
 
         if state.complete or state.migrated or state.wallet_touched:
-            return SelectionDecision(
-                False,
-                0.0,
-                threshold,
-                0.0,
-                "none",
-                "not an untouched live Pump curve",
-                {},
-                neutral_creator,
-                neutral_buyers,
-                regime,
+            return self._reject(
+                score=0.0,
+                threshold=threshold,
+                family="none",
+                reason="not an untouched live Pump curve",
+                components={},
+                creator=empty_creator,
+                buyers=empty_buyers,
+                regime=regime,
             )
-        fdv = _finite(state.fdv_usd)
-        if fdv <= 0 or fdv > self.settings.max_entry_fdv_usd:
-            return SelectionDecision(
-                False,
-                0.0,
-                threshold,
-                0.0,
-                "none",
-                "outside observed E4 entry FDV",
-                {},
-                neutral_creator,
-                neutral_buyers,
-                regime,
+        if state.created_ns is None:
+            return self._reject(
+                score=0.0,
+                threshold=threshold,
+                family="none",
+                reason="creation event not observed",
+                components={},
+                creator=empty_creator,
+                buyers=empty_buyers,
+                regime=regime,
             )
 
-        features = state.features()
-        buyers = self._public_buyers(state)
-        creator = self.library.assess(str(state.creator or ""))
-        buyer_assessment = self.memory.buyer_assessment(buyers)
-        model_score = self._model_score(features, fdv)
-        flow_score = self._flow_score(state, buyers)
-        fdv_score = self._fdv_score(fdv)
+        features = self._legacy_features(state)
+        context = self._legacy_context(state)
+        creator_key = self._creator(state)
+        creator = self.library.assess(creator_key)
+        public_buyers = self._public_buyers(state, creator_key)
+        buyers = self.memory.buyer_assessment(public_buyers)
+        age = _finite(features.get("age_ms"))
+        fdv = _finite(features.get("fdv_usd"), _finite(state.fdv_usd))
+        maximum_fdv = min(self.settings.max_entry_fdv_usd, self.config.maximum_entry_fdv_usd)
 
+        if age > self.config.maximum_entry_age_ms:
+            return self._reject(
+                score=0.0,
+                threshold=threshold,
+                family="none",
+                reason="outside E4 launch decision horizon",
+                components={"age_ms": age},
+                creator=creator,
+                buyers=buyers,
+                regime=regime,
+            )
+        if fdv <= 0 or fdv > maximum_fdv:
+            return self._reject(
+                score=0.0,
+                threshold=threshold,
+                family="none",
+                reason="outside observed E4 entry FDV",
+                components={"fdv_usd": fdv},
+                creator=creator,
+                buyers=buyers,
+                regime=regime,
+            )
+        if _finite(features.get("mayhem")) >= 1.0 or bool(context.get("mayhem")):
+            return self._reject(
+                score=0.0,
+                threshold=threshold,
+                family="none",
+                reason="Mayhem launch rejected",
+                components={"mayhem": 1.0},
+                creator=creator,
+                buyers=buyers,
+                regime=regime,
+            )
+        if _finite(features.get("sell_count")) > 0 or _finite(features.get("sell_sol")) > 0:
+            return self._reject(
+                score=0.0,
+                threshold=threshold,
+                family="none",
+                reason="sell appeared before E4 confirmation",
+                components={
+                    "sell_count": _finite(features.get("sell_count")),
+                    "sell_sol": _finite(features.get("sell_sol")),
+                },
+                creator=creator,
+                buyers=buyers,
+                regime=regime,
+            )
+        creator_seed = _finite(features.get("creator_buy_sol"))
+        if creator_seed < self.config.minimum_creator_seed_sol:
+            return self._reject(
+                score=0.0,
+                threshold=threshold,
+                family="none",
+                reason="creator seed not observed",
+                components={"creator_seed_sol": creator_seed},
+                creator=creator,
+                buyers=buyers,
+                regime=regime,
+            )
+        if creator.robust_negative:
+            return self._reject(
+                score=0.0,
+                threshold=threshold,
+                family="none",
+                reason="robust negative creator veto",
+                components={"creator_posterior": creator.posterior_mean},
+                creator=creator,
+                buyers=buyers,
+                regime=regime,
+            )
+
+        identity_score = self._identity_score(features, context)
+        candidate = self._core_candidate(features, context, identity_score, creator)
+        if candidate is None:
+            return self._reject(
+                score=0.0,
+                threshold=threshold,
+                family="none",
+                reason="no evidence-backed E4 entry family matched",
+                components={
+                    "identity_score": identity_score,
+                    "creator_seed_sol": creator_seed,
+                },
+                creator=creator,
+                buyers=buyers,
+                regime=regime,
+            )
+
+        if buyers.strongly_negative_wallets >= 2 and not creator.robust_positive:
+            return self._reject(
+                score=candidate.score,
+                threshold=threshold,
+                family=candidate.family,
+                reason="negative buyer cohort veto",
+                components={"negative_buyer_wallets": float(buyers.strongly_negative_wallets)},
+                creator=creator,
+                buyers=buyers,
+                regime=regime,
+            )
+
+        model_delta = self._optional_model_delta(state.features())
         score = _clamp(
-            0.48 * model_score
-            + 0.30 * flow_score
-            + 0.12 * fdv_score
-            + 0.10 * buyer_assessment.posterior_mean
-            + creator.score_delta
-            + buyer_assessment.score_delta
+            candidate.score + creator.score_delta + buyers.score_delta + model_delta
         )
         components = {
-            "model_score": model_score,
-            "flow_score": flow_score,
-            "fdv_score": fdv_score,
+            "core_score": candidate.score,
             "creator_delta": creator.score_delta,
-            "buyer_delta": buyer_assessment.score_delta,
-            "buyer_posterior": buyer_assessment.posterior_mean,
+            "buyer_delta": buyers.score_delta,
+            "optional_model_delta": model_delta,
             "creator_posterior": creator.posterior_mean,
+            "buyer_posterior": buyers.posterior_mean,
+            "identity_score": identity_score,
+            "creator_seed_sol": creator_seed,
+            "age_ms": age,
+            "fdv_usd": fdv,
             "regime_threshold_add": regime.threshold_add,
         }
-
-        if creator.robust_negative:
-            return SelectionDecision(
-                False,
-                score,
-                threshold,
-                0.0,
-                "none",
-                "robust negative creator veto",
-                components,
-                creator,
-                buyer_assessment,
-                regime,
-            )
-
-        flow1s = state.flow(1000)
-        ratio = 8.0 if math.isinf(flow1s.ratio) else max(0.0, flow1s.ratio)
-        normal_flow = (
-            len(buyers) >= self.config.minimum_flow_buyers
-            and flow1s.buy_sol >= self.config.minimum_flow_buy_sol
-            and ratio >= self.config.minimum_flow_ratio
-        )
-        # High-confidence repeat creators may enter earlier, but creator history
-        # still cannot bypass all live confirmation.
-        prearmed_flow = (
-            creator.robust_positive
-            and creator.confidence >= 0.60
-            and len(buyers) >= self.config.prearmed_minimum_buyers
-            and flow1s.buy_sol >= self.config.prearmed_minimum_buy_sol
-        )
-        if not normal_flow and not prearmed_flow:
-            return SelectionDecision(
-                False,
-                score,
-                threshold,
-                0.0,
-                "none",
-                "live flow confirmation missing",
-                components,
-                creator,
-                buyer_assessment,
-                regime,
-            )
-        if buyer_assessment.strongly_negative_wallets >= 2 and not creator.robust_positive:
-            return SelectionDecision(
-                False,
-                score,
-                threshold,
-                0.0,
-                "none",
-                "negative buyer cohort veto",
-                components,
-                creator,
-                buyer_assessment,
-                regime,
-            )
         if score < threshold:
-            return SelectionDecision(
-                False,
-                score,
-                threshold,
-                0.0,
-                "none",
-                "unified E4 score below threshold",
-                components,
-                creator,
-                buyer_assessment,
-                regime,
+            return self._reject(
+                score=score,
+                threshold=threshold,
+                family=candidate.family,
+                reason="unified E4 score below threshold",
+                components=components,
+                creator=creator,
+                buyers=buyers,
+                regime=regime,
             )
 
-        tier = self._tier(score)
+        tier = self._tier_at_least(score, candidate.minimum_tier)
         fraction = min(
             self.settings.max_position_fraction,
             self.config.maximum_position_fraction,
@@ -740,10 +1082,11 @@ class UnifiedE4Policy(core.E4Policy):
             threshold,
             max(0.0, fraction),
             tier,
-            f"unified E4 accepted ({tier})",
+            candidate.family,
+            f"unified E4 accepted family={candidate.family} tier={tier}",
             components,
             creator,
-            buyer_assessment,
+            buyers,
             regime,
         )
 
@@ -755,11 +1098,24 @@ class UnifiedE4Policy(core.E4Policy):
         features.update(decision.components)
         features["selection_threshold"] = decision.threshold
         features["position_fraction"] = decision.fraction
+        features["family_index"] = float(
+            {
+                "none": 0,
+                "public_capital_burst": 1,
+                "coordinated_capital_burst": 2,
+                "known_creator_or_launch_source": 3,
+                "robust_repeat_e4_creator": 4,
+                "preannounced_social_community_launch": 5,
+                "trusted_funder_with_confirmation": 6,
+                "authorized_prearmed_launch": 7,
+            }.get(decision.family, -1)
+        )
         if decision.accepted:
-            buyers = self._public_buyers(state)
+            creator = self._creator(state)
+            buyers = self._public_buyers(state, creator)
             self.memory.register_entry(
                 state.mint,
-                creator=str(state.creator or ""),
+                creator=creator,
                 buyers=buyers,
                 score=decision.score,
                 decision_ns=state.latest_ns,
@@ -828,22 +1184,43 @@ class UnifiedE4Policy(core.E4Policy):
 
 
 def install(core_module: Any = core, *, force: bool = False) -> None:
-    """Install selection after every legacy/final execution patch is loaded.
-
-    The historical E4 stack is import-time monkey-patched. Checking the current
-    class and wrapped sell function makes this installer resilient to boot order:
-    if a later hardening module overwrites either path, calling install() again
-    restores the authoritative production selector without double-wrapping.
-    """
+    """Install after legacy and final patches; reassert authority if boot order changes."""
     policy_current = core_module.E4Policy is UnifiedE4Policy
+    buy_current = bool(
+        getattr(core_module.Engine.execute_buy, "_e4_selection_v2_buy_wrapper", False)
+    )
     sell_current = bool(
         getattr(core_module.Engine.execute_sell, "_e4_selection_v2_learning_wrapper", False)
     )
-    if not force and policy_current and sell_current:
+    if not force and policy_current and buy_current and sell_current:
         core_module._e4_selection_v2_installed = True
         return
 
     core_module.E4Policy = UnifiedE4Policy
+
+    if not buy_current:
+        original_execute_buy = core_module.Engine.execute_buy
+
+        async def execute_buy_with_memory_cleanup(
+            self: Any,
+            state: core.TokenState,
+            score: float,
+            fraction: float,
+            reason: str,
+        ) -> None:
+            try:
+                await original_execute_buy(self, state, score, fraction, reason)
+            finally:
+                if state.mint not in getattr(self, "positions", {}):
+                    policy = getattr(self, "policy", None)
+                    memory = getattr(policy, "memory", None)
+                    discard = getattr(memory, "discard_pending", None)
+                    if callable(discard):
+                        discard(state.mint)
+
+        execute_buy_with_memory_cleanup._e4_selection_v2_buy_wrapper = True  # type: ignore[attr-defined]
+        execute_buy_with_memory_cleanup._e4_selection_v2_wrapped = original_execute_buy  # type: ignore[attr-defined]
+        core_module.Engine.execute_buy = execute_buy_with_memory_cleanup
 
     if not sell_current:
         original_execute_sell = core_module.Engine.execute_sell
