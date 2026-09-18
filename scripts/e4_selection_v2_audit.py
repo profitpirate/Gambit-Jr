@@ -5,8 +5,8 @@ import argparse
 import json
 import os
 import tempfile
-from pathlib import Path
 from collections.abc import Mapping
+from pathlib import Path
 from typing import Any
 
 from memecoin_bot import e4_live as core

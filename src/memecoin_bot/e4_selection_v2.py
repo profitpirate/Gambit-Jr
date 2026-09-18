@@ -6,9 +6,9 @@ import os
 import threading
 import time
 from collections import deque
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from collections.abc import Mapping, Sequence
 from typing import Any
 
 from . import e4_live as core
