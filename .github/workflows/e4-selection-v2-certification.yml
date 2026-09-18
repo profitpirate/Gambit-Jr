@@ -1,0 +1,70 @@
+name: E4 selection v2 certification
+
+on:
+  push:
+    branches: [codex/gambit-selection-rebuild-v1]
+    paths:
+      - 'src/memecoin_bot/e4_selection_v2.py'
+      - 'src/memecoin_bot/e4_production.py'
+      - 'src/memecoin_bot/e4_hardening_v6.py'
+      - 'src/memecoin_bot/e4_exec/**'
+      - 'scripts/e4_selection_v2_stress.py'
+      - 'scripts/e4_selection_v2_audit.py'
+      - 'scripts/run_pytest_isolated.py'
+      - 'tests/test_e4_selection_v2.py'
+      - 'tests/test_e4_production.py'
+      - '.github/workflows/e4-selection-v2-certification.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  certify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install
+        run: |
+          python -m pip install --disable-pip-version-check -U pip
+          python -m pip install --disable-pip-version-check -e '.[dev,research]'
+
+      - name: Compile production paths
+        run: |
+          python -m py_compile src/memecoin_bot/e4_selection_v2.py src/memecoin_bot/e4_production.py src/memecoin_bot/e4_hardening_v6.py src/memecoin_bot/e4_exec/__init__.py src/memecoin_bot/e4_exec/__main__.py scripts/e4_selection_v2_stress.py scripts/e4_selection_v2_audit.py scripts/run_pytest_isolated.py
+
+      - name: Static audit
+        run: |
+          ruff check src/memecoin_bot/e4_selection_v2.py src/memecoin_bot/e4_production.py src/memecoin_bot/e4_hardening_v6.py src/memecoin_bot/e4_exec/__init__.py src/memecoin_bot/e4_exec/__main__.py scripts/e4_selection_v2_stress.py scripts/e4_selection_v2_audit.py scripts/run_pytest_isolated.py tests/test_e4_selection_v2.py tests/test_e4_production.py
+
+      - name: Selection unit and integration tests
+        run: pytest -q tests/test_e4_selection_v2.py
+
+      - name: Full repository regression suite
+        run: |
+          mkdir -p artifacts
+          python scripts/run_pytest_isolated.py --output artifacts/e4-isolated-regression.json
+
+      - name: Stress and fuzz selector
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_selection_v2_stress.py             --iterations 50000             --max-p95-us 2500             --max-p99-us 5000             --output artifacts/e4-selection-v2-stress.json
+
+      - name: Strict system audit
+        run: |
+          python scripts/e4_selection_v2_audit.py             --strict             --stress-report artifacts/e4-selection-v2-stress.json             --output artifacts/e4-selection-v2-audit.json
+
+      - name: Upload certification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e4-selection-v2-certification-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 90

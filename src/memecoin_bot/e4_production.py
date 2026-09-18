@@ -3,8 +3,9 @@ from __future__ import annotations
 import json
 import os
 import time
-from datetime import datetime, timezone
-from typing import Any, Mapping
+from collections.abc import Mapping
+from datetime import UTC, datetime
+from typing import Any
 
 from . import e4_live as core
 from .e4_runner import _save_position
@@ -36,7 +37,7 @@ def _parse_timestamp_ns(value: Any) -> int | None:
         except ValueError:
             return None
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
+        parsed = parsed.replace(tzinfo=UTC)
     return int(parsed.timestamp() * 1_000_000_000)
 
 
@@ -148,7 +149,7 @@ async def _reconcile(engine: core.Engine) -> None:
     for mint, position in list(engine.positions.items()):
         try:
             balance = await engine.rpc.token_balance(engine.signer.wallet, mint)
-        except Exception:
+        except Exception:  # noqa: BLE001 - provider-specific RPC failure must not kill restart
             core.LOGGER.exception("E4 restart balance reconciliation failed", extra={"mint": mint})
             continue
         if balance <= max(1e-9, position.tokens * 1e-8):
@@ -170,7 +171,7 @@ async def _reconcile(engine: core.Engine) -> None:
         mint = str(row["mint"])
         try:
             token_balance = await engine.rpc.token_balance(engine.signer.wallet, mint)
-        except Exception:
+        except Exception:  # noqa: BLE001 - provider-specific RPC failure must not kill restart
             core.LOGGER.exception("E4 orphaned-buy reconciliation failed", extra={"mint": mint})
             continue
         if token_balance <= 0:

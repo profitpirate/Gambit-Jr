@@ -6,9 +6,10 @@ import logging
 import math
 import os
 import time
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 from urllib.parse import urlparse
 
 from . import e4_hardening_v5
@@ -435,13 +436,16 @@ def _entry_v6(
     # Explicit prearmed launch intent is the only path allowed to act on tiny
     # public flow. Metadata-host enrichment alone is not treated as permission.
     if features["age_ms"] <= 80 and features["prearmed"] >= 1.0:
-        score = min(
-            0.995,
-            0.82
-            + 0.06 * identity_score
-            + 0.05 * fdv_score
-            + 0.04 * creator_seed_score
-            + 0.03 * acceleration_score,
+        score = max(
+            _TIER_MIN_SCORE["elite"],
+            min(
+                0.995,
+                0.82
+                + 0.06 * identity_score
+                + 0.05 * fdv_score
+                + 0.04 * creator_seed_score
+                + 0.03 * acceleration_score,
+            ),
         )
         candidates.append((score, "authorized_prearmed_launch", "elite"))
 
@@ -772,7 +776,7 @@ async def _guardian_v6(self: core.Engine) -> None:
             )
         try:
             await asyncio.wait_for(self.stop_event.wait(), timeout=interval)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             pass
 
 
