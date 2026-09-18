@@ -6,7 +6,8 @@ import json
 import os
 import tempfile
 from pathlib import Path
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 from memecoin_bot import e4_live as core
 from memecoin_bot.e4_selection_v2 import UnifiedE4Policy

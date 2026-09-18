@@ -8,7 +8,8 @@ import time
 from collections import deque
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 from . import e4_live as core
 
@@ -450,7 +451,7 @@ class SelectionConfig:
     maximum_position_fraction: float = 0.10
 
     @classmethod
-    def from_env(cls) -> "SelectionConfig":
+    def from_env(cls) -> SelectionConfig:
         return cls(
             threshold=_finite(os.getenv("E4_SELECTION_V2_THRESHOLD"), 0.62),
             minimum_flow_buy_sol=_finite(os.getenv("E4_SELECTION_V2_MIN_FLOW_SOL"), 0.06),

@@ -98,7 +98,7 @@ def percentile(values: list[int], q: float) -> float:
     if not values:
         return 0.0
     ordered = sorted(values)
-    index = min(len(ordered) - 1, max(0, int(math.ceil(q * len(ordered))) - 1))
+    index = min(len(ordered) - 1, max(0, math.ceil(q * len(ordered)) - 1))
     return ordered[index] / 1_000.0
 
 
@@ -136,7 +136,7 @@ def main() -> int:
             started = time.perf_counter_ns()
             try:
                 decision = policy.decision(state)
-            except Exception as exc:  # pragma: no cover - stress telemetry
+            except Exception as exc:  # noqa: BLE001  # pragma: no cover - fuzz telemetry
                 exceptions.append(f"{type(exc).__name__}:{exc}")
                 continue
             timings.append(time.perf_counter_ns() - started)
