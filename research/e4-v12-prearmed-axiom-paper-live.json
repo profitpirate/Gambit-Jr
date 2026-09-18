@@ -1,18 +1,19 @@
 {
   "audit_counts": {
-    "creator_seed_below_floor": 20,
-    "execution_entry_output_guard_rejected": 4,
-    "not_prearmed_handle": 56,
-    "selected_candidates": 19,
-    "social_age_outside_window": 3,
-    "unknown_creator": 11902
+    "creator_seed_below_floor": 25,
+    "execution_entry_output_guard_rejected": 6,
+    "mayhem": 2,
+    "not_prearmed_handle": 70,
+    "selected_candidates": 23,
+    "social_age_outside_window": 4,
+    "unknown_creator": 14876
   },
   "completion": {
     "reached": false,
-    "remaining": 35,
+    "remaining": 33,
     "required_closed_trades": 50
   },
-  "ending_bankroll_sol": 3.6487027517021833,
+  "ending_bankroll_sol": 3.811031925312885,
   "golden_thesis_approved": false,
   "ledger": [
     {
@@ -524,30 +525,99 @@
       "social_status_id": "2100774751882928190",
       "tweet_age_seconds": 4.613455081,
       "win": true
+    },
+    {
+      "costs_sol": {
+        "axiom_entry": 0.0033720796126390164,
+        "axiom_exit": 0.00476348145334082,
+        "base_priority_bribe_entry": 0.002005,
+        "base_priority_exit": 0.00201,
+        "pump_entry": 0.004436946858735548,
+        "pump_exit": 0.006267738754395816,
+        "total_axiom": 0.008135561065979836,
+        "total_fixed_execution": 0.0040149999999999995,
+        "total_pump": 0.010704685613131364
+      },
+      "create_to_fill_price_multiple": 1.227365231496148,
+      "creator": "C2TFeiRyzzApUxvjrfaXF1RLfad2SfaHvSqGaEPmmxfv",
+      "creator_seed_sol": 2.962962962,
+      "curve_input_sol": 0.35495574869884383,
+      "decision_ns": 1789702742380983469,
+      "entry_budget_sol": 0.36476977517021836,
+      "entry_cost_sol": 0.36476977517021836,
+      "entry_latency_ms": 5.0,
+      "exit_ns": 1789702744368846000,
+      "exit_reason": "MAXIMUM_HOLD",
+      "exit_transactions": 2,
+      "fill_ns": 1789702742385983469,
+      "mint": "7jA8ex42dTnBnQGs2iB8mHn7B6QGdr2GLTJMJz6Epump",
+      "output_ratio": 0.8155993982938574,
+      "pnl_sol": 0.12360810497371033,
+      "proceeds_sol": 0.4883778801439287,
+      "run_id": "35300946966",
+      "social_handle": "devilantesol",
+      "social_status_id": "2100791651182481503",
+      "tweet_age_seconds": 7.260983469,
+      "win": true
+    },
+    {
+      "costs_sol": {
+        "axiom_entry": 0.0034860453168709376,
+        "axiom_exit": 0.004077531662467812,
+        "base_priority_bribe_entry": 0.002005,
+        "base_priority_exit": 0.00201,
+        "pump_entry": 0.004586901732724918,
+        "pump_exit": 0.005365173240089227,
+        "total_axiom": 0.00756357697933875,
+        "total_fixed_execution": 0.0040149999999999995,
+        "total_pump": 0.009952074972814145
+      },
+      "create_to_fill_price_multiple": 1.162476033057851,
+      "creator": "29yFzeBZgxf5zqrAkKXwgZtQehRf4pL8WbV2nRJikbw8",
+      "creator_seed_sol": 3.0,
+      "curve_input_sol": 0.3669521386179935,
+      "decision_ns": 1789707745297983963,
+      "entry_budget_sol": 0.37703008566758933,
+      "entry_cost_sol": 0.3770300856675893,
+      "entry_latency_ms": 5.0,
+      "exit_ns": 1789707747156769812,
+      "exit_reason": "MAXIMUM_HOLD",
+      "exit_transactions": 2,
+      "fill_ns": 1789707745302983963,
+      "mint": "4JFD24GzZsEEYRW4AxAf1miKBxsvaUtywfcgXxx8Y6BX",
+      "output_ratio": 0.8609193341030249,
+      "pnl_sol": 0.040731068636991885,
+      "proceeds_sol": 0.41776115430458116,
+      "run_id": "35300946966",
+      "social_handle": "ddddddd8a",
+      "social_status_id": "2100812662250635496",
+      "tweet_age_seconds": 0.748983963,
+      "win": true
     }
   ],
   "metrics": {
     "acceptance_gate_passed": false,
-    "capture_windows": 4,
-    "closed_trades": 15,
-    "ending_bankroll_sol": 3.652722751702182,
+    "capture_windows": 5,
+    "closed_trades": 17,
+    "ending_bankroll_sol": 3.8170619253128844,
     "losses": 3,
     "maximum_closed_equity_drawdown_fraction": 0.009562409976405709,
-    "net_pnl_sol": 0.6527227517021821,
-    "profit_factor": 16.785557358473067,
-    "total_axiom_fees_sol": 0.09940185543198146,
-    "total_fixed_execution_costs_sol": 0.05821499999999999,
-    "total_pump_fees_sol": 0.13079191504208088,
-    "wilson_lower_bound": 0.5481455128483065,
-    "win_rate": 0.8,
-    "wins": 12
+    "net_pnl_sol": 0.8170619253128844,
+    "profit_factor": 20.7599637117228,
+    "total_axiom_fees_sol": 0.11510099347730005,
+    "total_fixed_execution_costs_sol": 0.066245,
+    "total_pump_fees_sol": 0.15144867562802639,
+    "wilson_lower_bound": 0.5897054143116587,
+    "win_rate": 0.8235294117647058,
+    "wins": 14
   },
   "model_sha256": "4792187bfb7cd47f2708dc9fbac247faab9650e103005a57782bdc1ad8aaa7d0",
   "processed_runs": [
     "35263289604",
     "35272227172",
     "35284497655",
-    "35292351408"
+    "35292351408",
+    "35300946966"
   ],
   "production_authorised": false,
   "production_paths_changed": 0,
@@ -584,6 +654,22 @@
       "output_ratio": 0.5624108168948473,
       "reason": "entry_output_guard_rejected",
       "run_id": "35292351408"
+    },
+    {
+      "create_to_fill_price_multiple": 1.7834601536318966,
+      "fee_sol": 0.001005,
+      "mint": "B1RdYCfmBobTxPei4rADMxA8GwY8t8LJiQFDc8HMZmSf",
+      "output_ratio": 0.5620606170871649,
+      "reason": "entry_output_guard_rejected",
+      "run_id": "35300946966"
+    },
+    {
+      "create_to_fill_price_multiple": 1.7575041965241016,
+      "fee_sol": 0.001005,
+      "mint": "Bmf8fQ53Kh8bVCZ64o21KXvXKkefg772isePciLJrdEe",
+      "output_ratio": 0.5705306274494548,
+      "reason": "entry_output_guard_rejected",
+      "run_id": "35300946966"
     }
   ],
   "schema_version": "e4-v12-prearmed-axiom-paper-live-v1",
