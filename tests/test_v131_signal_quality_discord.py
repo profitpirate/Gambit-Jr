@@ -378,6 +378,16 @@ class MultiGuildDeliveryTests(unittest.IsolatedAsyncioTestCase):
             service.store, service.notifier, service.settings = db, Notifier(), settings(path)
             service.log = logging.getLogger("test-v131")
             self.assertEqual(await service.flush_outbox(), 0)
+            # Hardened outbox uses retry backoff: a failed destination is not
+            # hammered again in the same instant.
+            self.assertEqual(await service.flush_outbox(), 0)
+            pending = db.pending_outbox()
+            self.assertEqual(len(pending), 1)
+            with db.conn:
+                db.conn.execute(
+                    "UPDATE outbox SET next_attempt_at=? WHERE id=?",
+                    ((datetime.now(UTC) - timedelta(seconds=1)).isoformat(), pending[0]["id"]),
+                )
             self.assertEqual(await service.flush_outbox(), 1)
             self.assertEqual(service.notifier.calls.count(11), 1)
             self.assertEqual(service.notifier.calls.count(22), 2)

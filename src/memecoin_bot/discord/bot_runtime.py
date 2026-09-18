@@ -332,8 +332,10 @@ async def _run_coupled_runtime(
             error = service_task.exception()
             if error is not None:
                 raise RuntimeError("intelligence service crashed") from error
-            raise RuntimeError("intelligence service exited unexpectedly")
-        await discord_task
+            if discord_task not in done:
+                raise RuntimeError("intelligence service exited unexpectedly")
+        if discord_task in done:
+            await discord_task
     finally:
         service.stop()
         if not discord_task.done():
