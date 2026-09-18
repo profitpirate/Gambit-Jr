@@ -4,6 +4,13 @@ services:
       context: .
       dockerfile: Dockerfile.e4-exec
     restart: unless-stopped
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
     env_file:
       - .env.e4
     volumes:

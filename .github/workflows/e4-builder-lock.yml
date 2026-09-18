@@ -1,0 +1,36 @@
+name: Generate E4 builder lockfile
+
+on:
+  push:
+    branches: [codex/gambit-fullbot-audit-v1]
+    paths:
+      - 'tools/e4-builder/package.json'
+      - '.github/workflows/e4-builder-lock.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  lock:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: codex/gambit-fullbot-audit-v1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - name: Generate deterministic lock
+        working-directory: tools/e4-builder
+        run: npm install --package-lock-only --ignore-scripts
+      - name: Commit lockfile
+        run: |
+          if git diff --quiet -- tools/e4-builder/package-lock.json && git ls-files --error-unmatch tools/e4-builder/package-lock.json >/dev/null 2>&1; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/e4-builder/package.json tools/e4-builder/package-lock.json
+          git commit -m "build(e4): lock builder dependencies"
+          git push origin HEAD:codex/gambit-fullbot-audit-v1
