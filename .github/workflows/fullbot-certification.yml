@@ -1,0 +1,83 @@
+name: Full bot certification
+
+on:
+  push:
+    branches: [codex/gambit-fullbot-audit-v1]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  certify-full-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tools/e4-builder/package-lock.json
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --disable-pip-version-check -U pip
+          python -m pip install --disable-pip-version-check -e '.[dev,research]'
+          python -m pip check
+
+      - name: Install locked E4 builder dependencies
+        working-directory: tools/e4-builder
+        run: npm ci --omit=dev
+
+      - name: Compile whole Python tree
+        run: python -m compileall -q src scripts tests
+
+      - name: Static audit of hardened runtime
+        run: |
+          ruff check             src/memecoin_bot/config.py             src/memecoin_bot/database/store.py             src/memecoin_bot/alpha_engine.py             src/memecoin_bot/service.py             src/memecoin_bot/providers/base.py             src/memecoin_bot/providers/launch_events.py             src/memecoin_bot/realtime/events.py             src/memecoin_bot/realtime/fabric.py             src/memecoin_bot/realtime/providers.py             tests/test_fullbot_runtime_hardening.py             scripts/fullbot_stress.py             scripts/fullbot_audit.py
+
+      - name: Builder syntax and local contract
+        run: |
+          for file in tools/e4-builder/*.mjs; do node --check "$file"; done
+          mkdir -p artifacts
+          node tools/e4-builder/daemon-v2.mjs --self-test > artifacts/e4-builder-self-test.json
+
+      - name: Adversarial full-bot hardening tests
+        run: pytest -q tests/test_fullbot_runtime_hardening.py
+
+      - name: Isolated full repository regression
+        run: |
+          mkdir -p artifacts
+          python scripts/run_pytest_isolated.py             --output artifacts/fullbot-isolated-regression.json
+
+      - name: Full-bot persistence and concurrency stress
+        run: |
+          python scripts/fullbot_stress.py             --events 20000             --outbox 5000             --queue-events 20000             --output artifacts/fullbot-stress.json
+
+      - name: Re-certify E4 selection under hardened runtime
+        run: |
+          python scripts/e4_selection_v2_stress.py             --iterations 50000             --max-p95-us 2500             --max-p99-us 5000             --output artifacts/e4-selection-v2-stress.json
+          python scripts/e4_selection_v2_audit.py             --strict             --stress-report artifacts/e4-selection-v2-stress.json             --output artifacts/e4-selection-v2-audit.json
+
+      - name: Strict architecture and supply-chain audit
+        run: python scripts/fullbot_audit.py --output artifacts/fullbot-audit.json
+
+      - name: Build production images
+        run: |
+          docker build -f Dockerfile -t gambit-fullbot-cert:main .
+          docker build -f Dockerfile.e4-exec -t gambit-fullbot-cert:e4 .
+
+      - name: Upload certification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: fullbot-certification-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 90

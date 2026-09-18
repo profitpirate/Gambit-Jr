@@ -11,6 +11,7 @@ services:
       - no-new-privileges:true
     tmpfs:
       - /tmp:size=64m,mode=1777
+    user: "${E4_RUNTIME_UID:-1000}:${E4_RUNTIME_GID:-1000}"
     env_file:
       - .env.e4
     volumes:
