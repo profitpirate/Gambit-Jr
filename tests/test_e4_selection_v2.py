@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import json
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -219,3 +222,29 @@ def test_invalid_state_never_enters(policy: UnifiedE4Policy) -> None:
         fdv=50_000,
     )
     assert not policy.decision(state2).accepted
+
+
+def test_authoritative_e4_boot_installs_unified_policy_last() -> None:
+    root = Path(__file__).resolve().parents[1]
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(root / "src")
+    code = (
+        "from memecoin_bot import e4_live as core;"
+        "import memecoin_bot.e4_exec;"
+        "from memecoin_bot.e4_selection_v2 import UnifiedE4Policy;"
+        "assert core.E4Policy is UnifiedE4Policy;"
+        "assert getattr(core.Engine.execute_sell,"
+        "'_e4_selection_v2_learning_wrapper',False);"
+        "print('AUTHORITATIVE_E4_BOOT_OK')"
+    )
+    completed = subprocess.run(
+        [sys.executable, "-c", code],
+        cwd=root,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=15,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert "AUTHORITATIVE_E4_BOOT_OK" in completed.stdout

@@ -10,7 +10,7 @@ The previous Golden developer-library experiment proved that a developer's histo
 
 ## Production path
 
-The production entrypoint remains `memecoin_bot.e4_production`. At import time it installs `UnifiedE4Policy` into the existing E4 engine without changing signer, transaction builder, route racing, one-entry-per-mint, two-position concurrency, restart reconciliation or sweep behavior.
+The authoritative production entrypoint is `memecoin_bot.e4_exec`. Boot order is explicit: legacy E4 hardening loads first, final execution/reconciliation loads second, and `UnifiedE4Policy` installs last. This prevents any legacy import-time patch from silently overwriting the selector or its close-out learning hook while preserving signer, transaction builder, route racing, one-entry-per-mint, two-position concurrency, restart reconciliation and sweep behavior.
 
 ### Selection pipeline
 
@@ -110,7 +110,7 @@ The branch is not considered acceptable unless all of these pass:
 - Python compile of production selector/entrypoint/audit/stress paths;
 - Ruff on every changed production and test file;
 - dedicated selection unit/integration suite;
-- full repository regression suite;
+- every real repository test module in a fresh interpreter (legacy hardening modules are import-time monkey patches, so isolated modules prevent test-order contamination);
 - 50,000 synthetic selection decisions;
 - deterministic decision check;
 - no invalid-curve acceptance;
@@ -118,7 +118,7 @@ The branch is not considered acceptable unless all of these pass:
 - no duplicate-memory inflation;
 - p95 selector latency <= 2.5 ms;
 - p99 selector latency <= 5 ms;
-- strict architecture audit;
+- authoritative `gambit-e4` boot-order audit (Unified V2 must be the final policy and the final sell path must retain causal learning);\n- strict architecture audit;
 - stress report must pass.
 
 Certification evidence is uploaded as a GitHub Actions artifact.

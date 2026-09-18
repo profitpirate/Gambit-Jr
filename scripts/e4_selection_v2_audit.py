@@ -4,6 +4,8 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
+import sys
 import tempfile
 from collections.abc import Mapping
 from pathlib import Path
@@ -177,6 +179,36 @@ def main() -> int:
         if args.stress_report and args.stress_report.exists():
             stress = json.loads(args.stress_report.read_text())
 
+        root = Path(__file__).resolve().parents[1]
+        environment = os.environ.copy()
+        environment["PYTHONPATH"] = str(root / "src")
+        boot_code = (
+            "import json;"
+            "from memecoin_bot import e4_live as core;"
+            "import memecoin_bot.e4_exec;"
+            "from memecoin_bot.e4_selection_v2 import UnifiedE4Policy;"
+            "print(json.dumps({"
+            "'policy':core.E4Policy is UnifiedE4Policy,"
+            "'learning':bool(getattr(core.Engine.execute_sell,"
+            "'_e4_selection_v2_learning_wrapper',False))"
+            "}))"
+        )
+        boot = subprocess.run(
+            [sys.executable, "-c", boot_code],
+            cwd=root,
+            env=environment,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        boot_payload: dict[str, Any] = {}
+        if boot.returncode == 0:
+            try:
+                boot_payload = json.loads(boot.stdout.strip().splitlines()[-1])
+            except (json.JSONDecodeError, IndexError):
+                boot_payload = {}
+
         checks = {
             "library_cannot_authorize_without_live_flow": not thin_no_flow.accepted,
             "three_of_three_creator_is_confidence_capped": thin_assessment.score_delta <= 0.03 + 1e-12,
@@ -198,6 +230,8 @@ def main() -> int:
             "duplicate_outcomes_cannot_inflate_memory": duplicate_rejected,
             "sizing_is_hard_capped": policy.config.maximum_position_fraction <= 0.10,
             "stress_report_passed": stress is None or bool(stress.get("passed")),
+            "authoritative_cli_uses_unified_policy": bool(boot_payload.get("policy")),
+            "final_sell_path_retains_causal_learning": bool(boot_payload.get("learning")),
         }
 
         expectancy = json.loads(
@@ -229,6 +263,11 @@ def main() -> int:
                     "Creator history is contextual evidence only; weak one-off winner "
                     "registries and externally discovered creators cannot independently buy."
                 ),
+            },
+            "authoritative_boot": {
+                "returncode": boot.returncode,
+                "payload": boot_payload,
+                "stderr_tail": boot.stderr[-1000:],
             },
             "stress": stress,
         }
