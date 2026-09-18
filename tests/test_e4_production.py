@@ -4,10 +4,11 @@ import sqlite3
 import tempfile
 import time
 import unittest
-from unittest import mock
 from pathlib import Path
+from unittest import mock
 
-from memecoin_bot import e4_live, e4_production as _e4_production  # noqa: F401
+from memecoin_bot import e4_live
+from memecoin_bot import e4_production as _e4_production
 
 
 class E4ProductionMappingTests(unittest.TestCase):
