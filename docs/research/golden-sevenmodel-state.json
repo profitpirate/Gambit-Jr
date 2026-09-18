@@ -4,13 +4,13 @@
   "entry_latency_ms_common": 20.0,
   "last_audit_counts": {
     "e4_prearmed_qualified": 0,
-    "golden_qualified": 2,
+    "golden_qualified": 3,
     "launches": 400,
     "library_negative_e4_veto": 0,
     "library_negative_golden_veto": 0,
-    "library_positive": 3,
+    "library_positive": 6,
     "library_positive_golden_overlap": 0,
-    "library_positive_standalone": 3,
+    "library_positive_standalone": 6,
     "library_strong_negative": 0
   },
   "library_fingerprint": "430f637dd4914318fe2f54743173bf5400d7fcf26fecc1a4ea86a3f81349d606",
@@ -609,11 +609,12 @@
         }
       ],
       "rejections": {
+        "MISSING_EXIT_STATE": 3,
         "MISSING_RESERVE_STATE": 2
       }
     },
     "FULL_3S_LIBRARY": {
-      "cash_sol": 1.7907582742352186,
+      "cash_sol": 2.048566002697438,
       "ledger": [
         {
           "balance_after_sol": 2.9478411668876867,
@@ -4098,16 +4099,277 @@
           "real_money_execution": false,
           "selection_source": "GOLDEN",
           "win": true
+        },
+        {
+          "balance_after_sol": 1.9902144930546863,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "conviction_score": 69.798,
+            "conviction_tier": "HIGH",
+            "initial_fraction": 0.3,
+            "library_stats": {
+              "losses": 0,
+              "mean_return": 1.1198086566666665,
+              "positive": true,
+              "resolved": 3,
+              "strong_negative": false,
+              "win_rate": 1.0,
+              "wins": 3
+            },
+            "library_tier_shift": 1,
+            "management_version": "golden-management-v2-aggressive-5-8-15-25",
+            "position_fraction": 0.15,
+            "score_inputs": {
+              "buyer_count": 5,
+              "prior_appearances": 45,
+              "prior_win_rate": 0.0
+            }
+          },
+          "creator": "9aztChMYbsF5HRFG2ECkjfEdHHZChB1b3tRHQ2TPgKjv",
+          "decision_ns": 1789688918417929672,
+          "entry_cost_sol": 0.2686137411352828,
+          "exit_ns": 1789688921446617868,
+          "exit_reason": "FULL_3000MS",
+          "fill_ns": 1789688918439558336,
+          "library_stats_at_decision": {
+            "losses": 0,
+            "mean_return": 1.1198086566666665,
+            "positive": true,
+            "resolved": 3,
+            "strong_negative": false,
+            "win_rate": 1.0,
+            "wins": 3
+          },
+          "mint": "8or2ciXNyUiYH86K7NMTejLrFEWiViH8DvGkQKW11YXZ",
+          "model": "FULL_3S_LIBRARY",
+          "output_ratio": 0.9419093166675166,
+          "paper_only": true,
+          "pnl_sol": 0.19945621881946785,
+          "position_fraction": 0.15,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.46806995995475065,
+          "real_money_execution": false,
+          "selection_source": "LIBRARY_POSITIVE",
+          "win": true
+        },
+        {
+          "balance_after_sol": 1.9831120917743612,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "conviction_score": 50.0,
+            "conviction_tier": "MEDIUM",
+            "initial_fraction": 0.3,
+            "library_stats": {
+              "losses": 0,
+              "mean_return": 0.16965317571428565,
+              "positive": true,
+              "resolved": 7,
+              "strong_negative": false,
+              "win_rate": 1.0,
+              "wins": 7
+            },
+            "library_tier_shift": 1,
+            "management_version": "golden-management-v2-aggressive-5-8-15-25",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "buyer_count": 0,
+              "prior_appearances": 0,
+              "prior_win_rate": 0.0
+            }
+          },
+          "creator": "GaMPRt9yhnhRAB134imiwkmXAtVYkcTtZFzF1nBeqw6H",
+          "decision_ns": 1789688926221100461,
+          "entry_cost_sol": 0.15921715944437492,
+          "exit_ns": 1789688932850323936,
+          "exit_reason": "FULL_3000MS",
+          "fill_ns": 1789688926474051380,
+          "library_stats_at_decision": {
+            "losses": 0,
+            "mean_return": 0.16965317571428565,
+            "positive": true,
+            "resolved": 7,
+            "strong_negative": false,
+            "win_rate": 1.0,
+            "wins": 7
+          },
+          "mint": "8bboVkG6qsnsukMgXzQbU2yaSWY9LJ2ToTvbvQHrpump",
+          "model": "FULL_3S_LIBRARY",
+          "output_ratio": 0.9817668565132109,
+          "paper_only": true,
+          "pnl_sol": -0.007102401280325188,
+          "position_fraction": 0.08,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.15211475816404973,
+          "real_money_execution": false,
+          "selection_source": "LIBRARY_POSITIVE",
+          "win": false
+        },
+        {
+          "balance_after_sol": 1.9727645425976812,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "conviction_score": 58.829,
+            "conviction_tier": "MEDIUM",
+            "initial_fraction": 0.3,
+            "library_stats": {
+              "losses": 0,
+              "mean_return": 0.16965317571428565,
+              "positive": true,
+              "resolved": 7,
+              "strong_negative": false,
+              "win_rate": 1.0,
+              "wins": 7
+            },
+            "library_tier_shift": 1,
+            "management_version": "golden-management-v2-aggressive-5-8-15-25",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "buyer_count": 3,
+              "prior_appearances": 18,
+              "prior_win_rate": 0.16666666666666666
+            }
+          },
+          "creator": "GaMPRt9yhnhRAB134imiwkmXAtVYkcTtZFzF1nBeqw6H",
+          "decision_ns": 1789689053136528052,
+          "entry_cost_sol": 0.1586489673419489,
+          "exit_ns": 1789689143372372334,
+          "exit_reason": "FULL_3000MS",
+          "fill_ns": 1789689055351356253,
+          "library_stats_at_decision": {
+            "losses": 0,
+            "mean_return": 0.16965317571428565,
+            "positive": true,
+            "resolved": 7,
+            "strong_negative": false,
+            "win_rate": 1.0,
+            "wins": 7
+          },
+          "mint": "J9NSNPyzhiSEagSHhZdA2GWPYhrMGMiW67GoLSVbpump",
+          "model": "FULL_3S_LIBRARY",
+          "output_ratio": 1.0316204823451989,
+          "paper_only": true,
+          "pnl_sol": -0.010347549176679932,
+          "position_fraction": 0.08,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.14830141816526896,
+          "real_money_execution": false,
+          "selection_source": "LIBRARY_POSITIVE",
+          "win": false
+        },
+        {
+          "balance_after_sol": 2.0596291669547115,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "conviction_score": 50.0,
+            "conviction_tier": "MEDIUM",
+            "initial_fraction": 0.3,
+            "library_stats": {
+              "losses": 2,
+              "mean_return": 0.20645755666666654,
+              "positive": true,
+              "resolved": 9,
+              "strong_negative": false,
+              "win_rate": 0.7777777777777778,
+              "wins": 7
+            },
+            "library_tier_shift": 1,
+            "management_version": "golden-management-v2-aggressive-5-8-15-25",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "buyer_count": 0,
+              "prior_appearances": 0,
+              "prior_win_rate": 0.0
+            }
+          },
+          "creator": "4S8cTizFiq3UyPUELVyFjA7dsvKkbFssHZgMZXGv6FNU",
+          "decision_ns": 1789689220443087240,
+          "entry_cost_sol": 0.1577407634078145,
+          "exit_ns": 1789689226988949567,
+          "exit_reason": "FULL_3000MS",
+          "fill_ns": 1789689221127337738,
+          "library_stats_at_decision": {
+            "losses": 2,
+            "mean_return": 0.20645755666666654,
+            "positive": true,
+            "resolved": 9,
+            "strong_negative": false,
+            "win_rate": 0.7777777777777778,
+            "wins": 7
+          },
+          "mint": "DK8vTsqivdZrPAMTN2fByLAEYFQuSnyaoRThpazFpump",
+          "model": "FULL_3S_LIBRARY",
+          "output_ratio": 1.2526436470226965,
+          "paper_only": true,
+          "pnl_sol": 0.08786962435703025,
+          "position_fraction": 0.08,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.24561038776484476,
+          "real_money_execution": false,
+          "selection_source": "LIBRARY_POSITIVE",
+          "win": true
+        },
+        {
+          "balance_after_sol": 2.048566002697438,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "conviction_score": 57.015,
+            "conviction_tier": "MEDIUM",
+            "initial_fraction": 0.3,
+            "library_stats": {
+              "losses": 0,
+              "mean_return": 0.16965317571428565,
+              "positive": true,
+              "resolved": 7,
+              "strong_negative": false,
+              "win_rate": 1.0,
+              "wins": 7
+            },
+            "library_tier_shift": 1,
+            "management_version": "golden-management-v2-aggressive-5-8-15-25",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "buyer_count": 2,
+              "prior_appearances": 20,
+              "prior_win_rate": 0.15
+            }
+          },
+          "creator": "GaMPRt9yhnhRAB134imiwkmXAtVYkcTtZFzF1nBeqw6H",
+          "decision_ns": 1789689309520227930,
+          "entry_cost_sol": 0.16477033335637692,
+          "exit_ns": 1789689327646788723,
+          "exit_reason": "FULL_3000MS",
+          "fill_ns": 1789689314780497265,
+          "library_stats_at_decision": {
+            "losses": 0,
+            "mean_return": 0.16965317571428565,
+            "positive": true,
+            "resolved": 7,
+            "strong_negative": false,
+            "win_rate": 1.0,
+            "wins": 7
+          },
+          "mint": "56iRTcznEV3gDX2gCZnMCHJmoLLzJuPtekJwHugipump",
+          "model": "FULL_3S_LIBRARY",
+          "output_ratio": 0.9938807101201328,
+          "paper_only": true,
+          "pnl_sol": -0.011063164257273272,
+          "position_fraction": 0.08,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.15370716909910365,
+          "real_money_execution": false,
+          "selection_source": "LIBRARY_POSITIVE",
+          "win": false
         }
       ],
       "rejections": {
         "CONCURRENCY": 1,
-        "GOLDEN_SLIPPAGE_LIMIT": 4,
+        "GOLDEN_SLIPPAGE_LIMIT": 5,
+        "MISSING_EXIT_STATE": 3,
         "MISSING_RESERVE_STATE": 3
       }
     },
     "FULL_3S_V2_1": {
-      "cash_sol": 3.059696501240416,
+      "cash_sol": 3.0263074056770938,
       "ledger": [
         {
           "actions": [
@@ -4591,14 +4853,157 @@
           "real_money_execution": false,
           "selection_source": "GOLDEN",
           "win": true
+        },
+        {
+          "actions": [
+            {
+              "fraction": 0.3,
+              "kind": "INITIAL",
+              "proceeds_sol": 0.06798053135277317,
+              "reason": "PATH_AWARE_INITIAL_30PCT_SCORE_0",
+              "t_ms": 350.0
+            },
+            {
+              "fraction": 0.7000000000000001,
+              "kind": "EXIT",
+              "proceeds_sol": 0.15945819983490275,
+              "reason": "FLOW_2S_EXIT_SCORE_0",
+              "t_ms": 2000.0
+            }
+          ],
+          "balance_after_sol": 3.0423595123288587,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "cluster_profile": {
+              "clusters": [
+                [
+                  "AVA1cYQc4HKeR3K6SiJ7u8dwrMubb1JS2KNpm6Smrcu8"
+                ]
+              ],
+              "independent_groups": 1,
+              "largest_cluster": 1,
+              "raw_buyer_count": 1,
+              "redundant_wallets": 0
+            },
+            "conviction_score": 69.978,
+            "conviction_tier": "MEDIUM",
+            "creator_profile": {
+              "appearances": 0,
+              "win_rate": null,
+              "wins": 0
+            },
+            "initial_fraction": 0.3,
+            "management_version": "golden-management-v2.1-flow-cluster-loss-hardened-v2",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "cluster_penalty": 0.0,
+              "creator_component": 0.0,
+              "early_vsol_delta": 0.0,
+              "independent_groups": 1,
+              "prior_appearances": 13,
+              "prior_win_rate": 0.8461538461538461,
+              "raw_buyer_count": 1,
+              "reserve_component": 0.0
+            }
+          },
+          "creator": "DoXKC26YJozYHGdbpTjvUQzZt35aNQA1gXGSVZdb8kse",
+          "decision_ns": 1789689459860286712,
+          "entry_cost_sol": 0.2447757200992333,
+          "exit_ns": 1789689461389842264,
+          "exit_reason": "FLOW_2S_EXIT_SCORE_0",
+          "fill_ns": 1789689461389842264,
+          "library_stats_at_decision": null,
+          "mint": "4SuKfGzgjKHru9EFQTAtn12VWxnuZqrhap9N5geMpump",
+          "model": "FULL_3S_V2_1",
+          "output_ratio": 1.0000216431139994,
+          "paper_only": true,
+          "pnl_sol": -0.017336988911557355,
+          "position_fraction": 0.08,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.22743873118767594,
+          "real_money_execution": false,
+          "selection_source": "GOLDEN",
+          "win": false
+        },
+        {
+          "actions": [
+            {
+              "fraction": 0.3,
+              "kind": "INITIAL",
+              "proceeds_sol": 0.06246825980958653,
+              "reason": "PATH_AWARE_INITIAL_30PCT_SCORE_0",
+              "t_ms": 350.0
+            },
+            {
+              "fraction": 0.7000000000000001,
+              "kind": "EXIT",
+              "proceeds_sol": 0.14667329602994303,
+              "reason": "FLOW_2S_EXIT_SCORE_0",
+              "t_ms": 2000.0
+            }
+          ],
+          "balance_after_sol": 3.0263074056770938,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "cluster_profile": {
+              "clusters": [
+                [
+                  "AVA1cYQc4HKeR3K6SiJ7u8dwrMubb1JS2KNpm6Smrcu8"
+                ]
+              ],
+              "independent_groups": 1,
+              "largest_cluster": 1,
+              "raw_buyer_count": 1,
+              "redundant_wallets": 0
+            },
+            "conviction_score": 69.978,
+            "conviction_tier": "MEDIUM",
+            "creator_profile": {
+              "appearances": 0,
+              "win_rate": null,
+              "wins": 0
+            },
+            "initial_fraction": 0.3,
+            "management_version": "golden-management-v2.1-flow-cluster-loss-hardened-v2",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "cluster_penalty": 0.0,
+              "creator_component": 0.0,
+              "early_vsol_delta": 0.0,
+              "independent_groups": 1,
+              "prior_appearances": 13,
+              "prior_win_rate": 0.8461538461538461,
+              "raw_buyer_count": 1,
+              "reserve_component": 0.0
+            }
+          },
+          "creator": "ES18wsYuD4cNh3wvYG7BSXYxw5khmdCiqMsh17PSF9xi",
+          "decision_ns": 1789689459860638050,
+          "entry_cost_sol": 0.22519366249129463,
+          "exit_ns": 1789689461397901529,
+          "exit_reason": "FLOW_2S_EXIT_SCORE_0",
+          "fill_ns": 1789689461397901529,
+          "library_stats_at_decision": null,
+          "mint": "FYdcYyXSjSRQMXVABudCQzmbtpJFnwCMS8sNfqYLpump",
+          "model": "FULL_3S_V2_1",
+          "output_ratio": 1.0000002164401498,
+          "paper_only": true,
+          "pnl_sol": -0.01605210665176507,
+          "position_fraction": 0.08,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.20914155583952956,
+          "real_money_execution": false,
+          "selection_source": "GOLDEN",
+          "win": false
         }
       ],
       "rejections": {
+        "CONCURRENCY": 1,
         "MISSING_RESERVE_STATE": 2
       }
     },
     "FULL_3S_V2_1_LIBRARY": {
-      "cash_sol": 2.212929269194815,
+      "cash_sol": 2.1573948972416734,
       "ledger": [
         {
           "actions": [
@@ -10629,10 +11034,641 @@
           "real_money_execution": false,
           "selection_source": "GOLDEN",
           "win": true
+        },
+        {
+          "actions": [
+            {
+              "fraction": 0.3,
+              "kind": "INITIAL",
+              "proceeds_sol": 0.04898598524619089,
+              "reason": "PATH_AWARE_INITIAL_30PCT_SCORE_0",
+              "t_ms": 350.0
+            },
+            {
+              "fraction": 0.7,
+              "kind": "EXIT",
+              "proceeds_sol": 0.15133039785179572,
+              "reason": "FLOW_2S_EXIT_SCORE_-10",
+              "t_ms": 2000.0
+            }
+          ],
+          "balance_after_sol": 2.2362113107572164,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "cluster_profile": {
+              "clusters": [
+                [
+                  "9ygmSiDMic7iW3vT7mYu4L9VhY2aBWERJFou4UXxT4Eb",
+                  "AkefHZVkGeRyczf4QaJzPJV26VMAZ11GC4VniNMYcEVF",
+                  "7QZa7vBBhm64jaRFbs4KV7fB6ptJLMEHndBugAf2FioK",
+                  "FSEXGWdLEMYfMg77w5H7FcCi6LDZineYyyP1zmFXcnh4"
+                ],
+                [
+                  "6ePFAmj6nddaJWdoAgmPd22nGFVqTo9Yu5szqzzWdyPS"
+                ]
+              ],
+              "independent_groups": 2,
+              "largest_cluster": 4,
+              "raw_buyer_count": 5,
+              "redundant_wallets": 3
+            },
+            "conviction_score": 45.298,
+            "conviction_tier": "MEDIUM",
+            "creator_profile": {
+              "appearances": 10,
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "initial_fraction": 0.3,
+            "library_stats": {
+              "losses": 0,
+              "mean_return": 1.1198086566666665,
+              "positive": true,
+              "resolved": 3,
+              "strong_negative": false,
+              "win_rate": 1.0,
+              "wins": 3
+            },
+            "library_tier_shift": 1,
+            "management_version": "golden-management-v2.1-flow-cluster-loss-hardened-v2",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "cluster_penalty": 12.0,
+              "creator_component": -8.0,
+              "early_vsol_delta": 7.0,
+              "independent_groups": 2,
+              "prior_appearances": 45,
+              "prior_win_rate": 0.0,
+              "raw_buyer_count": 5,
+              "reserve_component": 3.0
+            }
+          },
+          "creator": "9aztChMYbsF5HRFG2ECkjfEdHHZChB1b3tRHQ2TPgKjv",
+          "decision_ns": 1789688918417929672,
+          "entry_cost_sol": 0.1770343415355852,
+          "exit_ns": 1789688920115366317,
+          "exit_reason": "FLOW_2S_EXIT_SCORE_-10",
+          "fill_ns": 1789688918439558336,
+          "library_stats_at_decision": {
+            "losses": 0,
+            "mean_return": 1.1198086566666665,
+            "positive": true,
+            "resolved": 3,
+            "strong_negative": false,
+            "win_rate": 1.0,
+            "wins": 3
+          },
+          "mint": "8or2ciXNyUiYH86K7NMTejLrFEWiViH8DvGkQKW11YXZ",
+          "model": "FULL_3S_V2_1_LIBRARY",
+          "output_ratio": 0.941850495866849,
+          "paper_only": true,
+          "pnl_sol": 0.023282041562401407,
+          "position_fraction": 0.08,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.2003163830979866,
+          "real_money_execution": false,
+          "selection_source": "LIBRARY_POSITIVE",
+          "win": true
+        },
+        {
+          "actions": [
+            {
+              "fraction": 0.3,
+              "kind": "INITIAL",
+              "proceeds_sol": 0.05200370505151742,
+              "reason": "PATH_AWARE_INITIAL_30PCT_SCORE_5",
+              "t_ms": 350.0
+            },
+            {
+              "fraction": 0.7,
+              "kind": "EXIT",
+              "proceeds_sol": 0.11857960235091035,
+              "reason": "FLOW_2S_EXIT_SCORE_-4",
+              "t_ms": 2000.0
+            }
+          ],
+          "balance_after_sol": 2.2278977132990665,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "cluster_profile": {
+              "clusters": [],
+              "independent_groups": 0,
+              "largest_cluster": 0,
+              "raw_buyer_count": 0,
+              "redundant_wallets": 0
+            },
+            "conviction_score": 50.0,
+            "conviction_tier": "MEDIUM",
+            "creator_profile": {
+              "appearances": 0,
+              "win_rate": null,
+              "wins": 0
+            },
+            "initial_fraction": 0.3,
+            "library_stats": {
+              "losses": 0,
+              "mean_return": 0.16965317571428565,
+              "positive": true,
+              "resolved": 7,
+              "strong_negative": false,
+              "win_rate": 1.0,
+              "wins": 7
+            },
+            "library_tier_shift": 1,
+            "management_version": "golden-management-v2.1-flow-cluster-loss-hardened-v2",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "cluster_penalty": 0.0,
+              "creator_component": 0.0,
+              "early_vsol_delta": 0.0,
+              "independent_groups": 0,
+              "prior_appearances": 0,
+              "prior_win_rate": 0.0,
+              "raw_buyer_count": 0,
+              "reserve_component": 0.0
+            }
+          },
+          "creator": "GaMPRt9yhnhRAB134imiwkmXAtVYkcTtZFzF1nBeqw6H",
+          "decision_ns": 1789688926221100461,
+          "entry_cost_sol": 0.1788969048605773,
+          "exit_ns": 1789688928307098151,
+          "exit_reason": "FLOW_2S_EXIT_SCORE_-4",
+          "fill_ns": 1789688926474051380,
+          "library_stats_at_decision": {
+            "losses": 0,
+            "mean_return": 0.16965317571428565,
+            "positive": true,
+            "resolved": 7,
+            "strong_negative": false,
+            "win_rate": 1.0,
+            "wins": 7
+          },
+          "mint": "8bboVkG6qsnsukMgXzQbU2yaSWY9LJ2ToTvbvQHrpump",
+          "model": "FULL_3S_V2_1_LIBRARY",
+          "output_ratio": 0.9817722288282038,
+          "paper_only": true,
+          "pnl_sol": -0.008313597458149524,
+          "position_fraction": 0.08,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.17058330740242778,
+          "real_money_execution": false,
+          "selection_source": "LIBRARY_POSITIVE",
+          "win": false
+        },
+        {
+          "actions": [
+            {
+              "fraction": 0.3,
+              "kind": "INITIAL",
+              "proceeds_sol": 0.0492409328559081,
+              "reason": "PATH_AWARE_INITIAL_30PCT_SCORE_0",
+              "t_ms": 350.0
+            },
+            {
+              "fraction": 0.7000000000000001,
+              "kind": "EXIT",
+              "proceeds_sol": 0.11598932170034353,
+              "reason": "FLOW_2S_EXIT_SCORE_0",
+              "t_ms": 2000.0
+            }
+          ],
+          "balance_after_sol": 2.214896150791393,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "cluster_profile": {
+              "clusters": [
+                [
+                  "9DgHKGFtRTvXRG4fbyXLp1gr7YayQbNVP3huWGfC2fLJ"
+                ],
+                [
+                  "CWCJECCdXJgT2iHGCeTFip3a3kw4BYTspfKUsdhA84A2"
+                ],
+                [
+                  "6MX6aPjPykHxhzHZzqYd48k9htom5Rxdp2BPCZ4WPMhw"
+                ]
+              ],
+              "independent_groups": 3,
+              "largest_cluster": 1,
+              "raw_buyer_count": 3,
+              "redundant_wallets": 0
+            },
+            "conviction_score": 61.829,
+            "conviction_tier": "MEDIUM",
+            "creator_profile": {
+              "appearances": 0,
+              "win_rate": null,
+              "wins": 0
+            },
+            "initial_fraction": 0.3,
+            "library_stats": {
+              "losses": 0,
+              "mean_return": 0.16965317571428565,
+              "positive": true,
+              "resolved": 7,
+              "strong_negative": false,
+              "win_rate": 1.0,
+              "wins": 7
+            },
+            "library_tier_shift": 1,
+            "management_version": "golden-management-v2.1-flow-cluster-loss-hardened-v2",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "cluster_penalty": 0.0,
+              "creator_component": 0.0,
+              "early_vsol_delta": 1.0864197509999975,
+              "independent_groups": 3,
+              "prior_appearances": 18,
+              "prior_win_rate": 0.16666666666666666,
+              "raw_buyer_count": 3,
+              "reserve_component": 3.0
+            }
+          },
+          "creator": "GaMPRt9yhnhRAB134imiwkmXAtVYkcTtZFzF1nBeqw6H",
+          "decision_ns": 1789689053136528052,
+          "entry_cost_sol": 0.17823181706392532,
+          "exit_ns": 1789689055351356253,
+          "exit_reason": "FLOW_2S_EXIT_SCORE_0",
+          "fill_ns": 1789689055351356253,
+          "library_stats_at_decision": {
+            "losses": 0,
+            "mean_return": 0.16965317571428565,
+            "positive": true,
+            "resolved": 7,
+            "strong_negative": false,
+            "win_rate": 1.0,
+            "wins": 7
+          },
+          "mint": "J9NSNPyzhiSEagSHhZdA2GWPYhrMGMiW67GoLSVbpump",
+          "model": "FULL_3S_V2_1_LIBRARY",
+          "output_ratio": 1.0316111748594565,
+          "paper_only": true,
+          "pnl_sol": -0.013001562507673703,
+          "position_fraction": 0.08,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.16523025455625162,
+          "real_money_execution": false,
+          "selection_source": "LIBRARY_POSITIVE",
+          "win": false
+        },
+        {
+          "actions": [
+            {
+              "fraction": 0.3,
+              "kind": "INITIAL",
+              "proceeds_sol": 0.050696735509355655,
+              "reason": "PATH_AWARE_INITIAL_30PCT_SCORE_3",
+              "t_ms": 350.0
+            },
+            {
+              "fraction": 0.7000000000000001,
+              "kind": "EXIT",
+              "proceeds_sol": 0.10627649489923585,
+              "reason": "EARLY_FLOW_INVALIDATION_-5",
+              "t_ms": 1073.531738
+            }
+          ],
+          "balance_after_sol": 2.193753089136673,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "cluster_profile": {
+              "clusters": [],
+              "independent_groups": 0,
+              "largest_cluster": 0,
+              "raw_buyer_count": 0,
+              "redundant_wallets": 0
+            },
+            "conviction_score": 42.0,
+            "conviction_tier": "MEDIUM",
+            "creator_profile": {
+              "appearances": 7,
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "initial_fraction": 0.3,
+            "library_stats": {
+              "losses": 2,
+              "mean_return": 0.20645755666666654,
+              "positive": true,
+              "resolved": 9,
+              "strong_negative": false,
+              "win_rate": 0.7777777777777778,
+              "wins": 7
+            },
+            "library_tier_shift": 1,
+            "management_version": "golden-management-v2.1-flow-cluster-loss-hardened-v2",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "cluster_penalty": 0.0,
+              "creator_component": -8.0,
+              "early_vsol_delta": 0.0,
+              "independent_groups": 0,
+              "prior_appearances": 0,
+              "prior_win_rate": 0.0,
+              "raw_buyer_count": 0,
+              "reserve_component": 0.0
+            }
+          },
+          "creator": "4S8cTizFiq3UyPUELVyFjA7dsvKkbFssHZgMZXGv6FNU",
+          "decision_ns": 1789689220443087240,
+          "entry_cost_sol": 0.17711129206331144,
+          "exit_ns": 1789689222200869476,
+          "exit_reason": "EARLY_FLOW_INVALIDATION_-5",
+          "fill_ns": 1789689221127337738,
+          "library_stats_at_decision": {
+            "losses": 2,
+            "mean_return": 0.20645755666666654,
+            "positive": true,
+            "resolved": 9,
+            "strong_negative": false,
+            "win_rate": 0.7777777777777778,
+            "wins": 7
+          },
+          "mint": "DK8vTsqivdZrPAMTN2fByLAEYFQuSnyaoRThpazFpump",
+          "model": "FULL_3S_V2_1_LIBRARY",
+          "output_ratio": 1.2524466948132373,
+          "paper_only": true,
+          "pnl_sol": -0.02013806165471993,
+          "position_fraction": 0.08,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.1569732304085915,
+          "real_money_execution": false,
+          "selection_source": "LIBRARY_POSITIVE",
+          "win": false
+        },
+        {
+          "actions": [
+            {
+              "fraction": 0.3,
+              "kind": "INITIAL",
+              "proceeds_sol": 0.04890553461420843,
+              "reason": "PATH_AWARE_INITIAL_30PCT_SCORE_0",
+              "t_ms": 2000.0
+            },
+            {
+              "fraction": 0.7,
+              "kind": "EXIT",
+              "proceeds_sol": 0.11521193713509217,
+              "reason": "FLOW_2S_EXIT_SCORE_0",
+              "t_ms": 2250.0
+            }
+          ],
+          "balance_after_sol": 2.18237031375504,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "cluster_profile": {
+              "clusters": [
+                [
+                  "CWCJECCdXJgT2iHGCeTFip3a3kw4BYTspfKUsdhA84A2"
+                ],
+                [
+                  "6MX6aPjPykHxhzHZzqYd48k9htom5Rxdp2BPCZ4WPMhw"
+                ]
+              ],
+              "independent_groups": 2,
+              "largest_cluster": 1,
+              "raw_buyer_count": 2,
+              "redundant_wallets": 0
+            },
+            "conviction_score": 60.015,
+            "conviction_tier": "MEDIUM",
+            "creator_profile": {
+              "appearances": 0,
+              "win_rate": null,
+              "wins": 0
+            },
+            "initial_fraction": 0.3,
+            "library_stats": {
+              "losses": 0,
+              "mean_return": 0.16965317571428565,
+              "positive": true,
+              "resolved": 7,
+              "strong_negative": false,
+              "win_rate": 1.0,
+              "wins": 7
+            },
+            "library_tier_shift": 1,
+            "management_version": "golden-management-v2.1-flow-cluster-loss-hardened-v2",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "cluster_penalty": 0.0,
+              "creator_component": 0.0,
+              "early_vsol_delta": 0.592592591999999,
+              "independent_groups": 2,
+              "prior_appearances": 20,
+              "prior_win_rate": 0.15,
+              "raw_buyer_count": 2,
+              "reserve_component": 3.0
+            }
+          },
+          "creator": "GaMPRt9yhnhRAB134imiwkmXAtVYkcTtZFzF1nBeqw6H",
+          "decision_ns": 1789689309520227930,
+          "entry_cost_sol": 0.17550024713093385,
+          "exit_ns": 1789689314786552926,
+          "exit_reason": "FLOW_2S_EXIT_SCORE_0",
+          "fill_ns": 1789689314780497265,
+          "library_stats_at_decision": {
+            "losses": 0,
+            "mean_return": 0.16965317571428565,
+            "positive": true,
+            "resolved": 7,
+            "strong_negative": false,
+            "win_rate": 1.0,
+            "wins": 7
+          },
+          "mint": "56iRTcznEV3gDX2gCZnMCHJmoLLzJuPtekJwHugipump",
+          "model": "FULL_3S_V2_1_LIBRARY",
+          "output_ratio": 0.9938816843541141,
+          "paper_only": true,
+          "pnl_sol": -0.011382775381633237,
+          "position_fraction": 0.08,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.1641174717493006,
+          "real_money_execution": false,
+          "selection_source": "LIBRARY_POSITIVE",
+          "win": false
+        },
+        {
+          "actions": [
+            {
+              "fraction": 0.3,
+              "kind": "INITIAL",
+              "proceeds_sol": 0.04818138796208356,
+              "reason": "PATH_AWARE_INITIAL_30PCT_SCORE_0",
+              "t_ms": 350.0
+            },
+            {
+              "fraction": 0.7000000000000001,
+              "kind": "EXIT",
+              "proceeds_sol": 0.11350728214549027,
+              "reason": "FLOW_2S_EXIT_SCORE_0",
+              "t_ms": 2000.0
+            }
+          ],
+          "balance_after_sol": 2.1694693587622105,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "cluster_profile": {
+              "clusters": [
+                [
+                  "AVA1cYQc4HKeR3K6SiJ7u8dwrMubb1JS2KNpm6Smrcu8"
+                ]
+              ],
+              "independent_groups": 1,
+              "largest_cluster": 1,
+              "raw_buyer_count": 1,
+              "redundant_wallets": 0
+            },
+            "conviction_score": 69.978,
+            "conviction_tier": "MEDIUM",
+            "creator_profile": {
+              "appearances": 0,
+              "win_rate": null,
+              "wins": 0
+            },
+            "initial_fraction": 0.3,
+            "library_stats": {
+              "losses": 0,
+              "mean_return": 0.0,
+              "positive": false,
+              "resolved": 0,
+              "strong_negative": false,
+              "win_rate": null,
+              "wins": 0
+            },
+            "library_tier_shift": 0,
+            "management_version": "golden-management-v2.1-flow-cluster-loss-hardened-v2",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "cluster_penalty": 0.0,
+              "creator_component": 0.0,
+              "early_vsol_delta": 0.0,
+              "independent_groups": 1,
+              "prior_appearances": 13,
+              "prior_win_rate": 0.8461538461538461,
+              "raw_buyer_count": 1,
+              "reserve_component": 0.0
+            }
+          },
+          "creator": "DoXKC26YJozYHGdbpTjvUQzZt35aNQA1gXGSVZdb8kse",
+          "decision_ns": 1789689459860286712,
+          "entry_cost_sol": 0.17458962510040318,
+          "exit_ns": 1789689461389842264,
+          "exit_reason": "FLOW_2S_EXIT_SCORE_0",
+          "fill_ns": 1789689461389842264,
+          "library_stats_at_decision": {
+            "losses": 0,
+            "mean_return": 0.0,
+            "positive": false,
+            "resolved": 0,
+            "strong_negative": false,
+            "win_rate": null,
+            "wins": 0
+          },
+          "mint": "4SuKfGzgjKHru9EFQTAtn12VWxnuZqrhap9N5geMpump",
+          "model": "FULL_3S_V2_1_LIBRARY",
+          "output_ratio": 1.0000216676502003,
+          "paper_only": true,
+          "pnl_sol": -0.012900954992829367,
+          "position_fraction": 0.08,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.16168867010757382,
+          "real_money_execution": false,
+          "selection_source": "GOLDEN",
+          "win": false
+        },
+        {
+          "actions": [
+            {
+              "fraction": 0.3,
+              "kind": "INITIAL",
+              "proceeds_sol": 0.044227348654265634,
+              "reason": "PATH_AWARE_INITIAL_30PCT_SCORE_0",
+              "t_ms": 350.0
+            },
+            {
+              "fraction": 0.7,
+              "kind": "EXIT",
+              "proceeds_sol": 0.10432064491756819,
+              "reason": "FLOW_2S_EXIT_SCORE_0",
+              "t_ms": 2000.0
+            }
+          ],
+          "balance_after_sol": 2.1573948972416734,
+          "common_added_entry_latency_ms": 20.0,
+          "conviction": {
+            "cluster_profile": {
+              "clusters": [
+                [
+                  "AVA1cYQc4HKeR3K6SiJ7u8dwrMubb1JS2KNpm6Smrcu8"
+                ]
+              ],
+              "independent_groups": 1,
+              "largest_cluster": 1,
+              "raw_buyer_count": 1,
+              "redundant_wallets": 0
+            },
+            "conviction_score": 69.978,
+            "conviction_tier": "MEDIUM",
+            "creator_profile": {
+              "appearances": 0,
+              "win_rate": null,
+              "wins": 0
+            },
+            "initial_fraction": 0.3,
+            "library_stats": {
+              "losses": 0,
+              "mean_return": 0.0,
+              "positive": false,
+              "resolved": 0,
+              "strong_negative": false,
+              "win_rate": null,
+              "wins": 0
+            },
+            "library_tier_shift": 0,
+            "management_version": "golden-management-v2.1-flow-cluster-loss-hardened-v2",
+            "position_fraction": 0.08,
+            "score_inputs": {
+              "cluster_penalty": 0.0,
+              "creator_component": 0.0,
+              "early_vsol_delta": 0.0,
+              "independent_groups": 1,
+              "prior_appearances": 13,
+              "prior_win_rate": 0.8461538461538461,
+              "raw_buyer_count": 1,
+              "reserve_component": 0.0
+            }
+          },
+          "creator": "ES18wsYuD4cNh3wvYG7BSXYxw5khmdCiqMsh17PSF9xi",
+          "decision_ns": 1789689459860638050,
+          "entry_cost_sol": 0.16062245509237094,
+          "exit_ns": 1789689461397901529,
+          "exit_reason": "FLOW_2S_EXIT_SCORE_0",
+          "fill_ns": 1789689461397901529,
+          "library_stats_at_decision": {
+            "losses": 0,
+            "mean_return": 0.0,
+            "positive": false,
+            "resolved": 0,
+            "strong_negative": false,
+            "win_rate": null,
+            "wins": 0
+          },
+          "mint": "FYdcYyXSjSRQMXVABudCQzmbtpJFnwCMS8sNfqYLpump",
+          "model": "FULL_3S_V2_1_LIBRARY",
+          "output_ratio": 1.000000216666044,
+          "paper_only": true,
+          "pnl_sol": -0.012074461520537122,
+          "position_fraction": 0.08,
+          "prearmed_e4": null,
+          "proceeds_sol": 0.14854799357183382,
+          "real_money_execution": false,
+          "selection_source": "GOLDEN",
+          "win": false
         }
       ],
       "rejections": {
-        "GOLDEN_SLIPPAGE_LIMIT": 5,
+        "CONCURRENCY": 1,
+        "GOLDEN_SLIPPAGE_LIMIT": 6,
         "MISSING_RESERVE_STATE": 3
       }
     },
@@ -10845,6 +11881,7 @@
         }
       ],
       "rejections": {
+        "MISSING_EXIT_STATE": 3,
         "MISSING_RESERVE_STATE": 2
       }
     }
@@ -10861,7 +11898,8 @@
     "35282437927",
     "35284082765",
     "35285506317",
-    "35286816745"
+    "35286816745",
+    "35288156093"
   ],
   "real_money_execution": false,
   "reputation_delta": {
@@ -10914,7 +11952,7 @@
       1
     ],
     "24678QKx2Dy8ZCw6Ra8o9DeTqPLL5GR9ZQKxt5FddHmq": [
-      27,
+      29,
       8
     ],
     "25BnFoSY7Qds4qVZstJqSDAMzXk9hJdymisJz9UdqSG9": [
@@ -10934,7 +11972,7 @@
       0
     ],
     "283FxqaYa3Ya5pgGGFHqPegYmbBxmbC3pMka8yKyg9Jc": [
-      11,
+      12,
       0
     ],
     "28U7RcqyuF7oHzQhhF7x7NwHD1ySgMALHhKpedHnyx28": [
@@ -10950,8 +11988,8 @@
       0
     ],
     "2BKyGYqh5nzq9wpfaT2MED8HHEWS9hWdD5DbGNNzRS4m": [
-      1,
-      1
+      2,
+      2
     ],
     "2BQxrCimMpasHkfFkEshBcxHcG8NbbvcUWMKJ6Cu4yvx": [
       1,
@@ -10962,8 +12000,8 @@
       0
     ],
     "2CQgjcdNEo7WtbQLpJTAVcC3Ga61pNvRDTgP5grzctFG": [
-      32,
-      1
+      34,
+      2
     ],
     "2D4Ljw9gBo4nk6bmaSwvsdWRJAJqvx3wXeqck7TiAWat": [
       1,
@@ -11038,15 +12076,15 @@
       0
     ],
     "2PxmGRCWCms6axEnqaPypHDeC8A8zD7uk3YFZM1MH22R": [
-      1,
-      1
+      2,
+      2
     ],
     "2QHNiNWus2gRffGCakou7izYvVUgJvhv3R5nZLVSUaVj": [
       1,
       0
     ],
     "2QRNKeqqRgkdMFdVJLNhCo5cM6MSwGQdiBjJDaP7VUcD": [
-      4,
+      6,
       3
     ],
     "2QVGjBS3stfb8WaY9oQ8E8TbCpSoW9ax1Dg9cPGFWz4d": [
@@ -11058,7 +12096,7 @@
       0
     ],
     "2S8xfwN6ABmuwk4kd7aqG1b2ZyuFrYsKugaqYDPsGpLk": [
-      4,
+      5,
       0
     ],
     "2SWmMECu22iL2j1chnHLqqKBhtUA6ip9qipKSEgQsqVE": [
@@ -11070,8 +12108,8 @@
       0
     ],
     "2UyLkf3fWmGxzZHYvxzn48Z7zb9XEYYpM8HhTXFJ6rEU": [
-      17,
-      11
+      19,
+      12
     ],
     "2V6oHwhG6Wxm72uSsXwG5Uami17M58cjHr2AVos51jxT": [
       1,
@@ -11093,6 +12131,10 @@
       1,
       0
     ],
+    "2X3akQ9gM3ji35ejZqcDoTUCFWK9bpJtfc4YE6x5KJiu": [
+      2,
+      0
+    ],
     "2X6QYm1uW4xDpVx87L4zaBMj6wrbNG3dPuQXmYdbKbjY": [
       1,
       0
@@ -11102,7 +12144,7 @@
       0
     ],
     "2Xtmbm2qV2sfZ3DGqWdFLEZjyb3nTWybs7zmuBxXCJcs": [
-      10,
+      11,
       2
     ],
     "2YBfRawTkHzNX2qsQr2ummM8rDjZcwDvFQzXmZbRj2qD": [
@@ -11110,7 +12152,7 @@
       0
     ],
     "2aBgJZa6T6dRRSKkNpMDwTGH8dejaCjHbxuq3wqB6een": [
-      7,
+      9,
       1
     ],
     "2aKvjec65S5Pydjm1rjzJi6Zwi5cbD2mnS6F3ip4vMSa": [
@@ -11126,7 +12168,7 @@
       0
     ],
     "2bL7fAPxWt4DG8hhpGqUPJr9Kfhj35j6HL424zUBiT9y": [
-      7,
+      9,
       0
     ],
     "2c88JRMRVJJ3EY9bqzzeXzeDXx9kpCZcCkhXLDqUjmpx": [
@@ -11194,7 +12236,7 @@
       0
     ],
     "2mqrindMAjJEQPLhroYWyiYPo5h9iAsahfdd4QtsjwdY": [
-      5,
+      6,
       3
     ],
     "2nU1AogLMqD6iLr8u2itPPimAozyZoyZ24f9TmbRW7vM": [
@@ -11246,7 +12288,7 @@
       0
     ],
     "2vzVZeQvwqcDFcUCr71dFzhHARVhs4Km2zMgPtxqL2u5": [
-      6,
+      7,
       1
     ],
     "2wMYf8sWSWhihhma17zMW4CPBfmZFFAB1MVe9SpqzT14": [
@@ -11345,6 +12387,10 @@
       6,
       5
     ],
+    "3E7SePw25jvRH2URaCYMxYnYqYhQ8kPT1qFvroSdoi2g": [
+      1,
+      0
+    ],
     "3EKAEKJTnALRENiAJEwmAevy2EKVYvuQ42GjvzSr3esR": [
       1,
       0
@@ -11377,11 +12423,23 @@
       1,
       0
     ],
+    "3LsetD8jdRaRfQ94cdwhevRURQyXwdjJbN6mwf7N6b9j": [
+      1,
+      1
+    ],
     "3NJcE1Nj3feFMjkgnGdyXSw8TY1io1KU8UaVkFTskTDi": [
       1,
       1
     ],
     "3NtvjF8tsYaPEN28VnyG7FB3iUs1oqfsdiR2Tbayp3AV": [
+      1,
+      0
+    ],
+    "3PBkzwvvXFcAyheMJHUvZNHtcVTDa4ezWwuCoVq3mPn3": [
+      1,
+      0
+    ],
+    "3Q5xMS5XUmsWxXYHq37yHnvyF2pJfUokMwgzkCHtmP3u": [
       1,
       0
     ],
@@ -11506,8 +12564,8 @@
       2
     ],
     "3kc4AwL5NhLv7mp72HqTKe1FdKcHe5eHjTaq2eZxeWRq": [
-      17,
-      10
+      19,
+      11
     ],
     "3mTzcCCyVPJ1ijyVHMSHwXuT98QvjJ9Tu6qJZHipQHnE": [
       1,
@@ -11541,6 +12599,10 @@
       1,
       0
     ],
+    "3rZk6mPj76Xq31yhFGh2JX2j79AsUe7X42VgWVPLd71J": [
+      1,
+      1
+    ],
     "3rsHweQqBs3KB3Q6GmXPedLqSVPQpSKRCQtM9g2EJsLT": [
       1,
       0
@@ -11570,16 +12632,16 @@
       1
     ],
     "3uuGdtp8Yves8TfbnjRJbv5VPNabTRnTv9g4GFmbGckw": [
-      2,
-      0
+      3,
+      1
     ],
     "3vLWM9qSiMZzjTW4pSEViQxVdaMP1aEWp2MMBhSmtDWp": [
       1,
       1
     ],
     "3w2XwgAFq4v8jt3ZgsK7vPHbmXGHrnFgoMzLaZKqxQT4": [
-      41,
-      9
+      44,
+      10
     ],
     "3xaqYBkaaE49sKJxbA7YS9GJJ7N9YgocmTe747tu2b1Q": [
       1,
@@ -11645,11 +12707,19 @@
       1,
       0
     ],
+    "4FGrbn57CfAGNnRA2ipyLM6onkktVDUiowUYRLY3owKj": [
+      1,
+      0
+    ],
     "4GfngzvTBDwLHZzyJtJMoTuMzgD5qUVY8RnP68gcivj7": [
       11,
       0
     ],
     "4GjtX5WVWj7qYZnbWLxs2KbECc1HkjMuCenoQKhv9cod": [
+      1,
+      0
+    ],
+    "4HXb7ivgvjbHC3TBesmmD9LovH8tmTv9DZsq12GMvEpU": [
       1,
       0
     ],
@@ -11694,11 +12764,11 @@
       0
     ],
     "4TnayWRQizk4RpxYLusVLKumJooSWRDRAzzwKRELbCRK": [
-      12,
+      13,
       0
     ],
     "4U2rcvmTbFDv9NKrBcanQcohddykpBVbp8y9SEARsJkm": [
-      1,
+      3,
       0
     ],
     "4UhjMQNng6K5MBz2Z4uJ1H8oAAUX2ZYWPyx7BcvVCP2d": [
@@ -11730,8 +12800,8 @@
       0
     ],
     "4afpNX19JZb5o9WUDKjTVTBMU4TWXyW85wXsXcnW4LDC": [
-      16,
-      11
+      18,
+      12
     ],
     "4b3a8s1ySTtDurS7fJD68cw3oUoc7LjPmUcsSiem83au": [
       1,
@@ -11762,7 +12832,7 @@
       0
     ],
     "4kgP66iRUa4fv7Td77cuuii2baAzZtzPEy13QvTQ9TGq": [
-      10,
+      11,
       4
     ],
     "4kjM7pGAzDvRD3UTZqpneV7Px1BBTLCTXdRHvKzvtnLC": [
@@ -11809,6 +12879,10 @@
       1,
       1
     ],
+    "4tYHhUu4NJs4mRMgsFzNEHPuHGrpeW1ge7ayZypLQN9N": [
+      1,
+      0
+    ],
     "4u5cCwTS4ZuXeZpoT9PvP2V5Gs5dy5f6e3RydkC6G3tN": [
       1,
       0
@@ -11836,6 +12910,10 @@
     "4xY9T1Q7foJzJsJ6YZDSsfp9zkzeZsXnxd45SixduMmr": [
       2,
       1
+    ],
+    "4xaBQG4oxQFqFbXyqvTZNREDURHiLFMZhmUJmw6Uos9D": [
+      1,
+      0
     ],
     "4y2W7VE5YPiWqBWMKv51MTKuh7HFadNM282QqmgYZNNG": [
       1,
@@ -11870,7 +12948,7 @@
       1
     ],
     "54md8NmG6WMNpdDP3YsicvsNCsMM7RRsAr4wUwJKJ4Sg": [
-      7,
+      9,
       1
     ],
     "556FY1aMvA8bEa4V8WmTAqMvnaUeAVu3kfSAApUBQHEC": [
@@ -11882,8 +12960,8 @@
       0
     ],
     "55mTsu1FCfC2CPUWVGczAtsVrwE99Nfy7gZHsdFUipfs": [
-      7,
-      1
+      10,
+      2
     ],
     "56CNiRtDgHRWWNJ9Wt59jPRzqYqHbfjw9qrwBQsRmbJf": [
       1,
@@ -11902,7 +12980,7 @@
       0
     ],
     "5BFuw7KyK5ryyvBwv4uJYwwNMnXPqGJGcf6okqtnhmFJ": [
-      6,
+      8,
       4
     ],
     "5BHshrizdigd2ackNWcKzXviDdbNTxsfbKNK2Tvu1KKA": [
@@ -11942,7 +13020,7 @@
       0
     ],
     "5Evyn77ib4bxpKAMNvzoNDgLhBjFSLxeePaZpWeCqTWW": [
-      10,
+      12,
       5
     ],
     "5Fq8QzSJ6JpvWr9rx8CNWig1FEF5cTB4Zus5q3iCjj1j": [
@@ -11974,7 +13052,7 @@
       0
     ],
     "5LzmN8VvSEfeC67qfBMd6fNvnsZ48SaGGGg93wzdG9N6": [
-      7,
+      9,
       0
     ],
     "5M3jPJtvJXQMVeUMi2gaEF4XtJopH7PBR3oLRYnyDBVP": [
@@ -12126,8 +13204,8 @@
       0
     ],
     "5nTHhFwipNhtH3FfaBCMVZVdiHpyDVZ5Dh6ZiuzCSYK3": [
-      17,
-      10
+      19,
+      11
     ],
     "5o5vGxrLPzFNGomVpE4PNRPQZd7yqChaLAMRTZpppSZL": [
       4,
@@ -12177,6 +13255,10 @@
       1,
       1
     ],
+    "5upJwedwxNGdUY8dhTADy2gGVT5SkhdQ8ca6TZi1MXQU": [
+      1,
+      0
+    ],
     "5wz9yJ3UtRXWDF1d2uf3ZwNZF9hbFUdaERxZhgdPoCp8": [
       1,
       0
@@ -12206,8 +13288,8 @@
       0
     ],
     "64J7BwLw4cLVHfwRQLxzy14o78hpdDsf2fPLHqxKpQxn": [
-      1,
-      1
+      2,
+      2
     ],
     "65LPageBC9c3jZVdfqXkp9QNQdCvZSceqLiAPrgm3E5B": [
       1,
@@ -12270,7 +13352,7 @@
       0
     ],
     "69nfXaN7qkvX1MegsdjFrjgMu1LjjM8pY8wA4XT3fjzN": [
-      1,
+      2,
       0
     ],
     "6AH4TCNecDbpETQMbmgxyJnXAQuXTCyM8eCNdsB9KTu7": [
@@ -12300,6 +13382,10 @@
     "6FsMeLpCPooCeHjmeMED2ZeCwwWhgzCXPzm53KMBgcMp": [
       2,
       1
+    ],
+    "6GFWQScCfNNc1JuAH8GgR7AwzyTEPccJLkUrpFobU2iG": [
+      1,
+      0
     ],
     "6Gk7xoodXowut2Ts84vJpbEcSem716c4NNniJcsrgTd8": [
       18,
@@ -12334,7 +13420,7 @@
       0
     ],
     "6MX6aPjPykHxhzHZzqYd48k9htom5Rxdp2BPCZ4WPMhw": [
-      8,
+      11,
       2
     ],
     "6PbKPsFDe8AKbnYwJ6nZXP64ypgj939sijhTEtmUrDT1": [
@@ -12410,8 +13496,12 @@
       0
     ],
     "6Y7JH7iDfyPxep6Xet1hUiMQqD6z2cKD8NCgnM2rb876": [
-      1,
+      2,
       0
+    ],
+    "6YbdTU7TQohiV71UEZ4rpB8XyREKogRvffYJVVcZ1ecp": [
+      1,
+      1
     ],
     "6aM7pQvDkXMcpunbUKVfF4sJL3t7MLdboi2zaRZMEuim": [
       1,
@@ -12433,8 +13523,12 @@
       2,
       0
     ],
+    "6ePFAmj6nddaJWdoAgmPd22nGFVqTo9Yu5szqzzWdyPS": [
+      1,
+      1
+    ],
     "6ePbEvTDFGPembAtY1vwLF4CWbTWKFisUE2G2k53tHHw": [
-      4,
+      5,
       0
     ],
     "6enVtjD6ChdKHfAPV7txEwauCoA1UhKv13p94EiYzkJn": [
@@ -12473,6 +13567,10 @@
       1,
       0
     ],
+    "6jXK7cAgCuGPucYLdqq749mvwjk1jX9vz7aZSpWikSYC": [
+      1,
+      0
+    ],
     "6jvnxgLCBL35v39CRhPwed3Jvm6cMBRTn7WRLCEHPu5d": [
       7,
       0
@@ -12486,8 +13584,8 @@
       0
     ],
     "6m4hgG6APhfC724eRmRsJYmi9F6S7KmyTR9gbiHRVphP": [
-      1,
-      1
+      2,
+      2
     ],
     "6mH3A6xtJfnqE8SL8wPDJoJQjffTiTVxP3hLYuQP1Gh8": [
       1,
@@ -12586,7 +13684,7 @@
       1
     ],
     "71kNdNXjLiz2y4kSrntNPuAppoZJ8L2E6JuTgQMK75k7": [
-      1,
+      2,
       0
     ],
     "71qEGi3DJhKUnMKmY8spZRAT1LmU4nnb4NM6DUqPMsvw": [
@@ -12649,9 +13747,17 @@
       1,
       1
     ],
+    "7A6gYB88hmZfQg7h2kmx9nmLvonK5aTgvKnehEssXeFr": [
+      2,
+      0
+    ],
     "7AZdSeA5ZW7LnMYxKP2bM68gjohsDpHqnS3JhidTsD64": [
       2,
       0
+    ],
+    "7AiwgUXVorN5sB8RBS855ayzw4TVoLNTg4PreB1CTo8i": [
+      1,
+      1
     ],
     "7Au467z6UVJdxi7FBTyEGMyjwXWD5cEv2crdBUCcDNoT": [
       1,
@@ -12730,12 +13836,16 @@
       0
     ],
     "7Kd2EVt8KjQ9gFXwryk7s8f2DXokHNJhnMZJQD2P2fwi": [
-      7,
+      9,
       0
     ],
     "7KjtLirkehkm6EhtYEXepTajJ4eKNKt5Vr2yKQkR9XVN": [
       2,
       1
+    ],
+    "7Ldwns7GXo6FwZSjz3xnRFB8xEcLj7pkkikfduFHqfn6": [
+      1,
+      0
     ],
     "7LfDVtrzLL2qnfppAVMbWfdYJBUtpU9Vw3WrKaLoGmJ7": [
       1,
@@ -12769,6 +13879,10 @@
       2,
       0
     ],
+    "7QZa7vBBhm64jaRFbs4KV7fB6ptJLMEHndBugAf2FioK": [
+      1,
+      1
+    ],
     "7QjjD8MuxMMX8FKfV6Mkpm9V17qouFhJtPvh416PMb8D": [
       1,
       0
@@ -12801,6 +13915,10 @@
       1,
       0
     ],
+    "7UTQ1iXCzsmzJFP7b3otwwDmcT6FEPjTEynDisXmMHS3": [
+      1,
+      1
+    ],
     "7VGXnqQMoQaXZq8sfm2uQqLf6odGwLemp88fxhqZrgjs": [
       1,
       0
@@ -12818,6 +13936,10 @@
       1
     ],
     "7YR8az7b2GRQ4FMhxVdmPfD1H7L4X85AXqCQcDuWWaKn": [
+      1,
+      0
+    ],
+    "7YXs9WRcZbViTWQ1Mg6hyWVSphFuNPhaujz9SmLcQAvv": [
       1,
       0
     ],
@@ -12850,8 +13972,8 @@
       1
     ],
     "7cWpF6NeGueFa6JXDrTQmApinoHjyfsh5kaAXDaeoEy8": [
-      2,
-      0
+      3,
+      1
     ],
     "7cayU5GACSogMZyFmwnmksb5BVAFv9jyjUsUcKR8jPGp": [
       3,
@@ -12923,6 +14045,10 @@
     ],
     "7nroKK5QXL6XahVnNN1TBp6YKNi2et7uLAnZnz9NvqBP": [
       2,
+      0
+    ],
+    "7o8nbB1jC3oqiZ6YD7UgDyYFweLmysnyLKXsLiSkNapS": [
+      1,
       0
     ],
     "7oLZPaRkko5FuEiHrEG1UKS53BVcVaeNf831bNX3o8do": [
@@ -13001,6 +14127,10 @@
       1,
       0
     ],
+    "82vSmBTzNKY6UGM6xGxfkZw2i4cKdnDXy2e1HZM7Rxwd": [
+      1,
+      0
+    ],
     "82xneXKcQqY22B6dm4jHYrmhDaFeDvYHmigEeWKx4wJ8": [
       1,
       0
@@ -13050,7 +14180,7 @@
       1
     ],
     "89ooxuy4NTf3UNswCsjXx7fEd2WtJasaqUQbcrMUsPrm": [
-      12,
+      14,
       5
     ],
     "8CAKbZck2QFiqMyaimsd9adUko6XJ9rt3wk9PNj8AQk4": [
@@ -13122,7 +14252,7 @@
       0
     ],
     "8NZq6z8y5697n1iqAqCHSwAKZeiT4M54JdmQ6rAjCJB1": [
-      9,
+      10,
       1
     ],
     "8PRKEUv2R9uoinpMmxJCPDNqb2jWZd5wzV5mQVqvSUsG": [
@@ -13138,6 +14268,10 @@
       0
     ],
     "8RNkDLN53VyetT4LkKtpVaQ2qavKiHtvYMak4cqgWWzb": [
+      1,
+      0
+    ],
+    "8RmY5qt2p3AhqgD3iFcmEYsH1urH219SyW6Lc4xEToyf": [
       1,
       0
     ],
@@ -13185,6 +14319,10 @@
       1,
       0
     ],
+    "8X8vgaiom3yqi1CVB5BLgXuXotSuEvVyaY9rXcvmSSwJ": [
+      1,
+      1
+    ],
     "8XJEFLNa7frpvJMVb4WQmCvvDRRoyiyrWk9nXxTTGXgG": [
       1,
       1
@@ -13206,7 +14344,7 @@
       0
     ],
     "8ZUm1sUGyz9D84j8qSFPW4YGTrXmS1XToV5HiAvhbGvr": [
-      4,
+      5,
       0
     ],
     "8ZatX3uYfVxH1emrDQd3erxwGsX8tdrqxH1mHiKh3GCw": [
@@ -13234,8 +14372,8 @@
       0
     ],
     "8cbC7zwNNVAXGqEiB64bPJheSr3yVcWysJHgt2sMLjBu": [
-      1,
-      1
+      2,
+      2
     ],
     "8deJ9xeUvXSJwicYptA9mHsU2rN2pDx37KWzkDkEXhU6": [
       1,
@@ -13298,10 +14436,14 @@
       0
     ],
     "8ki679dZgE8ozmGVKBzBbBqqby5CToRfqzAoKYx49aNX": [
-      14,
-      4
+      15,
+      5
     ],
     "8kjh4f1M4aqj41XVYHht3N6XXxBjJYzUcVDzmmGgtxPu": [
+      1,
+      1
+    ],
+    "8mJYooQfrVG6JgvUXF6VRtX5nb5Z6ikjsGm4RFtpmAri": [
       1,
       1
     ],
@@ -13417,6 +14559,10 @@
       1,
       1
     ],
+    "91RpCePwmwCvSq5FjnBLvzCG748rMu4xcCCoxLedfejs": [
+      1,
+      0
+    ],
     "91Xro6h15uouBHfoJeqKNrTpxJzhJNQYg8RFw4tW4na5": [
       1,
       0
@@ -13481,11 +14627,19 @@
       1,
       0
     ],
+    "9Bu28pBeehABzWyW6CNJxhzh8M2qKDsqSmPN1Lifbzqu": [
+      1,
+      1
+    ],
     "9CaViPX7cVVUoed1JRYQNwepR5viJsGCy7uc245DQaim": [
       3,
       0
     ],
     "9DA9odgijUGXVARKwuS5dwA6AG7WsrXkJaz6ULnD8vN4": [
+      1,
+      0
+    ],
+    "9DgHKGFtRTvXRG4fbyXLp1gr7YayQbNVP3huWGfC2fLJ": [
       1,
       0
     ],
@@ -13502,8 +14656,8 @@
       0
     ],
     "9F53CDFZuUSizMXNzoT9SEP42xwLH5J5C6AFegYPJA5U": [
-      1,
-      1
+      2,
+      2
     ],
     "9FQnf1QFTg8TZ6AJEffsfa7CNQJGALecmPtkYoTYUPFj": [
       3,
@@ -13565,6 +14719,10 @@
       1,
       1
     ],
+    "9PAzcvFQmWiqGxEb5F87VakoZqk24MChwSNneCgfNPYW": [
+      1,
+      0
+    ],
     "9QpPzM9SXQPJpKxdRWU5qCWNcGn6PdLtYZvMSXSjmteJ": [
       1,
       1
@@ -13588,6 +14746,10 @@
     "9W2JNrQtT9Gp6HfoZAd7xTvpWNPg3pPzM8Ju8e9p5jp3": [
       18,
       6
+    ],
+    "9Xv5bAvPk4czPGMeuWeR7BJCWuNDeJ9x3QE5VqDYN4z2": [
+      1,
+      0
     ],
     "9YFoJvBsQEBWr4e2xBBabHvw4vHPFbzKxrrnP6N5rcvD": [
       1,
@@ -13614,7 +14776,7 @@
       0
     ],
     "9gYpkT6B9YZcXXkpN1zkLgtBFgzK23pzHwEq8DaoG3Jx": [
-      3,
+      6,
       0
     ],
     "9gjtCVWUPNbM7r5zZ7d8opKUCECTU3fdQA8j9GhZXEui": [
@@ -13650,7 +14812,11 @@
       0
     ],
     "9p6f4N7t7eXyFk5Dr6D7iM631Z9pjZi99uuYQ7Eo58LY": [
-      5,
+      6,
+      1
+    ],
+    "9pLLE2nufaRGyRDUExMFnQkFhnEoNAUDBKatj1cV4gkz": [
+      1,
       1
     ],
     "9pLLd2ceyWYSFQUc7zjXGAgdDMSqb5ms8yNsBkXccgNR": [
@@ -13658,7 +14824,7 @@
       0
     ],
     "9pdYXJGy698VVwMacH19fd5yBCy1Yq2HdfXE1M4WYTbR": [
-      3,
+      4,
       0
     ],
     "9pwNPrc94X18tGS9ZWRLKBZtBaFQJKuLpizdeTpqvfmH": [
@@ -13697,8 +14863,12 @@
       1,
       0
     ],
-    "9zBdfmSRhk84TRRfJ6pGeGbwU8VdvApfGr14KFywt4rP": [
+    "9ygmSiDMic7iW3vT7mYu4L9VhY2aBWERJFou4UXxT4Eb": [
       1,
+      1
+    ],
+    "9zBdfmSRhk84TRRfJ6pGeGbwU8VdvApfGr14KFywt4rP": [
+      3,
       0
     ],
     "9zmrwsvM8xmbejLdA3XqXqVYpvEGRbinEbNXr3geCA9A": [
@@ -13726,7 +14896,7 @@
       1
     ],
     "A222GV8NCFRu9N3xPYk9HKXEzXJrBqamYxdZqoYAuQhd": [
-      10,
+      11,
       2
     ],
     "A26MWyyV8cxSMi8Aohj4ZyhH5uKEQxhGo5e94kAMxkCN": [
@@ -13742,6 +14912,10 @@
       0
     ],
     "A3WfsKCg1QBrJ7amkdXSHqRmJHMj1dxBRAW1t6DZoNbs": [
+      1,
+      0
+    ],
+    "A5CKQeJQeAVVK78t8SRW6py3jszBN83sX9H7yyhggYu1": [
       1,
       0
     ],
@@ -13846,7 +15020,7 @@
       1
     ],
     "AMDEmVocLtN5ji2gBY7BrmSHEyM5vt6TGszBbg4crMXg": [
-      45,
+      47,
       5
     ],
     "AMHswPpjoG7JVa3p21bqzLD57vrGUeRPvpnuP5SoNZUR": [
@@ -13874,6 +15048,10 @@
       0
     ],
     "AS9a2k7k1Sum1LMpeZkgskebAUkGAQaTFNvnv1BwYoeT": [
+      3,
+      0
+    ],
+    "AUNArgHkYd6miq9uYhjHU5XpA8opMGEmHV11q6dbNchy": [
       1,
       0
     ],
@@ -13913,9 +15091,13 @@
       1,
       0
     ],
-    "AaNmgcFtXYxaYQn22RdJroZYS8s6pVG9PvbFaDfTZ2JZ": [
-      2,
+    "AaDKP3FLuZ2RgwzKw83RpdnpABAhAEK1ZWcWthftZzmq": [
+      1,
       0
+    ],
+    "AaNmgcFtXYxaYQn22RdJroZYS8s6pVG9PvbFaDfTZ2JZ": [
+      3,
+      1
     ],
     "Aanv53VYxVzbBPM7K5JGzf8hGAG2Tnc8PsPbQjPraFAM": [
       1,
@@ -13982,7 +15164,7 @@
       0
     ],
     "AgqvEVgkMSMibDaSUYTQz9WvARjEH11rEj34V4YxXbhs": [
-      3,
+      4,
       0
     ],
     "AhpDeSLiW2K29THsrFtiPxDdE8Vib8SAmoS4wWESPKBq": [
@@ -14001,16 +15183,24 @@
       1,
       1
     ],
+    "AifWvJ7QpncToNJdsaCpzQezFNZG8UeGMjdm9ToKCEUs": [
+      1,
+      0
+    ],
     "AixiMshyuyfZTs6wqB4iNKAU5Lx348mU5gDggYLog4dh": [
       1,
       0
     ],
     "AkSxkjXaPY1kg8jFQArTQhPuZR93Ceh5vMCVJV6HoX4A": [
-      8,
+      10,
+      2
+    ],
+    "AkefHZVkGeRyczf4QaJzPJV26VMAZ11GC4VniNMYcEVF": [
+      1,
       1
     ],
     "AmiGTWibR8NmKE5FGgtcLGFr5ou7DgDq9eg3i82esoBm": [
-      1,
+      3,
       0
     ],
     "AnXj1BAhZ1Mco8jWwcVZhpz5bnmtX23iX1SyAAtjKAUJ": [
@@ -14054,7 +15244,7 @@
       0
     ],
     "AufH68UFBGSVVRL9D7u5W6NySCrukL4fWfSRTxDcJC6u": [
-      4,
+      5,
       0
     ],
     "AufzvhHHWLs6BRFUhHKA2BhzV5T98f2LPYwNw8b92RN6": [
@@ -14064,6 +15254,10 @@
     "AvBd5Ekkfa2PwW1xT4AqHsjFcdoVX8Wb7brwzMBN5bQJ": [
       1,
       0
+    ],
+    "AvMy8HRHXEEcLb8opguuXJhFHdRpitN9zoUKYiW7vsZT": [
+      1,
+      1
     ],
     "Awe56HCTehJ5gfFqdpTgS7L7k82zEYxZGPfjuKCf4gsp": [
       1,
@@ -14088,6 +15282,10 @@
     "B32QbbdDAyhvUQzjcaM5j6ZVKwjCxAwGH5Xgvb9SJqnC": [
       2,
       1
+    ],
+    "B3do6rNWjJbycnSAhSTgJETK7CnPVHxXwHcGrWymQW9M": [
+      1,
+      0
     ],
     "B64cv1PTHhpTFhjHpAfBS3EjPvEhyWkHZFNCgqErhc2C": [
       1,
@@ -14118,7 +15316,7 @@
       0
     ],
     "B7v2xGaFp6h6iDAaDs4nDJb46o7v5244x6EkUi4WHBnB": [
-      12,
+      14,
       5
     ],
     "B8PY49Jrux3V45eePn6dnigusVg22k2LBuDtzqSioxu7": [
@@ -14161,6 +15359,10 @@
       1,
       0
     ],
+    "BDyoBnsKAYVRuiAbVvYbmEHcVjCW7QrF4K2tEBuigSgC": [
+      1,
+      0
+    ],
     "BFskFj5bjg9cVAgXKA22F7M7zU4foNHfRanT7KTBkR6f": [
       2,
       1
@@ -14189,6 +15391,10 @@
       1,
       0
     ],
+    "BL5rpTQStSkBGECKGe5tYESQr4S21x6Tg5q77hcyDKEd": [
+      1,
+      1
+    ],
     "BLnA72XN7Jvt5oPZXXnpXYQzwsuqYJ2x511nZ24wRfr3": [
       1,
       0
@@ -14201,8 +15407,12 @@
       1,
       0
     ],
+    "BQZpcces7QgDiyD6YvZ4L8z8XXS3WsnJUH6m9mai3Kza": [
+      1,
+      0
+    ],
     "BQgx5U4ggeqb2dsSMcvk5qEZAVBTh3LzMp8QbXJd2Rhx": [
-      2,
+      3,
       0
     ],
     "BSYktuyD8ARGgLUYgHys6Tzg3fEiExacV59APuxQSAKj": [
@@ -14274,8 +15484,8 @@
       0
     ],
     "Bgcrbz4BvTdajCbRgAKbwVU4hQcHPYy9Nk5rL9xpA8eu": [
-      28,
-      4
+      36,
+      5
     ],
     "BhaTqNzmSZpsmRKAsXSeN5ZQ8N9zrXVCF1vkdNEAmYgD": [
       1,
@@ -14305,6 +15515,14 @@
       1,
       0
     ],
+    "BnDzLEesuH4wwbeZ3ZTNpuCth9Hx7ZaLfAzrtgcjKCN8": [
+      1,
+      1
+    ],
+    "BnFJe7anmakgWftK39B5zca7hXya347FRnBoLiy3yLXr": [
+      1,
+      0
+    ],
     "BoEVpctnMRtB7XhaJ99gNRGhP88HojtPvJ76BwX1gUwQ": [
       1,
       0
@@ -14322,6 +15540,10 @@
       0
     ],
     "BsZnFjpGcWhQQPUP86b1A1moyXmENGGRBmM3xXS8KXXo": [
+      1,
+      0
+    ],
+    "BsmDunQ6zfVvARUzzKMzLcDf2ft1Mx7GqaLmCqjbZvNJ": [
       1,
       0
     ],
@@ -14386,7 +15608,7 @@
       0
     ],
     "C5EMTGGE87SqLyuvhShLDMj2jUBwqBLJAZF6ybK8Jyqw": [
-      13,
+      17,
       3
     ],
     "C6ccQBA6STzJh5NRoAtsbpoooxe1GZyyCxc16qaZeCgF": [
@@ -14417,6 +15639,10 @@
       1,
       0
     ],
+    "CBcNrPBRRiMgihLCqbjfUDJGepyeYoeP5B8HrH2PD5vy": [
+      2,
+      0
+    ],
     "CC3JyQA4oH2LH9FxJcWKjLVsohhMnVxSDdJe1FtcNvrT": [
       1,
       0
@@ -14434,7 +15660,7 @@
       1
     ],
     "CEHwoJ7fGGZr6KgDWw4zuVvC6mXuNx7wKn56NLYkAuhF": [
-      7,
+      9,
       0
     ],
     "CEbqz8o3i68J4GRiJYeBKCYhSkhnccwZzmcyFi7Y2dKv": [
@@ -14482,8 +15708,8 @@
       1
     ],
     "CPtcyRHTDzy3i7UQDAQyuSAFBEAETuJVTvYVktWHpYp5": [
-      7,
-      1
+      8,
+      2
     ],
     "CQ4bEZm5sCDHJkY3eWXdAarhBZNNqf6rL5eZQrA73g1e": [
       1,
@@ -14514,7 +15740,7 @@
       0
     ],
     "CWCJECCdXJgT2iHGCeTFip3a3kw4BYTspfKUsdhA84A2": [
-      9,
+      11,
       1
     ],
     "CWUqhP2gq49fxJqW99zjQptZStvTWDV1XwrtmSKTf49p": [
@@ -14528,6 +15754,10 @@
     "CYuTY8HvujuLPnhDHCD5ZZbGLbLEGR6x97RafioJjoBU": [
       1,
       0
+    ],
+    "CaBjQPwsvdWkCEQqaf3g9USpNcvJPXuy6Wk3tmWj2UEy": [
+      1,
+      1
     ],
     "CaSQy3FzgAK3sgALbd8iTETgAQfuzABZKBwNJX7L3x66": [
       1,
@@ -14564,6 +15794,10 @@
     "CfZVHRuq9C5thvQNn8vnXNWqAoHdrihb66iRgkwYcT8y": [
       2,
       1
+    ],
+    "CfdH1e3yiGBVTJo2Ph9MgmBdK5cj4Mo3VGQF8aYQ4yHG": [
+      1,
+      0
     ],
     "Cfdvd2zuHYuoA6k5tZ1zpx2XrZZYhLYghVShPCJjeJbF": [
       1,
@@ -14621,6 +15855,10 @@
       1,
       0
     ],
+    "Cqz25PdzrWw4eS5Tm1HvKiN44j9ZBp8UeUF7iNnSPyhM": [
+      1,
+      0
+    ],
     "CrMfXJLWvZFMa9WniHR7vkLF4aNkAXd346JYrk1UXbZ5": [
       1,
       1
@@ -14662,7 +15900,7 @@
       0
     ],
     "CvQc2TWe4BPJFQS99qFEUfG71Q92N4EWyxcirJ2MUpsv": [
-      4,
+      5,
       0
     ],
     "CvohYM1EEdvAY1tQ4gqL1UzF6HiJn4BtYnds5gd4wYAo": [
@@ -14726,6 +15964,10 @@
       1
     ],
     "D5MGjAEPtEiRzQ1YWGbYC2Mpd7PXmxMwiZn9W3yV8UsX": [
+      1,
+      0
+    ],
+    "D69cRZmPADKC8x4EZnSU4DaLw1qk3ogGx6AfkYuu8Zve": [
       1,
       0
     ],
@@ -14821,6 +16063,10 @@
       1,
       0
     ],
+    "DJQwtiowTJmAvAu4vhCaFgPiS3nnKD5r5agZgBQEdHK2": [
+      1,
+      1
+    ],
     "DJnQfdQD3uR4q21kdjtrcb5qEbcZVU55AsyeTv7tiGzf": [
       11,
       0
@@ -14842,11 +16088,11 @@
       0
     ],
     "DN9LKrJffsCiTfFSKQR9CzBN6xNRot4SesZd9Fp34YHE": [
-      9,
+      10,
       3
     ],
     "DNk4U4vhCk589X28q1TAiaKym3h1acrYQ1sDswNNZdy5": [
-      1,
+      2,
       0
     ],
     "DPWGVLxMNshPZ31FGdCkhgLPxVS8YbknH1747qTGL8be": [
@@ -14886,12 +16132,16 @@
       0
     ],
     "DU12mVzvKa7n8L9uLZymJ1739Ww4gXfzpjWEckeXYAv8": [
-      7,
+      9,
       0
     ],
     "DVVc44kdvH6BGLuH6UZ4hidxRGwyZQoi3oKW4NiZy3VU": [
       14,
       2
+    ],
+    "DWmK3GhiTpAYiNwtNT8akgho6edyezJMLmxBCvA9u9LD": [
+      1,
+      0
     ],
     "DXecKtd18G5jz2vXchwpHCm1gHxFRy8kvr7Mx69PT7he": [
       1,
@@ -14949,6 +16199,10 @@
       1,
       0
     ],
+    "DfG6UhpaE4kXTi6qFWp6n2FLV1djoZQ5YyD7gqbVPscU": [
+      2,
+      0
+    ],
     "Dg3oFnB4mqsSZXjdGJdbUGEjV4oa6zZN48GrB8AXqrpu": [
       1,
       0
@@ -14978,7 +16232,7 @@
       0
     ],
     "DmH2DZW7PrZKFyDC7wtSPZfpyakfktXpWMno8GygwcW": [
-      43,
+      45,
       0
     ],
     "DmPsmBUhqiPcpUs9PJB1dmmwBACpC8dUbWFAfZeX8NZQ": [
@@ -14988,6 +16242,10 @@
     "Dn2GsPEpq1XpjbTfzcaH6v84LcoNsNy2KWh8igd4zMpJ": [
       1,
       0
+    ],
+    "DnkLKQtYXi4LHRhKTnWeExNfSE2LZyadAiUnQVdHnBNg": [
+      1,
+      1
     ],
     "DpBUrt6HsNvdPXV7eXGvfDZsUD9QLQZvYdno52YqtffV": [
       8,
@@ -15006,7 +16264,7 @@
       1
     ],
     "DsKi6KALKMRfV1kGjMpenzVAfD5mZydJt5W6jVzeXWbG": [
-      9,
+      10,
       3
     ],
     "DuNkqb24ofMNmSVjXVx8qGdYLsVmziFrrn4HBG27svh7": [
@@ -15026,8 +16284,8 @@
       0
     ],
     "DxhpC9c4kGkYJR34xUrfFeDx9vwb6yoHUMWrTCZybwtH": [
-      20,
-      4
+      22,
+      5
     ],
     "Dxis2F7p4LLbmA1XANAY6AVo4LQYoyqrgE42vRzXi9z8": [
       9,
@@ -15070,8 +16328,8 @@
       0
     ],
     "E3ybyU3jr8oyZqGtzxAGHjrF1qEjHZT63b7skXUjwi2i": [
-      17,
-      10
+      19,
+      11
     ],
     "E4B87Ta1vfFNheCTC7h6NXQSCXGULHJuhaxqVJaBkoBB": [
       1,
@@ -15086,7 +16344,7 @@
       0
     ],
     "E7Goe4BqN9rSqzCwwWHs2s6Cf6XDYU6JxqGGWd2a4cHt": [
-      1,
+      2,
       0
     ],
     "E7icimjJJLdkct9ty72shtyEBA7XD6YLY5wy48wk6TmS": [
@@ -15149,6 +16407,10 @@
       1,
       0
     ],
+    "EMAozawyYaVAKjJCdVhTiVq4tTpdtFsuE22WVK8WEp25": [
+      1,
+      0
+    ],
     "EMGCwXs7S3iLq1nFGGx58r6EpMtto5DonzAz9eMMnkAG": [
       1,
       0
@@ -15174,6 +16436,10 @@
       0
     ],
     "ES57DEkjmVRok5L1wopTY6gxwwVoAVuBfiCPCJzfXXnR": [
+      1,
+      1
+    ],
+    "ES6vaUBvbbLv4ATk2gVfHdkf2FgY5H6iD7zu2PV5HTtG": [
       1,
       1
     ],
@@ -15213,6 +16479,10 @@
       1,
       0
     ],
+    "EcQMBs17Uym8AVLXSacvjPz6xBoayjZjGtKUMPDXF7Xg": [
+      1,
+      0
+    ],
     "Ecu9jadE91d5y5raQj4ASPGWRyDMqb4461CCHs7s15Cz": [
       1,
       0
@@ -15245,17 +16515,25 @@
       1,
       0
     ],
+    "EiARpY3ySYhBUxhVpDENLDobn56azHPEZeP6ExdNk4TQ": [
+      1,
+      0
+    ],
     "EiPD2jyGgzyFxRnv2fz5HpmgyZt4KGJk2pYCTqyE2Rrz": [
       1,
       1
     ],
     "EnVLuTsWE5xB6wBWBBjux9gVqoxnkEVv7dkGBmLY8rS1": [
-      9,
+      10,
       3
     ],
     "EnYrTE5RwamrZA2omCJ1wQYWrA8YsYRBPc8SzHtBLRcA": [
       1,
       1
+    ],
+    "Eobskz6FzJRHz4Wdc9Q3w8FVg19XfjRPA1YvkfybH9Wj": [
+      1,
+      0
     ],
     "EokZKwTCbpZQCjb2nWpFEjP1j2zjrz3cfaFMfZdeB7SJ": [
       1,
@@ -15270,8 +16548,12 @@
       0
     ],
     "EpXF8MzHZjTAdNCCk7veUGojfvKnFJzk8kMjMHCJxPBL": [
-      6,
+      7,
       1
+    ],
+    "EqL7TdciE12gsoLkTc5nif8w9LBUPSWsBjLN1TJCRVv5": [
+      2,
+      0
     ],
     "Eqpkom7SbqiUNZnD6bJdo8zD7pcLfCCZSggmrGT8Mpma": [
       1,
@@ -15298,8 +16580,12 @@
       0
     ],
     "EtishewfPpdydKkjaSxes1JjeGsSmULyg982fq11LvxU": [
-      16,
-      11
+      18,
+      12
+    ],
+    "Ettfnx5XYZAdzP7153jJGGrzE6uec1ETQVuz2AwLx7Tb": [
+      1,
+      1
     ],
     "EtzLQ7oERnMXoKCwzVqFBLZzN9F2aRLuhk81oLANaFvf": [
       1,
@@ -15361,6 +16647,10 @@
       2,
       1
     ],
+    "F22heo67JcivQk86utfqCCQrH1BdhatLtax3PzGVaQ2v": [
+      1,
+      0
+    ],
     "F3auAejtPLunxHBqZ8LVsXUvodSRqH659VyWJ7uULyjG": [
       1,
       0
@@ -15381,6 +16671,10 @@
       1,
       0
     ],
+    "F5XvCe4233m6mHRbkkq2ZsFvqrPAnRrDBExeQy2fwagQ": [
+      1,
+      1
+    ],
     "F6TQbcNrPMzTxQCBDFcrJeGEa1vJ4CnD3KU3wHf1FgR5": [
       1,
       1
@@ -15393,24 +16687,28 @@
       2,
       0
     ],
+    "F8WeeKs23KfjPNXaG3N3Un6hKwNxnrmq7D5kp9kz3M87": [
+      1,
+      1
+    ],
     "F91RwE999KbvvKBgofBgv64bQ6PZpw36KBRLtFRi5mgn": [
       4,
       0
     ],
     "F935djfRr8owAbjvwRCtv3Jtmac7g2wJjFX2uSZs5woV": [
-      1,
-      1
+      2,
+      2
     ],
     "F9ES7T9wgAULhyTHzmqgnKXS4MoTtNXNaKWLmCbsMN6W": [
       1,
       1
     ],
     "F9xWoAsW3Ci93EqbM9wDuABYDgaxkbDyLwGcX726f7Xs": [
-      2,
+      3,
       0
     ],
     "FAHMvDeWBEBe6fG653ChW7suaLVMQboS3hiaNqpejuBF": [
-      9,
+      10,
       1
     ],
     "FASqTHRxR37w3MqATns1jSWQxyt6XiesYHFA3eC3eEVr": [
@@ -15474,7 +16772,7 @@
       1
     ],
     "FMYZnTqYPo4d6CyAG4UGVFhHVfoP1nLvtKiLN6uSFiHD": [
-      6,
+      7,
       1
     ],
     "FNJWSPP53cMNftwt2mpX6zMLKV4fcWvA3ipM8Sy7e9GK": [
@@ -15497,7 +16795,15 @@
       1,
       0
     ],
+    "FSEXGWdLEMYfMg77w5H7FcCi6LDZineYyyP1zmFXcnh4": [
+      1,
+      1
+    ],
     "FUeRbAxedqNsEBJQkPxVC7EoDTDSurs84MVEoVwYxhJ9": [
+      1,
+      1
+    ],
+    "FWSRcaWZZuMV3oSepkqUxCkv2RJJWEW7us3ioQbJCkQp": [
       1,
       1
     ],
@@ -15578,8 +16884,8 @@
       1
     ],
     "FepdTeDw5dTveciEK1o718UAU5kqiJBv1etn8fZKvbV4": [
-      17,
-      2
+      18,
+      3
     ],
     "Fev2anmUmfZ9bAigaGiJUgKoPXoA5kaa7vdJ6w9wjW2W": [
       1,
@@ -15602,7 +16908,7 @@
       0
     ],
     "Fi9fjEmzM7ieUEwT5LtFiYBrnz8EFYFYSqgZg5F2T8T8": [
-      14,
+      16,
       2
     ],
     "FiFawHqxeTVBhv6YbqbLwDVuvokRpPUM1bNwAyxhGc6W": [
@@ -15737,6 +17043,10 @@
       1,
       0
     ],
+    "G2jBYYLd9TGEvhTM5Ei3z8cy3ew7ouZsJrwCzPAgixMz": [
+      1,
+      0
+    ],
     "G3HoaipVoFZ66pEbHDQLigPeWwVTiS1bZfhNzKBDbrpV": [
       1,
       0
@@ -15841,6 +17151,10 @@
       2,
       0
     ],
+    "GHoA7nqi1aq6azqBYk3yVsMXweyCqQoQCt4kmnevFeCL": [
+      1,
+      0
+    ],
     "GJA1HEbxGnqBhBifH9uQauzXSB53to5rhDrzmKxhSU65": [
       1,
       0
@@ -15877,6 +17191,10 @@
       1,
       0
     ],
+    "GPA1gHpKmw5j7YDBR4sPB1eDuX5ZGYNGoZYfJ3T2YfU3": [
+      1,
+      0
+    ],
     "GPLmVnDTjo4f6zsKQLzuzvqRouCNrnA6LPJyGw1iL8aW": [
       1,
       0
@@ -15884,6 +17202,10 @@
     "GRnaVVksAmNAXCUyE6MvKMUmRiyLhh32kqndP9x7sHd1": [
       1,
       1
+    ],
+    "GSBaedtpVHYP6u8kPhyMUW4DHazAsF8FnoHG8xedYbvn": [
+      1,
+      0
     ],
     "GSGeKUrkfAF7e7x2gi7SiAhq2cq87YNGJko5g8FopCQW": [
       1,
@@ -15910,8 +17232,8 @@
       0
     ],
     "GZ6L5jrbrYpcwHrRF15LJdps4GWA3K1bwQ47YZ8V79B7": [
-      14,
-      3
+      17,
+      4
     ],
     "GZAW7eAKAuRETckkYYKbCsq5w3dF4uRXgV5hUcpkM8yC": [
       1,
@@ -15933,6 +17255,10 @@
       1,
       0
     ],
+    "GbXCFdo2DCnXF9NHUatXGq1uZAVizco9jdztRmwwnW7U": [
+      1,
+      0
+    ],
     "Gc6hj9VGvoXCq2eiwRvRSkcDBFV3dTQzeHE7RWs2sGSG": [
       1,
       1
@@ -15947,6 +17273,10 @@
     ],
     "Gdq1W8zG8sjovy1nBmCrY1XhqB7o4eDLjXsPmz9qTccS": [
       2,
+      0
+    ],
+    "GfMGfVKNLVRs7HUAKmRiYMs5XvXPTofYRfWWKDGUHc6f": [
+      1,
       0
     ],
     "GfV2Fy8AxqLXT7BoP8JfQMM7B67CNG6XytNa1R5Vyz6t": [
@@ -15996,6 +17326,10 @@
     "Gpi2YaWNaViM2SRFcP5QsziGzBbNyDfZsBdmpYLGLTkj": [
       8,
       0
+    ],
+    "GqBp4iKTFT32WHehRhGYgbBzcZ1J93uN6YXe2ogvf6vH": [
+      1,
+      1
     ],
     "GqHFwCf3qCk6WkC628kXwryhzctGTzWeonBdeCRNmJRd": [
       1,
@@ -16066,7 +17400,7 @@
       1
     ],
     "H5YRNkimfzu3VSy6Wv7cyCxwsdsmZQwd6yKtPNu124Ki": [
-      2,
+      3,
       0
     ],
     "H66RBGAoaPuqvv7daVqVt5j4rbgdR1Y4LfVECz264VoM": [
@@ -16098,7 +17432,7 @@
       1
     ],
     "H8bgvrbb1E6WWiyFtKSrWZomkuf54LPcNjVGwoH449bz": [
-      13,
+      16,
       3
     ],
     "H9G2sNMned4TPAVstto7aSyksCJZzzGqDS11aBdPMUtM": [
@@ -16201,6 +17535,10 @@
       2,
       2
     ],
+    "HSMJXr6PSpMLZvXzY8uBJBCXqJnkyDRo1BwuUkPKaVMw": [
+      1,
+      0
+    ],
     "HSNNPDC37tezpHMSsaUazrcvVU5diKMkvpJKu76ToKQo": [
       1,
       1
@@ -16222,7 +17560,7 @@
       0
     ],
     "HZa9Sr7UgvR8tBJinhPJ1sVdQXu95MbEzNaUBg8oNbvc": [
-      1,
+      3,
       0
     ],
     "HZt5ywsQQJcCPcSYKjKcAbpzmgeF49o4S8CMtiCWAf5P": [
@@ -16337,6 +17675,10 @@
       1,
       0
     ],
+    "HrS9cxnEkAaqWRtPhFuB72PHWWEJXK3ZHqDBN7mrmeXs": [
+      1,
+      0
+    ],
     "HrrZQK2WSm4NXSTQQZuYqLTvYiuahVsGjfLsKdLxJqE": [
       10,
       3
@@ -16410,7 +17752,7 @@
       0
     ],
     "J7B2FGTFdh4VXu4dxxFCF28JKwQt7CKECuR2qx4P443k": [
-      7,
+      9,
       1
     ],
     "J7zRyLAu5JAeEx8Axu73EpWbZt3U4u3Tk4CUpbKGSDwm": [
@@ -16438,7 +17780,7 @@
       0
     ],
     "JC1pZZMKAFRLP3FmC2hWH8KfepRjBHxLE1MXmNM9ryb5": [
-      4,
+      6,
       0
     ],
     "JCWXcjG6bTR8y6h9grgV4HucppwvmHLuJadPbi48tMkR": [
@@ -16485,6 +17827,10 @@
       2,
       1
     ],
+    "MyDNxCppjvV4uoMRHqCdzNU9zVeGrMXsRjg5ws8PGwq": [
+      1,
+      1
+    ],
     "NULLioEUhd89Jo5Acm9sX88bwjNjrsAVy6KWkXD7qZh": [
       1,
       0
@@ -16521,7 +17867,15 @@
       1,
       1
     ],
+    "TS6L8kkTUtbP9WDCRbYEjaf1dYx9n5kJfYwJXoacymy": [
+      1,
+      0
+    ],
     "TrkhWzXaUfX95ThvMACGmr3LmwCdvhxZjP9WnoGeT5V": [
+      1,
+      0
+    ],
+    "VampPCKcUxhyW7gJYobqbju4zLSVvPuuRk826Q7dz67": [
       1,
       0
     ],
@@ -16550,7 +17904,7 @@
       0
     ],
     "YWfoY5WUU5Hij4671phF2i9vseVvAVwSQRo3h23yijP": [
-      10,
+      11,
       2
     ],
     "apexpDoPm9ypJ97YoUk6eNiZHZWqqq3Ktgfmv94QAov": [
@@ -16580,6 +17934,10 @@
     "dtrzJPj7yDdvm6eRqBAgxsK2sMJeD9HhBEBB3XMedXy": [
       9,
       2
+    ],
+    "eGdck5R4ogxHu7nP3sA5dmJkNfmkoHyzm5CtnCyzB33": [
+      1,
+      0
     ],
     "eiq2n1KZzaVLjEmTRRMW2VMDyfu2ofCsxEU7F8K6TBY": [
       1,
@@ -16685,6 +18043,10 @@
       1,
       0
     ],
+    "rNAUS5wm8CqFodvUaU1qqiBJ594uVn3heCLtTnHrjpw": [
+      1,
+      1
+    ],
     "rfzgPHA1cPifdMrPnuaf3xqCxYKAsb4JFQHaeerMeFF": [
       1,
       1
@@ -16698,7 +18060,7 @@
       1
     ],
     "twamXGa9GVEnhEurqZD9w8g6zdSa8sVRBxR8s8DR9hj": [
-      2,
+      3,
       0
     ],
     "vEM7CDGgWn7rpPaLea5UTgoKyrhSwxKp5pHoaHL4MJt": [
@@ -16756,6 +18118,6 @@
   },
   "starting_sol_per_model": 3.0,
   "target_per_model": 100,
-  "updated_ns": 1789688650519560496,
+  "updated_ns": 1789689636025909868,
   "version": "golden-sevenmodel-forward-v2-library-active"
 }
