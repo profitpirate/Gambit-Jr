@@ -6,9 +6,10 @@ import logging
 import math
 import os
 import time
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 from urllib.parse import urlparse
 
 from . import e4_hardening_v5
@@ -775,7 +776,7 @@ async def _guardian_v6(self: core.Engine) -> None:
             )
         try:
             await asyncio.wait_for(self.stop_event.wait(), timeout=interval)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             pass
 
 

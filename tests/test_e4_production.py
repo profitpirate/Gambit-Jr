@@ -4,11 +4,10 @@ import sqlite3
 import tempfile
 import time
 import unittest
-import unittest.mock
+from unittest import mock
 from pathlib import Path
 
-from memecoin_bot import e4_live
-from memecoin_bot import e4_production  # applies production patches
+from memecoin_bot import e4_live, e4_production as _e4_production  # noqa: F401
 
 
 class E4ProductionMappingTests(unittest.TestCase):
@@ -36,7 +35,7 @@ class E4ProductionMappingTests(unittest.TestCase):
             conn.commit()
             conn.close()
             source = e4_live.SQLiteEventSource(path, 0.001)
-            with unittest.mock.patch.dict(
+            with mock.patch.dict(
                 "os.environ",
                 {"E4_EVENT_TABLE": "exact_events", "E4_EVENT_ID_COLUMN": "sequence"},
                 clear=False,
