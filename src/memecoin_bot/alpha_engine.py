@@ -88,12 +88,16 @@ class LaunchEvent:
         # Falling back to the event timestamp keeps synthetic/polling sources stable
         # without letting a reconnect manufacture a second launch from the same tx.
         source_identity = str(kwargs.get("transaction_id") or source_event_timestamp)
+        chain_key = chain.strip().lower()
+        preserve_case = chain_key == "solana"
+        token_identity = token_address.strip() if preserve_case else token_address.strip().lower()
+        transaction_identity = source_identity if preserve_case else source_identity.lower()
         fingerprint = "|".join(
             (
                 source,
-                chain,
-                token_address.lower(),
-                source_identity,
+                chain_key,
+                token_identity,
+                transaction_identity,
                 str(kwargs.get("phase", "CREATED")),
             )
         )

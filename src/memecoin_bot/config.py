@@ -564,6 +564,18 @@ class Settings:
             raise ValueError("Event queue and edge sample settings must be positive")
         if self.historical_live_latency_budget_ms <= 0:
             raise ValueError("Historical live latency budget must be positive")
+        if self.provider_timeout_seconds <= 0:
+            raise ValueError("PROVIDER_TIMEOUT_SECONDS must be positive")
+        if self.provider_max_retries < 0:
+            raise ValueError("PROVIDER_MAX_RETRIES cannot be negative")
+        if self.provider_circuit_failures <= 0 or self.provider_circuit_cooldown_seconds <= 0:
+            raise ValueError("Provider circuit settings must be positive")
+        if self.launch_source_reconnect_seconds <= 0:
+            raise ValueError("LAUNCH_SOURCE_RECONNECT_SECONDS must be positive")
+        if self.candidate_retry_backoff < 1:
+            raise ValueError("CANDIDATE_RETRY_BACKOFF must be at least 1")
+        if not 1 <= self.health_port <= 65_535 or not 1 <= self.radar_board_port <= 65_535:
+            raise ValueError("Health and Radar Board ports must be in 1..65535")
         paths = {
             self.database_path.resolve(),
             self.historical_warehouse_path.resolve(),

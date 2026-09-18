@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import random
+import re
 import time
 import urllib.error
 import urllib.request
@@ -17,6 +18,27 @@ class ProviderError(RuntimeError):
 
 class CircuitOpen(ProviderError):
     pass
+
+
+def sanitize_provider_error(error: object) -> str:
+    """Remove common query/path/header credential shapes before persistence."""
+    value = str(error)
+    value = re.sub(
+        r"(?i)((?:api[-_]?key|token|secret|password)=)[^&\s'\"]+",
+        r"\1<redacted>",
+        value,
+    )
+    value = re.sub(
+        r"(?i)(x-[a-z0-9-]*(?:key|token)[=: ]+)[^&\s'\"]+",
+        r"\1<redacted>",
+        value,
+    )
+    value = re.sub(
+        r"(https?://[^/\s]+/(?:v1|v2|v3)/)[^/?&\s]+",
+        r"\1<redacted>",
+        value,
+    )
+    return value
 
 
 @dataclass(slots=True)
@@ -94,14 +116,16 @@ class ResilientJsonClient:
                 return result
             except (OSError, TimeoutError, ValueError, urllib.error.URLError) as exc:
                 last = exc
+                safe_error = sanitize_provider_error(exc)
                 self.health.consecutive_failures += 1
-                self.health.last_error = str(exc)
+                self.health.last_error = safe_error
                 if self.health.consecutive_failures >= self.circuit_failures:
                     self.health.opened_at = time.monotonic()
                 if self.health_callback:
                     self.health_callback(
-                        self.name, False, self.health.consecutive_failures, str(exc)
+                        self.name, False, self.health.consecutive_failures, safe_error
                     )
                 if attempt < self.retries:
                     await asyncio.sleep(min(0.5 * (2**attempt) + random.random() * 0.2, 5))
-        raise ProviderError(f"{self.name} request failed: {last}") from last
+        safe_last = sanitize_provider_error(last) if last is not None else "unknown provider error"
+        raise ProviderError(f"{self.name} request failed: {safe_last}") from None

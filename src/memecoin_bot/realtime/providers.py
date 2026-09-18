@@ -615,13 +615,13 @@ class NativePumpFunSource:
                                 try:
                                     enrichment_queue.put_nowait((signature, slot, logs))
                                     self._enrichment_pending.add(signature)
-                                except asyncio.QueueFull:
-                                    log_event(
-                                        self.log,
-                                        logging.WARNING,
-                                        "pumpfun_enrichment_backpressure",
-                                        queue_size=enrichment_queue.qsize(),
-                                    )
+                                except asyncio.QueueFull as exc:
+                                    # Do not silently lose a launch that requires
+                                    # transaction enrichment. The cursor has not
+                                    # advanced, so reconnect/backfill can recover it.
+                                    raise ProviderError(
+                                        "PUMPFUN_ENRICHMENT_BACKPRESSURE"
+                                    ) from exc
                         elif message.type in {
                             aiohttp.WSMsgType.CLOSED,
                             aiohttp.WSMsgType.CLOSE,
@@ -955,6 +955,7 @@ class EvmFactoryRealtimeSource:
             for event in await self.poller.poll_once():
                 await emit(self._from_launch(event, transport="eth_getLogs_gap_backfill"))
                 emitted += 1
+            self.poller.commit_cursor()
         return emitted
 
     async def run_events(self, emit: Emit, stop: asyncio.Event) -> None:

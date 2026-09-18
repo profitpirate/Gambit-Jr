@@ -242,6 +242,7 @@ class EvmFactoryLaunchSource:
         self.save_cursor = save_cursor
         self.poll_seconds = poll_seconds
         self.next_block: int | None = None
+        self._pending_cursor: tuple[str, dict[str, Any]] | None = None
         self.log = logging.getLogger("memecoin_bot.launch.bsc")
 
     async def _rpc(self, method: str, params: list[Any]) -> Any:
@@ -275,12 +276,10 @@ class EvmFactoryLaunchSource:
             ],
         )
         self.next_block = end + 1
-        if self.save_cursor:
-            self.save_cursor(
-                self.name,
-                str(self.next_block),
-                {"last_completed_block": end, "backfill_window": end - start + 1},
-            )
+        self._pending_cursor = (
+            str(self.next_block),
+            {"last_completed_block": end, "backfill_window": end - start + 1},
+        )
         received = iso()
         block_timestamps: dict[str, str] = {}
         for block_number in {
@@ -348,11 +347,21 @@ class EvmFactoryLaunchSource:
             )
         return events
 
+    def commit_cursor(self) -> None:
+        pending = self._pending_cursor
+        if pending is None:
+            return
+        if self.save_cursor:
+            cursor, metadata = pending
+            self.save_cursor(self.name, cursor, metadata)
+        self._pending_cursor = None
+
     async def run(self, emit: Emit, stop: asyncio.Event) -> None:
         while not stop.is_set():
             try:
                 for event in await self.poll_once():
                     await emit(event)
+                self.commit_cursor()
                 try:
                     await asyncio.wait_for(stop.wait(), timeout=self.poll_seconds)
                 except TimeoutError:

@@ -1296,7 +1296,8 @@ class Store:
     def pending_outbox(self, limit: int = 20) -> list[sqlite3.Row]:
         return list(
             self.conn.execute(
-                "SELECT * FROM outbox WHERE sent_at IS NULL ORDER BY id LIMIT ?", (limit,)
+                "SELECT * FROM outbox WHERE sent_at IS NULL AND dead_lettered_at IS NULL "
+                "ORDER BY id LIMIT ?", (limit,)
             )
         )
 
@@ -1311,8 +1312,10 @@ class Store:
                     int(row[0])
                     for row in self.conn.execute(
                         "SELECT id FROM outbox WHERE sent_at IS NULL "
+                        "AND dead_lettered_at IS NULL "
+                        "AND (next_attempt_at IS NULL OR next_attempt_at<=?) "
                         "AND (claim_token IS NULL OR claimed_at<?) ORDER BY id LIMIT ?",
-                        (expired, limit),
+                        (iso(), expired, limit),
                     )
                 ]
                 if ids:
@@ -1337,7 +1340,7 @@ class Store:
         with self._lock, self.conn:
             sql = (
                 "UPDATE outbox SET sent_at=?,remote_message_id=?,attempts=attempts+1,last_error=NULL,"
-                "claim_token=NULL,claimed_at=NULL WHERE id=?"
+                "next_attempt_at=NULL,dead_lettered_at=NULL,claim_token=NULL,claimed_at=NULL WHERE id=?"
             )
             args: tuple[Any, ...] = (iso(), remote_id, outbox_id)
             if claim_token is not None:
@@ -1345,17 +1348,54 @@ class Store:
                 args += (claim_token,)
             self.conn.execute(sql, args)
 
-    def mark_outbox_error(self, outbox_id: int, error: str, claim_token: str | None = None) -> None:
+    def mark_outbox_error(
+        self,
+        outbox_id: int,
+        error: str,
+        claim_token: str | None = None,
+        *,
+        max_attempts: int = 8,
+        base_delay_seconds: float = 5,
+        max_delay_seconds: float = 900,
+    ) -> None:
+        now = datetime.now(UTC)
         with self._lock, self.conn:
-            sql = (
-                "UPDATE outbox SET attempts=attempts+1,last_error=?,claim_token=NULL,claimed_at=NULL "
-                "WHERE id=?"
-            )
-            args = (error[:1000], outbox_id)
+            sql = "SELECT attempts FROM outbox WHERE id=?"
+            args: tuple[Any, ...] = (outbox_id,)
             if claim_token is not None:
                 sql += " AND claim_token=?"
                 args += (claim_token,)
-            self.conn.execute(sql, args)
+            row = self.conn.execute(sql, args).fetchone()
+            if row is None:
+                return
+            attempts = int(row[0] or 0) + 1
+            common: tuple[Any, ...]
+            if attempts >= max_attempts:
+                common = (
+                    attempts,
+                    str(error)[:1000],
+                    now.isoformat(),
+                    outbox_id,
+                )
+                sql = (
+                    "UPDATE outbox SET attempts=?,last_error=?,dead_lettered_at=?,"
+                    "next_attempt_at=NULL,claim_token=NULL,claimed_at=NULL WHERE id=?"
+                )
+            else:
+                delay = min(
+                    max_delay_seconds,
+                    base_delay_seconds * (2 ** max(0, attempts - 1)),
+                )
+                next_attempt = (now + timedelta(seconds=delay)).isoformat()
+                common = (attempts, str(error)[:1000], next_attempt, outbox_id)
+                sql = (
+                    "UPDATE outbox SET attempts=?,last_error=?,next_attempt_at=?,"
+                    "claim_token=NULL,claimed_at=NULL WHERE id=?"
+                )
+            if claim_token is not None:
+                sql += " AND claim_token=?"
+                common += (claim_token,)
+            self.conn.execute(sql, common)
 
     def ensure_alert_deliveries(self, outbox_id: int, channel_ids: Iterable[int]) -> None:
         with self._lock, self.conn:
@@ -1854,7 +1894,12 @@ class Store:
             "providers_total": int(providers[2]),
             "providers_configured": int(providers[0]),
             "provider_status": provider_rows,
-            "outbox_pending": one("SELECT COUNT(*) FROM outbox WHERE sent_at IS NULL"),
+            "outbox_pending": one(
+                "SELECT COUNT(*) FROM outbox WHERE sent_at IS NULL AND dead_lettered_at IS NULL"
+            ),
+            "outbox_dead_lettered": one(
+                "SELECT COUNT(*) FROM outbox WHERE sent_at IS NULL AND dead_lettered_at IS NOT NULL"
+            ),
             "discord_deliveries_pending": one(
                 "SELECT (SELECT COUNT(*) FROM alert_deliveries WHERE status!='SENT') + "
                 "(SELECT COUNT(*) FROM alert_deliveries_v131 WHERE status!='SENT')"
@@ -1876,6 +1921,7 @@ class Store:
             else "DEGRADED"
             if not result["state_reconciliation"]["reconciled"]
             or result["discord_deliveries_failed"] > 0
+            or result["outbox_dead_lettered"] > 0
             or (result["providers_total"] > 0 and result["providers_healthy"] == 0)
             else "HEALTHY"
         )
@@ -2025,6 +2071,35 @@ class Store:
             observed = observed.replace(tzinfo=UTC)
         latency_ms = max(0.0, (received - observed).total_seconds() * 1000)
         with self._lock, self.conn:
+            # event_key hashing became chain-aware in the full-bot hardening
+            # release. Match the durable launch identity first so existing rows
+            # created with the legacy Solana lowercase hash are not duplicated.
+            if event.transaction_id:
+                existing = self.conn.execute(
+                    "SELECT id FROM launch_events WHERE source=? AND chain=? "
+                    "AND token_address=? AND phase=? AND transaction_id=? LIMIT 1",
+                    (
+                        event.source,
+                        event.chain,
+                        event.token_address,
+                        event.phase,
+                        event.transaction_id,
+                    ),
+                ).fetchone()
+            else:
+                existing = self.conn.execute(
+                    "SELECT id FROM launch_events WHERE source=? AND chain=? "
+                    "AND token_address=? AND phase=? AND source_event_timestamp=? LIMIT 1",
+                    (
+                        event.source,
+                        event.chain,
+                        event.token_address,
+                        event.phase,
+                        event.source_event_timestamp,
+                    ),
+                ).fetchone()
+            if existing is not None:
+                return int(existing[0]), False
             cur = self.conn.execute(
                 "INSERT OR IGNORE INTO launch_events(event_key,source,chain,launchpad,token_address,"
                 "creator_address,phase,source_event_timestamp,source_received_at,source_to_candidate_ms,"

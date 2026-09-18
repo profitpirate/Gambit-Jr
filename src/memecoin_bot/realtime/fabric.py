@@ -51,6 +51,11 @@ class CanonicalEventFabric:
             row = self.store.conn.execute(
                 "SELECT * FROM canonical_events WHERE canonical_key=?", (event.canonical_key,)
             ).fetchone()
+            if row is None and event.legacy_canonical_key != event.canonical_key:
+                row = self.store.conn.execute(
+                    "SELECT * FROM canonical_events WHERE canonical_key=?",
+                    (event.legacy_canonical_key,),
+                ).fetchone()
             if row is None:
                 self.store.conn.execute(
                     "INSERT INTO canonical_events(event_id,canonical_key,event_type,canonical_token,"
@@ -121,7 +126,7 @@ class CanonicalEventFabric:
                 )
             self._insert_source(event, semantic, source_event_id, event_id=event_id)
             self._observe_provider_event(event)
-            sources = sorted(set(_loads(row["confirmation_sources_json"], [])) | {event.source})
+            existing_sources = sorted(set(_loads(row["confirmation_sources_json"], [])))
             latencies = _loads(row["provider_latency_json"], {})
             latencies[event.source] = event.provider_latency_ms
             conflicts = _loads(row["conflicts_json"], [])
@@ -134,6 +139,22 @@ class CanonicalEventFabric:
                         "detected_at": now,
                     }
                 )
+                # A disagreeing source is provenance, not consensus. Do not let
+                # it increase confirmation count or canonical confidence.
+                self.store.conn.execute(
+                    "UPDATE canonical_events SET provider_latency_json=?,conflicts_json=?,"
+                    "last_seen_at=? WHERE event_id=?",
+                    (_json(latencies), _json(conflicts), now, event_id),
+                )
+                return IngestResult(
+                    event_id,
+                    "CONFLICT",
+                    False,
+                    len(existing_sources),
+                    True,
+                )
+
+            sources = sorted(set(existing_sources) | {event.source})
             self.store.conn.execute(
                 "UPDATE canonical_events SET confirmation_sources_json=?,provider_latency_json=?,"
                 "conflicts_json=?,confidence=MAX(confidence,?),last_seen_at=? WHERE event_id=?",
@@ -146,13 +167,7 @@ class CanonicalEventFabric:
                     event_id,
                 ),
             )
-            return IngestResult(
-                event_id,
-                "CONFLICT" if conflict else "CONFIRMED",
-                False,
-                len(sources),
-                conflict,
-            )
+            return IngestResult(event_id, "CONFIRMED", False, len(sources), False)
 
     def _observe_provider_event(self, event: CanonicalEvent) -> None:
         if event.event_type == CanonicalEventType.PROVIDER_HEALTH:
@@ -204,14 +219,25 @@ class CanonicalEventFabric:
             ),
         )
 
-    def recover_stale_claims(self, lease_seconds: float = 120) -> int:
+    def recover_stale_claims(
+        self, lease_seconds: float = 120, max_attempts: int = 5
+    ) -> int:
         cutoff = (datetime.now(UTC) - timedelta(seconds=lease_seconds)).isoformat()
         with self.store._lock, self.store.conn:
+            # A process can die before fail() runs. Do not let a poison event
+            # bypass the normal attempt ceiling forever across restarts.
+            self.store.conn.execute(
+                "UPDATE canonical_events SET processing_status='FAILED',claimed_at=NULL,"
+                "processing_error='STALE_CLAIM_MAX_ATTEMPTS' "
+                "WHERE processing_status='PROCESSING' AND claimed_at<? "
+                "AND processing_attempts>=?",
+                (cutoff, max_attempts),
+            )
             cur = self.store.conn.execute(
                 "UPDATE canonical_events SET processing_status='PENDING',claimed_at=NULL,"
                 "processing_error='STALE_CLAIM_RECOVERED' WHERE processing_status='PROCESSING' "
-                "AND claimed_at<?",
-                (cutoff,),
+                "AND claimed_at<? AND processing_attempts<?",
+                (cutoff, max_attempts),
             )
             return int(cur.rowcount)
 
@@ -337,12 +363,31 @@ class CanonicalEventFabric:
         current_is_latest = (
             existing_event_at is None or _timestamp(event.source_timestamp) >= existing_event_at
         )
+        if row:
+            existing_migration_state = str(row["migration_state"] or "PRE_MIGRATION")
+            ranks = {"PRE_MIGRATION": 0, "MIGRATING": 1, "MIGRATED": 2}
+            if (
+                not current_is_latest
+                or ranks.get(existing_migration_state, 0) > ranks.get(migration_state, 0)
+            ):
+                migration_state = existing_migration_state
+                migration_started = row["migration_started_at"]
+                migration_completed = row["migration_completed_at"]
+
         evidence = _loads(row["evidence_json"], {}) if row else {}
-        evidence[str(event.event_type)] = {
-            "event_id": event.event_id,
-            "source": event.source,
-            "available_at": event.available_timestamp,
-        }
+        evidence_key = str(event.event_type)
+        previous_evidence = evidence.get(evidence_key)
+        previous_available = (
+            _timestamp(str(previous_evidence.get("available_at")))
+            if isinstance(previous_evidence, dict) and previous_evidence.get("available_at")
+            else None
+        )
+        if previous_available is None or _timestamp(event.available_timestamp) >= previous_available:
+            evidence[evidence_key] = {
+                "event_id": event.event_id,
+                "source": event.source,
+                "available_at": event.available_timestamp,
+            }
         values = {
             "creator_address": payload.get("creator"),
             "bonding_curve_address": payload.get("bonding_curve"),
@@ -401,7 +446,11 @@ class CanonicalEventFabric:
                 migration_state,
                 migration_started,
                 migration_completed,
-                event.pool_identity or (row["pool_identity"] if row else None),
+                (
+                    event.pool_identity or (row["pool_identity"] if row else None)
+                    if current_is_latest
+                    else row["pool_identity"]
+                ),
                 row["monitoring_temperature"] if row else "GENESIS",
                 event.source_timestamp if current_is_latest else str(row["last_event_at"]),
                 iso(),

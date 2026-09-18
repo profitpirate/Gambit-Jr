@@ -134,7 +134,14 @@ class CanonicalEvent:
         return value
 
     @staticmethod
+    def _case_sensitive_identity(chain: str) -> bool:
+        # Solana Base58 public keys/signatures are case-sensitive. EVM hex
+        # identities are case-insensitive and are normalized for dedupe.
+        return chain.strip().lower() == "solana"
+
+    @classmethod
     def canonical_key_for(
+        cls,
         event_type: CanonicalEventType,
         canonical_token: str,
         chain: str,
@@ -144,6 +151,43 @@ class CanonicalEvent:
         source_event_id: str | None,
         source_timestamp: str,
     ) -> str:
+        chain_key = chain.strip().lower()
+        preserve_case = cls._case_sensitive_identity(chain_key)
+
+        def identity_key(value: object) -> str:
+            text = str(value).strip()
+            return text if preserve_case else text.lower()
+
+        token = identity_key(canonical_token)
+        if event_type == CanonicalEventType.TOKEN_CREATED:
+            identity = token
+        elif event_type in {
+            CanonicalEventType.MIGRATION_STARTED,
+            CanonicalEventType.MIGRATION_COMPLETED,
+            CanonicalEventType.POOL_CREATED,
+        }:
+            identity = pool_identity or transaction_signature or f"{token}:{slot_or_block or ''}"
+        elif transaction_signature:
+            suffix = str((source_event_id or "").rsplit(":", 1)[-1])
+            identity = f"{transaction_signature}:{suffix}"
+        elif slot_or_block:
+            identity = f"{token}:{slot_or_block}:{source_event_id or ''}"
+        else:
+            identity = source_event_id or f"{token}:{source_timestamp}"
+        return "|".join((chain_key, str(event_type), token, identity_key(identity)))
+
+    @staticmethod
+    def legacy_canonical_key_for(
+        event_type: CanonicalEventType,
+        canonical_token: str,
+        chain: str,
+        transaction_signature: str | None,
+        slot_or_block: str | None,
+        pool_identity: str | None,
+        source_event_id: str | None,
+        source_timestamp: str,
+    ) -> str:
+        """Pre-hardening key used only to find already-persisted rows."""
         token = canonical_token.strip().lower()
         chain_key = chain.strip().lower()
         if event_type == CanonicalEventType.TOKEN_CREATED:
@@ -166,6 +210,19 @@ class CanonicalEvent:
     @property
     def canonical_key(self) -> str:
         return self.canonical_key_for(
+            self.event_type,
+            self.canonical_token,
+            self.chain,
+            self.transaction_signature,
+            self.slot_or_block,
+            self.pool_identity,
+            self.source_event_id,
+            self.source_timestamp,
+        )
+
+    @property
+    def legacy_canonical_key(self) -> str:
+        return self.legacy_canonical_key_for(
             self.event_type,
             self.canonical_token,
             self.chain,

@@ -1660,7 +1660,24 @@ class IntelligenceService:
                     str(candidate["token_address"])
                 )
             for chain, addresses in by_chain.items():
-                for address, snapshot in (await batch_fetch(addresses, chain)).items():
+                try:
+                    snapshots = await batch_fetch(addresses, chain)
+                except ProviderError as exc:
+                    log_event(
+                        self.log,
+                        logging.WARNING,
+                        "candidate_batch_provider_failure",
+                        chain=chain,
+                        error=str(exc),
+                    )
+                    continue
+                except Exception:  # noqa: BLE001 - isolate a broken batch implementation per chain
+                    self.log.exception(
+                        "candidate batch fetch failed",
+                        extra={"fields": {"chain": chain}},
+                    )
+                    continue
+                for address, snapshot in snapshots.items():
                     prefetched[(chain, address)] = snapshot
         for candidate in candidates:
             try:
@@ -1839,6 +1856,36 @@ class IntelligenceService:
                 continue
         return sent
 
+    async def _supervise(
+        self, jobs: dict[str, Any]
+    ) -> None:
+        tasks = {
+            asyncio.create_task(coro, name=name): name for name, coro in jobs.items()
+        }
+        stop_wait = asyncio.create_task(self.stop_event.wait(), name="service-stop")
+        try:
+            done, _pending = await asyncio.wait(
+                {*tasks, stop_wait},
+                return_when=asyncio.FIRST_COMPLETED,
+            )
+            if stop_wait in done:
+                return
+            for task in done:
+                if task is stop_wait:
+                    continue
+                name = tasks[task]
+                error = task.exception()
+                if error is not None:
+                    raise RuntimeError(f"service worker crashed: {name}") from error
+                raise RuntimeError(f"service worker exited unexpectedly: {name}")
+        finally:
+            self.stop_event.set()
+            stop_wait.cancel()
+            for task in tasks:
+                task.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
+            await asyncio.gather(stop_wait, return_exceptions=True)
+
     async def run(self) -> None:
         recovered_realtime = self.realtime_fabric.recover_stale_claims()
         log_event(
@@ -1852,8 +1899,11 @@ class IntelligenceService:
 
         async def scanner() -> None:
             while not self.stop_event.is_set():
-                await self.scan_once()
-                await self.flush_outbox()
+                try:
+                    await self.scan_once()
+                    await self.flush_outbox()
+                except Exception:  # noqa: BLE001 - a single scan cycle cannot kill the service
+                    self.log.exception("scanner cycle failed")
                 try:
                     await asyncio.wait_for(
                         self.stop_event.wait(), self.settings.discovery_interval_seconds
@@ -1866,7 +1916,7 @@ class IntelligenceService:
                 try:
                     await self.tracker.monitor_once()
                     await self.flush_outbox()
-                except Exception:
+                except Exception:  # noqa: BLE001 - isolate tracker provider/store failures
                     self.log.exception("tracking cycle failed")
                 try:
                     await asyncio.wait_for(
@@ -1877,8 +1927,11 @@ class IntelligenceService:
 
         async def candidate_monitor() -> None:
             while not self.stop_event.is_set():
-                await self.monitor_candidates_once()
-                await self.flush_outbox()
+                try:
+                    await self.monitor_candidates_once()
+                    await self.flush_outbox()
+                except Exception:  # noqa: BLE001 - a single candidate cycle cannot kill the service
+                    self.log.exception("candidate monitoring cycle failed")
                 try:
                     await asyncio.wait_for(
                         self.stop_event.wait(), self.settings.candidate_monitor_interval_seconds
@@ -1888,7 +1941,10 @@ class IntelligenceService:
 
         async def outcome_monitor() -> None:
             while not self.stop_event.is_set():
-                await self.monitor_outcomes_once()
+                try:
+                    await self.monitor_outcomes_once()
+                except Exception:  # noqa: BLE001 - isolate outcome provider/store failures
+                    self.log.exception("outcome monitoring cycle failed")
                 try:
                     await asyncio.wait_for(
                         self.stop_event.wait(), self.settings.outcome_monitor_interval_seconds
@@ -1904,7 +1960,7 @@ class IntelligenceService:
                     continue
                 try:
                     await self.handle_launch_event(event)
-                except Exception:
+                except Exception:  # noqa: BLE001 - isolate one launch from the queue
                     self.log.exception(
                         "launch event processing failed",
                         extra={"fields": {"event_key": event.event_key}},
@@ -1938,21 +1994,25 @@ class IntelligenceService:
                 on_error=on_error,
             )
 
-        tasks = [scanner(), candidate_monitor(), outcome_monitor(), tracker()]
+        jobs: dict[str, Any] = {
+            "scanner": scanner(),
+            "candidate-monitor": candidate_monitor(),
+            "outcome-monitor": outcome_monitor(),
+            "tracker": tracker(),
+        }
         if self.launch_sources:
-            tasks.append(launch_worker())
-            tasks.extend(
-                source.run(self.offer_launch_event, self.stop_event)
-                for source in self.launch_sources
-            )
+            jobs["launch-worker"] = launch_worker()
+            for index, source in enumerate(self.launch_sources):
+                jobs[f"launch-source:{getattr(source, 'name', index)}:{index}"] = source.run(
+                    self.offer_launch_event, self.stop_event
+                )
         if self.settings.realtime_fabric_enabled:
-            tasks.append(realtime_worker())
-        if self.realtime_sources:
-            tasks.extend(
-                source.run_events(self.offer_realtime_event, self.stop_event)
-                for source in self.realtime_sources
+            jobs["realtime-worker"] = realtime_worker()
+        for index, source in enumerate(self.realtime_sources):
+            jobs[f"realtime-source:{getattr(source, 'name', index)}:{index}"] = source.run_events(
+                self.offer_realtime_event, self.stop_event
             )
-        await asyncio.gather(*tasks)
+        await self._supervise(jobs)
 
     def stop(self) -> None:
         self.stop_event.set()
