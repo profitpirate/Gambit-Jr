@@ -1671,7 +1671,7 @@ class IntelligenceService:
                         error=str(exc),
                     )
                     continue
-                except Exception:  # noqa: BLE001 - isolate a broken batch implementation per chain
+                except Exception:
                     self.log.exception(
                         "candidate batch fetch failed",
                         extra={"fields": {"chain": chain}},
@@ -1902,7 +1902,7 @@ class IntelligenceService:
                 try:
                     await self.scan_once()
                     await self.flush_outbox()
-                except Exception:  # noqa: BLE001 - a single scan cycle cannot kill the service
+                except Exception:
                     self.log.exception("scanner cycle failed")
                 try:
                     await asyncio.wait_for(
@@ -1916,7 +1916,7 @@ class IntelligenceService:
                 try:
                     await self.tracker.monitor_once()
                     await self.flush_outbox()
-                except Exception:  # noqa: BLE001 - isolate tracker provider/store failures
+                except Exception:
                     self.log.exception("tracking cycle failed")
                 try:
                     await asyncio.wait_for(
@@ -1930,7 +1930,7 @@ class IntelligenceService:
                 try:
                     await self.monitor_candidates_once()
                     await self.flush_outbox()
-                except Exception:  # noqa: BLE001 - a single candidate cycle cannot kill the service
+                except Exception:
                     self.log.exception("candidate monitoring cycle failed")
                 try:
                     await asyncio.wait_for(
@@ -1943,7 +1943,7 @@ class IntelligenceService:
             while not self.stop_event.is_set():
                 try:
                     await self.monitor_outcomes_once()
-                except Exception:  # noqa: BLE001 - isolate outcome provider/store failures
+                except Exception:
                     self.log.exception("outcome monitoring cycle failed")
                 try:
                     await asyncio.wait_for(
@@ -1960,7 +1960,7 @@ class IntelligenceService:
                     continue
                 try:
                     await self.handle_launch_event(event)
-                except Exception:  # noqa: BLE001 - isolate one launch from the queue
+                except Exception:
                     self.log.exception(
                         "launch event processing failed",
                         extra={"fields": {"event_key": event.event_key}},

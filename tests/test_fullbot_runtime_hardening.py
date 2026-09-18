@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import asyncio
-import logging
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from types import SimpleNamespace
 
 import pytest
 
@@ -260,11 +258,10 @@ async def test_candidate_batch_failure_falls_back_to_individual_monitor(db: Stor
 
         async def market_snapshot(self, _address, _chain):
             self.individual += 1
-            return None
 
     class Null:
         async def send(self, _content):
-            return None
+            pass
 
     config = Settings(
         database_path=db.path,
