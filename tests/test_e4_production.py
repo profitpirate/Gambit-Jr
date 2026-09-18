@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 import sqlite3
 import tempfile
 import time
@@ -8,7 +9,8 @@ from pathlib import Path
 from unittest import mock
 
 from memecoin_bot import e4_live
-from memecoin_bot import e4_production as _e4_production
+
+importlib.import_module("memecoin_bot.e4_production")
 
 
 class E4ProductionMappingTests(unittest.TestCase):
