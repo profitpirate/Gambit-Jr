@@ -311,6 +311,43 @@ else:  # pragma: no cover - deployment dependency guard
     ScanView = object
 
 
+async def _run_coupled_runtime(
+    service: object,
+    client: object,
+    token: str,
+    *,
+    shutdown_timeout: float = 5.0,
+) -> None:
+    """Keep Discord and the intelligence service in one failure domain."""
+    service_task = asyncio.create_task(service.run(), name="intelligence-service")
+    discord_task = asyncio.create_task(client.start(token), name="discord-client")
+    try:
+        done, _pending = await asyncio.wait(
+            {service_task, discord_task},
+            return_when=asyncio.FIRST_COMPLETED,
+        )
+        if service_task in done:
+            if service_task.cancelled():
+                raise RuntimeError("intelligence service was cancelled unexpectedly")
+            error = service_task.exception()
+            if error is not None:
+                raise RuntimeError("intelligence service crashed") from error
+            raise RuntimeError("intelligence service exited unexpectedly")
+        await discord_task
+    finally:
+        service.stop()
+        if not discord_task.done():
+            await client.close()
+        if not service_task.done():
+            try:
+                await asyncio.wait_for(asyncio.shield(service_task), timeout=shutdown_timeout)
+            except TimeoutError:
+                service_task.cancel()
+        if not discord_task.done():
+            discord_task.cancel()
+        await asyncio.gather(service_task, discord_task, return_exceptions=True)
+
+
 async def run_discord_bot(service: object, store: object, settings: object) -> None:
     if discord is None or app_commands is None:
         raise RuntimeError("discord.py is required for slash commands")
@@ -901,16 +938,11 @@ async def run_discord_bot(service: object, store: object, settings: object) -> N
         ):
             await service.offer_realtime_event(social_event)
 
-    service_task = asyncio.create_task(service.run(), name="intelligence-service")
-    try:
-        event(
-            log,
-            logging.INFO,
-            "discord_connect_start",
-            persistent_view_count=2,
-            command_count=len(tree.get_commands()),
-        )
-        await client.start(settings.discord_token)
-    finally:
-        service.stop()
-        await service_task
+    event(
+        log,
+        logging.INFO,
+        "discord_connect_start",
+        persistent_view_count=2,
+        command_count=len(tree.get_commands()),
+    )
+    await _run_coupled_runtime(service, client, settings.discord_token)

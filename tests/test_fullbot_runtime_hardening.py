@@ -9,6 +9,7 @@ import pytest
 from memecoin_bot.alpha_engine import LaunchEvent
 from memecoin_bot.config import Settings
 from memecoin_bot.database import Store
+from memecoin_bot.discord.bot_runtime import _run_coupled_runtime
 from memecoin_bot.models import DiscoveryEvent, iso
 from memecoin_bot.providers.base import ProviderError, sanitize_provider_error
 from memecoin_bot.providers.launch_events import EvmFactoryLaunchSource
@@ -301,6 +302,65 @@ async def test_supervisor_cancels_siblings_before_propagating_worker_failure() -
         await service._supervise({"sibling": sibling(), "broken": broken()})
     assert cancelled.is_set()
     assert service.stop_event.is_set()
+
+
+@pytest.mark.asyncio
+async def test_discord_and_intelligence_share_failure_domain() -> None:
+    class Service:
+        def __init__(self) -> None:
+            self.stopped = False
+
+        async def run(self) -> None:
+            await asyncio.sleep(0)
+            raise RuntimeError("service failure")
+
+        def stop(self) -> None:
+            self.stopped = True
+
+    class Client:
+        def __init__(self) -> None:
+            self.closed = False
+            self.wait = asyncio.Event()
+
+        async def start(self, _token: str) -> None:
+            await self.wait.wait()
+
+        async def close(self) -> None:
+            self.closed = True
+            self.wait.set()
+
+    service = Service()
+    client = Client()
+    with pytest.raises(RuntimeError, match="intelligence service crashed"):
+        await _run_coupled_runtime(service, client, "token")
+    assert service.stopped
+    assert client.closed
+
+
+@pytest.mark.asyncio
+async def test_discord_exit_stops_intelligence_service() -> None:
+    class Service:
+        def __init__(self) -> None:
+            self.stopped = False
+            self.stop_event = asyncio.Event()
+
+        async def run(self) -> None:
+            await self.stop_event.wait()
+
+        def stop(self) -> None:
+            self.stopped = True
+            self.stop_event.set()
+
+    class Client:
+        async def start(self, _token: str) -> None:
+            return
+
+        async def close(self) -> None:
+            return
+
+    service = Service()
+    await _run_coupled_runtime(service, Client(), "token")
+    assert service.stopped
 
 
 def test_provider_error_redaction_removes_query_and_path_secrets() -> None:
