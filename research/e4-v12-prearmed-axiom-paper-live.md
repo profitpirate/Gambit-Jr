@@ -1,20 +1,20 @@
 # E4 V12 pre-armed Axiom-costed paper-live test
 
-Status: **COLLECTING_UNTOUCHED_FORWARD_TRADES**
+Status: **PAPER_LIVE_GOLDEN_GATE_PASSED**
 
 This is an untouched forward paper test. It does not place real trades or modify production V12.
 
 ## Progress
 
-- Closed trades: 47 / 50
-- Wins: 33
-- Win rate: 70.21%
-- Wilson lower bound: 56.02%
-- Net PnL: +1.938688865 SOL
-- Ending bankroll: 4.938688865 SOL
-- Profit factor: 6.9031
-- Maximum closed-equity drawdown: 2.24%
-- Capture windows: 15
+- Closed trades: 50 / 50
+- Wins: 35
+- Win rate: 70.00%
+- Wilson lower bound: 56.25%
+- Net PnL: +2.086015102 SOL
+- Ending bankroll: 5.086015102 SOL
+- Profit factor: 6.0063
+- Maximum closed-equity drawdown: 2.94%
+- Capture windows: 16
 
 ## Execution costs included
 
@@ -23,9 +23,9 @@ This is an untouched forward paper test. It does not place real trades or modify
 - Priority fee: 0.001000 SOL per transaction
 - Buy MEV bribe: 0.001000 SOL
 - Solana base fee: 0.000005 SOL per transaction
-- Total Axiom fees charged: 0.378623544 SOL
-- Total Pump fees charged: 0.498188874 SOL
-- Total fixed execution costs charged: 0.177650000 SOL
+- Total Axiom fees charged: 0.408768428 SOL
+- Total Pump fees charged: 0.537853195 SOL
+- Total fixed execution costs charged: 0.188690000 SOL
 
 ## Integrity
 
