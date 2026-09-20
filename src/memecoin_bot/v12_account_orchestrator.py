@@ -73,6 +73,10 @@ class AccountRuntimeManager:
         env.update(
             {
                 "V12_ACCOUNT_ID": str(row["user_id"]),
+                "DATABASE_PATH": os.getenv(
+                    "V12_MARKETDATA_DB",
+                    "/var/lib/gambit/marketdata.db",
+                ),
                 "E4_DATABASE_PATH": str(runtime / "execution.db"),
                 "V12_AUDIT_LOG": str(runtime / "audit.jsonl"),
                 "V12_BACKUP_DIR": str(runtime / "backups"),
