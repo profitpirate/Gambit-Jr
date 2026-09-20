@@ -37,6 +37,21 @@ class DiscordNotifier:
         else:
             raise ValueError("Discord requires webhook URL or both bot token and channel ID")
 
+    async def send_dm(self, user_id: int, content: str | dict[str, Any]) -> str | None:
+        """Create/reuse a Discord DM channel and send one outbound message.
+
+        This is the only Discord interaction needed by the automated-sniper
+        control plane; it does not register slash commands or message handlers.
+        """
+        if not self.token:
+            raise RuntimeError("Discord bot token is required for direct messages")
+        dm = await self._post_json(
+            "https://discord.com/api/v10/users/@me/channels",
+            {"recipient_id": str(int(user_id))},
+        )
+        channel_id = int(dm["id"])
+        return await self.send_to(channel_id, content)
+
     async def send_to(self, channel_id: int, content: str | dict[str, Any]) -> str | None:
         if not self.token:
             return await self.send(content)
@@ -48,6 +63,37 @@ class DiscordNotifier:
         if not self.url:
             raise RuntimeError("Discord destination is not configured; use send_to")
         return await self._send_url(self.url, content)
+
+    async def _post_json(self, url: str, message: dict[str, Any]) -> dict[str, Any]:
+        payload = json.dumps(message).encode()
+        for attempt in range(4):
+            def perform() -> tuple[int, bytes, dict[str, str]]:
+                headers = {
+                    "Content-Type": "application/json",
+                    "User-Agent": "DiscordBot (gambit-sniper, 2.0)",
+                    "Authorization": f"Bot {self.token}",
+                }
+                request = urllib.request.Request(url, data=payload, headers=headers, method="POST")
+                try:
+                    with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                        return response.status, response.read(), dict(response.headers)
+                except urllib.error.HTTPError as exc:
+                    return exc.code, exc.read(), dict(exc.headers)
+
+            status, body, headers = await asyncio.to_thread(perform)
+            if status in (200, 201):
+                return json.loads(body or b"{}")
+            if status == 429 and attempt < 3:
+                try:
+                    delay = float(json.loads(body).get("retry_after", 1))
+                except (ValueError, json.JSONDecodeError):
+                    delay = float(headers.get("Retry-After", "1"))
+                await asyncio.sleep(min(delay, 30))
+                continue
+            raise RuntimeError(
+                f"Discord HTTP {status}: {body[:300].decode(errors='replace')}"
+            )
+        raise RuntimeError("Discord retry limit exceeded")
 
     async def _send_url(self, url: str, content: str | dict[str, Any]) -> str | None:
         message = (
