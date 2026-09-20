@@ -140,8 +140,8 @@ class E4PolicyTests(unittest.TestCase):
         ).entry(state)
         self.assertFalse(accepted)
         self.assertIn("identity", reason.lower())
-        self.assertEqual(features["microburst_buyers"], 7)
-        self.assertEqual(features["microburst_bundled_buys"], 6)
+        self.assertNotIn("microburst_buyers", features)
+        self.assertNotIn("microburst_bundled_buys", features)
 
     def test_unbundled_fast_buyers_are_rejected(self) -> None:
         state = e4_live.TokenState("mint")
