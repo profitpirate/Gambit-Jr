@@ -24,7 +24,7 @@ from memecoin_bot.e4_runtime_services_v10 import (  # noqa: E402
 from memecoin_bot.e4_final import main  # noqa: E402
 
 E4_V12_ROLE_MODEL_POLICY_SHA256 = "f4d5959b25f607bc667073b672d66570bf29d8d2b2020811605808ce08e032df"
-E4_V12_DIRECT_COPY_POLICY_SHA256 = "ed3e29edef1484a46a16858c303b97d0155ecf88aa63a23d95e6839592ee2f5e"
+E4_V12_DIRECT_COPY_POLICY_SHA256 = "cec133a234fa7e59dc3950dc6c2aa4902e5c12b43eb59bf31eb76d28287380b3"
 e4_role_model_v12.assert_policy_fingerprint(E4_V12_ROLE_MODEL_POLICY_SHA256)
 e4_direct_copy_v12.assert_policy_fingerprint(E4_V12_DIRECT_COPY_POLICY_SHA256)
 
