@@ -49,6 +49,7 @@ jobs:
             src/memecoin_bot/v12_portal.py \
             src/memecoin_bot/notifications.py \
             src/memecoin_bot/e4_notifications_v12.py \
+            src/memecoin_bot/e4_nextgen_creator_authority_v12.py \
             src/memecoin_bot/v12_creator_library.py \
             src/memecoin_bot/v12_postcert_risk.py \
             src/memecoin_bot/e4_sub10ms_transport_final_v12.py \
@@ -69,6 +70,7 @@ jobs:
             tests/test_v12_access_service.py \
             tests/test_v12_notifications.py \
             tests/test_v12_transport_first_ack.py \
+            tests/test_v12_nextgen_creator_authority.py \
             tests/test_v12_route_authority.py
 
       - name: Full repository regression suite
