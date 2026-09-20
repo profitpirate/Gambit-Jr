@@ -4,7 +4,6 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from memecoin_bot.database import Store
-from memecoin_bot.discord.cards import performance_card, status_card
 from memecoin_bot.realtime import CanonicalEvent, CanonicalEventFabric, CanonicalEventType
 from memecoin_bot.realtime.features import RealtimeFeatureProjector
 from memecoin_bot.realtime.learning import AdaptiveLearningLab
@@ -163,31 +162,10 @@ def test_canonical_source_to_shadow_outcome_autopsy_hypothesis_and_challenger(tm
         assert store.conn.execute("SELECT SUM(public_route) FROM challenger_runs_v15").fetchone()[0] == 0
 
         scorecard = thesis.shadow_scorecard()
-        internal_performance = performance_card(
-            {
-                "total_signals": scorecard["matured"],
-                "failed": 0,
-                "2x_rate": scorecard["2x_precision"],
-                "5x_rate": scorecard["5x_precision"],
-                "10x_rate": scorecard["10x_precision"],
-                "small_sample": True,
-            }
-        )
-        internal_status = status_card(
-            {
-                "provider_status": [],
-                "model": {
-                    "active_model": "CONTROL_V15",
-                    "control": "ACTIVE",
-                    "candidate_state": learning["advancement"],
-                    "signal_truth": "SHADOW_ONLY",
-                },
-            }
-        )
-        assert internal_performance["embed"]["title"] == "PERFORMANCE • MEASURED OUTCOMES"
-        assert any(
-            field["name"] == "MODEL / RESEARCH" for field in internal_status["embed"]["fields"]
-        )
+        assert scorecard["matured"] >= 1
+        assert scorecard["2x_precision"] is not None
+        assert learning["status"] == "MEASURED_SHADOW_ONLY"
+        assert learning["public_route"] is False
         assert store.conn.execute("PRAGMA quick_check").fetchone()[0] == "ok"
     finally:
         store.close()
