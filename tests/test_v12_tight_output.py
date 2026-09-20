@@ -67,7 +67,7 @@ class TightOutputTests(unittest.TestCase):
             },
         }
         guarded = strict.guarded_request(request)
-        self.assertEqual(guarded["slippage_bps"], 800)
+        self.assertEqual(guarded["slippage_bps"], 600)
         self.assertTrue(guarded["metadata"]["strict_output_guard"])
         self.assertGreater(guarded["metadata"]["current_quoted_token_output"], 30_000.0 * 0.92)
 
