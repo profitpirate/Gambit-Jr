@@ -15,10 +15,9 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from memecoin_bot.realtime.pumpfun import PUMP_PROGRAM_ID, anchor_events_from_logs
-
 import e4_live_market_stress as stress
 import v12_e4_recent_compare as recent
+from memecoin_bot.realtime.pumpfun import PUMP_PROGRAM_ID, anchor_events_from_logs
 
 
 UNKNOWN = "UNKNOWN_CREATOR"
@@ -130,7 +129,10 @@ async def creator_for_position(
 
         semaphore = asyncio.Semaphore(8)
 
-        async def fetch(row: Mapping[str, Any]):
+        async def fetch(
+            row: Mapping[str, Any],
+            semaphore: asyncio.Semaphore = semaphore,
+        ):
             async with semaphore:
                 try:
                     value = await rpc.call(
