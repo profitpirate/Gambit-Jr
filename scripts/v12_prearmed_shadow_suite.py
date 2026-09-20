@@ -31,6 +31,7 @@ import statistics
 import sys
 from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -320,6 +321,7 @@ def risk_of_ruin(
 
 def regime_snapshot(
     run: replay.RunData,
+    traces: Mapping[str, base.Trace],
     candidate_counts: Mapping[str, int],
     prior_windows: Sequence[Mapping[str, Any]],
 ) -> dict[str, Any]:
@@ -357,6 +359,94 @@ def regime_snapshot(
     else:
         regime = "NORMAL"
 
+    all_points = [
+        point
+        for trace in traces.values()
+        for point in trace.points
+    ]
+    buys = [
+        point
+        for point in all_points
+        if point.kind.upper() in base.choice_sets.BUY_KINDS
+    ]
+    sells = [
+        point
+        for point in all_points
+        if point.kind.upper() in base.choice_sets.SELL_KINDS
+    ]
+    buy_sol = sum(max(0.0, point.sol_amount) for point in buys)
+    sell_sol = sum(max(0.0, point.sol_amount) for point in sells)
+    flow_ratio = buy_sol / max(sell_sol, 1e-9)
+    flow_regime = (
+        "BUY_DOMINANT"
+        if flow_ratio >= 1.5
+        else "SELL_DOMINANT"
+        if flow_ratio <= 0.67
+        else "BALANCED"
+    )
+    unique_traders = len(
+        {point.trader for point in all_points if point.trader}
+    )
+
+    excursions: list[float] = []
+    for trace in traces.values():
+        prices = [point.price_sol for point in trace.points if point.price_sol > 0]
+        if len(prices) < 2:
+            continue
+        first = prices[0]
+        peak = max(prices)
+        trough = min(prices)
+        excursions.append(
+            max(
+                abs(peak / max(first, 1e-18) - 1.0),
+                abs(trough / max(first, 1e-18) - 1.0),
+            )
+        )
+    median_excursion = statistics.median(excursions) if excursions else 0.0
+    prior_excursions = [
+        finite(row.get("median_price_excursion"))
+        for row in prior_windows
+        if finite(row.get("median_price_excursion")) > 0
+    ]
+    excursion_reference = (
+        statistics.median(prior_excursions)
+        if prior_excursions
+        else median_excursion
+    )
+    volatility_ratio = (
+        median_excursion / max(excursion_reference, 1e-12)
+        if median_excursion > 0
+        else 0.0
+    )
+    volatility_regime = (
+        "BOOTSTRAP"
+        if len(prior_excursions) < 2
+        else "HIGH"
+        if volatility_ratio >= 1.5
+        else "LOW"
+        if volatility_ratio <= 0.67
+        else "NORMAL"
+    )
+
+    median_create_ns = (
+        int(statistics.median(create_times)) if create_times else 0
+    )
+    if median_create_ns > 0:
+        hour = datetime.fromtimestamp(
+            median_create_ns / 1_000_000_000, tz=UTC
+        ).hour
+        daypart = (
+            "00_06_UTC"
+            if hour < 6
+            else "06_12_UTC"
+            if hour < 12
+            else "12_18_UTC"
+            if hour < 18
+            else "18_24_UTC"
+        )
+    else:
+        daypart = "UNKNOWN"
+
     unknown = integer(candidate_counts.get("unknown_creator"))
     selected = integer(candidate_counts.get("selected_candidates"))
     return {
@@ -367,6 +457,16 @@ def regime_snapshot(
         "rolling_median_launches_per_minute": reference,
         "relative_launch_pressure": ratio,
         "market_regime": regime,
+        "utc_daypart": daypart,
+        "buy_sol": buy_sol,
+        "sell_sol": sell_sol,
+        "buy_sell_ratio": flow_ratio,
+        "flow_regime": flow_regime,
+        "unique_traders": unique_traders,
+        "median_price_excursion": median_excursion,
+        "rolling_median_price_excursion": excursion_reference,
+        "relative_volatility": volatility_ratio,
+        "volatility_regime": volatility_regime,
         "known_creator_rate": max(0.0, 1.0 - unknown / max(launches, 1)),
         "selected_rate": selected / max(launches, 1),
         "candidate_counts": dict(candidate_counts),
@@ -642,6 +742,84 @@ def _winner_seed_reference(
     return median, statistics.median(deviations) or 1.0
 
 
+def _early_flow_features(
+    trace: base.Trace | None,
+    *,
+    decision_ns: int,
+    horizon_ms: int = 250,
+) -> dict[str, float]:
+    if trace is None:
+        return {
+            "buyer_diversity": 0.0,
+            "buy_imbalance": 0.0,
+            "bundle_cleanliness": 0.0,
+            "price_resilience": 0.0,
+            "early_flow_quality": 0.0,
+        }
+    cutoff = decision_ns + horizon_ms * 1_000_000
+    points = [
+        point
+        for point in trace.points
+        if decision_ns <= point.timestamp_ns <= cutoff
+    ]
+    buys = [
+        point
+        for point in points
+        if point.kind.upper() in base.choice_sets.BUY_KINDS
+    ]
+    sells = [
+        point
+        for point in points
+        if point.kind.upper() in base.choice_sets.SELL_KINDS
+    ]
+    buy_sol = sum(max(0.0, point.sol_amount) for point in buys)
+    sell_sol = sum(max(0.0, point.sol_amount) for point in sells)
+    unique_buyers = len({point.trader for point in buys if point.trader})
+    buyer_totals: Counter[str] = Counter()
+    slot_counts: Counter[int] = Counter()
+    for point in buys:
+        if point.trader:
+            buyer_totals[point.trader] += max(0.0, point.sol_amount)
+        slot_counts[point.slot] += 1
+    largest_buyer_share = (
+        max(buyer_totals.values()) / max(buy_sol, 1e-12)
+        if buyer_totals and buy_sol > 0
+        else 1.0
+    )
+    largest_slot_share = (
+        max(slot_counts.values()) / max(len(buys), 1)
+        if slot_counts
+        else 1.0
+    )
+    buyer_diversity = clamp(unique_buyers / 5.0)
+    buy_imbalance = clamp(buy_sol / max(buy_sol + sell_sol, 1e-12))
+    bundle_cleanliness = 1.0 - clamp(
+        max(largest_buyer_share, largest_slot_share)
+    )
+    prices = [point.price_sol for point in points if point.price_sol > 0]
+    if len(prices) >= 2:
+        price_resilience = clamp(
+            (prices[-1] / max(prices[0], 1e-18) - 0.80) / 0.40
+        )
+    elif prices:
+        price_resilience = 0.5
+    else:
+        price_resilience = 0.0
+    early_flow_quality = clamp(
+        0.35 * buyer_diversity
+        + 0.30 * buy_imbalance
+        + 0.20 * bundle_cleanliness
+        + 0.15 * price_resilience
+    )
+    return {
+        "buyer_diversity": buyer_diversity,
+        "buy_imbalance": buy_imbalance,
+        "bundle_cleanliness": bundle_cleanliness,
+        "price_resilience": price_resilience,
+        "early_flow_quality": early_flow_quality,
+    }
+
+
 def new_creator_score(
     *,
     creator_seed_sol: float,
@@ -650,6 +828,7 @@ def new_creator_score(
     handle_stats: Mapping[str, Mapping[str, float]],
     seed_reference: tuple[float, float],
     metadata_quality: float,
+    early_flow: Mapping[str, Any] | None = None,
 ) -> tuple[float, dict[str, float]]:
     seed_score = clamp((creator_seed_sol - 2.0) / 6.0)
     age_score = clamp(1.0 - tweet_age_seconds / 10.0)
@@ -671,19 +850,29 @@ def new_creator_score(
     similarity = math.exp(
         -abs(creator_seed_sol - median) / max(1.0, 2.0 * mad)
     )
+    flow = dict(early_flow or {})
+    buyer_diversity = clamp(finite(flow.get("buyer_diversity"), 0.5))
+    bundle_cleanliness = clamp(finite(flow.get("bundle_cleanliness"), 0.5))
+    early_flow_quality = clamp(finite(flow.get("early_flow_quality"), 0.5))
     components = {
         "creator_seed": seed_score,
         "social_recency": age_score,
         "handle_reputation": rep_score,
         "winner_seed_similarity": similarity,
         "metadata_quality": clamp(metadata_quality),
+        "buyer_diversity": buyer_diversity,
+        "bundle_cleanliness": bundle_cleanliness,
+        "early_flow_quality": early_flow_quality,
     }
     score = (
-        0.30 * seed_score
-        + 0.20 * age_score
-        + 0.25 * rep_score
-        + 0.15 * similarity
-        + 0.10 * clamp(metadata_quality)
+        0.18 * seed_score
+        + 0.15 * age_score
+        + 0.18 * rep_score
+        + 0.12 * similarity
+        + 0.07 * clamp(metadata_quality)
+        + 0.12 * buyer_diversity
+        + 0.08 * bundle_cleanliness
+        + 0.10 * early_flow_quality
     )
     return clamp(score), components
 
@@ -769,7 +958,7 @@ async def new_creator_shadow(
     seed_reference = _winner_seed_reference(baseline_ledger)
     costs = paper.load_costs(model)
     policy = paper.load_policy(model)
-    decisions = []
+    scored: list[tuple[paper.Candidate, dict[str, Any]]] = []
 
     for row in preliminaries:
         metadata = cache.get(row["uri"], {})
@@ -799,6 +988,10 @@ async def new_creator_shadow(
             counters["social_age_outside_window"] += 1
             continue
 
+        early_flow = _early_flow_features(
+            traces.get(row["mint"]),
+            decision_ns=row["decision_ns"],
+        )
         score, components = new_creator_score(
             creator_seed_sol=row["seed"],
             tweet_age_seconds=age,
@@ -806,6 +999,7 @@ async def new_creator_shadow(
             handle_stats=handle_stats,
             seed_reference=seed_reference,
             metadata_quality=1.0,
+            early_flow=early_flow,
         )
         tier = (
             "SHADOW_ELIGIBLE"
@@ -827,59 +1021,105 @@ async def new_creator_shadow(
             decision_sequence=row["decision_sequence"],
             creator_seed_sol=row["seed"],
         )
-
-        trade = None
-        rejection = None
-        if tier != "REJECT" and candidate.mint in traces:
-            trade, rejection = paper.simulate_trade(
-                run,
-                traces[candidate.mint],
+        scored.append(
+            (
                 candidate,
-                finite(
-                    model["position_sizing"]["starting_bankroll_sol"]
-                )
-                * finite(
-                    model["position_sizing"]["fraction_of_available_cash"]
-                ),
-                model,
-                costs,
-                policy,
-            )
-
-        decisions.append(
-            {
-                "version": NEW_CREATOR_VERSION,
-                "run_id": run.run_id,
-                "mint": row["mint"],
-                "creator": row["creator"],
-                "handle": handle,
-                "decision_ns": row["decision_ns"],
-                "creator_seed_sol": row["seed"],
-                "tweet_age_seconds": age,
-                "score": score,
-                "components": components,
-                "tier": tier,
-                "shadow_only": True,
-                "outcome": {
-                    "status": (
-                        "FILLED"
-                        if trade
-                        else "REJECTED_BY_EXECUTION"
-                        if rejection
-                        else "NOT_SIMULATED"
-                    ),
-                    "pnl_sol": (
-                        finite(trade.get("pnl_sol")) if trade else None
-                    ),
-                    "win": bool(
-                        trade and finite(trade.get("pnl_sol")) > 0
-                    ),
-                    "rejection_reason": (
-                        rejection.get("reason") if rejection else None
-                    ),
+                {
+                    "version": NEW_CREATOR_VERSION,
+                    "run_id": run.run_id,
+                    "mint": row["mint"],
+                    "creator": row["creator"],
+                    "handle": handle,
+                    "decision_ns": row["decision_ns"],
+                    "creator_seed_sol": row["seed"],
+                    "tweet_age_seconds": age,
+                    "score": score,
+                    "components": components,
+                    "early_flow": early_flow,
+                    "tier": tier,
+                    "shadow_only": True,
                 },
-            }
+            )
         )
+
+    cash = finite(model["position_sizing"]["starting_bankroll_sol"])
+    fraction = finite(model["position_sizing"]["fraction_of_available_cash"])
+    max_positions = integer(
+        model["position_sizing"]["maximum_concurrent_positions"]
+    )
+    active: list[dict[str, Any]] = []
+    decisions: list[dict[str, Any]] = []
+
+    for candidate, decision in sorted(
+        scored, key=lambda pair: (pair[0].decision_ns, pair[0].mint)
+    ):
+        active, cash = paper.settle(active, cash, candidate.decision_ns)
+        outcome: dict[str, Any]
+        if decision["tier"] == "REJECT":
+            outcome = {
+                "status": "NOT_SIMULATED",
+                "pnl_sol": None,
+                "win": False,
+                "rejection_reason": "SHADOW_SCORE_REJECTED",
+            }
+        elif len(active) >= max_positions:
+            counters["shadow_concurrency_rejected"] += 1
+            outcome = {
+                "status": "CONCURRENCY_REJECTED",
+                "pnl_sol": None,
+                "win": False,
+                "rejection_reason": "MAX_CONCURRENT_POSITIONS",
+            }
+        else:
+            trace = traces.get(candidate.mint)
+            if trace is None:
+                counters["shadow_missing_trace"] += 1
+                outcome = {
+                    "status": "MISSING_TRACE",
+                    "pnl_sol": None,
+                    "win": False,
+                    "rejection_reason": "MISSING_TRACE",
+                }
+            else:
+                budget = cash * fraction
+                trade, rejection = paper.simulate_trade(
+                    run,
+                    trace,
+                    candidate,
+                    budget,
+                    model,
+                    costs,
+                    policy,
+                )
+                if rejection is not None:
+                    fee = min(cash, finite(rejection.get("fee_sol")))
+                    cash -= fee
+                    counters["shadow_execution_rejected"] += 1
+                    outcome = {
+                        "status": "REJECTED_BY_EXECUTION",
+                        "pnl_sol": None,
+                        "win": False,
+                        "rejection_reason": rejection.get("reason"),
+                        "fee_sol": fee,
+                    }
+                else:
+                    assert trade is not None
+                    cash -= finite(trade.get("entry_cost_sol"))
+                    active.append(trade)
+                    outcome = {
+                        "status": "FILLED",
+                        "pnl_sol": finite(trade.get("pnl_sol")),
+                        "win": finite(trade.get("pnl_sol")) > 0,
+                        "rejection_reason": None,
+                        "entry_cost_sol": finite(trade.get("entry_cost_sol")),
+                        "exit_ns": integer(trade.get("exit_ns")),
+                    }
+        decision["outcome"] = outcome
+        decisions.append(decision)
+
+    active, cash = paper.settle(active, cash, 2**63 - 1)
+    if active:
+        raise ValueError("new-creator shadow positions remained open after tail")
 
     counters["scored"] = len(decisions)
     counters["shadow_eligible"] = sum(
@@ -888,37 +1128,112 @@ async def new_creator_shadow(
     counters["watch"] = sum(
         row["tier"] == "WATCH" for row in decisions
     )
-    return {"counts": dict(counters), "decisions": decisions}
+    return {
+        "counts": dict(counters),
+        "decisions": decisions,
+        "shadow_bankroll": {
+            "starting_sol": finite(
+                model["position_sizing"]["starting_bankroll_sol"]
+            ),
+            "ending_sol": cash,
+            "net_pnl_sol": cash
+            - finite(model["position_sizing"]["starting_bankroll_sol"]),
+        },
+    }
+
+
+def _pre_entry_microstructure(
+    trace: base.Trace | None,
+    *,
+    fill_ns: int,
+) -> dict[str, float]:
+    if trace is None:
+        return {
+            "buyer_concentration": 0.0,
+            "same_slot_buy_share": 0.0,
+            "sell_pressure": 0.0,
+            "unique_buyers": 0.0,
+        }
+    points = [point for point in trace.points if point.timestamp_ns <= fill_ns]
+    buys = [
+        point
+        for point in points
+        if point.kind.upper() in base.choice_sets.BUY_KINDS
+    ]
+    sells = [
+        point
+        for point in points
+        if point.kind.upper() in base.choice_sets.SELL_KINDS
+    ]
+    buy_sol = sum(max(0.0, point.sol_amount) for point in buys)
+    sell_sol = sum(max(0.0, point.sol_amount) for point in sells)
+    by_buyer: Counter[str] = Counter()
+    by_slot: Counter[int] = Counter()
+    for point in buys:
+        if point.trader:
+            by_buyer[point.trader] += max(0.0, point.sol_amount)
+        by_slot[point.slot] += 1
+    buyer_concentration = (
+        max(by_buyer.values()) / max(buy_sol, 1e-12)
+        if by_buyer and buy_sol > 0
+        else 0.0
+    )
+    same_slot_buy_share = (
+        max(by_slot.values()) / max(len(buys), 1)
+        if by_slot
+        else 0.0
+    )
+    sell_pressure = sell_sol / max(buy_sol + sell_sol, 1e-12)
+    return {
+        "buyer_concentration": clamp(buyer_concentration),
+        "same_slot_buy_share": clamp(same_slot_buy_share),
+        "sell_pressure": clamp(sell_pressure),
+        "unique_buyers": float(
+            len({point.trader for point in buys if point.trader})
+        ),
+    }
 
 
 def hard_negative_score(
     trade: Mapping[str, Any],
     regime: Mapping[str, Any],
+    microstructure: Mapping[str, Any] | None = None,
 ) -> tuple[float, dict[str, float]]:
     output_ratio = finite(trade.get("output_ratio"), 1.0)
     chase = finite(trade.get("create_to_fill_price_multiple"), 1.0)
     age = finite(trade.get("tweet_age_seconds"))
     seed = finite(trade.get("creator_seed_sol"))
     pressure = finite(regime.get("relative_launch_pressure"), 1.0)
+    micro = dict(microstructure or {})
+    crowding = max(
+        clamp(finite(micro.get("buyer_concentration"))),
+        clamp(finite(micro.get("same_slot_buy_share"))),
+    )
+    sell_pressure = clamp(finite(micro.get("sell_pressure")))
     components = {
         "output_deterioration": clamp((0.82 - output_ratio) / 0.17),
         "chase_pressure": clamp((chase - 1.20) / 0.30),
         "late_social": clamp((age - 5.0) / 5.0),
         "low_creator_seed": clamp((3.0 - seed) / 1.0),
         "market_heat": clamp((pressure - 1.0) / 1.0),
+        "pre_entry_crowding": crowding,
+        "pre_entry_sell_pressure": sell_pressure,
     }
     score = (
-        0.32 * components["output_deterioration"]
-        + 0.30 * components["chase_pressure"]
-        + 0.14 * components["late_social"]
-        + 0.14 * components["low_creator_seed"]
-        + 0.10 * components["market_heat"]
+        0.24 * components["output_deterioration"]
+        + 0.22 * components["chase_pressure"]
+        + 0.10 * components["late_social"]
+        + 0.10 * components["low_creator_seed"]
+        + 0.08 * components["market_heat"]
+        + 0.16 * components["pre_entry_crowding"]
+        + 0.10 * components["pre_entry_sell_pressure"]
     )
     return clamp(score), components
 
 
 def hard_negative_shadow(
     ledger: Sequence[Mapping[str, Any]],
+    traces: Mapping[str, base.Trace],
     run_id: str,
     regime: Mapping[str, Any],
 ) -> list[dict[str, Any]]:
@@ -926,16 +1241,24 @@ def hard_negative_shadow(
     for trade in ledger:
         if str(trade.get("run_id")) != run_id:
             continue
-        score, components = hard_negative_score(trade, regime)
+        mint = str(trade.get("mint"))
+        micro = _pre_entry_microstructure(
+            traces.get(mint),
+            fill_ns=integer(trade.get("fill_ns")),
+        )
+        score, components = hard_negative_score(
+            trade, regime, micro
+        )
         veto = score >= 0.70
         pnl = finite(trade.get("pnl_sol"))
         output.append(
             {
                 "version": HARD_NEGATIVE_VERSION,
                 "run_id": run_id,
-                "mint": str(trade.get("mint")),
+                "mint": mint,
                 "score": score,
                 "components": components,
+                "pre_entry_microstructure": micro,
                 "shadow_veto": veto,
                 "actual_pnl_sol": pnl,
                 "classification": (
@@ -953,7 +1276,7 @@ def hard_negative_shadow(
     return output
 
 
-def _fill_price(trace: base.Trace, fill_ns: int) -> float:
+def _fill_price(def _fill_price(trace: base.Trace, fill_ns: int) -> float:
     prior = [
         point.price_sol
         for point in trace.points
@@ -1100,6 +1423,58 @@ def _row_failed_attempt(row: Mapping[str, Any]) -> bool:
     )
 
 
+def _failed_attempt_features(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    cutoff_ns: int,
+) -> dict[str, Any]:
+    attempts = [
+        row
+        for row in rows
+        if integer(row.get("received_ns")) <= cutoff_ns
+        and _row_failed_attempt(row)
+    ]
+    actors: set[str] = set()
+    signatures: set[str] = set()
+    notional_sol = 0.0
+    for row in attempts:
+        raw = row.get("raw") if isinstance(row.get("raw"), Mapping) else {}
+        actor = str(
+            row.get("trader")
+            or row.get("user")
+            or raw.get("trader")
+            or raw.get("user")
+            or raw.get("from")
+            or ""
+        )
+        if actor:
+            actors.add(actor)
+        signature = str(
+            row.get("signature")
+            or raw.get("signature")
+            or row.get("tx_signature")
+            or ""
+        )
+        if signature:
+            signatures.add(signature)
+        amount = finite(
+            row.get("sol_amount")
+            or row.get("amount_sol")
+            or row.get("quote_amount")
+            or raw.get("sol_amount")
+            or raw.get("amount_sol")
+            or raw.get("quote_amount")
+            or raw.get("input_sol")
+        )
+        notional_sol += max(0.0, amount)
+    return {
+        "count": len(attempts),
+        "unique_actors": len(actors),
+        "unique_signatures": len(signatures),
+        "notional_sol": notional_sol,
+    }
+
+
 def failed_aware_shadow(
     run: replay.RunData,
     ledger: Sequence[Mapping[str, Any]],
@@ -1111,33 +1486,43 @@ def failed_aware_shadow(
         rows = run.events_by_mint.get(str(trade.get("mint")), [])
         decision_ns = integer(trade.get("decision_ns"))
         fill_ns = integer(trade.get("fill_ns"))
-        before_decision = [
-            row
-            for row in rows
-            if integer(row.get("received_ns")) <= decision_ns
-            and _row_failed_attempt(row)
-        ]
-        before_fill = [
-            row
-            for row in rows
-            if integer(row.get("received_ns")) <= fill_ns
-            and _row_failed_attempt(row)
-        ]
+        before_decision = _failed_attempt_features(
+            rows, cutoff_ns=decision_ns
+        )
+        before_fill = _failed_attempt_features(
+            rows, cutoff_ns=fill_ns
+        )
+        count_score = min(1.0, before_fill["count"] / 5.0)
+        breadth_score = min(1.0, before_fill["unique_actors"] / 3.0)
+        notional_score = min(1.0, finite(before_fill["notional_sol"]) / 1.0)
         score = clamp(
-            0.55 * min(1.0, len(before_decision) / 3.0)
-            + 0.45 * min(1.0, len(before_fill) / 5.0)
+            0.40 * count_score
+            + 0.25 * breadth_score
+            + 0.35 * notional_score
         )
         output.append(
             {
                 "version": FAILED_AWARE_VERSION,
                 "run_id": run.run_id,
                 "mint": str(trade.get("mint")),
-                "failed_attempts_before_decision": len(before_decision),
-                "failed_attempts_before_fill": len(before_fill),
+                "failed_attempts_before_decision": before_decision["count"],
+                "failed_attempts_before_fill": before_fill["count"],
+                "failed_unique_actors_before_decision": before_decision[
+                    "unique_actors"
+                ],
+                "failed_unique_actors_before_fill": before_fill[
+                    "unique_actors"
+                ],
+                "failed_notional_sol_before_decision": before_decision[
+                    "notional_sol"
+                ],
+                "failed_notional_sol_before_fill": before_fill[
+                    "notional_sol"
+                ],
                 "failed_intent_score": score,
                 "coverage": (
                     "OBSERVED"
-                    if before_fill
+                    if before_fill["count"]
                     else "NO_FAILED_INTENT_EVIDENCE"
                 ),
                 "actual_pnl_sol": finite(trade.get("pnl_sol")),
@@ -1158,17 +1543,29 @@ def validate_integrity(
 
     if paper_state.get("model_sha256") != expected_hash:
         errors.append("PAPER_STATE_MODEL_HASH_MISMATCH")
+    if paper_state.get("production_authorised") is not False:
+        errors.append("PRODUCTION_AUTHORISATION_NOT_FALSE")
+    if paper_state.get("real_money_execution") is not False:
+        errors.append("REAL_MONEY_EXECUTION_NOT_FALSE")
+    if integer(paper_state.get("production_paths_changed")) != 0:
+        errors.append("PRODUCTION_PATHS_CHANGED_NONZERO")
 
     required = integer(model["acceptance_gate"]["closed_trades"])
     if required != 100:
         warnings.append(f"CONFIRMATION_TARGET_IS_{required}_NOT_100")
 
     ledger = list(paper_state.get("ledger", []))
+    rejections = list(paper_state.get("rejections", []))
+    processed_runs = [str(value) for value in paper_state.get("processed_runs", [])]
     if len(ledger) > required:
         errors.append("LEDGER_EXCEEDS_REQUIRED_SAMPLE")
+    if len(processed_runs) != len(set(processed_runs)):
+        errors.append("DUPLICATE_PROCESSED_RUN_IDS")
 
-    seen = set()
+    seen: set[tuple[str, str]] = set()
     duplicate_keys = 0
+    pnls: list[float] = []
+    wins = 0
     for row in ledger:
         key = (str(row.get("run_id")), str(row.get("mint")))
         if key in seen:
@@ -1181,6 +1578,7 @@ def validate_integrity(
             errors.append(
                 f"NON_MONOTONIC_TRADE_TIMESTAMPS:{key[0]}:{key[1]}"
             )
+        parsed: dict[str, float] = {}
         for field in ("entry_cost_sol", "pnl_sol", "proceeds_sol"):
             try:
                 value = float(row.get(field))
@@ -1193,13 +1591,65 @@ def validate_integrity(
                 errors.append(
                     f"NONFINITE_TRADE_VALUE:{field}:{key[0]}:{key[1]}"
                 )
+            parsed[field] = value
+        if {"entry_cost_sol", "pnl_sol", "proceeds_sol"} <= parsed.keys():
+            implied = parsed["proceeds_sol"] - parsed["entry_cost_sol"]
+            tolerance = max(1e-10, abs(parsed["pnl_sol"]) * 1e-9)
+            if abs(implied - parsed["pnl_sol"]) > tolerance:
+                errors.append(
+                    f"TRADE_PNL_CASHFLOW_MISMATCH:{key[0]}:{key[1]}"
+                )
+            pnls.append(parsed["pnl_sol"])
+            actual_win = parsed["pnl_sol"] > 0
+            wins += int(actual_win)
+            if "win" in row and bool(row.get("win")) != actual_win:
+                errors.append(
+                    f"TRADE_WIN_FLAG_MISMATCH:{key[0]}:{key[1]}"
+                )
 
     if duplicate_keys:
         errors.append(f"DUPLICATE_RUN_MINT_KEYS:{duplicate_keys}")
 
-    if run_id not in {
-        str(value) for value in paper_state.get("processed_runs", [])
-    }:
+    rejection_seen: set[tuple[str, str]] = set()
+    rejection_fees = 0.0
+    for row in rejections:
+        key = (str(row.get("run_id")), str(row.get("mint")))
+        if key in rejection_seen:
+            errors.append(f"DUPLICATE_REJECTION_KEY:{key[0]}:{key[1]}")
+        rejection_seen.add(key)
+        fee = finite(row.get("fee_sol"), -1.0)
+        if fee < 0:
+            errors.append(f"INVALID_REJECTION_FEE:{key[0]}:{key[1]}")
+        else:
+            rejection_fees += fee
+
+    starting = finite(paper_state.get("starting_bankroll_sol"))
+    actual_ending = finite(paper_state.get("ending_bankroll_sol"))
+    expected_ending = starting + sum(pnls) - rejection_fees
+    cash_tolerance = max(1e-9, abs(expected_ending) * 1e-9)
+    if abs(actual_ending - expected_ending) > cash_tolerance:
+        errors.append("ENDING_BANKROLL_RECONCILIATION_FAILED")
+
+    metrics = paper_state.get("metrics") or {}
+    if metrics:
+        if integer(metrics.get("closed_trades")) != len(ledger):
+            errors.append("METRIC_CLOSED_TRADES_MISMATCH")
+        if integer(metrics.get("wins")) != wins:
+            errors.append("METRIC_WINS_MISMATCH")
+        if integer(metrics.get("losses")) != len(ledger) - wins:
+            errors.append("METRIC_LOSSES_MISMATCH")
+        if abs(finite(metrics.get("net_pnl_sol")) - sum(pnls)) > 1e-9:
+            errors.append("METRIC_NET_PNL_MISMATCH")
+
+    completion = paper_state.get("completion") or {}
+    expected_remaining = max(0, required - len(ledger))
+    if integer(completion.get("remaining"), expected_remaining) != expected_remaining:
+        errors.append("COMPLETION_REMAINING_MISMATCH")
+    expected_reached = len(ledger) >= required
+    if bool(completion.get("reached")) != expected_reached:
+        errors.append("COMPLETION_REACHED_MISMATCH")
+
+    if run_id not in set(processed_runs):
         warnings.append("CURRENT_RUN_NOT_YET_PERSISTED_IN_PAPER_STATE")
 
     return {
@@ -1207,12 +1657,20 @@ def validate_integrity(
         "errors": errors,
         "warnings": warnings,
         "ledger_rows": len(ledger),
+        "rejection_rows": len(rejections),
         "required_closed_trades": required,
         "model_hash": expected_hash,
+        "cash_reconciliation": {
+            "starting_bankroll_sol": starting,
+            "trade_pnl_sol": sum(pnls),
+            "rejected_entry_fees_sol": rejection_fees,
+            "expected_ending_bankroll_sol": expected_ending,
+            "actual_ending_bankroll_sol": actual_ending,
+        },
     }
 
 
-def _dedupe_extend(
+def _dedupe_extend(def _dedupe_extend(
     existing: list[dict[str, Any]],
     incoming: Sequence[Mapping[str, Any]],
     keys: Sequence[str],
@@ -1350,7 +1808,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         run, model, cache
     )
     regime = regime_snapshot(
-        run, candidate_counts, analytics.get("windows", [])
+        run, traces, candidate_counts, analytics.get("windows", [])
     )
     reliability = validate_integrity(
         paper_state, model, args.run_id
@@ -1381,6 +1839,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         )
         hard_negative = hard_negative_shadow(
             paper_state.get("ledger", []),
+            traces,
             args.run_id,
             regime,
         )
