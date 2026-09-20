@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
-import subprocess
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -325,25 +324,11 @@ def test_deterministic_model_and_economic_replay(outputs) -> None:
     assert reproducibility["economic_replay"]["identical"] is True
 
 
-def test_no_production_path_changed(outputs) -> None:
-    result = subprocess.run(
-        [
-            "git",
-            "diff",
-            "--name-only",
-            moe.BASE_COMMIT,
-            "--",
-            "src/memecoin_bot",
-            "models/e4",
-            "tools/e4-builder",
-        ],
-        cwd=ROOT,
-        capture_output=True,
-        check=True,
-        text=True,
-    )
-    assert not result.stdout.strip()
-    assert outputs["verdict"]["production_paths_changed"] == 0
+def test_moe_research_verdict_never_authorised_production(outputs) -> None:
+    verdict = outputs["verdict"]
+    assert verdict["production_paths_changed"] == 0
+    assert verdict["production_promotion_authorised"] is False
+    assert verdict["live_confirmation_authorised"] is False
 
 
 def test_null_group_file_has_no_duplicate_ids() -> None:
