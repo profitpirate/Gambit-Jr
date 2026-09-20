@@ -14,6 +14,7 @@ on:
       - "scripts/v12_prearmed_shadow_suite.py"
       - "tests/test_v12_prearmed_shadow_suite.py"
       - "research/v12-pre-armed-50-trade-results.json"
+      - "research/v12-pre-armed-100-control.json"
   workflow_dispatch:
 
 permissions:
@@ -71,13 +72,21 @@ jobs:
             scripts/v12_prearmed_shadow_suite.py \
             tests/test_v12_prearmed_shadow_suite.py
 
-      - name: Check whether 100 closed trades are already complete
+      - name: Check operator control and completion
         id: progress
         run: |
           complete=false
-          if [ -s research/v12-pre-armed-100-trade-paper-live.json ]; then
+          stopped=false
+          if [ -s research/v12-pre-armed-100-control.json ]; then
+            stopped="$(jq -r '.stop // false' research/v12-pre-armed-100-control.json)"
+          fi
+          if [ "$stopped" = "true" ]; then
+            complete=true
+            echo "V12 Pre-Armed 100-trade test is operator-paused."
+          elif [ -s research/v12-pre-armed-100-trade-paper-live.json ]; then
             complete="$(jq -r '.completion.reached // false' research/v12-pre-armed-100-trade-paper-live.json)"
           fi
+          echo "stopped=$stopped" >> "$GITHUB_OUTPUT"
           echo "complete=$complete" >> "$GITHUB_OUTPUT"
 
       - name: Capture 3000 strictly future live launches
