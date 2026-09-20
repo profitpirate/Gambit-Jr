@@ -43,6 +43,8 @@ def _preflight_live_if_requested() -> None:
     global _LIVE_INSTANCE_LOCK
     if "--live" not in sys.argv:
         return
+    if os.getenv("E4_LIVE", "").strip().lower() not in {"1", "true", "yes", "on"}:
+        raise SystemExit("E4 live execution requires both E4_LIVE=true and --live")
     settings = e4_hardening_v12.core.Settings.from_env()
     settings.live = True
     settings.validate()
