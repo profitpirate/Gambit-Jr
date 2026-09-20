@@ -21,10 +21,12 @@ PIPELINES = role_model.PIPELINES
 LOGGER = logging.getLogger("gambit.e4.direct-copy.v12")
 
 DIRECT_COPY_FAMILY = role_model.ROLE_MODEL_FAMILY
-# Pump's local builder itself clamps buy/sell slippage to 9,000 bps. A direct
-# E4 copy therefore uses that builder ceiling by default: once E4 authority is
-# observed, generic Gambit price-drift/slippage policy must not cancel the copy.
-DEFAULT_DIRECT_COPY_SLIPPAGE_BPS = 9000
+# Direct-copy output protection is canonical here. The previous layered runtime
+# declared 9,000 bps in this module and silently replaced it with 600 bps later.
+# One 6% default, bounded to 0.5%-12%, now applies regardless of import order.
+DEFAULT_DIRECT_COPY_SLIPPAGE_BPS = 600
+MIN_DIRECT_COPY_SLIPPAGE_BPS = 50
+MAX_DIRECT_COPY_SLIPPAGE_BPS = 1200
 
 
 def policy_fingerprint() -> str:
@@ -49,27 +51,28 @@ def _finite(value: Any, default: float = 0.0) -> float:
     return number if math.isfinite(number) else default
 
 
-def direct_copy_slippage_bps(settings: Any) -> int:
-    """Use the builder's direct-copy tolerance instead of generic entry slippage.
+def direct_copy_slippage_bps(_settings: Any) -> int:
+    """Return the canonical direct-copy maximum output shortfall in bps.
 
-    E4's private slippage configuration is not observable. The 9,000-bps
-    default is therefore a V12 execution parameter, equal to the local Pump
-    builder's own ceiling. It exists so an already-recognized E4 entry is sent
-    rather than vetoed by Gambit's generic 8% entry protection.
+    The value intentionally ignores generic strategy buy slippage. E4-copy
+    authority has its own bounded execution guard and must not change depending
+    on which V12 repair module happened to import first.
     """
     raw = os.getenv(
-        "E4_DIRECT_COPY_SLIPPAGE_BPS",
-        str(DEFAULT_DIRECT_COPY_SLIPPAGE_BPS),
+        "E4_DIRECT_COPY_MAX_OUTPUT_SHORTFALL_BPS",
+        os.getenv(
+            "E4_DIRECT_COPY_SLIPPAGE_BPS",
+            str(DEFAULT_DIRECT_COPY_SLIPPAGE_BPS),
+        ),
     )
     try:
         requested = int(raw)
     except (TypeError, ValueError):
         requested = DEFAULT_DIRECT_COPY_SLIPPAGE_BPS
-    return max(
-        int(getattr(settings, "buy_slippage_bps", 0) or 0),
-        min(9000, max(0, requested)),
+    return min(
+        MAX_DIRECT_COPY_SLIPPAGE_BPS,
+        max(MIN_DIRECT_COPY_SLIPPAGE_BPS, requested),
     )
-
 
 def direct_copy_amount_sol(
     observed_e4_sol: float,
