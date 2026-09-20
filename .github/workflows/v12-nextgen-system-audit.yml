@@ -3,7 +3,7 @@ name: V12 NextGen Cohesive System Audit
 on:
   push:
     branches:
-      - codex/v12-nextgen-cohesive-sniper-20260920
+      - codex/v12-production-hardening-20260920
     paths:
       - "src/memecoin_bot/**"
       - "scripts/v12_*.py"
@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: codex/v12-nextgen-cohesive-sniper-20260920
+          ref: codex/v12-production-hardening-20260920
           fetch-depth: 2
       - uses: actions/setup-python@v5
         with:
@@ -118,6 +118,6 @@ jobs:
           git add research/v12-nextgen-system-audit.json
           if ! git diff --cached --quiet; then
             git commit -m 'audit(v12): certify cohesive automated sniper stack [skip ci]'
-            git pull --rebase origin codex/v12-nextgen-cohesive-sniper-20260920
-            git push origin HEAD:codex/v12-nextgen-cohesive-sniper-20260920
+            git pull --rebase origin codex/v12-production-hardening-20260920
+            git push origin HEAD:codex/v12-production-hardening-20260920
           fi
