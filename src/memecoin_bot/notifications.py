@@ -14,7 +14,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
 from typing import Any, Protocol
@@ -45,7 +45,7 @@ class NotificationEvent:
         entry_sol: float,
         realized_sol: float,
         signature: str,
-    ) -> "NotificationEvent":
+    ) -> NotificationEvent:
         kind = (
             NotificationKind.TRADE_CLOSED_WIN
             if pnl_sol > 0
@@ -77,7 +77,7 @@ class NotificationEvent:
         amount_sol: float,
         destination: str,
         signature: str,
-    ) -> "NotificationEvent":
+    ) -> NotificationEvent:
         event_id = hashlib.sha256(
             f"storage-sweep|{request_id}|{signature}".encode()
         ).hexdigest()
@@ -334,7 +334,7 @@ class NotificationRouter:
                 continue
             try:
                 await sink.deliver(event)
-            except Exception as exc:
+            except (RuntimeError, OSError, ValueError, urllib.error.URLError) as exc:
                 self.outbox.failed(event.event_id, sink_name, attempts, str(exc))
             else:
                 self.outbox.delivered(event.event_id, sink_name)
