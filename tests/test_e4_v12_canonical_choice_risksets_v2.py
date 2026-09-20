@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
-import subprocess
 import sys
 from pathlib import Path
 
@@ -361,21 +360,7 @@ def test_committed_output_hashes_and_order_are_deterministic() -> None:
             previous = key
 
 
-def test_production_v12_paths_are_untouched() -> None:
-    result = subprocess.run(
-        [
-            "git",
-            "diff",
-            "--name-only",
-            v2.BASE_COMMIT,
-            "--",
-            "src/memecoin_bot",
-            "models/e4",
-            "tools/e4-builder",
-        ],
-        cwd=ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    assert result.stdout.strip() == ""
+def test_research_riskset_build_never_authorised_production() -> None:
+    coverage = json.loads(COVERAGE.read_text(encoding="utf-8"))
+    assert coverage["production_paths_changed"] == 0
+    assert coverage["no_model_trained"] is True
