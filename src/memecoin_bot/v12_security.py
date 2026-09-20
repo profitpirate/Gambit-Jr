@@ -13,7 +13,8 @@ import stat
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any, Self
 
 LOGGER = logging.getLogger("gambit.v12.security")
 _SECRET_RE = re.compile(
@@ -90,11 +91,11 @@ class SingleInstanceLock:
             self.handle.close()
             self.handle = None
 
-    def __enter__(self) -> "SingleInstanceLock":
+    def __enter__(self) -> Self:
         self.acquire()
         return self
 
-    def __exit__(self, *_: Any) -> None:
+    def __exit__(self, *_: object) -> None:
         self.release()
 
 
