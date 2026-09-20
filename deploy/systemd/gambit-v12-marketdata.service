@@ -11,6 +11,8 @@ Group=gambit
 WorkingDirectory=/opt/gambit/current
 EnvironmentFile=/etc/gambit/v12-marketdata.env
 Environment=DATABASE_PATH=/var/lib/gambit/marketdata.db
+Environment=V12_MARKETDATA_HEARTBEAT=/run/gambit/v12-marketdata-heartbeat.json
+Environment=V12_MARKETDATA_KILL_SWITCH=/run/gambit/V12_MARKETDATA_KILL
 ExecStart=/opt/gambit/venv/bin/python /opt/gambit/current/scripts/v12_supervisor.py --heartbeat /run/gambit/v12-marketdata-heartbeat.json --kill-switch /run/gambit/V12_MARKETDATA_KILL --stale-seconds 30 -- /opt/gambit/venv/bin/python -m memecoin_bot.v12_marketdata
 Restart=always
 RestartSec=3
