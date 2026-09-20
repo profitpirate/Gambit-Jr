@@ -1,0 +1,40 @@
+{
+  "version": "e4-v11-pipeline-stress-v2",
+  "creator_registry_profiles": 184,
+  "iterations": 200000,
+  "workers": 16,
+  "elapsed_seconds": 36.99084352,
+  "operations_per_second": 5406.743425352415,
+  "decision_p50_ns": 87393,
+  "decision_p95_ns": 114805,
+  "decision_p99_ns": 136176,
+  "decision_max_ns": 814854711,
+  "decision_budget_ns": 36000000,
+  "decision_budget_pass": true,
+  "decision_correctness_failures": 0,
+  "sample_failures": [],
+  "reason_distribution": {
+    "E4_V11 family=proven_repeat_e4_creator tier=elite: proven_repeat_e4_creator identity fast path": 50000,
+    "E4_V11 family=prior_e4_winning_creator tier=strong: prior_e4_winning_creator identity fast path": 50000,
+    "negative creator history identity veto": 50000,
+    "identity-only gate: no approved creator, prelaunch narrative, or fresh E4 confirmation": 50000
+  },
+  "narrative": {
+    "iterations": 50000,
+    "matches": 50000,
+    "p50_ns": 12423384,
+    "p95_ns": 13942814,
+    "p99_ns": 15970276,
+    "max_ns": 180434052
+  },
+  "narrative_budget_pass": true,
+  "pipeline_metrics": {
+    "available": false,
+    "reason": "canonical_v11_manager_has_no_metrics_surface"
+  },
+  "selected_test_creators": {
+    "elite": "4devFPRkWUTknomCHr1uMbfJLn111nKB3GDjH811JP4L",
+    "approved": "6ujZxnphRxTqveaQtLAQHFoWz16xhLWZbTijcgZN4fRp",
+    "negative": "D9gQ6RhKEpnobPBUdWY5bPQt2p3zGk3iVz6ChpUi2ArA"
+  }
+}
