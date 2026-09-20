@@ -14,9 +14,9 @@ This upgrade is deliberately **shadow-only**. It expands what V12 can observe wi
 
 `DISCOVERED -> RUNNER_OBSERVED -> SHORTLISTED -> CONFIRMED_REPEAT_WINNER -> PROMOTION_CANDIDATE`
 
-- First profitable V12-compatible hypothetical fill: **SHORTLISTED**.
+- First profitable all-unknown shadow hypothetical: **SHORTLISTED**, even if the creator is not yet V12-compatible.
 - Second profitable launch on a different mint: **CONFIRMED_REPEAT_WINNER**.
-- Promotion additionally requires at least three V12-compatible fills, at least 66.7% win rate, PF >= 1.5 and positive net P&L.
+- Promotion into the trusted creator evidence queue additionally requires at least two distinct V12-compatible winning mints, at least three V12-compatible fills, at least 66.7% win rate, PF >= 1.5 and positive net P&L.
 - **Promotion never edits the frozen creator list automatically.** It creates a separate evidence queue for later forward validation.
 
 The extra promotion gate is intentional. With thousands of unknown creators, auto-promoting every 2-for-2 sequence would create multiple-testing/false-discovery risk and could destroy V12's selectivity.
