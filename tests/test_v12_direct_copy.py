@@ -10,16 +10,16 @@ from memecoin_bot import e4_direct_copy_v12 as direct
 
 
 class V12DirectCopyTests(unittest.TestCase):
-    def test_default_direct_copy_slippage_uses_builder_ceiling(self):
+    def test_default_direct_copy_slippage_uses_six_percent_guard(self):
         settings = SimpleNamespace(buy_slippage_bps=800)
         with patch.dict(os.environ, {"E4_DIRECT_COPY_SLIPPAGE_BPS": ""}, clear=False):
             os.environ.pop("E4_DIRECT_COPY_SLIPPAGE_BPS", None)
-            self.assertEqual(direct.direct_copy_slippage_bps(settings), 9000)
+            self.assertEqual(direct.direct_copy_slippage_bps(settings), 600)
 
-    def test_direct_copy_slippage_is_bounded_by_builder(self):
+    def test_direct_copy_slippage_is_bounded_by_canonical_guard(self):
         settings = SimpleNamespace(buy_slippage_bps=800)
-        with patch.dict(os.environ, {"E4_DIRECT_COPY_SLIPPAGE_BPS": "12000"}, clear=False):
-            self.assertEqual(direct.direct_copy_slippage_bps(settings), 9000)
+        with patch.dict(os.environ, {"E4_DIRECT_COPY_MAX_OUTPUT_SHORTFALL_BPS": "12000"}, clear=False):
+            self.assertEqual(direct.direct_copy_slippage_bps(settings), 1200)
 
     def test_exact_e4_sol_amount_is_used_when_wallet_can_support_it(self):
         amount, exact = direct.direct_copy_amount_sol(
