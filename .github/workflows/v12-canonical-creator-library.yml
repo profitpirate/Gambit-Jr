@@ -1,0 +1,109 @@
+name: V12 Canonical Creator Library
+
+on:
+  push:
+    branches:
+      - codex/v12-nextgen-cohesive-sniper-20260920
+    paths:
+      - "scripts/v12_creator_library_rebuild.py"
+      - "tests/test_v12_creator_library_rebuild.py"
+      - ".github/workflows/v12-canonical-creator-library.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v12-canonical-creator-library
+  cancel-in-progress: true
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v12-nextgen-cohesive-sniper-20260920
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .[dev,research]
+
+      - name: Verify frozen proof branch is not the target
+        run: |
+          test "$GITHUB_REF_NAME" = "codex/v12-nextgen-cohesive-sniper-20260920"
+          python - <<'PY'
+          import json
+          state=json.load(open("research/v12-pre-armed-100-causal-paper-live.json"))
+          assert state["real_money_execution"] is False
+          print("nextgen branch only; frozen causal proof untouched")
+          PY
+
+      - name: Policy tests
+        run: |
+          python -m pytest tests/test_v12_creator_library_rebuild.py -q
+          ruff check scripts/v12_creator_library_rebuild.py tests/test_v12_creator_library_rebuild.py
+
+      - name: Rebuild canonical library
+        run: |
+          python scripts/v12_creator_library_rebuild.py \
+            --e4-expectancy models/e4/e4-creator-expectancy.json \
+            --apprentice research/v12-creator-apprentice-backfill.json \
+            --output models/e4/v12-creator-library.json \
+            --report research/v12-creator-library-report.md
+
+      - name: Clear legacy active creator registries
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          legacy = (
+              "models/e4/e4-discovered-creators.json",
+              "models/e4/e4-winning-creators.json",
+              "models/e4/e4-discovered-known-creators.json",
+          )
+          for name in legacy:
+              payload = {
+                  "version": "deprecated-empty-after-v12-library-rebuild",
+                  "active": False,
+                  "creators": {},
+                  "replacement": "models/e4/v12-creator-library.json",
+                  "note": "Historical evidence is retained separately; this legacy active registry is intentionally empty.",
+              }
+              Path(name).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+          PY
+
+      - name: Integrity
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open("models/e4/v12-creator-library.json"))
+          assert d["activation"]["enabled_now"] is False
+          assert d["activation"]["frozen_100_trade_model_modified"] is False
+          assert d["counts"]["e4_repeat_winner_promotions"] == 35, d["counts"]
+          assert d["counts"]["promoted_unique"] >= 35, d["counts"]
+          assert d["counts"]["shortlisted_unique"] <= 75, d["counts"]
+          assert all(x["auto_buy"] is False for x in d["promoted"])
+          assert all(x["selection_authority"] == "RESEARCH_ONLY" for x in d["shortlisted"])
+          print(json.dumps(d["counts"], sort_keys=True))
+          print(json.dumps(d["runner_2x_gap"], sort_keys=True))
+          PY
+
+      - name: Commit canonical library
+        run: |
+          git config user.name 'gambit-v12-library'
+          git config user.email 'actions@users.noreply.github.com'
+          git add \
+            models/e4/v12-creator-library.json \
+            models/e4/e4-discovered-creators.json \
+            models/e4/e4-winning-creators.json \
+            models/e4/e4-discovered-known-creators.json \
+            research/v12-creator-library-report.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'data(v12): replace creator registries with canonical promoted library [skip ci]'
+            git pull --rebase origin codex/v12-nextgen-cohesive-sniper-20260920
+            git push origin HEAD:codex/v12-nextgen-cohesive-sniper-20260920
+          fi
