@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Shadow-only unknown-creator apprenticeship for frozen V12 Pre-Armed."""
 
 from __future__ import annotations
@@ -441,9 +440,11 @@ def render_report(state: Mapping[str, Any]) -> str:
         "",
         "- First profitable V12-compatible hypothetical fill -> SHORTLISTED.",
         "- Second profitable launch on a different mint -> CONFIRMED_REPEAT_WINNER.",
-        f"- Promotion additionally requires >= {PROMOTION_MIN_FILLS} fills, "
-        f">= {PROMOTION_MIN_WIN_RATE:.2%} WR, PF >= {PROMOTION_MIN_PROFIT_FACTOR:.2f}, "
-        f"and net P&L >= {PROMOTION_MIN_NET_PNL_SOL:.3f} SOL.",
+        (
+            f"- Promotion additionally requires >= {PROMOTION_MIN_FILLS} fills, "
+            f">= {PROMOTION_MIN_WIN_RATE:.2%} WR, PF >= {PROMOTION_MIN_PROFIT_FACTOR:.2f}, "
+            f"and net P&L >= {PROMOTION_MIN_NET_PNL_SOL:.3f} SOL."
+        ),
         "- Promotion candidates are evidence only; frozen creator lists are never mutated.",
         "",
         "## Leading creators",
