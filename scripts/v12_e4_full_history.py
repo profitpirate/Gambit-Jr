@@ -17,6 +17,7 @@ from typing import Any
 
 import e4_live_market_stress as stress
 import v12_e4_recent_compare as recent
+
 from memecoin_bot.realtime.pumpfun import PUMP_PROGRAM_ID, anchor_events_from_logs
 
 
