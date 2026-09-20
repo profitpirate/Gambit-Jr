@@ -1,0 +1,37 @@
+[Unit]
+Description=Gambit V12 Canonical Market Data
+After=network-online.target
+Wants=network-online.target
+Before=gambit-v12.service gambit-v12-orchestrator.service
+
+[Service]
+Type=simple
+User=gambit
+Group=gambit
+WorkingDirectory=/opt/gambit/current
+EnvironmentFile=/etc/gambit/v12-marketdata.env
+Environment=DATABASE_PATH=/var/lib/gambit/marketdata.db
+ExecStart=/opt/gambit/venv/bin/python /opt/gambit/current/scripts/v12_supervisor.py --heartbeat /run/gambit/v12-marketdata-heartbeat.json --kill-switch /run/gambit/V12_MARKETDATA_KILL --stale-seconds 30 -- /opt/gambit/venv/bin/python -m memecoin_bot.v12_marketdata
+Restart=always
+RestartSec=3
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+LockPersonality=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/gambit /var/log/gambit /run/gambit
+RuntimeDirectory=gambit
+RuntimeDirectoryMode=0700
+StateDirectory=gambit
+StateDirectoryMode=0700
+
+[Install]
+WantedBy=multi-user.target
