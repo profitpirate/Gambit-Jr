@@ -52,7 +52,7 @@ class CreatorExpectancyEntryTests(unittest.TestCase):
         v9._EXPECTANCY_CREATORS[creator] = {"wins": 5, "losses": 1, "trades": 6, "gross_win_rate": 5 / 6}
         accepted, score, fraction, reason, features = self.policy.entry(seeded_state("proven-mint", creator))
         self.assertTrue(accepted, reason)
-        self.assertIn("proven_repeat_e4_creator", reason)
+        self.assertIn("v12_elite_creator_quality_launch", reason)
         self.assertGreaterEqual(score, 0.93)
         self.assertGreaterEqual(fraction, 0.03)
         self.assertEqual(features["creator_prior_wins"], 5.0)
@@ -74,7 +74,7 @@ class CreatorExpectancyEntryTests(unittest.TestCase):
         self.assertFalse(accepted)
         self.assertEqual(score, 0.0)
         self.assertEqual(fraction, 0.0)
-        self.assertIn("identity-only gate", reason)
+        self.assertIn("identity gate", reason)
 
     def test_unknown_creator_public_flow_has_no_authority(self) -> None:
         creator = "unknown"
@@ -84,7 +84,7 @@ class CreatorExpectancyEntryTests(unittest.TestCase):
             state.apply(event(index, core.EventKind.BUY, state.mint, now + index * 2_000_000, trader=wallet, sol=3.0, price=1.2e-6 + index * 1e-8, fdv=5_000.0), None)
         accepted, _, _, reason, _ = self.policy.entry(state)
         self.assertFalse(accepted)
-        self.assertIn("identity-only gate", reason)
+        self.assertIn("identity gate", reason)
 
     def test_explicit_prearmed_overrides_negative_history(self) -> None:
         creator = "authorized-negative"
