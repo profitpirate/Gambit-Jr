@@ -103,7 +103,7 @@ class CopyExitTests(unittest.TestCase):
         action, fraction, reason = core.E4Policy(
             core.Settings(model_path=Path("missing.json"))
         ).exit(self.position(mint), self.state(mint))
-        self.assertEqual(action, "SELL_FULL", reason)
+        self.assertEqual(action, "SELL_ALL", reason)
         self.assertEqual(fraction, 1.0)
 
 
