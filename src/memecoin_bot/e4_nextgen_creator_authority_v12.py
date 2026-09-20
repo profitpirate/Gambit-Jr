@@ -160,7 +160,7 @@ def _entry_nextgen_authority(
     if not active() or _LIBRARY is None:
         return result
 
-    accepted, score, fraction, reason, features = result
+    accepted, score, _fraction, reason, features = result
     if not accepted:
         return result
 
@@ -231,7 +231,7 @@ def status() -> dict[str, Any]:
         "active": active(),
         "library": _LIBRARY.status() if _LIBRARY else None,
         "causal_closed_trades": int(
-            ((_CAUSAL_STATE.get("metrics") or {}).get("closed_trades") or 0)
+            (_CAUSAL_STATE.get("metrics") or {}).get("closed_trades") or 0
         ),
         "old_creator_registries_have_authority_when_active": False,
         "selection_formula_replaced": False,
