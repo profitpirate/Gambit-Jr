@@ -103,6 +103,10 @@ def _make_profile(
         features=dict(features),
     )
     v6._PROFILE_BY_MINT[state.mint] = profile
+    if "e4_v12_decision_latency_ns" in features:
+        features["e4_v10_decision_latency_ns"] = features[
+            "e4_v12_decision_latency_ns"
+        ]
     features.update(
         {
             "e4_v12_score": profile.score,
