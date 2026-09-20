@@ -1,14 +1,12 @@
 """Time-decayed creator lifecycle for V12 production."""
 from __future__ import annotations
 
-import json
 import math
 import sqlite3
 import time
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
-from typing import Any
 
 
 SCHEMA = """
