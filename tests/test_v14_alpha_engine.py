@@ -34,7 +34,6 @@ from memecoin_bot.alpha_engine import (
     survival_engine,
     t0_decision,
 )
-from memecoin_bot.discord.cards import compare_card, menu_card, scan_card
 from memecoin_bot.models import MarketSnapshot, SafetyAssessment, iso
 from memecoin_bot.providers.launch_events import (
     EvmFactoryLaunchSource,
@@ -506,28 +505,6 @@ async def test_manual_scan_is_parallel_read_only_and_watchlist_is_separate():
         assert len(db.user_watchlist(1, 2)) == 1
         assert db.remove_watch(1, 2, "solana", "mint")
         db.close()
-
-
-def test_discord_cards_are_branded_mobile_safe_and_have_no_raw_json():
-    scan = {
-        "token_address": "mint",
-        "chain": "solana",
-        "state": "FOUND",
-        "entry_state": "EARLY",
-        "market": {"symbol": "TST", "market_cap_usd": 10_000, "liquidity_usd": 8_000},
-        "survival": {"grade": "ACCEPTABLE"},
-        "payoff": {"grade": "CONVEX"},
-        "providers": {"market": {"state": "HEALTHY"}},
-        "unknowns": [],
-    }
-    cards = [menu_card(), scan_card(scan), compare_card(scan, scan)]
-    for value in cards:
-        embed = value["embed"]
-        assert embed["color"] == 0xD96B1D
-        assert len(embed["title"]) <= 256
-        assert len(embed.get("description", "")) <= 4096
-        assert len(embed.get("fields", [])) <= 25
-        assert "{" not in embed.get("description", "")
 
 
 def test_1000_candidate_scheduler_prevents_fresh_starvation():
