@@ -6,6 +6,10 @@ on:
       - codex/e4-v12-flow-survival-hazard-v12
     paths:
       - ".github/workflows/v12-pre-armed-shadow-integration.yml"
+      - "scripts/v12_prearmed_shadow_suite.py"
+      - "scripts/v12_prearmed_guardrail_policy.py"
+      - "scripts/e4_v12_axiom_paper_live.py"
+      - "research/e4-builder-security-status.json"
   workflow_dispatch:
 
 permissions:
@@ -98,6 +102,7 @@ jobs:
           assert "creator_concentration" in data
           assert "risk_of_ruin" in data
           assert "drift" in data
+          assert data["guardrails"]["real_money_authorised"] is False
           print(json.dumps({
               "reliability": data["reliability"]["status"],
               "latest_run_id": data["latest_run_id"],
