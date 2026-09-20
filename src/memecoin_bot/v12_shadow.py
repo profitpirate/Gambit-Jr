@@ -5,8 +5,8 @@ import json
 import math
 import random
 import statistics
-from collections import defaultdict
 from collections.abc import Mapping, Sequence
+from collections import defaultdict
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from typing import Any, ClassVar
