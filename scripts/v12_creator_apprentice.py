@@ -185,6 +185,18 @@ def creator_summary(
 ) -> dict[str, Any]:
     rows = [row for row in observations if row.get("creator") == creator]
     rows.sort(key=lambda row: (integer(row.get("create_ns")), str(row.get("mint"))))
+
+    scout_fills = [
+        row for row in rows if row.get("scout", {}).get("status") == "FILLED"
+    ]
+    scout_pnls = [finite(row["scout"].get("pnl_sol")) for row in scout_fills]
+    scout_winners = [
+        row for row in scout_fills if finite(row["scout"].get("pnl_sol")) > 0
+    ]
+    scout_winning_mints = list(
+        dict.fromkeys(str(row.get("mint")) for row in scout_winners)
+    )
+
     compatible = [
         row
         for row in rows
@@ -201,15 +213,18 @@ def creator_summary(
     win_rate = wins / fills if fills else 0.0
     net = sum(pnls)
     pf = profit_factor(pnls)
+
     status = "DISCOVERED"
     if any(row.get("runner", {}).get("runner_2x_60s") for row in rows):
         status = "RUNNER_OBSERVED"
-    if wins >= 1:
+    if len(scout_winning_mints) >= 1:
         status = "SHORTLISTED"
-    if len(winning_mints) >= 2:
+    if len(scout_winning_mints) >= 2:
         status = "CONFIRMED_REPEAT_WINNER"
+
     promotion_ready = bool(
-        len(winning_mints) >= 2
+        len(scout_winning_mints) >= 2
+        and len(winning_mints) >= 2
         and fills >= PROMOTION_MIN_FILLS
         and win_rate >= PROMOTION_MIN_WIN_RATE
         and net >= PROMOTION_MIN_NET_PNL_SOL
@@ -217,6 +232,9 @@ def creator_summary(
     )
     if promotion_ready:
         status = "PROMOTION_CANDIDATE"
+
+    scout_wins = len(scout_winners)
+    scout_losses = len(scout_fills) - scout_wins
     return {
         "creator": creator,
         "status": status,
@@ -228,6 +246,13 @@ def creator_summary(
         "runner_3x_count": sum(
             bool(row.get("runner", {}).get("runner_3x_60s")) for row in rows
         ),
+        "scout_fills": len(scout_fills),
+        "scout_wins": scout_wins,
+        "scout_losses": scout_losses,
+        "scout_win_rate": scout_wins / len(scout_fills) if scout_fills else 0.0,
+        "scout_net_pnl_sol": sum(scout_pnls),
+        "scout_profit_factor": profit_factor(scout_pnls),
+        "distinct_scout_winning_mints": scout_winning_mints,
         "v12_compatible_fills": fills,
         "wins": wins,
         "losses": losses,
@@ -236,13 +261,14 @@ def creator_summary(
         "expectancy_sol": net / fills if fills else 0.0,
         "profit_factor": pf,
         "distinct_winning_mints": winning_mints,
-        "first_win_mint": winning_mints[0] if winning_mints else None,
-        "second_confirmation_mint": winning_mints[1] if len(winning_mints) > 1 else None,
+        "first_win_mint": scout_winning_mints[0] if scout_winning_mints else None,
+        "second_confirmation_mint": (
+            scout_winning_mints[1] if len(scout_winning_mints) > 1 else None
+        ),
         "first_seen_ns": integer(rows[0].get("create_ns")) if rows else 0,
         "last_seen_ns": integer(rows[-1].get("create_ns")) if rows else 0,
         "automatic_whitelist_mutation": False,
     }
-
 
 def rebuild_creator_index(state: dict[str, Any]) -> None:
     creators = sorted(
