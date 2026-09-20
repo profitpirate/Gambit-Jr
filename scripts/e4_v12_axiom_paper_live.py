@@ -68,6 +68,51 @@ def atomic_json(path: Path, value: Any) -> None:
         raise
 
 
+def validate_paper_state(state: Mapping[str, Any], model_hash: str) -> None:
+    """Fail closed on any state that cannot be continued causally."""
+    if state.get("model_sha256") != model_hash:
+        raise ValueError("frozen model fingerprint changed after paper-live test began")
+
+    seen: set[tuple[str, str]] = set()
+    for index, row in enumerate(state.get("ledger", [])):
+        run_id = str(row.get("run_id") or "")
+        mint = str(row.get("mint") or "")
+        key = (run_id, mint)
+        if not run_id or not mint:
+            raise ValueError(f"paper ledger row {index} is missing run_id or mint")
+        if key in seen:
+            raise ValueError(f"duplicate paper trade identity: {run_id}/{mint}")
+        seen.add(key)
+
+        decision_ns = integer(row.get("decision_ns"), -1)
+        fill_ns = integer(row.get("fill_ns"), -1)
+        exit_ns = integer(row.get("exit_ns"), -1)
+        if decision_ns < 0 or fill_ns < decision_ns or exit_ns < fill_ns:
+            raise ValueError(
+                "non-causal paper trade chronology: "
+                f"{run_id}/{mint} decision={decision_ns} fill={fill_ns} exit={exit_ns}"
+            )
+
+        for field in ("entry_cost_sol", "proceeds_sol", "pnl_sol"):
+            try:
+                value = float(row.get(field))
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    f"invalid {field} for paper trade {run_id}/{mint}"
+                ) from exc
+            if not math.isfinite(value):
+                raise ValueError(
+                    f"non-finite {field} for paper trade {run_id}/{mint}"
+                )
+
+    rejection_seen: set[tuple[str, str]] = set()
+    for row in state.get("rejections", []):
+        key = (str(row.get("run_id") or ""), str(row.get("mint") or ""))
+        if key in rejection_seen:
+            raise ValueError(f"duplicate paper rejection identity: {key[0]}/{key[1]}")
+        rejection_seen.add(key)
+
+
 def wilson_lower(wins: int, trades: int, z: float = 1.959963984540054) -> float:
     if trades <= 0:
         return 0.0
@@ -609,8 +654,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         if args.state.exists()
         else empty_state(model, model_hash)
     )
-    if state.get("model_sha256") != model_hash:
-        raise ValueError("frozen model fingerprint changed after paper-live test began")
+    validate_paper_state(state, model_hash)
     if bool(state.get("completion", {}).get("reached")):
         state["metrics"] = metrics(state, model)
         args.report.write_text(render_report(state, model), encoding="utf-8")
@@ -662,6 +706,11 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                 audit[f"execution_{rejection['reason']}"] += 1
                 continue
             assert trade is not None
+            if integer(trade["exit_ns"]) < integer(trade["fill_ns"]):
+                raise ValueError(
+                    "simulator produced pre-fill exit chronology: "
+                    f"{run_id}/{candidate.mint}"
+                )
             cash -= finite(trade["entry_cost_sol"])
             active.append(trade)
             state["ledger"].append(trade)
