@@ -3,7 +3,9 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import shutil
 import sys
+import tempfile
 from copy import deepcopy
 from pathlib import Path
 
@@ -32,6 +34,21 @@ holdout = load_module(
 
 def protocol():
     return json.loads((ROOT / holdout.PROTOCOL_PATH).read_text(encoding="utf-8"))
+
+
+@pytest.fixture
+def repo_tmp() -> Path:
+    parent = ROOT / ".tmp-regime-veto-pytest"
+    parent.mkdir(parents=True, exist_ok=True)
+    path = Path(tempfile.mkdtemp(prefix="case-", dir=parent))
+    try:
+        yield path
+    finally:
+        shutil.rmtree(path, ignore_errors=True)
+        try:
+            parent.rmdir()
+        except OSError:
+            pass
 
 
 def metric(*, pnl: float = 1.0, quote_coverage: float = 1.0):
@@ -89,8 +106,9 @@ def capture(
 def test_protocol_content_addresses_the_frozen_candidate() -> None:
     specification = protocol()
     frozen = ROOT / specification["frozen_candidate"]["path"]
-    assert hashlib.sha256(frozen.read_bytes()).hexdigest() == (
-        specification["frozen_candidate"]["sha256"]
+    assert holdout.newline_equivalent_sha256(
+        frozen,
+        specification["frozen_candidate"]["sha256"],
     )
     assert holdout.verify_protocol(ROOT)["experiment_id"] == (
         specification["experiment_id"]
@@ -109,11 +127,11 @@ def test_frozen_hash_allows_only_git_newline_normalisation(tmp_path: Path) -> No
     assert not holdout.newline_equivalent_sha256(path, expected)
 
 
-def test_prefreeze_capture_is_quarantine_but_never_final(tmp_path: Path) -> None:
+def test_prefreeze_capture_is_quarantine_but_never_final(repo_tmp: Path) -> None:
     specification = protocol()
     freeze_ns = specification["frozen_candidate"]["frozen_at_epoch_ns"]
     early = capture(
-        tmp_path,
+        repo_tmp,
         run_id="1",
         role=holdout.QUARANTINE_ROLE,
         workflow_start_ns=freeze_ns - 2,
@@ -133,11 +151,11 @@ def test_prefreeze_capture_is_quarantine_but_never_final(tmp_path: Path) -> None
         holdout.validate_manifest(ROOT, manifest, specification)
 
 
-def test_final_captures_must_be_hash_valid_and_non_overlapping(tmp_path: Path) -> None:
+def test_final_captures_must_be_hash_valid_and_non_overlapping(repo_tmp: Path) -> None:
     specification = protocol()
     freeze_ns = specification["frozen_candidate"]["frozen_at_epoch_ns"]
     first = capture(
-        tmp_path,
+        repo_tmp,
         run_id="2",
         role=holdout.FINAL_ROLE,
         workflow_start_ns=freeze_ns + 1,
@@ -145,7 +163,7 @@ def test_final_captures_must_be_hash_valid_and_non_overlapping(tmp_path: Path) -
         capture_end_ns=freeze_ns + 10,
     )
     second = capture(
-        tmp_path,
+        repo_tmp,
         run_id="3",
         role=holdout.FINAL_ROLE,
         workflow_start_ns=freeze_ns + 11,
