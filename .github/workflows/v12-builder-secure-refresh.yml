@@ -1,0 +1,76 @@
+name: V12 Builder Secure Refresh
+
+on:
+  push:
+    branches:
+      - codex/v12-production-hardening-20260920
+    paths:
+      - "tools/e4-builder/package.json"
+      - ".github/workflows/v12-builder-secure-refresh.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v12-builder-secure-refresh
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v12-production-hardening-20260920
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Regenerate locked dependency graph
+        working-directory: tools/e4-builder
+        run: npm install --package-lock-only --ignore-scripts
+
+      - name: Verify locked install
+        working-directory: tools/e4-builder
+        run: npm ci --omit=dev
+
+      - name: Builder syntax and self-test
+        working-directory: tools/e4-builder
+        run: |
+          node --check race-proxy-v3.mjs
+          node --check strict-race-proxy-v12.mjs
+          node --check fast-preload-v4.mjs
+          node race-proxy-v3.mjs --self-test
+
+      - name: Security audit and SBOM
+        working-directory: tools/e4-builder
+        run: |
+          mkdir -p ../../research
+          npm audit --omit=dev --json > ../../research/v12-builder-npm-audit-current.json || true
+          npm sbom --sbom-format cyclonedx > ../../research/v12-builder-sbom.json
+
+      - name: Enforce vulnerability ceiling
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const a = JSON.parse(fs.readFileSync('research/v12-builder-npm-audit-current.json'));
+          const v = a.metadata?.vulnerabilities || {};
+          console.log(v);
+          if ((v.critical || 0) > 0) process.exit(2);
+          // New graph must not regress above the previously measured 8 high / 8 moderate.
+          if ((v.high || 0) > 8 || (v.moderate || 0) > 8) process.exit(3);
+          NODE
+
+      - name: Commit refreshed lock and evidence
+        run: |
+          git config user.name 'gambit-v12-security'
+          git config user.email 'actions@users.noreply.github.com'
+          git add             tools/e4-builder/package-lock.json             research/v12-builder-npm-audit-current.json             research/v12-builder-sbom.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'security(builder): lock and certify refreshed dependency graph [skip ci]'
+            git pull --rebase origin codex/v12-production-hardening-20260920
+            git push origin HEAD:codex/v12-production-hardening-20260920
+          fi
