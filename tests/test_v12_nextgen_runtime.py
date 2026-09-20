@@ -88,18 +88,18 @@ def test_library_forbids_auto_buy_records() -> None:
 
 
 def test_promoted_creator_only_replaces_recognition_leg() -> None:
-    kwargs = dict(
-        creator="promoted",
-        social_handle="new-handle",
-        social_status_ns=1_000_000_000,
-        create_ns=2_000_000_000,
-        prior_e4_attempts=0,
-        creator_seed_sol=2.0,
-        mayhem_mode=False,
-        creator_handles={},
-        promoted_creators={"promoted"},
-        promoted_library_enabled=True,
-    )
+    kwargs = {
+        "creator": "promoted",
+        "social_handle": "new-handle",
+        "social_status_ns": 1_000_000_000,
+        "create_ns": 2_000_000_000,
+        "prior_e4_attempts": 0,
+        "creator_seed_sol": 2.0,
+        "mayhem_mode": False,
+        "creator_handles": {},
+        "promoted_creators": {"promoted"},
+        "promoted_library_enabled": True,
+    }
     assert selector.should_select_nextgen(**kwargs) is True
     assert selector.should_select_nextgen(**{**kwargs, "creator_seed_sol": 1.99}) is False
     assert selector.should_select_nextgen(**{**kwargs, "mayhem_mode": True}) is False
