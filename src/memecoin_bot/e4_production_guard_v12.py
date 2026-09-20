@@ -13,7 +13,8 @@ import sqlite3
 import time
 import uuid
 from pathlib import Path
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 from . import e4_hardening_v10 as v10
 from . import e4_role_model_v12 as role_model
@@ -27,7 +28,7 @@ from .v12_observability import from_env as metrics_from_env
 from .v12_operator_graph import OperatorGraph
 from .v12_recovery import reconcile_engine, signature_status
 from .v12_route_health import RouteHealthStore
-from .v12_safety import CircuitBreaker, CircuitConfig, SafetyMode, SafetyStore
+from .v12_safety import CircuitBreaker, CircuitConfig, SafetyStore
 from .v12_security import TamperEvidentAuditLog, decode_secret_key, install_redaction_filter
 from .v12_watchdogs import WatchdogManager
 
@@ -776,7 +777,6 @@ def _status_production(self: Any) -> dict[str, Any]:
     try:
         safety = SafetyStore(self.conn)
         journal = ExecutionJournal(self.conn)
-        route = RouteHealthStore(self.conn)
         payload["v12_production"] = {
             "safety": safety.snapshot().mode.value,
             "safety_reason": safety.snapshot().reason,
