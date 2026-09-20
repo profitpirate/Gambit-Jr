@@ -63,7 +63,7 @@ class CreatorLibrary:
         return cls(json.loads(path.read_text(encoding="utf-8")))
 
     @classmethod
-    def from_default_path(cls) -> "CreatorLibrary":
+    def from_default_path(cls) -> CreatorLibrary:
         return cls.from_path(
             Path(os.getenv("V12_CREATOR_LIBRARY_PATH", "models/e4/v12-creator-library.json"))
         )
