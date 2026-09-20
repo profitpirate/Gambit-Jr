@@ -9,6 +9,8 @@ on:
       - "scripts/v12_prearmed_shadow_suite.py"
       - "scripts/e4_v12_axiom_paper_live.py"
       - "tests/test_v12_prearmed_shadow_suite.py"
+      - "scripts/v12_prearmed_guardrail_policy.py"
+      - "tests/test_v12_prearmed_guardrail_policy.py"
       - "tests/test_e4_v12_axiom_paper_live.py"
   workflow_dispatch:
 
@@ -38,8 +40,11 @@ jobs:
         run: |
           python -m compileall -q \
             scripts/v12_prearmed_shadow_suite.py \
+            scripts/v12_prearmed_guardrail_policy.py \
             scripts/e4_v12_axiom_paper_live.py \
             tests/test_v12_prearmed_shadow_suite.py \
+            tests/test_v12_prearmed_guardrail_policy.py \
+            tests/test_v12_prearmed_guardrail_policy.py \
             tests/test_e4_v12_axiom_paper_live.py
 
       - name: Static analysis
@@ -54,4 +59,5 @@ jobs:
         run: |
           python -m pytest \
             tests/test_v12_prearmed_shadow_suite.py \
+            tests/test_v12_prearmed_guardrail_policy.py \
             tests/test_e4_v12_axiom_paper_live.py -q
