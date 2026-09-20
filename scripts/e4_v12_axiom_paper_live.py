@@ -375,14 +375,10 @@ def simulate_trade(
     peak = 1.0
     exit_count = 0
     reason = "MAXIMUM_HOLD"
-    last = next(
-        (
-            point
-            for point in reversed(trace.points)
-            if point.timestamp_ns <= fill_ns and point.virtual_sol > 0 and point.virtual_tokens > 0
-        ),
-        None,
-    )
+    # Exit state must never precede the modeled fill.  We deliberately
+    # start without a post-fill point and fall back to the fill reserve state
+    # at the maximum-hold deadline if the curve is otherwise quiet.
+    last = None
     deadline = fill_ns + policy.hold_ms * 1_000_000
     for point in trace.points:
         if point.timestamp_ns <= fill_ns:
@@ -414,10 +410,17 @@ def simulate_trade(
         if point.complete or multiple <= floor:
             reason = "LIQUIDITY_EMERGENCY" if point.complete else "TRAILING_OR_STOP"
             break
-    if last is None:
-        return None, {"reason": "missing_exit_state", "fee_sol": costs.base_sol + costs.priority_sol}
     if remaining > 0:
-        gross = remaining * last.virtual_sol / max(last.virtual_tokens + remaining, 1e-18)
+        exit_virtual_sol = last.virtual_sol if last is not None else fill.virtual_sol
+        exit_virtual_tokens = (
+            last.virtual_tokens if last is not None else fill.virtual_tokens
+        )
+        if exit_virtual_sol <= 0 or exit_virtual_tokens <= 0:
+            return None, {
+                "reason": "missing_exit_state",
+                "fee_sol": costs.base_sol + costs.priority_sol,
+            }
+        gross = remaining * exit_virtual_sol / max(exit_virtual_tokens + remaining, 1e-18)
         axiom = gross * costs.axiom_bps / 10_000.0
         pump = gross * costs.pump_bps / 10_000.0
         proceeds += max(0.0, gross - axiom - pump - costs.sell_fixed)
@@ -437,7 +440,11 @@ def simulate_trade(
             "creator_seed_sol": candidate.creator_seed_sol,
             "decision_ns": candidate.decision_ns,
             "fill_ns": fill_ns,
-            "exit_ns": last.timestamp_ns,
+            "exit_ns": (
+                last.timestamp_ns
+                if reason != "MAXIMUM_HOLD" and last is not None
+                else deadline
+            ),
             "entry_latency_ms": finite(selector["entry_latency_ms"]),
             "entry_budget_sol": budget,
             "curve_input_sol": curve_input,
