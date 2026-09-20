@@ -11,6 +11,9 @@ on:
       - "research/v12-pre-armed-100-trade-frozen-model.json"
       - "tests/test_e4_v12_axiom_paper_live.py"
       - "tests/test_e4_v12_fast_prearmed_selector.py"
+      - "scripts/v12_prearmed_shadow_suite.py"
+      - "tests/test_v12_prearmed_shadow_suite.py"
+      - "research/v12-pre-armed-50-trade-results.json"
   workflow_dispatch:
 
 permissions:
@@ -58,12 +61,15 @@ jobs:
         run: |
           python -m pytest \
             tests/test_e4_v12_fast_prearmed_selector.py \
-            tests/test_e4_v12_axiom_paper_live.py -q
+            tests/test_e4_v12_axiom_paper_live.py \
+            tests/test_v12_prearmed_shadow_suite.py -q
           ruff check \
             scripts/e4_v12_fast_prearmed_selector.py \
             scripts/e4_v12_axiom_paper_live.py \
             tests/test_e4_v12_fast_prearmed_selector.py \
-            tests/test_e4_v12_axiom_paper_live.py
+            tests/test_e4_v12_axiom_paper_live.py \
+            scripts/v12_prearmed_shadow_suite.py \
+            tests/test_v12_prearmed_shadow_suite.py
 
       - name: Check whether 100 closed trades are already complete
         id: progress
@@ -101,6 +107,20 @@ jobs:
             --report research/v12-pre-armed-100-trade-paper-live.md \
             --metadata-cache artifacts/v12-pre-armed-100-metadata-cache.json
 
+      - name: Run parallel shadow intelligence suite
+        if: steps.progress.outputs.complete != 'true'
+        run: |
+          python scripts/v12_prearmed_shadow_suite.py \
+            --run-id "${GITHUB_RUN_ID}" \
+            --batch artifacts/v12-pre-armed-100-live-batch.json \
+            --events artifacts/v12-pre-armed-100-live-batch-live-events.jsonl \
+            --paper-state research/v12-pre-armed-100-trade-paper-live.json \
+            --model research/v12-pre-armed-100-trade-frozen-model.json \
+            --baseline research/v12-pre-armed-50-trade-results.json \
+            --analytics-state research/v12-pre-armed-shadow-analytics.json \
+            --report research/v12-pre-armed-shadow-analytics.md \
+            --metadata-cache artifacts/v12-pre-armed-100-metadata-cache.json
+
       - name: Persist the cumulative ledger
         if: steps.progress.outputs.complete != 'true'
         run: |
@@ -109,6 +129,10 @@ jobs:
           git add \
             research/v12-pre-armed-100-trade-paper-live.json \
             research/v12-pre-armed-100-trade-paper-live.md
+            research/v12-pre-armed-shadow-analytics.json
+            research/v12-pre-armed-shadow-analytics.md \
+            research/v12-pre-armed-shadow-analytics.json \
+            research/v12-pre-armed-shadow-analytics.md
           if ! git diff --cached --quiet; then
             git commit -m 'data(e4): accumulate Axiom-costed paper-live trades [skip ci]'
             git push origin HEAD:"$RESEARCH_BRANCH"
