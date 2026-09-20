@@ -441,12 +441,9 @@ async def async_main(args: argparse.Namespace) -> int:
                 loop.add_signal_handler(sig, service.stop)
             except (NotImplementedError, RuntimeError):
                 pass
-        if settings.discord_token:
-            from memecoin_bot.discord.bot_runtime import run_discord_bot
-
-            await run_discord_bot(service, store, settings)
-        else:
-            await service.run()
+        # Gambit Jr is now an automated sniper. Discord is outbound-only
+        # (login DMs and notifications); no slash-command runtime owns the process.
+        await service.run()
         server.shutdown()
         if board:
             board.shutdown()
