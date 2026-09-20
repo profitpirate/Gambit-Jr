@@ -94,7 +94,7 @@ def _receipt_with_notifications(
     try:
         import os
 
-        destination = os.getenv("E4_VAULT_WALLET", "") or os.getenv("E4_VAULT", "")
+        destination = os.getenv("E4_VAULT_PUBLIC_KEY", "")
     except Exception:
         destination = ""
     _publish(
