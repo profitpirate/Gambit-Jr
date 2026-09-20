@@ -431,12 +431,73 @@ class ControlPlane:
                         "SELECT status,COUNT(*) FROM e4_positions GROUP BY status"
                     )
                 }
-                safety = conn.execute(
-                    "SELECT mode,reason FROM v12_safety_state WHERE singleton=1"
+                open_positions = [
+                    dict(row)
+                    for row in conn.execute(
+                        """
+                        SELECT mint,status,opened_ns,entry_sol,remaining,last_price,
+                               realized_sol,entry_signature,close_signature
+                        FROM e4_positions
+                        WHERE status IN ('OPEN','PARTIAL','EXITING')
+                        ORDER BY opened_ns
+                        """
+                    )
+                ]
+                recent_trades = [
+                    {
+                        **dict(row),
+                        "pnl_sol": float(row["realized_sol"]) - float(row["entry_sol"]),
+                    }
+                    for row in conn.execute(
+                        """
+                        SELECT mint,opened_ns,entry_sol,realized_sol,close_signature
+                        FROM e4_positions
+                        WHERE status='CLOSED'
+                        ORDER BY updated_ns DESC
+                        LIMIT 20
+                        """
+                    )
+                ]
+                pnl_row = conn.execute(
+                    """
+                    SELECT COALESCE(SUM(realized_sol-entry_sol),0),
+                           COUNT(*)
+                    FROM e4_positions
+                    WHERE status='CLOSED'
+                    """
                 ).fetchone()
+                sweeps = [
+                    dict(row)
+                    for row in conn.execute(
+                        """
+                        SELECT amount,signature,confirmed,confirmation_slot,error,created_ns
+                        FROM e4_orders
+                        WHERE side='SWEEP'
+                        ORDER BY created_ns DESC
+                        LIMIT 20
+                        """
+                    )
+                ]
+                safety = conn.execute(
+                    "SELECT mode,reason,peak_equity_sol,day_start_equity_sol,"
+                    "consecutive_losses,tx_failures_window "
+                    "FROM v12_safety_state WHERE singleton=1"
+                ).fetchone()
+                journal = {
+                    str(row[0]): int(row[1])
+                    for row in conn.execute(
+                        "SELECT state,COUNT(*) FROM v12_execution_journal GROUP BY state"
+                    )
+                }
                 payload["execution"] = {
                     "positions": positions,
+                    "open_positions": open_positions,
+                    "recent_trades": recent_trades,
+                    "closed_pnl_sol": float(pnl_row[0]) if pnl_row else 0.0,
+                    "closed_trades": int(pnl_row[1]) if pnl_row else 0,
+                    "storage_sweeps": sweeps,
                     "safety": dict(safety) if safety else None,
+                    "journal": journal,
                 }
                 conn.close()
             except sqlite3.Error:
