@@ -47,8 +47,31 @@ jobs:
       - name: Python production dependency audit
         run: |
           mkdir -p research
+          set +e
           pip-audit . --format json --output research/v12-python-project-audit.json
+          echo "$?" > research/v12-python-project-audit.exit
           pip-audit -r requirements-e4.txt --format json --output research/v12-python-e4-audit.json
+          echo "$?" > research/v12-python-e4-audit.exit
+          set -e
+          python - <<'PY'
+          import json
+          for name in ("project","e4"):
+              path=f"research/v12-python-{name}-audit.json"
+              data=json.load(open(path))
+              vulnerable=[]
+              for dep in data.get("dependencies",[]):
+                  vulns=dep.get("vulns") or []
+                  if vulns:
+                      vulnerable.append({
+                          "name":dep.get("name"),
+                          "version":dep.get("version"),
+                          "vulns":[
+                              {"id":v.get("id"),"fix_versions":v.get("fix_versions",[])}
+                              for v in vulns
+                          ],
+                      })
+              print(json.dumps({"audit":name,"vulnerable":vulnerable},sort_keys=True))
+          PY
 
       - name: Production security static analysis
         run: |
@@ -76,11 +99,19 @@ jobs:
           if ((v.critical || 0) > 0) process.exit(2);
           NODE
 
+      - name: Enforce Python dependency audit
+        run: |
+          project_rc="$(cat research/v12-python-project-audit.exit)"
+          e4_rc="$(cat research/v12-python-e4-audit.exit)"
+          test "$project_rc" -eq 0
+          test "$e4_rc" -eq 0
+
       - name: Commit security evidence
         run: |
           git config user.name 'gambit-v12-security'
           git config user.email 'actions@users.noreply.github.com'
-          git add             security/v12-integrity-manifest.json             research/v12-python-project-audit.json             research/v12-python-e4-audit.json             research/v12-bandit.json             research/v12-python-sbom.json             research/v12-builder-npm-audit-security.json             research/v12-builder-sbom-security.json
+          git add             security/v12-integrity-manifest.json             research/v12-python-project-audit.json \
+            research/v12-python-e4-audit.json             research/v12-bandit.json             research/v12-python-sbom.json             research/v12-builder-npm-audit-security.json             research/v12-builder-sbom-security.json
           if ! git diff --cached --quiet; then
             git commit -m 'security(v12): refresh production security evidence [skip ci]'
             git pull --rebase origin codex/v12-production-hardening-20260920
