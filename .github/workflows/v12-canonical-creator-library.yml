@@ -3,7 +3,7 @@ name: V12 Canonical Creator Library
 on:
   push:
     branches:
-      - codex/v12-nextgen-cohesive-sniper-20260920
+      - codex/v12-production-hardening-20260920
     paths:
       - "scripts/v12_creator_library_rebuild.py"
       - "tests/test_v12_creator_library_rebuild.py"
@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: codex/v12-nextgen-cohesive-sniper-20260920
+          ref: codex/v12-production-hardening-20260920
           fetch-depth: 1
       - uses: actions/setup-python@v5
         with:
@@ -35,12 +35,12 @@ jobs:
 
       - name: Verify frozen proof branch is not the target
         run: |
-          test "$GITHUB_REF_NAME" = "codex/v12-nextgen-cohesive-sniper-20260920"
+          test "$GITHUB_REF_NAME" = "codex/v12-production-hardening-20260920"
           python - <<'PY'
           import json
           state=json.load(open("research/v12-pre-armed-100-causal-paper-live.json"))
           assert state["real_money_execution"] is False
-          print("nextgen branch only; frozen causal proof untouched")
+          print("production-hardening branch only; frozen causal proof untouched")
           PY
 
       - name: Policy tests
@@ -107,6 +107,6 @@ jobs:
             research/v12-creator-library-report.md
           if ! git diff --cached --quiet; then
             git commit -m 'data(v12): replace creator registries with canonical promoted library [skip ci]'
-            git pull --rebase origin codex/v12-nextgen-cohesive-sniper-20260920
-            git push origin HEAD:codex/v12-nextgen-cohesive-sniper-20260920
+            git pull --rebase origin codex/v12-production-hardening-20260920
+            git push origin HEAD:codex/v12-production-hardening-20260920
           fi
