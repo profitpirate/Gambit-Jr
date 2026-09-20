@@ -103,13 +103,13 @@ def test_shortlist_is_research_only() -> None:
         "creators": {
             "candidate": fresh(
                 "candidate",
-                fills=3,
-                wins=1,
+                fills=4,
+                wins=2,
                 losses=2,
-                net=0.06,
-                scout_wins=2,
-                scout_net=0.10,
-                runners=2,
+                net=0.16,
+                scout_wins=3,
+                scout_net=0.24,
+                runners=3,
             )
         },
         "counts": {"unknown_launch_observations": 3},
