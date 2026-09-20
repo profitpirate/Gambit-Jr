@@ -6,11 +6,10 @@ eligible after the causal 100 passes and an explicit operator env flag is set.
 from __future__ import annotations
 
 import os
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Mapping
 
 from memecoin_bot.v12_creator_library import CreatorLibrary, causal_100_passed
-
 
 FROZEN_FRACTION = 0.10
 BASE_POSTCERT_FRACTION = 0.125
