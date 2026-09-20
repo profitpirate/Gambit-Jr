@@ -9,7 +9,8 @@ import statistics
 import sys
 import time
 from pathlib import Path
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import e4_live_market_stress as stress
@@ -75,7 +76,7 @@ async def fetch_transactions(
                         ],
                     )
                     return row, tx if isinstance(tx, Mapping) else None
-                except Exception:
+                except RuntimeError:
                     await asyncio.sleep(0.2 * (attempt + 1))
             return row, None
 
@@ -340,8 +341,10 @@ def render(result: Mapping[str, Any]) -> str:
         f"- <=2s exits: {(v12['exited_within_2s_fraction'] or 0):.1%}",
         f"- Losing trades <=2s: {(v12['losers_exited_within_2s_fraction'] or 0):.1%}",
         f"- Median entry: {(v12['entry_size_sol']['median'] or 0):.4f} SOL",
-        f"- Selection: {v12['closed_positions']}/{v12['launches_observed']} launches "
-        f"({(v12['trade_rate_per_launch'] or 0):.3%})",
+        (
+            f"- Selection: {v12['closed_positions']}/{v12['launches_observed']} launches "
+            f"({(v12['trade_rate_per_launch'] or 0):.3%})"
+        ),
         f"- Top creator share: {v12['top_creator_trade_share']:.1%}",
         "",
         "## Direct overlap",
