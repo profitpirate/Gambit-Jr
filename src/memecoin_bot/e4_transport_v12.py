@@ -13,6 +13,7 @@ from urllib.parse import urlsplit, urlunsplit
 import aiohttp
 
 from . import e4_role_model_v12 as role_model
+from . import e4_v12_authority as authority
 
 core = role_model.core
 LOGGER = logging.getLogger("gambit.e4.transport.v12")
@@ -231,7 +232,12 @@ class WarmFanoutRouteSender(_PREVIOUS_ROUTE_SENDER):
             self._http_session = None
 
 
-core.RouteSender = WarmFanoutRouteSender
+authority.install_route_sender(
+    core,
+    WarmFanoutRouteSender,
+    priority=authority.ROUTE_PRIORITY_BASE,
+    authority="v12_base_transport",
+)
 
 _PREVIOUS_ENGINE_RUN = core.Engine.run
 
