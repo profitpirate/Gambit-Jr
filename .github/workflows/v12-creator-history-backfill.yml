@@ -1,0 +1,118 @@
+name: V12 Creator History Backfill
+
+on:
+  push:
+    branches:
+      - codex/v12-broad-discovery-creator-apprentice-20260920
+    paths:
+      - "scripts/v12_creator_history_enrich.py"
+      - ".github/workflows/v12-creator-history-backfill.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: v12-creator-history-backfill
+  cancel-in-progress: true
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: \${{ github.token }}
+      BRANCH: codex/v12-broad-discovery-creator-apprentice-20260920
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v12-broad-discovery-creator-apprentice-20260920
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .[dev,research]
+      - run: python -m pip install -r requirements-e4.txt
+
+      - name: Verify frozen model fingerprint
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          p=json.load(open("research/v12-pre-armed-100-trade-frozen-model.json"))
+          d=hashlib.sha256(json.dumps(p,sort_keys=True,separators=(",",":")).encode()).hexdigest()
+          assert d=="69df86eaf386fd37d699928a95d25aaeb2053e743b59c9e687c8a7c49d14f977", d
+          PY
+
+      - name: Download all committed fresh causal source windows
+        run: |
+          set -euo pipefail
+          mkdir -p replay
+          for run in 35508088321 35516796792 35523801183; do
+            mkdir -p "replay/$run"
+            gh run download "$run" \
+              --repo "$GITHUB_REPOSITORY" \
+              --name "v12-pre-armed-100-causal-live-$run" \
+              --dir "replay/$run"
+          done
+
+      - name: Rebuild apprenticeship over every unknown creator
+        run: |
+          set -euo pipefail
+          rm -f research/v12-creator-apprentice-backfill.json
+          for run in 35508088321 35516796792 35523801183; do
+            batch="$(find "replay/$run" -name 'v12-pre-armed-100-causal-live-batch.json' -print -quit)"
+            events="$(find "replay/$run" -name 'v12-pre-armed-100-causal-live-batch-live-events.jsonl' -print -quit)"
+            test -s "$batch"
+            test -s "$events"
+            python scripts/v12_creator_apprentice.py \
+              --run-id "$run" \
+              --batch "$batch" \
+              --events "$events" \
+              --model research/v12-pre-armed-100-trade-frozen-model.json \
+              --state research/v12-creator-apprentice-backfill.json \
+              --report research/v12-creator-apprentice-backfill.md \
+              --promotion-candidates research/v12-creator-apprentice-fresh-promotions.json
+          done
+
+      - name: Cross-check previous E4-created coins and creator history
+        run: |
+          python scripts/v12_creator_history_enrich.py \
+            --apprentice-state research/v12-creator-apprentice-backfill.json \
+            --expectancy models/e4/e4-creator-expectancy.json \
+            --winning-creators models/e4/e4-winning-creators.json \
+            --discovered-creators models/e4/e4-discovered-creators.json \
+            --output research/v12-creator-history-backfill.json \
+            --report research/v12-creator-history-backfill.md
+
+      - name: Invariants
+        run: |
+          python - <<'PY'
+          import json
+          s=json.load(open("research/v12-creator-apprentice-backfill.json"))
+          h=json.load(open("research/v12-creator-history-backfill.json"))
+          assert s["shadow_only"] is True
+          assert s["frozen_selector_modified"] is False
+          assert s["production_paths_changed"] == 0
+          assert h["shadow_only"] is True
+          assert h["automatic_whitelist_mutation"] is False
+          assert h["counts"]["fresh_unknown_launches"] >= 8900, h["counts"]
+          print(json.dumps(h["counts"],sort_keys=True))
+          PY
+
+      - name: Commit analysis
+        run: |
+          git config user.name 'gambit-v12-creator-backfill'
+          git config user.email 'actions@users.noreply.github.com'
+          git add \
+            research/v12-creator-apprentice-backfill.json \
+            research/v12-creator-apprentice-backfill.md \
+            research/v12-creator-apprentice-fresh-promotions.json \
+            research/v12-creator-history-backfill.json \
+            research/v12-creator-history-backfill.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(v12): backfill 9k unknown creators with prior history [skip ci]'
+            git pull --rebase origin "$BRANCH"
+            git push origin HEAD:"$BRANCH"
+          fi
