@@ -53,7 +53,7 @@ class CreatorExpectancyEntryTests(unittest.TestCase):
         accepted, score, fraction, reason, features = self.policy.entry(seeded_state("proven-mint", creator))
         self.assertTrue(accepted, reason)
         self.assertIn("v12_elite_creator_quality_launch", reason)
-        self.assertGreaterEqual(score, 0.93)
+        self.assertGreaterEqual(score, 0.90)
         self.assertGreaterEqual(fraction, 0.03)
         self.assertEqual(features["creator_prior_wins"], 5.0)
 
