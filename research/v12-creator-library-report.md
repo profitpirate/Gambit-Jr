@@ -4,7 +4,7 @@
 
 ## Coverage
 
-- E4 historical creators analysed: 292
+- E4 historical creators analysed: 291
 - E4 repeat-winner promotions: 41
 - Fresh creators analysed: 4216
 - Fresh launches analysed: 8955
