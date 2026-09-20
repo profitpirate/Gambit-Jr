@@ -28,7 +28,7 @@ gambit-e4 = "memecoin_bot.e4_exec.__main__:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-memecoin_bot = ["historical/migrations/**/*.sql", "historical/sql/dune/*.sql", "historical/sql/dune/*.json"]
+memecoin_bot = ["historical/migrations/**/*.sql", "historical/sql/dune/*.sql", "historical/sql/dune/*.json", "portal_web/*"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
