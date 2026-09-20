@@ -11,7 +11,6 @@ from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from typing import Any, ClassVar
 
-
 SCHEMA_VERSION = "v12-shadow-suite-v1"
 
 
