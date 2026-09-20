@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """High-confidence secret scan for tracked Gambit source/config files."""
 from __future__ import annotations
 
@@ -19,8 +18,8 @@ PATTERNS = (
     (
         "assigned_secret",
         re.compile(
-            r"(?im)^\s*(?:V12_AUDIT_HMAC_KEY|V12_BACKUP_AES_KEY|DISCORD_TOKEN|"
-            r"PUSHOVER_APP_TOKEN|PUSHOVER_USER_KEY|GAMBIT_PORTAL_ADMIN_KEY)\s*=\s*"
+            r"(?im)^[ \t]*(?:V12_AUDIT_HMAC_KEY|V12_BACKUP_AES_KEY|DISCORD_TOKEN|"
+            r"PUSHOVER_APP_TOKEN|PUSHOVER_USER_KEY|GAMBIT_PORTAL_ADMIN_KEY)[ \t]*=[ \t]*"
             r"['\"]?([^'\"\s#]{16,})"
         ),
     ),
@@ -64,7 +63,8 @@ def main() -> int:
                     continue
                 failures.append((str(path), name, match.start()))
         for match in re.finditer(
-            r"(?i)(?:secret|token|private[_-]?key|api[_-]?key)\s*[:=]\s*['\"]([^'\"]{32,})['\"]",
+            r"(?i)(?:secret|private[_-]?key|api[_-]?key|auth[_-]?token|access[_-]?token|"
+            r"bearer[_-]?token)\s*[:=]\s*['\"]([^'\"]{32,})['\"]",
             text,
         ):
             value = match.group(1)
