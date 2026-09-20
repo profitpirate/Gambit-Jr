@@ -21,8 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      GH_TOKEN: \${{ github.token }}
-      REPO: \${{ github.repository }}
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -71,13 +71,13 @@ jobs:
         run: |
           mkdir -p artifacts
           cache_arg=""
-          if [ -s "\${{ steps.paths.outputs.cache }}" ]; then
-            cache_arg="--metadata-cache \${{ steps.paths.outputs.cache }}"
+          if [ -s "${{ steps.paths.outputs.cache }}" ]; then
+            cache_arg="--metadata-cache ${{ steps.paths.outputs.cache }}"
           fi
           python scripts/v12_prearmed_shadow_suite.py \
-            --run-id "\${{ steps.source.outputs.run_id }}" \
-            --batch "\${{ steps.paths.outputs.batch }}" \
-            --events "\${{ steps.paths.outputs.events }}" \
+            --run-id "${{ steps.source.outputs.run_id }}" \
+            --batch "${{ steps.paths.outputs.batch }}" \
+            --events "${{ steps.paths.outputs.events }}" \
             --paper-state research/v12-pre-armed-100-trade-paper-live.json \
             --model research/v12-pre-armed-100-trade-frozen-model.json \
             --baseline research/v12-pre-armed-50-trade-results.json \
@@ -109,7 +109,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: v12-shadow-integration-\${{ github.run_id }}
+          name: v12-shadow-integration-${{ github.run_id }}
           path: |
             artifacts/v12-pre-armed-shadow-integration.json
             artifacts/v12-pre-armed-shadow-integration.md
