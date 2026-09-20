@@ -1,0 +1,73 @@
+name: V12 E4 48h Comparison
+
+on:
+  push:
+    branches:
+      - codex/v12-broad-discovery-creator-apprentice-20260920
+    paths:
+      - "scripts/v12_e4_recent_compare.py"
+      - "scripts/e4_live_market_stress.py"
+      - "tests/test_e4_wallet_sample_filters.py"
+      - ".github/workflows/v12-e4-48h-comparison.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v12-e4-48h-comparison
+  cancel-in-progress: true
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v12-broad-discovery-creator-apprentice-20260920
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .[dev,research]
+      - run: python -m pip install -r requirements-e4.txt
+      - name: Verify comparator filters
+        run: |
+          python -m pytest tests/test_e4_wallet_sample_filters.py -q
+          ruff check scripts/v12_e4_recent_compare.py tests/test_e4_wallet_sample_filters.py
+      - name: Fetch newest causal state without modifying it
+        run: |
+          git fetch --depth=1 origin \
+            codex/e4-v12-flow-survival-hazard-v12:refs/remotes/origin/v12-causal
+          git show origin/v12-causal:research/v12-pre-armed-100-causal-paper-live.json > /tmp/v12-paper.json
+          git show origin/v12-causal:research/v12-pre-armed-100-causal-shadow-analytics.json > /tmp/v12-shadow.json
+      - name: Reconstruct E4 last 48h and compare
+        run: |
+          python scripts/v12_e4_recent_compare.py \
+            --hours 48 \
+            --v12-paper /tmp/v12-paper.json \
+            --v12-shadow /tmp/v12-shadow.json \
+            --output research/v12-e4-48h-comparison.json \
+            --report research/v12-e4-48h-comparison.md
+      - name: Reject corrupted quote-asset reconstruction
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open("research/v12-e4-48h-comparison.json"))
+          bad={"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v","Es9vMFrzaCERmJfrF4H2FYD8ZfGpM9eGKYmxxE2VZch"}
+          assert not (bad & {x["mint"] for x in d["e4_positions"]})
+          assert d["filters"]["requires_material_sol_flow"] is True
+          print(json.dumps({"e4":d["e4_48h"],"overlap":d["mint_overlap"]},default=str))
+          PY
+      - name: Commit comparison
+        run: |
+          git config user.name 'gambit-v12-e4-compare'
+          git config user.email 'actions@users.noreply.github.com'
+          git add research/v12-e4-48h-comparison.json research/v12-e4-48h-comparison.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'research(v12): compare current model with E4 last 48h [skip ci]'
+            git pull --rebase origin codex/v12-broad-discovery-creator-apprentice-20260920
+            git push origin HEAD:codex/v12-broad-discovery-creator-apprentice-20260920
+          fi
