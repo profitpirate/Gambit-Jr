@@ -347,10 +347,42 @@ class AccessService:
     ) -> None:
         if max_active_bankroll_sol < 0:
             raise ValueError("max active bankroll cannot be negative")
+        if enabled and max_active_bankroll_sol <= 0:
+            raise ValueError("enabled mandate requires positive active bankroll")
         if not 0 < max_position_fraction <= 0.20:
             raise ValueError("max position fraction must be >0 and <=20%")
         if not 1 <= int(max_concurrent_positions) <= 2:
             raise ValueError("maximum concurrent positions must be 1 or 2")
+        normalized_storage = str(storage_wallet or "").strip()
+        if enabled:
+            connection = self.store.conn.execute(
+                """
+                SELECT provider,public_identifier,state,secret_ref
+                FROM access_execution_connections
+                WHERE user_id=? AND state='READY'
+                ORDER BY updated_ns DESC LIMIT 1
+                """,
+                (int(user_id),),
+            ).fetchone()
+            if connection is None:
+                raise PermissionError(
+                    "enabled mandate requires a provisioned execution connection"
+                )
+            if not str(connection["secret_ref"] or "").startswith("vault://"):
+                raise PermissionError("live mandate requires Vault-backed signing")
+            if not normalized_storage:
+                raise ValueError("enabled mandate requires a storage wallet")
+            try:
+                from solders.pubkey import Pubkey
+
+                Pubkey.from_string(normalized_storage)
+            except (ValueError, TypeError) as exc:
+                raise ValueError("storage wallet is not a valid Solana public key") from exc
+            if normalized_storage == str(connection["public_identifier"] or ""):
+                raise ValueError(
+                    "storage wallet must be distinct from the trading wallet"
+                )
+
         now = time.time_ns()
         self.store.conn.execute(
             """
@@ -372,7 +404,7 @@ class AccessService:
                 float(max_active_bankroll_sol),
                 float(max_position_fraction),
                 int(max_concurrent_positions),
-                storage_wallet,
+                normalized_storage or None,
                 now,
             ),
         )
