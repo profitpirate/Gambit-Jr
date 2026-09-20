@@ -171,6 +171,7 @@ def positions_from_events(events: list[Mapping[str, Any]], cutoff: int) -> tuple
                     "mint": mint,
                     "entry_time": int(event["block_time"]),
                     "entry_slot": event.get("slot"),
+                    "entry_signature": str(event.get("signature") or ""),
                     "tokens": delta,
                     "sold": 0.0,
                     "cost_sol": cost,
@@ -199,6 +200,7 @@ def positions_from_events(events: list[Mapping[str, Any]], cutoff: int) -> tuple
         ):
             row["exit_time"] = int(event["block_time"])
             row["exit_slot"] = event.get("slot")
+            row["exit_signature"] = str(event.get("signature") or "")
             row["hold_ms"] = max(0, (row["exit_time"] - row["entry_time"]) * 1000)
             row["pnl_sol"] = row["proceeds_sol"] - row["cost_sol"]
             if row["entry_time"] >= cutoff:
