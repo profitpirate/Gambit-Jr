@@ -3,7 +3,7 @@ name: V12 E4 48h Comparison
 on:
   push:
     branches:
-      - codex/v12-broad-discovery-creator-apprentice-20260920
+      - codex/v12-nextgen-cohesive-sniper-20260920
     paths:
       - "scripts/v12_e4_recent_compare.py"
       - "scripts/e4_live_market_stress.py"
@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: codex/v12-broad-discovery-creator-apprentice-20260920
+          ref: codex/v12-nextgen-cohesive-sniper-20260920
           fetch-depth: 1
       - uses: actions/setup-python@v5
         with:
@@ -68,6 +68,6 @@ jobs:
           git add research/v12-e4-48h-comparison.json research/v12-e4-48h-comparison.md
           if ! git diff --cached --quiet; then
             git commit -m 'research(v12): compare current model with E4 last 48h [skip ci]'
-            git pull --rebase origin codex/v12-broad-discovery-creator-apprentice-20260920
-            git push origin HEAD:codex/v12-broad-discovery-creator-apprentice-20260920
+            git pull --rebase origin codex/v12-nextgen-cohesive-sniper-20260920
+            git push origin HEAD:codex/v12-nextgen-cohesive-sniper-20260920
           fi
