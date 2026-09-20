@@ -97,7 +97,7 @@ class ControlPlane:
     async def body(self, request: web.Request) -> dict[str, Any]:
         value = await request.json()
         if not isinstance(value, dict):
-            raise ValueError("JSON object required")
+            raise TypeError("JSON object required")
         return value
 
     def user_id(self, request: web.Request) -> int:
@@ -140,7 +140,7 @@ class ControlPlane:
                     "delivered": "discord_dm",
                 }
             )
-        except (KeyError, ValueError) as exc:
+        except (KeyError, TypeError, ValueError) as exc:
             return _json_error(str(exc), 400)
         except RuntimeError as exc:
             return _json_error(str(exc), 503)
@@ -150,7 +150,7 @@ class ControlPlane:
             body = await self.body(request)
             session = self.access.redeem_login(str(body["code"]))
             return web.json_response({"ok": True, "session": session})
-        except (KeyError, ValueError) as exc:
+        except (KeyError, TypeError, ValueError) as exc:
             return _json_error(str(exc), 400)
         except PermissionError as exc:
             return _json_error(str(exc), 401)
@@ -208,7 +208,7 @@ class ControlPlane:
             )
         except PermissionError as exc:
             return _json_error(str(exc), 401)
-        except (KeyError, ValueError) as exc:
+        except (KeyError, TypeError, ValueError) as exc:
             return _json_error(str(exc), 400)
 
     async def wallet_verify(self, request: web.Request) -> web.Response:
@@ -225,7 +225,7 @@ class ControlPlane:
             return web.json_response({"ok": True, "wallet": wallet})
         except PermissionError as exc:
             return _json_error(str(exc), 401)
-        except (KeyError, ValueError) as exc:
+        except (KeyError, TypeError, ValueError) as exc:
             return _json_error(str(exc), 400)
 
     async def execution_connect(self, request: web.Request) -> web.Response:
@@ -246,7 +246,7 @@ class ControlPlane:
             return web.json_response({"ok": True, "connection_id": connection_id})
         except PermissionError as exc:
             return _json_error(str(exc), 401)
-        except (KeyError, ValueError) as exc:
+        except (KeyError, TypeError, ValueError) as exc:
             return _json_error(str(exc), 400)
         except RuntimeError as exc:
             return _json_error(str(exc), 409)
@@ -270,7 +270,7 @@ class ControlPlane:
             return web.json_response({"ok": True})
         except PermissionError as exc:
             return _json_error(str(exc), 401)
-        except (KeyError, ValueError) as exc:
+        except (KeyError, TypeError, ValueError) as exc:
             return _json_error(str(exc), 400)
 
 
