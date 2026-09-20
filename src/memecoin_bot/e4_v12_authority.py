@@ -6,6 +6,7 @@ from typing import Any
 # a layered V12 runtime because importing an older telemetry module could silently
 # replace the final low-latency sender. Every transport layer now registers with
 # an explicit authority priority instead.
+ROUTE_PRIORITY_BASE = 50
 ROUTE_PRIORITY_EPOCH = 100
 ROUTE_PRIORITY_REPAIRS = 200
 ROUTE_PRIORITY_SUB10MS = 300
