@@ -42,7 +42,6 @@ jobs:
       - name: Static and unit certification
         run: |
           python -m compileall -q src scripts tests
-          ruff check --diff src/memecoin_bot/v12_shadow.py scripts/v12_shadow_suite.py tests/test_v12_shadow_suite.py || true
           ruff check src/memecoin_bot/v12_shadow.py scripts/v12_shadow_suite.py tests/test_v12_shadow_suite.py
           pytest -q tests/test_v12_shadow_suite.py
 
