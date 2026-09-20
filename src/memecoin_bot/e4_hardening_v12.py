@@ -243,7 +243,7 @@ def _entry_v12(self: core.E4Policy, state: core.TokenState) -> tuple[bool, float
         and win_rate >= _float("history", "proven_min_win_rate", 0.75)
     )
     if not (elite or proven):
-        return False, 0.0, 0.0, "V12 identity gate: no approved creator with sufficient repeat history; observation only", features
+        return False, 0.0, 0.0, "V12 identity gate: no approved creator with sufficient repeat history; creator history permits observation but not autonomous entry", features
 
     max_age = _float("limits", "elite_max_age_ms", 150.0) if elite else _float("limits", "proven_max_age_ms", 180.0)
     if age_ms > max_age:
