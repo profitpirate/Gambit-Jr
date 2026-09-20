@@ -343,3 +343,48 @@ def test_quiet_curve_exit_is_timestamped_at_deadline_not_before_fill() -> None:
     assert trade is not None
     assert trade["exit_ns"] == trade["fill_ns"] + frozen["exit_policy"]["hold_ms"] * 1_000_000
     assert trade["exit_ns"] >= trade["fill_ns"]
+
+
+def test_existing_state_with_pre_fill_exit_is_rejected() -> None:
+    frozen = model()
+    state = subject.empty_state(frozen, subject.stable_hash(frozen))
+    state["ledger"] = [
+        {
+            "run_id": "old",
+            "mint": "bad",
+            "decision_ns": 100,
+            "fill_ns": 105,
+            "exit_ns": 104,
+            "entry_cost_sol": 0.3,
+            "proceeds_sol": 0.29,
+            "pnl_sol": -0.01,
+        }
+    ]
+    try:
+        subject.validate_paper_state(state, subject.stable_hash(frozen))
+    except ValueError as exc:
+        assert "non-causal paper trade chronology" in str(exc)
+    else:
+        raise AssertionError("pre-fill exit state was accepted")
+
+
+def test_existing_state_with_duplicate_trade_identity_is_rejected() -> None:
+    frozen = model()
+    state = subject.empty_state(frozen, subject.stable_hash(frozen))
+    row = {
+        "run_id": "dup",
+        "mint": "same",
+        "decision_ns": 100,
+        "fill_ns": 105,
+        "exit_ns": 110,
+        "entry_cost_sol": 0.3,
+        "proceeds_sol": 0.31,
+        "pnl_sol": 0.01,
+    }
+    state["ledger"] = [row, dict(row)]
+    try:
+        subject.validate_paper_state(state, subject.stable_hash(frozen))
+    except ValueError as exc:
+        assert "duplicate paper trade identity" in str(exc)
+    else:
+        raise AssertionError("duplicate trade identity was accepted")
