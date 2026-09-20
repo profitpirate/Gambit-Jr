@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Any, Mapping
+import os
+from collections.abc import Mapping
+from typing import Any
 
 from . import e4_final as final
 from .notifications import NotificationEvent, NotificationRouter, router_from_env
@@ -87,16 +89,10 @@ def _receipt_with_notifications(
     ).fetchone()
     if not row or str(row["side"]).upper() != "SWEEP":
         return
-    destination = ""
     # The execution store deliberately does not persist private credentials.
     # Vault destination is public wallet metadata and is read from engine env/settings
     # by the live runtime; an unset value is still a valid notification record.
-    try:
-        import os
-
-        destination = os.getenv("E4_VAULT_PUBLIC_KEY", "")
-    except Exception:
-        destination = ""
+    destination = os.getenv("E4_VAULT_PUBLIC_KEY", "")
     _publish(
         NotificationEvent.storage_sweep(
             request_id=str(request_id),
