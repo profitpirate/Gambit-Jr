@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Operational sidecar intelligence for the frozen V12 Pre-Armed forward test.
 
 This module is intentionally incapable of changing V12 Pre-Armed decisions.
