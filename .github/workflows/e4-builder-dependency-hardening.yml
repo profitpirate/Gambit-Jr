@@ -95,7 +95,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: e4-builder-security-\${{ github.run_id }}
+          name: e4-builder-security-${{ github.run_id }}
           path: |
             artifacts/npm-audit-before.json
             artifacts/npm-audit-after.json
