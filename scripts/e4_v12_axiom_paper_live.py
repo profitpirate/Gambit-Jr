@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Accumulate a frozen 50-trade forward paper-live ledger with Axiom costs."""
+"""Accumulate a frozen forward paper-live ledger with Axiom costs."""
 
 from __future__ import annotations
 
@@ -482,7 +482,7 @@ def empty_state(model: Mapping[str, Any], model_hash: str) -> dict[str, Any]:
         "ledger": [],
         "rejections": [],
         "audit_counts": {},
-        "completion": {"required_closed_trades": 50, "reached": False},
+        "completion": {"required_closed_trades": integer(model["acceptance_gate"]["closed_trades"]), "reached": False},
         "golden_thesis_approved": False,
         "production_authorised": False,
         "production_paths_changed": 0,
@@ -552,7 +552,7 @@ def render_report(state: Mapping[str, Any], model: Mapping[str, Any]) -> str:
     result = state["metrics"]
     costs = model["execution_costs"]
     lines = [
-        "# E4 V12 pre-armed Axiom-costed paper-live test",
+        "# V12 Pre-Armed Axiom-costed paper-live test",
         "",
         f"Status: **{state['status']}**",
         "",
@@ -584,7 +584,7 @@ def render_report(state: Mapping[str, Any], model: Mapping[str, Any]) -> str:
         "## Integrity",
         "",
         f"- Frozen model SHA-256: `{state['model_sha256']}`",
-        "- The test stops at the first 50 chronological closed trades.",
+        f"- The test stops at the first {model['acceptance_gate']['closed_trades']} chronological closed trades.",
         "- The selector, position sizing, exit policy, latency, and cost model cannot change mid-test.",
         "- Social timestamps come from immutable launch metadata and must predate CREATE by 0-10 seconds.",
         "- A real-time X transport/fill claim is not made by this paper test.",
