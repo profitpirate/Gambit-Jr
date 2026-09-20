@@ -10,10 +10,11 @@ import sqlite3
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Awaitable, Callable
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 from .v12_route_health import RouteHealthStore
-from .v12_safety import CircuitBreaker, SafetyMode
+from .v12_safety import CircuitBreaker
 
 LOGGER = logging.getLogger("gambit.v12.watchdogs")
 
