@@ -1,4 +1,4 @@
-# V12 Pre-Armed Axiom-costed paper-live test
+# E4 V12 pre-armed Axiom-costed paper-live test
 
 Status: **PAPER_LIVE_GOLDEN_GATE_PASSED**
 
