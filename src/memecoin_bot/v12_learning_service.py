@@ -128,6 +128,38 @@ class ContinuousLearningStore:
             )
         return len(rows)
 
+    def maintenance(
+        self,
+        *,
+        now_ns: int | None = None,
+        event_retention_days: float = 7.0,
+        launch_retention_days: float = 180.0,
+    ) -> dict[str, int]:
+        now = int(now_ns or time.time_ns())
+        event_cutoff = now - int(max(1.0, event_retention_days) * 86_400 * 1e9)
+        launch_cutoff = now - int(max(event_retention_days, launch_retention_days) * 86_400 * 1e9)
+        before_events = self.conn.total_changes
+        self.conn.execute(
+            """
+            DELETE FROM v12_learning_events
+            WHERE received_ns<? AND mint IN(
+                SELECT mint FROM v12_learning_launches WHERE finalized=1
+            )
+            """,
+            (event_cutoff,),
+        )
+        event_deleted = self.conn.total_changes - before_events
+        before_launches = self.conn.total_changes
+        self.conn.execute(
+            "DELETE FROM v12_learning_launches WHERE finalized=1 AND latest_ns<?",
+            (launch_cutoff,),
+        )
+        launch_deleted = self.conn.total_changes - before_launches
+        return {
+            "events_deleted": event_deleted,
+            "launches_deleted": launch_deleted,
+        }
+
     def export_unprocessed(self, limit: int = 10_000) -> list[dict[str, Any]]:
         return [
             dict(row)
