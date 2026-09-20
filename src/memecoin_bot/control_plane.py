@@ -1,8 +1,12 @@
-"""Minimal authenticated control-plane API for a small V12 beta."""
+"""Secure authenticated control-plane API for a small V12 beta."""
 from __future__ import annotations
 
+import collections
 import hmac
+import json
 import os
+import sqlite3
+import time
 from pathlib import Path
 from typing import Any
 
@@ -12,15 +16,51 @@ from memecoin_bot.access_service import AccessService, SoldersWalletSignatureVer
 from memecoin_bot.discord.notifier import DiscordNotifier
 
 
+COOKIE_NAME = "gambit_session"
+
+
 def _json_error(message: str, status: int) -> web.Response:
     return web.json_response({"ok": False, "error": message}, status=status)
 
 
-def _bearer(request: web.Request) -> str:
-    value = request.headers.get("Authorization", "")
-    if not value.startswith("Bearer "):
-        raise PermissionError("bearer session is required")
-    return value[7:].strip()
+class RateLimiter:
+    def __init__(self) -> None:
+        self._hits: dict[str, collections.deque[float]] = {}
+
+    def check(self, key: str, *, limit: int, window_seconds: float) -> bool:
+        now = time.monotonic()
+        rows = self._hits.setdefault(key, collections.deque())
+        while rows and now - rows[0] > window_seconds:
+            rows.popleft()
+        if len(rows) >= limit:
+            return False
+        rows.append(now)
+        return True
+
+
+@web.middleware
+async def security_headers_middleware(
+    request: web.Request,
+    handler: Any,
+) -> web.StreamResponse:
+    response = await handler(request)
+    response.headers.update(
+        {
+            "Content-Security-Policy": (
+                "default-src 'self'; script-src 'self'; style-src 'self'; "
+                "connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'; "
+                "base-uri 'none'; form-action 'self'"
+            ),
+            "X-Content-Type-Options": "nosniff",
+            "Referrer-Policy": "no-referrer",
+            "X-Frame-Options": "DENY",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "Cross-Origin-Opener-Policy": "same-origin",
+            "Cross-Origin-Resource-Policy": "same-origin",
+            "Cache-Control": "no-store",
+        }
+    )
+    return response
 
 
 class ControlPlane:
@@ -36,9 +76,26 @@ class ControlPlane:
         self.admin_key = admin_key
         self.wallet_verifier = SoldersWalletSignatureVerifier()
         self.web_root = Path(__file__).with_name("portal_web")
+        self.rate = RateLimiter()
+        self.state_root = Path(os.getenv("V12_ACCOUNTS_ROOT", "data/accounts"))
+        self.cookie_secure = os.getenv(
+            "GAMBIT_COOKIE_SECURE",
+            "true",
+        ).lower() in {"1", "true", "yes", "on"}
+        self.admin_ips = {
+            item.strip()
+            for item in os.getenv(
+                "GAMBIT_ADMIN_ALLOWED_IPS",
+                "127.0.0.1,::1",
+            ).split(",")
+            if item.strip()
+        }
 
     def app(self) -> web.Application:
-        app = web.Application(client_max_size=64 * 1024)
+        app = web.Application(
+            client_max_size=64 * 1024,
+            middlewares=[security_headers_middleware],
+        )
         app.add_routes(
             [
                 web.get("/", self.portal),
@@ -48,51 +105,35 @@ class ControlPlane:
                 web.get("/static/styles.css", self.portal_css),
                 web.get("/health", self.health),
                 web.post("/v1/admin/invite", self.invite),
+                web.post("/v1/admin/execution", self.admin_execution),
                 web.post("/v1/auth/redeem", self.redeem),
+                web.post("/v1/auth/logout", self.logout),
                 web.get("/v1/me", self.me),
                 web.get("/v1/providers", self.providers),
                 web.post("/v1/wallet/challenge", self.wallet_challenge),
                 web.post("/v1/wallet/verify", self.wallet_verify),
-                web.post("/v1/execution/connect", self.execution_connect),
                 web.post("/v1/mandate", self.mandate),
+                web.get("/v1/runtime/status", self.runtime_status),
+                web.post("/v1/runtime/kill", self.runtime_kill),
+                web.post("/v1/runtime/resume", self.runtime_resume),
             ]
         )
         return app
 
-    @staticmethod
-    def _security_headers() -> dict[str, str]:
-        return {
-            "Content-Security-Policy": (
-                "default-src 'self'; script-src 'self'; style-src 'self'; "
-                "connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'; "
-                "base-uri 'none'; form-action 'self'"
-            ),
-            "X-Content-Type-Options": "nosniff",
-            "Referrer-Policy": "no-referrer",
-            "X-Frame-Options": "DENY",
-            "Cache-Control": "no-store",
-        }
-
     async def portal(self, _request: web.Request) -> web.StreamResponse:
-        response = web.FileResponse(self.web_root / "index.html")
-        response.headers.update(self._security_headers())
-        return response
+        return web.FileResponse(self.web_root / "index.html")
 
     async def portal_js(self, _request: web.Request) -> web.StreamResponse:
-        response = web.FileResponse(
+        return web.FileResponse(
             self.web_root / "app.js",
             headers={"Content-Type": "application/javascript; charset=utf-8"},
         )
-        response.headers.update(self._security_headers())
-        return response
 
     async def portal_css(self, _request: web.Request) -> web.StreamResponse:
-        response = web.FileResponse(
+        return web.FileResponse(
             self.web_root / "styles.css",
             headers={"Content-Type": "text/css; charset=utf-8"},
         )
-        response.headers.update(self._security_headers())
-        return response
 
     async def body(self, request: web.Request) -> dict[str, Any]:
         value = await request.json()
@@ -100,8 +141,47 @@ class ControlPlane:
             raise TypeError("JSON object required")
         return value
 
-    def user_id(self, request: web.Request) -> int:
-        return self.access.authenticate(_bearer(request))
+    def _remote(self, request: web.Request) -> str:
+        return str(request.remote or "unknown")
+
+    def _limit(
+        self,
+        request: web.Request,
+        name: str,
+        *,
+        limit: int,
+        window: float,
+    ) -> None:
+        key = f"{self._remote(request)}|{name}"
+        if not self.rate.check(key, limit=limit, window_seconds=window):
+            raise web.HTTPTooManyRequests(text="rate limit exceeded")
+
+    def _session_token(self, request: web.Request) -> str:
+        cookie = request.cookies.get(COOKIE_NAME)
+        if cookie:
+            return cookie
+        value = request.headers.get("Authorization", "")
+        if value.startswith("Bearer "):
+            return value[7:].strip()
+        raise PermissionError("authenticated session is required")
+
+    def user_id(self, request: web.Request, *, csrf: bool = False) -> int:
+        token = self._session_token(request)
+        user_id = self.access.authenticate(token)
+        if csrf and request.cookies.get(COOKIE_NAME):
+            self.access.validate_csrf(
+                token,
+                request.headers.get("X-CSRF-Token", ""),
+            )
+        return user_id
+
+    def _admin(self, request: web.Request) -> None:
+        self._limit(request, "admin", limit=10, window=60)
+        if self._remote(request) not in self.admin_ips:
+            raise PermissionError("admin endpoint is not available from this address")
+        provided = request.headers.get("X-Gambit-Admin-Key", "")
+        if not self.admin_key or not hmac.compare_digest(provided, self.admin_key):
+            raise PermissionError("admin authentication failed")
 
     async def health(self, _request: web.Request) -> web.Response:
         return web.json_response(
@@ -110,14 +190,14 @@ class ControlPlane:
                 "discord_commands_enabled": False,
                 "axiom_direct_link": False,
                 "wallet_link": True,
+                "session_cookie": "httponly",
+                "csrf": True,
             }
         )
 
     async def invite(self, request: web.Request) -> web.Response:
-        provided = request.headers.get("X-Gambit-Admin-Key", "")
-        if not self.admin_key or not hmac.compare_digest(provided, self.admin_key):
-            return _json_error("unauthorized", 401)
         try:
+            self._admin(request)
             body = await self.body(request)
             discord_id = str(body["discord_user_id"])
             grant = self.access.issue_discord_login(discord_id)
@@ -140,22 +220,66 @@ class ControlPlane:
                     "delivered": "discord_dm",
                 }
             )
+        except PermissionError as exc:
+            return _json_error(str(exc), 401)
         except (KeyError, TypeError, ValueError) as exc:
             return _json_error(str(exc), 400)
         except RuntimeError as exc:
             return _json_error(str(exc), 503)
 
+    async def admin_execution(self, request: web.Request) -> web.Response:
+        try:
+            self._admin(request)
+            body = await self.body(request)
+            connection = self.access.set_execution_connection(
+                int(body["user_id"]),
+                provider=str(body["provider"]),
+                mode=str(body.get("mode") or "VAULT_TRANSIT"),
+                public_identifier=str(body["public_identifier"]),
+                secret_ref=str(body["secret_ref"]),
+            )
+            return web.json_response({"ok": True, "connection_id": connection})
+        except PermissionError as exc:
+            return _json_error(str(exc), 401)
+        except (KeyError, TypeError, ValueError) as exc:
+            return _json_error(str(exc), 400)
+        except RuntimeError as exc:
+            return _json_error(str(exc), 409)
+
     async def redeem(self, request: web.Request) -> web.Response:
+        self._limit(request, "redeem", limit=10, window=60)
         try:
             body = await self.body(request)
-            session = self.access.redeem_login(str(body["code"]))
-            return web.json_response({"ok": True, "session": session})
+            session, csrf = self.access.redeem_login_with_csrf(str(body["code"]))
+            response = web.json_response({"ok": True, "csrf": csrf})
+            response.set_cookie(
+                COOKIE_NAME,
+                session,
+                httponly=True,
+                secure=self.cookie_secure,
+                samesite="Strict",
+                max_age=self.access.session_ttl_seconds,
+                path="/",
+            )
+            return response
         except (KeyError, TypeError, ValueError) as exc:
             return _json_error(str(exc), 400)
         except PermissionError as exc:
             return _json_error(str(exc), 401)
 
+    async def logout(self, request: web.Request) -> web.Response:
+        try:
+            token = self._session_token(request)
+            self.user_id(request, csrf=True)
+            self.access.revoke_session(token)
+        except PermissionError as exc:
+            return _json_error(str(exc), 401)
+        response = web.json_response({"ok": True})
+        response.del_cookie(COOKIE_NAME, path="/")
+        return response
+
     async def me(self, request: web.Request) -> web.Response:
+        self._limit(request, "api", limit=180, window=60)
         try:
             user_id = self.user_id(request)
             return web.json_response(
@@ -174,16 +298,24 @@ class ControlPlane:
                 "ok": True,
                 "providers": [
                     {
-                        "id": "NATIVE_WALLET",
-                        "wallet_ownership_link": True,
-                        "execution_connection": "vault_or_delegated_signer",
+                        "id": "MANAGED_WALLET",
                         "state": "SUPPORTED",
+                        "execution_connection": "vault_transit",
+                        "description": (
+                            "Isolated trading wallet provisioned in Vault; user keeps "
+                            "storage/withdrawal wallet separate."
+                        ),
+                    },
+                    {
+                        "id": "NATIVE_WALLET",
+                        "state": "SUPPORTED_WITH_VAULT_SIGNER",
+                        "wallet_ownership_link": True,
+                        "execution_connection": "vault_transit",
                     },
                     {
                         "id": "AXIOM",
-                        "wallet_ownership_link": True,
-                        "execution_connection": None,
                         "state": "WAITING_FOR_OFFICIAL_THIRD_PARTY_AUTH",
+                        "execution_connection": None,
                         "accepts_passwords": False,
                         "accepts_browser_cookies": False,
                         "accepts_recovery_phrase": False,
@@ -193,10 +325,14 @@ class ControlPlane:
         )
 
     async def wallet_challenge(self, request: web.Request) -> web.Response:
+        self._limit(request, "wallet", limit=30, window=60)
         try:
-            user_id = self.user_id(request)
+            user_id = self.user_id(request, csrf=True)
             body = await self.body(request)
-            challenge = self.access.create_wallet_challenge(user_id, str(body["wallet"]))
+            challenge = self.access.create_wallet_challenge(
+                user_id,
+                str(body["wallet"]),
+            )
             return web.json_response(
                 {
                     "ok": True,
@@ -212,8 +348,9 @@ class ControlPlane:
             return _json_error(str(exc), 400)
 
     async def wallet_verify(self, request: web.Request) -> web.Response:
+        self._limit(request, "wallet", limit=30, window=60)
         try:
-            user_id = self.user_id(request)
+            user_id = self.user_id(request, csrf=True)
             body = await self.body(request)
             wallet = self.access.verify_wallet(
                 user_id,
@@ -228,39 +365,20 @@ class ControlPlane:
         except (KeyError, TypeError, ValueError) as exc:
             return _json_error(str(exc), 400)
 
-    async def execution_connect(self, request: web.Request) -> web.Response:
-        try:
-            user_id = self.user_id(request)
-            body = await self.body(request)
-            connection_id = self.access.set_execution_connection(
-                user_id,
-                provider=str(body["provider"]),
-                mode=str(body.get("mode") or "DELEGATED"),
-                public_identifier=str(body["public_identifier"]),
-                secret_ref=(
-                    str(body["secret_ref"])
-                    if body.get("secret_ref") is not None
-                    else None
-                ),
-            )
-            return web.json_response({"ok": True, "connection_id": connection_id})
-        except PermissionError as exc:
-            return _json_error(str(exc), 401)
-        except (KeyError, TypeError, ValueError) as exc:
-            return _json_error(str(exc), 400)
-        except RuntimeError as exc:
-            return _json_error(str(exc), 409)
-
     async def mandate(self, request: web.Request) -> web.Response:
         try:
-            user_id = self.user_id(request)
+            user_id = self.user_id(request, csrf=True)
             body = await self.body(request)
             self.access.set_mandate(
                 user_id,
                 enabled=bool(body.get("enabled")),
                 max_active_bankroll_sol=float(body["max_active_bankroll_sol"]),
-                max_position_fraction=float(body.get("max_position_fraction", 0.10)),
-                max_concurrent_positions=int(body.get("max_concurrent_positions", 2)),
+                max_position_fraction=float(
+                    body.get("max_position_fraction", 0.10)
+                ),
+                max_concurrent_positions=int(
+                    body.get("max_concurrent_positions", 2)
+                ),
                 storage_wallet=(
                     str(body["storage_wallet"])
                     if body.get("storage_wallet")
@@ -272,6 +390,92 @@ class ControlPlane:
             return _json_error(str(exc), 401)
         except (KeyError, TypeError, ValueError) as exc:
             return _json_error(str(exc), 400)
+
+    def _runtime_dir(self, user_id: int) -> Path:
+        return self.state_root / str(int(user_id))
+
+    async def runtime_status(self, request: web.Request) -> web.Response:
+        try:
+            user_id = self.user_id(request)
+        except PermissionError as exc:
+            return _json_error(str(exc), 401)
+        runtime = self._runtime_dir(user_id)
+        heartbeat = runtime / "heartbeat.json"
+        payload: dict[str, Any] = {
+            "running": False,
+            "heartbeat": None,
+            "kill_switch": (runtime / "KILL").exists(),
+            "execution": None,
+        }
+        if heartbeat.exists():
+            try:
+                hb = json.loads(heartbeat.read_text(encoding="utf-8"))
+                payload["heartbeat"] = hb
+                payload["running"] = (
+                    time.time_ns() - int(hb.get("ts_ns") or 0)
+                ) < 30_000_000_000
+            except (OSError, ValueError, json.JSONDecodeError):
+                pass
+        database = runtime / "execution.db"
+        if database.exists():
+            try:
+                conn = sqlite3.connect(
+                    f"file:{database.resolve()}?mode=ro",
+                    uri=True,
+                    timeout=1,
+                )
+                conn.row_factory = sqlite3.Row
+                positions = {
+                    str(row[0]): int(row[1])
+                    for row in conn.execute(
+                        "SELECT status,COUNT(*) FROM e4_positions GROUP BY status"
+                    )
+                }
+                safety = conn.execute(
+                    "SELECT mode,reason FROM v12_safety_state WHERE singleton=1"
+                ).fetchone()
+                payload["execution"] = {
+                    "positions": positions,
+                    "safety": dict(safety) if safety else None,
+                }
+                conn.close()
+            except sqlite3.Error:
+                payload["execution"] = {"status": "database_unavailable"}
+        return web.json_response({"ok": True, "runtime": payload})
+
+    async def runtime_kill(self, request: web.Request) -> web.Response:
+        try:
+            user_id = self.user_id(request, csrf=True)
+        except PermissionError as exc:
+            return _json_error(str(exc), 401)
+        runtime = self._runtime_dir(user_id)
+        runtime.mkdir(parents=True, exist_ok=True)
+        kill = runtime / "KILL"
+        kill.write_text(
+            json.dumps(
+                {"reason": "user_kill_switch", "ts_ns": time.time_ns()},
+                sort_keys=True,
+            ),
+            encoding="utf-8",
+        )
+        os.chmod(kill, 0o600)
+        self.access.store.audit(user_id, "USER_KILL_SWITCH")
+        return web.json_response({"ok": True})
+
+    async def runtime_resume(self, request: web.Request) -> web.Response:
+        try:
+            user_id = self.user_id(request, csrf=True)
+        except PermissionError as exc:
+            return _json_error(str(exc), 401)
+        snapshot = self.access.store.account_snapshot(user_id)
+        mandate = snapshot.get("mandate") or {}
+        if not bool(mandate.get("enabled")):
+            return _json_error("trading mandate is disabled", 409)
+        if not snapshot.get("execution_connections"):
+            return _json_error("no execution connection is provisioned", 409)
+        (self._runtime_dir(user_id) / "KILL").unlink(missing_ok=True)
+        self.access.store.audit(user_id, "USER_RUNTIME_RESUME")
+        return web.json_response({"ok": True})
 
 
 def build_from_env(access: AccessService) -> ControlPlane:
