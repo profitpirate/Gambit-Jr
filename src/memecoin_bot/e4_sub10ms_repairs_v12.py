@@ -45,33 +45,8 @@ def _integer(value: Any, default: int = 0) -> int:
 
 
 def max_output_shortfall_bps() -> int:
-    """Maximum deterioration accepted by the V12 buy instruction.
-
-    Pump's BuyExactSolIn instruction protects a minimum token quantity.  The
-    old direct-copy path used 9,000 bps, which deliberately shrank that minimum
-    and forced fills after E4 had moved the curve.  V12 now defaults to a 6%
-    output floor and permits research overrides only inside a bounded range.
-    """
-    raw = os.getenv(
-        "E4_DIRECT_COPY_MAX_OUTPUT_SHORTFALL_BPS",
-        str(_DEFAULT_MAX_OUTPUT_SHORTFALL_BPS),
-    )
-    try:
-        requested = int(raw)
-    except (TypeError, ValueError):
-        requested = _DEFAULT_MAX_OUTPUT_SHORTFALL_BPS
-    return min(1_200, max(50, requested))
-
-
-def _tight_direct_copy_slippage_bps(_settings: Any) -> int:
-    return max_output_shortfall_bps()
-
-
-# The direct-copy executor resolves this function at call time, so replacing it
-# changes both the local Pump quote and the remote fallback without duplicating
-# the order lifecycle.
-direct.direct_copy_slippage_bps = _tight_direct_copy_slippage_bps
-
+    """Expose the canonical direct-copy output guard for repair telemetry/tests."""
+    return direct.direct_copy_slippage_bps(None)
 
 # Preserve real multi-leg E4 exits.  The inherited manager could mark a second
 # token-accounted sell as complete merely because it was >=50% of the remaining
