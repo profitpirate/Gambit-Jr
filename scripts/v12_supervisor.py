@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Host-level V12 supervisor with heartbeat/hang/crash-loop protection."""
 from __future__ import annotations
 
