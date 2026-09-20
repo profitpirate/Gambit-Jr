@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import subprocess
@@ -31,6 +32,19 @@ PREFIX = ROOT / "artifacts/e4-v12-choice-moe"
 
 def artifact(suffix: str):
     return json.loads(Path(f"{PREFIX}-{suffix}").read_text(encoding="utf-8"))
+
+
+def assert_frozen_checkout(path: Path, expected_bytes: int, expected_sha256: str) -> None:
+    raw = path.read_bytes()
+    variants = [raw]
+    if path.suffix.lower() in {".json", ".jsonl", ".md", ".txt"}:
+        lf = raw.replace(b"\r\n", b"\n")
+        variants.extend((lf, lf.replace(b"\n", b"\r\n")))
+    assert any(
+        len(value) == expected_bytes
+        and hashlib.sha256(value).hexdigest() == expected_sha256
+        for value in variants
+    ), f"frozen artifact changed beyond LF/CRLF normalization: {path}"
 
 
 @pytest.fixture(scope="module")
@@ -79,8 +93,11 @@ def test_v1_and_v2_inputs_remain_frozen(outputs) -> None:
     assert len(data["frozen_inputs"]) == 12
     for row in data["frozen_inputs"]:
         path = ROOT / row["path"]
-        assert path.stat().st_size == row["expected_bytes"]
-        assert moe.sha256_path(path) == row["expected_sha256"]
+        assert_frozen_checkout(
+            path,
+            row["expected_bytes"],
+            row["expected_sha256"],
+        )
 
 
 def test_jsonl_parquet_parity_and_order(outputs) -> None:
