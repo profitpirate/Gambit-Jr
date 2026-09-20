@@ -1,0 +1,46 @@
+[Unit]
+Description=Gambit V12 Multi-User Runtime Orchestrator
+After=network-online.target gambit-v12-marketdata.service
+Wants=network-online.target
+Requires=gambit-v12-marketdata.service
+
+[Service]
+Type=simple
+User=gambit
+Group=gambit
+WorkingDirectory=/opt/gambit/current
+EnvironmentFile=/etc/gambit/v12-orchestrator.env
+Environment=V12_MARKETDATA_DB=/var/lib/gambit/marketdata.db
+Environment=V12_ACCOUNTS_ROOT=/var/lib/gambit/accounts
+ExecStart=/opt/gambit/venv/bin/python -m memecoin_bot.v12_account_orchestrator
+Restart=always
+RestartSec=3
+TimeoutStopSec=30
+KillMode=mixed
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/gambit /var/log/gambit /run/gambit /opt/gambit/current/data /opt/gambit/current/backups
+RuntimeDirectory=gambit
+RuntimeDirectoryMode=0700
+StateDirectory=gambit
+StateDirectoryMode=0700
+LogsDirectory=gambit
+LogsDirectoryMode=0700
+
+[Install]
+WantedBy=multi-user.target
