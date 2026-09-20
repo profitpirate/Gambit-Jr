@@ -10,7 +10,7 @@ import argparse
 import asyncio
 import json
 import time
-from collections import defaultdict
+from collections import Counter, defaultdict
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
