@@ -40,6 +40,7 @@ import e4_v12_axiom_paper_live as paper
 import e4_v12_failed_intent_registry as failed_registry
 import e4_v12_profit_survival_search as base
 import e4_v12_true_latency_replay as replay
+import v12_prearmed_guardrail_policy as guardrail_policy
 
 SCHEMA_VERSION = "v12-pre-armed-shadow-suite-v1"
 NEW_CREATOR_VERSION = "v12-new-creator-analogue-shadow-v1"
@@ -1298,6 +1299,9 @@ def render_report(state: Mapping[str, Any]) -> str:
         "## Integrity",
         "",
         f"- Reliability status: {reliability.get('status', 'UNKNOWN')}",
+        f"- Guardrail state: {state.get('guardrails', {}).get('state', 'UNKNOWN')}",
+        f"- Guardrail halts: {', '.join(state.get('guardrails', {}).get('hard_halts', [])) or 'none'}",
+        f"- Guardrail warnings: {', '.join(state.get('guardrails', {}).get('warnings', [])) or 'none'}",
         f"- Errors: {', '.join(reliability.get('errors', [])) or 'none'}",
         (
             "- Warnings: "
@@ -1488,6 +1492,12 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         "shadow_only": True,
         "frozen_v12_modified": False,
     }
+    dependency_summary = read_json(args.dependency_summary, None)
+    analytics["guardrails"] = guardrail_policy.evaluate_guardrails(
+        paper_state=paper_state,
+        shadow_state=analytics,
+        dependency_summary=dependency_summary,
+    )
     analytics["latest_run_id"] = args.run_id
     analytics["paper_progress"] = dict(
         paper_state.get("completion", {})
@@ -1518,6 +1528,11 @@ def parser() -> argparse.ArgumentParser:
     )
     value.add_argument("--report", type=Path, required=True)
     value.add_argument(
+        "--dependency-summary",
+        type=Path,
+        default=Path("research/e4-builder-security-status.json"),
+    )
+    value.add_argument(
         "--metadata-cache",
         action="append",
         type=Path,
@@ -1539,6 +1554,7 @@ def main() -> int:
                 "new_creator_summary": result[
                     "new_creator_summary"
                 ],
+                "guardrails": result["guardrails"],
                 "reliability": result["reliability"],
             },
             indent=2,
