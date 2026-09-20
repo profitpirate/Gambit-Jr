@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from memecoin_bot import e4_sub10ms_transport_v12 as transport
+from memecoin_bot import e4_v12_authority as authority
 
 
 class Sub10msTransportTests(unittest.TestCase):
@@ -62,11 +63,17 @@ class Sub10msTransportTests(unittest.TestCase):
         self.assertNotIn("sleep(", source)
         self.assertIn("del index", source)
 
-    def test_transport_is_authoritative_route_sender(self):
-        self.assertIs(transport.core.RouteSender, transport.Sub10msPersistentSender)
-        self.assertIs(
-            transport.repairs.FastPersistentRouteSender,
-            transport.Sub10msPersistentSender,
+    def test_transport_registers_without_overriding_higher_authority(self):
+        snapshot = authority.route_authority(transport.core)
+        self.assertGreaterEqual(
+            snapshot["priority"],
+            authority.ROUTE_PRIORITY_SUB10MS,
+        )
+        self.assertTrue(
+            issubclass(
+                transport.Sub10msPersistentSender,
+                transport._PreviousSender,
+            )
         )
 
 
