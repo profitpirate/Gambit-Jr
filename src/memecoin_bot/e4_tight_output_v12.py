@@ -122,7 +122,11 @@ def guarded_request(request: Mapping[str, Any]) -> dict[str, Any]:
     if expected_tokens <= 0 and is_direct:
         expected_tokens = _scaled_source_token_reference(mint, submitted_sol)
 
-    guard_bps = max_output_shortfall_bps()
+    guard_bps = (
+        direct.direct_copy_slippage_bps(None)
+        if is_direct
+        else max_output_shortfall_bps()
+    )
     metadata.update(
         {
             "strict_output_guard": True,
@@ -138,17 +142,16 @@ def guarded_request(request: Mapping[str, Any]) -> dict[str, Any]:
         metadata["expected_token_output"] = expected_tokens
 
     enriched["metadata"] = metadata
+    slippage_ceiling = (
+        direct.direct_copy_slippage_bps(None)
+        if is_direct
+        else guarded_buy_slippage_bps()
+    )
     enriched["slippage_bps"] = min(
-        guarded_buy_slippage_bps(),
-        max(0, _integer(enriched.get("slippage_bps"), guarded_buy_slippage_bps())),
+        slippage_ceiling,
+        max(0, _integer(enriched.get("slippage_bps"), slippage_ceiling)),
     )
     return enriched
-
-
-# Direct-copy code resolves this function through its module globals at runtime,
-# so replacing it here removes the 9,000-bps forced-fill default without
-# editing or weakening the immutable direct-copy recognition policy.
-direct.direct_copy_slippage_bps = guarded_buy_slippage_bps
 
 _PREVIOUS_EXECUTE = core.Engine.execute
 
