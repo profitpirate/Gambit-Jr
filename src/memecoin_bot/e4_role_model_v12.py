@@ -374,7 +374,7 @@ def _decide_launch_role_model_v12(
                 ROLE_MODEL_FAMILY,
                 0.94,
                 _copy_fraction(source.entry_sol if source is not None else 0.0),
-                "copy-safe E4 role-model confirmation",
+                "copy_safe E4 role-model confirmation",
                 evidence,
                 time.perf_counter_ns() - started,
             )
