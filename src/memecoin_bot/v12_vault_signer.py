@@ -74,19 +74,18 @@ class VaultTransitSigner:
         payload: dict | None = None,
     ) -> dict:
         timeout = aiohttp.ClientTimeout(total=self.timeout)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            async with session.request(
-                method,
-                self.address + path,
-                headers=self._headers(),
-                json=payload,
-            ) as response:
-                body = await response.json(content_type=None)
-                if response.status >= 400:
-                    raise RuntimeError(
-                        f"Vault HTTP {response.status}: {json.dumps(body)[:500]}"
-                    )
-                return body
+        async with aiohttp.ClientSession(timeout=timeout) as session, session.request(
+            method,
+            self.address + path,
+            headers=self._headers(),
+            json=payload,
+        ) as response:
+            body = await response.json(content_type=None)
+            if response.status >= 400:
+                raise RuntimeError(
+                    f"Vault HTTP {response.status}: {json.dumps(body)[:500]}"
+                )
+            return body
 
     async def public_key(self) -> Pubkey:
         path = (
