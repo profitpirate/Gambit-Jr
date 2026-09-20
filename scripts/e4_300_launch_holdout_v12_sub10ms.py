@@ -10,6 +10,7 @@ from memecoin_bot import e4_hardening_v12  # noqa: F401
 from memecoin_bot import e4_role_model_v12  # noqa: F401
 from memecoin_bot import e4_direct_copy_v12  # noqa: F401
 from memecoin_bot import e4_sub10ms_repairs_v12  # noqa: F401
+from memecoin_bot import e4_sub10ms_runtime_final_v12  # noqa: F401
 
 
 if __name__ == "__main__":
