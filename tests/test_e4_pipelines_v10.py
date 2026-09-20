@@ -233,7 +233,7 @@ class V10PolicyTests(unittest.TestCase):
             core.Settings(model_path=Path("missing.json"))
         ).entry(state_for("elite"))
         self.assertTrue(accepted, reason)
-        self.assertIn("elite_recurring_creator", reason)
+        self.assertIn("v12_elite_creator_quality_launch", reason)
         self.assertGreater(score, 0.90)
         self.assertGreater(fraction, 0)
         self.assertLess(features["e4_v10_decision_latency_ns"], 36_000_000)
