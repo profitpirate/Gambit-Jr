@@ -109,8 +109,20 @@ def classify(history: Mapping[str, Any], fresh: Mapping[str, Any]) -> tuple[str,
         f["v12_compatible_wins"] >= 1
         and f["v12_compatible_net_pnl_sol"] > 0
     )
-    if h["strong_history"] and fresh_v12_positive:
+    fresh_v12_clean_confirmation = bool(
+        fresh_v12_positive
+        and (
+            (f["v12_compatible_fills"] == 1 and f["v12_compatible_losses"] == 0)
+            or (
+                f["v12_compatible_fills"] >= 3
+                and f["v12_compatible_wins"] / max(f["v12_compatible_fills"], 1) >= 2.0 / 3.0
+            )
+        )
+    )
+    if h["strong_history"] and fresh_v12_clean_confirmation:
         return "PROMOTION_CANDIDATE_HISTORICAL_PLUS_FRESH", True
+    if h["strong_history"] and fresh_v12_positive:
+        return "SHORTLISTED_STRONG_HISTORY_FRESH_MIXED", False
     if h["pure_repeat_winner"] and (fresh_scout_positive or f["runner_2x_count"] > 0):
         return "SHORTLISTED_PURE_REPEAT_HISTORY_PLUS_FRESH_SIGNAL", False
     if h["repeat_winner"] and fresh_scout_positive:
