@@ -1,7 +1,8 @@
 [Unit]
 Description=Gambit V12 Autonomous Trading Supervisor
-After=network-online.target
+After=network-online.target gambit-v12-marketdata.service
 Wants=network-online.target
+Requires=gambit-v12-marketdata.service
 StartLimitIntervalSec=600
 StartLimitBurst=3
 
@@ -11,6 +12,9 @@ User=gambit
 Group=gambit
 WorkingDirectory=/opt/gambit/current
 EnvironmentFile=/etc/gambit/v12.env
+Environment=V12_HEARTBEAT_PATH=/run/gambit/v12-heartbeat.json
+Environment=V12_KILL_SWITCH_PATH=/run/gambit/V12_KILL
+Environment=V12_INSTANCE_LOCK=/run/gambit/v12-live.lock
 ExecStart=/opt/gambit/venv/bin/python /opt/gambit/current/scripts/v12_supervisor.py --heartbeat /run/gambit/v12-heartbeat.json --kill-switch /run/gambit/V12_KILL
 Restart=always
 RestartSec=3
