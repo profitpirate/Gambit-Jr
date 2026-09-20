@@ -289,13 +289,14 @@ class FinalPersistentRouteSender(_BaseSender):
                 await value
 
 
-authority.install_route_sender(
+_ACTIVE_SENDER = authority.install_route_sender(
     core,
     FinalPersistentRouteSender,
     priority=authority.ROUTE_PRIORITY_FINAL,
     authority="v12_final_transport",
 )
-repairs.FastPersistentRouteSender = FinalPersistentRouteSender
+if _ACTIVE_SENDER is FinalPersistentRouteSender:
+    repairs.FastPersistentRouteSender = FinalPersistentRouteSender
 
 
 def telemetry_snapshot() -> list[dict[str, Any]]:
