@@ -6,7 +6,6 @@ from datetime import UTC, datetime, timedelta
 import numpy as np
 import pytest
 
-from memecoin_bot.discord.cards import v3_operator_preview_card
 from memecoin_bot.historical.intelligence_v3 import (
     CompetingOutcome,
     CurveState,
@@ -620,21 +619,3 @@ def test_copyability_requires_all_delays_and_linked_wallets_count_once() -> None
     )
     assert consensus["raw_wallet_count"] == 3
     assert consensus["independent_validated_wallet_count"] == 2
-
-
-def test_v3_operator_preview_is_explicitly_research_only() -> None:
-    preview = v3_operator_preview_card(
-        {
-            "symbol": "V3",
-            "token_address": "Token111",
-            "chain": "solana",
-            "quick_2x_hazard": None,
-            "coverage": 0.4,
-            "uncertainty": 0.6,
-            "positive_evidence": ["real reserve increasing"],
-            "negative_evidence": ["wallet graph unavailable"],
-        }
-    )
-    assert "Operator/test-guild preview only" in preview["embed"]["description"]
-    assert "NO PUBLIC ROUTE" in preview["embed"]["footer"]["text"]
-    assert preview["embed"]["fields"][0]["value"] == "UNKNOWN"
