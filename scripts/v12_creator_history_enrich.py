@@ -9,7 +9,8 @@ import argparse
 import json
 import math
 from pathlib import Path
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 
 def load(path: Path, default: Any = None) -> Any:
