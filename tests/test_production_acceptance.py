@@ -47,6 +47,7 @@ def test_production_acceptance_passes_migrated_registered_database(tmp_path, mon
     assert completed.returncode == 0, completed.stdout + completed.stderr
     report = json.loads(completed.stdout)
     assert report["result"] == "PASS"
-    assert report["checks"]["discord_commands"]["count"] == 24
+    assert report["checks"]["discord_commands_removed"]["legacy_files_present"] == []
+    assert report["checks"]["portal_assets"]["portal_asset_count"] == 3
     assert report["checks"]["discord_py_version"] == "2.7.1"
     assert "acceptance-secret-must-not-appear" not in completed.stdout
