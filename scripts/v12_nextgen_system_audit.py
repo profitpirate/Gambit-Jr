@@ -14,15 +14,43 @@ REQUIRED = (
     "src/memecoin_bot/e4_sub10ms_runtime_final_v12.py",
     "src/memecoin_bot/e4_notifications_v12.py",
     "src/memecoin_bot/e4_nextgen_creator_authority_v12.py",
+    "src/memecoin_bot/e4_adaptive_exit_v12.py",
+    "src/memecoin_bot/e4_production_guard_v12.py",
     "src/memecoin_bot/notifications.py",
     "src/memecoin_bot/v12_creator_library.py",
+    "src/memecoin_bot/v12_creator_lifecycle.py",
+    "src/memecoin_bot/v12_learning_service.py",
+    "src/memecoin_bot/v12_operator_graph.py",
     "src/memecoin_bot/v12_postcert_risk.py",
+    "src/memecoin_bot/v12_security.py",
+    "src/memecoin_bot/v12_capacity.py",
+    "src/memecoin_bot/v12_execution_journal.py",
+    "src/memecoin_bot/v12_safety.py",
+    "src/memecoin_bot/v12_route_health.py",
+    "src/memecoin_bot/v12_backup.py",
+    "src/memecoin_bot/v12_live_readiness.py",
+    "src/memecoin_bot/v12_recovery.py",
+    "src/memecoin_bot/v12_watchdogs.py",
+    "src/memecoin_bot/v12_forensics.py",
+    "src/memecoin_bot/v12_observability.py",
+    "src/memecoin_bot/v12_vault_signer.py",
+    "src/memecoin_bot/v12_account_orchestrator.py",
     "src/memecoin_bot/access_store.py",
     "src/memecoin_bot/access_service.py",
     "src/memecoin_bot/control_plane.py",
     "src/memecoin_bot/v12_portal.py",
     "scripts/v12_creator_library_rebuild.py",
     "scripts/v12_e4_full_history.py",
+    "scripts/v12_supervisor.py",
+    "scripts/v12_integrity_manifest.py",
+    "scripts/v12_secret_scan.py",
+)
+REQUIRED_DEPLOYMENT = (
+    "deploy/systemd/gambit-v12.service",
+    "deploy/systemd/gambit-v12-marketdata.service",
+    "deploy/systemd/gambit-v12-orchestrator.service",
+    "deploy/systemd/gambit-v12-portal.service",
+    "deploy/tmpfiles.d/gambit-v12.conf",
 )
 FORBIDDEN_COMMAND_FILES = (
     "src/memecoin_bot/discord/bot_runtime.py",
@@ -78,6 +106,12 @@ def main() -> int:
     failures: list[str] = []
     missing = [path for path in REQUIRED if not (ROOT / path).exists()]
     failures.extend(f"missing:{path}" for path in missing)
+    missing_deployment = [
+        path for path in REQUIRED_DEPLOYMENT if not (ROOT / path).exists()
+    ]
+    failures.extend(
+        f"missing_deployment:{path}" for path in missing_deployment
+    )
 
     forbidden_present = [
         path for path in FORBIDDEN_COMMAND_FILES if (ROOT / path).exists()
@@ -146,7 +180,12 @@ def main() -> int:
     access_source = (ROOT / "src/memecoin_bot/access_service.py").read_text()
     if "Axiom direct account linking is disabled" not in access_source:
         failures.append("axiom_fail_closed_guard_missing")
-    if "raw private keys are forbidden" not in access_source:
+    vault_ref_guard = 'secret_ref.startswith("vault://")' in access_source
+    raw_key_guard = (
+        "raw private keys" in access_source
+        and "forbidden" in access_source
+    )
+    if not (vault_ref_guard and raw_key_guard):
         failures.append("raw_private_key_guard_missing")
 
     notifications = (ROOT / "src/memecoin_bot/notifications.py").read_text()
@@ -168,6 +207,8 @@ def main() -> int:
         "status": "PASS" if not failures else "FAIL",
         "failures": failures,
         "required_components": len(REQUIRED),
+        "required_deployment_units": len(REQUIRED_DEPLOYMENT),
+        "deployment_units_present": not missing_deployment,
         "components": components,
         "discord_command_runtime_removed": not forbidden_present,
         "creator_library": {
@@ -196,6 +237,7 @@ def main() -> int:
             "wallet_signature_proof": True,
             "axiom_direct_link": False,
             "raw_private_keys_accepted": False,
+            "vault_only_live_signer": vault_ref_guard and raw_key_guard,
         },
     }
     output = ROOT / "research/v12-nextgen-system-audit.json"
