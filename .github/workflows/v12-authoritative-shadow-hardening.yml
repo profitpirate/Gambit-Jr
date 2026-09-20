@@ -65,8 +65,9 @@ jobs:
 
       - name: Verify no frozen model or current causal state was changed
         run: |
-          git fetch --depth=1 origin codex/e4-v12-flow-survival-hazard-v12:refs/remotes/origin/v12-live
-          git diff --exit-code origin/v12-live -- \
+          git fetch --depth=50 origin codex/e4-v12-flow-survival-hazard-v12:refs/remotes/origin/v12-live
+          base="$(git merge-base HEAD origin/v12-live)"
+          git diff --exit-code "$base"..HEAD -- \
             research/v12-pre-armed-100-trade-frozen-model.json \
             research/v12-pre-armed-50-trade-results.json \
             research/v12-pre-armed-100-causal-paper-live.json \
