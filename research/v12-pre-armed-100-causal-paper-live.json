@@ -1,18 +1,18 @@
 {
   "audit_counts": {
-    "creator_seed_below_floor": 8,
-    "execution_entry_output_guard_rejected": 1,
-    "not_prearmed_handle": 28,
-    "selected_candidates": 8,
-    "social_age_outside_window": 1,
-    "unknown_creator": 8955
+    "creator_seed_below_floor": 13,
+    "execution_entry_output_guard_rejected": 2,
+    "not_prearmed_handle": 37,
+    "selected_candidates": 10,
+    "social_age_outside_window": 2,
+    "unknown_creator": 11938
   },
   "completion": {
     "reached": false,
-    "remaining": 93,
+    "remaining": 92,
     "required_closed_trades": 100
   },
-  "ending_bankroll_sol": 3.3038187327087942,
+  "ending_bankroll_sol": 3.2269534002660687,
   "golden_thesis_approved": false,
   "ledger": [
     {
@@ -252,29 +252,64 @@
       "social_status_id": "2101742241643459035",
       "tweet_age_seconds": 5.507690619,
       "win": false
+    },
+    {
+      "costs_sol": {
+        "axiom_entry": 0.0030524269041813648,
+        "axiom_exit": 0.0024821085254268516,
+        "base_priority_bribe_entry": 0.002005,
+        "base_priority_exit": 0.001005,
+        "pump_entry": 0.004016351189712322,
+        "pump_exit": 0.003265932270298489,
+        "total_axiom": 0.005534535429608216,
+        "total_fixed_execution": 0.0030099999999999997,
+        "total_pump": 0.007282283460010811
+      },
+      "create_to_fill_price_multiple": 1.4591973670824723,
+      "creator": "29yFzeBZgxf5zqrAkKXwgZtQehRf4pL8WbV2nRJikbw8",
+      "creator_seed_sol": 3.0,
+      "curve_input_sol": 0.3213080951769858,
+      "decision_ns": 1789934493586397269,
+      "entry_budget_sol": 0.3303818732708794,
+      "entry_cost_sol": 0.3303818732708794,
+      "entry_latency_ms": 5.0,
+      "exit_ns": 1789934495591397269,
+      "exit_reason": "MAXIMUM_HOLD",
+      "exit_transactions": 1,
+      "fill_ns": 1789934493591397269,
+      "mint": "3CFKFN3Dbgf2N4M1CRKXJvpc5h4ptjUMVpncTJFduofF",
+      "output_ratio": 0.686447863186329,
+      "pnl_sol": -0.07586033244272561,
+      "proceeds_sol": 0.2545215408281538,
+      "run_id": "35530267888",
+      "social_handle": "ddddddd8a",
+      "social_status_id": "2101763713770406358",
+      "tweet_age_seconds": 0.685397269,
+      "win": false
     }
   ],
   "metrics": {
     "acceptance_gate_passed": false,
-    "capture_windows": 3,
-    "closed_trades": 7,
-    "ending_bankroll_sol": 3.3048237327087944,
-    "losses": 2,
-    "maximum_closed_equity_drawdown_fraction": 0.009157270681828736,
-    "net_pnl_sol": 0.30482373270879426,
-    "profit_factor": 7.653709038448676,
-    "total_axiom_fees_sol": 0.044142453940001374,
-    "total_fixed_execution_costs_sol": 0.026094999999999997,
-    "total_pump_fees_sol": 0.05808217623684392,
-    "wilson_lower_bound": 0.35893445183261935,
-    "win_rate": 0.7142857142857143,
+    "capture_windows": 4,
+    "closed_trades": 8,
+    "ending_bankroll_sol": 3.2289634002660685,
+    "losses": 3,
+    "maximum_closed_equity_drawdown_fraction": 0.03140037456858794,
+    "net_pnl_sol": 0.22896340026606865,
+    "profit_factor": 2.8817939984136194,
+    "total_axiom_fees_sol": 0.04967698936960959,
+    "total_fixed_execution_costs_sol": 0.029104999999999995,
+    "total_pump_fees_sol": 0.06536445969685473,
+    "wilson_lower_bound": 0.3057423946026273,
+    "win_rate": 0.625,
     "wins": 5
   },
   "model_sha256": "69df86eaf386fd37d699928a95d25aaeb2053e743b59c9e687c8a7c49d14f977",
   "processed_runs": [
     "35508088321",
     "35516796792",
-    "35523801183"
+    "35523801183",
+    "35530267888"
   ],
   "production_authorised": false,
   "production_paths_changed": 0,
@@ -287,6 +322,14 @@
       "output_ratio": 0.6192093825968215,
       "reason": "entry_output_guard_rejected",
       "run_id": "35516796792"
+    },
+    {
+      "create_to_fill_price_multiple": 1.5423354022990619,
+      "fee_sol": 0.001005,
+      "mint": "9UXr4zhGW3gVsfSrBTk67yWJpJFHJv97GdnTWnzREYaa",
+      "output_ratio": 0.6495595385979535,
+      "reason": "entry_output_guard_rejected",
+      "run_id": "35530267888"
     }
   ],
   "schema_version": "e4-v12-prearmed-axiom-paper-live-v1",
