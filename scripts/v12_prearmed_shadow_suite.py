@@ -1276,7 +1276,7 @@ def hard_negative_shadow(
     return output
 
 
-def _fill_price(def _fill_price(trace: base.Trace, fill_ns: int) -> float:
+def _fill_price(trace: base.Trace, fill_ns: int) -> float:
     prior = [
         point.price_sol
         for point in trace.points
@@ -1670,7 +1670,7 @@ def validate_integrity(
     }
 
 
-def _dedupe_extend(def _dedupe_extend(
+def _dedupe_extend(
     existing: list[dict[str, Any]],
     incoming: Sequence[Mapping[str, Any]],
     keys: Sequence[str],
