@@ -13,6 +13,7 @@ from urllib.parse import urlsplit, urlunsplit
 import aiohttp
 
 from . import e4_sub10ms_repairs_v12 as repairs
+from . import e4_v12_authority as authority
 
 core = repairs.core
 LOGGER = logging.getLogger("gambit.e4.sub10ms.transport.final.v12")
@@ -288,7 +289,12 @@ class FinalPersistentRouteSender(_BaseSender):
                 await value
 
 
-core.RouteSender = FinalPersistentRouteSender
+authority.install_route_sender(
+    core,
+    FinalPersistentRouteSender,
+    priority=authority.ROUTE_PRIORITY_FINAL,
+    authority="v12_final_transport",
+)
 repairs.FastPersistentRouteSender = FinalPersistentRouteSender
 
 
