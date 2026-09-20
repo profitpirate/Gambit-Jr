@@ -5,6 +5,7 @@ import asyncio
 import json
 import os
 import signal
+import sqlite3
 import time
 from pathlib import Path
 
@@ -18,8 +19,14 @@ async def heartbeat(
     service,
     path: Path,
     stop: asyncio.Event,
+    *,
+    stale_seconds: float,
+    max_pending: int,
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+    last_count = -1
+    last_progress = time.monotonic()
+    started = time.monotonic()
     while not stop.is_set():
         provider_rows = [
             dict(row)
@@ -41,9 +48,26 @@ async def heartbeat(
                     "WHERE processing_state!='DONE'"
                 ).fetchone()[0]
             )
-        except Exception:
-            # The health file still proves process liveness during migrations.
-            pass
+        except sqlite3.Error:
+            # During migrations the heartbeat still proves process liveness,
+            # but prolonged lack of canonical progress below will fail closed.
+            canonical_count = 0
+            pending = 0
+
+        if canonical_count > last_count:
+            last_count = canonical_count
+            last_progress = time.monotonic()
+        elif (
+            time.monotonic() - started >= stale_seconds
+            and time.monotonic() - last_progress >= stale_seconds
+        ):
+            raise RuntimeError(
+                f"canonical market-data feed stale for >= {stale_seconds:.1f}s"
+            )
+        if pending > max_pending:
+            raise RuntimeError(
+                f"canonical processing backlog exceeded limit: {pending}>{max_pending}"
+            )
         payload = {
             "pid": os.getpid(),
             "ts_ns": time.time_ns(),
@@ -98,16 +122,34 @@ async def run() -> int:
                 )
             ),
             stop,
+            stale_seconds=float(
+                os.getenv("V12_MARKETDATA_STALE_SECONDS", "90")
+            ),
+            max_pending=int(
+                os.getenv("V12_MARKETDATA_MAX_PENDING", "10000")
+            ),
         ),
         name="v12-marketdata-heartbeat",
     )
+    runner = asyncio.create_task(service.run(), name="v12-marketdata-service")
     try:
-        await service.run()
+        done, _pending = await asyncio.wait(
+            {runner, hb},
+            return_when=asyncio.FIRST_COMPLETED,
+        )
+        if hb in done:
+            error = hb.exception()
+            service.stop()
+            await asyncio.gather(runner, return_exceptions=True)
+            if error is not None:
+                raise error
+            raise RuntimeError("market-data heartbeat exited unexpectedly")
         return 0
     finally:
         service.stop()
         hb.cancel()
-        await asyncio.gather(hb, return_exceptions=True)
+        runner.cancel()
+        await asyncio.gather(hb, runner, return_exceptions=True)
         service.close()
         store.close()
 
