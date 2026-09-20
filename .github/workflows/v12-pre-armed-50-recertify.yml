@@ -226,6 +226,7 @@ jobs:
             research/v12-pre-armed-50-trade-results-pre-exit-chronology-fix.md \
             research/v12-pre-armed-50-trade-recertification.json
           git commit -m 'research(v12): recertify 50-trade baseline after chronology fix [skip ci]'
+          git pull --rebase origin codex/e4-v12-flow-survival-hazard-v12
           git push origin HEAD:codex/e4-v12-flow-survival-hazard-v12
 
       - uses: actions/upload-artifact@v4
