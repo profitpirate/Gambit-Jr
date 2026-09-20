@@ -263,13 +263,14 @@ class Sub10msPersistentSender(_PreviousSender):
                 await value
 
 
-authority.install_route_sender(
+_ACTIVE_SENDER = authority.install_route_sender(
     core,
     Sub10msPersistentSender,
     priority=authority.ROUTE_PRIORITY_SUB10MS,
     authority="v12_sub10ms_transport",
 )
-repairs.FastPersistentRouteSender = Sub10msPersistentSender
+if _ACTIVE_SENDER is Sub10msPersistentSender:
+    repairs.FastPersistentRouteSender = Sub10msPersistentSender
 
 
 def telemetry_snapshot() -> list[dict[str, Any]]:
