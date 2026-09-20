@@ -272,6 +272,77 @@ def merge_position_ledgers(
     }
 
 
+def apprenticeship_creator_map(path: Path | None) -> dict[str, str]:
+    if path is None or not path.exists():
+        return {}
+    payload = load(path)
+    mapping: dict[str, str] = {}
+    for row in payload.get("observations", []) or []:
+        if not isinstance(row, Mapping):
+            continue
+        mint = str(row.get("mint") or "")
+        creator = str(row.get("creator") or "")
+        if mint and creator:
+            mapping[mint] = creator
+    return mapping
+
+
+async def recover_unknown_creators(
+    rpc: stress.RpcPool,
+    rows: list[dict[str, Any]],
+    *,
+    apprenticeship: dict[str, str],
+    pages: int,
+    page_size: int,
+) -> dict[str, int]:
+    unresolved = [row for row in rows if row.get("creator") == UNKNOWN]
+    recovered_apprentice = 0
+    recovered_chain = 0
+
+    for row in unresolved:
+        mint = str(row["mint"])
+        known = apprenticeship.get(mint)
+        if known:
+            row["creator"] = known
+            row["creator_resolution"] = "RESOLVED_APPRENTICESHIP_RAW_EVIDENCE"
+            recovered_apprentice += 1
+
+    unresolved = [row for row in rows if row.get("creator") == UNKNOWN]
+    for index, row in enumerate(unresolved, start=1):
+        # The first pass is deliberately fast. For the tiny residual set, spend
+        # more RPC budget and run sequentially to avoid public-RPC throttling.
+        await asyncio.sleep(0.35)
+        resolved = await creator_for_position(
+            rpc,
+            row,
+            pages=max(20, pages * 5),
+            page_size=max(100, page_size),
+        )
+        if str(resolved.get("creator") or UNKNOWN) != UNKNOWN:
+            row["creator"] = str(resolved["creator"])
+            row["creator_resolution"] = "RESOLVED_DEEP_CHAIN_RETRY"
+            row["create_signature"] = resolved.get("create_signature")
+            row["create_slot"] = resolved.get("create_slot")
+            recovered_chain += 1
+        else:
+            print(
+                json.dumps(
+                    {
+                        "unresolved_creator_mint": row["mint"],
+                        "entry_signature": row.get("entry_signature"),
+                        "deep_retry_index": index,
+                    }
+                ),
+                flush=True,
+            )
+    return {
+        "initial_unknown": len(unresolved) + recovered_apprentice,
+        "recovered_apprenticeship": recovered_apprentice,
+        "recovered_deep_chain": recovered_chain,
+        "remaining_unknown": sum(row.get("creator") == UNKNOWN for row in rows),
+    }
+
+
 def creator_summary(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in records:
@@ -369,6 +440,14 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                 ),
                 flush=True,
             )
+        apprentice_map = apprenticeship_creator_map(args.apprentice_state)
+        creator_recovery = await recover_unknown_creators(
+            rpc,
+            onchain,
+            apprenticeship=apprentice_map,
+            pages=args.creator_pages,
+            page_size=args.creator_page_size,
+        )
         rpc_errors = rpc.errors[-200:]
 
     legacy = legacy_records(expectancy)
@@ -397,6 +476,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             "onchain_creator_unresolved": sum(
                 row["creator"] == UNKNOWN for row in onchain
             ),
+            "creator_recovery": creator_recovery,
         },
         "counts": {
             "creators_known": len(known),
@@ -432,6 +512,11 @@ def parser() -> argparse.ArgumentParser:
         "--recent-comparison",
         type=Path,
         default=Path("research/v12-e4-48h-comparison.json"),
+    )
+    value.add_argument(
+        "--apprentice-state",
+        type=Path,
+        default=Path("research/v12-creator-apprentice-backfill.json"),
     )
     value.add_argument("--signature-hard-cap", type=int, default=50_000)
     value.add_argument("--creator-pages", type=int, default=4)
