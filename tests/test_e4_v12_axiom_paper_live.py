@@ -267,3 +267,79 @@ def test_nonfuture_capture_is_rejected(tmp_path: Path) -> None:
         assert "strictly after" in str(exc)
     else:
         raise AssertionError("nonfuture capture was accepted")
+
+
+def test_quiet_curve_exit_is_timestamped_at_deadline_not_before_fill() -> None:
+    frozen = model()
+    run = subject.replay.RunData(
+        run_id="quiet-run",
+        batch={},
+        events_by_mint={"quiet-mint": []},
+        reserves_by_mint={
+            "quiet-mint": [
+                subject.replay.ReserveState(
+                    received_ns=100,
+                    sequence=0,
+                    virtual_sol=30.0,
+                    virtual_tokens=1_000_000_000.0,
+                    real_tokens=800_000_000.0,
+                    price_sol=3e-8,
+                    fdv_usd=0.0,
+                )
+            ]
+        },
+        e4_positions={},
+    )
+    trace = subject.base.Trace(
+        run_id="quiet-run",
+        split="live",
+        mint="quiet-mint",
+        creator="creator",
+        create_ns=100,
+        create_slot=1,
+        create_signature="sig",
+        mayhem_mode=False,
+        cashback_enabled=False,
+        metadata_content_addressed=True,
+        creator_prior_launch_count=1,
+        points=[
+            subject.base.Point(
+                timestamp_ns=100,
+                kind="BUY",
+                trader="creator",
+                signature="sig",
+                slot=1,
+                sol_amount=2.0,
+                price_sol=3e-8,
+                virtual_sol=30.0,
+                virtual_tokens=1_000_000_000.0,
+                real_tokens=800_000_000.0,
+                complete=False,
+            )
+        ],
+    )
+    candidate = subject.Candidate(
+        run_id="quiet-run",
+        mint="quiet-mint",
+        creator="creator",
+        handle="known",
+        status_id="1",
+        tweet_age_seconds=1.0,
+        create_ns=100,
+        decision_ns=100,
+        decision_sequence=0,
+        creator_seed_sol=2.0,
+    )
+    trade, rejection = subject.simulate_trade(
+        run,
+        trace,
+        candidate,
+        0.3,
+        frozen,
+        subject.load_costs(frozen),
+        subject.load_policy(frozen),
+    )
+    assert rejection is None
+    assert trade is not None
+    assert trade["exit_ns"] == trade["fill_ns"] + frozen["exit_policy"]["hold_ms"] * 1_000_000
+    assert trade["exit_ns"] >= trade["fill_ns"]
