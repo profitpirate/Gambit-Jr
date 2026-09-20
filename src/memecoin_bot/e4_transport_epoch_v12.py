@@ -5,6 +5,7 @@ import time
 from typing import Any, Mapping
 
 from . import e4_transport_v12 as base
+from . import e4_v12_authority as authority
 
 core = base.core
 
@@ -129,4 +130,9 @@ class EpochWarmFanoutRouteSender(base.WarmFanoutRouteSender):
             )
 
 
-core.RouteSender = EpochWarmFanoutRouteSender
+authority.install_route_sender(
+    core,
+    EpochWarmFanoutRouteSender,
+    priority=authority.ROUTE_PRIORITY_EPOCH,
+    authority="v12_epoch_transport",
+)
