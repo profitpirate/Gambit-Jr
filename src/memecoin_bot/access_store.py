@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS access_sessions(
     expires_ns INTEGER NOT NULL,
     revoked_ns INTEGER,
     created_ns INTEGER NOT NULL,
+    csrf_hash TEXT,
     FOREIGN KEY(user_id) REFERENCES access_users(id)
 );
 CREATE TABLE IF NOT EXISTS access_wallet_challenges(
@@ -91,6 +92,12 @@ class AccessStore:
         )
         self.conn.row_factory = sqlite3.Row
         self.conn.executescript(SCHEMA)
+        columns = {
+            str(row[1])
+            for row in self.conn.execute("PRAGMA table_info(access_sessions)")
+        }
+        if "csrf_hash" not in columns:
+            self.conn.execute("ALTER TABLE access_sessions ADD COLUMN csrf_hash TEXT")
         self.conn.execute("PRAGMA foreign_keys=ON")
         self.conn.execute("PRAGMA busy_timeout=5000")
 
