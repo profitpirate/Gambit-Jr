@@ -1,0 +1,146 @@
+name: V12 Infrastructure Deep Audit
+
+on:
+  push:
+    branches:
+      - codex/v12-broad-discovery-creator-apprentice-20260920
+    paths:
+      - "scripts/v12_infrastructure_audit.py"
+      - ".github/workflows/v12-infrastructure-deep-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v12-infrastructure-deep-audit
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v12-broad-discovery-creator-apprentice-20260920
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .[dev,research]
+      - run: python -m pip install -r requirements-e4.txt
+      - name: Static structural shell audit
+        run: |
+          python scripts/v12_infrastructure_audit.py \
+            --output research/v12-infrastructure-audit.json
+      - name: Compile and lint active V12 paths
+        run: |
+          python -m compileall -q \
+            scripts/e4_v12_fast_prearmed_selector.py \
+            scripts/e4_v12_axiom_paper_live.py \
+            scripts/v12_prearmed_shadow_suite.py \
+            scripts/v12_prearmed_guardrail_policy.py \
+            scripts/v12_creator_apprentice.py \
+            scripts/v12_creator_history_enrich.py \
+            scripts/v12_e4_recent_compare.py \
+            src/memecoin_bot/e4_role_model_v12.py \
+            src/memecoin_bot/e4_direct_copy_v12.py \
+            src/memecoin_bot/e4_sub10ms_repairs_v12.py \
+            src/memecoin_bot/e4_sub10ms_runtime_final_v12.py \
+            src/memecoin_bot/e4_sub10ms_transport_final_v12.py
+          ruff check \
+            scripts/v12_creator_apprentice.py \
+            scripts/v12_creator_history_enrich.py \
+            scripts/v12_e4_recent_compare.py \
+            tests/test_v12_creator_apprentice.py \
+            tests/test_e4_wallet_sample_filters.py
+      - name: Full active V12 regression battery
+        run: |
+          python -m pytest -q \
+            tests/test_e4_v12_fast_prearmed_selector.py \
+            tests/test_e4_v12_axiom_paper_live.py \
+            tests/test_v12_prearmed_shadow_suite.py \
+            tests/test_v12_prearmed_guardrail_policy.py \
+            tests/test_v12_creator_apprentice.py \
+            tests/test_e4_wallet_sample_filters.py \
+            tests/test_e4_v12_sub10ms_repairs.py \
+            tests/test_e4_v12_sub10ms_transport.py \
+            tests/test_e4_v12_sub10ms_transport_final.py \
+            tests/test_v12_role_model_pipeline.py \
+            tests/test_v12_direct_copy.py \
+            tests/test_v12_transport.py \
+            tests/test_v12_transport_epoch.py \
+            tests/test_v12_selection.py
+      - name: Frozen evidence and causal-state invariants
+        run: |
+          python - <<'PY'
+          import hashlib,json,math
+          model=json.load(open("research/v12-pre-armed-100-trade-frozen-model.json"))
+          digest=hashlib.sha256(json.dumps(model,sort_keys=True,separators=(",",":")).encode()).hexdigest()
+          assert digest=="69df86eaf386fd37d699928a95d25aaeb2053e743b59c9e687c8a7c49d14f977"
+          cert=json.load(open("research/v12-pre-armed-certification-status.json"))
+          assert cert["official_50_trade_baseline_valid"] is True
+          assert cert["causal_exit_recertification"]["impossible_exit_count_after"] == 0
+          state=json.load(open("research/v12-pre-armed-100-causal-paper-live.json"))
+          assert state["real_money_execution"] is False
+          assert state["production_paths_changed"] == 0
+          for row in state["ledger"]:
+              assert int(row["decision_ns"]) <= int(row["fill_ns"]) <= int(row["exit_ns"])
+              assert all(math.isfinite(float(row[k])) for k in ("entry_cost_sol","proceeds_sol","pnl_sol"))
+          print(digest, len(state["ledger"]))
+          PY
+      - name: Builder locked install and syntax/self-test
+        working-directory: tools/e4-builder
+        run: |
+          npm ci --omit=dev
+          node --check race-proxy-v3.mjs
+          node --check strict-race-proxy-v12.mjs
+          node --check fast-preload-v4.mjs
+          node race-proxy-v3.mjs --self-test
+      - name: Dependency audit snapshot
+        working-directory: tools/e4-builder
+        continue-on-error: true
+        run: npm audit --omit=dev --json > ../../research/v12-builder-npm-audit.json
+      - name: Write operational audit summary
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open("research/v12-infrastructure-audit.json"))
+          dep=json.load(open("research/e4-builder-security-status.json"))
+          summary={
+            "version":"v12-operational-audit-v1",
+            "static_status":a["status"],
+            "active_python_components":len(a["active_python"]),
+            "active_js_components":len(a["active_javascript"]),
+            "active_workflows":len(a["active_workflows"]),
+            "full_regression_battery_passed":True,
+            "builder_locked_install_passed":True,
+            "builder_self_test_passed":True,
+            "frozen_model_verified":True,
+            "causal_state_verified":True,
+            "real_money_execution":False,
+            "dependency_advisories_after":dep.get("after"),
+            "dependency_advisories_unresolved":dep.get("unresolved"),
+            "known_non_shell_debt":[
+              "8 high + 8 moderate transitive builder advisories remain because safe non-breaking remediation did not reduce them"
+            ] if dep.get("unresolved") else [],
+          }
+          open("research/v12-operational-audit-summary.json","w").write(json.dumps(summary,indent=2,sort_keys=True)+"\n")
+          print(json.dumps(summary,indent=2))
+          PY
+      - name: Commit audit evidence
+        run: |
+          git config user.name 'gambit-v12-infra-audit'
+          git config user.email 'actions@users.noreply.github.com'
+          git add research/v12-infrastructure-audit.json research/v12-operational-audit-summary.json
+          test -f research/v12-builder-npm-audit.json && git add research/v12-builder-npm-audit.json || true
+          if ! git diff --cached --quiet; then
+            git commit -m 'audit(v12): certify active infrastructure is operational [skip ci]'
+            git pull --rebase origin codex/v12-broad-discovery-creator-apprentice-20260920
+            git push origin HEAD:codex/v12-broad-discovery-creator-apprentice-20260920
+          fi
