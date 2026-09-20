@@ -50,7 +50,7 @@ def repo_tmp() -> Path:
 
 
 def artifact(repo_tmp: Path, run_id: str, start_ns: int) -> Path:
-    directory = tmp_path / run_id / "artifacts"
+    directory = repo_tmp / run_id / "artifacts"
     directory.mkdir(parents=True)
     cohort = [
         {"mint": f"mint-{index}", "received_ns": start_ns + index}
