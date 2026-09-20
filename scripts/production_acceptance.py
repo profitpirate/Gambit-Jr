@@ -3,45 +3,17 @@
 
 from __future__ import annotations
 
-import ast
 import json
 import sys
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
-from types import SimpleNamespace
 from typing import Any
 
 import discord
 
 from memecoin_bot.config import Settings
 from memecoin_bot.database import Store
-from memecoin_bot.discord import bot_runtime
-from memecoin_bot.discord.cards import (
-    compare_card,
-    creator_card,
-    menu_card,
-    narrative_card,
-    performance_card,
-    rows_card,
-    scan_card,
-    settings_card,
-    smartmoney_card,
-    status_card,
-    token_card,
-    wallet_card,
-    watchlist_card,
-)
-from memecoin_bot.discord.cards import (
-    test_alert_card as make_test_alert_card,
-)
-from memecoin_bot.discord.command_center import CommandCenterData, MenuView
-from memecoin_bot.discord.validation import (
-    validate_message,
-    validate_view,
-    validate_webhook_payload,
-)
 from memecoin_bot.historical import ApprovedFeatureStore
-from memecoin_bot.signals import format_discord_event
 
 EXPECTED_DISCORD_VERSION = "2.7.1"
 VALID_PROVIDER_STATES = {
@@ -73,133 +45,30 @@ class Acceptance:
             self.failures.append(name)
 
 
-def _registered_command_names() -> set[str]:
-    source = Path(bot_runtime.__file__).read_text(encoding="utf-8")
-    tree = ast.parse(source)
-    names: set[str] = set()
-    for node in ast.walk(tree):
-        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            continue
-        for decorator in node.decorator_list:
-            if not isinstance(decorator, ast.Call):
-                continue
-            function = decorator.func
-            if not isinstance(function, ast.Attribute) or function.attr != "command":
-                continue
-            for keyword in decorator.keywords:
-                if keyword.arg == "name" and isinstance(keyword.value, ast.Constant):
-                    names.add(str(keyword.value.value))
-    return names
-
-
-def _validate_discord_artifacts(store: Store, settings: Settings) -> dict[str, int]:
-    scan = scan_card(
-        {
-            "token_address": "So11111111111111111111111111111111111111112",
-            "chain": "solana",
-            "market": {},
-            "survival": {},
-            "payoff": {},
-            "providers": {},
-        }
-    )
-    token = {
-        "token_address": "So11111111111111111111111111111111111111112",
-        "chain": "solana",
-        "symbol": "TEST",
-        "name": "Acceptance Token",
-        "wallet_intelligence": {},
+def _validate_sniper_surfaces(root: Path) -> dict[str, Any]:
+    portal = root / "src" / "memecoin_bot" / "portal_web"
+    assets = {
+        name: (portal / name).is_file()
+        for name in ("index.html", "app.js", "styles.css")
     }
-    cards = [
-        menu_card(),
-        status_card({}),
-        scan,
-        compare_card(scan, scan),
-        watchlist_card([]),
-        wallet_card({"wallet": "AcceptanceWallet"}),
-        creator_card(None, "AcceptanceCreator"),
-        narrative_card([]),
-        token_card(token),
-        smartmoney_card(token),
-        rows_card("ACCEPTANCE", [], "No rows.", str),
-        performance_card({}),
-        settings_card(None),
-        make_test_alert_card(),
+    legacy = [
+        str(path.relative_to(root))
+        for path in (
+            root / "src/memecoin_bot/discord/bot_runtime.py",
+            root / "src/memecoin_bot/discord/command_center.py",
+            root / "src/memecoin_bot/discord/responses.py",
+            root / "src/memecoin_bot/discord/cards.py",
+        )
+        if path.exists()
     ]
-    for payload in cards:
-        validate_message(card_payload=payload)
-
-    service = SimpleNamespace(
-        started_at="1970-01-01T00:00:00+00:00",
-        launch_queue=SimpleNamespace(stats=lambda: {"size": 0, "maxsize": 0}),
-    )
-    data = CommandCenterData(service, store, settings)
-    views = [
-        MenuView(data, timeout=900),
-        MenuView(data, timeout=None),
-        bot_runtime.ScanView(service, store, "So111", "solana", timeout=900),
-        bot_runtime.ScanView(service, store, None, None, timeout=None),
-        bot_runtime.TokenActionView(store, timeout=900),
-        bot_runtime.TokenActionView(store, timeout=None),
-    ]
-    for view in views:
-        validate_view(view)
-
-    automatic = format_discord_event(
-        "SIGNAL",
-        {
-            "classification": "STRONG",
-            "chain": "solana",
-            "token_address": token["token_address"],
-            "name": token["name"],
-            "symbol": token["symbol"],
-            "component_scores": {
-                name: 1
-                for name in (
-                    "narrative",
-                    "social",
-                    "onchain",
-                    "developer",
-                    "momentum",
-                    "safety",
-                )
-            },
-            "component_maxima": {
-                name: 1
-                for name in (
-                    "narrative",
-                    "social",
-                    "onchain",
-                    "developer",
-                    "momentum",
-                    "safety",
-                )
-            },
-            "developer": {},
-            "narrative": {},
-            "social": {},
-            "momentum": {},
-            "v15_signal_tier": "STRONG",
-            "runner_score": 80,
-            "failure_score": 10,
-            "evidence_coverage": 85,
-            "entry_status": "OPEN",
-            "survival_grade": "HIGH",
-        },
-    )
-    validate_webhook_payload(automatic)
-    actions = automatic["components"][0]["components"]
-    assert [value["label"] for value in actions] == [
-        "Copy CA",
-        "DexScreener",
-        "Open GMGN",
-        "Solscan",
-        "Watch",
-    ]
+    notifier = root / "src/memecoin_bot/discord/notifier.py"
+    control_plane = root / "src/memecoin_bot/control_plane.py"
     return {
-        "card_builders": len(cards),
-        "views": len(views),
-        "automatic_alert_payloads": 1,
+        "portal_assets": assets,
+        "portal_asset_count": sum(assets.values()),
+        "legacy_command_files_present": legacy,
+        "outbound_notifier": notifier.is_file(),
+        "control_plane": control_plane.is_file(),
     }
 
 
@@ -253,12 +122,21 @@ def run_acceptance(settings: Settings) -> tuple[dict[str, Any], int]:
         finally:
             feature_store.close()
 
-    command_names = _registered_command_names()
-    expected_names = set(bot_runtime.EXPECTED_COMMAND_NAMES)
+    surface = _validate_sniper_surfaces(Path.cwd())
     acceptance.require(
-        "discord_commands",
-        command_names == expected_names and len(command_names) == 24,
-        {"count": len(command_names), "names": sorted(command_names)},
+        "discord_commands_removed",
+        not surface["legacy_command_files_present"],
+        {
+            "legacy_files_present": surface["legacy_command_files_present"],
+            "outbound_notifier": surface["outbound_notifier"],
+        },
+    )
+    acceptance.require(
+        "portal_assets",
+        surface["portal_asset_count"] == 3
+        and surface["control_plane"]
+        and surface["outbound_notifier"],
+        surface,
     )
 
     database_path = Path(settings.database_path)
@@ -344,8 +222,6 @@ def run_acceptance(settings: Settings) -> tuple[dict[str, Any], int]:
                 all(state in VALID_PROVIDER_STATES for state in provider_states.values()),
                 provider_states,
             )
-            payload_counts = _validate_discord_artifacts(store, settings)
-            acceptance.require("discord_payloads", True, payload_counts)
         except Exception as error:  # noqa: BLE001 - report a single deterministic gate failure
             acceptance.require(
                 "acceptance_runtime",
