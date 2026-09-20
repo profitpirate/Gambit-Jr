@@ -229,6 +229,49 @@ def merge_records(
     )
 
 
+def merge_position_ledgers(
+    primary: list[dict[str, Any]],
+    recent_report: Mapping[str, Any] | None,
+) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    """Recover recent positions independently verified by the 48h ledger.
+
+    The full-history RPC pass can lose transactions to public-RPC throttling.
+    The recent ledger is produced by a separate bounded reconstruction. We only
+    add mints absent from the primary scan, preserving primary rows otherwise.
+    """
+    by_mint = {str(row["mint"]): dict(row) for row in primary}
+    recent_rows = (
+        list(recent_report.get("e4_positions") or [])
+        if isinstance(recent_report, Mapping)
+        else []
+    )
+    added = 0
+    skipped_without_signatures = 0
+    for raw in recent_rows:
+        if not isinstance(raw, Mapping) or not raw.get("mint"):
+            continue
+        mint = str(raw["mint"])
+        if mint in by_mint:
+            continue
+        row = dict(raw)
+        if not row.get("entry_signature"):
+            skipped_without_signatures += 1
+            continue
+        by_mint[mint] = row
+        added += 1
+    merged = sorted(
+        by_mint.values(),
+        key=lambda row: (int(row.get("entry_time") or 0), str(row.get("mint") or "")),
+    )
+    return merged, {
+        "primary_positions": len(primary),
+        "recent_verified_positions": len(recent_rows),
+        "recent_positions_added": added,
+        "recent_positions_missing_signatures": skipped_without_signatures,
+        "positions_after_recovery": len(merged),
+    }
+
+
 def creator_summary(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in records:
@@ -278,6 +321,12 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         events, event_diagnostics = recent.wallet_events(fetched)
         positions, reconstruction = recent.positions_from_events(events, 0)
         positions.sort(key=lambda row: (int(row["entry_time"]), str(row["mint"])))
+        recent_report = (
+            load(args.recent_comparison)
+            if args.recent_comparison and args.recent_comparison.exists()
+            else None
+        )
+        positions, recovery = merge_position_ledgers(positions, recent_report)
 
         semaphore = asyncio.Semaphore(args.creator_concurrency)
 
@@ -336,6 +385,10 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             "wallet_signature_scan_exhausted": len(signatures) < args.signature_hard_cap,
             "signatures_scanned": len(signatures),
             "onchain_closed_positions": len(positions),
+            "onchain_closed_positions_raw": recovery["primary_positions"],
+            "recent_verified_positions": recovery["recent_verified_positions"],
+            "recent_positions_added": recovery["recent_positions_added"],
+            "positions_after_recovery": recovery["positions_after_recovery"],
             "legacy_trades": len(legacy),
             "union_trades": len(merged),
             "onchain_creator_resolved": sum(
@@ -357,6 +410,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         "onchain_diagnostics": {
             "event": event_diagnostics,
             "reconstruction": reconstruction,
+            "recent_recovery": recovery,
             "rpc_errors": rpc_errors,
         },
     }
@@ -373,6 +427,11 @@ def parser() -> argparse.ArgumentParser:
         "--output",
         type=Path,
         default=Path("models/e4/e4-complete-creator-history.json"),
+    )
+    value.add_argument(
+        "--recent-comparison",
+        type=Path,
+        default=Path("research/v12-e4-48h-comparison.json"),
     )
     value.add_argument("--signature-hard-cap", type=int, default=50_000)
     value.add_argument("--creator-pages", type=int, default=4)
