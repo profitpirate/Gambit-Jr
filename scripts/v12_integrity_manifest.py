@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Build and optionally Ed25519-sign the V12 critical-code integrity manifest."""
 from __future__ import annotations
 
