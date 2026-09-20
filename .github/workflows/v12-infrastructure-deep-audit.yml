@@ -52,7 +52,8 @@ jobs:
             src/memecoin_bot/e4_direct_copy_v12.py \
             src/memecoin_bot/e4_sub10ms_repairs_v12.py \
             src/memecoin_bot/e4_sub10ms_runtime_final_v12.py \
-            src/memecoin_bot/e4_sub10ms_transport_final_v12.py
+            src/memecoin_bot/e4_sub10ms_transport_final_v12.py \
+            src/memecoin_bot/e4_v12_authority.py
           ruff check \
             scripts/v12_creator_apprentice.py \
             scripts/v12_creator_history_enrich.py \
@@ -75,7 +76,8 @@ jobs:
             tests/test_v12_direct_copy.py \
             tests/test_v12_transport.py \
             tests/test_v12_transport_epoch.py \
-            tests/test_v12_selection.py
+            tests/test_v12_selection.py \
+            tests/test_v12_route_authority.py
       - name: Frozen evidence and causal-state invariants
         run: |
           python - <<'PY'
@@ -144,4 +146,4 @@ jobs:
             git pull --rebase origin codex/v12-broad-discovery-creator-apprentice-20260920
             git push origin HEAD:codex/v12-broad-discovery-creator-apprentice-20260920
           fi
-# rerun after final import-order cleanup
+# rerun after deterministic transport authority hardening
