@@ -183,6 +183,13 @@ def _entry_v12(self: core.E4Policy, state: core.TokenState) -> tuple[bool, float
     wins, losses, trades, win_rate, profile = _creator_history(creator)
     features.update(
         {
+            # Canonical V12 names plus the historical feature aliases retained
+            # for forensic/regression compatibility. These are telemetry only;
+            # they do not change selection authority.
+            "creator_prior_wins": float(wins),
+            "creator_prior_losses": float(losses),
+            "creator_prior_trades": float(trades),
+            "creator_prior_gross_win_rate": float(win_rate),
             "v12_creator_prior_wins": float(wins),
             "v12_creator_prior_losses": float(losses),
             "v12_creator_prior_trades": float(trades),
