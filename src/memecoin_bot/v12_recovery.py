@@ -1,7 +1,6 @@
 """Crash-safe execution and position reconciliation for V12 live trading."""
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
 import time
@@ -9,8 +8,8 @@ import uuid
 from dataclasses import dataclass
 from typing import Any
 
-from .v12_execution_journal import ExecutionJournal, JournalEntry
-from .v12_safety import CircuitBreaker, SafetyMode
+from .v12_execution_journal import ExecutionJournal
+from .v12_safety import CircuitBreaker
 
 LOGGER = logging.getLogger("gambit.v12.recovery")
 
