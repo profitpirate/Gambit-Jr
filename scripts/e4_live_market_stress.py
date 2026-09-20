@@ -28,6 +28,9 @@ hardening = e4_hardening_v2.e4_hardening
 E4_WALLET = "E4EzXdwf7NNdqM2XGswWaWHfxgucVCo24PTCcrimTKBz"
 WSOL_MINT = "So11111111111111111111111111111111111111112"
 PUMP_TOKEN_MINT = "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn"
+USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+USDT_MINT = "Es9vMFrzaCERmJfrF4H2FYD8ZfGpM9eGKYmxxE2VZch"
+QUOTE_ASSET_MINTS = {WSOL_MINT, PUMP_TOKEN_MINT, USDC_MINT, USDT_MINT}
 JITO_TIP_ACCOUNTS = {
     "96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5",
     "HFqU5x63VTqvQss8hp11i4wVV8bD44PvwucfZ2bU7gRe",
@@ -991,6 +994,16 @@ def token_totals(rows: Iterable[Mapping[str, Any]], wallet: str) -> dict[str, fl
     return totals
 
 
+def trade_like_wallet_event(token_delta: float, sol_delta: float) -> bool:
+    """Reject quote-asset transfers and token movements that are not SOL-funded trades."""
+    threshold = 0.0005
+    if token_delta > 0:
+        return sol_delta < -threshold
+    if token_delta < 0:
+        return sol_delta > threshold
+    return False
+
+
 async def fetch_e4_wallet_sample(rpc: RpcPool, signature_limit: int) -> dict[str, Any]:
     signatures: list[Mapping[str, Any]] = []
     before = None
@@ -1054,7 +1067,7 @@ async def fetch_e4_wallet_sample(rpc: RpcPool, signature_limit: int) -> dict[str
         post = token_totals(meta.get("postTokenBalances") or [], E4_WALLET)
         changed = []
         for mint in set(pre) | set(post):
-            if mint in {WSOL_MINT, PUMP_TOKEN_MINT}:
+            if mint in QUOTE_ASSET_MINTS:
                 continue
             delta = post.get(mint, 0.0) - pre.get(mint, 0.0)
             if abs(delta) > max(1e-9, abs(pre.get(mint, 0.0)) * 1e-12):
@@ -1062,6 +1075,8 @@ async def fetch_e4_wallet_sample(rpc: RpcPool, signature_limit: int) -> dict[str
         if len(changed) != 1:
             continue
         mint, delta, post_balance = changed[0]
+        if not trade_like_wallet_event(float(delta), float(sol_delta)):
+            continue
         wallet_events.append(
             {
                 "signature": row["signature"],
