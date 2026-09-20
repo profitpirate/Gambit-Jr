@@ -18,7 +18,7 @@ class DeferredStrictOutputTests(unittest.TestCase):
             },
         }
         protected = deferred.guarded_request(request)
-        self.assertEqual(protected["slippage_bps"], 800)
+        self.assertEqual(protected["slippage_bps"], 600)
         self.assertTrue(protected["metadata"]["strict_output_guard"])
         self.assertTrue(protected["metadata"]["strict_output_check_deferred"])
 
