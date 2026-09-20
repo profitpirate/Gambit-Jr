@@ -79,6 +79,9 @@ class FinalPersistentRouteSender(_BaseSender):
         self._final_http_session: aiohttp.ClientSession | None = None
         self._final_keepalive_task: asyncio.Task[Any] | None = None
         self._request_counter = 0
+        self._payload_cache: dict[tuple[str, str], bytes] = {}
+        self._payload_cache_order: deque[tuple[str, str]] = deque(maxlen=16)
+        self._headers_cache: dict[str, dict[str, str]] = {}
         additions: list[tuple[str, str]] = []
         relay = os.getenv("E4_ALLENHARK_RELAY_URL", "").strip()
         if relay:
@@ -158,6 +161,36 @@ class FinalPersistentRouteSender(_BaseSender):
             ],
         }
 
+    def _cached_headers_for(self, name: str) -> dict[str, str]:
+        key = str(name)
+        cached = self._headers_cache.get(key)
+        if cached is None:
+            cached = self._headers_for(key)
+            self._headers_cache[key] = cached
+        return cached
+
+    def _payload_bytes(
+        self,
+        name: str,
+        tx: str,
+        expected_signature: str,
+    ) -> bytes:
+        kind = self._kind(name)
+        key = (expected_signature, kind)
+        cached = self._payload_cache.get(key)
+        if cached is not None:
+            return cached
+        payload = json.dumps(
+            self._payload(name, tx),
+            separators=(",", ":"),
+        ).encode()
+        if len(self._payload_cache_order) == self._payload_cache_order.maxlen:
+            stale = self._payload_cache_order.popleft()
+            self._payload_cache.pop(stale, None)
+        self._payload_cache_order.append(key)
+        self._payload_cache[key] = payload
+        return payload
+
     async def _warm_one(self, name: str, url: str) -> None:
         origin = _origin(url)
         if not origin:
@@ -216,8 +249,8 @@ class FinalPersistentRouteSender(_BaseSender):
             request_sent = time.perf_counter_ns()
             async with self._session().post(
                 url,
-                json=self._payload(name, tx),
-                headers=self._headers_for(name),
+                data=self._payload_bytes(name, tx, expected_signature),
+                headers=self._cached_headers_for(name),
             ) as response:
                 status = response.status
                 text = await response.text()
@@ -270,6 +303,67 @@ class FinalPersistentRouteSender(_BaseSender):
                 http_status=status,
                 error=error,
             ))
+
+    async def submit(
+        self,
+        tx: str,
+        signature: str,
+    ):
+        """Race all routes immediately and begin confirmation on first acceptance.
+
+        Remaining route responses are still collected for telemetry, but a slow
+        duplicate route can no longer postpone confirmation polling.
+        """
+        tasks = [
+            asyncio.create_task(
+                self._send(index, str(name), str(url), tx, signature),
+                name=f"v12-route-{name}",
+            )
+            for index, (name, url) in enumerate(getattr(self, "routes", []))
+        ]
+        if not tasks:
+            return "NONE", False, None, "no execution routes", []
+
+        first_accepted = None
+        confirmation_task: asyncio.Task[Any] | None = None
+        try:
+            for completed in asyncio.as_completed(tasks):
+                result = await completed
+                if result.accepted and first_accepted is None:
+                    first_accepted = result
+                    confirmation_task = asyncio.create_task(
+                        self.rpc.confirm(
+                            signature,
+                            self.settings.confirmation_timeout_seconds,
+                        ),
+                        name="v12-first-ack-confirmation",
+                    )
+                    break
+
+            results = await asyncio.gather(*tasks)
+            accepted = [item for item in results if item.accepted]
+            if not accepted:
+                return (
+                    "NONE",
+                    False,
+                    None,
+                    "; ".join(f"{item.name}:{item.error}" for item in results),
+                    results,
+                )
+            winner = min(accepted, key=lambda item: item.completed_ns)
+            if confirmation_task is None:
+                confirmation_task = asyncio.create_task(
+                    self.rpc.confirm(
+                        signature,
+                        self.settings.confirmation_timeout_seconds,
+                    )
+                )
+            confirmed, slot, error = await confirmation_task
+            return winner.name, confirmed, slot, error, results
+        finally:
+            for task in tasks:
+                if not task.done():
+                    task.cancel()
 
     async def close(self) -> None:
         if self._final_keepalive_task is not None:
