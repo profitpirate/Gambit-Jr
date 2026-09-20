@@ -1,0 +1,72 @@
+name: V12 Pre-Armed shadow hardening
+
+on:
+  push:
+    branches:
+      - codex/v12-prearmed-shadow-hardening-20260920
+    paths:
+      - "src/memecoin_bot/v12_shadow.py"
+      - "scripts/v12_shadow_suite.py"
+      - "tests/test_v12_shadow_suite.py"
+      - ".github/workflows/v12-shadow-hardening.yml"
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v12-prearmed-shadow-hardening
+  cancel-in-progress: true
+
+jobs:
+  certify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v12-prearmed-shadow-hardening-20260920
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev,research]'
+
+      - name: Static and unit certification
+        run: |
+          python -m compileall -q src scripts tests
+          ruff check src/memecoin_bot/v12_shadow.py scripts/v12_shadow_suite.py tests/test_v12_shadow_suite.py
+          pytest -q tests/test_v12_shadow_suite.py
+
+      - name: Fetch latest untouched 100-trade benchmark state
+        run: |
+          git fetch origin codex/e4-v12-flow-survival-hazard-v12:refs/remotes/origin/v12-live
+          mkdir -p artifacts
+          git show origin/v12-live:research/v12-pre-armed-100-trade-paper-live.json > artifacts/v12-live-state.json
+          git show origin/v12-live:research/v12-pre-armed-100-trade-frozen-model.json > artifacts/v12-live-model.json
+          git show origin/v12-live:research/v12-pre-armed-50-trade-results.json > artifacts/v12-50-baseline.json
+
+      - name: Run full shadow analytics
+        run: |
+          python scripts/v12_shadow_suite.py \
+            --state artifacts/v12-live-state.json \
+            --baseline artifacts/v12-50-baseline.json \
+            --output artifacts/v12-shadow-report.json \
+            --risk-paths 20000
+
+      - name: Prove frozen benchmark was not changed
+        run: |
+          test "$(git status --porcelain -- research/v12-pre-armed-100-trade-paper-live.json research/v12-pre-armed-100-trade-frozen-model.json)" = ""
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v12-shadow-hardening-\${{ github.run_id }}
+          path: artifacts/
+          retention-days: 30
