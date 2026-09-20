@@ -15,7 +15,6 @@ import math
 from pathlib import Path
 from typing import Any
 
-
 SCHEMA = "v12-creator-library-v2"
 E4_SHORTLIST_LIMIT = 25
 FRESH_SHORTLIST_LIMIT = 50
