@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from memecoin_bot.v12_shadow import (
     CreatorConcentrationAnalyzer,
     DriftMonitor,
@@ -59,7 +61,7 @@ def test_guard_counterfactual_marks_saves_and_misses():
     assert report["correct_rejections"] == 1
     assert report["missed_winners"] == 1
     assert report["unresolved"] == 1
-    assert report["net_guard_value_sol"] == 0.1
+    assert report["net_guard_value_sol"] == pytest.approx(0.1)
 
 
 def test_risk_simulator_is_deterministic_and_bounded():
