@@ -6,7 +6,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED = (
     "src/memecoin_bot/e4_exec/__main__.py",
