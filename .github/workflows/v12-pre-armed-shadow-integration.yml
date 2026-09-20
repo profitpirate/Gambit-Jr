@@ -1,4 +1,4 @@
-name: V12 Pre-Armed shadow integration
+name: V12 Pre-Armed causal shadow integration
 
 on:
   push:
@@ -40,31 +40,32 @@ jobs:
       - run: python -m pip install -e .[dev,research]
       - run: python -m pip install -r requirements-e4.txt
 
-      - name: Download latest successful raw 100-trade window
+      - name: Resolve latest persisted causal window
         id: source
         run: |
-          run_id="$(gh run list \
-            --repo "$REPO" \
-            --workflow v12-pre-armed-100-trade.yml \
-            --branch codex/e4-v12-flow-survival-hazard-v12 \
-            --status success \
-            --limit 1 \
-            --json databaseId \
-            --jq '.[0].databaseId')"
-          test -n "$run_id"
-          mkdir -p integration
-          gh run download "$run_id" \
-            --repo "$REPO" \
-            --name "v12-pre-armed-100-live-$run_id" \
-            --dir integration
+          has_data=false
+          run_id=""
+          if [ -s research/v12-pre-armed-100-causal-paper-live.json ]; then
+            run_id="$(jq -r '.processed_runs[-1] // empty' research/v12-pre-armed-100-causal-paper-live.json)"
+          fi
+          if [ -n "$run_id" ]; then
+            has_data=true
+            mkdir -p integration
+            gh run download "$run_id" \
+              --repo "$REPO" \
+              --name "v12-pre-armed-100-causal-live-$run_id" \
+              --dir integration
+          fi
+          echo "has_data=$has_data" >> "$GITHUB_OUTPUT"
           echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
 
       - name: Resolve artifact paths
+        if: steps.source.outputs.has_data == 'true'
         id: paths
         run: |
-          batch="$(find integration -name 'v12-pre-armed-100-live-batch.json' -print -quit)"
-          events="$(find integration -name 'v12-pre-armed-100-live-batch-live-events.jsonl' -print -quit)"
-          cache="$(find integration -name 'v12-pre-armed-100-metadata-cache.json' -print -quit)"
+          batch="$(find integration -name 'v12-pre-armed-100-causal-live-batch.json' -print -quit)"
+          events="$(find integration -name 'v12-pre-armed-100-causal-live-batch-live-events.jsonl' -print -quit)"
+          cache="$(find integration -name 'v12-pre-armed-100-causal-metadata-cache.json' -print -quit)"
           test -s "$batch"
           test -s "$events"
           echo "batch=$batch" >> "$GITHUB_OUTPUT"
@@ -72,6 +73,7 @@ jobs:
           echo "cache=$cache" >> "$GITHUB_OUTPUT"
 
       - name: Execute shadow suite on immutable raw evidence
+        if: steps.source.outputs.has_data == 'true'
         run: |
           mkdir -p artifacts
           cache_arg=""
@@ -82,7 +84,7 @@ jobs:
             --run-id "${{ steps.source.outputs.run_id }}" \
             --batch "${{ steps.paths.outputs.batch }}" \
             --events "${{ steps.paths.outputs.events }}" \
-            --paper-state research/v12-pre-armed-100-trade-paper-live.json \
+            --paper-state research/v12-pre-armed-100-causal-paper-live.json \
             --model research/v12-pre-armed-100-trade-frozen-model.json \
             --baseline research/v12-pre-armed-50-trade-results.json \
             --analytics-state artifacts/v12-pre-armed-shadow-integration.json \
@@ -90,6 +92,7 @@ jobs:
             $cache_arg
 
       - name: Validate integration output
+        if: steps.source.outputs.has_data == 'true'
         run: |
           python - <<'PY'
           import json
@@ -112,7 +115,7 @@ jobs:
           PY
 
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && steps.source.outputs.has_data == 'true'
         with:
           name: v12-shadow-integration-${{ github.run_id }}
           path: |
