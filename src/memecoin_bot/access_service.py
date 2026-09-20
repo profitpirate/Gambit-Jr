@@ -7,7 +7,7 @@ import secrets
 import time
 import uuid
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import Protocol
 
 from memecoin_bot.access_store import AccessStore
 
