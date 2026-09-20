@@ -13,6 +13,7 @@ REQUIRED = (
     "src/memecoin_bot/e4_sub10ms_transport_final_v12.py",
     "src/memecoin_bot/e4_sub10ms_runtime_final_v12.py",
     "src/memecoin_bot/e4_notifications_v12.py",
+    "src/memecoin_bot/e4_nextgen_creator_authority_v12.py",
     "src/memecoin_bot/notifications.py",
     "src/memecoin_bot/v12_creator_library.py",
     "src/memecoin_bot/v12_postcert_risk.py",
@@ -111,6 +112,7 @@ def main() -> int:
     for marker in (
         "e4_sub10ms_runtime_final_v12",
         "e4_notifications_v12",
+        "e4_nextgen_creator_authority_v12",
     ):
         if marker not in entrypoint:
             failures.append(f"entrypoint_missing:{marker}")
