@@ -20,7 +20,6 @@ import v12_e4_recent_compare as recent
 
 from memecoin_bot.realtime.pumpfun import PUMP_PROGRAM_ID, anchor_events_from_logs
 
-
 UNKNOWN = "UNKNOWN_CREATOR"
 
 
