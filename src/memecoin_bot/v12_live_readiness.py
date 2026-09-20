@@ -159,7 +159,7 @@ def run_live_readiness(
         )
     )
 
-    execution_db = Path(getattr(settings, "execution_db"))
+    execution_db = Path(settings.execution_db)
     execution_db.parent.mkdir(parents=True, exist_ok=True)
     try:
         probe = sqlite3.connect(execution_db, timeout=5)
