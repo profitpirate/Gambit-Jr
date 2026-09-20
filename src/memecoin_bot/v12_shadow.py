@@ -6,9 +6,10 @@ import math
 import random
 import statistics
 from collections import defaultdict
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
-from typing import Any, Mapping, Sequence
+from typing import Any, ClassVar
 
 
 SCHEMA_VERSION = "v12-shadow-suite-v1"
@@ -76,7 +77,7 @@ class MetricSnapshot:
     expectancy_sol: float
 
     @classmethod
-    def from_pnls(cls, pnls: Sequence[float], starting_bankroll: float = 3.0) -> "MetricSnapshot":
+    def from_pnls(cls, pnls: Sequence[float], starting_bankroll: float = 3.0) -> MetricSnapshot:
         wins = sum(v > 0 for v in pnls)
         trades = len(pnls)
         return cls(
@@ -302,7 +303,7 @@ class ShadowDecision:
 
 
 class NewCreatorAnalogueScorer:
-    weights = {
+    weights: ClassVar[dict[str, float]] = {
         "prelaunch_social_quality": 0.22,
         "funding_quality": 0.18,
         "creator_seed_quality": 0.14,
@@ -321,7 +322,7 @@ class NewCreatorAnalogueScorer:
 
 
 class HardNegativeScorer:
-    penalties = {
+    penalties: ClassVar[dict[str, float]] = {
         "known_rug_funder": 0.35,
         "insider_concentration": 0.18,
         "bundle_probability": 0.16,
