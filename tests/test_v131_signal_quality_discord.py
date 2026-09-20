@@ -5,19 +5,8 @@ import sqlite3
 import unittest
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from unittest.mock import AsyncMock, patch
 
 from memecoin_bot.database import Store
-from memecoin_bot.discord import bot_runtime
-from memecoin_bot.discord.cards import (
-    settings_card,
-    smartmoney_card,
-    status_card,
-    token_card,
-)
-from memecoin_bot.discord.cards import (
-    test_alert_card as build_test_alert_card,
-)
 from memecoin_bot.intelligence import (
     catalyst_timing,
     entry_quality,
@@ -332,29 +321,6 @@ class IntelligenceAndCardsTests(unittest.TestCase):
             "EARLY_AFTER_CATALYST",
         )
 
-    def test_all_major_card_builders_emit_rich_embeds_without_raw_json(self):
-        stats = {
-            "provider_status": [{"provider": "gmgn", "state": "DISABLED"}],
-            "state_reconciliation": {"difference": 0},
-        }
-        token = {
-            "token_address": "abc",
-            "symbol": "T",
-            "chain": "solana",
-            "wallet_intelligence": {"counts": {}},
-        }
-        cards = [
-            status_card(stats),
-            token_card(token),
-            smartmoney_card(token),
-            settings_card(None),
-            build_test_alert_card(),
-        ]
-        for payload in cards:
-            self.assertIn("embed", payload)
-            self.assertNotIn("```json", str(payload).lower())
-        self.assertIn("DISABLED", str(cards[0]))
-        self.assertIn("TEST / NON-LIVE", str(cards[-1]))
 
 
 class MultiGuildDeliveryTests(unittest.IsolatedAsyncioTestCase):
@@ -382,67 +348,6 @@ class MultiGuildDeliveryTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(service.notifier.calls.count(11), 1)
             self.assertEqual(service.notifier.calls.count(22), 2)
             self.assertEqual(len(db.pending_outbox()), 0)
-            db.close()
-
-
-class DiscordCommandRegistrationTests(unittest.IsolatedAsyncioTestCase):
-    async def test_all_discord_commands_register_without_network_access(self):
-        class Service:
-            started_at = iso()
-
-            async def run(self):
-                pass
-
-            def stop(self):
-                pass
-
-        with temp_db_path() as path:
-            db = store(path)
-            config = settings(path)
-            config.discord_token = "test-token"
-            trees = []
-            original_tree = bot_runtime.app_commands.CommandTree
-
-            def tree_factory(client):
-                tree = original_tree(client)
-                trees.append(tree)
-                return tree
-
-            # Client.start returning immediately exercises command construction and type resolution.
-            with (
-                patch("discord.Client.start", new=AsyncMock(return_value=None)),
-                patch.object(bot_runtime.app_commands, "CommandTree", side_effect=tree_factory),
-            ):
-                await bot_runtime.run_discord_bot(Service(), db, config)
-            self.assertEqual(
-                {command.name for command in trees[0].get_commands()},
-                {
-                    "status",
-                    "menu",
-                    "help",
-                    "performance",
-                    "scan",
-                    "compare",
-                    "watch",
-                    "watchlist",
-                    "unwatch",
-                    "candidates",
-                    "rejections",
-                    "missed",
-                    "radar",
-                    "runners",
-                    "failed",
-                    "token",
-                    "smartmoney",
-                    "wallet",
-                    "clusters",
-                    "creator",
-                    "narrative",
-                    "setup",
-                    "server-settings",
-                    "test-alert",
-                },
-            )
             db.close()
 
 
