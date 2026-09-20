@@ -355,7 +355,10 @@ async def earliest_signer_creator(
 
         semaphore = asyncio.Semaphore(6)
 
-        async def fetch(signature_row: Mapping[str, Any]):
+        async def fetch(
+            signature_row: Mapping[str, Any],
+            semaphore: asyncio.Semaphore = semaphore,
+        ):
             async with semaphore:
                 try:
                     tx = await rpc.call(
