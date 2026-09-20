@@ -1,0 +1,64 @@
+name: V12 Broad Discovery CI
+
+on:
+  push:
+    branches:
+      - codex/v12-broad-discovery-creator-apprentice-20260920
+    paths:
+      - "scripts/v12_creator_apprentice.py"
+      - "tests/test_v12_creator_apprentice.py"
+      - ".github/workflows/v12-broad-discovery-ci.yml"
+      - ".github/workflows/v12-broad-discovery-shadow.yml"
+      - "docs/research/v12-broad-discovery-creator-apprentice.md"
+      - "research/v12-broad-discovery-control.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  certify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v12-broad-discovery-creator-apprentice-20260920
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .[dev,research]
+      - run: python -m pip install -r requirements-e4.txt
+
+      - name: Verify frozen V12 fingerprint
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+          payload = json.loads(Path("research/v12-pre-armed-100-trade-frozen-model.json").read_text())
+          digest = hashlib.sha256(
+              json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+          ).hexdigest()
+          expected = "69df86eaf386fd37d699928a95d25aaeb2053e743b59c9e687c8a7c49d14f977"
+          assert digest == expected, (digest, expected)
+          assert payload.get("production_paths_changed") == 0
+          print(digest)
+          PY
+
+      - name: Creator apprenticeship tests
+        run: |
+          python -m pytest tests/test_v12_creator_apprentice.py -q
+          ruff check scripts/v12_creator_apprentice.py tests/test_v12_creator_apprentice.py
+
+      - name: Existing V12 regressions
+        run: |
+          python -m pytest \
+            tests/test_e4_v12_fast_prearmed_selector.py \
+            tests/test_e4_v12_axiom_paper_live.py \
+            tests/test_v12_prearmed_shadow_suite.py \
+            tests/test_v12_prearmed_guardrail_policy.py -q
