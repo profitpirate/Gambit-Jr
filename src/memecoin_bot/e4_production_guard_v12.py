@@ -363,6 +363,9 @@ async def _execute_buy_production(
             if cache is not None
             else await self.rpc.balance(self.signer.wallet)
         )
+        account_cap = _float_env("V12_ACCOUNT_MAX_BANKROLL_SOL", 0.0)
+        if account_cap > 0:
+            balance = min(balance, account_cap)
         async with self.allocation_lock:
             priority, tip = self.fee_bid(balance * fraction, score)
             deployable = balance - self.settings.reserve_sol - self.reserved_sol - priority - tip
