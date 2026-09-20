@@ -144,3 +144,41 @@ def test_runner_gap_distinguishes_outcome_from_profitable_entry() -> None:
     assert result["unique_runner_2x_creators"] == 2
     assert result["runner_creators_not_shortlisted"] == 1
     assert result["reason_counts_by_creator"]["no_profitable_scout_fill"] == 1
+
+
+def test_complete_history_rejects_low_confidence_creator_identity() -> None:
+    expectancy = {"top_creators": []}
+    complete = {
+        "completeness": {"union_trades": 450},
+        "creators": [
+            {
+                "creator": "uncertain",
+                "wins": 5,
+                "losses": 0,
+                "trades": 5,
+                "winning_pnl_sol": 2.0,
+                "minimum_resolution_confidence": 0.50,
+                "winner_mints": ["a", "b", "c", "d", "e"],
+                "loser_mints": [],
+            },
+            {
+                "creator": "certain",
+                "wins": 2,
+                "losses": 0,
+                "trades": 2,
+                "winning_pnl_sol": 0.5,
+                "minimum_resolution_confidence": 0.95,
+                "winner_mints": ["f", "g"],
+                "loser_mints": [],
+            },
+        ],
+    }
+    apprentice = {
+        "creators": {},
+        "counts": {"unknown_launch_observations": 0},
+        "observations": [],
+    }
+    result = subject.build(expectancy, apprentice, complete)
+    promoted = {row["creator"] for row in result["promoted"]}
+    assert "uncertain" not in promoted
+    assert "certain" in promoted
