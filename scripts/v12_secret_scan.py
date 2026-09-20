@@ -6,7 +6,6 @@ import re
 import subprocess
 from pathlib import Path
 
-
 PATTERNS = (
     ("private_pem", re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----")),
     ("github_pat", re.compile(r"\bgithub_pat_[A-Za-z0-9_]{40,}\b")),

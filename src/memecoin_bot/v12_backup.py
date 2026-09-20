@@ -11,7 +11,6 @@ from pathlib import Path
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
-
 MAGIC = b"V12DB1"
 NONCE_BYTES = 12
 TAG_BYTES = 16

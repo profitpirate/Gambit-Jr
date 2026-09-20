@@ -8,9 +8,9 @@ import os
 import shutil
 import sqlite3
 import time
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from collections.abc import Awaitable, Callable
 from typing import Any
 
 from .v12_route_health import RouteHealthStore

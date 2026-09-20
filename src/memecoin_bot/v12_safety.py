@@ -9,7 +9,6 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
-
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS v12_safety_state(
     singleton INTEGER PRIMARY KEY CHECK(singleton=1),

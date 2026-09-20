@@ -8,7 +8,6 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS v12_forensic_trace(
     id INTEGER PRIMARY KEY AUTOINCREMENT,

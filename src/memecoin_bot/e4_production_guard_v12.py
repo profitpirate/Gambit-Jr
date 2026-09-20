@@ -12,8 +12,8 @@ import os
 import sqlite3
 import time
 import uuid
-from pathlib import Path
 from collections.abc import Mapping
+from pathlib import Path
 from typing import Any
 
 from . import e4_hardening_v10 as v10

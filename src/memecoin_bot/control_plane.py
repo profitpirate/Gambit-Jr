@@ -15,7 +15,6 @@ from aiohttp import web
 from memecoin_bot.access_service import AccessService, SoldersWalletSignatureVerifier
 from memecoin_bot.discord.notifier import DiscordNotifier
 
-
 COOKIE_NAME = "gambit_session"
 
 

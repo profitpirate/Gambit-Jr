@@ -11,9 +11,9 @@ import re
 import secrets
 import stat
 import time
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from collections.abc import Iterable
 from typing import Any, Self
 
 LOGGER = logging.getLogger("gambit.v12.security")

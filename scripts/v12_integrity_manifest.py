@@ -8,7 +8,6 @@ from pathlib import Path
 
 from memecoin_bot.v12_security import build_manifest
 
-
 DEFAULT_PATHS = (
     "src/memecoin_bot/e4_exec/__main__.py",
     "src/memecoin_bot/e4_hardening_v12.py",

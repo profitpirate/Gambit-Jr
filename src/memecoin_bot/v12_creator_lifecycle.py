@@ -8,7 +8,6 @@ from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
 
-
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS v12_creator_live_evidence(
     id INTEGER PRIMARY KEY AUTOINCREMENT,

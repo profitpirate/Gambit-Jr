@@ -7,7 +7,6 @@ import time
 from pathlib import Path
 from typing import Any
 
-
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS v12_learning_launches(
     mint TEXT PRIMARY KEY,
