@@ -1,0 +1,121 @@
+name: V12 Brutal Production Certification
+
+on:
+  push:
+    branches:
+      - codex/v12-production-hardening-20260920
+    paths:
+      - "src/memecoin_bot/v12_*.py"
+      - "src/memecoin_bot/e4_production_guard_v12.py"
+      - "src/memecoin_bot/e4_adaptive_exit_v12.py"
+      - "scripts/v12_*.py"
+      - "tests/test_v12_*.py"
+      - ".github/workflows/v12-brutal-production-certification.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v12-brutal-production-certification
+  cancel-in-progress: true
+
+jobs:
+  brutal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v12-production-hardening-20260920
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .[dev,research]
+      - run: python -m pip install -r requirements-e4.txt
+
+      - name: Critical fault injection repeated 20x
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 20); do
+            echo "critical cycle=$i"
+            python -m pytest -q \
+              tests/test_v12_execution_safety.py \
+              tests/test_v12_recovery.py \
+              tests/test_v12_watchdogs.py \
+              tests/test_v12_security.py \
+              tests/test_v12_backup.py \
+              tests/test_v12_account_orchestrator.py \
+              tests/test_v12_adaptive_exit.py \
+              tests/test_v12_stress_runtime.py \
+              tests/test_v12_supervisor.py
+          done
+
+      - name: Large restart and duplicate soak
+        run: |
+          mkdir -p research
+          python scripts/v15_load_soak.py \
+            --events 25000 \
+            --queue-size 512 \
+            --burst-multiplier 5 \
+            > research/v12-load-soak-25k.json
+
+      - name: 200k decision-pipeline stress
+        run: |
+          python scripts/e4_v10_pipeline_stress.py \
+            --iterations 200000 \
+            --workers 16 \
+            --narrative-iterations 50000 \
+            --output research/v12-production-pipeline-stress.json
+
+      - name: Existing E4 stress hardening and convergence E2E
+        run: |
+          python -m pytest -q \
+            tests/test_e4_stress_hardening.py \
+            tests/test_v15_load_soak.py \
+            tests/test_v15_convergence_e2e.py
+
+      - name: Full V12 production regression pass
+        run: |
+          python -m pytest -q \
+            tests/test_v12_*.py \
+            tests/test_e4_v12_sub10ms_repairs.py \
+            tests/test_e4_v12_sub10ms_transport.py \
+            tests/test_e4_v12_sub10ms_transport_final.py
+
+      - name: Write certification result
+        run: |
+          python - <<'PY'
+          import json,time
+          payload={
+            "version":"v12-brutal-production-certification-v1",
+            "status":"PASS",
+            "critical_fault_cycles":20,
+            "load_soak_events":25000,
+            "load_soak_burst_multiplier":5,
+            "pipeline_stress_iterations":200000,
+            "narrative_stress_iterations":50000,
+            "completed_ns":time.time_ns(),
+          }
+          open("research/v12-brutal-production-certification.json","w").write(
+            json.dumps(payload,indent=2,sort_keys=True)+"\n"
+          )
+          PY
+
+      - name: Persist certification evidence
+        run: |
+          git config user.name 'gambit-v12-brutal-cert'
+          git config user.email 'actions@users.noreply.github.com'
+          git add \
+            research/v12-brutal-production-certification.json \
+            research/v12-production-pipeline-stress.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'cert(v12): pass brutal production stress and E2E [skip ci]'
+            git pull --rebase origin codex/v12-production-hardening-20260920
+            git push origin HEAD:codex/v12-production-hardening-20260920
+          fi
