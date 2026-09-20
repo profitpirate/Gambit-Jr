@@ -127,6 +127,43 @@ def _exit_exact_source_mirror(self: Any, position: Any, state: Any):
 
     source = PIPELINES.e4_signal(position.mint)
     if source is None:
+        # Legacy context-only copy observations predate the authoritative
+        # E4Signal registry. Preserve their already-recorded sell mirror rather
+        # than letting import order turn a legitimate first partial into a
+        # source-missing emergency liquidation.
+        context = v6._CONTEXT_BY_MINT.get(str(position.mint), {})
+        sell_events = int(context.get("e4_copy_sell_events") or 0)
+        cumulative = max(
+            0.0,
+            _finite(context.get("e4_copy_cumulative_sell_fraction")),
+        )
+        latest = max(
+            0.0,
+            _finite(context.get("e4_copy_latest_sell_fraction")),
+        )
+        if family == role_model.LEGACY_ROLE_MODEL_FAMILY and sell_events > 0:
+            if cumulative >= 0.90 or latest >= 0.50:
+                return (
+                    "SELL_ALL",
+                    1.0,
+                    "E4 V12 legacy cumulative copy exit mirror",
+                )
+            if not bool(getattr(position, "first_partial_done", False)):
+                fraction = min(
+                    1.0,
+                    max(
+                        0.0,
+                        _finite(
+                            getattr(profile, "first_partial_fraction", 0.30),
+                            0.30,
+                        ),
+                    ),
+                )
+                return (
+                    "SELL_PARTIAL",
+                    fraction,
+                    "E4 V12 legacy first-sell mirror",
+                )
         return "SELL_ALL", 1.0, "E4 V12 source missing fail-safe"
     if bool(getattr(source, "fully_exited", False)):
         return "SELL_ALL", 1.0, "E4 V12 source fully exited"
