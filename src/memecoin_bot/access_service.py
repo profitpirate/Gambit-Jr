@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import hashlib
-import hmac
 import json
 import secrets
 import time
@@ -258,6 +257,15 @@ class AccessService:
             )
         if provider not in {"NATIVE_WALLET", "MANAGED_WALLET"}:
             raise ValueError("unsupported execution provider")
+        if provider == "NATIVE_WALLET":
+            owned = self.store.conn.execute(
+                "SELECT 1 FROM access_wallets WHERE user_id=? AND wallet=?",
+                (int(user_id), str(public_identifier)),
+            ).fetchone()
+            if owned is None:
+                raise PermissionError(
+                    "native execution connection requires a verified wallet"
+                )
         if secret_ref and not secret_ref.startswith(("vault://", "kms://", "turnkey://")):
             raise ValueError(
                 "execution credentials must be stored in an external vault/KMS reference; "
