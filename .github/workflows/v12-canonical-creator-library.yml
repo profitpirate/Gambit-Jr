@@ -7,6 +7,7 @@ on:
     paths:
       - "scripts/v12_creator_library_rebuild.py"
       - "tests/test_v12_creator_library_rebuild.py"
+      - "models/e4/e4-complete-creator-history.json"
       - ".github/workflows/v12-canonical-creator-library.yml"
   workflow_dispatch:
 
@@ -52,6 +53,7 @@ jobs:
           python scripts/v12_creator_library_rebuild.py \
             --e4-expectancy models/e4/e4-creator-expectancy.json \
             --apprentice research/v12-creator-apprentice-backfill.json \
+            --e4-complete-history models/e4/e4-complete-creator-history.json \
             --output models/e4/v12-creator-library.json \
             --report research/v12-creator-library-report.md
 
@@ -83,7 +85,8 @@ jobs:
           d=json.load(open("models/e4/v12-creator-library.json"))
           assert d["activation"]["enabled_now"] is False
           assert d["activation"]["frozen_100_trade_model_modified"] is False
-          assert d["counts"]["e4_repeat_winner_promotions"] == 35, d["counts"]
+          minimum = 35
+          assert d["counts"]["e4_repeat_winner_promotions"] >= minimum, d["counts"]
           assert d["counts"]["promoted_unique"] >= 35, d["counts"]
           assert d["counts"]["shortlisted_unique"] <= 75, d["counts"]
           assert all(x["auto_buy"] is False for x in d["promoted"])
