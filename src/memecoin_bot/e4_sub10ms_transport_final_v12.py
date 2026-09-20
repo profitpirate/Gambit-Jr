@@ -201,7 +201,7 @@ class FinalPersistentRouteSender(_BaseSender):
                 headers={"accept": "application/json"},
             ) as response:
                 await response.read()
-        except (aiohttp.ClientError, asyncio.TimeoutError, OSError) as exc:
+        except (aiohttp.ClientError, TimeoutError, OSError) as exc:
             LOGGER.debug("route warmup failed route=%s error=%s", name, exc)
 
     async def warm(self) -> None:
@@ -281,7 +281,7 @@ class FinalPersistentRouteSender(_BaseSender):
                 )
         except (
             aiohttp.ClientError,
-            asyncio.TimeoutError,
+            TimeoutError,
             json.JSONDecodeError,
             OSError,
             RuntimeError,
