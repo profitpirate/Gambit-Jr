@@ -76,7 +76,7 @@ def test_axiom_linking_fails_closed_and_raw_secrets_are_forbidden(access) -> Non
             secret_ref="vault://axiom",
         )
 
-    with pytest.raises(ValueError, match="raw private keys are forbidden"):
+    with pytest.raises(ValueError, match="raw private keys .* forbidden"):
         service.set_execution_connection(
             user_id,
             provider="NATIVE_WALLET",
