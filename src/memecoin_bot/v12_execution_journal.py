@@ -40,6 +40,7 @@ class JournalEntry:
     side: str
     mint: str | None
     payload_hash: str
+    payload: dict[str, Any]
     state: str
     signed_tx_b64: str | None
     signature: str | None
@@ -99,6 +100,7 @@ class ExecutionJournal:
             side=str(row["side"]),
             mint=str(row["mint"]) if row["mint"] is not None else None,
             payload_hash=str(row["payload_hash"]),
+            payload=json.loads(str(row["payload_json"])),
             state=str(row["state"]),
             signed_tx_b64=str(row["signed_tx_b64"]) if row["signed_tx_b64"] else None,
             signature=str(row["signature"]) if row["signature"] else None,
