@@ -6,7 +6,6 @@ import time
 from pathlib import Path
 from typing import Any
 
-
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS access_users(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
