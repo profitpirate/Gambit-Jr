@@ -1,0 +1,105 @@
+name: E4 builder dependency hardening
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-flow-survival-hazard-v12
+    paths:
+      - ".github/workflows/e4-builder-dependency-hardening.yml"
+      - "tools/e4-builder/package.json"
+      - "tools/e4-builder/package-lock.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: e4-builder-dependency-hardening
+  cancel-in-progress: true
+
+jobs:
+  harden:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: tools/e4-builder
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-flow-survival-hazard-v12
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: tools/e4-builder/package-lock.json
+
+      - name: Install locked production graph
+        run: npm ci --omit=dev
+
+      - name: Capture baseline audit
+        run: |
+          mkdir -p ../../artifacts
+          npm audit --omit=dev --json > ../../artifacts/npm-audit-before.json || true
+
+      - name: Apply only semver-safe audit fixes to lockfile
+        run: npm audit fix --package-lock-only --omit=dev || true
+
+      - name: Reinstall from candidate lock
+        run: npm ci --omit=dev
+
+      - name: Builder syntax and contract
+        run: |
+          for file in *.mjs; do node --check "$file"; done
+          node daemon-v2.mjs --self-test > ../../artifacts/e4-builder-self-test.json
+
+      - name: Capture hardened audit
+        run: npm audit --omit=dev --json > ../../artifacts/npm-audit-after.json || true
+
+      - name: Verify audit did not regress
+        working-directory: .
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          def counts(path):
+              data=json.loads(Path(path).read_text())
+              meta=data.get("metadata",{}).get("vulnerabilities",{})
+              return {k:int(meta.get(k,0) or 0) for k in ("info","low","moderate","high","critical","total")}
+
+          before=counts("artifacts/npm-audit-before.json")
+          after=counts("artifacts/npm-audit-after.json")
+          print(json.dumps({"before":before,"after":after},indent=2))
+          if after["critical"] > before["critical"] or after["high"] > before["high"]:
+              raise SystemExit("safe audit fix regressed high/critical vulnerability counts")
+          Path("artifacts/e4-builder-security-summary.json").write_text(
+              json.dumps({"before":before,"after":after},indent=2)+"\n"
+          )
+          PY
+
+      - name: Commit safe lockfile remediation
+        working-directory: .
+        run: |
+          if git diff --quiet -- tools/e4-builder/package-lock.json; then
+            echo "No semver-safe lockfile remediation available."
+            exit 0
+          fi
+          git config user.name 'gambit-security-hardening'
+          git config user.email 'actions@users.noreply.github.com'
+          git add tools/e4-builder/package-lock.json
+          git commit -m 'security(e4): apply safe dependency remediation [skip ci]'
+          git push origin HEAD:codex/e4-v12-flow-survival-hazard-v12
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e4-builder-security-\${{ github.run_id }}
+          path: |
+            artifacts/npm-audit-before.json
+            artifacts/npm-audit-after.json
+            artifacts/e4-builder-self-test.json
+            artifacts/e4-builder-security-summary.json
+          if-no-files-found: warn
+          retention-days: 30
