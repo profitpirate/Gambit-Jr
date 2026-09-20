@@ -1,0 +1,44 @@
+[Unit]
+Description=Gambit V12 Secure Beta Portal
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=gambit
+Group=gambit
+WorkingDirectory=/opt/gambit/current
+EnvironmentFile=/etc/gambit/v12-portal.env
+Environment=GAMBIT_ACCESS_DB=/var/lib/gambit/v12-access.db
+Environment=V12_ACCOUNTS_ROOT=/var/lib/gambit/accounts
+ExecStart=/opt/gambit/venv/bin/python -m memecoin_bot.v12_portal
+Restart=always
+RestartSec=3
+TimeoutStopSec=15
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/gambit /var/log/gambit /run/gambit /opt/gambit/current/data
+RuntimeDirectory=gambit
+RuntimeDirectoryMode=0700
+StateDirectory=gambit
+StateDirectoryMode=0700
+LogsDirectory=gambit
+LogsDirectoryMode=0700
+
+[Install]
+WantedBy=multi-user.target
