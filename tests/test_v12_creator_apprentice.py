@@ -78,6 +78,31 @@ def test_promotion_requires_repeat_wins_and_minimum_sample_quality() -> None:
     assert result["automatic_whitelist_mutation"] is False
 
 
+
+def test_profitable_scout_shortlists_even_when_v12_ineligible() -> None:
+    row = observation(
+        "scout-only",
+        0.08,
+        status="INELIGIBLE_CREATOR_SEED",
+    )
+    result = subject.creator_summary("creator-x", [row])
+    assert result["status"] == "SHORTLISTED"
+    assert result["scout_wins"] == 1
+    assert result["v12_compatible_fills"] == 0
+    assert result["promotion_ready"] is False
+
+
+def test_repeat_scout_winners_confirm_but_do_not_bypass_v12_promotion_gate() -> None:
+    rows = [
+        observation("a", 0.08, create_ns=100, status="INELIGIBLE_CREATOR_SEED"),
+        observation("b", 0.06, create_ns=200, status="INELIGIBLE_CREATOR_SEED"),
+    ]
+    result = subject.creator_summary("creator-x", rows)
+    assert result["status"] == "CONFIRMED_REPEAT_WINNER"
+    assert result["distinct_scout_winning_mints"] == ["a", "b"]
+    assert result["v12_compatible_fills"] == 0
+    assert result["promotion_ready"] is False
+
 def test_runner_is_recorded_even_when_not_v12_compatible() -> None:
     row = observation(
         "runner",
