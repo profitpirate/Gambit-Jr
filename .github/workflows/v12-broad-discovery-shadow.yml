@@ -22,7 +22,7 @@ concurrency:
 
 env:
   PYTHONUNBUFFERED: "1"
-  GH_TOKEN: \${{ github.token }}
+  GH_TOKEN: ${{ github.token }}
   BROAD_BRANCH: codex/v12-broad-discovery-creator-apprentice-20260920
   E4_PIPELINES_BACKGROUND: "false"
   E4_SOL_USD_FALLBACK: "150"
@@ -74,8 +74,8 @@ jobs:
       - name: Resolve broad capture parameters
         id: params
         run: |
-          target='\${{ inputs.target_launches }}'
-          seconds='\${{ inputs.capture_seconds }}'
+          target='${{ inputs.target_launches }}'
+          seconds='${{ inputs.capture_seconds }}'
           if [ -z "$target" ]; then target="$(jq -r '.target_launches // 6000' research/v12-broad-discovery-control.json)"; fi
           if [ -z "$seconds" ]; then seconds="$(jq -r '.capture_seconds // 18000' research/v12-broad-discovery-control.json)"; fi
           if [ "$target" -lt 3000 ] || [ "$target" -gt 12000 ]; then
@@ -94,11 +94,11 @@ jobs:
           mkdir -p artifacts
           export E4_HOLDOUT_PROGRESS_PATH=artifacts/v12-broad-discovery-progress.json
           python scripts/e4_300_launch_holdout_v12_sub10ms.py \
-            --target-launches "\${{ steps.params.outputs.target }}" \
-            --capture-seconds "\${{ steps.params.outputs.seconds }}" \
+            --target-launches "${{ steps.params.outputs.target }}" \
+            --capture-seconds "${{ steps.params.outputs.seconds }}" \
             --tail-seconds 300 \
             --heartbeat-seconds 60 \
-            --minimum-launches "\${{ steps.params.outputs.target }}" \
+            --minimum-launches "${{ steps.params.outputs.target }}" \
             --wallet-signatures 200 \
             --builder-probes 0 \
             --testnet-route-probes 0 \
@@ -134,7 +134,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v12-broad-discovery-\${{ github.run_id }}
+          name: v12-broad-discovery-${{ github.run_id }}
           path: |
             artifacts/v12-broad-discovery-progress.json
             artifacts/v12-broad-discovery-batch.json
@@ -155,6 +155,6 @@ jobs:
             gh workflow run v12-broad-discovery-shadow.yml \
               --repo "\${GITHUB_REPOSITORY}" \
               --ref "$BROAD_BRANCH" \
-              -f target_launches="\${{ steps.params.outputs.target }}" \
-              -f capture_seconds="\${{ steps.params.outputs.seconds }}"
+              -f target_launches="${{ steps.params.outputs.target }}" \
+              -f capture_seconds="${{ steps.params.outputs.seconds }}"
           fi
