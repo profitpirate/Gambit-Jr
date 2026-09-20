@@ -1,0 +1,160 @@
+name: V12 Broad Discovery Shadow
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_launches:
+        description: "Strictly future Pump launches to capture in this shadow window"
+        required: false
+        default: "6000"
+      capture_seconds:
+        description: "Maximum live capture duration"
+        required: false
+        default: "18000"
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: v12-broad-discovery-shadow
+  cancel-in-progress: false
+
+env:
+  PYTHONUNBUFFERED: "1"
+  GH_TOKEN: \${{ github.token }}
+  BROAD_BRANCH: codex/v12-broad-discovery-creator-apprentice-20260920
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_SOL_USD_FALLBACK: "150"
+  E4_BUILDER_COMMAND: "node tools/e4-builder/race-proxy-v3.mjs"
+  E4_BUILDER_PRELOAD: tools/e4-builder/fast-preload-v4.mjs
+
+jobs:
+  broad-discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v12-broad-discovery-creator-apprentice-20260920
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .[dev,research]
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm ci --omit=dev
+
+      - name: Verify isolation and frozen V12 fingerprint
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+          payload = json.loads(Path("research/v12-pre-armed-100-trade-frozen-model.json").read_text())
+          digest = hashlib.sha256(
+              json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+          ).hexdigest()
+          assert digest == "69df86eaf386fd37d699928a95d25aaeb2053e743b59c9e687c8a7c49d14f977"
+          assert payload.get("production_paths_changed") == 0
+          control = json.loads(Path("research/v12-broad-discovery-control.json").read_text())
+          assert control.get("shadow_only") is True
+          assert control.get("allow_real_money_execution") is False
+          PY
+          python -m pytest tests/test_v12_creator_apprentice.py -q
+
+      - name: Resolve broad capture parameters
+        id: params
+        run: |
+          target='\${{ inputs.target_launches }}'
+          seconds='\${{ inputs.capture_seconds }}'
+          if [ -z "$target" ]; then target="$(jq -r '.target_launches // 6000' research/v12-broad-discovery-control.json)"; fi
+          if [ -z "$seconds" ]; then seconds="$(jq -r '.capture_seconds // 18000' research/v12-broad-discovery-control.json)"; fi
+          if [ "$target" -lt 3000 ] || [ "$target" -gt 12000 ]; then
+            echo "target_launches must be between 3000 and 12000" >&2
+            exit 2
+          fi
+          if [ "$seconds" -lt 3600 ] || [ "$seconds" -gt 19800 ]; then
+            echo "capture_seconds must be between 3600 and 19800" >&2
+            exit 2
+          fi
+          echo "target=$target" >> "$GITHUB_OUTPUT"
+          echo "seconds=$seconds" >> "$GITHUB_OUTPUT"
+
+      - name: Capture a larger strictly future launch universe
+        run: |
+          mkdir -p artifacts
+          export E4_HOLDOUT_PROGRESS_PATH=artifacts/v12-broad-discovery-progress.json
+          python scripts/e4_300_launch_holdout_v12_sub10ms.py \
+            --target-launches "\${{ steps.params.outputs.target }}" \
+            --capture-seconds "\${{ steps.params.outputs.seconds }}" \
+            --tail-seconds 300 \
+            --heartbeat-seconds 60 \
+            --minimum-launches "\${{ steps.params.outputs.target }}" \
+            --wallet-signatures 200 \
+            --builder-probes 0 \
+            --testnet-route-probes 0 \
+            --stress-iterations 0 \
+            --output artifacts/v12-broad-discovery-batch.json
+
+      - name: Observe every unknown creator and update apprenticeship state
+        run: |
+          python scripts/v12_creator_apprentice.py \
+            --run-id "\${GITHUB_RUN_ID}" \
+            --batch artifacts/v12-broad-discovery-batch.json \
+            --events artifacts/v12-broad-discovery-batch-live-events.jsonl \
+            --model research/v12-pre-armed-100-trade-frozen-model.json \
+            --state research/v12-creator-apprentice-state.json \
+            --report research/v12-creator-apprentice-report.md \
+            --promotion-candidates research/v12-creator-promotion-candidates.json
+
+      - name: Persist only shadow-learning evidence
+        run: |
+          git config user.name 'gambit-v12-shadow-learning'
+          git config user.email 'actions@users.noreply.github.com'
+          git add \
+            research/v12-creator-apprentice-state.json \
+            research/v12-creator-apprentice-report.md \
+            research/v12-creator-promotion-candidates.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'data(v12): accumulate broad creator apprenticeship evidence [skip ci]'
+            git pull --rebase origin "$BROAD_BRANCH"
+            git push origin HEAD:"$BROAD_BRANCH"
+          fi
+
+      - name: Upload immutable broad-discovery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v12-broad-discovery-\${{ github.run_id }}
+          path: |
+            artifacts/v12-broad-discovery-progress.json
+            artifacts/v12-broad-discovery-batch.json
+            artifacts/v12-broad-discovery-batch.md
+            artifacts/v12-broad-discovery-batch-live-events.jsonl
+            research/v12-creator-apprentice-state.json
+            research/v12-creator-apprentice-report.md
+            research/v12-creator-promotion-candidates.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Auto-continue only when explicitly enabled
+        if: success()
+        run: |
+          enabled="$(jq -r '.auto_continue // false' research/v12-broad-discovery-control.json)"
+          stopped="$(jq -r '.stop // false' research/v12-broad-discovery-control.json)"
+          if [ "$enabled" = "true" ] && [ "$stopped" != "true" ]; then
+            gh workflow run v12-broad-discovery-shadow.yml \
+              --repo "\${GITHUB_REPOSITORY}" \
+              --ref "$BROAD_BRANCH" \
+              -f target_launches="\${{ steps.params.outputs.target }}" \
+              -f capture_seconds="\${{ steps.params.outputs.seconds }}"
+          fi
