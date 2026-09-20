@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hmac
 import os
+from pathlib import Path
 from typing import Any
 
 from aiohttp import web
@@ -34,11 +35,17 @@ class ControlPlane:
         self.discord = discord
         self.admin_key = admin_key
         self.wallet_verifier = SoldersWalletSignatureVerifier()
+        self.web_root = Path(__file__).with_name("portal_web")
 
     def app(self) -> web.Application:
         app = web.Application(client_max_size=64 * 1024)
         app.add_routes(
             [
+                web.get("/", self.portal),
+                web.get("/login", self.portal),
+                web.get("/app", self.portal),
+                web.get("/static/app.js", self.portal_js),
+                web.get("/static/styles.css", self.portal_css),
                 web.get("/health", self.health),
                 web.post("/v1/admin/invite", self.invite),
                 web.post("/v1/auth/redeem", self.redeem),
@@ -51,6 +58,41 @@ class ControlPlane:
             ]
         )
         return app
+
+    @staticmethod
+    def _security_headers() -> dict[str, str]:
+        return {
+            "Content-Security-Policy": (
+                "default-src 'self'; script-src 'self'; style-src 'self'; "
+                "connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'; "
+                "base-uri 'none'; form-action 'self'"
+            ),
+            "X-Content-Type-Options": "nosniff",
+            "Referrer-Policy": "no-referrer",
+            "X-Frame-Options": "DENY",
+            "Cache-Control": "no-store",
+        }
+
+    async def portal(self, _request: web.Request) -> web.StreamResponse:
+        response = web.FileResponse(self.web_root / "index.html")
+        response.headers.update(self._security_headers())
+        return response
+
+    async def portal_js(self, _request: web.Request) -> web.StreamResponse:
+        response = web.FileResponse(
+            self.web_root / "app.js",
+            headers={"Content-Type": "application/javascript; charset=utf-8"},
+        )
+        response.headers.update(self._security_headers())
+        return response
+
+    async def portal_css(self, _request: web.Request) -> web.StreamResponse:
+        response = web.FileResponse(
+            self.web_root / "styles.css",
+            headers={"Content-Type": "text/css; charset=utf-8"},
+        )
+        response.headers.update(self._security_headers())
+        return response
 
     async def body(self, request: web.Request) -> dict[str, Any]:
         value = await request.json()
