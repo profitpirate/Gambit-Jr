@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
-      GH_TOKEN: \${{ github.token }}
+      GH_TOKEN: ${{ github.token }}
       BRANCH: codex/v12-broad-discovery-creator-apprentice-20260920
     steps:
       - uses: actions/checkout@v4
