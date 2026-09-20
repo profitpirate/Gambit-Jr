@@ -38,6 +38,45 @@ def should_select(
     return social_handle in creator_handles.get(creator, ())
 
 
+
+def should_select_nextgen(
+    *,
+    creator: str,
+    social_handle: str,
+    social_status_ns: int,
+    create_ns: int,
+    prior_e4_attempts: int,
+    creator_seed_sol: float,
+    mayhem_mode: bool,
+    creator_handles: Mapping[str, AbstractSet[str]],
+    promoted_creators: AbstractSet[str],
+    promoted_library_enabled: bool,
+) -> bool:
+    """Post-certification selector with promoted-library recognition.
+
+    The frozen formula remains intact. A promoted creator can satisfy only the
+    creator-recognition leg; social recency, non-Mayhem status and creator seed
+    remain mandatory. Shortlisted creators are deliberately not accepted.
+    """
+    if (
+        mayhem_mode
+        or creator_seed_sol < MINIMUM_CREATOR_SEED_SOL
+        or not social_handle
+    ):
+        return False
+    age_ns = create_ns - social_status_ns
+    if age_ns < 0 or age_ns > MAX_TWEET_AGE_NS:
+        return False
+
+    frozen_recognition = (
+        prior_e4_attempts >= 1
+        and social_handle in creator_handles.get(creator, ())
+    )
+    promoted_recognition = (
+        promoted_library_enabled and creator in promoted_creators
+    )
+    return frozen_recognition or promoted_recognition
+
 def benchmark(iterations: int = 100_000) -> dict[str, Any]:
     creator_handles = {"creator": {"known_handle"}}
     timings = []
