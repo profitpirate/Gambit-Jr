@@ -257,6 +257,11 @@ class AccessService:
             )
         if provider not in {"NATIVE_WALLET", "MANAGED_WALLET"}:
             raise ValueError("unsupported execution provider")
+        if secret_ref and not secret_ref.startswith(("vault://", "kms://", "turnkey://")):
+            raise ValueError(
+                "execution credentials must be stored in an external vault/KMS reference; "
+                "raw private keys are forbidden"
+            )
         if provider == "NATIVE_WALLET":
             owned = self.store.conn.execute(
                 "SELECT 1 FROM access_wallets WHERE user_id=? AND wallet=?",
@@ -266,11 +271,6 @@ class AccessService:
                 raise PermissionError(
                     "native execution connection requires a verified wallet"
                 )
-        if secret_ref and not secret_ref.startswith(("vault://", "kms://", "turnkey://")):
-            raise ValueError(
-                "execution credentials must be stored in an external vault/KMS reference; "
-                "raw private keys are forbidden"
-            )
         now = time.time_ns()
         cursor = self.store.conn.execute(
             """
