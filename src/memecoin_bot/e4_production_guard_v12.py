@@ -9,6 +9,7 @@ import asyncio
 import collections
 import logging
 import os
+import sqlite3
 import time
 import uuid
 from pathlib import Path
@@ -20,7 +21,9 @@ from .v12_backup import EncryptedBackupManager, decode_aes_key
 from .v12_capacity import decide_capacity
 from .v12_creator_lifecycle import CreatorLifecycleStore
 from .v12_execution_journal import ExecutionJournal
+from .v12_forensics import ForensicTraceStore
 from .v12_learning_service import ContinuousLearningStore
+from .v12_observability import from_env as metrics_from_env
 from .v12_operator_graph import OperatorGraph
 from .v12_recovery import reconcile_engine, signature_status
 from .v12_route_health import RouteHealthStore
@@ -76,11 +79,15 @@ def _engine_init(self: Any, settings: Any) -> None:
     self.v12_creator_lifecycle = CreatorLifecycleStore(self.store.conn)
     self.v12_learning = ContinuousLearningStore(self.store.conn)
     self.v12_operator_graph = OperatorGraph(self.store.conn)
+    self.v12_trace = ForensicTraceStore(self.store.conn)
+    self.v12_metrics_server = metrics_from_env(self)
     self.v12_tx_failures = collections.deque()
     self.v12_closed_recorded: set[str] = set()
     self.v12_watchdog = None
     self.v12_watchdog_task = None
     self.v12_backup_task = None
+    self.v12_maintenance_task = None
+    self.v12_metrics_task = None
     self.v12_emergency_exit_lock = asyncio.Lock()
 
     audit_key = os.getenv("V12_AUDIT_HMAC_KEY", "")
@@ -141,6 +148,19 @@ core.Engine.__init__ = _engine_init
 def _audit(engine: Any, event: str, payload: dict[str, Any]) -> None:
     if engine.v12_audit is not None:
         engine.v12_audit.append(event, payload)
+    trace_key = str(
+        payload.get("mint")
+        or payload.get("request_id")
+        or payload.get("signature")
+        or event
+    )
+    engine.v12_trace.record(
+        trace_key=trace_key,
+        phase=event,
+        payload=payload,
+        mint=str(payload.get("mint") or "") or None,
+        request_id=str(payload.get("request_id") or "") or None,
+    )
 
 
 def _record_tx_result(engine: Any, success: bool) -> None:
@@ -593,6 +613,52 @@ async def _backup_loop(self: Any) -> None:
             self.v12_breaker.exit_only(f"backup_failure:{exc}")
 
 
+
+async def _maintenance_loop(self: Any) -> None:
+    interval = max(60.0, _float_env("V12_MAINTENANCE_INTERVAL_SECONDS", 300.0))
+    while not self.stop_event.is_set():
+        try:
+            await asyncio.wait_for(self.stop_event.wait(), timeout=interval)
+            break
+        except TimeoutError:
+            pass
+        try:
+            finalized = self.v12_learning.finalize_ready()
+            learning = self.v12_learning.maintenance(
+                event_retention_days=_float_env(
+                    "V12_LEARNING_EVENT_RETENTION_DAYS",
+                    7.0,
+                ),
+                launch_retention_days=_float_env(
+                    "V12_LEARNING_LAUNCH_RETENTION_DAYS",
+                    180.0,
+                ),
+            )
+            self.v12_creator_lifecycle.prune()
+            clusters = len(self.v12_operator_graph.rebuild())
+            traces = self.v12_trace.prune(
+                retention_days=_float_env(
+                    "V12_FORENSIC_RETENTION_DAYS",
+                    90.0,
+                )
+            )
+            self.store.conn.execute("PRAGMA wal_checkpoint(PASSIVE)")
+            self.store.conn.execute("PRAGMA optimize")
+            _audit(
+                self,
+                "MAINTENANCE",
+                {
+                    "launches_finalized": finalized,
+                    "learning_pruned": learning,
+                    "cluster_members": clusters,
+                    "traces_pruned": traces,
+                },
+            )
+        except (sqlite3.Error, OSError, ValueError) as exc:
+            LOGGER.exception("V12 maintenance failure")
+            self.v12_breaker.exit_only(f"maintenance_failure:{exc}")
+
+
 async def _run_production(self: Any) -> None:
     report = await reconcile_engine(
         self,
@@ -629,19 +695,37 @@ async def _run_production(self: Any) -> None:
             _backup_loop(self),
             name="v12-encrypted-backups",
         )
+    self.v12_maintenance_task = asyncio.create_task(
+        _maintenance_loop(self),
+        name="v12-maintenance",
+    )
+    self.v12_metrics_task = asyncio.create_task(
+        self.v12_metrics_server.run(self.stop_event),
+        name="v12-local-metrics",
+    )
 
     try:
         await _PREVIOUS_RUN(self)
     finally:
         if self.v12_watchdog is not None:
             self.v12_watchdog.stop()
-        for task in (self.v12_watchdog_task, self.v12_backup_task):
+        for task in (
+            self.v12_watchdog_task,
+            self.v12_backup_task,
+            self.v12_maintenance_task,
+            self.v12_metrics_task,
+        ):
             if task is not None:
                 task.cancel()
         await asyncio.gather(
             *[
                 task
-                for task in (self.v12_watchdog_task, self.v12_backup_task)
+                for task in (
+                    self.v12_watchdog_task,
+                    self.v12_backup_task,
+                    self.v12_maintenance_task,
+                    self.v12_metrics_task,
+                )
                 if task is not None
             ],
             return_exceptions=True,
@@ -712,7 +796,5 @@ def _status_production(self: Any) -> dict[str, Any]:
         payload["v12_production"] = {"status": "unavailable"}
     return payload
 
-
-import sqlite3  # noqa: E402 - used by final status wrapper
 
 core.Store.status = _status_production
