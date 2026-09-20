@@ -24,6 +24,7 @@ ACTIVE_PYTHON = (
     "src/memecoin_bot/e4_sub10ms_repairs_v12.py",
     "src/memecoin_bot/e4_sub10ms_runtime_final_v12.py",
     "src/memecoin_bot/e4_sub10ms_transport_final_v12.py",
+    "src/memecoin_bot/e4_v12_authority.py",
 )
 ACTIVE_JS = (
     "tools/e4-builder/race-proxy-v3.mjs",
