@@ -12,6 +12,9 @@ on:
       - "tests/test_e4_v12_axiom_paper_live.py"
       - "tests/test_e4_v12_fast_prearmed_selector.py"
       - "scripts/v12_prearmed_shadow_suite.py"
+      - "scripts/v12_prearmed_guardrail_policy.py"
+      - "tests/test_v12_prearmed_guardrail_policy.py"
+      - "research/e4-builder-security-status.json"
       - "tests/test_v12_prearmed_shadow_suite.py"
       - "research/v12-pre-armed-50-trade-results.json"
       - "research/v12-pre-armed-100-control.json"
@@ -63,14 +66,17 @@ jobs:
           python -m pytest \
             tests/test_e4_v12_fast_prearmed_selector.py \
             tests/test_e4_v12_axiom_paper_live.py \
-            tests/test_v12_prearmed_shadow_suite.py -q
+            tests/test_v12_prearmed_shadow_suite.py \
+            tests/test_v12_prearmed_guardrail_policy.py -q
           ruff check \
             scripts/e4_v12_fast_prearmed_selector.py \
             scripts/e4_v12_axiom_paper_live.py \
             tests/test_e4_v12_fast_prearmed_selector.py \
             tests/test_e4_v12_axiom_paper_live.py \
             scripts/v12_prearmed_shadow_suite.py \
-            tests/test_v12_prearmed_shadow_suite.py
+            scripts/v12_prearmed_guardrail_policy.py \
+            tests/test_v12_prearmed_shadow_suite.py \
+            tests/test_v12_prearmed_guardrail_policy.py
 
       - name: Check operator control and completion
         id: progress
