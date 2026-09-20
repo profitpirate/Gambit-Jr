@@ -209,12 +209,32 @@ def runner_gap(apprentice: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def build(expectancy: dict[str, Any], apprentice: dict[str, Any]) -> dict[str, Any]:
-    e4_rows = [
-        dict(row)
-        for row in expectancy.get("top_creators", []) or []
-        if isinstance(row, dict) and row.get("creator")
-    ]
+def build(
+    expectancy: dict[str, Any],
+    apprentice: dict[str, Any],
+    complete_history: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    complete_rows = (
+        complete_history.get("creators", [])
+        if isinstance(complete_history, dict)
+        else []
+    )
+    use_complete = bool(
+        complete_rows
+        and int((complete_history.get("completeness") or {}).get("union_trades") or 0) >= 316
+    )
+    source_rows = complete_rows if use_complete else expectancy.get("top_creators", [])
+    e4_rows = []
+    for raw in source_rows or []:
+        if not isinstance(raw, dict) or not raw.get("creator"):
+            continue
+        row = dict(raw)
+        if "winning_pnl_sol" not in row:
+            row["winning_pnl_sol"] = max(
+                0.0,
+                finite(row.get("net_pnl_sol_observed")),
+            )
+        e4_rows.append(row)
     fresh = {
         str(key): dict(value)
         for key, value in (apprentice.get("creators") or {}).items()
@@ -307,6 +327,11 @@ def build(expectancy: dict[str, Any], apprentice: dict[str, Any]) -> dict[str, A
             "enabled_now": False,
             "frozen_100_trade_model_modified": False,
         },
+        "history_source": (
+            "COMPLETE_ONCHAIN_UNION"
+            if use_complete
+            else "LEGACY_316_TRADE_CORPUS"
+        ),
         "policy": {
             "e4_promote_rule": "verified E4 creator with >=2 historical wins",
             "fresh_promote_rule": "fresh apprenticeship promotion_ready=true",
@@ -386,10 +411,20 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--e4-expectancy", type=Path, required=True)
     parser.add_argument("--apprentice", type=Path, required=True)
+    parser.add_argument(
+        "--e4-complete-history",
+        type=Path,
+        default=Path("models/e4/e4-complete-creator-history.json"),
+    )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args()
-    library = build(load(args.e4_expectancy), load(args.apprentice))
+    complete = load(args.e4_complete_history) if args.e4_complete_history.exists() else None
+    library = build(
+        load(args.e4_expectancy),
+        load(args.apprentice),
+        complete,
+    )
     write(args.output, library)
     args.report.write_text(render(library), encoding="utf-8")
     print(json.dumps(library["counts"], sort_keys=True))
