@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: codex/v12-prearmed-shadow-hardening-20260920
-          fetch-depth: 0
+          fetch-depth: 1
 
       - uses: actions/setup-python@v5
         with:
@@ -47,7 +47,7 @@ jobs:
 
       - name: Fetch latest untouched 100-trade benchmark state
         run: |
-          git fetch origin codex/e4-v12-flow-survival-hazard-v12:refs/remotes/origin/v12-live
+          git fetch --depth=1 origin codex/e4-v12-flow-survival-hazard-v12:refs/remotes/origin/v12-live
           mkdir -p artifacts
           git show origin/v12-live:research/v12-pre-armed-100-trade-paper-live.json > artifacts/v12-live-state.json
           git show origin/v12-live:research/v12-pre-armed-100-trade-frozen-model.json > artifacts/v12-live-model.json
