@@ -8,8 +8,8 @@ from pathlib import Path
 # These three legacy tests encoded policies explicitly invalidated by the
 # 300-launch holdouts. Replace their assertions rather than weakening V10 back
 # into accepting anonymous public-flow bursts.
-import test_e4_hardening_v6 as legacy_v6
-import test_e4_live as legacy_live
+from tests import test_e4_hardening_v6 as legacy_v6
+from tests import test_e4_live as legacy_live
 from memecoin_bot import e4_hardening_v10 as v10
 
 core = v10.core
