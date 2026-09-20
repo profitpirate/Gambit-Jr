@@ -1,7 +1,7 @@
 """Secure authenticated control-plane API for a small V12 beta."""
 from __future__ import annotations
 
-import collections
+from collections import deque
 import hmac
 import json
 import os
@@ -25,11 +25,11 @@ def _json_error(message: str, status: int) -> web.Response:
 
 class RateLimiter:
     def __init__(self) -> None:
-        self._hits: dict[str, collections.deque[float]] = {}
+        self._hits: dict[str, deque[float]] = {}
 
     def check(self, key: str, *, limit: int, window_seconds: float) -> bool:
         now = time.monotonic()
-        rows = self._hits.setdefault(key, collections.deque())
+        rows = self._hits.setdefault(key, deque())
         while rows and now - rows[0] > window_seconds:
             rows.popleft()
         if len(rows) >= limit:
