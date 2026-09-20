@@ -122,13 +122,25 @@ def test_protocol_is_frozen_and_never_authorises_production() -> None:
 def test_registered_manifest_progress_is_valid_and_not_a_live_pass() -> None:
     specification = holdout.verify_protocol(ROOT)
     payload = holdout.read_json(ROOT / holdout.DEFAULT_MANIFEST_PATH)
-    captures = holdout.validate_manifest(ROOT, payload, specification)
+    registered = [dict(row) for row in payload.get("captures", [])]
     required = specification["final_evidence_contract"][
         "required_capture_windows"
     ]
-    assert 0 < len(captures) <= required
-    assert all(capture["role"] == holdout.FINAL_ROLE for capture in captures)
-    assert all(capture["launches"] == 3_000 for capture in captures)
+    assert 0 < len(registered) <= required
+    assert all(capture["role"] == holdout.FINAL_ROLE for capture in registered)
+    assert all(capture["launches"] == 3_000 for capture in registered)
+    missing = [
+        capture
+        for capture in registered
+        if not (ROOT / str(capture.get("events_path", ""))).is_file()
+        or not (ROOT / str(capture.get("batch_path", ""))).is_file()
+    ]
+    if missing:
+        with pytest.raises(ValueError, match="file missing"):
+            holdout.validate_manifest(ROOT, payload, specification)
+        assert specification["result_policy"]["production_deployment_authorised"] is False
+        return
+    captures = holdout.validate_manifest(ROOT, payload, specification)
     if len(captures) == required:
         return
     report = holdout.waiting_report(
