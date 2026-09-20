@@ -81,6 +81,9 @@ class AccountRuntimeManager:
                 "V12_INSTANCE_LOCK": str(runtime / "live.lock"),
                 "E4_WALLET_PUBLIC_KEY": wallet,
                 "E4_VAULT_PUBLIC_KEY": storage,
+                "V12_ACCOUNT_MAX_BANKROLL_SOL": str(
+                    max(0.0, float(row["max_active_bankroll_sol"]))
+                ),
                 "E4_MAX_POSITION_FRACTION": str(
                     min(0.20, float(row["max_position_fraction"]))
                 ),
