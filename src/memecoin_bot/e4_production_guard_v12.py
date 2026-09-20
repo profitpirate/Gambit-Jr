@@ -18,7 +18,10 @@ from . import e4_hardening_v10 as v10
 from . import e4_role_model_v12 as role_model
 from .v12_backup import EncryptedBackupManager, decode_aes_key
 from .v12_capacity import decide_capacity
+from .v12_creator_lifecycle import CreatorLifecycleStore
 from .v12_execution_journal import ExecutionJournal
+from .v12_learning_service import ContinuousLearningStore
+from .v12_operator_graph import OperatorGraph
 from .v12_recovery import reconcile_engine, signature_status
 from .v12_route_health import RouteHealthStore
 from .v12_safety import CircuitBreaker, CircuitConfig, SafetyMode, SafetyStore
@@ -70,6 +73,9 @@ def _engine_init(self: Any, settings: Any) -> None:
         ),
     )
     self.v12_route_health = RouteHealthStore(self.store.conn)
+    self.v12_creator_lifecycle = CreatorLifecycleStore(self.store.conn)
+    self.v12_learning = ContinuousLearningStore(self.store.conn)
+    self.v12_operator_graph = OperatorGraph(self.store.conn)
     self.v12_tx_failures = collections.deque()
     self.v12_closed_recorded: set[str] = set()
     self.v12_watchdog = None
@@ -97,6 +103,31 @@ def _engine_init(self: Any, settings: Any) -> None:
         if backup_key
         else None
     )
+
+    library_path = Path(
+        os.getenv("V12_CREATOR_LIBRARY_PATH", "models/e4/v12-creator-library.json")
+    )
+    if library_path.exists():
+        try:
+            import json
+
+            library_payload = json.loads(library_path.read_text(encoding="utf-8"))
+            for row in library_payload.get("promoted", []) or []:
+                creator = str(row.get("creator") or "")
+                if not creator:
+                    continue
+                e4 = row.get("e4") or {}
+                fresh = row.get("fresh") or {}
+                self.v12_creator_lifecycle.seed_canonical(
+                    creator,
+                    tier=str(row.get("tier") or "PROMOTED"),
+                    wins=int(e4.get("wins") or 0) + int(fresh.get("wins") or 0),
+                    losses=int(e4.get("losses") or 0) + int(fresh.get("losses") or 0),
+                    pnl_sol=float(e4.get("winning_pnl_sol") or 0.0)
+                    + float(fresh.get("net_pnl_sol") or 0.0),
+                )
+        except (OSError, ValueError, TypeError):
+            LOGGER.exception("Could not seed V12 creator lifecycle from canonical library")
 
     # Recovery uses these explicit factories rather than importing engine internals.
     self.position_factory = core.Position
@@ -311,10 +342,12 @@ async def _execute_buy_production(
             None,
             "SKIP",
             score,
-            "V12 creator lifecycle quarantine/probation veto",
+            "V12 creator lifecycle quarantine veto",
             {"creator": creator},
         )
         return
+    if lifecycle is not None and creator:
+        fraction *= lifecycle.risk_multiplier(creator)
 
     mint = state.mint
     reserved = 0.0
@@ -563,7 +596,19 @@ async def _run_production(self: Any) -> None:
         self.v12_journal,
         self.v12_breaker,
     )
-    _audit(self, "STARTUP_RECOVERY", report.__dict__)
+    _audit(
+        self,
+        "STARTUP_RECOVERY",
+        {
+            "journal_checked": report.journal_checked,
+            "journal_confirmed": report.journal_confirmed,
+            "journal_retried": report.journal_retried,
+            "journal_uncertain": report.journal_uncertain,
+            "positions_checked": report.positions_checked,
+            "positions_closed": report.positions_closed,
+            "positions_reconstructed": report.positions_reconstructed,
+        },
+    )
 
     self.v12_watchdog = WatchdogManager(
         self,
@@ -571,6 +616,7 @@ async def _run_production(self: Any) -> None:
         self.v12_route_health,
         emergency_exit=lambda reason: _emergency_exit_all(self, reason),
     )
+    self.v12_operator_graph.rebuild()
     self.v12_watchdog_task = asyncio.create_task(
         self.v12_watchdog.run(),
         name="v12-watchdogs",
@@ -613,6 +659,16 @@ core.Engine.run = _run_production
 async def _on_event_production(self: Any, event: Any) -> None:
     if self.v12_watchdog is not None:
         self.v12_watchdog.touch_event()
+    self.v12_learning.observe(event)
+    creator = str(getattr(event, "creator", "") or "")
+    if creator:
+        context = v6._CONTEXT_BY_MINT.get(str(getattr(event, "mint", "")), {})
+        self.v12_operator_graph.observe(
+            creator,
+            metadata_host=str(context.get("metadata_host") or "") or None,
+            social_handle=str(context.get("social_handle") or "") or None,
+            observed_ns=int(getattr(event, "received_ns", 0) or time.time_ns()),
+        )
     await _PREVIOUS_ON_EVENT(self, event)
 
 
