@@ -287,6 +287,153 @@ def apprenticeship_creator_map(path: Path | None) -> dict[str, str]:
     return mapping
 
 
+def _transaction_signers(tx: Mapping[str, Any]) -> list[str]:
+    transaction = tx.get("transaction") or {}
+    message = transaction.get("message") or {}
+    result: list[str] = []
+    for item in message.get("accountKeys") or []:
+        if isinstance(item, Mapping):
+            if bool(item.get("signer")):
+                pubkey = str(item.get("pubkey") or "")
+                if pubkey:
+                    result.append(pubkey)
+        elif isinstance(item, str):
+            # jsonParsed responses normally include signer metadata. A bare-key
+            # response is not strong enough for creator attribution.
+            continue
+    return result
+
+
+async def earliest_signer_creator(
+    rpc: stress.RpcPool,
+    row: Mapping[str, Any],
+    *,
+    pages: int = 8,
+    page_size: int = 100,
+) -> dict[str, Any]:
+    """Resolve residual creators from the earliest mint transaction signer.
+
+    This is deliberately conservative: the mint itself, E4, system/token/Pump
+    programs and known tip accounts are excluded. A candidate must either be the
+    sole non-system signer in the earliest successful transaction or recur across
+    at least two of the first three successful transactions.
+    """
+    mint = str(row.get("mint") or "")
+    entry_signature = str(row.get("entry_signature") or "")
+    entry_time = int(row.get("entry_time") or 0)
+    if not mint or not entry_signature:
+        return {"creator": UNKNOWN, "status": "EARLIEST_SIGNER_INPUT_MISSING"}
+
+    excluded = {
+        mint,
+        stress.E4_WALLET,
+        getattr(stress, "WSOL_MINT", ""),
+        getattr(stress, "PUMP_TOKEN_MINT", ""),
+        "11111111111111111111111111111111",
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "TokenzQdYwVCbPGjv7Dvnjn6DqQ7xDmtSycJQKz",
+        "ComputeBudget111111111111111111111111111111",
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+    }
+    excluded.update(str(value) for value in getattr(stress, "JITO_TIPS", ()) or ())
+    excluded.discard("")
+
+    before = entry_signature
+    oldest_allowed = entry_time - 7_200
+    candidates: list[tuple[int, str, list[str]]] = []
+    for _ in range(max(1, pages)):
+        try:
+            batch = await rpc.call(
+                "getSignaturesForAddress",
+                [mint, {"before": before, "limit": page_size}],
+            )
+        except RuntimeError:
+            break
+        if not batch:
+            break
+
+        semaphore = asyncio.Semaphore(6)
+
+        async def fetch(signature_row: Mapping[str, Any]):
+            async with semaphore:
+                try:
+                    tx = await rpc.call(
+                        "getTransaction",
+                        [
+                            signature_row["signature"],
+                            {
+                                "encoding": "jsonParsed",
+                                "commitment": "confirmed",
+                                "maxSupportedTransactionVersion": 0,
+                            },
+                        ],
+                    )
+                except RuntimeError:
+                    return None
+                if not isinstance(tx, Mapping):
+                    return None
+                if (tx.get("meta") or {}).get("err") is not None:
+                    return None
+                signers = [
+                    signer
+                    for signer in _transaction_signers(tx)
+                    if signer not in excluded
+                ]
+                return (
+                    int(tx.get("blockTime") or signature_row.get("blockTime") or 0),
+                    str(signature_row["signature"]),
+                    list(dict.fromkeys(signers)),
+                )
+
+        fetched = await asyncio.gather(*(fetch(item) for item in batch))
+        candidates.extend(item for item in fetched if item is not None)
+        times = [
+            int(item.get("blockTime") or 0)
+            for item in batch
+            if item.get("blockTime")
+        ]
+        if times and min(times) < oldest_allowed:
+            break
+        before = str(batch[-1]["signature"])
+        if len(batch) < page_size:
+            break
+
+    candidates = [
+        item for item in candidates
+        if item[0] >= oldest_allowed and item[0] <= entry_time
+    ]
+    candidates.sort(key=lambda item: (item[0], item[1]))
+    if not candidates:
+        return {"creator": UNKNOWN, "status": "EARLIEST_SIGNER_NO_TRANSACTIONS"}
+
+    first = candidates[0]
+    if len(first[2]) == 1:
+        return {
+            "creator": first[2][0],
+            "status": "RESOLVED_EARLIEST_SOLE_SIGNER",
+            "create_signature": first[1],
+            "creator_resolution_confidence": 0.95,
+        }
+
+    counts: Counter[str] = Counter()
+    for _block_time, _signature, signers in candidates[:3]:
+        counts.update(signers)
+    recurring = [signer for signer, count in counts.items() if count >= 2]
+    if len(recurring) == 1:
+        return {
+            "creator": recurring[0],
+            "status": "RESOLVED_EARLIEST_RECURRING_SIGNER",
+            "create_signature": first[1],
+            "creator_resolution_confidence": 0.85,
+        }
+    return {
+        "creator": UNKNOWN,
+        "status": "EARLIEST_SIGNER_AMBIGUOUS",
+        "candidate_signers": sorted(counts),
+    }
+
+
 async def recover_unknown_creators(
     rpc: stress.RpcPool,
     rows: list[dict[str, Any]],
@@ -298,6 +445,7 @@ async def recover_unknown_creators(
     unresolved = [row for row in rows if row.get("creator") == UNKNOWN]
     recovered_apprentice = 0
     recovered_chain = 0
+    recovered_signer = 0
 
     for row in unresolved:
         mint = str(row["mint"])
@@ -305,6 +453,7 @@ async def recover_unknown_creators(
         if known:
             row["creator"] = known
             row["creator_resolution"] = "RESOLVED_APPRENTICESHIP_RAW_EVIDENCE"
+            row["creator_resolution_confidence"] = 1.0
             recovered_apprentice += 1
 
     unresolved = [row for row in rows if row.get("creator") == UNKNOWN]
@@ -321,24 +470,45 @@ async def recover_unknown_creators(
         if str(resolved.get("creator") or UNKNOWN) != UNKNOWN:
             row["creator"] = str(resolved["creator"])
             row["creator_resolution"] = "RESOLVED_DEEP_CHAIN_RETRY"
+            row["creator_resolution_confidence"] = 1.0
             row["create_signature"] = resolved.get("create_signature")
             row["create_slot"] = resolved.get("create_slot")
             recovered_chain += 1
         else:
-            print(
-                json.dumps(
-                    {
-                        "unresolved_creator_mint": row["mint"],
-                        "entry_signature": row.get("entry_signature"),
-                        "deep_retry_index": index,
-                    }
-                ),
-                flush=True,
+            signer_resolution = await earliest_signer_creator(
+                rpc,
+                row,
+                pages=8,
+                page_size=100,
             )
+            signer_creator = str(signer_resolution.get("creator") or UNKNOWN)
+            confidence = float(
+                signer_resolution.get("creator_resolution_confidence") or 0.0
+            )
+            if signer_creator != UNKNOWN and confidence >= 0.85:
+                row["creator"] = signer_creator
+                row["creator_resolution"] = str(signer_resolution["status"])
+                row["creator_resolution_confidence"] = confidence
+                row["create_signature"] = signer_resolution.get("create_signature")
+                recovered_signer += 1
+            else:
+                row["creator_resolution_confidence"] = 0.0
+                print(
+                    json.dumps(
+                        {
+                            "unresolved_creator_mint": row["mint"],
+                            "entry_signature": row.get("entry_signature"),
+                            "deep_retry_index": index,
+                            "signer_resolution": signer_resolution,
+                        }
+                    ),
+                    flush=True,
+                )
     return {
         "initial_unknown": len(unresolved) + recovered_apprentice,
         "recovered_apprenticeship": recovered_apprentice,
         "recovered_deep_chain": recovered_chain,
+        "recovered_earliest_signer": recovered_signer,
         "remaining_unknown": sum(row.get("creator") == UNKNOWN for row in rows),
     }
 
@@ -356,9 +526,17 @@ def creator_summary(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
             for row in rows
             if row.get("pnl_sol") is not None
         ]
+        confidences = [
+            float(row.get("creator_resolution_confidence") or 1.0)
+            for row in rows
+            if row.get("source") == "ONCHAIN_E4_WALLET"
+        ]
         output.append(
             {
                 "creator": creator,
+                "minimum_resolution_confidence": (
+                    min(confidences) if confidences else 1.0
+                ),
                 "wins": wins,
                 "losses": losses,
                 "trades": wins + losses,
@@ -414,6 +592,11 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                     "mint": str(position["mint"]),
                     "creator": str(resolved["creator"]),
                     "creator_resolution": str(resolved["status"]),
+                    "creator_resolution_confidence": (
+                        1.0
+                        if str(resolved.get("creator") or UNKNOWN) != UNKNOWN
+                        else 0.0
+                    ),
                     "create_signature": resolved.get("create_signature"),
                     "create_slot": resolved.get("create_slot"),
                     "outcome": "WIN" if pnl > 0 else "LOSS",
