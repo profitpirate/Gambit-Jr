@@ -10,7 +10,6 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 from .access_store import AccessStore
 
