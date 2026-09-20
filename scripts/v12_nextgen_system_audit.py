@@ -92,13 +92,26 @@ def python_component(path: str) -> dict[str, Any]:
     stubs = [
         node.name for node in [*functions, *classes] if pass_only(node)
     ]
+    not_implemented_raises = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Raise) or node.exc is None:
+            continue
+        target = node.exc.func if isinstance(node.exc, ast.Call) else node.exc
+        if isinstance(target, ast.Name) and target.id == "NotImplementedError":
+            not_implemented_raises.append(getattr(node, "lineno", 0))
+        elif (
+            isinstance(target, ast.Attribute)
+            and target.attr == "NotImplementedError"
+        ):
+            not_implemented_raises.append(getattr(node, "lineno", 0))
     return {
         "path": path,
         "lines": len(source.splitlines()),
         "functions": len(functions),
         "classes": len(classes),
         "pass_only": stubs,
-        "not_implemented": source.count("NotImplementedError"),
+        "not_implemented": len(not_implemented_raises),
+        "not_implemented_lines": not_implemented_raises,
     }
 
 
