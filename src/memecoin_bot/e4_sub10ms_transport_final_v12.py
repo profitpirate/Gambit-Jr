@@ -140,8 +140,8 @@ class FinalPersistentRouteSender(_BaseSender):
             configured = super()._headers(name.split("#", 1)[0])
             if configured:
                 headers.update(configured)
-        except Exception:
-            pass
+        except (AttributeError, TypeError):
+            LOGGER.debug("route-specific headers unavailable route=%s", name)
         return headers
 
     def _payload(self, name: str, tx: str) -> dict[str, Any]:
@@ -201,7 +201,7 @@ class FinalPersistentRouteSender(_BaseSender):
                 headers={"accept": "application/json"},
             ) as response:
                 await response.read()
-        except Exception as exc:
+        except (aiohttp.ClientError, asyncio.TimeoutError, OSError) as exc:
             LOGGER.debug("route warmup failed route=%s error=%s", name, exc)
 
     async def warm(self) -> None:
@@ -279,7 +279,15 @@ class FinalPersistentRouteSender(_BaseSender):
                     True,
                     returned or expected_signature,
                 )
-        except Exception as exc:
+        except (
+            aiohttp.ClientError,
+            asyncio.TimeoutError,
+            json.JSONDecodeError,
+            OSError,
+            RuntimeError,
+            TypeError,
+            ValueError,
+        ) as exc:
             error = str(exc)
             response_wall = time.time_ns()
             return core.RouteResult(
