@@ -30,6 +30,10 @@ This is an untouched forward paper test. It does not place real trades or modify
 ## Integrity
 
 - Frozen model SHA-256: `4792187bfb7cd47f2708dc9fbac247faab9650e103005a57782bdc1ad8aaa7d0`
+- Corrected full replay workflow: 35507467607
+- Corrected replay artifact: 10604247755
+- Impossible pre-fill exits after replay: 0
+- Performance metrics changed by chronology correction: none
 - The test stops at the first 50 chronological closed trades.
 - The selector, position sizing, exit policy, latency, and cost model cannot change mid-test.
 - Social timestamps come from immutable launch metadata and must predate CREATE by 0-10 seconds.
