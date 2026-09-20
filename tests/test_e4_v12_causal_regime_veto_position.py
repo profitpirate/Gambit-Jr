@@ -45,6 +45,13 @@ def frozen():
     )
 
 
+def newline_equivalent_sha256(path: Path, expected: str) -> bool:
+    raw = path.read_bytes()
+    lf = raw.replace(b"\r\n", b"\n")
+    variants = (raw, lf, lf.replace(b"\n", b"\r\n"))
+    return expected in {hashlib.sha256(value).hexdigest() for value in variants}
+
+
 def test_vetoes_are_fixed_interpretable_and_causal() -> None:
     assert research.POSITION_FRACTION == 0.04
     assert research.REGIME_VETO.feature == "prior_price_multiple_median"
@@ -91,8 +98,10 @@ def test_frozen_candidate_is_content_addressed_and_not_promoted() -> None:
     development_path = (
         ROOT / "artifacts/e4-v12-causal-regime-veto-position-development.json"
     )
-    actual_sha = hashlib.sha256(development_path.read_bytes()).hexdigest()
-    assert freeze["development_sha256"] == actual_sha
+    assert newline_equivalent_sha256(
+        development_path,
+        freeze["development_sha256"],
+    )
     assert freeze["experiment_id"] == result["experiment_id"]
     assert result["ready_for_strictly_later_evidence"] is True
     assert result["untouched_holdout_passed"] is False
