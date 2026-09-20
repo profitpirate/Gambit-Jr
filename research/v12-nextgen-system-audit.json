@@ -1,0 +1,377 @@
+{
+  "access": {
+    "axiom_direct_link": false,
+    "discord_magic_login": true,
+    "raw_private_keys_accepted": false,
+    "vault_only_live_signer": true,
+    "wallet_signature_proof": true
+  },
+  "causal_proof": {
+    "closed_trades": 7,
+    "real_money_execution": false,
+    "status": "COLLECTING_UNTOUCHED_FORWARD_TRADES"
+  },
+  "complete_e4_history": {
+    "legacy_trades": 316,
+    "onchain_closed_positions": 134,
+    "onchain_closed_positions_raw": 134,
+    "onchain_creator_resolved": 133,
+    "onchain_creator_unresolved": 1,
+    "positions_after_recovery": 134,
+    "recent_positions_added": 0,
+    "recent_verified_positions": 134,
+    "signatures_scanned": 1459,
+    "union_trades": 450,
+    "wallet_signature_scan_exhausted": true
+  },
+  "components": [
+    {
+      "classes": 0,
+      "functions": 2,
+      "lines": 72,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/e4_exec/__main__.py"
+    },
+    {
+      "classes": 0,
+      "functions": 2,
+      "lines": 40,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/e4_v12_authority.py"
+    },
+    {
+      "classes": 2,
+      "functions": 17,
+      "lines": 408,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/e4_sub10ms_transport_final_v12.py"
+    },
+    {
+      "classes": 0,
+      "functions": 1,
+      "lines": 42,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/e4_sub10ms_runtime_final_v12.py"
+    },
+    {
+      "classes": 0,
+      "functions": 4,
+      "lines": 107,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/e4_notifications_v12.py"
+    },
+    {
+      "classes": 0,
+      "functions": 8,
+      "lines": 239,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/e4_nextgen_creator_authority_v12.py"
+    },
+    {
+      "classes": 0,
+      "functions": 3,
+      "lines": 100,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/e4_adaptive_exit_v12.py"
+    },
+    {
+      "classes": 0,
+      "functions": 17,
+      "lines": 800,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/e4_production_guard_v12.py"
+    },
+    {
+      "classes": 8,
+      "functions": 22,
+      "lines": 377,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/notifications.py"
+    },
+    {
+      "classes": 2,
+      "functions": 12,
+      "lines": 118,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_creator_library.py"
+    },
+    {
+      "classes": 3,
+      "functions": 12,
+      "lines": 272,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_creator_lifecycle.py"
+    },
+    {
+      "classes": 1,
+      "functions": 6,
+      "lines": 174,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_learning_service.py"
+    },
+    {
+      "classes": 2,
+      "functions": 9,
+      "lines": 195,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_operator_graph.py"
+    },
+    {
+      "classes": 1,
+      "functions": 2,
+      "lines": 92,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_postcert_risk.py"
+    },
+    {
+      "classes": 5,
+      "functions": 19,
+      "lines": 278,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_security.py"
+    },
+    {
+      "classes": 1,
+      "functions": 3,
+      "lines": 106,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_capacity.py"
+    },
+    {
+      "classes": 2,
+      "functions": 16,
+      "lines": 231,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_execution_journal.py"
+    },
+    {
+      "classes": 5,
+      "functions": 16,
+      "lines": 216,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_safety.py"
+    },
+    {
+      "classes": 2,
+      "functions": 7,
+      "lines": 138,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_route_health.py"
+    },
+    {
+      "classes": 2,
+      "functions": 7,
+      "lines": 141,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_backup.py"
+    },
+    {
+      "classes": 2,
+      "functions": 6,
+      "lines": 241,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_live_readiness.py"
+    },
+    {
+      "classes": 1,
+      "functions": 4,
+      "lines": 193,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_recovery.py"
+    },
+    {
+      "classes": 3,
+      "functions": 11,
+      "lines": 210,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_watchdogs.py"
+    },
+    {
+      "classes": 1,
+      "functions": 5,
+      "lines": 97,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_forensics.py"
+    },
+    {
+      "classes": 1,
+      "functions": 5,
+      "lines": 107,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_observability.py"
+    },
+    {
+      "classes": 2,
+      "functions": 9,
+      "lines": 178,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_vault_signer.py"
+    },
+    {
+      "classes": 2,
+      "functions": 10,
+      "lines": 223,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_account_orchestrator.py"
+    },
+    {
+      "classes": 1,
+      "functions": 6,
+      "lines": 170,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/access_store.py"
+    },
+    {
+      "classes": 5,
+      "functions": 14,
+      "lines": 411,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/access_service.py"
+    },
+    {
+      "classes": 2,
+      "functions": 30,
+      "lines": 548,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/control_plane.py"
+    },
+    {
+      "classes": 0,
+      "functions": 1,
+      "lines": 38,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "src/memecoin_bot/v12_portal.py"
+    },
+    {
+      "classes": 0,
+      "functions": 12,
+      "lines": 440,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "scripts/v12_creator_library_rebuild.py"
+    },
+    {
+      "classes": 0,
+      "functions": 19,
+      "lines": 726,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "scripts/v12_e4_full_history.py"
+    },
+    {
+      "classes": 1,
+      "functions": 9,
+      "lines": 174,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "scripts/v12_supervisor.py"
+    },
+    {
+      "classes": 0,
+      "functions": 1,
+      "lines": 82,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "scripts/v12_integrity_manifest.py"
+    },
+    {
+      "classes": 0,
+      "functions": 3,
+      "lines": 85,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "scripts/v12_secret_scan.py"
+    }
+  ],
+  "creator_library": {
+    "activation": {
+      "enabled_now": false,
+      "frozen_100_trade_model_modified": false,
+      "mode": "POST_CAUSAL_100_ONLY"
+    },
+    "elite": 14,
+    "history_source": "COMPLETE_ONCHAIN_UNION",
+    "promoted": 44,
+    "shortlisted": 28
+  },
+  "deployment_units_present": true,
+  "discord_command_runtime_removed": true,
+  "failures": [],
+  "notifications": {
+    "enabled_by_default": false,
+    "storage_sweep": true,
+    "trade_loss": true,
+    "trade_win": true
+  },
+  "required_components": 36,
+  "required_deployment_units": 5,
+  "status": "PASS",
+  "version": "v12-nextgen-system-audit-v1"
+}
