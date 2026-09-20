@@ -14,6 +14,7 @@ import aiohttp
 
 from . import e4_direct_copy_v12 as direct
 from . import e4_role_model_v12 as role_model
+from . import e4_v12_authority as authority
 
 core = role_model.core
 v6 = role_model.v6
@@ -298,7 +299,12 @@ class FastPersistentRouteSender(_PREVIOUS_ROUTE_SENDER):
             self._http_session = None
 
 
-core.RouteSender = FastPersistentRouteSender
+authority.install_route_sender(
+    core,
+    FastPersistentRouteSender,
+    priority=authority.ROUTE_PRIORITY_REPAIRS,
+    authority="v12_sub10ms_repairs",
+)
 
 
 # Start both persistent builders and warm every route before consuming live
