@@ -1219,7 +1219,14 @@ def hard_negative_score(
         "pre_entry_crowding": crowding,
         "pre_entry_sell_pressure": sell_pressure,
     }
-    score = (
+    legacy_score = (
+        0.32 * components["output_deterioration"]
+        + 0.30 * components["chase_pressure"]
+        + 0.14 * components["late_social"]
+        + 0.14 * components["low_creator_seed"]
+        + 0.10 * components["market_heat"]
+    )
+    microstructure_score = (
         0.24 * components["output_deterioration"]
         + 0.22 * components["chase_pressure"]
         + 0.10 * components["late_social"]
@@ -1228,6 +1235,10 @@ def hard_negative_score(
         + 0.16 * components["pre_entry_crowding"]
         + 0.10 * components["pre_entry_sell_pressure"]
     )
+    # Preserve every veto the prior hard-negative contract would have made.
+    # New causal microstructure is additive evidence, never a way to dilute
+    # an already-dangerous execution profile below its historical threshold.
+    score = max(legacy_score, microstructure_score)
     return clamp(score), components
 
 
