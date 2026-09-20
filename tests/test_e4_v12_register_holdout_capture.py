@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -32,7 +34,22 @@ def protocol():
     return registration.holdout.verify_protocol(ROOT)
 
 
-def artifact(tmp_path: Path, run_id: str, start_ns: int) -> Path:
+@pytest.fixture
+def repo_tmp() -> Path:
+    parent = ROOT / ".tmp-holdout-registration-pytest"
+    parent.mkdir(parents=True, exist_ok=True)
+    path = Path(tempfile.mkdtemp(prefix="case-", dir=parent))
+    try:
+        yield path
+    finally:
+        shutil.rmtree(path, ignore_errors=True)
+        try:
+            parent.rmdir()
+        except OSError:
+            pass
+
+
+def artifact(repo_tmp: Path, run_id: str, start_ns: int) -> Path:
     directory = tmp_path / run_id / "artifacts"
     directory.mkdir(parents=True)
     cohort = [
@@ -73,11 +90,11 @@ def test_epoch_ns_requires_timezone() -> None:
 
 
 def test_registration_assigns_role_from_both_workflow_and_capture_time(
-    tmp_path: Path,
+    repo_tmp: Path,
 ) -> None:
     specification = protocol()
     freeze_ns = specification["frozen_candidate"]["frozen_at_epoch_ns"]
-    final_dir = artifact(tmp_path, "10", freeze_ns + 2)
+    final_dir = artifact(repo_tmp, "10", freeze_ns + 2)
     final = registration.capture_record(
         ROOT,
         final_dir,
@@ -89,7 +106,7 @@ def test_registration_assigns_role_from_both_workflow_and_capture_time(
     assert final["launches"] == 3000
     assert final["decoded_events"] == 3000
 
-    quarantine_dir = artifact(tmp_path, "11", freeze_ns + 5000)
+    quarantine_dir = artifact(repo_tmp, "11", freeze_ns + 5000)
     quarantine = registration.capture_record(
         ROOT,
         quarantine_dir,
@@ -101,11 +118,11 @@ def test_registration_assigns_role_from_both_workflow_and_capture_time(
 
 
 def test_registration_rejects_event_count_and_copy_audit_mismatch(
-    tmp_path: Path,
+    repo_tmp: Path,
 ) -> None:
     specification = protocol()
     freeze_ns = specification["frozen_candidate"]["frozen_at_epoch_ns"]
-    directory = artifact(tmp_path, "12", freeze_ns + 2)
+    directory = artifact(repo_tmp, "12", freeze_ns + 2)
     events = directory / "artifacts/e4-v12-forward-batch-live-events.jsonl"
     events.write_text("{}\n", encoding="utf-8")
     with pytest.raises(ValueError, match="line count"):
@@ -132,10 +149,10 @@ def test_registration_rejects_event_count_and_copy_audit_mismatch(
         )
 
 
-def test_atomic_registration_is_idempotent(tmp_path: Path) -> None:
+def test_atomic_registration_is_idempotent(repo_tmp: Path) -> None:
     specification = protocol()
     freeze_ns = specification["frozen_candidate"]["frozen_at_epoch_ns"]
-    directory = artifact(tmp_path, "13", freeze_ns + 2)
+    directory = artifact(repo_tmp, "13", freeze_ns + 2)
     record = registration.capture_record(
         ROOT,
         directory,
@@ -143,19 +160,19 @@ def test_atomic_registration_is_idempotent(tmp_path: Path) -> None:
         "2026-09-12T23:21:48Z",
         specification,
     )
-    manifest_path = tmp_path / "manifest.json"
+    manifest_path = repo_tmp / "manifest.json"
     first = registration.register(ROOT, manifest_path, record, specification)
     first_bytes = manifest_path.read_bytes()
     second = registration.register(ROOT, manifest_path, record, specification)
     assert first == second
     assert manifest_path.read_bytes() == first_bytes
-    assert not list(tmp_path.glob(".*.tmp"))
+    assert not list(repo_tmp.glob(".*.tmp"))
 
 
-def test_registration_rejects_mainnet_activity(tmp_path: Path) -> None:
+def test_registration_rejects_mainnet_activity(repo_tmp: Path) -> None:
     specification = protocol()
     freeze_ns = specification["frozen_candidate"]["frozen_at_epoch_ns"]
-    directory = artifact(tmp_path, "14", freeze_ns + 2)
+    directory = artifact(repo_tmp, "14", freeze_ns + 2)
     path = directory / "artifacts/e4-v12-forward-batch.json"
     batch = json.loads(path.read_text(encoding="utf-8"))
     batch["mainnet_transactions_sent"] = 1
