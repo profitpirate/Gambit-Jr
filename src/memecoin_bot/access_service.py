@@ -89,7 +89,7 @@ class AccessService:
             expires_ns=expires,
         )
 
-    def redeem_login(self, code: str) -> str:
+    def redeem_login_with_csrf(self, code: str) -> tuple[str, str]:
         digest = _hash(code)
         now = time.time_ns()
         self.store.conn.execute("BEGIN IMMEDIATE")
@@ -111,20 +111,23 @@ class AccessService:
                 self.store.conn.execute("ROLLBACK")
                 raise PermissionError("login grant is invalid, expired or already used")
             session = secrets.token_urlsafe(48)
+            csrf = secrets.token_urlsafe(32)
             self.store.conn.execute(
                 "UPDATE access_login_grants SET consumed_ns=? WHERE grant_hash=?",
                 (now, digest),
             )
             self.store.conn.execute(
                 """
-                INSERT INTO access_sessions(session_hash,user_id,expires_ns,created_ns)
-                VALUES(?,?,?,?)
+                INSERT INTO access_sessions(
+                    session_hash,user_id,expires_ns,created_ns,csrf_hash
+                ) VALUES(?,?,?,?,?)
                 """,
                 (
                     _hash(session),
                     int(row["user_id"]),
                     now + int(self.session_ttl_seconds * 1e9),
                     now,
+                    _hash(csrf),
                 ),
             )
             self.store.conn.execute("COMMIT")
@@ -133,7 +136,25 @@ class AccessService:
                 self.store.conn.execute("ROLLBACK")
             raise
         self.store.audit(int(row["user_id"]), "LOGIN_GRANT_REDEEMED")
+        return session, csrf
+
+    def redeem_login(self, code: str) -> str:
+        session, _csrf = self.redeem_login_with_csrf(code)
         return session
+
+    def validate_csrf(self, session_token: str, csrf_token: str) -> None:
+        if not session_token or not csrf_token:
+            raise PermissionError("CSRF token is required")
+        row = self.store.conn.execute(
+            "SELECT csrf_hash FROM access_sessions WHERE session_hash=?",
+            (_hash(session_token),),
+        ).fetchone()
+        if row is None or not row["csrf_hash"]:
+            raise PermissionError("session has no CSRF binding")
+        import hmac
+
+        if not hmac.compare_digest(str(row["csrf_hash"]), _hash(csrf_token)):
+            raise PermissionError("CSRF token is invalid")
 
     def authenticate(self, session_token: str) -> int:
         now = time.time_ns()
@@ -257,10 +278,10 @@ class AccessService:
             )
         if provider not in {"NATIVE_WALLET", "MANAGED_WALLET"}:
             raise ValueError("unsupported execution provider")
-        if secret_ref and not secret_ref.startswith(("vault://", "kms://", "turnkey://")):
+        if not secret_ref or not secret_ref.startswith("vault://"):
             raise ValueError(
-                "execution credentials must be stored in an external vault/KMS reference; "
-                "raw private keys are forbidden"
+                "live execution requires a HashiCorp Vault Transit signer reference; "
+                "raw private keys and unimplemented signer schemes are forbidden"
             )
         if provider == "NATIVE_WALLET":
             owned = self.store.conn.execute(
