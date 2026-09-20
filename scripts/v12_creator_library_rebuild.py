@@ -229,6 +229,10 @@ def build(
         if not isinstance(raw, dict) or not raw.get("creator"):
             continue
         row = dict(raw)
+        if str(row.get("creator")) == "UNKNOWN_CREATOR":
+            continue
+        if use_complete and float(row.get("minimum_resolution_confidence") or 1.0) < 0.85:
+            continue
         if "winning_pnl_sol" not in row:
             row["winning_pnl_sol"] = max(
                 0.0,
