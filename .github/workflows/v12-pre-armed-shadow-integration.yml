@@ -1,0 +1,117 @@
+name: V12 Pre-Armed shadow integration
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-flow-survival-hazard-v12
+    paths:
+      - ".github/workflows/v12-pre-armed-shadow-integration.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: v12-pre-armed-shadow-integration
+  cancel-in-progress: true
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: \${{ github.token }}
+      REPO: \${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-flow-survival-hazard-v12
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .[dev,research]
+      - run: python -m pip install -r requirements-e4.txt
+
+      - name: Download latest successful raw 100-trade window
+        id: source
+        run: |
+          run_id="$(gh run list \
+            --repo "$REPO" \
+            --workflow v12-pre-armed-100-trade.yml \
+            --branch codex/e4-v12-flow-survival-hazard-v12 \
+            --status success \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')"
+          test -n "$run_id"
+          mkdir -p integration
+          gh run download "$run_id" \
+            --repo "$REPO" \
+            --name "v12-pre-armed-100-live-$run_id" \
+            --dir integration
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve artifact paths
+        id: paths
+        run: |
+          batch="$(find integration -name 'v12-pre-armed-100-live-batch.json' -print -quit)"
+          events="$(find integration -name 'v12-pre-armed-100-live-batch-live-events.jsonl' -print -quit)"
+          cache="$(find integration -name 'v12-pre-armed-100-metadata-cache.json' -print -quit)"
+          test -s "$batch"
+          test -s "$events"
+          echo "batch=$batch" >> "$GITHUB_OUTPUT"
+          echo "events=$events" >> "$GITHUB_OUTPUT"
+          echo "cache=$cache" >> "$GITHUB_OUTPUT"
+
+      - name: Execute shadow suite on immutable raw evidence
+        run: |
+          mkdir -p artifacts
+          cache_arg=""
+          if [ -s "\${{ steps.paths.outputs.cache }}" ]; then
+            cache_arg="--metadata-cache \${{ steps.paths.outputs.cache }}"
+          fi
+          python scripts/v12_prearmed_shadow_suite.py \
+            --run-id "\${{ steps.source.outputs.run_id }}" \
+            --batch "\${{ steps.paths.outputs.batch }}" \
+            --events "\${{ steps.paths.outputs.events }}" \
+            --paper-state research/v12-pre-armed-100-trade-paper-live.json \
+            --model research/v12-pre-armed-100-trade-frozen-model.json \
+            --baseline research/v12-pre-armed-50-trade-results.json \
+            --analytics-state artifacts/v12-pre-armed-shadow-integration.json \
+            --report artifacts/v12-pre-armed-shadow-integration.md \
+            $cache_arg
+
+      - name: Validate integration output
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path("artifacts/v12-pre-armed-shadow-integration.json").read_text())
+          assert data["reliability"]["status"] == "PASS"
+          assert data["reliability"]["frozen_v12_modified"] is False
+          assert data["paper_progress"]["required_closed_trades"] == 100
+          assert data["execution_stress_summary"]
+          assert "creator_concentration" in data
+          assert "risk_of_ruin" in data
+          assert "drift" in data
+          print(json.dumps({
+              "reliability": data["reliability"]["status"],
+              "latest_run_id": data["latest_run_id"],
+              "new_creator_summary": data["new_creator_summary"],
+              "stress_scenarios": len(data["execution_stress_summary"]),
+          }, indent=2))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v12-shadow-integration-\${{ github.run_id }}
+          path: |
+            artifacts/v12-pre-armed-shadow-integration.json
+            artifacts/v12-pre-armed-shadow-integration.md
+          if-no-files-found: warn
+          retention-days: 30
