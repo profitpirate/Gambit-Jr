@@ -1,12 +1,12 @@
 """Secure authenticated control-plane API for a small V12 beta."""
 from __future__ import annotations
 
-from collections import deque
 import hmac
 import json
 import os
 import sqlite3
 import time
+from collections import deque
 from pathlib import Path
 from typing import Any
 
