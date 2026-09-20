@@ -136,7 +136,7 @@ def test_registered_manifest_progress_is_valid_and_not_a_live_pass() -> None:
         or not (ROOT / str(capture.get("batch_path", ""))).is_file()
     ]
     if missing:
-        with pytest.raises(ValueError, match="file missing"):
+        with pytest.raises(ValueError, match="files missing"):
             holdout.validate_manifest(ROOT, payload, specification)
         assert specification["result_policy"]["production_deployment_authorised"] is False
         return
