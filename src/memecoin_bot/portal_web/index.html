@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Gambit. sniper access</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script defer src="/static/app.js"></script>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="brand">gambit.</div>
+      <div id="auth-state" class="muted">checking access…</div>
+    </header>
+
+    <section id="login-view" class="panel hidden">
+      <h1>private sniper access</h1>
+      <p>Your account is invite-only. Open the one-time link sent to you by the Gambit Discord bot.</p>
+      <p class="muted">Gambit will never ask for your wallet seed phrase, Discord password or copied browser cookies.</p>
+    </section>
+
+    <section id="app-view" class="hidden">
+      <div class="hero panel">
+        <div>
+          <p class="eyebrow">AUTOMATED SNIPER</p>
+          <h1>control in motion</h1>
+          <p class="muted">Identity, wallet ownership and execution permissions are separate.</p>
+        </div>
+        <button id="logout" class="ghost">Log out</button>
+      </div>
+
+      <div class="grid">
+        <section class="panel">
+          <h2>Account</h2>
+          <dl id="account"></dl>
+        </section>
+
+        <section class="panel">
+          <h2>Wallet ownership</h2>
+          <p class="muted">Sign a message only. This does not send a transaction or give Gambit your seed phrase.</p>
+          <button id="connect-wallet">Connect & verify Phantom</button>
+          <div id="wallet-result" class="status"></div>
+          <ul id="wallets"></ul>
+        </section>
+
+        <section class="panel">
+          <h2>Execution provider</h2>
+          <div id="providers"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Trading mandate</h2>
+          <form id="mandate-form">
+            <label>Maximum active bankroll (SOL)
+              <input id="bankroll" type="number" min="0" step="0.01" required>
+            </label>
+            <label>Maximum position fraction
+              <select id="fraction">
+                <option value="0.10">10%</option>
+                <option value="0.125">12.5%</option>
+                <option value="0.15">15%</option>
+                <option value="0.175">17.5%</option>
+                <option value="0.20">20% hard ceiling</option>
+              </select>
+            </label>
+            <label>Maximum concurrent positions
+              <select id="concurrency">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+              </select>
+            </label>
+            <label>Storage wallet
+              <input id="storage-wallet" autocomplete="off" placeholder="Solana public address">
+            </label>
+            <label class="toggle"><input id="mandate-enabled" type="checkbox"> Enable mandate</label>
+            <button type="submit">Save mandate</button>
+          </form>
+          <div id="mandate-result" class="status"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
