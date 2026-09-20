@@ -13,7 +13,8 @@ os.environ.setdefault("E4_DIRECT_COPY_MAX_OUTPUT_SHORTFALL_BPS", "600")
 from memecoin_bot import e4_hardening_v12  # noqa: E402,F401 - permanent V12 authority
 from memecoin_bot import e4_role_model_v12  # noqa: E402 - direct E4/creator/social wiring
 from memecoin_bot import e4_direct_copy_v12  # noqa: E402 - recognized-E4 execution
-from memecoin_bot import e4_sub10ms_repairs_v12  # noqa: E402,F401 - output guard, exact exits, warm fanout
+from memecoin_bot import e4_sub10ms_repairs_v12  # noqa: E402,F401 - output guard, exact exits
+from memecoin_bot import e4_sub10ms_runtime_final_v12  # noqa: E402,F401 - final prewarm + route authority
 from memecoin_bot.e4_pipeline_runtime_v10 import start_background_supervisor  # noqa: E402
 from memecoin_bot.e4_role_model_v12 import stop_background_supervisor  # noqa: E402
 from memecoin_bot.e4_runtime_services_v10 import (  # noqa: E402
