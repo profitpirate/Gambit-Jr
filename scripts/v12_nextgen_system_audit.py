@@ -97,9 +97,7 @@ def python_component(path: str) -> dict[str, Any]:
         if not isinstance(node, ast.Raise) or node.exc is None:
             continue
         target = node.exc.func if isinstance(node.exc, ast.Call) else node.exc
-        if isinstance(target, ast.Name) and target.id == "NotImplementedError":
-            not_implemented_raises.append(getattr(node, "lineno", 0))
-        elif (
+        if isinstance(target, ast.Name) and target.id == "NotImplementedError" or (
             isinstance(target, ast.Attribute)
             and target.attr == "NotImplementedError"
         ):
