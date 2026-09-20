@@ -1,0 +1,38 @@
+{
+  "version": "v12-pre-armed-100-prefx-invalidated-v1",
+  "status": "INVALIDATED_FOR_CONFIRMATION",
+  "reason": "paper simulator could use/timestamp a pre-fill reserve state as MAXIMUM_HOLD exit",
+  "archived_at": "2026-09-20",
+  "closed_trades": 19,
+  "original_metrics": {
+    "acceptance_gate_passed": false,
+    "capture_windows": 5,
+    "closed_trades": 19,
+    "ending_bankroll_sol": 3.33751176191658,
+    "losses": 10,
+    "maximum_closed_equity_drawdown_fraction": 0.030419372230066372,
+    "net_pnl_sol": 0.3375117619165803,
+    "profit_factor": 2.8802852322663783,
+    "total_axiom_fees_sol": 0.11764149575637042,
+    "total_fixed_execution_costs_sol": 0.06422499999999999,
+    "total_pump_fees_sol": 0.15479144178469792,
+    "wilson_lower_bound": 0.2732980516117956,
+    "win_rate": 0.47368421052631576,
+    "wins": 9
+  },
+  "model_sha256": "69df86eaf386fd37d699928a95d25aaeb2053e743b59c9e687c8a7c49d14f977",
+  "impossible_exit_rows": [
+    {
+      "run_id": "35479529251",
+      "mint": "Ak8hkRXvayEp6vVqVRDip6Wm3pCrmKdLeMgovyehtefj",
+      "decision_ns": 1789869588323619300,
+      "fill_ns": 1789869588328619300,
+      "exit_ns": 1789869588327021600,
+      "pnl_sol": -0.021679756361250746,
+      "exit_reason": "MAXIMUM_HOLD"
+    }
+  ],
+  "impossible_exit_count": 1,
+  "restart_required": true,
+  "import_into_fresh_100_test": false
+}
