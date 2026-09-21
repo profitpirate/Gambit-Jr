@@ -8,14 +8,14 @@ from pathlib import Path
 from typing import Any
 
 PRIMARY_PATTERNS = (
-    re.compile(r"^e4-live-market-stress-", re.I),
-    re.compile(r"^e4-long-oracle-holdout-", re.I),
-    re.compile(r"^e4-v11-forward-batch-", re.I),
-    re.compile(r"^e4-v12-forward-\d+$", re.I),
-    re.compile(r"^e4-v12-full-wallet-history-", re.I),
-    re.compile(r"^e4-v12-v11-forward-", re.I),
-    re.compile(r"^e4-exact-300-launch-holdout-", re.I),
-    re.compile(r"^e4-v(?:7|8|11)-.*300-launch", re.I),
+    re.compile(r"^e4-live-market-stress-", re.IGNORECASE),
+    re.compile(r"^e4-long-oracle-holdout-", re.IGNORECASE),
+    re.compile(r"^e4-v11-forward-batch-", re.IGNORECASE),
+    re.compile(r"^e4-v12-forward-\d+$", re.IGNORECASE),
+    re.compile(r"^e4-v12-full-wallet-history-", re.IGNORECASE),
+    re.compile(r"^e4-v12-v11-forward-", re.IGNORECASE),
+    re.compile(r"^e4-exact-300-launch-holdout-", re.IGNORECASE),
+    re.compile(r"^e4-v(?:7|8|11)-.*300-launch", re.IGNORECASE),
 )
 
 
