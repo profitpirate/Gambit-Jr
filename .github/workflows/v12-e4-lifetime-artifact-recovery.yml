@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  actions: read
+  actions: write
   contents: write
 
 concurrency:
@@ -107,3 +107,8 @@ jobs:
             git pull --rebase origin codex/v12-production-hardening-20260920
             git push origin HEAD:codex/v12-production-hardening-20260920
           fi
+
+      - name: Dispatch lifetime ledger rebuild
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run v12-e4-lifetime-ledger.yml --ref codex/v12-production-hardening-20260920
