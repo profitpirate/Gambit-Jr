@@ -1,5 +1,5 @@
 {
-  "all_retained_artifacts": 2071,
+  "all_retained_artifacts": 2072,
   "artifacts": [
     {
       "created_at": "2026-08-30T18:01:45Z",
@@ -5514,7 +5514,7 @@
     },
     {
       "created_at": "2026-09-07T06:56:40Z",
-      "expired": false,
+      "expired": true,
       "expires_at": "2026-09-21T06:56:39Z",
       "id": 10007546618,
       "name": "e4-v12-watchdog-34093047827",
@@ -21582,13 +21582,24 @@
       "workflow_run_head_branch": "codex/e4-v12-sub10ms-entry-research-20260905",
       "workflow_run_head_sha": "d3c05bdaf788d60f5ccf7d1dc0d8c0ccbc1ef8ac",
       "workflow_run_id": 35564608198
+    },
+    {
+      "created_at": "2026-09-21T06:55:55Z",
+      "expired": false,
+      "expires_at": "2026-10-21T06:55:54Z",
+      "id": 10626225733,
+      "name": "e4-v12-master-candidate-cluster-1000-35564608198",
+      "size_in_bytes": 678,
+      "workflow_run_head_branch": "codex/e4-v12-sub10ms-entry-research-20260905",
+      "workflow_run_head_sha": "d3c05bdaf788d60f5ccf7d1dc0d8c0ccbc1ef8ac",
+      "workflow_run_id": 35564608198
     }
   ],
   "content_reconciliation_complete": false,
-  "e4_relevant_artifacts": 1962,
+  "e4_relevant_artifacts": 1963,
   "e4_relevant_nonexpired": 1921,
-  "e4_relevant_nonexpired_bytes": 8719710764,
-  "generated_epoch": 1789973681,
+  "e4_relevant_nonexpired_bytes": 8719709310,
+  "generated_epoch": 1789974079,
   "inventory_complete": true,
   "note": "Inventory completeness is metadata-only. Lifetime-history certification remains blocked until relevant artifact contents are reconciled.",
   "schema_version": "e4-lifetime-artifact-inventory-v1"
