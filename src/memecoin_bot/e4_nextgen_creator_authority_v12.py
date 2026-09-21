@@ -62,7 +62,10 @@ _PROMOTED_RAW = {
 def active() -> bool:
     return bool(
         _LIBRARY
-        and promoted_library_activation_allowed(_CAUSAL_STATE)
+        and promoted_library_activation_allowed(
+            _CAUSAL_STATE,
+            library=_LIBRARY.payload,
+        )
         and str(os.getenv("V12_POSTCERT_AGGRESSIVE_RISK_ENABLED", "")).lower()
         in {"1", "true", "yes", "on"}
     )
@@ -236,4 +239,7 @@ def status() -> dict[str, Any]:
         "old_creator_registries_have_authority_when_active": False,
         "selection_formula_replaced": False,
         "risk_policy": "postcert-bounded",
+        "lifetime_history_certified": bool(
+            (_LIBRARY.payload.get("activation") or {}).get("history_certified")
+        ) if _LIBRARY else False,
     }
