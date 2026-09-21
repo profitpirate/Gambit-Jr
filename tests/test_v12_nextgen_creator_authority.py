@@ -10,6 +10,8 @@ def promoted_library() -> CreatorLibrary:
     return CreatorLibrary(
         {
             "schema_version": "v12-creator-library-v2",
+            "history_source": "E4_LIFETIME_LEDGER_CERTIFIED",
+            "activation": {"history_certified": True},
             "promoted": [
                 {
                     "creator": "elite",
@@ -143,3 +145,12 @@ def test_inactive_authority_is_exact_pass_through(monkeypatch) -> None:
         SimpleNamespace(mint="m", creator="c"),
     )
     assert result == expected
+
+
+def test_uncertified_history_cannot_activate_creator_authority(monkeypatch) -> None:
+    enable(monkeypatch)
+    payload = dict(subject._LIBRARY.payload)
+    payload["history_source"] = "PROVISIONAL_COMPLETE_ONCHAIN_UNION"
+    payload["activation"] = {"history_certified": False}
+    monkeypatch.setattr(subject, "_LIBRARY", CreatorLibrary(payload))
+    assert subject.active() is False
