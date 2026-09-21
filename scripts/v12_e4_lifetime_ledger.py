@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Build a fail-closed lifetime E4 trade and attempt ledger for V12 Next Gen.
 
 Only explicit E4 evidence is admitted. Gambit replay/backtest positions are
@@ -469,12 +468,9 @@ def render(ledger: Mapping[str, Any]) -> str:
         "",
         f"- Minimum expected trade floor: {completeness['minimum_expected_closed_trades']}",
         f"- Trade floor met: {completeness['closed_trade_floor_met']}",
-        "- Actions artifact inventory complete: "
-        f"{completeness['historical_actions_artifact_inventory_complete']}",
-        "- Wallet identity inventory complete: "
-        f"{completeness['historical_e4_wallet_identity_inventory_complete']}",
-        "- Source reconciliation complete: "
-        f"{completeness['source_reconciliation_complete']}",
+        f"- Actions artifact inventory complete: {completeness['historical_actions_artifact_inventory_complete']}",
+        f"- Wallet identity inventory complete: {completeness['historical_e4_wallet_identity_inventory_complete']}",
+        f"- Source reconciliation complete: {completeness['source_reconciliation_complete']}",
         "",
         "### Blocking items",
         "",
@@ -484,8 +480,7 @@ def render(ledger: Mapping[str, Any]) -> str:
         lines.append("- none")
     lines += [
         "",
-        "Next Gen creator authority remains disabled until "
-        "ready_for_nextgen_training=true.",
+        "Next Gen creator authority remains disabled until ready_for_nextgen_training=true.",
         "",
     ]
     return "\n".join(lines)
