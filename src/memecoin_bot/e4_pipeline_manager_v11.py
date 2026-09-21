@@ -72,6 +72,56 @@ class LearningState:
         return self.peak_price_sol / self.entry_price_sol
 
 
+class PipelineMetrics:
+    """Thread-safe low-overhead observability for the canonical decision path."""
+
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._decisions = 0
+        self._accepted = 0
+        self._rejected = 0
+        self._decision_ns_total = 0
+        self._decision_ns_max = 0
+        self._families: Counter[str] = Counter()
+
+    def record(self, decision: PipelineDecision) -> None:
+        with self._lock:
+            self._decisions += 1
+            self._accepted += int(decision.accepted)
+            self._rejected += int(not decision.accepted)
+            elapsed = max(0, int(decision.decision_ns or 0))
+            self._decision_ns_total += elapsed
+            self._decision_ns_max = max(self._decision_ns_max, elapsed)
+            self._families[str(decision.family or "UNKNOWN")] += 1
+
+    def snapshot(self) -> dict[str, Any]:
+        with self._lock:
+            decisions = self._decisions
+            return {
+                "available": True,
+                "decisions": decisions,
+                "accepted": self._accepted,
+                "rejected": self._rejected,
+                "acceptance_rate": self._accepted / decisions if decisions else 0.0,
+                "decision_ns_mean": (
+                    self._decision_ns_total / decisions if decisions else 0.0
+                ),
+                "decision_ns_max": self._decision_ns_max,
+                "family_counts": dict(self._families),
+            }
+
+
+def record_pipeline_metrics(method):
+    """Record exactly one telemetry event for every completed launch decision."""
+
+    def wrapped(self: "PipelineManager", *args: Any, **kwargs: Any) -> PipelineDecision:
+        decision = method(self, *args, **kwargs)
+        self.metrics.record(decision)
+        return decision
+
+    return wrapped
+
+
 class PipelineManager:
     """Canonical V11 authority for creator, social and E4-copy decisions.
 
@@ -89,6 +139,7 @@ class PipelineManager:
         self.narratives = base.NarrativeCache()
         self.teacher = base.E4Learner()
         self.intents = base.LaunchIntentRegistry()
+        self.metrics = PipelineMetrics()
         self._lock = threading.RLock()
         self._e4_entries: Mapping[str, E4Signal] = MappingProxyType({})
         self._social_by_ca: Mapping[str, tuple[Any, ...]] = MappingProxyType({})
@@ -410,6 +461,7 @@ class PipelineManager:
         except OSError:
             pass
 
+    @record_pipeline_metrics
     def decide_launch(
         self,
         *,
