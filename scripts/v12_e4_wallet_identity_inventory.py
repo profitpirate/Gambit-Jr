@@ -28,7 +28,7 @@ def primary(name: str) -> bool:
 def grep_commit(sha: str) -> tuple[set[str], str | None]:
     try:
         exists = subprocess.run(
-            ["git", "cat-file", "-e", f"{sha}^{commit}"],
+            ["git", "cat-file", "-e", f"{sha}^{{commit}}"],
             cwd=ROOT,
             text=True,
             capture_output=True,
