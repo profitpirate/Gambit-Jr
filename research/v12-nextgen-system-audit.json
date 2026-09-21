@@ -73,7 +73,7 @@
     {
       "classes": 0,
       "functions": 8,
-      "lines": 239,
+      "lines": 245,
       "not_implemented": 0,
       "not_implemented_lines": [],
       "pass_only": [],
@@ -108,8 +108,8 @@
     },
     {
       "classes": 2,
-      "functions": 12,
-      "lines": 118,
+      "functions": 13,
+      "lines": 129,
       "not_implemented": 0,
       "not_implemented_lines": [],
       "pass_only": [],
@@ -307,7 +307,7 @@
     {
       "classes": 0,
       "functions": 12,
-      "lines": 440,
+      "lines": 484,
       "not_implemented": 0,
       "not_implemented_lines": [],
       "pass_only": [],
@@ -321,6 +321,51 @@
       "not_implemented_lines": [],
       "pass_only": [],
       "path": "scripts/v12_e4_full_history.py"
+    },
+    {
+      "classes": 0,
+      "functions": 18,
+      "lines": 569,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "scripts/v12_e4_lifetime_ledger.py"
+    },
+    {
+      "classes": 0,
+      "functions": 4,
+      "lines": 140,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "scripts/v12_e4_artifact_recovery.py"
+    },
+    {
+      "classes": 0,
+      "functions": 2,
+      "lines": 74,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "scripts/v12_e4_artifact_recovery_merge.py"
+    },
+    {
+      "classes": 0,
+      "functions": 3,
+      "lines": 129,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "scripts/v12_e4_source_reconciliation.py"
+    },
+    {
+      "classes": 0,
+      "functions": 4,
+      "lines": 145,
+      "not_implemented": 0,
+      "not_implemented_lines": [],
+      "pass_only": [],
+      "path": "scripts/v12_e4_wallet_identity_inventory.py"
     },
     {
       "classes": 1,
@@ -354,15 +399,49 @@
     "activation": {
       "enabled_now": false,
       "frozen_100_trade_model_modified": false,
-      "mode": "POST_CAUSAL_100_ONLY"
+      "history_certified": false,
+      "lifetime_closed_trades": 800,
+      "lifetime_ledger_status": "COLLECTING",
+      "mode": "POST_CAUSAL_100_AND_CERTIFIED_LIFETIME_HISTORY_ONLY"
     },
     "elite": 14,
-    "history_source": "COMPLETE_ONCHAIN_UNION",
+    "history_source": "PROVISIONAL_COMPLETE_ONCHAIN_UNION",
     "promoted": 44,
     "shortlisted": 28
   },
   "deployment_units_present": true,
   "discord_command_runtime_removed": true,
+  "e4_lifetime_ledger": {
+    "completeness": {
+      "blockers": [
+        "closed_trade_floor_not_met:800<2000",
+        "source_reconciliation_not_certified_complete"
+      ],
+      "closed_trade_floor_met": false,
+      "committed_source_inventory_scanned": true,
+      "definition": "Complete requires reconciled lifetime source coverage; exhausting one wallet address alone is insufficient.",
+      "historical_actions_artifact_inventory_complete": true,
+      "historical_e4_wallet_identity_inventory_complete": true,
+      "minimum_expected_closed_trades": 2000,
+      "ready_for_nextgen_training": false,
+      "source_reconciliation_complete": false
+    },
+    "counts": {
+      "attempt_records": 392,
+      "closed_trade_records": 800,
+      "creator_resolution_fraction": 0.56125,
+      "creator_resolved_trades": 449,
+      "failed_attempts": 243,
+      "losses": 263,
+      "outcome_conflicts": 0,
+      "source_documents": 7,
+      "successful_buy_attempts": 149,
+      "unique_creators_resolved": 291,
+      "unknown_outcomes": 0,
+      "wins": 537
+    },
+    "status": "COLLECTING"
+  },
   "failures": [],
   "notifications": {
     "enabled_by_default": false,
@@ -370,8 +449,15 @@
     "trade_loss": true,
     "trade_win": true
   },
-  "required_components": 36,
+  "readiness": {
+    "causal_100_complete": false,
+    "creator_library_history_certified": false,
+    "engineering_cohesion": true,
+    "historical_intelligence_ready": false,
+    "real_money_authorised": false
+  },
+  "required_components": 41,
   "required_deployment_units": 5,
   "status": "PASS",
-  "version": "v12-nextgen-system-audit-v1"
+  "version": "v12-nextgen-system-audit-v2"
 }
