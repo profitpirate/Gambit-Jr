@@ -1,6 +1,6 @@
 # V12 canonical creator library
 
-**Activation:** post-causal-100 only. Promoted means recognised creator, not auto-buy.
+**Activation:** post-causal-100 + certified E4 lifetime ledger only. Promoted means recognised creator, not auto-buy.
 
 ## Coverage
 

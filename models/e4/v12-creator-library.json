@@ -2,7 +2,10 @@
   "activation": {
     "enabled_now": false,
     "frozen_100_trade_model_modified": false,
-    "mode": "POST_CAUSAL_100_ONLY"
+    "history_certified": false,
+    "lifetime_closed_trades": 0,
+    "lifetime_ledger_status": "MISSING",
+    "mode": "POST_CAUSAL_100_AND_CERTIFIED_LIFETIME_HISTORY_ONLY"
   },
   "counts": {
     "e4_history_creators_analysed": 291,
@@ -14,7 +17,7 @@
     "promoted_unique": 44,
     "shortlisted_unique": 28
   },
-  "history_source": "COMPLETE_ONCHAIN_UNION",
+  "history_source": "PROVISIONAL_COMPLETE_ONCHAIN_UNION",
   "policy": {
     "e4_promote_rule": "verified E4 creator with >=2 historical wins",
     "fresh_promote_rule": "fresh apprenticeship promotion_ready=true",
