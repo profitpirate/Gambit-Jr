@@ -16,16 +16,15 @@ Only explicit E4 evidence is counted. Gambit replay/backtest positions are exclu
 
 ## Certification
 
-- Minimum expected trade floor: 1000
+- Minimum expected trade floor: 2000
 - Trade floor met: False
-- Actions artifact inventory complete: False
+- Actions artifact inventory complete: True
 - Wallet identity inventory complete: False
 - Source reconciliation complete: False
 
 ### Blocking items
 
-- closed_trade_floor_not_met:800<1000
-- historical_actions_artifact_inventory_not_certified_complete
+- closed_trade_floor_not_met:800<2000
 - historical_e4_wallet_identity_inventory_not_certified_complete
 - source_reconciliation_not_certified_complete
 

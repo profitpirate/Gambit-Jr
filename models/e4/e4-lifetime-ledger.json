@@ -3971,17 +3971,16 @@
   "canonical_wallet": "E4EzXdwf7NNdqM2XGswWaWHfxgucVCo24PTCcrimTKBz",
   "completeness": {
     "blockers": [
-      "closed_trade_floor_not_met:800<1000",
-      "historical_actions_artifact_inventory_not_certified_complete",
+      "closed_trade_floor_not_met:800<2000",
       "historical_e4_wallet_identity_inventory_not_certified_complete",
       "source_reconciliation_not_certified_complete"
     ],
     "closed_trade_floor_met": false,
     "committed_source_inventory_scanned": true,
     "definition": "Complete requires reconciled lifetime source coverage; exhausting one wallet address alone is insufficient.",
-    "historical_actions_artifact_inventory_complete": false,
+    "historical_actions_artifact_inventory_complete": true,
     "historical_e4_wallet_identity_inventory_complete": false,
-    "minimum_expected_closed_trades": 1000,
+    "minimum_expected_closed_trades": 2000,
     "ready_for_nextgen_training": false,
     "source_reconciliation_complete": false
   },
@@ -8839,7 +8838,7 @@
       "wins": 0
     }
   ],
-  "generated_epoch": 1789973692,
+  "generated_epoch": 1789974045,
   "schema_version": "e4-lifetime-ledger-v1",
   "source_manifest": [
     {
