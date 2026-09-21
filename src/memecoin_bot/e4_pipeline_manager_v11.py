@@ -8,10 +8,11 @@ import os
 import threading
 import time
 from collections import Counter
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, Mapping
+from typing import Any
 
 LOGGER = logging.getLogger("gambit.e4.pipeline.v11")
 
@@ -118,7 +119,7 @@ class PipelineMetrics:
 def record_pipeline_metrics(method):
     """Record exactly one telemetry event for every completed launch decision."""
 
-    def wrapped(self: "PipelineManager", *args: Any, **kwargs: Any) -> PipelineDecision:
+    def wrapped(self: PipelineManager, *args: Any, **kwargs: Any) -> PipelineDecision:
         decision = method(self, *args, **kwargs)
         self.metrics.record(decision)
         return decision
@@ -155,7 +156,7 @@ class PipelineManager:
         self.direct_ca_max_age_ns = int(float(os.getenv("E4_DIRECT_CA_MAX_AGE_MS", "1500")) * 1_000_000)
         self.copy_max_age_ns = int(float(os.getenv("E4_COPY_MAX_AGE_MS", "100")) * 1_000_000)
 
-    def __call__(self) -> "PipelineManager":
+    def __call__(self) -> PipelineManager:
         return self
 
     @staticmethod
@@ -279,7 +280,7 @@ class PipelineManager:
                 source=str(payload.get("source") or "e4-wallet"),
             )
             self.teacher.observe(observation)
-        except Exception:  # noqa: BLE001 - observation enrichment must not kill hot path
+        except Exception:
             LOGGER.exception("E4 learner observation failed mint=%s", mint)
         return signal
 
