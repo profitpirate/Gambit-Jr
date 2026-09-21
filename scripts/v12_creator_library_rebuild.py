@@ -213,7 +213,21 @@ def build(
     expectancy: dict[str, Any],
     apprentice: dict[str, Any],
     complete_history: dict[str, Any] | None = None,
+    lifetime_history: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    lifetime_rows = (
+        lifetime_history.get("creators", [])
+        if isinstance(lifetime_history, dict)
+        else []
+    )
+    lifetime_complete = bool(
+        lifetime_rows
+        and lifetime_history.get("status") == "CERTIFIED_COMPLETE"
+        and (lifetime_history.get("completeness") or {}).get(
+            "ready_for_nextgen_training"
+        )
+    )
+
     complete_rows = (
         complete_history.get("creators", [])
         if isinstance(complete_history, dict)
@@ -223,7 +237,12 @@ def build(
         complete_rows
         and int((complete_history.get("completeness") or {}).get("union_trades") or 0) >= 316
     )
-    source_rows = complete_rows if use_complete else expectancy.get("top_creators", [])
+    if lifetime_complete:
+        source_rows = lifetime_rows
+    elif use_complete:
+        source_rows = complete_rows
+    else:
+        source_rows = expectancy.get("top_creators", [])
     e4_rows = []
     for raw in source_rows or []:
         if not isinstance(raw, dict) or not raw.get("creator"):
@@ -231,7 +250,9 @@ def build(
         row = dict(raw)
         if str(row.get("creator")) == "UNKNOWN_CREATOR":
             continue
-        if use_complete and float(row.get("minimum_resolution_confidence") or 1.0) < 0.85:
+        if (lifetime_complete or use_complete) and float(
+            row.get("minimum_resolution_confidence") or 1.0
+        ) < 0.85:
             continue
         if "winning_pnl_sol" not in row:
             row["winning_pnl_sol"] = max(
@@ -327,14 +348,30 @@ def build(
     return {
         "schema_version": SCHEMA,
         "activation": {
-            "mode": "POST_CAUSAL_100_ONLY",
+            "mode": "POST_CAUSAL_100_AND_CERTIFIED_LIFETIME_HISTORY_ONLY",
             "enabled_now": False,
             "frozen_100_trade_model_modified": False,
+            "history_certified": lifetime_complete,
+            "lifetime_ledger_status": (
+                lifetime_history.get("status")
+                if isinstance(lifetime_history, dict)
+                else "MISSING"
+            ),
+            "lifetime_closed_trades": int(
+                ((lifetime_history or {}).get("counts") or {}).get(
+                    "closed_trade_records"
+                )
+                or 0
+            ),
         },
         "history_source": (
-            "COMPLETE_ONCHAIN_UNION"
-            if use_complete
-            else "LEGACY_316_TRADE_CORPUS"
+            "E4_LIFETIME_LEDGER_CERTIFIED"
+            if lifetime_complete
+            else (
+                "PROVISIONAL_COMPLETE_ONCHAIN_UNION"
+                if use_complete
+                else "LEGACY_316_TRADE_CORPUS"
+            )
         ),
         "policy": {
             "e4_promote_rule": "verified E4 creator with >=2 historical wins",
@@ -369,7 +406,7 @@ def render(library: dict[str, Any]) -> str:
     lines = [
         "# V12 canonical creator library",
         "",
-        "**Activation:** post-causal-100 only. Promoted means recognised creator, not auto-buy.",
+        "**Activation:** post-causal-100 + certified E4 lifetime ledger only. Promoted means recognised creator, not auto-buy.",
         "",
         "## Coverage",
         "",
@@ -420,14 +457,21 @@ def main() -> int:
         type=Path,
         default=Path("models/e4/e4-complete-creator-history.json"),
     )
+    parser.add_argument(
+        "--e4-lifetime-ledger",
+        type=Path,
+        default=Path("models/e4/e4-lifetime-ledger.json"),
+    )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args()
     complete = load(args.e4_complete_history) if args.e4_complete_history.exists() else None
+    lifetime = load(args.e4_lifetime_ledger) if args.e4_lifetime_ledger.exists() else None
     library = build(
         load(args.e4_expectancy),
         load(args.apprentice),
         complete,
+        lifetime,
     )
     write(args.output, library)
     args.report.write_text(render(library), encoding="utf-8")
