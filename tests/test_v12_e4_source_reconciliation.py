@@ -28,7 +28,7 @@ def test_only_primary_execution_artifacts_are_required() -> None:
         ]
     }
     recovery = {"manifest": [{"archive": "1.zip"}, {"archive": "2.zip"}]}
-    result = subject.build(inv, recovery)
+    result = subject.build(inv, [recovery])
     assert result["primary_artifact_count"] == 2
     assert result["content_reconciliation_complete"] is True
 
