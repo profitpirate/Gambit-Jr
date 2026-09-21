@@ -23,11 +23,14 @@ def is_primary(name: str) -> bool:
     return any(pattern.search(name) for pattern in PRIMARY_PATTERNS)
 
 
-def build(inventory: dict[str, Any], recovery: dict[str, Any] | None) -> dict[str, Any]:
+def build(
+    inventory: dict[str, Any],
+    recoveries: list[dict[str, Any]],
+) -> dict[str, Any]:
     artifacts = list(inventory.get("artifacts") or [])
     primary = [row for row in artifacts if is_primary(str(row.get("name") or ""))]
     recovered_ids: set[int] = set()
-    if recovery:
+    for recovery in recoveries:
         for row in recovery.get("manifest") or []:
             archive = Path(str(row.get("archive") or ""))
             try:
@@ -88,8 +91,9 @@ def main() -> int:
     )
     parser.add_argument(
         "--recovery",
+        action="append",
         type=Path,
-        default=Path("models/e4/e4-lifetime-artifact-recovery.json"),
+        default=[],
     )
     parser.add_argument(
         "--output",
@@ -98,12 +102,16 @@ def main() -> int:
     )
     args = parser.parse_args()
     inventory = json.loads(args.inventory.read_text(encoding="utf-8"))
-    recovery = (
-        json.loads(args.recovery.read_text(encoding="utf-8"))
-        if args.recovery.exists()
-        else None
-    )
-    result = build(inventory, recovery)
+    recovery_paths = args.recovery or [
+        Path("models/e4/e4-lifetime-artifact-recovery.json"),
+        Path("models/e4/e4-lifetime-artifact-recovery-tier2.json"),
+    ]
+    recoveries = [
+        json.loads(path.read_text(encoding="utf-8"))
+        for path in recovery_paths
+        if path.exists()
+    ]
+    result = build(inventory, recoveries)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(result, indent=2, sort_keys=True) + "\n",
