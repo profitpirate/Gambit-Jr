@@ -42,6 +42,7 @@ REQUIRED = (
     "scripts/v12_creator_library_rebuild.py",
     "scripts/v12_e4_full_history.py",
     "scripts/v12_e4_lifetime_ledger.py",
+    "scripts/v12_e4_artifact_recovery.py",
     "scripts/v12_supervisor.py",
     "scripts/v12_integrity_manifest.py",
     "scripts/v12_secret_scan.py",
