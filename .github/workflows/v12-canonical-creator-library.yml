@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: v12-canonical-creator-library
@@ -125,3 +126,8 @@ jobs:
             git pull --rebase origin codex/v12-production-hardening-20260920
             git push origin HEAD:codex/v12-production-hardening-20260920
           fi
+
+      - name: Dispatch NextGen cohesive audit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run v12-nextgen-system-audit.yml --ref codex/v12-production-hardening-20260920
