@@ -491,7 +491,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", action="append", default=[])
     parser.add_argument("--artifact-root", type=Path)
-    parser.add_argument("--minimum-expected-closed-trades", type=int, default=1000)
+    parser.add_argument("--minimum-expected-closed-trades", type=int, default=2000)
     parser.add_argument("--artifact-inventory-complete", action="store_true")
     parser.add_argument("--wallet-identity-inventory-complete", action="store_true")
     parser.add_argument("--source-reconciliation-complete", action="store_true")
