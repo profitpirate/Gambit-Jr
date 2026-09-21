@@ -43,6 +43,7 @@ REQUIRED = (
     "scripts/v12_e4_full_history.py",
     "scripts/v12_e4_lifetime_ledger.py",
     "scripts/v12_e4_artifact_recovery.py",
+    "scripts/v12_e4_artifact_recovery_merge.py",
     "scripts/v12_e4_source_reconciliation.py",
     "scripts/v12_e4_wallet_identity_inventory.py",
     "scripts/v12_supervisor.py",
