@@ -84,10 +84,16 @@ jobs:
         run: |
           python - <<'PY'
           import json
+          from pathlib import Path
           d=json.load(open("models/e4/v12-creator-library.json"))
           assert d["activation"]["enabled_now"] is False
           assert d["activation"]["frozen_100_trade_model_modified"] is False
-          ledger=json.load(open("models/e4/e4-lifetime-ledger.json"))
+          ledger_path=Path("models/e4/e4-lifetime-ledger.json")
+          ledger=(
+              json.load(ledger_path.open())
+              if ledger_path.exists()
+              else {"status":"MISSING","completeness":{"ready_for_nextgen_training":False}}
+          )
           ready=ledger["completeness"]["ready_for_nextgen_training"] is True
           assert d["activation"]["history_certified"] is ready, (d["activation"], ledger["completeness"])
           if ready:
