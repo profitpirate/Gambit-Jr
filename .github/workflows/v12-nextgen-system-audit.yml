@@ -10,6 +10,8 @@ on:
       - "tests/test_v12_*.py"
       - "models/e4/v12-creator-library.json"
       - "models/e4/e4-complete-creator-history.json"
+      - "models/e4/e4-lifetime-ledger.json"
+      - ".github/workflows/v12-e4-lifetime-ledger.yml"
       - ".github/workflows/v12-nextgen-system-audit.yml"
   workflow_dispatch:
 
@@ -50,6 +52,7 @@ jobs:
             src/memecoin_bot/notifications.py \
             src/memecoin_bot/e4_notifications_v12.py \
             src/memecoin_bot/e4_nextgen_creator_authority_v12.py \
+            src/memecoin_bot/e4_pipeline_manager_v11.py \
             src/memecoin_bot/e4_adaptive_exit_v12.py \
             src/memecoin_bot/e4_production_guard_v12.py \
             src/memecoin_bot/v12_creator_library.py \
@@ -73,11 +76,14 @@ jobs:
             src/memecoin_bot/e4_sub10ms_transport_final_v12.py \
             scripts/v12_creator_library_rebuild.py \
             scripts/v12_e4_full_history.py \
+            scripts/v12_e4_lifetime_ledger.py \
             scripts/v12_nextgen_system_audit.py \
             scripts/v12_supervisor.py \
             scripts/v12_integrity_manifest.py \
             scripts/v12_secret_scan.py \
             tests/test_v12_creator_library_rebuild.py \
+            tests/test_v12_e4_lifetime_ledger.py \
+            tests/test_v12_pipeline_metrics.py \
             tests/test_v12_nextgen_runtime.py \
             tests/test_v12_access_service.py \
             tests/test_v12_notifications.py \
@@ -94,6 +100,7 @@ jobs:
             src/memecoin_bot/notifications.py \
             src/memecoin_bot/e4_notifications_v12.py \
             src/memecoin_bot/e4_nextgen_creator_authority_v12.py \
+            src/memecoin_bot/e4_pipeline_manager_v11.py \
             src/memecoin_bot/e4_adaptive_exit_v12.py \
             src/memecoin_bot/e4_production_guard_v12.py \
             src/memecoin_bot/v12_creator_library.py \
@@ -117,11 +124,14 @@ jobs:
             src/memecoin_bot/e4_sub10ms_transport_final_v12.py \
             scripts/v12_creator_library_rebuild.py \
             scripts/v12_e4_full_history.py \
+            scripts/v12_e4_lifetime_ledger.py \
             scripts/v12_nextgen_system_audit.py \
             scripts/v12_supervisor.py \
             scripts/v12_integrity_manifest.py \
             scripts/v12_secret_scan.py \
             tests/test_v12_creator_library_rebuild.py \
+            tests/test_v12_e4_lifetime_ledger.py \
+            tests/test_v12_pipeline_metrics.py \
             tests/test_v12_nextgen_runtime.py \
             tests/test_v12_access_service.py \
             tests/test_v12_notifications.py \
@@ -146,6 +156,8 @@ jobs:
         run: |
           python -m pytest -q \
             tests/test_v12_creator_library_rebuild.py \
+            tests/test_v12_e4_lifetime_ledger.py \
+            tests/test_v12_pipeline_metrics.py \
             tests/test_v12_nextgen_runtime.py \
             tests/test_v12_access_service.py \
             tests/test_v12_notifications.py \
