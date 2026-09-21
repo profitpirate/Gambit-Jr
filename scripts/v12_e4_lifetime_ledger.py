@@ -194,8 +194,22 @@ def dedupe_trades(records: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
                 bucket[index] = merge_trade(existing, row)
                 break
         else:
-            row["sources"] = [str(row.pop("source"))]
-            row["evidence_classes"] = [str(row.pop("evidence_class"))]
+            if "sources" not in row:
+                row["sources"] = [str(row.pop("source"))]
+            else:
+                row.pop("source", None)
+                row["sources"] = sorted(
+                    str(value) for value in row.get("sources") or [] if value
+                )
+            if "evidence_classes" not in row:
+                row["evidence_classes"] = [str(row.pop("evidence_class"))]
+            else:
+                row.pop("evidence_class", None)
+                row["evidence_classes"] = sorted(
+                    str(value)
+                    for value in row.get("evidence_classes") or []
+                    if value
+                )
             bucket.append(row)
     result = [row for bucket in grouped.values() for row in bucket]
     result.sort(
