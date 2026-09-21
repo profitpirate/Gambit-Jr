@@ -9,7 +9,7 @@ on:
       - ".github/workflows/v12-e4-lifetime-artifact-inventory.yml"
 
 permissions:
-  actions: read
+  actions: write
   contents: write
 
 concurrency:
@@ -93,3 +93,8 @@ jobs:
             git pull --rebase origin codex/v12-production-hardening-20260920
             git push origin HEAD:codex/v12-production-hardening-20260920
           fi
+
+      - name: Dispatch tier-1 artifact recovery
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run v12-e4-lifetime-artifact-recovery.yml --ref codex/v12-production-hardening-20260920
