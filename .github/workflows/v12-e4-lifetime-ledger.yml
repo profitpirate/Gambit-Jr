@@ -16,6 +16,8 @@ on:
       - "artifacts/e4-v12-selection-backfill.json"
       - "models/e4/e4-lifetime-artifact-recovery.json"
       - "research/e4-lifetime-artifact-inventory.json"
+      - "research/e4-wallet-identity-inventory.json"
+      - "research/e4-lifetime-source-reconciliation.json"
       - ".github/workflows/v12-e4-lifetime-ledger.yml"
   workflow_dispatch:
     inputs:
@@ -84,8 +86,18 @@ jobs:
                python -c 'import json; assert json.load(open("research/e4-lifetime-artifact-inventory.json"))["inventory_complete"] is True'; then
             flags+=(--artifact-inventory-complete)
           fi
-          [[ "$WALLET_COMPLETE" == "true" ]] && flags+=(--wallet-identity-inventory-complete)
-          [[ "$RECON_COMPLETE" == "true" ]] && flags+=(--source-reconciliation-complete)
+          if [[ "$WALLET_COMPLETE" == "true" ]]; then
+            flags+=(--wallet-identity-inventory-complete)
+          elif [[ -f research/e4-wallet-identity-inventory.json ]] && \
+               python -c 'import json; assert json.load(open("research/e4-wallet-identity-inventory.json"))["certified_complete"] is True'; then
+            flags+=(--wallet-identity-inventory-complete)
+          fi
+          if [[ "$RECON_COMPLETE" == "true" ]]; then
+            flags+=(--source-reconciliation-complete)
+          elif [[ -f research/e4-lifetime-source-reconciliation.json ]] && \
+               python -c 'import json; assert json.load(open("research/e4-lifetime-source-reconciliation.json"))["content_reconciliation_complete"] is True'; then
+            flags+=(--source-reconciliation-complete)
+          fi
           python scripts/v12_e4_lifetime_ledger.py             --minimum-expected-closed-trades "$TRADE_FLOOR"             --output models/e4/e4-lifetime-ledger.json             --report research/e4-lifetime-ledger.md             "${flags[@]}"
 
       - name: Verify fail-closed certification state
