@@ -27,6 +27,25 @@ def primary(name: str) -> bool:
 
 def grep_commit(sha: str) -> tuple[set[str], str | None]:
     try:
+        exists = subprocess.run(
+            ["git", "cat-file", "-e", f"{sha}^{commit}"],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=10,
+        )
+        if exists.returncode != 0:
+            fetched = subprocess.run(
+                ["git", "fetch", "--no-tags", "--depth=1", "origin", sha],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+                timeout=45,
+            )
+            if fetched.returncode != 0:
+                return set(), f"commit_fetch_failed:{fetched.stderr[-300:]}"
         proc = subprocess.run(
             ["git", "grep", "-h", "-E", "E4.*WALLET|WALLET.*E4", sha, "--", "*.py"],
             cwd=ROOT,
