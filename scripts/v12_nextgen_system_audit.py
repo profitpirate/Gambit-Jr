@@ -41,6 +41,7 @@ REQUIRED = (
     "src/memecoin_bot/v12_portal.py",
     "scripts/v12_creator_library_rebuild.py",
     "scripts/v12_e4_full_history.py",
+    "scripts/v12_e4_lifetime_ledger.py",
     "scripts/v12_supervisor.py",
     "scripts/v12_integrity_manifest.py",
     "scripts/v12_secret_scan.py",
@@ -182,6 +183,23 @@ def main() -> int:
         if legacy.get("active") is not False or legacy.get("creators") not in ({}, []):
             failures.append(f"legacy_creator_registry_not_empty:{path}")
 
+    lifetime_path = ROOT / "models/e4/e4-lifetime-ledger.json"
+    lifetime = load("models/e4/e4-lifetime-ledger.json") if lifetime_path.exists() else None
+    lifetime_ready = bool(
+        lifetime
+        and lifetime.get("status") == "CERTIFIED_COMPLETE"
+        and (lifetime.get("completeness") or {}).get("ready_for_nextgen_training") is True
+    )
+    library_history_certified = bool(
+        (library.get("activation") or {}).get("history_certified") is True
+    )
+    if lifetime is None:
+        failures.append("e4_lifetime_ledger_missing")
+    elif lifetime_ready != library_history_certified:
+        failures.append("creator_library_lifetime_certification_mismatch")
+    if library.get("history_source") == "E4_LIFETIME_LEDGER_CERTIFIED" and not lifetime_ready:
+        failures.append("creator_library_claims_uncertified_lifetime_history")
+
     causal = load("research/v12-pre-armed-100-causal-paper-live.json")
     if causal.get("real_money_execution") is not False:
         failures.append("causal_proof_real_money_enabled")
@@ -214,7 +232,7 @@ def main() -> int:
             failures.append("complete_e4_history_not_exhaustive")
 
     report = {
-        "version": "v12-nextgen-system-audit-v1",
+        "version": "v12-nextgen-system-audit-v2",
         "status": "PASS" if not failures else "FAIL",
         "failures": failures,
         "required_components": len(REQUIRED),
@@ -232,6 +250,21 @@ def main() -> int:
         "complete_e4_history": (
             complete_history.get("completeness") if complete_history else "PENDING"
         ),
+        "e4_lifetime_ledger": {
+            "status": lifetime.get("status") if lifetime else "MISSING",
+            "counts": lifetime.get("counts") if lifetime else None,
+            "completeness": lifetime.get("completeness") if lifetime else None,
+        },
+        "readiness": {
+            "engineering_cohesion": not failures,
+            "historical_intelligence_ready": lifetime_ready,
+            "creator_library_history_certified": library_history_certified,
+            "causal_100_complete": bool(
+                (causal.get("completion") or {}).get("reached")
+                and int((causal.get("metrics") or {}).get("closed_trades") or 0) >= 100
+            ),
+            "real_money_authorised": False,
+        },
         "causal_proof": {
             "closed_trades": (causal.get("metrics") or {}).get("closed_trades"),
             "real_money_execution": causal.get("real_money_execution"),
