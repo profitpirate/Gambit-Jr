@@ -1,0 +1,113 @@
+name: V12 E4 Lifetime Ledger
+
+on:
+  push:
+    branches:
+      - codex/v12-production-hardening-20260920
+    paths:
+      - "scripts/v12_e4_lifetime_ledger.py"
+      - "tests/test_v12_e4_lifetime_ledger.py"
+      - "models/e4/e4-complete-creator-history.json"
+      - "models/e4/e4-observed-v1.json"
+      - "models/e4/e4-v11-forward-evidence.json"
+      - "models/e4/e4-v12-forward-evidence.json"
+      - "models/e4/evidence-epochs/**"
+      - "research/v12-e4-48h-comparison.json"
+      - "artifacts/e4-v12-selection-backfill.json"
+      - ".github/workflows/v12-e4-lifetime-ledger.yml"
+  workflow_dispatch:
+    inputs:
+      artifact_inventory_complete:
+        description: "Historical GitHub Actions artifact inventory reconciled"
+        required: false
+        default: false
+        type: boolean
+      wallet_identity_inventory_complete:
+        description: "All historical E4 wallet identities reconciled"
+        required: false
+        default: false
+        type: boolean
+      source_reconciliation_complete:
+        description: "All known E4 ledgers/exports/artifacts reconciled"
+        required: false
+        default: false
+        type: boolean
+      minimum_expected_closed_trades:
+        description: "Fail-closed lower bound for lifetime closed trades"
+        required: false
+        default: "1000"
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v12-e4-lifetime-ledger
+  cancel-in-progress: true
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      ARTIFACT_COMPLETE: ${{ inputs.artifact_inventory_complete || false }}
+      WALLET_COMPLETE: ${{ inputs.wallet_identity_inventory_complete || false }}
+      RECON_COMPLETE: ${{ inputs.source_reconciliation_complete || false }}
+      TRADE_FLOOR: ${{ inputs.minimum_expected_closed_trades || '1000' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v12-production-hardening-20260920
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .[dev,research]
+
+      - name: Validate lifetime-ledger implementation
+        run: |
+          python -m py_compile scripts/v12_e4_lifetime_ledger.py
+          ruff check scripts/v12_e4_lifetime_ledger.py tests/test_v12_e4_lifetime_ledger.py
+          python -m pytest tests/test_v12_e4_lifetime_ledger.py -q
+
+      - name: Build fail-closed lifetime ledger
+        shell: bash
+        run: |
+          flags=()
+          [[ "$ARTIFACT_COMPLETE" == "true" ]] && flags+=(--artifact-inventory-complete)
+          [[ "$WALLET_COMPLETE" == "true" ]] && flags+=(--wallet-identity-inventory-complete)
+          [[ "$RECON_COMPLETE" == "true" ]] && flags+=(--source-reconciliation-complete)
+          python scripts/v12_e4_lifetime_ledger.py             --minimum-expected-closed-trades "$TRADE_FLOOR"             --output models/e4/e4-lifetime-ledger.json             --report research/e4-lifetime-ledger.md             "${flags[@]}"
+
+      - name: Verify fail-closed certification state
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open("models/e4/e4-lifetime-ledger.json"))
+          c=d["completeness"]
+          assert d["schema_version"] == "e4-lifetime-ledger-v1"
+          assert d["counts"]["closed_trade_records"] >= 0
+          if c["ready_for_nextgen_training"]:
+              assert d["status"] == "CERTIFIED_COMPLETE"
+              assert c["closed_trade_floor_met"]
+              assert c["historical_actions_artifact_inventory_complete"]
+              assert c["historical_e4_wallet_identity_inventory_complete"]
+              assert c["source_reconciliation_complete"]
+              assert not c["blockers"]
+          else:
+              assert d["status"] == "COLLECTING"
+              assert c["blockers"]
+          print(json.dumps({"status": d["status"], "counts": d["counts"], "blockers": c["blockers"]}, indent=2))
+          PY
+
+      - name: Commit lifetime ledger evidence
+        run: |
+          git config user.name 'gambit-e4-lifetime-ledger'
+          git config user.email 'actions@users.noreply.github.com'
+          git add models/e4/e4-lifetime-ledger.json research/e4-lifetime-ledger.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'data(v12): refresh fail-closed E4 lifetime ledger'
+            git pull --rebase origin codex/v12-production-hardening-20260920
+            git push origin HEAD:codex/v12-production-hardening-20260920
+          fi
