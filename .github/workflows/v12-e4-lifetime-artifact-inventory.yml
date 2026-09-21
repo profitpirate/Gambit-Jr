@@ -1,0 +1,95 @@
+name: V12 E4 Lifetime Artifact Inventory
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/v12-production-hardening-20260920
+    paths:
+      - ".github/workflows/v12-e4-lifetime-artifact-inventory.yml"
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: v12-e4-lifetime-artifact-inventory
+  cancel-in-progress: true
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v12-production-hardening-20260920
+          fetch-depth: 1
+
+      - name: Inventory every retained Actions artifact
+        run: |
+          mkdir -p research
+          gh api --paginate --slurp             "repos/$GITHUB_REPOSITORY/actions/artifacts?per_page=100"             > /tmp/artifact-pages.json
+          python - <<'PY'
+          import json, re, time
+          from pathlib import Path
+
+          pages=json.load(open("/tmp/artifact-pages.json"))
+          artifacts=[]
+          for page in pages:
+              artifacts.extend(page.get("artifacts") or [])
+
+          pattern=re.compile(
+              r"(?:^|[-_.])(e4|v10|v11|v12)(?:[-_.]|$)|"
+              r"pre.?armed|role.?model|oracle|creator|wallet|selection|forward",
+              re.I,
+          )
+          relevant=[]
+          for row in artifacts:
+              name=str(row.get("name") or "")
+              if not pattern.search(name):
+                  continue
+              relevant.append({
+                  "id": row.get("id"),
+                  "name": name,
+                  "size_in_bytes": row.get("size_in_bytes"),
+                  "expired": bool(row.get("expired")),
+                  "created_at": row.get("created_at"),
+                  "expires_at": row.get("expires_at"),
+                  "workflow_run_id": (row.get("workflow_run") or {}).get("id"),
+                  "workflow_run_head_branch": (row.get("workflow_run") or {}).get("head_branch"),
+                  "workflow_run_head_sha": (row.get("workflow_run") or {}).get("head_sha"),
+              })
+
+          nonexpired=[row for row in relevant if not row["expired"]]
+          payload={
+              "schema_version":"e4-lifetime-artifact-inventory-v1",
+              "generated_epoch":int(time.time()),
+              "all_retained_artifacts":len(artifacts),
+              "e4_relevant_artifacts":len(relevant),
+              "e4_relevant_nonexpired":len(nonexpired),
+              "e4_relevant_nonexpired_bytes":sum(int(row.get("size_in_bytes") or 0) for row in nonexpired),
+              "inventory_complete":True,
+              "content_reconciliation_complete":False,
+              "note":"Inventory completeness is metadata-only. Lifetime-history certification remains blocked until relevant artifact contents are reconciled.",
+              "artifacts":sorted(relevant,key=lambda row:(row.get("created_at") or "",row["id"] or 0)),
+          }
+          Path("research/e4-lifetime-artifact-inventory.json").write_text(
+              json.dumps(payload,indent=2,sort_keys=True)+"\n",
+              encoding="utf-8",
+          )
+          print(json.dumps({k:v for k,v in payload.items() if k!="artifacts"},indent=2))
+          PY
+
+      - name: Commit artifact inventory
+        run: |
+          git config user.name 'gambit-e4-artifact-inventory'
+          git config user.email 'actions@users.noreply.github.com'
+          git add research/e4-lifetime-artifact-inventory.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'data(v12): inventory retained E4 Actions artifacts'
+            git pull --rebase origin codex/v12-production-hardening-20260920
+            git push origin HEAD:codex/v12-production-hardening-20260920
+          fi
