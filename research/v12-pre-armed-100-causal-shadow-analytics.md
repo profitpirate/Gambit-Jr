@@ -7,9 +7,9 @@ This sidecar never changes V12 Pre-Armed selection, sizing, execution guards or 
 ## Creator concentration
 
 - Creators observed: 6
-- Effective creator count: 3.00
-- Top creator trade share: 53.33%
-- Top 3 trade share: 80.00%
+- Effective creator count: 2.33
+- Top creator trade share: 63.16%
+- Top 3 trade share: 84.21%
 
 ## Drift
 
@@ -18,32 +18,32 @@ This sidecar never changes V12 Pre-Armed selection, sizing, execution guards or 
 
 ## Bankroll risk simulation
 
-- Source trade samples: 15
-- 20% DD probability over 200 trades: 0.02%
+- Source trade samples: 19
+- 20% DD probability over 200 trades: 0.00%
 - Bankroll <= 1 SOL probability: 0.00%
 
 ## New creator shadow
 
-- Decisions scored: 291
+- Decisions scored: 322
 - Shadow eligible: 0
 
 ## Execution stress
 
-- 100ms_fee_1.0x: 11/15 filled, PnL +0.0186 SOL, PF 1.10
-- 100ms_fee_1.5x: 11/15 filled, PnL -0.0809 SOL, PF 0.63
-- 100ms_fee_2.0x: 11/15 filled, PnL -0.1783 SOL, PF 0.30
-- 10ms_fee_1.0x: 15/15 filled, PnL +0.5807 SOL, PF 3.43
-- 10ms_fee_1.5x: 15/15 filled, PnL +0.4318 SOL, PF 2.55
-- 10ms_fee_2.0x: 15/15 filled, PnL +0.2861 SOL, PF 1.89
-- 25ms_fee_1.0x: 12/15 filled, PnL +0.2185 SOL, PF 2.12
-- 25ms_fee_1.5x: 12/15 filled, PnL +0.1045 SOL, PF 1.46
-- 25ms_fee_2.0x: 12/15 filled, PnL -0.0070 SOL, PF 0.97
-- 50ms_fee_1.0x: 11/15 filled, PnL +0.0275 SOL, PF 1.15
-- 50ms_fee_1.5x: 11/15 filled, PnL -0.0722 SOL, PF 0.67
-- 50ms_fee_2.0x: 11/15 filled, PnL -0.1698 SOL, PF 0.34
-- 5ms_fee_1.0x: 15/15 filled, PnL +0.7291 SOL, PF 4.46
-- 5ms_fee_1.5x: 15/15 filled, PnL +0.5766 SOL, PF 3.31
-- 5ms_fee_2.0x: 15/15 filled, PnL +0.4273 SOL, PF 2.45
+- 100ms_fee_1.0x: 14/19 filled, PnL +0.0991 SOL, PF 1.46
+- 100ms_fee_1.5x: 14/19 filled, PnL -0.0324 SOL, PF 0.87
+- 100ms_fee_2.0x: 14/19 filled, PnL -0.1612 SOL, PF 0.48
+- 10ms_fee_1.0x: 19/19 filled, PnL +0.8031 SOL, PF 4.01
+- 10ms_fee_1.5x: 19/19 filled, PnL +0.6087 SOL, PF 2.92
+- 10ms_fee_2.0x: 19/19 filled, PnL +0.4185 SOL, PF 2.10
+- 25ms_fee_1.0x: 15/19 filled, PnL +0.3595 SOL, PF 2.62
+- 25ms_fee_1.5x: 15/19 filled, PnL +0.2120 SOL, PF 1.80
+- 25ms_fee_2.0x: 15/19 filled, PnL +0.0677 SOL, PF 1.21
+- 50ms_fee_1.0x: 14/19 filled, PnL +0.1684 SOL, PF 1.78
+- 50ms_fee_1.5x: 14/19 filled, PnL +0.0352 SOL, PF 1.14
+- 50ms_fee_2.0x: 14/19 filled, PnL -0.0951 SOL, PF 0.70
+- 5ms_fee_1.0x: 19/19 filled, PnL +1.0035 SOL, PF 5.21
+- 5ms_fee_1.5x: 19/19 filled, PnL +0.8042 SOL, PF 3.78
+- 5ms_fee_2.0x: 19/19 filled, PnL +0.6093 SOL, PF 2.73
 
 ## Integrity
 
@@ -53,4 +53,4 @@ This sidecar never changes V12 Pre-Armed selection, sizing, execution guards or 
 - Guardrail warnings: HIGH_RUNTIME_DEPENDENCY_ADVISORIES_8
 - Errors: none
 - Warnings: none
-- Processed shadow windows: 7
+- Processed shadow windows: 8
