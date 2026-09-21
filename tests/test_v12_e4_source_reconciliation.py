@@ -42,7 +42,7 @@ def test_missing_or_expired_primary_artifact_fails_closed() -> None:
         ]
     }
     recovery = {"manifest": [{"archive": "1.zip"}]}
-    result = subject.build(inv, recovery)
+    result = subject.build(inv, [recovery])
     assert result["content_reconciliation_complete"] is False
     assert result["missing_retained_primary_artifacts"] == 1
     assert result["expired_primary_artifacts"] == 1
