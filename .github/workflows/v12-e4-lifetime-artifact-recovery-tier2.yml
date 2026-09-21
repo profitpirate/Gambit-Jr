@@ -1,0 +1,172 @@
+name: V12 E4 Lifetime Artifact Recovery Tier 2
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/v12-production-hardening-20260920
+    paths:
+      - "scripts/v12_e4_artifact_recovery_merge.py"
+      - "tests/test_v12_e4_artifact_recovery_merge.py"
+      - ".github/workflows/v12-e4-lifetime-artifact-recovery-tier2.yml"
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: v12-e4-lifetime-artifact-recovery-tier2
+  cancel-in-progress: true
+
+jobs:
+  recover:
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0,1,2,3,4,5,6,7,8,9]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SHARDS: "10"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v12-production-hardening-20260920
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e .[dev,research]
+
+      - name: Validate recovery implementation
+        if: matrix.shard == 0
+        run: |
+          ruff check \
+            scripts/v12_e4_artifact_recovery.py \
+            scripts/v12_e4_artifact_recovery_merge.py \
+            tests/test_v12_e4_artifact_recovery.py \
+            tests/test_v12_e4_artifact_recovery_merge.py
+          python -m pytest -q \
+            tests/test_v12_e4_artifact_recovery.py \
+            tests/test_v12_e4_artifact_recovery_merge.py
+
+      - name: Select unrecovered primary artifacts for shard
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          python - <<'PY' > /tmp/shard.tsv
+          import json, os, sys
+          sys.path.insert(0, "scripts")
+          import v12_e4_source_reconciliation as recon
+
+          inv=json.load(open("research/e4-lifetime-artifact-inventory.json"))
+          rows=[
+              row for row in (inv.get("artifacts") or [])
+              if not row.get("expired")
+              and recon.is_primary(str(row.get("name") or ""))
+          ]
+          def tier1(row):
+              low=str(row.get("name") or "").lower()
+              size=int(row.get("size_in_bytes") or 0)
+              return (
+                  "full-wallet-history" in low
+                  or low.startswith("e4-live-market-stress")
+                  or low.startswith("e4-long-oracle-holdout")
+                  or low.startswith("e4-v11-forward-batch")
+                  or "creator-forensics" in low
+                  or "winning-creator-registry" in low
+                  or "creator-expectancy" in low
+                  or "recent-creator-recurrence" in low
+                  or "selection-research" in low
+                  or "selection-v2-certification" in low
+                  or (low.startswith("e4-v10-") and size <= 2_000_000)
+                  or (low.startswith("e4-v11-") and size <= 10_000_000)
+              )
+          rows=sorted(
+              [row for row in rows if not tier1(row)],
+              key=lambda row: (str(row.get("created_at") or ""), int(row["id"])),
+          )
+          shard=int(os.environ["SHARD"])
+          shards=int(os.environ["SHARDS"])
+          picked=[row for index,row in enumerate(rows) if index % shards == shard]
+          for row in picked:
+              print(f"{row['id']}\t{row['name']}")
+          print(
+              f"shard={shard} selected={len(picked)} bytes={sum(int(x.get('size_in_bytes') or 0) for x in picked)}",
+              file=sys.stderr,
+          )
+          PY
+
+      - name: Download shard artifacts
+        shell: bash
+        run: |
+          mkdir -p /tmp/e4-zips
+          while IFS=$'\t' read -r id name; do
+            [[ -z "$id" ]] && continue
+            echo "Downloading $id $name"
+            gh api "/repos/$GITHUB_REPOSITORY/actions/artifacts/$id/zip" > "/tmp/e4-zips/$id.zip"
+          done < /tmp/shard.tsv
+
+      - name: Recover shard evidence
+        run: |
+          python scripts/v12_e4_artifact_recovery.py \
+            --zip-root /tmp/e4-zips \
+            --output /tmp/tier2-part-${{ matrix.shard }}.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e4-tier2-recovery-${{ matrix.shard }}
+          path: /tmp/tier2-part-${{ matrix.shard }}.json
+          retention-days: 2
+
+  merge:
+    needs: recover
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v12-production-hardening-20260920
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e .[dev,research]
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: e4-tier2-recovery-*
+          path: /tmp/tier2-parts
+          merge-multiple: true
+
+      - name: Merge and verify Tier-2 evidence
+        run: |
+          python scripts/v12_e4_artifact_recovery_merge.py \
+            --part-root /tmp/tier2-parts \
+            --output models/e4/e4-lifetime-artifact-recovery-tier2.json
+          python - <<'PY'
+          import json
+          d=json.load(open("models/e4/e4-lifetime-artifact-recovery-tier2.json"))
+          assert d["artifact_archives_scanned"] == 98, d["artifact_archives_scanned"]
+          assert len(d["manifest"]) == 98, len(d["manifest"])
+          print(json.dumps({
+              "archives": d["artifact_archives_scanned"],
+              "closed_trades": d["closed_trade_records"],
+              "attempts": d["attempt_records"],
+          }, indent=2))
+          PY
+
+      - name: Commit Tier-2 evidence
+        run: |
+          git config user.name 'gambit-e4-artifact-recovery'
+          git config user.email 'actions@users.noreply.github.com'
+          git add models/e4/e4-lifetime-artifact-recovery-tier2.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'data(v12): recover tier-2 E4 forward history'
+            git push origin HEAD:codex/v12-production-hardening-20260920
+          fi
+
+      - name: Dispatch source reconciliation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run v12-e4-source-reconciliation.yml --ref codex/v12-production-hardening-20260920
