@@ -42,6 +42,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: v12-e4-lifetime-ledger
@@ -118,3 +119,8 @@ jobs:
             git pull --rebase origin codex/v12-production-hardening-20260920
             git push origin HEAD:codex/v12-production-hardening-20260920
           fi
+
+      - name: Dispatch canonical creator rebuild
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run v12-canonical-creator-library.yml --ref codex/v12-production-hardening-20260920
