@@ -103,9 +103,19 @@ def causal_100_passed(state: Mapping[str, Any]) -> bool:
     )
 
 
+def lifetime_history_certified(library: Mapping[str, Any]) -> bool:
+    activation = library.get("activation") or {}
+    return bool(
+        activation.get("history_certified") is True
+        and str(library.get("history_source") or "")
+        == "E4_LIFETIME_LEDGER_CERTIFIED"
+    )
+
+
 def promoted_library_activation_allowed(
     state: Mapping[str, Any],
     *,
+    library: Mapping[str, Any] | None = None,
     environment: Mapping[str, str] | None = None,
 ) -> bool:
     env = environment if environment is not None else os.environ
@@ -115,4 +125,5 @@ def promoted_library_activation_allowed(
         "yes",
         "on",
     }
-    return requested and causal_100_passed(state)
+    history_ok = True if library is None else lifetime_history_certified(library)
+    return requested and causal_100_passed(state) and history_ok
