@@ -182,3 +182,51 @@ def test_complete_history_rejects_low_confidence_creator_identity() -> None:
     promoted = {row["creator"] for row in result["promoted"]}
     assert "uncertain" not in promoted
     assert "certain" in promoted
+
+
+def test_certified_lifetime_ledger_is_authoritative_over_provisional_union() -> None:
+    expectancy = {"top_creators": [e4("legacy", 5, 0, 5.0)]}
+    complete = {
+        "completeness": {"union_trades": 450},
+        "creators": [e4("provisional", 4, 0, 4.0)],
+    }
+    lifetime = {
+        "status": "CERTIFIED_COMPLETE",
+        "completeness": {"ready_for_nextgen_training": True},
+        "counts": {"closed_trade_records": 2345},
+        "creators": [e4("lifetime", 3, 0, 3.0)],
+    }
+    apprentice = {
+        "creators": {},
+        "counts": {"unknown_launch_observations": 0},
+        "observations": [],
+    }
+    result = subject.build(expectancy, apprentice, complete, lifetime)
+    assert result["history_source"] == "E4_LIFETIME_LEDGER_CERTIFIED"
+    assert result["activation"]["history_certified"] is True
+    assert result["activation"]["lifetime_closed_trades"] == 2345
+    assert {row["creator"] for row in result["promoted"]} == {"lifetime"}
+
+
+def test_uncertified_lifetime_ledger_keeps_library_provisional_and_disabled() -> None:
+    expectancy = {"top_creators": []}
+    complete = {
+        "completeness": {"union_trades": 450},
+        "creators": [e4("provisional", 2, 0, 1.0)],
+    }
+    lifetime = {
+        "status": "COLLECTING",
+        "completeness": {"ready_for_nextgen_training": False},
+        "counts": {"closed_trade_records": 900},
+        "creators": [e4("should-not-be-authority", 9, 0, 9.0)],
+    }
+    apprentice = {
+        "creators": {},
+        "counts": {"unknown_launch_observations": 0},
+        "observations": [],
+    }
+    result = subject.build(expectancy, apprentice, complete, lifetime)
+    assert result["history_source"] == "PROVISIONAL_COMPLETE_ONCHAIN_UNION"
+    assert result["activation"]["history_certified"] is False
+    assert result["activation"]["enabled_now"] is False
+    assert {row["creator"] for row in result["promoted"]} == {"provisional"}
