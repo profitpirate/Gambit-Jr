@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import math
 import os
 import threading
@@ -11,6 +12,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Mapping
+
+LOGGER = logging.getLogger("gambit.e4.pipeline.v11")
 
 
 @dataclass(frozen=True, slots=True)
@@ -276,8 +279,8 @@ class PipelineManager:
                 source=str(payload.get("source") or "e4-wallet"),
             )
             self.teacher.observe(observation)
-        except Exception:
-            pass
+        except Exception:  # noqa: BLE001 - observation enrichment must not kill hot path
+            LOGGER.exception("E4 learner observation failed mint=%s", mint)
         return signal
 
     def observe_e4_exit(
