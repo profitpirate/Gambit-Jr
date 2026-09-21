@@ -44,6 +44,7 @@ jobs:
           python scripts/v12_e4_source_reconciliation.py \
             --inventory research/e4-lifetime-artifact-inventory.json \
             --recovery models/e4/e4-lifetime-artifact-recovery.json \
+            --recovery models/e4/e4-lifetime-artifact-recovery-tier2.json \
             --output research/e4-lifetime-source-reconciliation.json
 
       - name: Commit reconciliation evidence
