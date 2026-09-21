@@ -3,12 +3,12 @@
   "creator_registry_profiles": 184,
   "iterations": 1000000,
   "workers": 16,
-  "elapsed_seconds": 137.67140223799993,
-  "operations_per_second": 7263.672656367998,
-  "decision_p50_ns": 57276,
-  "decision_p95_ns": 78535,
-  "decision_p99_ns": 96263,
-  "decision_max_ns": 1312459785,
+  "elapsed_seconds": 179.95951898600003,
+  "operations_per_second": 5556.8052506174745,
+  "decision_p50_ns": 87103,
+  "decision_p95_ns": 113863,
+  "decision_p99_ns": 134050,
+  "decision_max_ns": 1378780917,
   "decision_budget_ns": 36000000,
   "decision_budget_pass": true,
   "decision_correctness_failures": 0,
@@ -22,15 +22,23 @@
   "narrative": {
     "iterations": 250000,
     "matches": 250000,
-    "p50_ns": 9733777,
-    "p95_ns": 10490772,
-    "p99_ns": 11034879,
-    "max_ns": 479464788
+    "p50_ns": 12645831,
+    "p95_ns": 14885329,
+    "p99_ns": 16619770,
+    "max_ns": 414795390
   },
   "narrative_budget_pass": true,
   "pipeline_metrics": {
-    "available": false,
-    "reason": "canonical_v11_manager_has_no_metrics_surface"
+    "available": true,
+    "decisions": 250000,
+    "accepted": 0,
+    "rejected": 250000,
+    "acceptance_rate": 0.0,
+    "decision_ns_mean": 13487.136056,
+    "decision_ns_max": 136086869,
+    "family_counts": {
+      "identity_only_reject": 250000
+    }
   },
   "selected_test_creators": {
     "elite": "4devFPRkWUTknomCHr1uMbfJLn111nKB3GDjH811JP4L",
