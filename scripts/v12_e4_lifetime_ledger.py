@@ -27,6 +27,7 @@ DEFAULT_SOURCES = (
     Path("models/e4/e4-v12-forward-evidence.json"),
     Path("research/v12-e4-48h-comparison.json"),
     Path("artifacts/e4-v12-selection-backfill.json"),
+    Path("models/e4/e4-lifetime-artifact-recovery.json"),
 )
 POSITION_KEYS = ("same_window_e4_positions", "e4_positions")
 
