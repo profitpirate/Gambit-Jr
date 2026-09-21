@@ -37,7 +37,7 @@ on:
       minimum_expected_closed_trades:
         description: "Fail-closed lower bound for lifetime closed trades"
         required: false
-        default: "1000"
+        default: "2000"
         type: string
 
 permissions:
@@ -55,7 +55,7 @@ jobs:
       ARTIFACT_COMPLETE: ${{ inputs.artifact_inventory_complete || false }}
       WALLET_COMPLETE: ${{ inputs.wallet_identity_inventory_complete || false }}
       RECON_COMPLETE: ${{ inputs.source_reconciliation_complete || false }}
-      TRADE_FLOOR: ${{ inputs.minimum_expected_closed_trades || '1000' }}
+      TRADE_FLOOR: ${{ inputs.minimum_expected_closed_trades || '2000' }}
     steps:
       - uses: actions/checkout@v4
         with:
