@@ -22,6 +22,28 @@ import v12_e4_lifetime_ledger as ledger
 MAX_JSON_BYTES = 64 * 1024 * 1024
 
 
+def nested_documents(
+    payload: dict[str, Any],
+    *,
+    prefix: str = "root",
+    depth: int = 0,
+) -> list[tuple[str, dict[str, Any]]]:
+    """Expose nested mappings without traversing huge raw-event lists."""
+    found = [(prefix, payload)]
+    if depth >= 5:
+        return found
+    for key, value in payload.items():
+        if isinstance(value, dict):
+            found.extend(
+                nested_documents(
+                    value,
+                    prefix=f"{prefix}.{key}",
+                    depth=depth + 1,
+                )
+            )
+    return found
+
+
 def scan_zip(path: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
     trades: list[dict[str, Any]] = []
     attempts: list[dict[str, Any]] = []
@@ -45,13 +67,15 @@ def scan_zip(path: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]], di
             if not isinstance(payload, dict):
                 continue
             documents += 1
-            source = f"artifact://{path.stem}/{info.filename}"
-            found_trades, found_attempts, found_claims = ledger.extract_document(
-                source, payload
-            )
-            trades.extend(found_trades)
-            attempts.extend(found_attempts)
-            claims += len(found_claims)
+            base_source = f"artifact://{path.stem}/{info.filename}"
+            for nested_path, candidate in nested_documents(payload):
+                source = f"{base_source}#{nested_path}"
+                found_trades, found_attempts, found_claims = ledger.extract_document(
+                    source, candidate
+                )
+                trades.extend(found_trades)
+                attempts.extend(found_attempts)
+                claims += len(found_claims)
 
     return trades, attempts, {
         "archive": path.name,
