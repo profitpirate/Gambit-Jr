@@ -7,50 +7,50 @@ This sidecar never changes V12 Pre-Armed selection, sizing, execution guards or 
 ## Creator concentration
 
 - Creators observed: 9
-- Effective creator count: 3.37
-- Top creator trade share: 51.22%
-- Top 3 trade share: 70.73%
+- Effective creator count: 3.54
+- Top creator trade share: 48.84%
+- Top 3 trade share: 72.09%
 
 ## Drift
 
-- Drift status: YELLOW
-- Flags: TOP_CREATOR_OVER_50_PERCENT
+- Drift status: GREEN
+- Flags: none
 
 ## Bankroll risk simulation
 
-- Source trade samples: 41
+- Source trade samples: 43
 - 20% DD probability over 200 trades: 0.01%
 - Bankroll <= 1 SOL probability: 0.00%
 
 ## New creator shadow
 
-- Decisions scored: 732
+- Decisions scored: 766
 - Shadow eligible: 0
 
 ## Execution stress
 
-- 100ms_fee_1.0x: 32/41 filled, PnL -0.0907 SOL, PF 0.87
-- 100ms_fee_1.5x: 32/41 filled, PnL -0.4235 SOL, PF 0.50
-- 100ms_fee_2.0x: 32/41 filled, PnL -0.7492 SOL, PF 0.28
-- 10ms_fee_1.0x: 40/41 filled, PnL +1.1410 SOL, PF 2.73
-- 10ms_fee_1.5x: 40/41 filled, PnL +0.6972 SOL, PF 1.84
-- 10ms_fee_2.0x: 40/41 filled, PnL +0.2629 SOL, PF 1.26
-- 25ms_fee_1.0x: 34/41 filled, PnL +0.3000 SOL, PF 1.43
-- 25ms_fee_1.5x: 34/41 filled, PnL -0.0638 SOL, PF 0.93
-- 25ms_fee_2.0x: 34/41 filled, PnL -0.4199 SOL, PF 0.60
-- 50ms_fee_1.0x: 32/41 filled, PnL -0.0212 SOL, PF 0.97
-- 50ms_fee_1.5x: 32/41 filled, PnL -0.3562 SOL, PF 0.59
-- 50ms_fee_2.0x: 32/41 filled, PnL -0.6841 SOL, PF 0.35
-- 5ms_fee_1.0x: 41/41 filled, PnL +1.8950 SOL, PF 4.04
-- 5ms_fee_1.5x: 41/41 filled, PnL +1.4216 SOL, PF 2.80
-- 5ms_fee_2.0x: 41/41 filled, PnL +0.9584 SOL, PF 1.98
+- 100ms_fee_1.0x: 34/43 filled, PnL -0.1789 SOL, PF 0.76
+- 100ms_fee_1.5x: 34/43 filled, PnL -0.5335 SOL, PF 0.45
+- 100ms_fee_2.0x: 34/43 filled, PnL -0.8805 SOL, PF 0.25
+- 10ms_fee_1.0x: 42/43 filled, PnL +1.0531 SOL, PF 2.41
+- 10ms_fee_1.5x: 42/43 filled, PnL +0.5875 SOL, PF 1.63
+- 10ms_fee_2.0x: 42/43 filled, PnL +0.1319 SOL, PF 1.12
+- 25ms_fee_1.0x: 36/43 filled, PnL +0.2118 SOL, PF 1.27
+- 25ms_fee_1.5x: 36/43 filled, PnL -0.1737 SOL, PF 0.82
+- 25ms_fee_2.0x: 36/43 filled, PnL -0.5511 SOL, PF 0.53
+- 50ms_fee_1.0x: 34/43 filled, PnL -0.1093 SOL, PF 0.86
+- 50ms_fee_1.5x: 34/43 filled, PnL -0.4661 SOL, PF 0.52
+- 50ms_fee_2.0x: 34/43 filled, PnL -0.8153 SOL, PF 0.31
+- 5ms_fee_1.0x: 43/43 filled, PnL +1.8073 SOL, PF 3.54
+- 5ms_fee_1.5x: 43/43 filled, PnL +1.3121 SOL, PF 2.46
+- 5ms_fee_2.0x: 43/43 filled, PnL +0.8275 SOL, PF 1.75
 
 ## Integrity
 
 - Reliability status: PASS
 - Guardrail state: WATCH
 - Guardrail halts: none
-- Guardrail warnings: 50MS_EXECUTION_STRESS_NET_NEGATIVE, HIGH_RUNTIME_DEPENDENCY_ADVISORIES_8, MODEL_DRIFT_YELLOW
+- Guardrail warnings: 50MS_EXECUTION_STRESS_NET_NEGATIVE, HIGH_RUNTIME_DEPENDENCY_ADVISORIES_8
 - Errors: none
 - Warnings: none
-- Processed shadow windows: 23
+- Processed shadow windows: 24
