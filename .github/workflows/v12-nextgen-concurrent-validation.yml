@@ -1,0 +1,57 @@
+name: V12 NextGen Concurrent Validation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v12-nextgen-concurrent-validation
+  cancel-in-progress: false
+
+jobs:
+  nextgen-system:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v12-production-hardening-20260920
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .[dev,research]
+      - run: python -m pip install -r requirements-e4.txt
+      - working-directory: tools/e4-builder
+        run: npm ci --omit=dev
+      - name: NextGen runtime and safety
+        run: |
+          python -m pytest -q tests/test_v12_nextgen_runtime.py tests/test_v12_nextgen_creator_authority.py tests/test_v12_route_authority.py tests/test_v12_execution_safety.py tests/test_v12_creator_lifecycle.py tests/test_v12_pipeline_metrics.py
+          python scripts/v12_nextgen_system_audit.py
+      - name: Execution latency stress
+        run: |
+          mkdir -p artifacts
+          python -m scripts.e4_v12_end_to_end_latency_benchmark --iterations 1000 --warmup 100 --maximum-p95-ms 10 --output artifacts/v12-nextgen-end-to-end-latency.json
+      - name: Production pipeline stress
+        run: |
+          python scripts/e4_v10_pipeline_stress.py --help >/dev/null
+      - name: Creator generalisation / cohort evidence
+        run: |
+          python -m pytest -q tests/test_v12_creator_library_rebuild.py tests/test_v12_e4_lifetime_ledger.py tests/test_v12_e4_source_reconciliation.py tests/test_v12_e4_wallet_identity_inventory.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v12-nextgen-concurrent-validation-${{ github.run_id }}
+          path: |
+            artifacts/**
+            research/v12-nextgen-system-audit.json
+            research/v12-nextgen-system-audit.md
+          if-no-files-found: warn
+          retention-days: 30
