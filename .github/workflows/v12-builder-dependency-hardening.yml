@@ -8,34 +8,86 @@ on:
     paths:
       - "tools/e4-builder/package.json"
       - "tools/e4-builder/package-lock.json"
+      - "tools/e4-builder/vendor/**"
+      - "tools/e4-builder/*.mjs"
       - ".github/workflows/v12-builder-dependency-hardening.yml"
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: v12-builder-dependency-hardening
+  cancel-in-progress: true
 
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
           ref: codex/v12-production-hardening-20260920
+          fetch-depth: 0
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
           cache-dependency-path: tools/e4-builder/package-lock.json
+
+      - name: Resolve and normalize production dependency graph
+        working-directory: tools/e4-builder
+        run: |
+          npm install --package-lock-only --ignore-scripts
+          npm audit fix --package-lock-only --omit=dev --ignore-scripts || true
+
       - name: Deterministic production install
         working-directory: tools/e4-builder
         run: npm ci --omit=dev
-      - name: Fail on high or critical production vulnerabilities
-        working-directory: tools/e4-builder
-        run: npm audit --omit=dev --audit-level=high
-      - name: Builder syntax and self-tests
+
+      - name: Security compatibility regression tests
         working-directory: tools/e4-builder
         run: |
+          npm run test:security-shim
+          npm run test:guard
           node --check race-proxy-v3.mjs
           node --check strict-race-proxy-v12.mjs
           node --check fast-preload-v4.mjs
           node race-proxy-v3.mjs --self-test
+          node strict-race-proxy-v12.mjs --self-test
+
+      - name: Require zero production npm vulnerabilities
+        working-directory: tools/e4-builder
+        run: |
+          mkdir -p ../../artifacts
+          npm audit --omit=dev --json > ../../artifacts/v12-builder-npm-audit.json || true
+          node - <<'NODE'
+          const fs = require("node:fs");
+          const report = JSON.parse(fs.readFileSync("../../artifacts/v12-builder-npm-audit.json", "utf8"));
+          const vulnerabilities = (report.metadata && report.metadata.vulnerabilities) || {};
+          console.log(JSON.stringify({vulnerabilities}, null, 2));
+          const total = Number(vulnerabilities.total || 0);
+          if (total !== 0) {
+            console.error("Production dependency audit is not clean.");
+            process.exit(1);
+          }
+          NODE
+
+      - name: Persist resolved lockfile only after clean audit
+        run: |
+          git config user.name 'gambit-v12-security'
+          git config user.email 'actions@users.noreply.github.com'
+          git add tools/e4-builder/package-lock.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'security(v12): lock clean builder dependency graph [skip ci]'
+            git pull --rebase origin codex/v12-production-hardening-20260920
+            git push origin HEAD:codex/v12-production-hardening-20260920
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v12-builder-npm-audit-${{ github.run_id }}
+          path: artifacts/v12-builder-npm-audit.json
+          if-no-files-found: warn
+          retention-days: 30
