@@ -24,7 +24,7 @@ This sidecar never changes V12 Pre-Armed selection, sizing, execution guards or 
 
 ## New creator shadow
 
-- Decisions scored: 950
+- Decisions scored: 1004
 - Shadow eligible: 0
 
 ## Execution stress
@@ -53,4 +53,4 @@ This sidecar never changes V12 Pre-Armed selection, sizing, execution guards or 
 - Guardrail warnings: HIGH_RUNTIME_DEPENDENCY_ADVISORIES_8
 - Errors: none
 - Warnings: none
-- Processed shadow windows: 31
+- Processed shadow windows: 32
