@@ -4,6 +4,7 @@ import {existsSync} from "node:fs";
 import {createInterface} from "node:readline";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
+import {protectLine} from "./strict-output-guard-v12.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "../..");
@@ -120,6 +121,19 @@ if (process.argv.includes("--self-test")) {
   const input = createInterface({input: process.stdin, crlfDelay: Infinity});
   input.on("line", (line) => {
     if (!line.trim()) return;
+    let guardedLine;
+    try {
+      guardedLine = protectLine(line);
+    } catch (error) {
+      let requestId = error?.request_id || null;
+      if (!requestId) {
+        try { requestId = JSON.parse(line).request_id || null; } catch {}
+      }
+      process.stdout.write(
+        JSON.stringify({request_id: requestId, error: error?.stack || String(error)}) + "\n",
+      );
+      return;
+    }
     generation += 1;
     const id = generation;
     const item = {
@@ -138,7 +152,7 @@ if (process.argv.includes("--self-test")) {
       const queue = generationsByChild.get(index) || [];
       queue.push(id);
       generationsByChild.set(index, queue);
-      if (child?.stdin?.writable) child.stdin.write(line.endsWith("\n") ? line : `${line}\n`);
+      if (child?.stdin?.writable) child.stdin.write(`${guardedLine}\n`);
       else settle(id, JSON.stringify({ok: false, error: `builder child ${index} unavailable`}), false);
     });
   });
