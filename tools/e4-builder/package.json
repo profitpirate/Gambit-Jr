@@ -10,7 +10,8 @@
     "@pump-fun/pump-sdk": "2.0.0",
     "@solana/spl-token": "0.4.15",
     "@solana/web3.js": "1.99.0",
-    "bn.js": "5.2.5"
+    "bn.js": "5.2.5",
+    "bigint-buffer": "file:vendor/bigint-buffer-safe"
   },
   "scripts": {
     "start": "node daemon.mjs",
@@ -20,6 +21,8 @@
     "audit:production": "npm audit --omit=dev"
   },
   "overrides": {
-    "bigint-buffer": "file:vendor/bigint-buffer-safe"
+    "bigint-buffer": "$bigint-buffer",
+    "jayson": "5.0.0",
+    "toml": "5.0.0"
   }
 }
