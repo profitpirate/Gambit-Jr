@@ -1,0 +1,41 @@
+name: V12 Builder Dependency Hardening
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/v12-production-hardening-20260920
+    paths:
+      - "tools/e4-builder/package.json"
+      - "tools/e4-builder/package-lock.json"
+      - ".github/workflows/v12-builder-dependency-hardening.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v12-production-hardening-20260920
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: tools/e4-builder/package-lock.json
+      - name: Deterministic production install
+        working-directory: tools/e4-builder
+        run: npm ci --omit=dev
+      - name: Fail on high or critical production vulnerabilities
+        working-directory: tools/e4-builder
+        run: npm audit --omit=dev --audit-level=high
+      - name: Builder syntax and self-tests
+        working-directory: tools/e4-builder
+        run: |
+          node --check race-proxy-v3.mjs
+          node --check strict-race-proxy-v12.mjs
+          node --check fast-preload-v4.mjs
+          node race-proxy-v3.mjs --self-test
