@@ -99,7 +99,9 @@ jobs:
             tests/test_v12_security.py \
             tests/test_v12_backup.py \
             tests/test_v12_execution_safety.py \
-            tests/test_v12_creator_lifecycle.py \\
+            tests/test_v12_creator_lifecycle.py \
+            tests/test_v12_axiom_wallet.py \
+            tests/test_v12_production_deployment_audit.py \\
             tests/test_v12_axiom_wallet.py \\
             tests/test_v12_production_deployment_audit.py
           ruff check \
@@ -185,7 +187,21 @@ jobs:
 
       - name: Builder production dependency security
         working-directory: tools/e4-builder
-        run: npm audit --omit=dev --audit-level=high
+        run: |
+          npm ci --omit=dev
+          npm run test:security-shim
+          npm run test:guard
+          node --check strict-output-guard-v12.mjs
+          node --check race-proxy-v3.mjs
+          node --check strict-race-proxy-v12.mjs
+          npm audit --omit=dev --json > ../../research/v12-builder-npm-audit-system-audit.json || true
+          node - <<'NODE'
+          const fs = require("node:fs");
+          const report = JSON.parse(fs.readFileSync("../../research/v12-builder-npm-audit-system-audit.json", "utf8"));
+          const v = (report.metadata && report.metadata.vulnerabilities) || {};
+          console.log(JSON.stringify(v));
+          if (Number(v.total || 0) !== 0) process.exit(1);
+          NODE
 
       - name: Full repository regression suite
         run: python -m pytest -q
