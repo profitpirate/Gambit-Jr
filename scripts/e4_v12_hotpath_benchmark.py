@@ -68,6 +68,8 @@ async def benchmark(iterations: int, warmup: int) -> dict[str, Any]:
     keypair = Keypair()
     guard_ms: list[float] = []
     build_ms: list[float] = []
+    builder_internal_ms: list[float] = []
+    builder_overhead_ms: list[float] = []
     sign_ms: list[float] = []
     prebroadcast_ms: list[float] = []
     errors: list[str] = []
@@ -112,6 +114,8 @@ async def benchmark(iterations: int, warmup: int) -> dict[str, Any]:
             response = json.loads(line)
             if response.get("error"):
                 raise RuntimeError(str(response["error"]))
+            internal_build_ms = max(0.0, float(response.get("build_ns") or 0.0) / 1_000_000.0)
+            external_build_ms = (build_completed - guard_completed) / 1_000_000.0
             raw = base64.b64decode(response["transaction_base64"], validate=True)
             transaction = VersionedTransaction.from_bytes(raw)
             sign_started = time.perf_counter_ns()
@@ -121,7 +125,9 @@ async def benchmark(iterations: int, warmup: int) -> dict[str, Any]:
                 raise RuntimeError("empty signature")
             if index >= warmup:
                 guard_ms.append((guard_completed - guard_started) / 1_000_000.0)
-                build_ms.append((build_completed - guard_completed) / 1_000_000.0)
+                build_ms.append(external_build_ms)
+                builder_internal_ms.append(internal_build_ms)
+                builder_overhead_ms.append(max(0.0, external_build_ms - internal_build_ms))
                 sign_ms.append((sign_completed - sign_started) / 1_000_000.0)
                 prebroadcast_ms.append((sign_completed - started) / 1_000_000.0)
     except Exception as exc:
@@ -140,6 +146,8 @@ async def benchmark(iterations: int, warmup: int) -> dict[str, Any]:
         "warmup": warmup,
         "guard": summary(guard_ms),
         "build": summary(build_ms),
+        "builder_internal": summary(builder_internal_ms),
+        "builder_ipc_scheduler_overhead": summary(builder_overhead_ms),
         "sign": summary(sign_ms),
         "prebroadcast": summary(prebroadcast_ms),
         "errors": errors,
