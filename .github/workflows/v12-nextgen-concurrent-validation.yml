@@ -46,7 +46,9 @@ jobs:
             tests/test_v12_route_authority.py \
             tests/test_v12_execution_safety.py \
             tests/test_v12_creator_lifecycle.py \
-            tests/test_v12_pipeline_metrics.py
+            tests/test_v12_pipeline_metrics.py \
+            tests/test_v12_axiom_wallet.py \
+            tests/test_v12_production_deployment_audit.py
           python scripts/v12_nextgen_system_audit.py
       - uses: actions/upload-artifact@v4
         if: always()
@@ -80,12 +82,19 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -e .[dev,research]
       - run: python -m pip install -r requirements-e4.txt
-      - working-directory: tools/e4-builder
-        run: npm ci --omit=dev
+      - name: Secure deterministic builder install
+        working-directory: tools/e4-builder
+        run: |
+          npm ci --omit=dev
+          npm run test:security-shim
+          npm run test:guard
+          npm audit --omit=dev
       - name: Execution safety and guarded end-to-end latency
         run: |
           mkdir -p artifacts
           python -m pytest -q tests/test_v12_execution_safety.py tests/test_v12_transport.py tests/test_v12_tight_output.py tests/test_v12_strict_output_deferred.py
+          node --check tools/e4-builder/strict-output-guard-v12.mjs
+          node --check tools/e4-builder/race-proxy-v3.mjs
           node --check tools/e4-builder/strict-race-proxy-v12.mjs
           python -m scripts.e4_v12_end_to_end_latency_benchmark \
             --iterations 1000 \
