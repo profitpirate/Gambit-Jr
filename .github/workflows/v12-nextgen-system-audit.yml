@@ -99,7 +99,9 @@ jobs:
             tests/test_v12_security.py \
             tests/test_v12_backup.py \
             tests/test_v12_execution_safety.py \
-            tests/test_v12_creator_lifecycle.py
+            tests/test_v12_creator_lifecycle.py \\
+            tests/test_v12_axiom_wallet.py \\
+            tests/test_v12_production_deployment_audit.py
           ruff check \
             src/memecoin_bot/access_store.py \
             src/memecoin_bot/access_service.py \
@@ -177,6 +179,13 @@ jobs:
             tests/test_v12_backup.py \
             tests/test_v12_execution_safety.py \
             tests/test_v12_creator_lifecycle.py
+
+      - name: Production deployment contract audit
+        run: python scripts/v12_production_deployment_audit.py
+
+      - name: Builder production dependency security
+        working-directory: tools/e4-builder
+        run: npm audit --omit=dev --audit-level=high
 
       - name: Full repository regression suite
         run: python -m pytest -q
