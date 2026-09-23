@@ -2,10 +2,10 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.5",
-  "serialNumber": "urn:uuid:9095c66a-969d-4640-b350-20c214648db3",
+  "serialNumber": "urn:uuid:2fbef939-17e8-4b70-970c-d51217cd6b10",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-09-23T19:54:52.248Z",
+    "timestamp": "2026-09-23T23:40:45.286Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -19,12 +19,12 @@
       }
     ],
     "component": {
-      "bom-ref": "gambit-e4-builder@2.1.1",
+      "bom-ref": "gambit-e4-builder@2.2.0",
       "type": "library",
       "name": "e4-builder",
-      "version": "2.1.1",
+      "version": "2.2.0",
       "scope": "required",
-      "purl": "pkg:npm/gambit-e4-builder@2.1.1",
+      "purl": "pkg:npm/gambit-e4-builder@2.2.0",
       "properties": [
         {
           "name": "cdx:npm:package:path",
@@ -328,14 +328,14 @@
       ]
     },
     {
-      "bom-ref": "@pump-fun/pump-sdk@1.37.0",
+      "bom-ref": "@pump-fun/pump-sdk@2.0.0",
       "type": "library",
       "name": "@pump-fun/pump-sdk",
-      "version": "1.37.0",
+      "version": "2.0.0",
       "scope": "required",
       "author": "pump-fun",
       "description": "Pump Bonding Curve SDK",
-      "purl": "pkg:npm/%40pump-fun/pump-sdk@1.37.0",
+      "purl": "pkg:npm/%40pump-fun/pump-sdk@2.0.0",
       "properties": [
         {
           "name": "cdx:npm:package:path",
@@ -345,7 +345,7 @@
       "externalReferences": [
         {
           "type": "distribution",
-          "url": "https://registry.npmjs.org/@pump-fun/pump-sdk/-/pump-sdk-1.37.0.tgz"
+          "url": "https://registry.npmjs.org/@pump-fun/pump-sdk/-/pump-sdk-2.0.0.tgz"
         },
         {
           "type": "vcs",
@@ -363,7 +363,7 @@
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "f6dad67cfb3f9d3fdda54e84d60a10172e20c331fad63eac450ab03089f99cb873ed24074b263db3a8d1cc70a45216c82dccd08675e761e88f927faf1ff090a7"
+          "content": "a83b54c7fd5e1c9978b8ca1fddbc5327f62a28da7e1ed5e82167e6380ad00f5d55a7e65bd006472e877492d8a2eed737b80c11b60d46a2d7a8b93d329cce7c61"
         }
       ],
       "licenses": [
@@ -1777,52 +1777,6 @@
       ]
     },
     {
-      "bom-ref": "bigint-buffer@1.1.5",
-      "type": "library",
-      "name": "bigint-buffer",
-      "version": "1.1.5",
-      "scope": "required",
-      "description": "bigint to buffer conversion with native support",
-      "purl": "pkg:npm/bigint-buffer@1.1.5",
-      "properties": [
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/bigint-buffer"
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "distribution",
-          "url": "https://registry.npmjs.org/bigint-buffer/-/bigint-buffer-1.1.5.tgz"
-        },
-        {
-          "type": "vcs",
-          "url": "git+https://github.com/no2chem/bigint-buffer.git"
-        },
-        {
-          "type": "website",
-          "url": "https://github.com/no2chem/bigint-buffer#readme"
-        },
-        {
-          "type": "issue-tracker",
-          "url": "https://github.com/no2chem/bigint-buffer/issues"
-        }
-      ],
-      "hashes": [
-        {
-          "alg": "SHA-512",
-          "content": "b6b7d8728e80a19fab2a12a7c40d21817d0701b54ffecf34f3f12e0d27b6243cd49c2a7fc40b258b7e4eaef93aed4ad311cc2ec59a9864399f036457260c55bc"
-        }
-      ],
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ]
-    },
-    {
       "bom-ref": "bignumber.js@9.3.1",
       "type": "library",
       "name": "bignumber.js",
@@ -1859,53 +1813,6 @@
         {
           "alg": "SHA-512",
           "content": "2a8d2e5f5e682144bbc09dd16f7d05b3a4a455b2e63c100a7659bbabdf9a93d6db21e15fd0cc2e06c415eb3efe5fbebcfdc1ec7e0f96972b03589726b618ec8d"
-        }
-      ],
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ]
-    },
-    {
-      "bom-ref": "bindings@1.5.0",
-      "type": "library",
-      "name": "bindings",
-      "version": "1.5.0",
-      "scope": "required",
-      "author": "Nathan Rajlich",
-      "description": "Helper module for loading your native module's .node file",
-      "purl": "pkg:npm/bindings@1.5.0",
-      "properties": [
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/bindings"
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "distribution",
-          "url": "https://registry.npmjs.org/bindings/-/bindings-1.5.0.tgz"
-        },
-        {
-          "type": "vcs",
-          "url": "git://github.com/TooTallNate/node-bindings.git"
-        },
-        {
-          "type": "website",
-          "url": "https://github.com/TooTallNate/node-bindings"
-        },
-        {
-          "type": "issue-tracker",
-          "url": "https://github.com/TooTallNate/node-bindings/issues"
-        }
-      ],
-      "hashes": [
-        {
-          "alg": "SHA-512",
-          "content": "a76abfb7f9a1bee3a3fd478b955eb9eba183fe0ba8c25af4847c42948d16f66ecc59890bd45d212e8fb401ec6cf4748f0ad4754974344c3dcc30aad765a8db89"
         }
       ],
       "licenses": [
@@ -2573,34 +2480,6 @@
       ]
     },
     {
-      "bom-ref": "eyes@0.1.8",
-      "type": "library",
-      "name": "eyes",
-      "version": "0.1.8",
-      "scope": "required",
-      "author": "Alexis Sellier",
-      "description": "a customizable value inspector",
-      "purl": "pkg:npm/eyes@0.1.8",
-      "properties": [
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/eyes"
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "distribution",
-          "url": "https://registry.npmjs.org/eyes/-/eyes-0.1.8.tgz"
-        }
-      ],
-      "hashes": [
-        {
-          "alg": "SHA-512",
-          "content": "1a2a723ec5ced5a9f36b400e65dcbaf489bb846142341ed8fcd1a30e564627718924bb703526f6bebcd8ad360946b465a15c7ba65f9b85469307cca271c3ef15"
-        }
-      ]
-    },
-    {
       "bom-ref": "fast-stable-stringify@1.0.0",
       "type": "library",
       "name": "fast-stable-stringify",
@@ -2690,53 +2569,6 @@
         {
           "license": {
             "id": "CC0-1.0"
-          }
-        }
-      ]
-    },
-    {
-      "bom-ref": "file-uri-to-path@1.0.0",
-      "type": "library",
-      "name": "file-uri-to-path",
-      "version": "1.0.0",
-      "scope": "required",
-      "author": "Nathan Rajlich",
-      "description": "Convert a file: URI to a file path",
-      "purl": "pkg:npm/file-uri-to-path@1.0.0",
-      "properties": [
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/file-uri-to-path"
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "distribution",
-          "url": "https://registry.npmjs.org/file-uri-to-path/-/file-uri-to-path-1.0.0.tgz"
-        },
-        {
-          "type": "vcs",
-          "url": "git://github.com/TooTallNate/file-uri-to-path.git"
-        },
-        {
-          "type": "website",
-          "url": "https://github.com/TooTallNate/file-uri-to-path"
-        },
-        {
-          "type": "issue-tracker",
-          "url": "https://github.com/TooTallNate/file-uri-to-path/issues"
-        }
-      ],
-      "hashes": [
-        {
-          "alg": "SHA-512",
-          "content": "d19b7eb372fb55fd5b8b0599dbd6804625582f1ee23069c4525f71df77db07f8f78d1f35bbf3b62dba8af819b508348d0ca56d27f623c18ed351de5291e2d02f"
-        }
-      ],
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
           }
         }
       ]
@@ -2883,14 +2715,14 @@
       ]
     },
     {
-      "bom-ref": "jayson@4.3.0",
+      "bom-ref": "jayson@5.0.0",
       "type": "library",
       "name": "jayson",
-      "version": "4.3.0",
+      "version": "5.0.0",
       "scope": "required",
       "author": "Tedde Lundgren",
       "description": "JSON-RPC 1.0/2.0 compliant server and client",
-      "purl": "pkg:npm/jayson@4.3.0",
+      "purl": "pkg:npm/jayson@5.0.0",
       "properties": [
         {
           "name": "cdx:npm:package:path",
@@ -2900,7 +2732,7 @@
       "externalReferences": [
         {
           "type": "distribution",
-          "url": "https://registry.npmjs.org/jayson/-/jayson-4.3.0.tgz"
+          "url": "https://registry.npmjs.org/jayson/-/jayson-5.0.0.tgz"
         },
         {
           "type": "vcs",
@@ -2918,7 +2750,7 @@
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "01abb31dc51caacf0e0670873a4258dbcd156938829b9ec06ee3bb96acdcc3b25aa468f9d018ac137c6192cc9ee33953491d7ed6d033ebbc0b4e5f2d107d686d"
+          "content": "16087139694907964fb11b2e305d54e061478e425f3846129481e923a5ade8c5c8cefa96568d0aa65eff48c7d8dfabd682003e6fe2f4f734463fa9b844e5672a"
         }
       ],
       "licenses": [
@@ -3535,100 +3367,6 @@
       ]
     },
     {
-      "bom-ref": "stream-chain@2.2.5",
-      "type": "library",
-      "name": "stream-chain",
-      "version": "2.2.5",
-      "scope": "required",
-      "author": "Eugene Lazutkin",
-      "description": "Chain functions as transform streams.",
-      "purl": "pkg:npm/stream-chain@2.2.5",
-      "properties": [
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/stream-chain"
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "distribution",
-          "url": "https://registry.npmjs.org/stream-chain/-/stream-chain-2.2.5.tgz"
-        },
-        {
-          "type": "vcs",
-          "url": "git+https://github.com/uhop/stream-chain.git"
-        },
-        {
-          "type": "website",
-          "url": "https://github.com/uhop/stream-chain#readme"
-        },
-        {
-          "type": "issue-tracker",
-          "url": "https://github.com/uhop/stream-chain/issues"
-        }
-      ],
-      "hashes": [
-        {
-          "alg": "SHA-512",
-          "content": "d53266071e9a496a99e2dc7b693a410d72b4fdeda185c3524d5f3e09b149b438db6fe235999f251e2b741abc3d1914fee896c8aeb0ddf1eb27720062f1a05718"
-        }
-      ],
-      "licenses": [
-        {
-          "license": {
-            "id": "BSD-3-Clause"
-          }
-        }
-      ]
-    },
-    {
-      "bom-ref": "stream-json@1.9.1",
-      "type": "library",
-      "name": "stream-json",
-      "version": "1.9.1",
-      "scope": "required",
-      "author": "Eugene Lazutkin",
-      "description": "stream-json is the micro-library of Node.js stream components for creating custom JSON processing pipelines with a minimal memory footprint. It can parse JSON files far exceeding available memory streaming individual primitives using a SAX-inspired API. Includes utilities to stream JSON database dumps.",
-      "purl": "pkg:npm/stream-json@1.9.1",
-      "properties": [
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/stream-json"
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "distribution",
-          "url": "https://registry.npmjs.org/stream-json/-/stream-json-1.9.1.tgz"
-        },
-        {
-          "type": "vcs",
-          "url": "git://github.com/uhop/stream-json.git"
-        },
-        {
-          "type": "website",
-          "url": "http://github.com/uhop/stream-json"
-        },
-        {
-          "type": "issue-tracker",
-          "url": "http://github.com/uhop/stream-json/issues"
-        }
-      ],
-      "hashes": [
-        {
-          "alg": "SHA-512",
-          "content": "b9692327ed8db7f2cef59fc9c8a65b32eb0bf03921f7bb94053bf700943be32d3b9556a12d8e1e105b0fb04f7ba71601c2bf279e330021c8797aa23480f4a1cb"
-        }
-      ],
-      "licenses": [
-        {
-          "license": {
-            "id": "BSD-3-Clause"
-          }
-        }
-      ]
-    },
-    {
       "bom-ref": "superstruct@0.15.5",
       "type": "library",
       "name": "superstruct",
@@ -3715,14 +3453,14 @@
       ]
     },
     {
-      "bom-ref": "toml@3.0.0",
+      "bom-ref": "toml@5.0.0",
       "type": "library",
       "name": "toml",
-      "version": "3.0.0",
+      "version": "5.0.0",
       "scope": "required",
       "author": "Michelle Tilley",
-      "description": "TOML parser for Node.js (parses TOML spec v0.4.0)",
-      "purl": "pkg:npm/toml@3.0.0",
+      "description": "TOML parser for Node.js (TOML v1.1.0 compliant)",
+      "purl": "pkg:npm/toml@5.0.0",
       "properties": [
         {
           "name": "cdx:npm:package:path",
@@ -3732,7 +3470,7 @@
       "externalReferences": [
         {
           "type": "distribution",
-          "url": "https://registry.npmjs.org/toml/-/toml-3.0.0.tgz"
+          "url": "https://registry.npmjs.org/toml/-/toml-5.0.0.tgz"
         },
         {
           "type": "vcs",
@@ -3750,7 +3488,7 @@
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "cbf9960998a79efc634ca62127ea58c700f49912d5bceb5d4b60306e0c659fa8849ede2b934c81c5e4811e418970fb9c4621b47b9e66c16a7e83fd39aecaddeb"
+          "content": "6eca8477e83b7f396bc3b2c4ca743a5ba68e2bf9533a57a9cf9c75b09c8857d7d3655252d90efa9ee8eee852be819856e5b529bc1ee6084a9d474bb85b388c17"
         }
       ],
       "licenses": [
@@ -3996,52 +3734,6 @@
       ]
     },
     {
-      "bom-ref": "uuid@8.3.2",
-      "type": "library",
-      "name": "uuid",
-      "version": "8.3.2",
-      "scope": "required",
-      "description": "RFC4122 (v1, v4, and v5) UUIDs",
-      "purl": "pkg:npm/uuid@8.3.2",
-      "properties": [
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/uuid"
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "distribution",
-          "url": "https://registry.npmjs.org/uuid/-/uuid-8.3.2.tgz"
-        },
-        {
-          "type": "vcs",
-          "url": "git+https://github.com/uuidjs/uuid.git"
-        },
-        {
-          "type": "website",
-          "url": "https://github.com/uuidjs/uuid#readme"
-        },
-        {
-          "type": "issue-tracker",
-          "url": "https://github.com/uuidjs/uuid/issues"
-        }
-      ],
-      "hashes": [
-        {
-          "alg": "SHA-512",
-          "content": "f8d62cd9078c5b2f865853849bdc679fa1c20e9d25ed0043ee697cccb52627ef77439345d0da1c12b9f09139175453625f7fdfa42e9a7d2f0385bfe0cfb47b7a"
-        }
-      ],
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ]
-    },
-    {
       "bom-ref": "webidl-conversions@3.0.1",
       "type": "library",
       "name": "webidl-conversions",
@@ -4181,16 +3873,37 @@
           }
         }
       ]
+    },
+    {
+      "bom-ref": "bigint-buffer@1.1.6-gambit.1",
+      "type": "library",
+      "name": "bigint-buffer-safe",
+      "version": "1.1.6-gambit.1",
+      "scope": "required",
+      "description": "Gambit-maintained pure-JS compatibility replacement for bigint-buffer; no native addon.",
+      "purl": "pkg:npm/bigint-buffer@1.1.6-gambit.1",
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "vendor/bigint-buffer-safe"
+        },
+        {
+          "name": "cdx:npm:package:private",
+          "value": "true"
+        }
+      ],
+      "externalReferences": []
     }
   ],
   "dependencies": [
     {
-      "ref": "gambit-e4-builder@2.1.1",
+      "ref": "gambit-e4-builder@2.2.0",
       "dependsOn": [
-        "@pump-fun/pump-sdk@1.37.0",
+        "@pump-fun/pump-sdk@2.0.0",
         "@solana/spl-token@0.4.15",
         "@solana/web3.js@1.99.0",
-        "bn.js@5.2.5"
+        "bn.js@5.2.5",
+        "bigint-buffer@1.1.6-gambit.1"
       ]
     },
     {
@@ -4212,7 +3925,7 @@
         "eventemitter3@4.0.7",
         "pako@2.2.0",
         "superstruct@0.15.5",
-        "toml@3.0.0"
+        "toml@5.0.0"
       ]
     },
     {
@@ -4247,7 +3960,7 @@
       ]
     },
     {
-      "ref": "@pump-fun/pump-sdk@1.37.0",
+      "ref": "@pump-fun/pump-sdk@2.0.0",
       "dependsOn": [
         "@coral-xyz/anchor@0.31.1",
         "@pump-fun/pump-swap-sdk@1.20.0",
@@ -4293,7 +4006,7 @@
       "dependsOn": [
         "@solana/buffer-layout@4.0.1",
         "@solana/web3.js@1.99.0",
-        "bigint-buffer@1.1.5",
+        "bigint-buffer@1.1.6-gambit.1",
         "bignumber.js@9.3.1"
       ]
     },
@@ -4400,7 +4113,7 @@
         "bs58@4.0.1",
         "buffer@6.0.3",
         "fast-stable-stringify@1.0.0",
-        "jayson@4.3.0",
+        "jayson@5.0.0",
         "node-fetch@2.7.0",
         "rpc-websockets@9.3.9",
         "superstruct@2.0.2"
@@ -4480,20 +4193,12 @@
       "dependsOn": []
     },
     {
-      "ref": "bigint-buffer@1.1.5",
-      "dependsOn": [
-        "bindings@1.5.0"
-      ]
+      "ref": "bigint-buffer@1.1.6-gambit.1",
+      "dependsOn": []
     },
     {
       "ref": "bignumber.js@9.3.1",
       "dependsOn": []
-    },
-    {
-      "ref": "bindings@1.5.0",
-      "dependsOn": [
-        "file-uri-to-path@1.0.0"
-      ]
     },
     {
       "ref": "bn.js@5.2.5",
@@ -4567,19 +4272,11 @@
       "dependsOn": []
     },
     {
-      "ref": "eyes@0.1.8",
-      "dependsOn": []
-    },
-    {
       "ref": "fast-stable-stringify@1.0.0",
       "dependsOn": []
     },
     {
       "ref": "fastestsmallesttextencoderdecoder@1.0.22",
-      "dependsOn": []
-    },
-    {
-      "ref": "file-uri-to-path@1.0.0",
       "dependsOn": []
     },
     {
@@ -4599,7 +4296,7 @@
       ]
     },
     {
-      "ref": "jayson@4.3.0",
+      "ref": "jayson@5.0.0",
       "dependsOn": [
         "@types/connect@3.4.38",
         "@types/node@12.20.55",
@@ -4607,11 +4304,8 @@
         "commander@2.20.3",
         "delay@5.0.0",
         "es6-promisify@5.0.0",
-        "eyes@0.1.8",
         "isomorphic-ws@4.0.1",
         "json-stringify-safe@5.0.1",
-        "stream-json@1.9.1",
-        "uuid@8.3.2",
         "ws@7.5.13"
       ]
     },
@@ -4687,16 +4381,6 @@
       "dependsOn": []
     },
     {
-      "ref": "stream-chain@2.2.5",
-      "dependsOn": []
-    },
-    {
-      "ref": "stream-json@1.9.1",
-      "dependsOn": [
-        "stream-chain@2.2.5"
-      ]
-    },
-    {
       "ref": "superstruct@0.15.5",
       "dependsOn": []
     },
@@ -4705,7 +4389,7 @@
       "dependsOn": []
     },
     {
-      "ref": "toml@3.0.0",
+      "ref": "toml@5.0.0",
       "dependsOn": []
     },
     {
@@ -4729,10 +4413,6 @@
       "dependsOn": [
         "node-gyp-build@4.8.4"
       ]
-    },
-    {
-      "ref": "uuid@8.3.2",
-      "dependsOn": []
     },
     {
       "ref": "webidl-conversions@3.0.1",
