@@ -1,19 +1,25 @@
 {
   "name": "gambit-e4-builder",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "private": true,
   "type": "module",
   "engines": {
     "node": ">=22"
   },
   "dependencies": {
-    "@pump-fun/pump-sdk": "1.37.0",
+    "@pump-fun/pump-sdk": "2.0.0",
     "@solana/spl-token": "0.4.15",
     "@solana/web3.js": "1.99.0",
     "bn.js": "5.2.5"
   },
   "scripts": {
     "start": "node daemon.mjs",
-    "postinstall": "node patch-anchor-bn-import.mjs"
+    "postinstall": "node patch-anchor-bn-import.mjs",
+    "test:security-shim": "node vendor/bigint-buffer-safe/test.cjs",
+    "test:guard": "node strict-output-guard-v12.test.mjs",
+    "audit:production": "npm audit --omit=dev"
+  },
+  "overrides": {
+    "bigint-buffer": "file:vendor/bigint-buffer-safe"
   }
 }
