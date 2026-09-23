@@ -1,19 +1,19 @@
 {
   "audit_counts": {
-    "creator_seed_below_floor": 110,
+    "creator_seed_below_floor": 112,
     "execution_entry_output_guard_rejected": 11,
     "mayhem": 52,
-    "not_prearmed_handle": 119,
-    "selected_candidates": 66,
+    "not_prearmed_handle": 121,
+    "selected_candidates": 67,
     "social_age_outside_window": 12,
-    "unknown_creator": 98641
+    "unknown_creator": 101636
   },
   "completion": {
     "reached": false,
-    "remaining": 45,
+    "remaining": 44,
     "required_closed_trades": 100
   },
-  "ending_bankroll_sol": 5.3921595244834855,
+  "ending_bankroll_sol": 5.278949860910428,
   "golden_thesis_approved": false,
   "ledger": [
     {
@@ -1885,22 +1885,56 @@
       "social_status_id": "2102810806890987908",
       "tweet_age_seconds": 0.713549714,
       "win": false
+    },
+    {
+      "costs_sol": {
+        "axiom_entry": 0.004993643882836899,
+        "axiom_exit": 0.004147860168011514,
+        "base_priority_bribe_entry": 0.002005,
+        "base_priority_exit": 0.001005,
+        "pump_entry": 0.00657058405636434,
+        "pump_exit": 0.005457710747383571,
+        "total_axiom": 0.009141504050848414,
+        "total_fixed_execution": 0.0030099999999999997,
+        "total_pump": 0.01202829480374791
+      },
+      "create_to_fill_price_multiple": 1.3273832874196507,
+      "creator": "29yFzeBZgxf5zqrAkKXwgZtQehRf4pL8WbV2nRJikbw8",
+      "creator_seed_sol": 3.0,
+      "curve_input_sol": 0.5256467245091473,
+      "decision_ns": 1790188485707018279,
+      "entry_budget_sol": 0.5392159524483485,
+      "entry_cost_sol": 0.5392159524483485,
+      "entry_latency_ms": 5.0,
+      "exit_ns": 1790188487712018279,
+      "exit_reason": "MAXIMUM_HOLD",
+      "exit_transactions": 1,
+      "fill_ns": 1790188485712018279,
+      "mint": "5HbiPrVaAEvxBMoCWFd44x8HQBq7V7mrWuHfmGUB2ZDe",
+      "output_ratio": 0.7549247345821811,
+      "pnl_sol": -0.11320966357305784,
+      "proceeds_sol": 0.4260062888752907,
+      "run_id": "35899596742",
+      "social_handle": "ddddddd8a",
+      "social_status_id": "2102829033771741297",
+      "tweet_age_seconds": 0.725018279,
+      "win": false
     }
   ],
   "metrics": {
     "acceptance_gate_passed": false,
-    "capture_windows": 26,
-    "closed_trades": 55,
-    "ending_bankroll_sol": 5.403214524483486,
-    "losses": 23,
+    "capture_windows": 27,
+    "closed_trades": 56,
+    "ending_bankroll_sol": 5.290004860910429,
+    "losses": 24,
     "maximum_closed_equity_drawdown_fraction": 0.08592783090982763,
-    "net_pnl_sol": 2.4032145244834866,
-    "profit_factor": 3.587537270608858,
-    "total_axiom_fees_sol": 0.47101489810064034,
-    "total_fixed_execution_costs_sol": 0.19569999999999999,
-    "total_pump_fees_sol": 0.6197564448692636,
-    "wilson_lower_bound": 0.45033103735230756,
-    "win_rate": 0.5818181818181818,
+    "net_pnl_sol": 2.290004860910429,
+    "profit_factor": 3.1977544566335347,
+    "total_axiom_fees_sol": 0.4801564021514888,
+    "total_fixed_execution_costs_sol": 0.19870999999999997,
+    "total_pump_fees_sol": 0.6317847396730115,
+    "wilson_lower_bound": 0.4413762073081304,
+    "win_rate": 0.5714285714285714,
     "wins": 32
   },
   "model_sha256": "69df86eaf386fd37d699928a95d25aaeb2053e743b59c9e687c8a7c49d14f977",
@@ -1937,7 +1971,8 @@
     "35831910119",
     "35849903039",
     "35868617605",
-    "35885641832"
+    "35885641832",
+    "35899596742"
   ],
   "production_authorised": false,
   "production_paths_changed": 0,
