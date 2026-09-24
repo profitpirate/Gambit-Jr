@@ -2,7 +2,7 @@
 
 ## Sole authority
 
-`memecoin_bot.e4_live` is a separate live order authority. The order path does not consult
+`memecoin_bot.e4_exec` is the sole production live authority. `e4_live` is the internal engine core and is not an operator entrypoint. The order path does not consult
 `RunnerDecision`, CONTROL_V15, legacy scoring, WATCH/STRONG tiers, narrative, social data, Discord, or
 slow enrichment.
 
@@ -67,15 +67,21 @@ Pump/PumpSwap SDK implementation without touching E4 selection, sizing, route ra
 
 ## Signer
 
-The recommended signer loads an operator-owned Solana keypair from a read-only mounted file:
+Production signing uses the external HashiCorp Vault Transit Ed25519 signer:
 
 ```text
-E4_KEYPAIR_PATH=/run/secrets/e4-solana-keypair.json
+V12_SIGNER_SECRET_REF=vault://transit/gambit-live
+E4_SIGNER_COMMAND=python -m memecoin_bot.v12_vault_signer
+VAULT_ADDR=https://vault.example.invalid
+VAULT_TOKEN_FILE=/run/secrets/vault-token
 ```
 
-The file must match `E4_WALLET_PUBLIC_KEY`. The key is never persisted in Gambit databases, logs,
-Discord, GitHub, prompts, or the transaction builder. An external local signer can instead implement
-this stdin/stdout contract:
+The Solana private key is non-exportable and is not mounted into Gambit. The signer verifies that the
+Vault public key matches `E4_WALLET_PUBLIC_KEY` and locally verifies every returned Ed25519 signature
+before the signed transaction can reach the route racer. A local keypair path is disabled by the V12
+live-readiness gate unless an operator explicitly opts into the development-only override.
+
+The signer implements this stdin/stdout contract:
 
 Request:
 
@@ -107,13 +113,12 @@ private staked RPC, and direct RPC can therefore be benchmarked using actual lan
 ```bash
 cp .env.e4.example .env.e4
 python -m pip install -r requirements-e4.txt
-cd tools/e4-builder && npm install --omit=dev && cd ../..
-python -m memecoin_bot.e4_live migrate
-E4_LIVE=true python -m memecoin_bot.e4_live run --live
+cd tools/e4-builder && npm ci --omit=dev && cd ../..
+python -m memecoin_bot.e4_exec migrate
+E4_LIVE=true python -m memecoin_bot.e4_exec run --live
 ```
 
-Both `E4_LIVE=true` and `--live` are required to prevent an accidental local command from signing with
-a mounted wallet. This is an acknowledgement interlock, not a paper/shadow trading mode.
+Both `E4_LIVE=true` and `--live` are required, and V12 additionally refuses live startup until the 100-trade causal gate, arm token, external signer, redundant routes/RPCs, notifications, encrypted backups, audit key, integrity manifest, database checks and kill-switch checks all pass. This is a fail-closed production interlock, not a paper/shadow mode.
 
 Do not paste a seed phrase, private key, Axiom login, Phantom login, Apple login, or Google login into
 ChatGPT, Codex, Discord, GitHub, `.env`, source code, or screenshots.
