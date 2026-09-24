@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 from memecoin_bot.v12_execution_journal import ExecutionJournal
-from memecoin_bot.v12_recovery import reconcile_journal
+from memecoin_bot.v12_recovery import reconcile_journal, reconcile_positions
 from memecoin_bot.v12_safety import CircuitBreaker, SafetyMode, SafetyStore
 
 
@@ -132,3 +132,80 @@ async def test_uncertain_recovery_consumes_retry_budget_once(tmp_path: Path) -> 
     assert after_second.attempts == 2
     assert sender.calls == [("tx", "sig")]
     assert safety.snapshot().mode == SafetyMode.EXIT_ONLY
+
+
+class PositionRpc:
+    def __init__(self, live_tokens: float):
+        self.live_tokens = live_tokens
+
+    async def token_balance(self, wallet, mint):
+        del wallet, mint
+        return self.live_tokens
+
+
+class PositionStore:
+    def __init__(self):
+        self.saved = []
+
+    def save_position(self, position):
+        self.saved.append(position)
+
+
+@pytest.mark.asyncio
+async def test_position_recovery_never_increases_tracked_exposure(tmp_path: Path) -> None:
+    journal = ExecutionJournal(tmp_path / "e4.db")
+    position = SimpleNamespace(
+        mint="m",
+        tokens=100.0,
+        remaining=50.0,
+        status="EXITING",
+    )
+    store = PositionStore()
+    engine = SimpleNamespace(
+        positions={"m": position},
+        rpc=PositionRpc(80.0),
+        signer=SimpleNamespace(wallet="wallet"),
+        store=store,
+        position_status_open="OPEN",
+        position_status_partial="PARTIAL",
+        position_status_closed="CLOSED",
+    )
+    breaker = CircuitBreaker(SafetyStore(journal.conn))
+
+    result = await reconcile_positions(engine, journal, breaker)
+
+    assert result == (1, 0, 0)
+    assert position.remaining == 50.0
+    assert position.status == "PARTIAL"
+    assert store.saved[-1] is position
+
+
+@pytest.mark.asyncio
+async def test_position_recovery_keeps_exiting_while_sell_is_unresolved(tmp_path: Path) -> None:
+    journal = ExecutionJournal(tmp_path / "e4.db")
+    entry = journal.prepare("sell-pending", {"side": "SELL", "mint": "m", "amount": 25.0})
+    journal.mark_signed(entry.idempotency_key, signed_tx_b64="tx", signature="sig")
+    journal.mark_submitted(entry.idempotency_key)
+    journal.mark_failed(entry.idempotency_key, "timeout", terminal=False)
+
+    position = SimpleNamespace(
+        mint="m",
+        tokens=100.0,
+        remaining=50.0,
+        status="EXITING",
+    )
+    engine = SimpleNamespace(
+        positions={"m": position},
+        rpc=PositionRpc(50.0),
+        signer=SimpleNamespace(wallet="wallet"),
+        store=PositionStore(),
+        position_status_open="OPEN",
+        position_status_partial="PARTIAL",
+        position_status_closed="CLOSED",
+    )
+    breaker = CircuitBreaker(SafetyStore(journal.conn))
+
+    await reconcile_positions(engine, journal, breaker)
+
+    assert position.remaining == 50.0
+    assert position.status == "EXITING"
