@@ -1,0 +1,62 @@
+name: E4 builder secure lock refresh
+
+on:
+  push:
+    branches:
+      - codex/e4-v12-flow-survival-hazard-v12
+    paths:
+      - "tools/e4-builder/package.json"
+      - "tools/e4-builder/vendor/**"
+      - "tools/e4-builder/safe-bigint-self-test.mjs"
+      - ".github/workflows/e4-builder-secure-lock.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: e4-builder-secure-lock
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/e4-v12-flow-survival-hazard-v12
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Regenerate lockfile from hardened dependency policy
+        working-directory: tools/e4-builder
+        run: npm install --package-lock-only --ignore-scripts
+      - name: Clean install exact lock
+        working-directory: tools/e4-builder
+        run: npm ci --omit=dev
+      - name: Safe bigint compatibility test
+        working-directory: tools/e4-builder
+        run: npm run security:self-test
+      - name: Native local builder construction self-test
+        working-directory: tools/e4-builder
+        env:
+          E4_LOCAL_PUMP_BUILDER: "true"
+          E4_REMOTE_BUILDER_FALLBACK: "false"
+        run: node race-proxy-v3.mjs --self-test
+      - name: High severity dependency gate
+        working-directory: tools/e4-builder
+        run: npm audit --omit=dev --audit-level=high
+      - name: Persist verified lockfile
+        run: |
+          if git diff --quiet -- tools/e4-builder/package-lock.json; then
+            echo "Lockfile already current."
+            exit 0
+          fi
+          git config user.name "gambit-security-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add tools/e4-builder/package-lock.json
+          git commit -m "security(builder): refresh verified production lock [skip ci]"
+          git pull --rebase origin codex/e4-v12-flow-survival-hazard-v12
+          git push origin HEAD:codex/e4-v12-flow-survival-hazard-v12
