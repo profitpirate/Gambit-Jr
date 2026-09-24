@@ -6,15 +6,15 @@ This is an untouched forward paper test. It does not place real trades or modify
 
 ## Progress
 
-- Closed trades: 78 / 100
-- Wins: 47
-- Win rate: 60.26%
-- Wilson lower bound: 49.16%
-- Net PnL: +3.729927828 SOL
-- Ending bankroll: 6.729927828 SOL
-- Profit factor: 3.8570
+- Closed trades: 80 / 100
+- Wins: 48
+- Win rate: 60.00%
+- Wilson lower bound: 49.05%
+- Net PnL: +3.682834099 SOL
+- Ending bankroll: 6.682834099 SOL
+- Profit factor: 3.5908
 - Maximum closed-equity drawdown: 8.59%
-- Capture windows: 36
+- Capture windows: 37
 
 ## Execution costs included
 
@@ -23,9 +23,9 @@ This is an untouched forward paper test. It does not place real trades or modify
 - Priority fee: 0.001000 SOL per transaction
 - Buy MEV bribe: 0.001000 SOL
 - Solana base fee: 0.000005 SOL per transaction
-- Total Axiom fees charged: 0.741529427 SOL
-- Total Pump fees charged: 0.975696615 SOL
-- Total fixed execution costs charged: 0.277995000 SOL
+- Total Axiom fees charged: 0.766727560 SOL
+- Total Pump fees charged: 1.008852052 SOL
+- Total fixed execution costs charged: 0.285020000 SOL
 
 ## Integrity
 
