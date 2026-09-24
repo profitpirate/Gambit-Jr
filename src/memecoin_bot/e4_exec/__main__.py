@@ -27,7 +27,7 @@ from memecoin_bot.e4_runtime_services_v10 import (  # noqa: E402
     start_runtime_services,
     stop_runtime_services,
 )
-from memecoin_bot.e4_final import main  # noqa: E402
+from memecoin_bot.e4_final import main as _engine_main  # noqa: E402
 from memecoin_bot.v12_live_readiness import run_live_readiness  # noqa: E402
 
 E4_V12_ROLE_MODEL_POLICY_SHA256 = "2eb324971185c4eacf09ca57c8e06609028381edd03e68c702a0a88e57600ea6"
@@ -66,7 +66,13 @@ def _start_v12_pipelines() -> None:
     atexit.register(stop_runtime_services)
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Canonical CLI wrapper; every live invocation passes the V12 readiness gate."""
     _preflight_live_if_requested()
-    _start_v12_pipelines()
+    if len(sys.argv) > 1 and sys.argv[1] == "run":
+        _start_v12_pipelines()
+    _engine_main()
+
+
+if __name__ == "__main__":
     main()
