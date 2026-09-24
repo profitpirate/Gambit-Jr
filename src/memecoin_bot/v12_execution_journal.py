@@ -171,7 +171,7 @@ class ExecutionJournal:
             """
             UPDATE v12_execution_journal
             SET state='SUBMITTED',attempts=attempts+1,updated_ns=?
-            WHERE idempotency_key=? AND state IN ('SIGNED','SUBMITTED')
+            WHERE idempotency_key=? AND state IN ('SIGNED','SUBMITTED','UNCERTAIN')
             """,
             (time.time_ns(), key),
         )
@@ -191,7 +191,7 @@ class ExecutionJournal:
             """
             UPDATE v12_execution_journal
             SET state=?,error=?,updated_ns=?
-            WHERE idempotency_key=?
+            WHERE idempotency_key=? AND state NOT IN ('CONFIRMED','FAILED_TERMINAL')
             """,
             (
                 "FAILED_TERMINAL" if terminal else "UNCERTAIN",
@@ -212,13 +212,35 @@ class ExecutionJournal:
         ).fetchone()
         return self._entry(row) if row is not None else None
 
-    def recoverable(self) -> list[JournalEntry]:
+    def recoverable(
+        self,
+        states: tuple[str, ...] = ("SIGNED", "SUBMITTED", "UNCERTAIN"),
+    ) -> list[JournalEntry]:
+        allowed = {"SIGNED", "SUBMITTED", "UNCERTAIN"}
+        selected = tuple(state for state in states if state in allowed)
+        if not selected:
+            return []
+        placeholders = ",".join("?" for _ in selected)
+        rows = self.conn.execute(
+            f"""
+            SELECT * FROM v12_execution_journal
+            WHERE state IN ({placeholders})
+            ORDER BY created_ns
+            """,
+            selected,
+        ).fetchall()
+        return [self._entry(row) for row in rows]
+
+    def unresolved_for(self, side: str, mint: str | None) -> list[JournalEntry]:
         rows = self.conn.execute(
             """
             SELECT * FROM v12_execution_journal
             WHERE state IN ('SIGNED','SUBMITTED','UNCERTAIN')
+              AND side=?
+              AND ((? IS NULL AND mint IS NULL) OR mint=?)
             ORDER BY created_ns
-            """
+            """,
+            (str(side), mint, mint),
         ).fetchall()
         return [self._entry(row) for row in rows]
 
