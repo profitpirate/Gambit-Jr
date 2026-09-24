@@ -19,6 +19,21 @@ REQUIRED_FILES = [
     "scripts/v12_supervisor.py",
 ]
 FORBIDDEN_ENV = ["AXIOM_PASSWORD", "AXIOM_SESSION", "AXIOM_COOKIE", "AXIOM_AUTH_TOKEN"]
+INTEGRITY_REQUIRED = [
+    "src/memecoin_bot/e4_exec/__main__.py",
+    "src/memecoin_bot/e4_live.py",
+    "src/memecoin_bot/e4_final.py",
+    "src/memecoin_bot/e4_production_guard_v12.py",
+    "src/memecoin_bot/v12_live_readiness.py",
+    "src/memecoin_bot/v12_vault_signer.py",
+    "src/memecoin_bot/v12_execution_journal.py",
+    "src/memecoin_bot/v12_recovery.py",
+    "src/memecoin_bot/v12_safety.py",
+    "src/memecoin_bot/v12_route_health.py",
+    "src/memecoin_bot/v12_backup.py",
+    "src/memecoin_bot/v12_watchdogs.py",
+    "scripts/v12_supervisor.py",
+]
 
 
 def _read(root: Path, relative: str) -> str:
@@ -38,12 +53,16 @@ def audit(root: Path) -> dict:
     docker_prod = _read(root, "Dockerfile.e4-prod")
     supervisor = _read(root, "scripts/v12_supervisor.py")
     pyproject = _read(root, "pyproject.toml")
+    integrity_builder = _read(root, "scripts/v12_integrity_manifest.py")
 
     forbidden = [key for key in FORBIDDEN_ENV if key in env_example]
     local_keypair_surface = any(
         token in env_example or token in compose_exec or token in compose_prod
         for token in ("E4_KEYPAIR_PATH=", "E4_KEYPAIR_HOST_PATH")
     )
+    integrity_missing = [
+        path for path in INTEGRITY_REQUIRED if f'"{path}"' not in integrity_builder
+    ]
 
     canonical_cli_gate = all(
         token in exec_main
@@ -115,6 +134,7 @@ def audit(root: Path) -> dict:
         not missing
         and not forbidden
         and not local_keypair_surface
+        and not integrity_missing
         and all_true(checks)
     )
     return {
@@ -122,6 +142,7 @@ def audit(root: Path) -> dict:
         "missing_required_files": missing,
         "forbidden_axiom_credential_surface": forbidden,
         "legacy_plaintext_keypair_surface": local_keypair_surface,
+        "integrity_manifest_missing_critical_paths": integrity_missing,
         "checks": checks,
         "execution_architecture": "NATIVE_SOLANA",
         "canonical_live_entrypoint": "memecoin_bot.e4_exec",
