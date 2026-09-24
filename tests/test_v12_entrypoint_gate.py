@@ -4,8 +4,8 @@ import sys
 
 import pytest
 
-from memecoin_bot.e4_exec import __main__ as entry
 from memecoin_bot import e4_prod
+from memecoin_bot.e4_exec import __main__ as entry
 
 
 def test_live_flag_fails_closed_without_e4_live(monkeypatch: pytest.MonkeyPatch) -> None:
