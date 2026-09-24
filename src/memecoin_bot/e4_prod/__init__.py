@@ -1,5 +1,1 @@
-"""Hardened Gambit Jr E4 production entrypoint."""
-
-from memecoin_bot.e4_production import main
-
-__all__ = ["main"]
+"""Compatibility alias for the canonical V12 production entrypoint.\n\nThe historical e4_prod command is retained for operator compatibility but\nmust never provide an alternate execution path around V12 readiness/security.\n"""\n\n\ndef main() -> None:\n    from memecoin_bot.e4_exec.__main__ import main as canonical_main\n\n    canonical_main()\n\n\n__all__ = ["main"]\n
