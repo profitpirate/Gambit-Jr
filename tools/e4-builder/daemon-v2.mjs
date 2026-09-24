@@ -22,7 +22,7 @@ const RPC_RETRIES = Math.max(1, Math.min(4, Number(process.env.E4_ALT_RPC_RETRIE
 const MAX_WIRE_BYTES = 1232;
 const COMPUTE_UNITS = Math.max(150_000, Number(process.env.E4_LOCAL_COMPUTE_UNITS || 360_000));
 const LOCAL_ENABLED = String(process.env.E4_LOCAL_PUMP_BUILDER || "true").toLowerCase() !== "false";
-const REMOTE_FALLBACK = String(process.env.E4_REMOTE_BUILDER_FALLBACK || "true").toLowerCase() !== "false";
+const REMOTE_FALLBACK = String(process.env.E4_REMOTE_BUILDER_FALLBACK || "false").toLowerCase() === "true";
 const TOKEN_DECIMALS = BigInt(Math.max(0, Number(process.env.E4_PUMP_TOKEN_DECIMALS || 6)));
 
 const JITO_TIP_ACCOUNTS = [
