@@ -4,9 +4,31 @@ services:
       context: .
       dockerfile: Dockerfile.e4-prod
     restart: unless-stopped
+    init: true
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 256
     env_file:
       - .env.e4
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
     volumes:
-      - ./data:/app/data
+      - ./data:/app/data:rw
+      - ./var/e4:/app/var/e4:rw
       - ${E4_KEYPAIR_HOST_PATH:?set E4_KEYPAIR_HOST_PATH}:/run/secrets/e4-solana-keypair.json:ro
     command: ["python", "-m", "memecoin_bot.e4_prod", "run", "--live"]
+    healthcheck:
+      test: ["CMD", "python", "-m", "memecoin_bot.e4_prod", "status"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    stop_grace_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
