@@ -123,6 +123,8 @@ jobs:
         with:
           python-version: "3.12"
       - name: Run 500k boundary/fuzz decisions plus threaded hot path
+        env:
+          PYTHONPATH: src
         run: |
           mkdir -p artifacts
           python scripts/v12_prearmed_brutal_stress.py \
