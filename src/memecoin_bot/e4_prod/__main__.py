@@ -1,4 +1,1 @@
-from memecoin_bot.e4_production import main
-
-if __name__ == "__main__":
-    main()
+from memecoin_bot.e4_prod import main\n\n\nif __name__ == "__main__":\n    main()\n
