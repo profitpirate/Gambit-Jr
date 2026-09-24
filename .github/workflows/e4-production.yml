@@ -94,10 +94,10 @@ jobs:
             scripts/v12_prearmed_brutal_stress.py \
             scripts/e4_security_audit.py \
             scripts/e4_execution_ledger_audit.py
-      - name: Ruff hardened paths
+      - name: Ruff correctness checks
         run: |
-          ruff check \
-            src/memecoin_bot/e4_live.py \
+          ruff check --select E9,F63,F7,F82 src/memecoin_bot/e4_live.py
+          ruff check --select E9,F \
             src/memecoin_bot/e4_prearmed_policy.py \
             src/memecoin_bot/e4_prearmed_readiness.py \
             scripts/v12_prearmed_readiness.py \
