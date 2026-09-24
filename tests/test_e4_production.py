@@ -5,6 +5,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest import mock
 
 from memecoin_bot import e4_live
@@ -63,6 +64,92 @@ class E4ProductionMappingTests(unittest.TestCase):
                 )
                 store.save_position(position)
                 self.assertIn("mint", store.load_open_positions())
+            finally:
+                store.close()
+
+
+class _BalanceRpc:
+    def __init__(self, balances: dict[str, float]) -> None:
+        self.balances = balances
+
+    async def token_balance(self, wallet: str, mint: str) -> float:
+        if wallet != "wallet":
+            raise AssertionError(wallet)
+        return float(self.balances.get(mint, 0.0))
+
+
+class E4ProductionRestartReconciliationTests(unittest.IsolatedAsyncioTestCase):
+    async def test_restart_closes_stale_position_when_onchain_balance_is_zero(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            store = e4_live.Store(Path(directory) / "e4.db")
+            try:
+                position = e4_live.Position(
+                    position_id="stale",
+                    mint="mint-stale",
+                    status=e4_live.PositionStatus.OPEN,
+                    opened_ns=time.time_ns(),
+                    entry_sol=0.2,
+                    tokens=1_000.0,
+                    remaining=1_000.0,
+                    entry_price=0.0002,
+                    max_price=0.0002,
+                    last_price=0.0002,
+                    entry_signature="entry-stale",
+                )
+                store.save_position(position)
+                engine = SimpleNamespace(
+                    positions={"mint-stale": position},
+                    store=store,
+                    signer=SimpleNamespace(wallet="wallet"),
+                    rpc=_BalanceRpc({"mint-stale": 0.0}),
+                )
+                await e4_production._reconcile(engine)
+                self.assertNotIn("mint-stale", engine.positions)
+                self.assertNotIn("mint-stale", store.load_open_positions())
+                row = store.conn.execute(
+                    "SELECT status,remaining FROM e4_positions WHERE mint=?",
+                    ("mint-stale",),
+                ).fetchone()
+                self.assertEqual(row["status"], e4_live.PositionStatus.CLOSED)
+                self.assertEqual(float(row["remaining"]), 0.0)
+            finally:
+                store.close()
+
+    async def test_restart_recovers_confirmed_buy_missing_position_row_once(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            store = e4_live.Store(Path(directory) / "e4.db")
+            try:
+                store.order("buy-request", "mint-orphan", "BUY", 0.25, None, "accepted")
+                store.receipt(
+                    "buy-request",
+                    "entry-signature",
+                    "direct",
+                    True,
+                    123,
+                    None,
+                    {"direct": "entry-signature"},
+                )
+                engine = SimpleNamespace(
+                    positions={},
+                    store=store,
+                    signer=SimpleNamespace(wallet="wallet"),
+                    rpc=_BalanceRpc({"mint-orphan": 500.0}),
+                )
+                await e4_production._reconcile(engine)
+                recovered = engine.positions["mint-orphan"]
+                self.assertEqual(recovered.entry_sol, 0.25)
+                self.assertEqual(recovered.tokens, 500.0)
+                self.assertEqual(recovered.remaining, 500.0)
+                self.assertEqual(recovered.status, e4_live.PositionStatus.OPEN)
+
+                first_id = recovered.position_id
+                await e4_production._reconcile(engine)
+                self.assertEqual(engine.positions["mint-orphan"].position_id, first_id)
+                count = store.conn.execute(
+                    "SELECT COUNT(*) FROM e4_positions WHERE mint=?",
+                    ("mint-orphan",),
+                ).fetchone()[0]
+                self.assertEqual(count, 1)
             finally:
                 store.close()
 
