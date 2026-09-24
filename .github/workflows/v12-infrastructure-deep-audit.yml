@@ -116,9 +116,11 @@ jobs:
           python - <<'PY'
           import json
           a=json.load(open("research/v12-infrastructure-audit.json"))
-          dep=json.load(open("research/e4-builder-security-status.json"))
+          dep=json.load(open("research/v12-builder-npm-audit.json"))
+          vuln=(dep.get("metadata") or {}).get("vulnerabilities") or {}
+          unresolved=int(vuln.get("total") or 0) > 0
           summary={
-            "version":"v12-operational-audit-v1",
+            "version":"v12-operational-audit-v2",
             "static_status":a["status"],
             "active_python_components":len(a["active_python"]),
             "active_js_components":len(a["active_javascript"]),
@@ -129,11 +131,11 @@ jobs:
             "frozen_model_verified":True,
             "causal_state_verified":True,
             "real_money_execution":False,
-            "dependency_advisories_after":dep.get("after"),
-            "dependency_advisories_unresolved":dep.get("unresolved"),
+            "dependency_advisories_after":vuln,
+            "dependency_advisories_unresolved":unresolved,
             "known_non_shell_debt":[
               "8 high + 8 moderate transitive builder advisories remain because safe non-breaking remediation did not reduce them"
-            ] if dep.get("unresolved") else [],
+            ] if unresolved else [],
           }
           open("research/v12-operational-audit-summary.json","w").write(json.dumps(summary,indent=2,sort_keys=True)+"\n")
           print(json.dumps(summary,indent=2))
