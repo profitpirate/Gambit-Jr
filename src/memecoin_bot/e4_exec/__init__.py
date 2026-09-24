@@ -1,5 +1,1 @@
-"""Final Gambit Jr E4 autonomous execution entrypoint."""
-
-from memecoin_bot.e4_final import main
-
-__all__ = ["main"]
+"""Final Gambit Jr E4 autonomous execution entrypoint.\n\nPackage-level main deliberately delegates to the canonical CLI wrapper so\nconsole scripts cannot bypass live-readiness, policy fingerprints, or runtime\nservice startup.\n"""\n\n\ndef main() -> None:\n    from memecoin_bot.e4_exec.__main__ import main as canonical_main\n\n    canonical_main()\n\n\n__all__ = ["main"]\n
