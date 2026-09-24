@@ -47,9 +47,11 @@ async def reconcile_journal(
     engine: Any,
     journal: ExecutionJournal,
     breaker: CircuitBreaker,
+    *,
+    states: tuple[str, ...] = ("SIGNED", "SUBMITTED", "UNCERTAIN"),
 ) -> tuple[int, int, int, int]:
     checked = confirmed = retried = uncertain = 0
-    for entry in journal.recoverable():
+    for entry in journal.recoverable(states):
         checked += 1
         if not entry.signature:
             journal.mark_failed(entry.idempotency_key, "recoverable entry has no signature", terminal=True)
@@ -179,8 +181,15 @@ async def reconcile_engine(
     engine: Any,
     journal: ExecutionJournal,
     breaker: CircuitBreaker,
+    *,
+    journal_states: tuple[str, ...] = ("SIGNED", "SUBMITTED", "UNCERTAIN"),
 ) -> RecoveryReport:
-    journal_result = await reconcile_journal(engine, journal, breaker)
+    journal_result = await reconcile_journal(
+        engine,
+        journal,
+        breaker,
+        states=journal_states,
+    )
     position_result = await reconcile_positions(engine, journal, breaker)
     return RecoveryReport(
         journal_checked=journal_result[0],
