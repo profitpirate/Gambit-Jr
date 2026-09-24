@@ -14,6 +14,12 @@ RUN python -m pip install --upgrade pip \
     && python -m pip install -e . \
     && python -m pip install -r requirements-e4.txt \
     && cd tools/e4-builder \
-    && npm install --omit=dev
+    && npm ci --omit=dev \
+    && groupadd --system --gid 10001 gambit \
+    && useradd --system --uid 10001 --gid gambit --home-dir /app --shell /usr/sbin/nologin gambit \
+    && mkdir -p /app/data /app/backups /app/run /app/var \
+    && chown -R gambit:gambit /app/data /app/backups /app/run /app/var
+
+USER gambit
 
 CMD ["python", "-m", "memecoin_bot.e4_exec", "run", "--live"]
