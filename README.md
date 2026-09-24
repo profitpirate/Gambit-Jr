@@ -29,15 +29,25 @@ scores, setup conviction separate from evidence coverage, stage-specific evaluat
 provider conflict/freshness states, notional tradeability estimates, effective actor
 concentration, buyer replacement, immutable V1.5 T0 calls, and signal-only Discord
 routing. Public automatic tiers are `PREMIUM`, `STRONG`, `HIGH_RISK_MOMENTUM`, and
-`CATALYST_REVIVAL`; Genesis and Radar remain internal/queryable. The read-only boundary
-is unchanged: there is no transaction signing, swap, approval, private-key, seed, or
-fund-transfer path.
+`CATALYST_REVIVAL`; Genesis and Radar remain internal/queryable.
 
-A read-only, autonomous intelligence service for Solana and BNB Chain memecoins. Gambit Jr now starts
-at the launch event, performs a low-latency T0 decision, enriches evidence in parallel, builds wallet,
-creator, and narrative context, estimates survival and convexity, and follows every promoted setup
-through measured outcomes. Discord is the complete supported product surface. Jr never connects to a
-wallet and contains no transaction, signing, order, swap, purchase, or sale path.
+The **default V1.5/Discord service remains read-only** and does not sign or route transactions.
+This repository also contains a separate, explicitly gated E4 execution subsystem. That subsystem
+must not be confused with V1.5 signal routing or with the V12 Pre-Armed research confirmation.
+Its example configuration is fail-closed, requires a separate local signer/key boundary and
+operator-provided RPC/routes, and now requires both `E4_LIVE=true` and `--live`.
+
+The frozen **V12 Pre-Armed 100-trade confirmation remains causal paper-live research** until its
+fresh 100-trade acceptance gate completes. `e4_prearmed_policy.py` and
+`e4_prearmed_readiness.py` provide policy-equivalence and production-readiness auditing only;
+they contain no wallet, signing, route, or transaction authority. See
+[`docs/e4-security-hardening.md`](docs/e4-security-hardening.md) for the secret and runtime
+boundary.
+
+As a read-only intelligence service, Gambit Jr starts at the launch event, performs a low-latency T0
+decision, enriches evidence in parallel, builds wallet, creator, and narrative context, estimates
+survival and convexity, and follows every promoted setup through measured outcomes. Discord remains
+the complete supported surface for that read-only service.
 
 ## V1.4 completion and operational boundary
 
