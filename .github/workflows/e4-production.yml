@@ -1,48 +1,201 @@
-name: E4 production
+name: E4 production hardening
 
 on:
   push:
     branches:
       - codex/gambit-jr-v2-e4-execution
-  pull_request:
+      - codex/e4-v12-flow-survival-hazard-v12
     paths:
-      - "src/memecoin_bot/e4_live.py"
-      - "src/memecoin_bot/e4_runner.py"
-      - "src/memecoin_bot/e4_production.py"
-      - "src/memecoin_bot/e4_prod/**"
-      - "tests/test_e4_live.py"
-      - "tests/test_e4_production.py"
+      - ".github/workflows/e4-production.yml"
+      - "src/memecoin_bot/e4_**"
+      - "scripts/e4_**"
+      - "scripts/v12_prearmed_**"
+      - "tests/test_e4_**"
+      - "research/v12-pre-armed-100-trade-frozen-model.json"
+      - "research/v12-pre-armed-certification-status.json"
+      - "research/v12-pre-armed-100-causal-paper-live.json"
+      - "research/v12-pre-armed-100-causal-shadow-analytics.json"
       - "tools/e4-builder/**"
       - "requirements-e4.txt"
       - "Dockerfile.e4-prod"
       - "docker-compose.e4-prod.yml"
+      - ".dockerignore"
+      - ".env.e4.example"
+      - "docs/e4-security-hardening.md"
+      - "docs/e4-production-command.md"
+  pull_request:
+    paths:
+      - "src/memecoin_bot/e4_**"
+      - "scripts/e4_**"
+      - "scripts/v12_prearmed_**"
+      - "tests/test_e4_**"
+      - "tools/e4-builder/**"
+      - "requirements-e4.txt"
+      - "Dockerfile.e4-prod"
+      - "docker-compose.e4-prod.yml"
+      - ".dockerignore"
+      - ".env.e4.example"
       - ".github/workflows/e4-production.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e4-production-hardening-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  test:
+  production-core:
+    name: Production core + causal E2E
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
       - run: python -m pip install --upgrade pip
-      - run: python -m pip install -e .
+      - run: python -m pip install -e .[dev,research]
       - run: python -m pip install -r requirements-e4.txt
-      - name: Unit tests
+      - name: Production and causal E2E tests
         run: |
-          python - <<'PY'
-          import unittest
-          import unittest.mock
-          suite = unittest.defaultTestLoader.discover("tests", pattern="test_e4*.py")
-          result = unittest.TextTestRunner(verbosity=2).run(suite)
-          raise SystemExit(0 if result.wasSuccessful() else 1)
-          PY
-      - run: python -m compileall -q src/memecoin_bot/e4_live.py src/memecoin_bot/e4_runner.py src/memecoin_bot/e4_production.py src/memecoin_bot/e4_prod
+          python -m pytest -q \
+            tests/test_e4_live.py \
+            tests/test_e4_production.py \
+            tests/test_e4_prearmed_readiness.py \
+            tests/test_e4_security_hardening.py \
+            tests/test_e4_v12_axiom_paper_live.py \
+            tests/test_e4_v12_fast_prearmed_selector.py \
+            tests/test_e4_v12_sub10ms_repairs.py \
+            tests/test_e4_v12_sub10ms_transport.py \
+            tests/test_e4_v12_sub10ms_transport_final.py
+      - name: Compile hardened Python paths
+        run: |
+          python -m compileall -q \
+            src/memecoin_bot/e4_live.py \
+            src/memecoin_bot/e4_production.py \
+            src/memecoin_bot/e4_prearmed_policy.py \
+            src/memecoin_bot/e4_prearmed_readiness.py \
+            scripts/v12_prearmed_readiness.py \
+            scripts/v12_prearmed_brutal_stress.py \
+            scripts/e4_security_audit.py \
+            scripts/e4_execution_ledger_audit.py
+      - name: Ruff hardened paths
+        run: |
+          ruff check \
+            src/memecoin_bot/e4_live.py \
+            src/memecoin_bot/e4_prearmed_policy.py \
+            src/memecoin_bot/e4_prearmed_readiness.py \
+            scripts/v12_prearmed_readiness.py \
+            scripts/v12_prearmed_brutal_stress.py \
+            scripts/e4_security_audit.py \
+            scripts/e4_execution_ledger_audit.py \
+            tests/test_e4_prearmed_readiness.py \
+            tests/test_e4_security_hardening.py
+      - name: Readiness report (expected to remain blocked until causal confirmation completes)
+        run: python scripts/v12_prearmed_readiness.py --no-fail
+
+  full-e4-regression:
+    name: Full E4 regression (all test_e4 files)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .[dev,research]
+      - run: python -m pip install -r requirements-e4.txt
+      - name: Run complete E4 test corpus
+        run: python -m pytest -q tests/test_e4*.py
+
+  brutal-prearmed-stress:
+    name: Frozen policy brutal fuzz + concurrency
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run 500k boundary/fuzz decisions plus threaded hot path
+        run: |
+          mkdir -p artifacts
+          python scripts/v12_prearmed_brutal_stress.py \
+            --iterations 250000 \
+            --threaded-calls 100000 \
+            --threads 16 \
+            --output artifacts/v12-prearmed-brutal-stress.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v12-prearmed-brutal-stress-${{ github.run_id }}
+          path: artifacts/v12-prearmed-brutal-stress.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  builder:
+    name: Local builder + dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
-      - working-directory: tools/e4-builder
-        run: npm install --omit=dev
-      - working-directory: tools/e4-builder
-        run: node --check index.mjs
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: tools/e4-builder/package-lock.json
+      - name: Install pinned production builder dependencies
+        working-directory: tools/e4-builder
+        run: npm ci --omit=dev
+      - name: Syntax check all production builder paths
+        working-directory: tools/e4-builder
+        run: |
+          node --check daemon-v2.mjs
+          node --check race-proxy-v3.mjs
+          node --check fast-preload-v4.mjs
+          node --check strict-race-proxy-v12.mjs
+          node --check index.mjs
+      - name: Native local Pump builder self-test (no broadcast)
+        working-directory: tools/e4-builder
+        env:
+          E4_LOCAL_PUMP_BUILDER: "true"
+          E4_REMOTE_BUILDER_FALLBACK: "false"
+        run: node race-proxy-v3.mjs --self-test
+      - name: Production npm vulnerability gate
+        working-directory: tools/e4-builder
+        run: npm audit --omit=dev --audit-level=high
+
+  security-and-container:
+    name: Secret audit + hardened container
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Static secret and container security audit
+        run: python scripts/e4_security_audit.py
+      - name: Python signer dependency audit
+        run: |
+          python -m pip install --upgrade pip pip-audit
+          pip-audit -r requirements-e4.txt
+      - name: Validate Compose structure without credentials
+        env:
+          E4_KEYPAIR_HOST_PATH: /tmp/not-a-real-keypair.json
+        run: |
+          cp .env.e4.example .env.e4
+          docker compose -f docker-compose.e4-prod.yml config >/tmp/e4-compose.rendered.yml
+          grep -q "no-new-privileges:true" /tmp/e4-compose.rendered.yml
+          grep -q "read_only: true" /tmp/e4-compose.rendered.yml
+      - name: Build hardened production image
+        run: docker build --pull -f Dockerfile.e4-prod -t gambit-jr:e4-hardening .
+      - name: Verify pinned runtime versions and credential-free readiness inside image
+        run: |
+          docker run --rm --entrypoint node gambit-jr:e4-hardening --version | grep '^v22\.'
+          docker run --rm --entrypoint python gambit-jr:e4-hardening scripts/v12_prearmed_readiness.py --no-fail
