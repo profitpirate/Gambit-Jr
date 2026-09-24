@@ -42,6 +42,7 @@ _PREVIOUS_STOP = core.Engine.stop
 _PREVIOUS_ON_EVENT = core.Engine.on_event
 _PREVIOUS_EXECUTE_BUY = core.Engine.execute_buy
 _PREVIOUS_EXECUTE_SELL = core.Engine.execute_sell
+_PREVIOUS_SWEEP = core.Engine.sweep
 _PREVIOUS_STORE_STATUS = core.Store.status
 
 
@@ -89,7 +90,9 @@ def _engine_init(self: Any, settings: Any) -> None:
     self.v12_backup_task = None
     self.v12_maintenance_task = None
     self.v12_metrics_task = None
+    self.v12_recovery_task = None
     self.v12_emergency_exit_lock = asyncio.Lock()
+    self.v12_recovery_lock = asyncio.Lock()
 
     audit_key = os.getenv("V12_AUDIT_HMAC_KEY", "")
     self.v12_audit = (
@@ -282,6 +285,9 @@ async def _execute_exactly_once(
             entry.idempotency_key,
             error or "transaction unconfirmed",
             terminal=False,
+        )
+        self.v12_breaker.exit_only(
+            f"uncertain_{side.lower() or 'transaction'}_requires_reconciliation"
         )
     _record_tx_result(self, confirmed)
     _audit(
@@ -533,6 +539,22 @@ async def _execute_sell_production(
     fraction: float,
     reason: str,
 ) -> None:
+    unresolved = self.v12_journal.unresolved_for("SELL", str(position.mint))
+    if unresolved:
+        self.v12_breaker.exit_only("unresolved_sell_blocks_duplicate_exit")
+        _audit(
+            self,
+            "DUPLICATE_EXIT_BLOCKED",
+            {
+                "mint": position.mint,
+                "unresolved_signatures": [
+                    entry.signature for entry in unresolved if entry.signature
+                ],
+            },
+        )
+        self.pending_exits.discard(position.mint)
+        return
+
     was_closed = position.status == core.PositionStatus.CLOSED
     await _PREVIOUS_EXECUTE_SELL(self, position, fraction, reason)
     if was_closed or position.status != core.PositionStatus.CLOSED:
@@ -570,6 +592,26 @@ async def _execute_sell_production(
 
 
 core.Engine.execute_sell = _execute_sell_production
+
+
+async def _sweep_production(self: Any) -> None:
+    unresolved = self.v12_journal.unresolved_for("SWEEP", None)
+    if unresolved:
+        self.v12_breaker.exit_only("unresolved_sweep_blocks_duplicate_transfer")
+        _audit(
+            self,
+            "DUPLICATE_SWEEP_BLOCKED",
+            {
+                "unresolved_signatures": [
+                    entry.signature for entry in unresolved if entry.signature
+                ],
+            },
+        )
+        return
+    await _PREVIOUS_SWEEP(self)
+
+
+core.Engine.sweep = _sweep_production
 
 
 async def _emergency_exit_all(self: Any, reason: str) -> None:
@@ -613,6 +655,48 @@ async def _backup_loop(self: Any) -> None:
             LOGGER.exception("V12 encrypted backup failed")
             self.v12_breaker.exit_only(f"backup_failure:{exc}")
 
+
+
+async def _runtime_recovery_loop(self: Any) -> None:
+    interval = max(
+        0.1,
+        _float_env("V12_UNCERTAIN_RECOVERY_INTERVAL_SECONDS", 0.5),
+    )
+    while not self.stop_event.is_set():
+        try:
+            uncertain_entries = self.v12_journal.recoverable(("UNCERTAIN",))
+            if uncertain_entries:
+                async with self.v12_recovery_lock:
+                    report = await reconcile_engine(
+                        self,
+                        self.v12_journal,
+                        self.v12_breaker,
+                        journal_states=("UNCERTAIN",),
+                    )
+                _audit(
+                    self,
+                    "RUNTIME_RECOVERY",
+                    {
+                        "journal_checked": report.journal_checked,
+                        "journal_confirmed": report.journal_confirmed,
+                        "journal_retried": report.journal_retried,
+                        "journal_uncertain": report.journal_uncertain,
+                        "positions_closed": report.positions_closed,
+                        "positions_reconstructed": report.positions_reconstructed,
+                    },
+                )
+            await asyncio.wait_for(self.stop_event.wait(), timeout=interval)
+            break
+        except TimeoutError:
+            continue
+        except (RuntimeError, sqlite3.Error, ValueError) as exc:
+            LOGGER.exception("V12 runtime reconciliation failure")
+            self.v12_breaker.exit_only(f"runtime_recovery_failure:{exc}")
+            try:
+                await asyncio.wait_for(self.stop_event.wait(), timeout=interval)
+                break
+            except TimeoutError:
+                continue
 
 
 async def _maintenance_loop(self: Any) -> None:
@@ -696,6 +780,10 @@ async def _run_production(self: Any) -> None:
             _backup_loop(self),
             name="v12-encrypted-backups",
         )
+    self.v12_recovery_task = asyncio.create_task(
+        _runtime_recovery_loop(self),
+        name="v12-runtime-recovery",
+    )
     self.v12_maintenance_task = asyncio.create_task(
         _maintenance_loop(self),
         name="v12-maintenance",
@@ -713,6 +801,7 @@ async def _run_production(self: Any) -> None:
         for task in (
             self.v12_watchdog_task,
             self.v12_backup_task,
+            self.v12_recovery_task,
             self.v12_maintenance_task,
             self.v12_metrics_task,
         ):
@@ -724,6 +813,7 @@ async def _run_production(self: Any) -> None:
                 for task in (
                     self.v12_watchdog_task,
                     self.v12_backup_task,
+                    self.v12_recovery_task,
                     self.v12_maintenance_task,
                     self.v12_metrics_task,
                 )
