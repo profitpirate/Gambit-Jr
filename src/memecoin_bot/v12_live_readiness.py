@@ -1,7 +1,9 @@
 """Fail-closed live-trading readiness gate for V12."""
 from __future__ import annotations
 
+import hashlib
 import json
+import math
 import os
 import shutil
 import sqlite3
@@ -40,20 +42,162 @@ def _truthy(name: str) -> bool:
     return os.getenv(name, "").strip().lower() in {"1", "true", "yes", "on"}
 
 
-def _causal_gate(path: Path) -> tuple[bool, str]:
+EXPECTED_FROZEN_MODEL_SHA256 = "69df86eaf386fd37d699928a95d25aaeb2053e743b59c9e687c8a7c49d14f977"
+EXPECTED_BASELINE = {
+    "closed_trades": 50,
+    "wins": 35,
+    "losses": 15,
+    "win_rate": 0.7,
+    "net_pnl_sol": 2.086015102090403,
+    "profit_factor": 6.00625698411455,
+    "maximum_closed_equity_drawdown_fraction": 0.029421494624602456,
+}
+
+
+def _resolve(root: Path, value: str | Path) -> Path:
+    path = Path(value)
+    return path if path.is_absolute() else root / path
+
+
+def _json_sha256(path: Path) -> str:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _same_number(actual: object, expected: float | int) -> bool:
     try:
-        state = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        return False, f"cannot read causal state: {exc}"
+        return math.isclose(float(actual), float(expected), rel_tol=1e-12, abs_tol=1e-12)
+    except (TypeError, ValueError):
+        return False
+
+
+def _causal_gate(path: Path, *, repository_root: Path) -> tuple[bool, str]:
+    causal_path = _resolve(repository_root, path)
+    status_path = _resolve(
+        repository_root,
+        os.getenv(
+            "V12_CAUSAL_CERTIFICATION_STATUS_PATH",
+            "research/v12-pre-armed-certification-status.json",
+        ),
+    )
+    model_path = _resolve(
+        repository_root,
+        os.getenv(
+            "V12_CAUSAL_FROZEN_MODEL_PATH",
+            "research/v12-pre-armed-100-trade-frozen-model.json",
+        ),
+    )
+
+    try:
+        state = json.loads(causal_path.read_text(encoding="utf-8"))
+        certification = json.loads(status_path.read_text(encoding="utf-8"))
+        frozen_digest = _json_sha256(model_path)
+    except (OSError, json.JSONDecodeError, TypeError, ValueError) as exc:
+        return False, f"cannot verify causal certification bundle: {exc}"
+
+    failures: list[str] = []
     metrics = state.get("metrics") or {}
     completion = state.get("completion") or {}
-    passed = bool(
-        completion.get("reached")
-        and int(metrics.get("closed_trades") or 0) >= 100
-        and metrics.get("acceptance_gate_passed") is True
-    )
-    return passed, f"closed={metrics.get('closed_trades')} gate={metrics.get('acceptance_gate_passed')}"
+    ledger = state.get("ledger") or []
 
+    closed = int(metrics.get("closed_trades") or 0)
+    wins = int(metrics.get("wins") or 0)
+    losses = int(metrics.get("losses") or 0)
+
+    if completion.get("reached") is not True:
+        failures.append("100-trade completion not reached")
+    if int(completion.get("required_closed_trades") or 0) != 100:
+        failures.append("required trade count is not exactly 100")
+    if closed < 100:
+        failures.append(f"closed_trades={closed}")
+    if metrics.get("acceptance_gate_passed") is not True:
+        failures.append("acceptance gate not passed")
+    if state.get("real_money_execution") is not False:
+        failures.append("causal state is not paper-live only")
+    if int(state.get("production_paths_changed") or 0) != 0:
+        failures.append("production paths changed during causal test")
+    if str(state.get("model_sha256") or "") != EXPECTED_FROZEN_MODEL_SHA256:
+        failures.append("causal state model fingerprint mismatch")
+    if frozen_digest != EXPECTED_FROZEN_MODEL_SHA256:
+        failures.append("frozen model file fingerprint mismatch")
+
+    if len(ledger) != closed:
+        failures.append(f"ledger length {len(ledger)} != closed_trades {closed}")
+    else:
+        recomputed_wins = 0
+        recomputed_losses = 0
+        recomputed_pnl = 0.0
+        for index, row in enumerate(ledger):
+            try:
+                decision_ns = int(row["decision_ns"])
+                fill_ns = int(row["fill_ns"])
+                exit_ns = int(row["exit_ns"])
+                entry = float(row["entry_cost_sol"])
+                proceeds = float(row["proceeds_sol"])
+                pnl = float(row["pnl_sol"])
+            except (KeyError, TypeError, ValueError):
+                failures.append(f"ledger row {index} is malformed")
+                break
+            if not (decision_ns <= fill_ns <= exit_ns):
+                failures.append(f"ledger row {index} has impossible causal timestamps")
+                break
+            if not all(math.isfinite(value) for value in (entry, proceeds, pnl)):
+                failures.append(f"ledger row {index} has non-finite economics")
+                break
+            recomputed_pnl += pnl
+            if pnl > 0:
+                recomputed_wins += 1
+            else:
+                recomputed_losses += 1
+
+        if recomputed_wins != wins or recomputed_losses != losses:
+            failures.append(
+                "ledger win/loss totals do not match metrics "
+                f"({recomputed_wins}W/{recomputed_losses}L vs {wins}W/{losses}L)"
+            )
+        if not _same_number(recomputed_pnl, metrics.get("net_pnl_sol")):
+            failures.append("ledger net P&L does not match metrics")
+        if wins + losses != closed:
+            failures.append("metric wins + losses != closed trades")
+
+    if certification.get("official_50_trade_baseline_valid") is not True:
+        failures.append("official 50-trade baseline is not valid")
+    if certification.get("pre_fix_100_trade_sample_invalidated") is not True:
+        failures.append("old pre-fix sample is not explicitly invalidated")
+    if certification.get("pre_fix_100_trade_sample_imported") is not False:
+        failures.append("old pre-fix sample was imported")
+    if certification.get("current_100_trade_confirmation_valid") is not True:
+        failures.append("fresh 100-trade confirmation generation is not valid")
+    if certification.get("current_100_trade_confirmation_generation") != "causal-v2-fresh-zero":
+        failures.append("unexpected 100-trade confirmation generation")
+    if certification.get("current_100_trade_workflow") != (
+        ".github/workflows/v12-pre-armed-100-trade-causal.yml"
+    ):
+        failures.append("unexpected causal confirmation workflow")
+
+    recertification = certification.get("causal_exit_recertification") or {}
+    if int(recertification.get("impossible_exit_count_after") or -1) != 0:
+        failures.append("recertified baseline still has impossible exits")
+    if recertification.get("performance_metrics_changed") is not False:
+        failures.append("recertification unexpectedly changed baseline performance")
+
+    baseline = certification.get("official_50_trade_metrics") or {}
+    for key, expected in EXPECTED_BASELINE.items():
+        if not _same_number(baseline.get(key), expected):
+            failures.append(f"official baseline mismatch for {key}")
+
+    if failures:
+        detail = "; ".join(failures[:8])
+        if len(failures) > 8:
+            detail += f"; +{len(failures) - 8} more"
+        return False, detail
+
+    return (
+        True,
+        f"closed={closed} gate=true model={frozen_digest[:12]} "
+        f"baseline=35W/15L invalidated_sample_excluded=true",
+    )
 
 def _secure_url(value: str) -> bool:
     parsed = urlparse(value)
@@ -86,7 +230,7 @@ def run_live_readiness(
             "research/v12-pre-armed-100-causal-paper-live.json",
         )
     )
-    causal_ok, causal_detail = _causal_gate(causal_path)
+    causal_ok, causal_detail = _causal_gate(causal_path, repository_root=repository_root)
     checks.append(ReadinessCheck("causal_100_gate", causal_ok, causal_detail))
 
     wallet = str(getattr(settings, "wallet", "") or "")
