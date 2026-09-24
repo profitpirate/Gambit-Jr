@@ -122,7 +122,18 @@ async def reconcile_positions(
             engine.store.save_position(position)
             closed += 1
         else:
-            position.remaining = min(float(position.tokens), live_tokens)
+            position.remaining = min(float(position.remaining), live_tokens)
+            if not journal.unresolved_for("SELL", mint):
+                partial_status = getattr(
+                    engine,
+                    "position_status_partial",
+                    engine.position_status_open,
+                )
+                position.status = (
+                    partial_status
+                    if position.remaining < float(position.tokens)
+                    else engine.position_status_open
+                )
             engine.store.save_position(position)
 
     existing = set(engine.positions)
