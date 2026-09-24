@@ -65,3 +65,16 @@ incomplete. That is a safety feature, not a test failure.
 Credentials, paid/private RPC endpoints, route-specific authorization headers, the operator-owned
 signer/key material, and real on-chain/Axiom reconciliation require operator-provided external
 information. None should be fabricated or stored in the repository.
+
+## Verified builder dependency remediation
+
+The production builder lockfile was regenerated and accepted only after a clean `npm ci --omit=dev`,
+the vendored bigint compatibility self-test, the native local Pump transaction-construction self-test,
+and `npm audit --omit=dev --audit-level=high` all passed.
+
+The verified production graph pins Pump SDK 2.0.0, SPL Token 0.4.15, Solana web3.js 1.99.0,
+bn.js 5.2.5, toml 4.2.0, stream-json 3.5.0 and uuid 11.1.1. The unpatched native
+`bigint-buffer` package is replaced by the repository-owned pure-JavaScript compatibility package
+under `tools/e4-builder/vendor/bigint-buffer-safe`; that replacement has no native addon or
+postinstall script and performs explicit buffer, width and bigint range checks.
+
