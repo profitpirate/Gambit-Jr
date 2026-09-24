@@ -143,6 +143,7 @@ def _engine_init(self: Any, settings: Any) -> None:
     # Recovery uses these explicit factories rather than importing engine internals.
     self.position_factory = core.Position
     self.position_status_open = core.PositionStatus.OPEN
+    self.position_status_partial = core.PositionStatus.PARTIAL
     self.position_status_closed = core.PositionStatus.CLOSED
 
 
