@@ -65,3 +65,33 @@ def test_route_health_demotes_repeated_failures(tmp_path: Path) -> None:
         store.record("good", accepted=True, latency_ms=20)
     assert store.ranked(["bad", "good"])[0] == "good"
     assert store.healthy(["bad", "good"]) == ["good"]
+
+
+def test_confirmed_journal_state_cannot_be_downgraded_by_late_failure(tmp_path: Path) -> None:
+    journal = ExecutionJournal(tmp_path / "e4.db")
+    entry = journal.prepare("request-confirmed", {"side": "SELL", "mint": "m", "amount": 1})
+    journal.mark_signed(entry.idempotency_key, signed_tx_b64="signed", signature="sig")
+    journal.mark_submitted(entry.idempotency_key)
+    journal.mark_confirmed(entry.idempotency_key, route="fast", slot=10)
+
+    journal.mark_failed(entry.idempotency_key, "late local timeout", terminal=False)
+
+    final = journal.get(entry.idempotency_key)
+    assert final is not None
+    assert final.state == "CONFIRMED"
+    assert final.slot == 10
+
+
+def test_unresolved_lookup_is_scoped_by_side_and_mint(tmp_path: Path) -> None:
+    journal = ExecutionJournal(tmp_path / "e4.db")
+    sell = journal.prepare("sell-1", {"side": "SELL", "mint": "m1", "amount": 1})
+    journal.mark_signed(sell.idempotency_key, signed_tx_b64="sell", signature="sell-sig")
+    journal.mark_submitted(sell.idempotency_key)
+    journal.mark_failed(sell.idempotency_key, "timeout", terminal=False)
+
+    sweep = journal.prepare("sweep-1", {"side": "SWEEP", "mint": None, "amount": 1})
+    journal.mark_signed(sweep.idempotency_key, signed_tx_b64="sweep", signature="sweep-sig")
+
+    assert [item.signature for item in journal.unresolved_for("SELL", "m1")] == ["sell-sig"]
+    assert journal.unresolved_for("SELL", "m2") == []
+    assert [item.signature for item in journal.unresolved_for("SWEEP", None)] == ["sweep-sig"]
