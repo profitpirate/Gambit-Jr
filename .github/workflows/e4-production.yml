@@ -43,7 +43,7 @@ permissions:
 
 concurrency:
   group: e4-production-hardening-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   production-core:
