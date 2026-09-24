@@ -65,7 +65,7 @@ def _json_sha256(path: Path) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
-def _same_number(actual: object, expected: float | int) -> bool:
+def _same_number(actual: object, expected: float) -> bool:
     try:
         return math.isclose(float(actual), float(expected), rel_tol=1e-12, abs_tol=1e-12)
     except (TypeError, ValueError):
@@ -193,11 +193,9 @@ def _causal_gate(path: Path, *, repository_root: Path) -> tuple[bool, str]:
             detail += f"; +{len(failures) - 8} more"
         return False, detail
 
-    return (
-        True,
-        f"closed={closed} gate=true model={frozen_digest[:12]} "
-        f"baseline=35W/15L invalidated_sample_excluded=true",
-    )
+    detail = f"closed={closed} gate=true model={frozen_digest[:12]} "
+    detail += "baseline=35W/15L invalidated_sample_excluded=true"
+    return True, detail
 
 def _secure_url(value: str) -> bool:
     parsed = urlparse(value)
