@@ -3,7 +3,7 @@ name: E4 V12 end-to-end internal latency
 on:
   push:
     branches:
-      - codex/e4-v12-sub10ms-entry-research-20260905
+      - codex/v12-production-reconcile-20260924
     paths:
       - "src/memecoin_bot/e4_transport_v12.py"
       - "src/memecoin_bot/e4_exec_sub10ms_v2/**"
@@ -37,7 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: codex/e4-v12-sub10ms-entry-research-20260905
+          ref: codex/v12-production-reconcile-20260924
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

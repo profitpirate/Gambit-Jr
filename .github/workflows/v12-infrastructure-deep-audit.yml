@@ -3,7 +3,7 @@ name: V12 Infrastructure Deep Audit
 on:
   push:
     branches:
-      - codex/v12-broad-discovery-creator-apprentice-20260920
+      - codex/v12-production-reconcile-20260924
     paths:
       - "scripts/v12_infrastructure_audit.py"
       - ".github/workflows/v12-infrastructure-deep-audit.yml"
@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: codex/v12-broad-discovery-creator-apprentice-20260920
+          ref: codex/v12-production-reconcile-20260924
           fetch-depth: 2
       - uses: actions/setup-python@v5
         with:
@@ -146,7 +146,7 @@ jobs:
           test -f research/v12-builder-npm-audit.json && git add research/v12-builder-npm-audit.json || true
           if ! git diff --cached --quiet; then
             git commit -m 'audit(v12): certify active infrastructure is operational [skip ci]'
-            git pull --rebase origin codex/v12-broad-discovery-creator-apprentice-20260920
-            git push origin HEAD:codex/v12-broad-discovery-creator-apprentice-20260920
+            git pull --rebase origin codex/v12-production-reconcile-20260924
+            git push origin HEAD:codex/v12-production-reconcile-20260924
           fi
 # rerun after complete transport authority coverage

@@ -3,7 +3,7 @@ name: V12 Brutal Production Certification
 on:
   push:
     branches:
-      - codex/v12-production-hardening-20260920
+      - codex/v12-production-reconcile-20260924
     paths:
       - "src/memecoin_bot/v12_*.py"
       - "src/memecoin_bot/e4_production_guard_v12.py"
@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: codex/v12-production-hardening-20260920
+          ref: codex/v12-production-reconcile-20260924
           fetch-depth: 2
       - uses: actions/setup-python@v5
         with:
@@ -117,8 +117,8 @@ jobs:
             research/v12-production-pipeline-stress.json
           if ! git diff --cached --quiet; then
             git commit -m 'cert(v12): pass brutal production stress and E2E [skip ci]'
-            git pull --rebase origin codex/v12-production-hardening-20260920
-            git push origin HEAD:codex/v12-production-hardening-20260920
+            git pull --rebase origin codex/v12-production-reconcile-20260924
+            git push origin HEAD:codex/v12-production-reconcile-20260924
           fi
 
 # definitive-current-head-brutal

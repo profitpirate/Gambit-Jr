@@ -3,7 +3,7 @@ name: V12 Production Security Audit
 on:
   push:
     branches:
-      - codex/v12-production-hardening-20260920
+      - codex/v12-production-reconcile-20260924
     paths:
       - "src/**"
       - "scripts/**"
@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: codex/v12-production-hardening-20260920
+          ref: codex/v12-production-reconcile-20260924
           fetch-depth: 1
       - uses: actions/setup-python@v5
         with:
@@ -114,6 +114,6 @@ jobs:
             research/v12-python-e4-audit.json             research/v12-bandit.json             research/v12-python-sbom.json             research/v12-builder-npm-audit-security.json             research/v12-builder-sbom-security.json
           if ! git diff --cached --quiet; then
             git commit -m 'security(v12): refresh production security evidence [skip ci]'
-            git pull --rebase origin codex/v12-production-hardening-20260920
-            git push origin HEAD:codex/v12-production-hardening-20260920
+            git pull --rebase origin codex/v12-production-reconcile-20260924
+            git push origin HEAD:codex/v12-production-reconcile-20260924
           fi
