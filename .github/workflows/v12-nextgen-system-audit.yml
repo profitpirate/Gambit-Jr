@@ -55,6 +55,10 @@ jobs:
             src/memecoin_bot/e4_pipeline_manager_v11.py
             src/memecoin_bot/e4_adaptive_exit_v12.py
             src/memecoin_bot/e4_production_guard_v12.py
+            src/memecoin_bot/e4_exec/__init__.py
+            src/memecoin_bot/e4_exec/__main__.py
+            src/memecoin_bot/e4_prod/__init__.py
+            src/memecoin_bot/e4_prod/__main__.py
             src/memecoin_bot/v12_creator_library.py
             src/memecoin_bot/v12_creator_lifecycle.py
             src/memecoin_bot/v12_learning_service.py
@@ -101,11 +105,12 @@ jobs:
             tests/test_v12_security.py
             tests/test_v12_backup.py
             tests/test_v12_execution_safety.py
-            tests/test_v12_creator_lifecycle.py
+            tests/test_v12_creator_lifecycle.py \
+            tests/test_v12_vault_signer.py
             tests/test_v12_axiom_wallet.py
             tests/test_v12_production_deployment_audit.py
+            tests/test_v12_vault_signer.py
           )
-          ruff check --fix "${paths[@]}"
           ruff check "${paths[@]}"
 
       - name: New nextgen subsystem tests
