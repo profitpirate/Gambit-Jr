@@ -105,11 +105,11 @@ jobs:
             tests/test_v12_security.py
             tests/test_v12_backup.py
             tests/test_v12_execution_safety.py
-            tests/test_v12_creator_lifecycle.py \
-            tests/test_v12_vault_signer.py
+            tests/test_v12_creator_lifecycle.py
             tests/test_v12_axiom_wallet.py
             tests/test_v12_production_deployment_audit.py
             tests/test_v12_vault_signer.py
+            tests/test_v12_entrypoint_gate.py
           )
           ruff check "${paths[@]}"
 
@@ -132,7 +132,9 @@ jobs:
             tests/test_v12_security.py \
             tests/test_v12_backup.py \
             tests/test_v12_execution_safety.py \
-            tests/test_v12_creator_lifecycle.py
+            tests/test_v12_creator_lifecycle.py \
+            tests/test_v12_vault_signer.py \
+            tests/test_v12_entrypoint_gate.py
 
       - name: Production deployment contract audit
         run: python scripts/v12_production_deployment_audit.py
