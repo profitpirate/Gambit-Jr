@@ -160,6 +160,33 @@ class Settings:
         if not 0 < self.max_position_fraction <= 1:
             raise ValueError("E4_MAX_POSITION_FRACTION must be in (0,1]")
         if self.live:
+            forbidden_secret_env = [
+                name
+                for name in (
+                    "E4_PRIVATE_KEY",
+                    "E4_SECRET_KEY",
+                    "E4_SEED_PHRASE",
+                    "SOLANA_PRIVATE_KEY",
+                    "PHANTOM_SEED_PHRASE",
+                )
+                if os.getenv(name)
+            ]
+            if forbidden_secret_env:
+                raise ValueError(
+                    "raw secret material in environment is forbidden: "
+                    + ", ".join(forbidden_secret_env)
+                )
+            if self.keypair_path:
+                if self.keypair_path.is_symlink():
+                    raise ValueError("E4 keypair path must not be a symlink")
+                if not self.keypair_path.is_file():
+                    raise ValueError("E4 keypair path must be a regular file")
+                if self.keypair_path.stat().st_mode & 0o077:
+                    raise PermissionError(
+                        "E4 keypair must have owner-only permissions (chmod 600 or 400)"
+                    )
+                if not 0 < self.keypair_path.stat().st_size <= 4096:
+                    raise ValueError("E4 keypair file size is invalid")
             missing = []
             if not self.wallet:
                 missing.append("E4_WALLET_PUBLIC_KEY")
@@ -1077,8 +1104,8 @@ def main() -> None:
         finally:
             store.close()
         return
-    if not args.live:
-        raise SystemExit("E4 live execution requires --live")
+    if not args.live or not settings.live:
+        raise SystemExit("E4 live execution requires both E4_LIVE=true and --live")
     settings.live = True
     settings.validate()
     asyncio.run(run_engine(settings))
