@@ -42,6 +42,27 @@ def _vault_token() -> str:
     raise RuntimeError("VAULT_TOKEN or VAULT_TOKEN_FILE is required")
 
 
+def _validate_transaction_authority(transaction: object, public_key: object) -> None:
+    """Fail closed unless the transaction has Gambit's exact single-signer layout."""
+    message = getattr(transaction, "message", None)
+    header = getattr(message, "header", None)
+    required = int(getattr(header, "num_required_signatures", 0) or 0)
+    if required != 1:
+        raise RuntimeError(
+            f"V12 signer requires exactly one transaction signer; got {required}"
+        )
+    account_keys = list(getattr(message, "account_keys", ()) or ())
+    if not account_keys or str(account_keys[0]) != str(public_key):
+        raise RuntimeError(
+            "V12 signer wallet must be the transaction fee payer and first required signer"
+        )
+    signatures = list(getattr(transaction, "signatures", ()) or ())
+    if len(signatures) != required:
+        raise RuntimeError(
+            "V12 transaction signature-slot count does not match required signer count"
+        )
+
+
 class VaultTransitSigner:
     def __init__(
         self,
@@ -113,6 +134,7 @@ class VaultTransitSigner:
         public_key = await self.public_key()
         if str(public_key) != str(expected_public_key):
             raise RuntimeError("Vault key does not match expected Solana public key")
+        _validate_transaction_authority(transaction, public_key)
 
         message = bytes(transaction.message)
         path = (
