@@ -1,3 +1,4 @@
+# ruff: noqa: I001
 import atexit
 import os
 import sys
@@ -12,23 +13,23 @@ os.environ.setdefault("E4_BUILDER_RACE_CHILDREN", "2")
 os.environ.setdefault("E4_BALANCE_CACHE_MAX_STALENESS_MS", "5000")
 os.environ.setdefault("E4_DIRECT_COPY_MAX_OUTPUT_SHORTFALL_BPS", "600")
 
-from memecoin_bot import e4_hardening_v12  # noqa: E402,F401 - permanent V12 authority
+from memecoin_bot import e4_hardening_v12  # noqa: F401 - permanent V12 authority
 from memecoin_bot import e4_role_model_v12  # noqa: E402 - direct E4/creator/social wiring
 from memecoin_bot import e4_direct_copy_v12  # noqa: E402 - recognized-E4 execution
-from memecoin_bot import e4_sub10ms_repairs_v12  # noqa: E402,F401 - output guard, exact exits
-from memecoin_bot import e4_sub10ms_runtime_final_v12  # noqa: E402,F401 - final prewarm + route authority
-from memecoin_bot import e4_notifications_v12  # noqa: E402,F401 - durable close/sweep notifications
-from memecoin_bot import e4_nextgen_creator_authority_v12  # noqa: E402,F401 - gated canonical post-cert authority
-from memecoin_bot import e4_adaptive_exit_v12  # noqa: E402,F401 - gated post-cert survivor exits
-from memecoin_bot import e4_production_guard_v12  # noqa: E402,F401 - final live safety/recovery authority
-from memecoin_bot.e4_pipeline_runtime_v10 import start_background_supervisor  # noqa: E402
-from memecoin_bot.e4_role_model_v12 import stop_background_supervisor  # noqa: E402
-from memecoin_bot.e4_runtime_services_v10 import (  # noqa: E402
+from memecoin_bot import e4_sub10ms_repairs_v12  # noqa: F401 - output guard, exact exits
+from memecoin_bot import e4_sub10ms_runtime_final_v12  # noqa: F401 - final prewarm + route authority
+from memecoin_bot import e4_notifications_v12  # noqa: F401 - durable close/sweep notifications
+from memecoin_bot import e4_nextgen_creator_authority_v12  # noqa: F401 - gated canonical post-cert authority
+from memecoin_bot import e4_adaptive_exit_v12  # noqa: F401 - gated post-cert survivor exits
+from memecoin_bot import e4_production_guard_v12  # noqa: F401 - final live safety/recovery authority
+from memecoin_bot.e4_pipeline_runtime_v10 import start_background_supervisor
+from memecoin_bot.e4_role_model_v12 import stop_background_supervisor
+from memecoin_bot.e4_runtime_services_v10 import (
     start_runtime_services,
     stop_runtime_services,
 )
-from memecoin_bot.e4_final import main as _engine_main  # noqa: E402
-from memecoin_bot.v12_live_readiness import run_live_readiness  # noqa: E402
+from memecoin_bot.e4_final import main as _engine_main
+from memecoin_bot.v12_live_readiness import run_live_readiness
 
 E4_V12_ROLE_MODEL_POLICY_SHA256 = "2eb324971185c4eacf09ca57c8e06609028381edd03e68c702a0a88e57600ea6"
 E4_V12_DIRECT_COPY_POLICY_SHA256 = "cec133a234fa7e59dc3950dc6c2aa4902e5c12b43eb59bf31eb76d28287380b3"
