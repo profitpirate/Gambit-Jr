@@ -1,0 +1,167 @@
+name: Golden live restore cancelled checkpoints
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/golden-live-restore-cancelled-checkpoints.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: golden-live-cancelled-checkpoint-recovery
+  cancel-in-progress: true
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Verify maintenance stop markers are armed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for spec in \
+            'codex/golden-top3-full3sv2-live|docs/research/golden-top4-operator-stop.json' \
+            'codex/golden-2s-loss-exit-live|docs/research/golden-loss2s-operator-stop.json'
+          do
+            branch="${spec%%|*}"; path="${spec#*|}"
+            stop="$(gh api --method GET "repos/${GITHUB_REPOSITORY}/contents/$path" -f ref="$branch" --jq '.content' | tr -d '\n' | base64 -d | jq -r '.stop // false')"
+            test "$stop" = true
+          done
+
+      - name: Quiesce all superseded live attempts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for spec in \
+            'Golden top4 - live Solana paper and E4|codex/golden-top3-full3sv2-live' \
+            'Golden 2s loss-exit A-B - live Solana paper|codex/golden-2s-loss-exit-live'
+          do
+            name="${spec%%|*}"
+            branch="${spec#*|}"
+            for round in $(seq 1 30); do
+              active="$(gh api --method GET "repos/${GITHUB_REPOSITORY}/actions/runs" -f branch="$branch" -f per_page=100 \
+                --jq ".workflow_runs[] | select(.name == \"$name\" and (.status == \"in_progress\" or .status == \"queued\")) | .id" | sort -u)"
+              if [[ -z "$active" ]]; then
+                echo "$name is quiesced"
+                break
+              fi
+              while read -r run_id; do
+                [[ -z "$run_id" ]] && continue
+                echo "Cancelling superseded $name run $run_id"
+                gh run cancel "$run_id" --repo "$GITHUB_REPOSITORY" || true
+              done <<< "$active"
+              sleep 4
+              if (( round == 30 )); then
+                echo "Unable to quiesce $name" >&2
+                exit 1
+              fi
+            done
+          done
+
+      - name: Download preserved cancellation artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p recovery/top4 recovery/loss2s
+          gh run download 35167071329 --repo "$GITHUB_REPOSITORY" --name golden-top4-solana-35167071329 --dir recovery/top4
+          gh run download 35168069899 --repo "$GITHUB_REPOSITORY" --name golden-loss2s-solana-35168069899 --dir recovery/loss2s
+          test -s recovery/top4/live/state.json
+          test -s recovery/loss2s/live/state.json
+          python - <<'PY'
+          import json
+          top=json.load(open('recovery/top4/live/state.json'))
+          los=json.load(open('recovery/loss2s/live/state.json'))
+          assert top['engine'].get('clean') is True and not top['engine'].get('errors') and not top['engine'].get('bundles')
+          assert los['engine'].get('clean') is True and not los['engine'].get('errors') and not los['engine'].get('bundles')
+          ta=top['sessions'][-1]['arms']; la=los['sessions'][-1]['arms']
+          assert {k:v['verified_forward_closed'] for k,v in ta.items()} == {'FULL_3S':39,'FULL_3S_V2':39,'FULL_4S':39,'FULL_7S':37}
+          assert all(v['verified_forward_closed']==6 for v in la.values()) and len(la)==6
+          print('PRESERVED_ARTIFACTS_VALIDATED')
+          PY
+
+      - name: Restore newest clean resumable states to campaign branches
+        shell: bash
+        run: |
+          set -euo pipefail
+          restore_one() {
+            kind="$1"; branch="$2"; prefix="$3"; source="$4"
+            for attempt in $(seq 1 8); do
+              git fetch origin "$branch"
+              tmp="$(mktemp -d)"
+              git worktree add --detach "$tmp" FETCH_HEAD
+              cp "$source/live/state.json" "$tmp/docs/research/${prefix}state.json"
+              cp "$source/live/e4-status.json" "$tmp/docs/research/${prefix}e4.json"
+              cp "$source/live/activity.json" "$tmp/docs/research/${prefix}activity.json"
+              python - "$source/live/status.json" "$tmp/docs/research/${prefix}status.json" "$kind" <<'PY'
+          import json, sys, time
+          src, dst, kind = sys.argv[1:]
+          d=json.load(open(src))
+          d['status']='RECOVERED_CANCELLED_ARTIFACT_READY_TO_RESUME'
+          d['collector_active']=False
+          d['completion_verified']=False
+          d['recovery_source']='GITHUB_ACTIONS_CANCELLED_RUN_ARTIFACT'
+          d['recovered_at_ns']=time.time_ns()
+          d['heartbeat_ns']=time.time_ns()
+          d['lease_expires_ns']=0
+          d['liveness_contract']='collector_active is valid only while heartbeat lease is unexpired; Actions run state is authoritative'
+          json.dump(d,open(dst,'w'),sort_keys=True,allow_nan=False);open(dst,'a').write('\n')
+          PY
+              python - "$source/live/state.json" "$source/live/status.json" "$tmp/docs/research/${prefix}checkpoint.json" "$kind" <<'PY'
+          import json,sys,time,hashlib
+          state_path,status_path,dst,kind=sys.argv[1:]
+          status=json.load(open(status_path))
+          meta={
+            'schema':'golden-live-clean-checkpoint-1','kind':kind,'checked_ns':time.time_ns(),
+            'verified_forward_counts':status.get('verified_forward_counts'),
+            'min_verified_closed_per_model':status.get('min_verified_closed_per_model'),
+            'matched_closed':status.get('matched_closed'),'journal_head':status.get('journal_head'),
+            'clean_engine_required':True,'paper_only':True,
+            'recovery_source':'GITHUB_ACTIONS_CANCELLED_RUN_ARTIFACT',
+            'state_sha256':hashlib.sha256(open(state_path,'rb').read()).hexdigest(),
+          }
+          json.dump(meta,open(dst,'w'),sort_keys=True);open(dst,'a').write('\n')
+          PY
+              git -C "$tmp" config user.name gambit-live-recovery
+              git -C "$tmp" config user.email actions@users.noreply.github.com
+              git -C "$tmp" add -- "docs/research/${prefix}state.json" "docs/research/${prefix}status.json" "docs/research/${prefix}e4.json" "docs/research/${prefix}activity.json" "docs/research/${prefix}checkpoint.json"
+              git -C "$tmp" commit -m "data(${kind}): restore cancelled-run clean checkpoint [skip ci]"
+              if git -C "$tmp" push origin "HEAD:$branch"; then
+                git worktree remove --force "$tmp"
+                return 0
+              fi
+              git worktree remove --force "$tmp" || true
+              sleep "$attempt"
+            done
+            return 1
+          }
+          restore_one top4 codex/golden-top3-full3sv2-live golden-top4- recovery/top4
+          restore_one loss2s codex/golden-2s-loss-exit-live golden-loss2s- recovery/loss2s
+
+      - name: Verify restored checkpoint vectors
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          get_json() {
+            gh api --method GET "repos/${GITHUB_REPOSITORY}/contents/$2" -f ref="$1" --jq '.content' | tr -d '\n' | base64 -d
+          }
+          top="$(get_json codex/golden-top3-full3sv2-live docs/research/golden-top4-checkpoint.json)"
+          los="$(get_json codex/golden-2s-loss-exit-live docs/research/golden-loss2s-checkpoint.json)"
+          test "$(jq -c '.verified_forward_counts' <<<"$top")" = '{"FULL_3S":39,"FULL_3S_V2":39,"FULL_4S":39,"FULL_7S":37}'
+          test "$(jq -r '.min_verified_closed_per_model' <<<"$top")" = 37
+          test "$(jq -r '[.verified_forward_counts[]] | all(. == 6)' <<<"$los")" = true
+          echo 'RESTORED_CHECKPOINTS_VERIFIED'

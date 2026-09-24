@@ -1,0 +1,25 @@
+name: Cancel superseded live research
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/cancel-superseded-live.yml']
+  workflow_dispatch:
+permissions:
+  actions: write
+  contents: read
+jobs:
+  cancel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel superseded model tests
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for id in 35247587119 35247183671 35250218543 35231735826; do
+            status="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$id" --jq .status 2>/dev/null || echo missing)"
+            echo "$id $status"
+            if [ "$status" = "in_progress" ] || [ "$status" = "queued" ] || [ "$status" = "waiting" ] || [ "$status" = "pending" ]; then
+              gh api --method POST "repos/$GITHUB_REPOSITORY/actions/runs/$id/cancel" || true
+            fi
+          done

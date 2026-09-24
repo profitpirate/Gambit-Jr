@@ -1,0 +1,30 @@
+name: Cancel seven-model campaign now
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/cancel-sevenmodel-now.yml']
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cancel:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Cancel active seven-model runs
+        run: |
+          set -euo pipefail
+          ids="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow golden-sevenmodel-live.yml --branch codex/golden-sevenmodel-live --limit 30 --json databaseId,status --jq '.[] | select(.status != "completed") | .databaseId')"
+          if [ -z "$ids" ]; then
+            echo 'No active seven-model runs.'
+            exit 0
+          fi
+          for id in $ids; do
+            echo "Cancelling $id"
+            gh api -X POST "repos/$GITHUB_REPOSITORY/actions/runs/$id/cancel" >/dev/null || true
+          done

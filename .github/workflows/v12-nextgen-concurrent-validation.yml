@@ -1,25 +1,78 @@
 name: V12 NextGen Concurrent Validation
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/v12-nextgen-concurrent-validation.yml"
   workflow_dispatch:
   schedule:
-    - cron: "17 */6 * * *"
+    - cron: "17 */3 * * *"
 
 permissions:
   contents: read
 
 concurrency:
   group: v12-nextgen-concurrent-validation
-  cancel-in-progress: false
+  cancel-in-progress: true
+
+env:
+  PYTHONUNBUFFERED: "1"
+  NEXTGEN_REF: codex/v12-production-hardening-20260920
+  E4_PIPELINES_BACKGROUND: "false"
+  E4_SOL_USD_FALLBACK: "150"
 
 jobs:
-  nextgen-system:
+  runtime-safety:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: codex/v12-production-hardening-20260920
+          ref: ${{ env.NEXTGEN_REF }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .[dev,research]
+      - run: python -m pip install -r requirements-e4.txt
+      - name: NextGen runtime and safety suite
+        run: |
+          mkdir -p artifacts
+          python -m pytest -q \
+            tests/test_v12_nextgen_runtime.py \
+            tests/test_v12_nextgen_creator_authority.py \
+            tests/test_v12_route_authority.py \
+            tests/test_v12_execution_safety.py \
+            tests/test_v12_creator_lifecycle.py \
+            tests/test_v12_pipeline_metrics.py \
+            tests/test_v12_axiom_wallet.py \
+            tests/test_v12_production_deployment_audit.py
+          python scripts/v12_nextgen_system_audit.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v12-nextgen-runtime-safety-${{ github.run_id }}
+          path: |
+            artifacts/**
+            research/v12-nextgen-system-audit.json
+            research/v12-nextgen-system-audit.md
+          if-no-files-found: warn
+          retention-days: 30
+
+  execution-latency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      E4_BUILDER_COMMAND: "node tools/e4-builder/strict-race-proxy-v12.mjs"
+      E4_BUILDER_PRELOAD: "${{ github.workspace }}/tools/e4-builder/fast-preload-v4.mjs"
+      E4_V12_BUY_SLIPPAGE_BPS: "800"
+      E4_V12_MAX_OUTPUT_SHORTFALL_BPS: "800"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.NEXTGEN_REF }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -29,29 +82,89 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -e .[dev,research]
       - run: python -m pip install -r requirements-e4.txt
-      - working-directory: tools/e4-builder
-        run: npm ci --omit=dev
-      - name: NextGen runtime and safety
+      - name: Secure deterministic builder install
+        working-directory: tools/e4-builder
         run: |
-          python -m pytest -q tests/test_v12_nextgen_runtime.py tests/test_v12_nextgen_creator_authority.py tests/test_v12_route_authority.py tests/test_v12_execution_safety.py tests/test_v12_creator_lifecycle.py tests/test_v12_pipeline_metrics.py
-          python scripts/v12_nextgen_system_audit.py
-      - name: Execution latency stress
+          npm ci --omit=dev
+          npm run test:security-shim
+          npm run test:guard
+          npm audit --omit=dev
+      - name: Execution safety and guarded end-to-end latency
         run: |
           mkdir -p artifacts
-          python -m scripts.e4_v12_end_to_end_latency_benchmark --iterations 1000 --warmup 100 --maximum-p95-ms 10 --output artifacts/v12-nextgen-end-to-end-latency.json
-      - name: Production pipeline stress
-        run: |
-          python scripts/e4_v10_pipeline_stress.py --help >/dev/null
-      - name: Creator generalisation / cohort evidence
-        run: |
-          python -m pytest -q tests/test_v12_creator_library_rebuild.py tests/test_v12_e4_lifetime_ledger.py tests/test_v12_e4_source_reconciliation.py tests/test_v12_e4_wallet_identity_inventory.py
+          python -m pytest -q tests/test_v12_execution_safety.py tests/test_v12_transport.py tests/test_v12_tight_output.py tests/test_v12_strict_output_deferred.py
+          node --check tools/e4-builder/strict-output-guard-v12.mjs
+          node --check tools/e4-builder/race-proxy-v3.mjs
+          node --check tools/e4-builder/strict-race-proxy-v12.mjs
+          python -m scripts.e4_v12_end_to_end_latency_benchmark \
+            --iterations 1000 \
+            --warmup 100 \
+            --maximum-p95-ms 10 \
+            --output artifacts/v12-nextgen-end-to-end-latency.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: v12-nextgen-concurrent-validation-${{ github.run_id }}
-          path: |
-            artifacts/**
-            research/v12-nextgen-system-audit.json
-            research/v12-nextgen-system-audit.md
+          name: v12-nextgen-execution-latency-${{ github.run_id }}
+          path: artifacts/v12-nextgen-end-to-end-latency.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  pipeline-stress:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.NEXTGEN_REF }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .[dev,research]
+      - run: python -m pip install -r requirements-e4.txt
+      - name: Million-decision pipeline and narrative stress
+        run: |
+          mkdir -p artifacts
+          python scripts/e4_v10_pipeline_stress.py \
+            --iterations 1000000 \
+            --workers 16 \
+            --narrative-iterations 250000 \
+            --output artifacts/v12-nextgen-pipeline-stress.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v12-nextgen-pipeline-stress-${{ github.run_id }}
+          path: artifacts/v12-nextgen-pipeline-stress.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  creator-generalisation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.NEXTGEN_REF }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .[dev,research]
+      - run: python -m pip install -r requirements-e4.txt
+      - name: Creator authority, history and generalisation checks
+        run: |
+          mkdir -p artifacts
+          python -m pytest -q \
+            tests/test_v12_creator_library_rebuild.py \
+            tests/test_v12_e4_lifetime_ledger.py \
+            tests/test_v12_e4_source_reconciliation.py \
+            tests/test_v12_e4_wallet_identity_inventory.py \
+            tests/test_v12_nextgen_creator_authority.py \
+            tests/test_v12_creator_lifecycle.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v12-nextgen-creator-generalisation-${{ github.run_id }}
+          path: artifacts/**
           if-no-files-found: warn
           retention-days: 30

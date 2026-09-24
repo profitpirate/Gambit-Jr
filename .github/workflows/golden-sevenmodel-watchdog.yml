@@ -1,0 +1,49 @@
+name: Golden seven-model watchdog
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/golden-sevenmodel-watchdog.yml']
+  workflow_run:
+    workflows: ['Golden seven-model live 100-trade tournament']
+    types: [completed]
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: golden-sevenmodel-watchdog
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BRANCH: codex/golden-sevenmodel-live
+      WORKFLOW: golden-sevenmodel-live.yml
+    steps:
+      - name: Ensure unfinished seven-model test has an active runner
+        run: |
+          set -euo pipefail
+          stop="$(gh api "repos/$GITHUB_REPOSITORY/contents/docs/research/golden-sevenmodel-operator-stop.json?ref=$BRANCH" --jq '.content' 2>/dev/null | base64 -d | jq -r '.stop // false' 2>/dev/null || echo false)"
+          if [ "$stop" = "true" ]; then
+            echo 'Seven-model campaign stopped by operator.'
+            exit 0
+          fi
+          complete="$(gh api "repos/$GITHUB_REPOSITORY/contents/docs/research/golden-sevenmodel-status.json?ref=$BRANCH" --jq '.content' 2>/dev/null | base64 -d | jq -r '.complete // false' 2>/dev/null || echo false)"
+          if [ "$complete" = "true" ]; then
+            echo 'Seven-model target complete.'
+            exit 0
+          fi
+          active="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow "$WORKFLOW" --branch "$BRANCH" --limit 20 --json status --jq '[.[] | select(.status=="in_progress" or .status=="queued" or .status=="waiting" or .status=="pending")] | length')"
+          if [ "$active" -gt 0 ]; then
+            echo "Seven-model runner healthy: $active active/queued run(s)."
+            exit 0
+          fi
+          echo 'No active seven-model runner and target incomplete; dispatching continuation.'
+          gh workflow run "$WORKFLOW" --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
