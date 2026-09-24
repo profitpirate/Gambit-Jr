@@ -115,7 +115,7 @@ def _causal_gate(path: Path, *, repository_root: Path) -> tuple[bool, str]:
         failures.append("acceptance gate not passed")
     if state.get("real_money_execution") is not False:
         failures.append("causal state is not paper-live only")
-    if int(state.get("production_paths_changed") or 0) != 0:
+    if state.get("production_paths_changed") != 0:
         failures.append("production paths changed during causal test")
     if str(state.get("model_sha256") or "") != EXPECTED_FROZEN_MODEL_SHA256:
         failures.append("causal state model fingerprint mismatch")
@@ -177,7 +177,7 @@ def _causal_gate(path: Path, *, repository_root: Path) -> tuple[bool, str]:
         failures.append("unexpected causal confirmation workflow")
 
     recertification = certification.get("causal_exit_recertification") or {}
-    if int(recertification.get("impossible_exit_count_after") or -1) != 0:
+    if recertification.get("impossible_exit_count_after") != 0:
         failures.append("recertified baseline still has impossible exits")
     if recertification.get("performance_metrics_changed") is not False:
         failures.append("recertification unexpectedly changed baseline performance")
