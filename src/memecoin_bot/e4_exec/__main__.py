@@ -69,7 +69,7 @@ def _start_v12_pipelines() -> None:
 def main() -> None:
     """Canonical CLI wrapper; every live invocation passes the V12 readiness gate."""
     _preflight_live_if_requested()
-    if len(sys.argv) > 1 and sys.argv[1] == "run":
+    if len(sys.argv) > 1 and sys.argv[1] == "run" and "--live" in sys.argv:
         _start_v12_pipelines()
     _engine_main()
 
