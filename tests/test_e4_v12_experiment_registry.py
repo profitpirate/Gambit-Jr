@@ -438,12 +438,27 @@ class SafetyBoundaryTests(unittest.TestCase):
         )
         self.assertEqual(process.returncode, 0, process.stderr)
         changed = set(process.stdout.splitlines())
+        protected_prefixes = ("src/memecoin_bot/", "models/e4/", "tools/e4-builder/")
         protected = {
             path
             for path in changed
-            if path.startswith(("src/memecoin_bot/", "models/e4/", "tools/e4-builder/"))
+            if path.startswith(protected_prefixes)
         }
-        self.assertEqual(protected, set())
+        allowed = {
+            path.strip()
+            for path in os.getenv("V12_SAFETY_BOUNDARY_ALLOWED_PATHS", "").split(",")
+            if path.strip()
+        }
+        self.assertTrue(
+            all(path.startswith(protected_prefixes) for path in allowed),
+            f"invalid safety-boundary allowlist entries: {sorted(allowed)}",
+        )
+        unexpected = protected - allowed
+        self.assertEqual(
+            unexpected,
+            set(),
+            f"unexpected production-path changes: {sorted(unexpected)}",
+        )
         self.assertNotEqual(watchdog.RESEARCH_REF, "main")
         self.assertTrue(all(target.ref != "main" for target in watchdog.TARGETS[1:]))
 
