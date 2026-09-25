@@ -160,6 +160,10 @@ jobs:
           NODE
 
       - name: Full repository regression suite
+        env:
+          V12_SAFETY_BOUNDARY_ALLOWED_PATHS: >-
+            src/memecoin_bot/e4_production_guard_v12.py,
+            src/memecoin_bot/v12_execution_journal.py
         run: python -m pytest -q
 
       - name: Cohesion and shell audit
