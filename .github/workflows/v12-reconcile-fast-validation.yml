@@ -1,0 +1,110 @@
+name: V12 Reconciliation Fast Validation
+
+on:
+  push:
+    branches:
+      - codex/v12-production-reconcile-20260924
+    paths:
+      - "src/memecoin_bot/e4_exec/**"
+      - "src/memecoin_bot/e4_production_guard_v12.py"
+      - "src/memecoin_bot/v12_execution_journal.py"
+      - "tests/test_v12_direct_copy.py"
+      - ".github/workflows/v12-production-security.yml"
+      - ".github/workflows/v12-reconcile-fast-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v12-reconcile-fast-validation
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v12-production-reconcile-20260924
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .[dev,research]
+      - run: python -m pip install -r requirements-e4.txt
+      - run: python -m pip install bandit
+
+      - name: Compile and targeted lint
+        run: |
+          python -m compileall -q src/memecoin_bot scripts
+          ruff check \
+            src/memecoin_bot/e4_exec/__main__.py \
+            src/memecoin_bot/e4_production_guard_v12.py \
+            src/memecoin_bot/v12_execution_journal.py \
+            tests/test_v12_direct_copy.py
+
+      - name: Direct-copy and live-safety integration tests
+        run: |
+          python -m pytest -q \
+            tests/test_v12_direct_copy.py \
+            tests/test_v12_execution_safety.py \
+            tests/test_v12_recovery.py \
+            tests/test_v12_entrypoint_gate.py \
+            tests/test_v12_live_readiness_certification.py
+
+      - name: Full V12 regression
+        run: |
+          python -m pytest -q \
+            tests/test_v12_*.py \
+            tests/test_e4_v12_sub10ms_repairs.py \
+            tests/test_e4_v12_sub10ms_transport.py \
+            tests/test_e4_v12_sub10ms_transport_final.py
+
+      - name: Production deployment contract audit
+        run: python scripts/v12_production_deployment_audit.py
+
+      - name: Secret scan
+        run: python scripts/v12_secret_scan.py
+
+      - name: Security static-analysis policy
+        run: |
+          set +e
+          bandit -r \
+            src/memecoin_bot/v12_security.py \
+            src/memecoin_bot/v12_backup.py \
+            src/memecoin_bot/v12_live_readiness.py \
+            src/memecoin_bot/v12_execution_journal.py \
+            src/memecoin_bot/v12_recovery.py \
+            src/memecoin_bot/v12_watchdogs.py \
+            src/memecoin_bot/e4_production_guard_v12.py \
+            src/memecoin_bot/v12_vault_signer.py \
+            src/memecoin_bot/v12_account_orchestrator.py \
+            src/memecoin_bot/control_plane.py \
+            -ll -ii -f json -o /tmp/v12-bandit.json
+          set -e
+          cat /tmp/v12-bandit.json
+          python - <<'PY'
+          import json
+          report=json.load(open("/tmp/v12-bandit.json"))
+          if report.get("errors"):
+              raise SystemExit(report["errors"])
+          findings=report.get("results") or []
+          if findings:
+              raise SystemExit(json.dumps(findings,sort_keys=True))
+          print("BANDIT_POLICY_PASS")
+          PY
+
+      - name: Builder self-test
+        working-directory: tools/e4-builder
+        run: |
+          npm ci --omit=dev
+          node --check race-proxy-v3.mjs
+          node --check strict-race-proxy-v12.mjs
+          node --check fast-preload-v4.mjs
+          node race-proxy-v3.mjs --self-test
