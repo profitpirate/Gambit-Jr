@@ -57,6 +57,12 @@ REQUIRED_DEPLOYMENT = (
     "deploy/systemd/gambit-v12-portal.service",
     "deploy/tmpfiles.d/gambit-v12.conf",
 )
+REQUIRED_VALIDATION = (
+    ".github/workflows/v12-nextgen-concurrent-validation.yml",
+    ".github/workflows/v12-nextgen-validation-watchdog.yml",
+    "scripts/v12_validation_freshness.py",
+    "tests/test_v12_validation_freshness.py",
+)
 FORBIDDEN_COMMAND_FILES = (
     "src/memecoin_bot/discord/bot_runtime.py",
     "src/memecoin_bot/discord/command_center.py",
@@ -127,6 +133,68 @@ def main() -> int:
     ]
     failures.extend(
         f"missing_deployment:{path}" for path in missing_deployment
+    )
+    missing_validation = [
+        path for path in REQUIRED_VALIDATION if not (ROOT / path).exists()
+    ]
+    failures.extend(
+        f"missing_validation:{path}" for path in missing_validation
+    )
+
+    validation_workflow_path = (
+        ROOT / ".github/workflows/v12-nextgen-concurrent-validation.yml"
+    )
+    validation_workflow = (
+        validation_workflow_path.read_text(encoding="utf-8")
+        if validation_workflow_path.exists()
+        else ""
+    )
+    validation_markers = (
+        "runtime-safety:",
+        "execution-latency:",
+        "pipeline-stress:",
+        "creator-generalisation:",
+        "--iterations 1000000",
+        "--workers 16",
+        "--narrative-iterations 250000",
+        "tests/test_v12_production_deployment_audit.py",
+        "tests/test_v12_validation_freshness.py",
+        'cron: "17 */3 * * *"',
+        "cancel-in-progress: true",
+    )
+    missing_validation_markers = [
+        marker for marker in validation_markers if marker not in validation_workflow
+    ]
+    failures.extend(
+        f"validation_workflow_missing_marker:{marker}"
+        for marker in missing_validation_markers
+    )
+    if (
+        "e4_v10_pipeline_stress.py" in validation_workflow
+        and "--help" in validation_workflow
+    ):
+        failures.append("validation_pipeline_stress_is_placeholder")
+
+    watchdog_path = ROOT / ".github/workflows/v12-nextgen-validation-watchdog.yml"
+    watchdog = (
+        watchdog_path.read_text(encoding="utf-8")
+        if watchdog_path.exists()
+        else ""
+    )
+    watchdog_markers = (
+        'cron: "47 * * * *"',
+        "actions: write",
+        "scripts/v12_validation_freshness.py",
+        "--dispatch-if-unhealthy",
+        "--max-age-hours 6",
+        "tests/test_v12_validation_freshness.py",
+    )
+    missing_watchdog_markers = [
+        marker for marker in watchdog_markers if marker not in watchdog
+    ]
+    failures.extend(
+        f"validation_watchdog_missing_marker:{marker}"
+        for marker in missing_watchdog_markers
     )
 
     forbidden_present = [
@@ -242,6 +310,22 @@ def main() -> int:
         "required_components": len(REQUIRED),
         "required_deployment_units": len(REQUIRED_DEPLOYMENT),
         "deployment_units_present": not missing_deployment,
+        "required_validation_units": len(REQUIRED_VALIDATION),
+        "validation_units_present": not missing_validation,
+        "validation_infrastructure": {
+            "concurrent_four_lane": not missing_validation_markers,
+            "million_decision_stress_real": (
+                "--iterations 1000000" in validation_workflow
+                and "--workers 16" in validation_workflow
+                and "--narrative-iterations 250000" in validation_workflow
+                and not (
+                    "e4_v10_pipeline_stress.py" in validation_workflow
+                    and "--help" in validation_workflow
+                )
+            ),
+            "freshness_watchdog_wired": not missing_watchdog_markers,
+            "self_healing_dispatch": "--dispatch-if-unhealthy" in watchdog,
+        },
         "components": components,
         "discord_command_runtime_removed": not forbidden_present,
         "creator_library": {
