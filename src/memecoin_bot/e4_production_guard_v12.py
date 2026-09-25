@@ -60,6 +60,21 @@ def _float_env(name: str, default: float) -> float:
         return default
 
 
+def _is_direct_copy_authoritative(mint: str) -> bool:
+    """True when the frozen E4 Direct Copy profile owns this mint.
+
+    The final production guard must remain the outer safety layer, but it must
+    not silently replace Direct Copy sizing/slippage/source-lifecycle semantics
+    with the generic V12 entry path.
+    """
+    profile = v6._PROFILE_BY_MINT.get(str(mint))
+    return bool(
+        profile is not None
+        and str(getattr(profile, "family", "") or "") == role_model.ROLE_MODEL_FAMILY
+        and role_model.PIPELINES.e4_signal(str(mint)) is not None
+    )
+
+
 def _engine_init(self: Any, settings: Any) -> None:
     _PREVIOUS_ENGINE_INIT(self, settings)
     install_redaction_filter()
@@ -249,7 +264,9 @@ async def _execute_exactly_once(
             },
         )
 
-    assert signed and signature
+    if not signed or not signature:
+        self.v12_breaker.halt("execution_journal_missing_signed_transaction")
+        raise RuntimeError("V12 execution journal reached submit without signed transaction")
     side = str(enriched.get("side") or "")
     _rank_routes(self, side=side)
     submit_started = time.time_ns()
@@ -345,16 +362,37 @@ async def _execute_buy_production(
     fraction: float,
     reason: str,
 ) -> None:
-    if not self.v12_breaker.store.snapshot().entries_allowed:
+    safety = self.v12_breaker.store.snapshot()
+    if not safety.entries_allowed:
         self.pending_entries.discard(state.mint)
         self.store.decision(
             state.mint,
             None,
             "SKIP",
             score,
-            f"V12 safety blocked entry: {self.v12_breaker.store.snapshot().reason}",
+            f"V12 safety blocked entry: {safety.reason}",
             {"fraction": fraction},
         )
+        return
+
+    mint = str(state.mint)
+    if _is_direct_copy_authoritative(mint):
+        before = self.positions.get(mint)
+        await _PREVIOUS_EXECUTE_BUY(self, state, score, fraction, reason)
+        opened = self.positions.get(mint)
+        if opened is not None and opened is not before:
+            context = v6._CONTEXT_BY_MINT.get(mint, {})
+            _audit(
+                self,
+                "POSITION_OPENED",
+                {
+                    "mint": mint,
+                    "creator": str(context.get("creator") or ""),
+                    "amount_sol": float(opened.entry_sol),
+                    "signature": opened.entry_signature,
+                    "entry_authority": "E4_DIRECT_COPY_V12",
+                },
+            )
         return
 
     creator = str(
@@ -377,7 +415,6 @@ async def _execute_buy_production(
     if lifecycle is not None and creator:
         fraction *= lifecycle.risk_multiplier(creator)
 
-    mint = state.mint
     reserved = 0.0
     runtime = v10._runtime_for(self)
     try:
