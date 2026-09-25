@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+import sys
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
-from scripts.v12_validation_freshness import evaluate_runs
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+
+from v12_validation_freshness import evaluate_runs
 
 
 NOW = datetime(2026, 9, 25, 12, 0, tzinfo=timezone.utc)
