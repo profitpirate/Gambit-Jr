@@ -2,9 +2,9 @@
 
 **Classification:** FAILED_FORWARD_EDGE_CERTIFICATION
 **Frozen strategy fingerprint:** `93616ed547c2548f9a554fcc4185e5b4a33736d27dedbe3a7449d88db0506801`
-**Independent batches:** 79
-**Copy-audited batches:** 79
-**Fresh launches:** 237000
+**Independent batches:** 80
+**Copy-audited batches:** 80
+**Fresh launches:** 240000
 
 ## Direct E4-copy cohort
 **Closed:** 574
@@ -20,17 +20,17 @@
 **Median fill drift:** 1314.069270315107 bps
 
 ## Non-copy V12 cohort
-**Closed:** 83
-**WR:** 14.46%
-**P&L:** -0.275884 SOL
-**PF:** 0.2461801746588823
-**Families:** {"v12_elite_creator_quality_launch": 5, "v12_proven_creator_quality_launch": 78}
+**Closed:** 85
+**WR:** 14.12%
+**P&L:** -0.286211 SOL
+**PF:** 0.23942388054962108
+**Families:** {"v12_elite_creator_quality_launch": 5, "v12_proven_creator_quality_launch": 80}
 
 ## All V12 positions (diagnostic only)
-**Closed:** 657
-**WR:** 16.13%
-**P&L:** -1.531976 SOL
-**PF:** 0.24780514765870992
+**Closed:** 659
+**WR:** 16.08%
+**P&L:** -1.542304 SOL
+**PF:** 0.2465549127450302
 
 ## Same-window E4
 **Closed:** 676
