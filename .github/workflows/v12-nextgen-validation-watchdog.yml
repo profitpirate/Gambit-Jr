@@ -1,0 +1,57 @@
+name: V12 NextGen Validation Freshness Watchdog
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "47 * * * *"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/v12-nextgen-validation-watchdog.yml"
+      - "scripts/v12_validation_freshness.py"
+      - "tests/test_v12_validation_freshness.py"
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: v12-nextgen-validation-freshness-watchdog
+  cancel-in-progress: true
+
+env:
+  VALIDATION_WORKFLOW: v12-nextgen-concurrent-validation.yml
+  VALIDATION_HEAD_BRANCH: main
+
+jobs:
+  freshness-watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Unit-test freshness evaluator
+        run: python -m pytest -q tests/test_v12_validation_freshness.py
+      - name: Check freshness and self-heal stale validation
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p artifacts
+          python scripts/v12_validation_freshness.py \
+            --repository "${GITHUB_REPOSITORY}" \
+            --workflow "${VALIDATION_WORKFLOW}" \
+            --head-branch "${VALIDATION_HEAD_BRANCH}" \
+            --max-age-hours 6 \
+            --dispatch-if-unhealthy \
+            --dispatch-ref main \
+            --output artifacts/v12-nextgen-validation-freshness.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v12-nextgen-validation-freshness-${{ github.run_id }}
+          path: artifacts/v12-nextgen-validation-freshness.json
+          if-no-files-found: warn
+          retention-days: 30
