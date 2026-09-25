@@ -143,7 +143,8 @@ class ExecutionJournal:
             )
             row = self._row(key)
             self.conn.execute("COMMIT")
-            assert row is not None
+            if row is None:
+                raise RuntimeError("execution journal insert committed without a readable row")
             return self._entry(row)
         except Exception:
             if self.conn.in_transaction:
