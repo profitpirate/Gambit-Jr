@@ -4,8 +4,17 @@ on:
   push:
     branches:
       - main
+      - codex/v12-production-hardening-20260920
     paths:
       - ".github/workflows/v12-nextgen-concurrent-validation.yml"
+      - ".github/workflows/v12-nextgen-validation-watchdog.yml"
+      - "src/memecoin_bot/e4_*v12*.py"
+      - "src/memecoin_bot/v12_*.py"
+      - "scripts/v12_*.py"
+      - "scripts/e4_v10_pipeline_stress.py"
+      - "tests/test_v12_*.py"
+      - "tools/e4-builder/**"
+      - "models/e4/**"
   workflow_dispatch:
   schedule:
     - cron: "17 */3 * * *"
@@ -48,7 +57,8 @@ jobs:
             tests/test_v12_creator_lifecycle.py \
             tests/test_v12_pipeline_metrics.py \
             tests/test_v12_axiom_wallet.py \
-            tests/test_v12_production_deployment_audit.py
+            tests/test_v12_production_deployment_audit.py \
+            tests/test_v12_validation_freshness.py
           python scripts/v12_nextgen_system_audit.py
       - uses: actions/upload-artifact@v4
         if: always()
