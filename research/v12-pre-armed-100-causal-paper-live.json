@@ -1,19 +1,19 @@
 {
   "audit_counts": {
     "creator_seed_below_floor": 161,
-    "execution_entry_output_guard_rejected": 14,
+    "execution_entry_output_guard_rejected": 15,
     "mayhem": 61,
     "not_prearmed_handle": 143,
-    "selected_candidates": 100,
+    "selected_candidates": 103,
     "social_age_outside_window": 18,
-    "unknown_creator": 164517
+    "unknown_creator": 167514
   },
   "completion": {
     "reached": false,
-    "remaining": 14,
+    "remaining": 12,
     "required_closed_trades": 100
   },
-  "ending_bankroll_sol": 6.665281677680195,
+  "ending_bankroll_sol": 6.573937955163147,
   "golden_thesis_approved": false,
   "ledger": [
     {
@@ -2939,22 +2939,90 @@
       "social_status_id": "2103479740300451952",
       "tweet_age_seconds": 1.657240729,
       "win": true
+    },
+    {
+      "costs_sol": {
+        "axiom_entry": 0.006176140258117599,
+        "axiom_exit": 0.005679716408020295,
+        "base_priority_bribe_entry": 0.002005,
+        "base_priority_exit": 0.001005,
+        "pump_entry": 0.00812650033962842,
+        "pump_exit": 0.007473311063184599,
+        "total_axiom": 0.011855856666137893,
+        "total_fixed_execution": 0.0030099999999999997,
+        "total_pump": 0.015599811402813017
+      },
+      "create_to_fill_price_multiple": 1.4209522975193718,
+      "creator": "9gpdgZTNxvSrbiBcFM8aWdCUBvQrcprQR4TmsJLU2M9L",
+      "creator_seed_sol": 10.0,
+      "curve_input_sol": 0.6501200271702735,
+      "decision_ns": 1790366230225558634,
+      "entry_budget_sol": 0.6664276677680195,
+      "entry_cost_sol": 0.6664276677680196,
+      "entry_latency_ms": 5.0,
+      "exit_ns": 1790366232230558634,
+      "exit_reason": "MAXIMUM_HOLD",
+      "exit_transactions": 1,
+      "fill_ns": 1790366230230558634,
+      "mint": "C2mCMTcgaWEYd8XiEvTGPwB5kW83Yw6z1SRfnE6KPvHA",
+      "output_ratio": 0.7055712835998798,
+      "pnl_sol": -0.08272081018445676,
+      "proceeds_sol": 0.5837068575835629,
+      "run_id": "36177393118",
+      "social_handle": "realdesertdoge",
+      "social_status_id": "2103574546712330584",
+      "tweet_age_seconds": 1.107558634,
+      "win": false
+    },
+    {
+      "costs_sol": {
+        "axiom_entry": 0.006099247137104647,
+        "axiom_exit": 0.006338653279101574,
+        "base_priority_bribe_entry": 0.002005,
+        "base_priority_exit": 0.00201,
+        "pump_entry": 0.008025325180400852,
+        "pump_exit": 0.008340333261975755,
+        "total_axiom": 0.01243790041620622,
+        "total_fixed_execution": 0.0040149999999999995,
+        "total_pump": 0.016365658442376606
+      },
+      "create_to_fill_price_multiple": 1.2188159999999961,
+      "creator": "7moqFjvm2MwAiMtCZoqYoTAPzRBxxMRT2ddyHThQuWjr",
+      "creator_seed_sol": 3.0,
+      "curve_input_sol": 0.6420260144320682,
+      "decision_ns": 1790367950077246388,
+      "entry_budget_sol": 0.6581555867495738,
+      "entry_cost_sol": 0.6581555867495738,
+      "entry_latency_ms": 5.0,
+      "exit_ns": 1790367951827931678,
+      "exit_reason": "TRAILING_OR_STOP",
+      "exit_transactions": 2,
+      "fill_ns": 1790367950082246388,
+      "mint": "DC1nwUpyt4W7QtujUE5k2QijYFREFBY6FUZS8ca3W8u",
+      "output_ratio": 0.82194606107498,
+      "pnl_sol": -0.007617912332590571,
+      "proceeds_sol": 0.6505376744169832,
+      "run_id": "36177393118",
+      "social_handle": "lebombjam",
+      "social_status_id": "2103581761003266265",
+      "tweet_age_seconds": 0.938246388,
+      "win": false
     }
   ],
   "metrics": {
     "acceptance_gate_passed": false,
-    "capture_windows": 40,
-    "closed_trades": 86,
-    "ending_bankroll_sol": 6.679351677680193,
-    "losses": 34,
+    "capture_windows": 41,
+    "closed_trades": 88,
+    "ending_bankroll_sol": 6.589012955163147,
+    "losses": 36,
     "maximum_closed_equity_drawdown_fraction": 0.1723397054662247,
-    "net_pnl_sol": 3.6793516776801938,
-    "profit_factor": 3.0187939136286155,
-    "total_axiom_fees_sol": 0.8403658018268915,
-    "total_fixed_execution_costs_sol": 0.30810499999999996,
-    "total_pump_fees_sol": 1.105744476088015,
-    "wilson_lower_bound": 0.4989772079672809,
-    "win_rate": 0.6046511627906976,
+    "net_pnl_sol": 3.5890129551631467,
+    "profit_factor": 2.87622729954055,
+    "total_axiom_fees_sol": 0.8646595589092355,
+    "total_fixed_execution_costs_sol": 0.31512999999999997,
+    "total_pump_fees_sol": 1.1377099459332047,
+    "wilson_lower_bound": 0.4864808526118738,
+    "win_rate": 0.5909090909090909,
     "wins": 52
   },
   "model_sha256": "69df86eaf386fd37d699928a95d25aaeb2053e743b59c9e687c8a7c49d14f977",
@@ -3013,7 +3081,8 @@
     "36124890630",
     "36139321997",
     "36153158188",
-    "36165468303"
+    "36165468303",
+    "36177393118"
   ],
   "production_authorised": false,
   "production_paths_changed": 0,
@@ -3130,6 +3199,14 @@
       "output_ratio": 0.6266666875377096,
       "reason": "entry_output_guard_rejected",
       "run_id": "36063652609"
+    },
+    {
+      "create_to_fill_price_multiple": 1.6111407966602276,
+      "fee_sol": 0.001005,
+      "mint": "4beiMmQPtU2UaBmkL8Z2yaavLuGqWb58BxkxTmJpAT5T",
+      "output_ratio": 0.6232332913329804,
+      "reason": "entry_output_guard_rejected",
+      "run_id": "36177393118"
     }
   ],
   "schema_version": "e4-v12-prearmed-axiom-paper-live-v1",
