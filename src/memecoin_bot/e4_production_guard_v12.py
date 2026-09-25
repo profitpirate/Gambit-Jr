@@ -362,6 +362,13 @@ async def _execute_buy_production(
     fraction: float,
     reason: str,
 ) -> None:
+    # Legacy/research stress harnesses intentionally construct Engine instances
+    # without running the production initializer. Preserve their original
+    # execution contract rather than dereferencing absent V12 runtime state.
+    if not hasattr(self, "v12_breaker"):
+        await _PREVIOUS_EXECUTE_BUY(self, state, score, fraction, reason)
+        return
+
     safety = self.v12_breaker.store.snapshot()
     if not safety.entries_allowed:
         self.pending_entries.discard(state.mint)
@@ -577,6 +584,10 @@ async def _execute_sell_production(
     fraction: float,
     reason: str,
 ) -> None:
+    if not hasattr(self, "v12_journal"):
+        await _PREVIOUS_EXECUTE_SELL(self, position, fraction, reason)
+        return
+
     unresolved = self.v12_journal.unresolved_for("SELL", str(position.mint))
     if unresolved:
         self.v12_breaker.exit_only("unresolved_sell_blocks_duplicate_exit")
@@ -633,6 +644,10 @@ core.Engine.execute_sell = _execute_sell_production
 
 
 async def _sweep_production(self: Any) -> None:
+    if not hasattr(self, "v12_journal"):
+        await _PREVIOUS_SWEEP(self)
+        return
+
     unresolved = self.v12_journal.unresolved_for("SWEEP", None)
     if unresolved:
         self.v12_breaker.exit_only("unresolved_sweep_blocks_duplicate_transfer")
@@ -873,13 +888,19 @@ core.Engine.run = _run_production
 
 
 async def _on_event_production(self: Any, event: Any) -> None:
-    if self.v12_watchdog is not None:
-        self.v12_watchdog.touch_event()
-    self.v12_learning.observe(event)
+    watchdog = getattr(self, "v12_watchdog", None)
+    learning = getattr(self, "v12_learning", None)
+    operator_graph = getattr(self, "v12_operator_graph", None)
+    if watchdog is not None:
+        watchdog.touch_event()
+    if learning is None or operator_graph is None:
+        await _PREVIOUS_ON_EVENT(self, event)
+        return
+    learning.observe(event)
     creator = str(getattr(event, "creator", "") or "")
     if creator:
         context = v6._CONTEXT_BY_MINT.get(str(getattr(event, "mint", "")), {})
-        self.v12_operator_graph.observe(
+        operator_graph.observe(
             creator,
             metadata_host=str(context.get("metadata_host") or "") or None,
             social_handle=str(context.get("social_handle") or "") or None,
@@ -892,8 +913,9 @@ core.Engine.on_event = _on_event_production
 
 
 def _stop_production(self: Any) -> None:
-    if self.v12_watchdog is not None:
-        self.v12_watchdog.stop()
+    watchdog = getattr(self, "v12_watchdog", None)
+    if watchdog is not None:
+        watchdog.stop()
     _PREVIOUS_STOP(self)
 
 
