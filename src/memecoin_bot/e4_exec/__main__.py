@@ -13,9 +13,9 @@ os.environ.setdefault("E4_BUILDER_RACE_CHILDREN", "2")
 os.environ.setdefault("E4_BALANCE_CACHE_MAX_STALENESS_MS", "5000")
 os.environ.setdefault("E4_DIRECT_COPY_MAX_OUTPUT_SHORTFALL_BPS", "600")
 
-from memecoin_bot import e4_hardening_v12  # noqa: F401 - permanent V12 authority
-from memecoin_bot import e4_role_model_v12  # noqa: E402 - direct E4/creator/social wiring
-from memecoin_bot import e4_direct_copy_v12  # noqa: E402 - recognized-E4 execution
+from memecoin_bot import e4_hardening_v12
+from memecoin_bot import e4_role_model_v12
+from memecoin_bot import e4_direct_copy_v12
 from memecoin_bot import e4_sub10ms_repairs_v12  # noqa: F401 - output guard, exact exits
 from memecoin_bot import e4_sub10ms_runtime_final_v12  # noqa: F401 - final prewarm + route authority
 from memecoin_bot import e4_notifications_v12  # noqa: F401 - durable close/sweep notifications
