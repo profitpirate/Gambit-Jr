@@ -75,7 +75,50 @@ jobs:
 
       - name: Production security static analysis
         run: |
-          bandit -r             src/memecoin_bot/v12_security.py             src/memecoin_bot/v12_backup.py             src/memecoin_bot/v12_live_readiness.py             src/memecoin_bot/v12_execution_journal.py             src/memecoin_bot/v12_recovery.py             src/memecoin_bot/v12_watchdogs.py             src/memecoin_bot/e4_production_guard_v12.py             src/memecoin_bot/v12_vault_signer.py             src/memecoin_bot/v12_account_orchestrator.py             src/memecoin_bot/control_plane.py             -ll -ii -f json -o research/v12-bandit.json
+          set +e
+          bandit -r \
+            src/memecoin_bot/v12_security.py \
+            src/memecoin_bot/v12_backup.py \
+            src/memecoin_bot/v12_live_readiness.py \
+            src/memecoin_bot/v12_execution_journal.py \
+            src/memecoin_bot/v12_recovery.py \
+            src/memecoin_bot/v12_watchdogs.py \
+            src/memecoin_bot/e4_production_guard_v12.py \
+            src/memecoin_bot/v12_vault_signer.py \
+            src/memecoin_bot/v12_account_orchestrator.py \
+            src/memecoin_bot/control_plane.py \
+            -ll -ii -f json -o research/v12-bandit.json
+          bandit_rc="$?"
+          set -e
+          cat research/v12-bandit.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("research/v12-bandit.json").read_text())
+          errors = report.get("errors") or []
+          findings = report.get("results") or []
+          if errors:
+              raise SystemExit(f"Bandit scan errors: {errors}")
+          if findings:
+              summary = [
+                  {
+                      "test_id": row.get("test_id"),
+                      "severity": row.get("issue_severity"),
+                      "confidence": row.get("issue_confidence"),
+                      "file": row.get("filename"),
+                      "line": row.get("line_number"),
+                      "text": row.get("issue_text"),
+                  }
+                  for row in findings
+              ]
+              raise SystemExit(
+                  "Bandit medium/high-confidence findings remain: "
+                  + json.dumps(summary, sort_keys=True)
+              )
+          print("BANDIT_POLICY_PASS")
+          PY
+          echo "bandit_exit_code=$bandit_rc (policy enforced from filtered JSON results)"
 
       - name: Python SBOM
         run: cyclonedx-py environment --output-format JSON --output-file research/v12-python-sbom.json
