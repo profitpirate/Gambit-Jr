@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import asyncio
 import os
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import AsyncMock, Mock, patch
 
 from memecoin_bot import e4_direct_copy_v12 as direct
+from memecoin_bot import e4_production_guard_v12 as production_guard
 
 
 class V12DirectCopyTests(unittest.TestCase):
@@ -63,7 +65,51 @@ class V12DirectCopyTests(unittest.TestCase):
         holdout = Path("scripts/e4_300_launch_holdout_v12.py").read_text(encoding="utf-8")
         self.assertIn(digest, entrypoint)
         self.assertIn(digest, holdout)
-        self.assertIs(direct.core.Engine.execute_buy, direct._execute_buy_direct_copy_v12)
+        self.assertIs(
+            production_guard._PREVIOUS_EXECUTE_BUY,
+            direct._execute_buy_direct_copy_v12,
+        )
+        self.assertIs(
+            direct.core.Engine.execute_buy,
+            production_guard._execute_buy_production,
+        )
+
+    def test_production_guard_delegates_authoritative_direct_copy(self):
+        safety = SimpleNamespace(entries_allowed=True, reason="")
+        engine = SimpleNamespace(
+            v12_breaker=SimpleNamespace(store=SimpleNamespace(snapshot=lambda: safety)),
+            pending_entries=set(),
+            positions={},
+            store=SimpleNamespace(decision=Mock()),
+        )
+        state = SimpleNamespace(mint="direct-copy-mint")
+        previous = AsyncMock()
+
+        with (
+            patch.object(
+                production_guard,
+                "_is_direct_copy_authoritative",
+                return_value=True,
+            ),
+            patch.object(production_guard, "_PREVIOUS_EXECUTE_BUY", previous),
+        ):
+            asyncio.run(
+                production_guard._execute_buy_production(
+                    engine,
+                    state,
+                    0.95,
+                    0.2,
+                    "direct copy regression",
+                )
+            )
+
+        previous.assert_awaited_once_with(
+            engine,
+            state,
+            0.95,
+            0.2,
+            "direct copy regression",
+        )
 
 
 if __name__ == "__main__":
