@@ -218,19 +218,21 @@ class ExecutionJournal:
         states: tuple[str, ...] = ("SIGNED", "SUBMITTED", "UNCERTAIN"),
     ) -> list[JournalEntry]:
         allowed = {"SIGNED", "SUBMITTED", "UNCERTAIN"}
-        selected = tuple(state for state in states if state in allowed)
+        selected = {state for state in states if state in allowed}
         if not selected:
             return []
-        placeholders = ",".join("?" for _ in selected)
         rows = self.conn.execute(
-            f"""
+            """
             SELECT * FROM v12_execution_journal
-            WHERE state IN ({placeholders})
+            WHERE state IN ('SIGNED','SUBMITTED','UNCERTAIN')
             ORDER BY created_ns
-            """,
-            selected,
+            """
         ).fetchall()
-        return [self._entry(row) for row in rows]
+        return [
+            self._entry(row)
+            for row in rows
+            if str(row["state"]) in selected
+        ]
 
     def unresolved_for(self, side: str, mint: str | None) -> list[JournalEntry]:
         rows = self.conn.execute(

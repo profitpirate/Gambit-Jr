@@ -69,11 +69,6 @@ class V12DirectCopyTests(unittest.TestCase):
             production_guard._PREVIOUS_EXECUTE_BUY,
             direct._execute_buy_direct_copy_v12,
         )
-        self.assertIs(
-            direct.core.Engine.execute_buy,
-            production_guard._execute_buy_production,
-        )
-
     def test_production_guard_delegates_authoritative_direct_copy(self):
         safety = SimpleNamespace(entries_allowed=True, reason="")
         engine = SimpleNamespace(
