@@ -1,8 +1,21 @@
 # V12 Pre-Armed Axiom-costed paper-live test
 
-Status: **PAPER_LIVE_SAMPLE_COMPLETE_GATE_FAILED**
+Status: **PAPER_LIVE_SAMPLE_COMPLETE_MANUAL_PASS**
 
 This is an untouched forward paper test. It does not place real trades or modify production V12.
+
+## Acceptance decision
+
+- Effective research decision: **PASS BY EXPLICIT USER OVERRIDE**.
+- Recorded at: 2026-09-26T08:35:06Z.
+- Applies only to the completed fresh causal 100-trade sample at commit `b865c49873082a6e67b276b5d79543267ba613b6`.
+- Automatic frozen-gate result remains **FAIL** (`metrics.acceptance_gate_passed: false`).
+- Waived conditions: win rate **59.00% < 65.00%**; Wilson lower bound **49.20143% < 55.00%**.
+- All five other automatic acceptance conditions passed.
+- Original thresholds, trade ledger, measured metrics, and frozen model are unchanged.
+- The invalidated 19-trade sample is excluded.
+- Golden thesis research approval: **true**, by manual override.
+- Production authorised: **false**. Real-money execution: **false**.
 
 ## Progress
 

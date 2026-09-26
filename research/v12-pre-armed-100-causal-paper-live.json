@@ -15,7 +15,7 @@
     "required_closed_trades": 100
   },
   "ending_bankroll_sol": 7.33223555712982,
-  "golden_thesis_approved": false,
+  "golden_thesis_approved": true,
   "ledger": [
     {
       "costs_sol": {
@@ -3418,6 +3418,34 @@
       "win": false
     }
   ],
+  "manual_acceptance_override": {
+    "passed": true,
+    "basis": "explicit_user_override",
+    "scope": "completed_fresh_causal_100_trade_research_sample_only",
+    "recorded_at_utc": "2026-09-26T08:35:06Z",
+    "user_instruction": "im overiding the gate and passing it",
+    "evidence_commit": "b865c49873082a6e67b276b5d79543267ba613b6",
+    "model_sha256": "69df86eaf386fd37d699928a95d25aaeb2053e743b59c9e687c8a7c49d14f977",
+    "original_status": "PAPER_LIVE_SAMPLE_COMPLETE_GATE_FAILED",
+    "automatic_acceptance_gate_passed": false,
+    "waived_conditions": [
+      {
+        "metric": "win_rate",
+        "required_operator": ">=",
+        "required_value": 0.65,
+        "actual_value": 0.59
+      },
+      {
+        "metric": "wilson_lower_bound",
+        "required_operator": ">=",
+        "required_value": 0.55,
+        "actual_value": 0.4920143005341077
+      }
+    ],
+    "invalidated_19_trade_sample_used": false,
+    "production_authorised": false,
+    "real_money_execution": false
+  },
   "metrics": {
     "acceptance_gate_passed": false,
     "capture_windows": 45,
@@ -3633,5 +3661,5 @@
   "schema_version": "e4-v12-prearmed-axiom-paper-live-v1",
   "social_evidence_mode": "immutable launch metadata proves the status existed before CREATE; live X transport is not claimed",
   "starting_bankroll_sol": 3.0,
-  "status": "PAPER_LIVE_SAMPLE_COMPLETE_GATE_FAILED"
+  "status": "PAPER_LIVE_SAMPLE_COMPLETE_MANUAL_PASS"
 }
