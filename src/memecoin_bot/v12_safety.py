@@ -50,6 +50,7 @@ TRANSIENT_EXIT_ONLY_PREFIXES = (
     "orphan_buy_recovery_rpc_failure",
     "confirmed_buy_token_balance_not_visible",
     "confirmed_direct_copy_token_balance_not_visible",
+    "confirmed_sell_reconciliation_failed",
 )
 
 
