@@ -339,6 +339,17 @@ async def _execute_buy_direct_copy_v12(
                 """,
                 (f"direct-copy pre-submit failure: {str(exc)[:500]}", mint),
             )
+            failure_window = getattr(self, "v12_tx_failures", None)
+            safety_store = getattr(self, "v12_safety_store", None)
+            breaker = getattr(self, "v12_breaker", None)
+            if failure_window is not None and safety_store is not None:
+                now = time.monotonic()
+                while failure_window and now - failure_window[0] > 60.0:
+                    failure_window.popleft()
+                failure_window.append(now)
+                safety_store.set_tx_failures(len(failure_window))
+                if breaker is not None:
+                    breaker.evaluate_operational()
         LOGGER.exception("E4 V12 direct-copy execution error mint=%s", mint)
     finally:
         if reserved:
