@@ -87,6 +87,20 @@ async def heartbeat(
 
 
 async def run() -> int:
+    # Keep the market-data service and live execution engine on the same
+    # operator-supplied Solana endpoints. E4 uses E4_PRIMARY_RPC_URL while the
+    # V1.5 market-data stack historically used SOLANA_RPC_URL.
+    primary_rpc = os.getenv("E4_PRIMARY_RPC_URL", "").strip()
+    if primary_rpc and not os.getenv("SOLANA_RPC_URL", "").strip():
+        os.environ["SOLANA_RPC_URL"] = primary_rpc
+    fallback_rpcs = [
+        value.strip()
+        for value in os.getenv("E4_FALLBACK_RPC_URLS", "").split(",")
+        if value.strip()
+    ]
+    if fallback_rpcs and not os.getenv("SOLANA_FALLBACK_RPC_URL", "").strip():
+        os.environ["SOLANA_FALLBACK_RPC_URL"] = fallback_rpcs[0]
+
     settings = Settings.from_env()
     configure_logging(settings.log_level)
     if not settings.realtime_fabric_enabled:
