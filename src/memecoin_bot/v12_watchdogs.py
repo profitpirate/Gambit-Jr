@@ -55,6 +55,8 @@ class WatchdogState:
     balance_healthy: bool = True
     routes_healthy: bool = True
     healthy_cycles: int = 0
+    marketdata_cursor_lag_started_ns: int = 0
+    marketdata_cursor_lag_rowid: int = 0
 
 
 class WatchdogManager:
@@ -141,16 +143,41 @@ class WatchdogManager:
                 or str(row.get("state") or "").upper() == "CONNECTED"
                 for row in pump_rows
             )
+
+            canonical_max_rowid = int(payload.get("canonical_max_rowid") or 0)
+            source = getattr(self.engine, "source", None)
+            source_cursor = int(getattr(source, "last_id", 0) or 0)
+            cursor_lag_age = 0.0
+            if canonical_max_rowid > source_cursor:
+                if (
+                    self.state.marketdata_cursor_lag_started_ns <= 0
+                    or self.state.marketdata_cursor_lag_rowid != canonical_max_rowid
+                ):
+                    self.state.marketdata_cursor_lag_started_ns = now_ns
+                    self.state.marketdata_cursor_lag_rowid = canonical_max_rowid
+                cursor_lag_age = max(
+                    0.0,
+                    (now_ns - self.state.marketdata_cursor_lag_started_ns) / 1e9,
+                )
+            else:
+                self.state.marketdata_cursor_lag_started_ns = 0
+                self.state.marketdata_cursor_lag_rowid = 0
+
+            heartbeat_limit = max(6.0, self.config.event_warn_seconds * 2.0)
+            cursor_ok = cursor_lag_age < max(2.0, self.config.event_warn_seconds)
             healthy = (
-                age < self.config.event_warn_seconds
+                age < heartbeat_limit
                 and sources > 0
                 and provider_ok
+                and cursor_ok
             )
             detail = (
                 f"marketdata heartbeat age={age:.1f}s "
-                f"sources={sources} pump_provider_ok={provider_ok}"
+                f"sources={sources} pump_provider_ok={provider_ok} "
+                f"source_cursor={source_cursor} canonical_max_rowid={canonical_max_rowid} "
+                f"cursor_lag_age={cursor_lag_age:.1f}s"
             )
-            return healthy, age, detail
+            return healthy, max(age, cursor_lag_age), detail
         except (OSError, ValueError, TypeError, json.JSONDecodeError) as exc:
             return False, float("inf"), f"marketdata heartbeat unreadable: {exc}"
 
