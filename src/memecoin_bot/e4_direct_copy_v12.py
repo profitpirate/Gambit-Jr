@@ -330,6 +330,11 @@ async def _execute_buy_direct_copy_v12(
         )
         received = max(0.0, after_tokens)
         if received <= 0:
+            breaker = getattr(self, "v12_breaker", None)
+            if breaker is not None:
+                breaker.exit_only(
+                    "confirmed_direct_copy_token_balance_not_visible"
+                )
             raise RuntimeError(
                 "E4 V12 direct copy landed but token balance did not become observable"
             )
