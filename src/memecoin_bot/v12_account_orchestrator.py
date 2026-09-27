@@ -91,6 +91,11 @@ class AccountRuntimeManager:
                 ),
                 "V12_KILL_SWITCH_PATH": str(runtime / "KILL"),
                 "V12_INSTANCE_LOCK": str(runtime / "live.lock"),
+                # Each account is its own process. Fixed localhost listener ports
+                # would collide after the first funded account, so bind optional
+                # internal UDP/metrics listeners ephemerally.
+                "E4_PIPELINE_UDP_PORT": "0",
+                "V12_METRICS_PORT": "0",
                 "E4_WALLET_PUBLIC_KEY": wallet,
                 "E4_VAULT_PUBLIC_KEY": storage,
                 "V12_ACCOUNT_MAX_BANKROLL_SOL": str(
