@@ -19,6 +19,9 @@ DEFAULT_PATHS = (
     "src/memecoin_bot/e4_hardening_v12.py",
     "src/memecoin_bot/e4_role_model_v12.py",
     "src/memecoin_bot/e4_direct_copy_v12.py",
+    "src/memecoin_bot/e4_tight_output_v12.py",
+    "src/memecoin_bot/e4_strict_output_v12.py",
+    "src/memecoin_bot/e4_strict_output_deferred_v12.py",
     "src/memecoin_bot/e4_sub10ms_repairs_v12.py",
     "src/memecoin_bot/e4_nextgen_creator_authority_v12.py",
     "src/memecoin_bot/e4_adaptive_exit_v12.py",
@@ -45,6 +48,7 @@ DEFAULT_PATHS = (
     "tools/e4-builder/race-proxy-v3.mjs",
     "tools/e4-builder/daemon-v2.mjs",
     "tools/e4-builder/daemon.mjs",
+    "tools/e4-builder/strict-output-guard-v12.mjs",
     "tools/e4-builder/strict-race-proxy-v12.mjs",
     "tools/e4-builder/fast-preload-v4.mjs",
 )
