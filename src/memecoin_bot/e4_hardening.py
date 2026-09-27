@@ -758,6 +758,9 @@ async def _recover_confirmed_sell(
             )
             position.status = core.PositionStatus.EXITING
             engine.store.save_position(position)
+            breaker = getattr(engine, "v12_breaker", None)
+            if breaker is not None:
+                breaker.exit_only("confirmed_sell_reconciliation_failed")
             return
         current_balance = min(after_tokens, max(0.0, live_tokens - sold))
         position.remaining = min(
