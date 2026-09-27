@@ -18,6 +18,9 @@ def test_trader_unit_requires_marketdata_and_aligns_supervisor_paths() -> None:
     assert "Environment=E4_DATABASE_PATH=/var/lib/gambit/e4.db" in unit
     assert "E4_LIVE_CREATOR_OVERLAY=/var/lib/gambit/e4-runtime/live-creator-overlay.json" in unit
     assert "E4_LIVE_OUTCOME_JOURNAL=/var/lib/gambit/e4-runtime/live-outcomes.jsonl" in unit
+    assert "E4_TEACHER_JOURNAL=/var/lib/gambit/e4-runtime/teacher-observations.jsonl" in unit
+    assert "E4_CREATOR_LEARNING_PATH=/var/lib/gambit/e4-runtime/creator-learning.json" in unit
+    assert "E4_DISCOVERY_QUEUE_PATH=/var/lib/gambit/e4-runtime/discovery-queue.jsonl" in unit
     assert "Environment=V12_HEARTBEAT_PATH=/run/gambit/v12-heartbeat.json" in unit
     assert (
         "Environment=V12_MARKETDATA_HEARTBEAT="
