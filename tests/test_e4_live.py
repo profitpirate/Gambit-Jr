@@ -262,7 +262,7 @@ class E4SourceTests(unittest.IsolatedAsyncioTestCase):
                 "source_timestamp_ns INTEGER,price_sol REAL,fdv_usd REAL)"
             )
             conn.execute(
-                "INSERT INTO canonical_events VALUES(1,'NOT_A_REAL_KIND','bad',1,0.001,4878)"
+                "INSERT INTO canonical_events VALUES(1,'BUY',NULL,1,0.001,4878)"
             )
             conn.execute(
                 "INSERT INTO canonical_events VALUES(2,'BUY','good',2,0.001,4878)"
