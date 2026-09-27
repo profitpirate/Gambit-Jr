@@ -84,6 +84,8 @@ DEFAULT_PATHS = (
     "src/memecoin_bot/main.py",
     "src/memecoin_bot/config.py",
     "scripts/v12_supervisor.py",
+    "tools/e4-builder/package.json",
+    "tools/e4-builder/package-lock.json",
     "tools/e4-builder/race-proxy-v3.mjs",
     "tools/e4-builder/daemon-v2.mjs",
     "tools/e4-builder/daemon.mjs",
