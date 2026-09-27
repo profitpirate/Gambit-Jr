@@ -2,10 +2,10 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.5",
-  "serialNumber": "urn:uuid:852aa832-ec14-4909-af27-76db160ed119",
+  "serialNumber": "urn:uuid:38d308c0-1fe8-4ac5-951c-7015d48573c0",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-09-27T18:27:20.523Z",
+    "timestamp": "2026-09-27T18:43:25.730Z",
     "lifecycles": [
       {
         "phase": "build"
@@ -3900,10 +3900,11 @@
       "ref": "gambit-e4-builder@2.2.0",
       "dependsOn": [
         "@pump-fun/pump-sdk@2.0.0",
+        "@pump-fun/pump-swap-sdk@1.20.0",
         "@solana/spl-token@0.4.15",
         "@solana/web3.js@1.99.0",
-        "bn.js@5.2.5",
-        "bigint-buffer@1.1.6-gambit.1"
+        "bigint-buffer@1.1.6-gambit.1",
+        "bn.js@5.2.5"
       ]
     },
     {
