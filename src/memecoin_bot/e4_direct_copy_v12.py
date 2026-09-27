@@ -164,6 +164,7 @@ async def _execute_buy_direct_copy_v12(
         return
 
     reserved = 0.0
+    request_id: str | None = None
     runtime = v10._runtime_for(self)
     try:
         if self.store.has_entered(mint):
@@ -323,7 +324,21 @@ async def _execute_buy_direct_copy_v12(
             slippage_bps,
             signature,
         )
-    except Exception:
+    except Exception as exc:
+        journal = getattr(self, "v12_journal", None)
+        entry = journal.by_request(request_id) if journal is not None and request_id else None
+        safe_to_retry = entry is None or (
+            entry.state == "FAILED_TERMINAL" and not entry.signature
+        )
+        if safe_to_retry:
+            self.store.conn.execute(
+                """
+                UPDATE e4_seen_mints
+                SET entry_count=0,last_action='BUY_RETRYABLE',last_reason=?
+                WHERE mint=? AND entry_count=0 AND last_action='BUY_PENDING'
+                """,
+                (f"direct-copy pre-submit failure: {str(exc)[:500]}", mint),
+            )
         LOGGER.exception("E4 V12 direct-copy execution error mint=%s", mint)
     finally:
         if reserved:
