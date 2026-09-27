@@ -34,6 +34,7 @@ class WatchdogConfig:
     recovery_healthy_cycles: int = 3
     tx_failure_window_seconds: float = 60.0
     heartbeat_path: Path = Path("run/v12-heartbeat.json")
+    marketdata_heartbeat_path: Path | None = None
     kill_switch_path: Path = Path("run/V12_KILL")
 
 
@@ -70,8 +71,12 @@ class WatchdogManager:
         self.breaker = breaker
         self.route_health = route_health
         self.emergency_exit = emergency_exit
+        marketdata_heartbeat = os.getenv("V12_MARKETDATA_HEARTBEAT", "").strip()
         self.config = config or WatchdogConfig(
             heartbeat_path=Path(os.getenv("V12_HEARTBEAT_PATH", "run/v12-heartbeat.json")),
+            marketdata_heartbeat_path=(
+                Path(marketdata_heartbeat) if marketdata_heartbeat else None
+            ),
             kill_switch_path=Path(os.getenv("V12_KILL_SWITCH_PATH", "run/V12_KILL")),
         )
         self.state = WatchdogState()
@@ -110,14 +115,66 @@ class WatchdogManager:
         os.chmod(tmp, 0o600)
         tmp.replace(path)
 
+    def _marketdata_heartbeat_health(
+        self,
+        now_ns: int,
+    ) -> tuple[bool, float, str] | None:
+        path = self.config.marketdata_heartbeat_path
+        if path is None:
+            return None
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            heartbeat_ns = int(payload.get("ts_ns") or 0)
+            if heartbeat_ns <= 0:
+                return False, float("inf"), "marketdata heartbeat has no timestamp"
+            age = max(0.0, (now_ns - heartbeat_ns) / 1e9)
+            sources = int(payload.get("realtime_sources") or 0)
+            providers = payload.get("providers") or []
+            pump_rows = [
+                row
+                for row in providers
+                if isinstance(row, dict)
+                and "pump" in str(row.get("provider") or "").lower()
+            ]
+            provider_ok = not pump_rows or any(
+                bool(int(row.get("healthy") or 0))
+                or str(row.get("state") or "").upper() == "CONNECTED"
+                for row in pump_rows
+            )
+            healthy = (
+                age < self.config.event_warn_seconds
+                and sources > 0
+                and provider_ok
+            )
+            detail = (
+                f"marketdata heartbeat age={age:.1f}s "
+                f"sources={sources} pump_provider_ok={provider_ok}"
+            )
+            return healthy, age, detail
+        except (OSError, ValueError, TypeError, json.JSONDecodeError) as exc:
+            return False, float("inf"), f"marketdata heartbeat unreadable: {exc}"
+
     async def _check_event_feed(self, now_ns: int) -> None:
+        heartbeat = self._marketdata_heartbeat_health(now_ns)
+        if heartbeat is not None:
+            healthy, age, detail = heartbeat
+            self.state.event_healthy = healthy
+            if healthy:
+                return
+            reason_age = age if age != float("inf") else self.config.event_halt_seconds
+            self.breaker.exit_only(f"event_feed_stale_{reason_age:.1f}s")
+            self.breaker.store.event(
+                "MARKETDATA_HEALTH",
+                "ERROR",
+                {"detail": detail},
+            )
+            if self.engine.positions and age >= self.config.event_halt_seconds:
+                await self.emergency_exit("watchdog_event_feed_halt")
+            return
+
         age = (now_ns - self.state.last_event_ns) / 1e9
         self.state.event_healthy = age < self.config.event_warn_seconds
         if age >= self.config.event_halt_seconds:
-            # A feed outage is recoverable infrastructure failure, not an
-            # operator kill condition. Freeze entries, liquidate exposed
-            # positions, and let the health-recovery gate re-arm only after the
-            # feed has stayed healthy again.
             self.breaker.exit_only(f"event_feed_stale_{age:.1f}s")
             if self.engine.positions:
                 await self.emergency_exit("watchdog_event_feed_halt")
