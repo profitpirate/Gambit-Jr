@@ -659,7 +659,42 @@ async def _execute_sell_production(
         return
 
     was_closed = position.status == core.PositionStatus.CLOSED
+    attempt_started_ns = time.time_ns()
     await _PREVIOUS_EXECUTE_SELL(self, position, fraction, reason)
+
+    latest = self.v12_journal.latest_for("SELL", str(position.mint))
+    new_attempt = latest is not None and latest.created_ns >= attempt_started_ns
+    if (
+        new_attempt
+        and latest.state == "FAILED_TERMINAL"
+        and not latest.signature
+    ):
+        _record_tx_result(self, False)
+        self.v12_breaker.exit_only("sell_pre_submit_execution_failure")
+        _audit(
+            self,
+            "SELL_PRE_SUBMIT_FAILURE",
+            {
+                "mint": position.mint,
+                "request_id": latest.request_id,
+                "error": latest.error,
+            },
+        )
+    elif (
+        not new_attempt
+        and position.status != core.PositionStatus.CLOSED
+        and str(position.mint) in self.positions
+    ):
+        # Older sell layers intentionally catch RPC/builder exceptions to keep
+        # the guardian alive. Production must still surface that the exit path
+        # failed before it could create a durable execution journal entry.
+        self.v12_breaker.exit_only("sell_failed_before_execution_journal")
+        _audit(
+            self,
+            "SELL_PRE_JOURNAL_FAILURE",
+            {"mint": position.mint, "reason": reason},
+        )
+
     if was_closed or position.status != core.PositionStatus.CLOSED:
         return
     if position.position_id in self.v12_closed_recorded:
