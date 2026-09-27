@@ -105,6 +105,32 @@ def direct_copy_amount_sol(
     return max(0.0, amount), exact
 
 
+def _account_capped_copy_terms(
+    observed_sol: float,
+    *,
+    wallet_balance_sol: float,
+    max_position_fraction: float,
+    account_bankroll_cap_sol: float,
+) -> tuple[float, float]:
+    """Apply operator/account mandate limits without weakening E4 copy authority.
+
+    Strategy-level ceilings remain bypassed for direct copy. A per-account
+    bankroll mandate is a higher authority and therefore caps both the balance
+    visible to sizing and the maximum single-position fraction.
+    """
+    balance = max(0.0, _finite(wallet_balance_sol))
+    cap = max(0.0, _finite(account_bankroll_cap_sol))
+    if cap <= 0:
+        return max(0.0, _finite(observed_sol)), balance
+    effective_balance = min(balance, cap)
+    fraction = min(1.0, max(0.0, _finite(max_position_fraction)))
+    allowed_observed = min(
+        max(0.0, _finite(observed_sol)),
+        effective_balance * fraction,
+    )
+    return allowed_observed, effective_balance
+
+
 def _is_direct_copy(mint: str) -> bool:
     profile = v6._PROFILE_BY_MINT.get(str(mint))
     return bool(
@@ -178,10 +204,21 @@ async def _execute_buy_direct_copy_v12(
         else:
             balance = await self.rpc.balance(self.signer.wallet)
 
+        account_cap = max(
+            0.0,
+            _finite(os.getenv("V12_ACCOUNT_MAX_BANKROLL_SOL", "0")),
+        )
+        sizing_observed_sol, balance = _account_capped_copy_terms(
+            observed_sol,
+            wallet_balance_sol=balance,
+            max_position_fraction=float(self.settings.max_position_fraction),
+            account_bankroll_cap_sol=account_cap,
+        )
+
         async with self.allocation_lock:
-            priority, tip = self.fee_bid(observed_sol, score)
+            priority, tip = self.fee_bid(sizing_observed_sol, score)
             amount, exact_amount = direct_copy_amount_sol(
-                observed_sol,
+                sizing_observed_sol,
                 balance_sol=balance,
                 reserve_sol=self.settings.reserve_sol,
                 reserved_sol=self.reserved_sol,
