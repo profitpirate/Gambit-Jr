@@ -246,3 +246,107 @@ async def test_fresh_marketdata_heartbeat_keeps_quiet_feed_active(tmp_path: Path
     assert manager.state.event_healthy is True
     assert safety.snapshot().mode == SafetyMode.ACTIVE
 
+@pytest.mark.asyncio
+async def test_marketdata_cursor_lag_blocks_entries_after_grace(tmp_path: Path) -> None:
+    safety = SafetyStore(tmp_path / "e4.db")
+    breaker = CircuitBreaker(safety)
+    routes = RouteHealthStore(safety.conn)
+    heartbeat = tmp_path / "marketdata.json"
+    heartbeat.write_text(
+        __import__("json").dumps(
+            {
+                "ts_ns": time.time_ns(),
+                "realtime_sources": 1,
+                "canonical_max_rowid": 100,
+                "providers": [
+                    {
+                        "provider": "solana_pumpfun_native",
+                        "healthy": 1,
+                        "state": "CONNECTED",
+                    }
+                ],
+            }
+        )
+    )
+    engine = SimpleNamespace(
+        source=SimpleNamespace(last_id=95),
+        positions={},
+        pending_entries=set(),
+        pending_exits=set(),
+        tokens={},
+        sender=SimpleNamespace(routes=[("r1", "https://x")]),
+        rpc=FakeRpc(),
+        signer=SimpleNamespace(wallet="w"),
+        settings=SimpleNamespace(execution_db=tmp_path / "e4.db"),
+        store=FakeStore(safety.conn),
+    )
+    manager = WatchdogManager(
+        engine,
+        breaker,
+        routes,
+        emergency_exit=lambda reason: None,
+        config=WatchdogConfig(
+            event_warn_seconds=0.01,
+            event_halt_seconds=10.0,
+            heartbeat_path=tmp_path / "hb.json",
+            marketdata_heartbeat_path=heartbeat,
+            kill_switch_path=tmp_path / "kill",
+        ),
+    )
+
+    manager.state.marketdata_cursor_lag_started_ns = time.time_ns() - 3_000_000_000
+    manager.state.marketdata_cursor_lag_rowid = 100
+    await manager._check_event_feed(time.time_ns())
+
+    assert manager.state.event_healthy is False
+    assert safety.snapshot().mode == SafetyMode.EXIT_ONLY
+    assert "event_feed_stale" in safety.snapshot().reason
+
+
+@pytest.mark.asyncio
+async def test_marketdata_cursor_catches_up_and_recovers_health(tmp_path: Path) -> None:
+    safety = SafetyStore(tmp_path / "e4.db")
+    breaker = CircuitBreaker(safety)
+    routes = RouteHealthStore(safety.conn)
+    heartbeat = tmp_path / "marketdata.json"
+    heartbeat.write_text(
+        __import__("json").dumps(
+            {
+                "ts_ns": time.time_ns(),
+                "realtime_sources": 1,
+                "canonical_max_rowid": 100,
+                "providers": [],
+            }
+        )
+    )
+    engine = SimpleNamespace(
+        source=SimpleNamespace(last_id=100),
+        positions={},
+        pending_entries=set(),
+        pending_exits=set(),
+        tokens={},
+        sender=SimpleNamespace(routes=[("r1", "https://x")]),
+        rpc=FakeRpc(),
+        signer=SimpleNamespace(wallet="w"),
+        settings=SimpleNamespace(execution_db=tmp_path / "e4.db"),
+        store=FakeStore(safety.conn),
+    )
+    manager = WatchdogManager(
+        engine,
+        breaker,
+        routes,
+        emergency_exit=lambda reason: None,
+        config=WatchdogConfig(
+            heartbeat_path=tmp_path / "hb.json",
+            marketdata_heartbeat_path=heartbeat,
+            kill_switch_path=tmp_path / "kill",
+        ),
+    )
+    manager.state.marketdata_cursor_lag_started_ns = time.time_ns() - 5_000_000_000
+    manager.state.marketdata_cursor_lag_rowid = 99
+
+    await manager._check_event_feed(time.time_ns())
+
+    assert manager.state.event_healthy is True
+    assert manager.state.marketdata_cursor_lag_started_ns == 0
+
