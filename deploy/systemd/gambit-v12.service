@@ -14,6 +14,8 @@ WorkingDirectory=/opt/gambit/current
 EnvironmentFile=/etc/gambit/v12.env
 Environment=DATABASE_PATH=/var/lib/gambit/marketdata.db
 Environment=E4_DATABASE_PATH=/var/lib/gambit/e4.db
+Environment=E4_LIVE_CREATOR_OVERLAY=/var/lib/gambit/e4-runtime/live-creator-overlay.json
+Environment=E4_LIVE_OUTCOME_JOURNAL=/var/lib/gambit/e4-runtime/live-outcomes.jsonl
 Environment=V12_HEARTBEAT_PATH=/run/gambit/v12-heartbeat.json
 Environment=V12_MARKETDATA_HEARTBEAT=/run/gambit/v12-marketdata-heartbeat.json
 Environment=V12_KILL_SWITCH_PATH=/run/gambit/V12_KILL
