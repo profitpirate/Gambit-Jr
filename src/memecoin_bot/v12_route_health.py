@@ -28,14 +28,42 @@ class RouteHealth:
     consecutive_failures: int
     observations: int
     cooldown_until_ns: int
+    updated_ns: int
 
     def score(self, now_ns: int | None = None) -> float:
         now = int(now_ns or time.time_ns())
         if now < self.cooldown_until_ns:
             return -math.inf
-        latency_component = 1.0 / (1.0 + max(0.0, self.ewma_latency_ms) / 100.0)
-        failure_penalty = min(0.8, self.consecutive_failures * 0.15)
-        return 0.65 * self.ewma_success + 0.35 * latency_component - failure_penalty
+
+        age_seconds = (
+            max(0.0, (now - self.updated_ns) / 1e9)
+            if self.updated_ns > 0
+            else 0.0
+        )
+        rehabilitation = min(1.0, age_seconds / 120.0)
+        latency_component = 1.0 / (
+            1.0 + max(0.0, self.ewma_latency_ms) / 100.0
+        )
+        # Historical route failures must not create a permanent funded-trading
+        # deadlock. After cooldown, penalties decay only with healthy wall-clock
+        # time; the next actual submission immediately replaces this optimism
+        # with fresh success/failure evidence.
+        effective_failures = max(
+            0,
+            self.consecutive_failures - int(age_seconds // 15.0),
+        )
+        effective_success = self.ewma_success + (
+            (1.0 - self.ewma_success) * 0.35 * rehabilitation
+        )
+        effective_latency = latency_component + (
+            (1.0 - latency_component) * 0.25 * rehabilitation
+        )
+        failure_penalty = min(0.8, effective_failures * 0.15)
+        return (
+            0.65 * effective_success
+            + 0.35 * effective_latency
+            - failure_penalty
+        )
 
 
 class RouteHealthStore:
@@ -112,7 +140,7 @@ class RouteHealthStore:
             (str(route),),
         ).fetchone()
         if row is None:
-            return RouteHealth(str(route), 0.0, 1.0, 0, 0, 0)
+            return RouteHealth(str(route), 0.0, 1.0, 0, 0, 0, time.time_ns())
         return RouteHealth(
             str(row["route"]),
             float(row["ewma_latency_ms"]),
@@ -120,6 +148,7 @@ class RouteHealthStore:
             int(row["consecutive_failures"]),
             int(row["observations"]),
             int(row["cooldown_until_ns"]),
+            int(row["updated_ns"]),
         )
 
     def ranked(self, routes: list[str]) -> list[str]:
