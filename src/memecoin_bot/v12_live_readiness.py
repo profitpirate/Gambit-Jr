@@ -197,6 +197,120 @@ def _causal_gate(path: Path, *, repository_root: Path) -> tuple[bool, str]:
     detail += "baseline=35W/15L invalidated_sample_excluded=true"
     return True, detail
 
+def _precertified_live_override_gate(
+    path: Path,
+    *,
+    repository_root: Path,
+) -> tuple[bool, str]:
+    causal_path = _resolve(repository_root, path)
+    status_path = _resolve(
+        repository_root,
+        os.getenv(
+            "V12_CAUSAL_CERTIFICATION_STATUS_PATH",
+            "research/v12-pre-armed-certification-status.json",
+        ),
+    )
+    model_path = _resolve(
+        repository_root,
+        os.getenv(
+            "V12_CAUSAL_FROZEN_MODEL_PATH",
+            "research/v12-pre-armed-100-trade-frozen-model.json",
+        ),
+    )
+    try:
+        state = json.loads(causal_path.read_text(encoding="utf-8"))
+        certification = json.loads(status_path.read_text(encoding="utf-8"))
+        frozen_digest = _json_sha256(model_path)
+    except (OSError, json.JSONDecodeError, TypeError, ValueError) as exc:
+        return False, f"cannot verify pre-cert live bundle: {exc}"
+
+    failures: list[str] = []
+    metrics = state.get("metrics") or {}
+    completion = state.get("completion") or {}
+    ledger = state.get("ledger") or []
+    try:
+        minimum_closed = max(
+            50,
+            int(os.getenv("V12_PRECERT_MIN_CLOSED_TRADES", "50")),
+        )
+    except ValueError:
+        return False, "V12_PRECERT_MIN_CLOSED_TRADES must be an integer"
+
+    closed = int(metrics.get("closed_trades") or 0)
+    wins = int(metrics.get("wins") or 0)
+    losses = int(metrics.get("losses") or 0)
+    required = int(completion.get("required_closed_trades") or 0)
+
+    if required != 100:
+        failures.append("required trade count is not exactly 100")
+    if closed < minimum_closed:
+        failures.append(f"closed_trades={closed} below override minimum={minimum_closed}")
+    if state.get("real_money_execution") is not False:
+        failures.append("causal state is not paper-live only")
+    if state.get("production_paths_changed") != 0:
+        failures.append("production paths changed during causal test")
+    if str(state.get("model_sha256") or "") != EXPECTED_FROZEN_MODEL_SHA256:
+        failures.append("causal state model fingerprint mismatch")
+    if frozen_digest != EXPECTED_FROZEN_MODEL_SHA256:
+        failures.append("frozen model file fingerprint mismatch")
+    if len(ledger) != closed:
+        failures.append(f"ledger length {len(ledger)} != closed_trades {closed}")
+    if wins + losses != closed:
+        failures.append("metric wins + losses != closed trades")
+    try:
+        net_pnl = float(metrics.get("net_pnl_sol"))
+    except (TypeError, ValueError):
+        net_pnl = float("nan")
+    if not math.isfinite(net_pnl) or net_pnl <= 0:
+        failures.append("current forward sample net P&L is not positive")
+
+    for index, row in enumerate(ledger):
+        try:
+            decision_ns = int(row["decision_ns"])
+            fill_ns = int(row["fill_ns"])
+            exit_ns = int(row["exit_ns"])
+            pnl = float(row["pnl_sol"])
+        except (KeyError, TypeError, ValueError):
+            failures.append(f"ledger row {index} is malformed")
+            break
+        if not (decision_ns <= fill_ns <= exit_ns):
+            failures.append(f"ledger row {index} has impossible causal timestamps")
+            break
+        if not math.isfinite(pnl):
+            failures.append(f"ledger row {index} has non-finite economics")
+            break
+
+    if certification.get("official_50_trade_baseline_valid") is not True:
+        failures.append("official 50-trade baseline is not valid")
+    if certification.get("pre_fix_100_trade_sample_invalidated") is not True:
+        failures.append("old pre-fix sample is not explicitly invalidated")
+    if certification.get("pre_fix_100_trade_sample_imported") is not False:
+        failures.append("old pre-fix sample was imported")
+
+    recertification = certification.get("causal_exit_recertification") or {}
+    if recertification.get("impossible_exit_count_after") != 0:
+        failures.append("recertified baseline still has impossible exits")
+    if recertification.get("performance_metrics_changed") is not False:
+        failures.append("recertification unexpectedly changed baseline performance")
+
+    baseline = certification.get("official_50_trade_metrics") or {}
+    for key, expected in EXPECTED_BASELINE.items():
+        if not _same_number(baseline.get(key), expected):
+            failures.append(f"official baseline mismatch for {key}")
+
+    if failures:
+        detail = "; ".join(failures[:8])
+        if len(failures) > 8:
+            detail += f"; +{len(failures) - 8} more"
+        return False, detail
+
+    return (
+        True,
+        f"explicit operator override eligible closed={closed}/100 "
+        f"net_pnl_sol={net_pnl:.6f} model={frozen_digest[:12]}",
+    )
+
+
 def _secure_url(value: str) -> bool:
     parsed = urlparse(value)
     return parsed.scheme in {"https", "wss"} and bool(parsed.hostname)
@@ -229,7 +343,36 @@ def run_live_readiness(
         )
     )
     causal_ok, causal_detail = _causal_gate(causal_path, repository_root=repository_root)
-    checks.append(ReadinessCheck("causal_100_gate", causal_ok, causal_detail))
+    override_enabled = _truthy("V12_ALLOW_PRECERTIFIED_LIVE")
+    override_ok = False
+    override_detail = "disabled"
+    if not causal_ok and override_enabled:
+        override_ok, override_detail = _precertified_live_override_gate(
+            causal_path,
+            repository_root=repository_root,
+        )
+    effective_causal_ok = causal_ok or override_ok
+    if causal_ok:
+        effective_detail = causal_detail
+    elif override_ok:
+        effective_detail = (
+            f"{override_detail}; full causal gate still pending: {causal_detail}"
+        )
+    else:
+        effective_detail = causal_detail
+        if override_enabled:
+            effective_detail += f"; override rejected: {override_detail}"
+    checks.append(
+        ReadinessCheck("causal_100_gate", effective_causal_ok, effective_detail)
+    )
+    if override_enabled:
+        checks.append(
+            ReadinessCheck(
+                "precert_live_override",
+                causal_ok or override_ok,
+                "not needed; full gate passed" if causal_ok else override_detail,
+            )
+        )
 
     wallet = str(getattr(settings, "wallet", "") or "")
     vault = str(getattr(settings, "vault", "") or "")
