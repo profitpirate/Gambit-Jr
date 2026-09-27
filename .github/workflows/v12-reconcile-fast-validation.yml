@@ -6,8 +6,10 @@ on:
       - codex/v12-production-reconcile-20260924
     paths:
       - "src/memecoin_bot/e4_exec/**"
+      - "src/memecoin_bot/e4_live.py"
       - "src/memecoin_bot/e4_production_guard_v12.py"
       - "src/memecoin_bot/v12_execution_journal.py"
+      - "tests/test_e4_live.py"
       - "tests/test_v12_direct_copy.py"
       - ".github/workflows/v12-production-security.yml"
       - ".github/workflows/v12-reconcile-fast-validation.yml"
@@ -45,13 +47,16 @@ jobs:
           python -m compileall -q src/memecoin_bot scripts
           ruff check \
             src/memecoin_bot/e4_exec/__main__.py \
+            src/memecoin_bot/e4_live.py \
             src/memecoin_bot/e4_production_guard_v12.py \
             src/memecoin_bot/v12_execution_journal.py \
+            tests/test_e4_live.py \
             tests/test_v12_direct_copy.py
 
       - name: Direct-copy and live-safety integration tests
         run: |
           python -m pytest -q \
+            tests/test_e4_live.py \
             tests/test_v12_direct_copy.py \
             tests/test_v12_execution_safety.py \
             tests/test_v12_recovery.py \
