@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from .v12_route_health import RouteHealthStore
-from .v12_safety import CircuitBreaker
+from .v12_safety import CircuitBreaker, SafetyMode
 
 LOGGER = logging.getLogger("gambit.v12.watchdogs")
 
@@ -31,6 +31,8 @@ class WatchdogConfig:
     database_check_seconds: float = 60.0
     rpc_check_seconds: float = 5.0
     balance_check_seconds: float = 5.0
+    recovery_healthy_cycles: int = 3
+    tx_failure_window_seconds: float = 60.0
     heartbeat_path: Path = Path("run/v12-heartbeat.json")
     kill_switch_path: Path = Path("run/V12_KILL")
 
@@ -43,6 +45,15 @@ class WatchdogState:
     last_balance_check_ns: int = 0
     last_balance_sol: float | None = None
     iteration: int = 0
+    event_healthy: bool = True
+    positions_healthy: bool = True
+    rpc_healthy: bool = True
+    clock_healthy: bool = True
+    database_healthy: bool = True
+    disk_healthy: bool = True
+    balance_healthy: bool = True
+    routes_healthy: bool = True
+    healthy_cycles: int = 0
 
 
 class WatchdogManager:
@@ -75,13 +86,23 @@ class WatchdogManager:
     async def _write_heartbeat(self) -> None:
         path = self.config.heartbeat_path
         path.parent.mkdir(parents=True, exist_ok=True)
+        snapshot = self.breaker.store.snapshot()
+        journal = getattr(self.engine, "v12_journal", None)
+        unresolved = (
+            len(journal.recoverable(("SIGNED", "SUBMITTED", "UNCERTAIN")))
+            if journal is not None
+            else 0
+        )
         payload = {
             "pid": os.getpid(),
             "ts_ns": time.time_ns(),
-            "mode": self.breaker.store.snapshot().mode.value,
+            "mode": snapshot.mode.value,
+            "safety_reason": snapshot.reason,
             "open_positions": len(self.engine.positions),
             "pending_entries": len(self.engine.pending_entries),
             "pending_exits": len(self.engine.pending_exits),
+            "unresolved_transactions": unresolved,
+            "healthy_recovery_cycles": self.state.healthy_cycles,
             "iteration": self.state.iteration,
         }
         tmp = path.with_suffix(".tmp")
@@ -91,6 +112,7 @@ class WatchdogManager:
 
     async def _check_event_feed(self, now_ns: int) -> None:
         age = (now_ns - self.state.last_event_ns) / 1e9
+        self.state.event_healthy = age < self.config.event_warn_seconds
         if age >= self.config.event_halt_seconds:
             self.breaker.halt(f"event_feed_stale_{age:.1f}s")
             if self.engine.positions:
@@ -108,6 +130,7 @@ class WatchdogManager:
             age = (now_ns - latest) / 1e9
             if age >= self.config.position_price_stale_seconds:
                 stale.append((mint, age))
+        self.state.positions_healthy = not stale
         if stale:
             self.breaker.exit_only("position_price_feed_stale")
             await self.emergency_exit(
@@ -122,14 +145,20 @@ class WatchdogManager:
             slot = await self.engine.rpc.call("getSlot", [{"commitment": "processed"}])
             block_time = await self.engine.rpc.call("getBlockTime", [slot])
         except RuntimeError as exc:
+            self.state.rpc_healthy = False
+            self.state.clock_healthy = False
             self.breaker.exit_only("rpc_health_check_failed")
             self.breaker.store.event("RPC_HEALTH", "ERROR", {"error": str(exc)})
             return
+        self.state.rpc_healthy = True
+        self.state.clock_healthy = True
         if block_time:
             drift = abs(time.time() - float(block_time))
             if drift >= self.config.clock_halt_seconds:
+                self.state.clock_healthy = False
                 self.breaker.halt(f"clock_drift_{drift:.1f}s")
             elif drift >= self.config.clock_warn_seconds:
+                self.state.clock_healthy = False
                 self.breaker.exit_only(f"clock_drift_{drift:.1f}s")
 
     async def _check_database_disk(self, now_ns: int) -> None:
@@ -141,13 +170,16 @@ class WatchdogManager:
             if row is None or str(row[0]).lower() != "ok":
                 raise sqlite3.DatabaseError(str(row))
         except sqlite3.Error as exc:
+            self.state.database_healthy = False
             self.breaker.halt("database_integrity_failure")
             self.breaker.store.event("DATABASE", "CRITICAL", {"error": str(exc)})
             if self.engine.positions:
                 await self.emergency_exit("watchdog_database_failure")
             return
+        self.state.database_healthy = True
         free = shutil.disk_usage(self.engine.settings.execution_db.parent).free
-        if free < self.config.minimum_disk_free_bytes:
+        self.state.disk_healthy = free >= self.config.minimum_disk_free_bytes
+        if not self.state.disk_healthy:
             self.breaker.exit_only("disk_space_low")
 
     async def _check_balance(self, now_ns: int) -> None:
@@ -157,8 +189,10 @@ class WatchdogManager:
         try:
             balance = await self.engine.rpc.balance(self.engine.signer.wallet)
         except RuntimeError:
+            self.state.balance_healthy = False
             self.breaker.exit_only("balance_rpc_failure")
             return
+        self.state.balance_healthy = True
         self.breaker.evaluate_equity(balance)
         previous = self.state.last_balance_sol
         self.state.last_balance_sol = balance
@@ -169,6 +203,7 @@ class WatchdogManager:
             and not self.engine.pending_exits
             and balance < previous * 0.70
         ):
+            self.state.balance_healthy = False
             self.breaker.halt("unexpected_balance_drop")
             self.breaker.store.event(
                 "BALANCE_DROP",
@@ -179,11 +214,76 @@ class WatchdogManager:
     async def _check_routes(self) -> None:
         names = [str(name) for name, _url in getattr(self.engine.sender, "routes", [])]
         if not names:
+            self.state.routes_healthy = False
             self.breaker.halt("no_transaction_routes")
             return
         healthy = self.route_health.healthy(names)
+        self.state.routes_healthy = bool(healthy)
         if not healthy:
             self.breaker.exit_only("all_transaction_routes_degraded")
+
+    def _refresh_tx_failure_window(self) -> None:
+        window = getattr(self.engine, "v12_tx_failures", None)
+        if window is None:
+            return
+        now = time.monotonic()
+        while window and now - window[0] > self.config.tx_failure_window_seconds:
+            window.popleft()
+        self.breaker.store.set_tx_failures(len(window))
+
+    def _health_is_stable(self) -> bool:
+        if self.config.kill_switch_path.exists():
+            return False
+        if not all(
+            (
+                self.state.event_healthy,
+                self.state.positions_healthy,
+                self.state.rpc_healthy,
+                self.state.clock_healthy,
+                self.state.database_healthy,
+                self.state.disk_healthy,
+                self.state.balance_healthy,
+                self.state.routes_healthy,
+            )
+        ):
+            return False
+        journal = getattr(self.engine, "v12_journal", None)
+        if journal is not None and journal.recoverable(
+            ("SIGNED", "SUBMITTED", "UNCERTAIN")
+        ):
+            return False
+        return True
+
+    def _maybe_restore_entries(self) -> None:
+        snapshot = self.breaker.store.snapshot()
+        if snapshot.mode != SafetyMode.EXIT_ONLY or not self._health_is_stable():
+            self.state.healthy_cycles = 0
+            return
+        self.state.healthy_cycles += 1
+        if self.state.healthy_cycles < max(1, self.config.recovery_healthy_cycles):
+            return
+        recovered = self.breaker.recover_exit_only(
+            "transient_health_recovered",
+            allowed_prefixes=(
+                "event_feed_stale_",
+                "position_price_feed_stale",
+                "rpc_health_check_failed",
+                "clock_drift_",
+                "disk_space_low",
+                "balance_rpc_failure",
+                "all_transaction_routes_degraded",
+                "transaction_failure_burst",
+                "uncertain_",
+                "runtime_recovery_failure:",
+            ),
+        )
+        if recovered.mode == SafetyMode.ACTIVE:
+            self.breaker.store.event(
+                "AUTO_RECOVERY",
+                "INFO",
+                {"previous_reason": snapshot.reason},
+            )
+            self.state.healthy_cycles = 0
 
     async def run(self) -> None:
         while not self.stop_event.is_set():
@@ -199,7 +299,9 @@ class WatchdogManager:
             await self._check_database_disk(now_ns)
             await self._check_balance(now_ns)
             await self._check_routes()
+            self._refresh_tx_failure_window()
             self.breaker.evaluate_operational()
+            self._maybe_restore_entries()
             await self._write_heartbeat()
             try:
                 await asyncio.wait_for(
