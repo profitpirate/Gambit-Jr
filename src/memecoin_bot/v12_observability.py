@@ -79,6 +79,54 @@ class MetricsServer:
             status=200 if safety.mode.value != "HALTED" else 503,
         )
 
+    async def readiness(self, _request: web.Request) -> web.Response:
+        safety = self.engine.v12_safety_store.snapshot()
+        watchdog = getattr(self.engine, "v12_watchdog", None)
+        watchdog_state = getattr(watchdog, "state", None)
+        health_flags = (
+            bool(getattr(watchdog_state, "event_healthy", False)),
+            bool(getattr(watchdog_state, "positions_healthy", False)),
+            bool(getattr(watchdog_state, "rpc_healthy", False)),
+            bool(getattr(watchdog_state, "clock_healthy", False)),
+            bool(getattr(watchdog_state, "database_healthy", False)),
+            bool(getattr(watchdog_state, "disk_healthy", False)),
+            bool(getattr(watchdog_state, "balance_healthy", False)),
+            bool(getattr(watchdog_state, "routes_healthy", False)),
+        )
+        journal = getattr(self.engine, "v12_journal", None)
+        uncertain = (
+            len(journal.recoverable(("UNCERTAIN",)))
+            if journal is not None
+            else 0
+        )
+        ready = (
+            safety.mode.value == "ACTIVE"
+            and watchdog is not None
+            and all(health_flags)
+            and uncertain == 0
+        )
+        return web.json_response(
+            {
+                "ready": ready,
+                "safety": safety.mode.value,
+                "reason": safety.reason,
+                "watchdog": watchdog is not None,
+                "health_flags": {
+                    "event": health_flags[0],
+                    "positions": health_flags[1],
+                    "rpc": health_flags[2],
+                    "clock": health_flags[3],
+                    "database": health_flags[4],
+                    "disk": health_flags[5],
+                    "balance": health_flags[6],
+                    "routes": health_flags[7],
+                },
+                "uncertain_transactions": uncertain,
+                "ts_ns": time.time_ns(),
+            },
+            status=200 if ready else 503,
+        )
+
     async def run(self, stop_event: asyncio.Event) -> None:
         if self.host not in {"127.0.0.1", "::1", "localhost"}:
             raise ValueError("metrics server must remain local-only")
@@ -87,6 +135,7 @@ class MetricsServer:
             [
                 web.get("/metrics", self.metrics),
                 web.get("/healthz", self.health),
+                web.get("/readyz", self.readiness),
             ]
         )
         runner = web.AppRunner(app, access_log=None)
