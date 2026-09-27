@@ -30,7 +30,7 @@ services:
         - CMD
         - python
         - -c
-        - "import json,time,pathlib; p=pathlib.Path('/app/run/v12-marketdata-heartbeat.json'); d=json.loads(p.read_text()); assert (time.time_ns()-int(d['ts_ns']))/1e9 < 10"
+        - "import json,time,pathlib; p=pathlib.Path('/app/run/v12-marketdata-heartbeat.json'); d=json.loads(p.read_text()); assert (time.time_ns()-int(d['ts_ns']))/1e9 < 10 and d.get('pump_provider_ok') is True"
       interval: 10s
       timeout: 3s
       retries: 6
