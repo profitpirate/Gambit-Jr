@@ -59,6 +59,26 @@ class V12DirectCopyTests(unittest.TestCase):
         self.assertEqual(amount, 7.0)
         self.assertTrue(exact)
 
+
+    def test_account_mandate_caps_direct_copy_without_changing_global_copy_rule(self):
+        observed, balance = direct._account_capped_copy_terms(
+            3.0,
+            wallet_balance_sol=20.0,
+            max_position_fraction=0.15,
+            account_bankroll_cap_sol=10.0,
+        )
+        self.assertEqual(balance, 10.0)
+        self.assertEqual(observed, 1.5)
+
+        unrestricted, unrestricted_balance = direct._account_capped_copy_terms(
+            3.0,
+            wallet_balance_sol=20.0,
+            max_position_fraction=0.15,
+            account_bankroll_cap_sol=0.0,
+        )
+        self.assertEqual(unrestricted_balance, 20.0)
+        self.assertEqual(unrestricted, 3.0)
+
     def test_production_entrypoint_pins_direct_copy_module(self):
         digest = direct.policy_fingerprint()
         entrypoint = Path("src/memecoin_bot/e4_exec/__main__.py").read_text(encoding="utf-8")
