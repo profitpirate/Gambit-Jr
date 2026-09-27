@@ -51,6 +51,7 @@ services:
       DATABASE_PATH: /app/data/memecoin.db
       E4_DATABASE_PATH: /app/data/e4.db
       V12_HEARTBEAT_PATH: /app/run/v12-heartbeat.json
+      V12_MARKETDATA_HEARTBEAT: /app/run/v12-marketdata-heartbeat.json
       V12_KILL_SWITCH_PATH: /app/run/V12_KILL
       V12_INSTANCE_LOCK: /app/run/v12-live.lock
       VAULT_TOKEN_FILE: /run/secrets/vault-token
