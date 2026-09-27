@@ -114,7 +114,11 @@ class WatchdogManager:
         age = (now_ns - self.state.last_event_ns) / 1e9
         self.state.event_healthy = age < self.config.event_warn_seconds
         if age >= self.config.event_halt_seconds:
-            self.breaker.halt(f"event_feed_stale_{age:.1f}s")
+            # A feed outage is recoverable infrastructure failure, not an
+            # operator kill condition. Freeze entries, liquidate exposed
+            # positions, and let the health-recovery gate re-arm only after the
+            # feed has stayed healthy again.
+            self.breaker.exit_only(f"event_feed_stale_{age:.1f}s")
             if self.engine.positions:
                 await self.emergency_exit("watchdog_event_feed_halt")
         elif age >= self.config.event_warn_seconds:
@@ -156,7 +160,7 @@ class WatchdogManager:
             drift = abs(time.time() - float(block_time))
             if drift >= self.config.clock_halt_seconds:
                 self.state.clock_healthy = False
-                self.breaker.halt(f"clock_drift_{drift:.1f}s")
+                self.breaker.exit_only(f"clock_drift_{drift:.1f}s")
             elif drift >= self.config.clock_warn_seconds:
                 self.state.clock_healthy = False
                 self.breaker.exit_only(f"clock_drift_{drift:.1f}s")
