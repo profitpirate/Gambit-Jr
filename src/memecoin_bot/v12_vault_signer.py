@@ -116,10 +116,9 @@ class VaultTransitSigner:
         async with aiohttp.ClientSession(timeout=timeout) as active:
             return await perform(active)
 
-    async def public_key(
+    async def _public_key_with_session(
         self,
-        *,
-        session: aiohttp.ClientSession | None = None,
+        session: aiohttp.ClientSession | None,
     ) -> Pubkey:
         path = (
             f"/v1/{quote(self.reference.mount)}/keys/"
@@ -135,6 +134,9 @@ class VaultTransitSigner:
             raise RuntimeError("Vault Transit key is not raw Ed25519 public key")
         return Pubkey.from_bytes(raw)
 
+    async def public_key(self) -> Pubkey:
+        return await self._public_key_with_session(None)
+
     async def sign(
         self,
         transaction_b64: str,
@@ -145,7 +147,12 @@ class VaultTransitSigner:
         )
         timeout = aiohttp.ClientTimeout(total=self.timeout)
         async with aiohttp.ClientSession(timeout=timeout) as session:
-            public_key = await self.public_key(session=session)
+            # Preserve the public_key() seam for fault-injection/tests while
+            # still reusing one HTTP session in normal production operation.
+            if type(self).public_key is VaultTransitSigner.public_key:
+                public_key = await self._public_key_with_session(session)
+            else:
+                public_key = await self.public_key()
             if str(public_key) != str(expected_public_key):
                 raise RuntimeError("Vault key does not match expected Solana public key")
             _validate_transaction_authority(transaction, public_key)
