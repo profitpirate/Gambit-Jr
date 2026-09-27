@@ -11,7 +11,7 @@ from memecoin_bot import e4_role_model_v12 as role_model
 from memecoin_bot import e4_direct_copy_v12 as direct_copy
 
 E4_V12_ROLE_MODEL_POLICY_SHA256 = "2eb324971185c4eacf09ca57c8e06609028381edd03e68c702a0a88e57600ea6"
-E4_V12_DIRECT_COPY_POLICY_SHA256 = "68194a4ad93b267989aa217a4fc2aeb32f8cde8562cff22c3fedb4b9aff5cf90"
+E4_V12_DIRECT_COPY_POLICY_SHA256 = "a7a397b454894ea4b08f31c2054280a92789e4602968f8af1340e50c931b8295"
 role_model.assert_policy_fingerprint(E4_V12_ROLE_MODEL_POLICY_SHA256)
 direct_copy.assert_policy_fingerprint(E4_V12_DIRECT_COPY_POLICY_SHA256)
 
