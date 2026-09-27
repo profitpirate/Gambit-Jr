@@ -7,6 +7,7 @@ from pathlib import Path
 from memecoin_bot.v12_live_readiness import (
     EXPECTED_FROZEN_MODEL_SHA256,
     _causal_gate,
+    _precertified_live_override_gate,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -137,3 +138,63 @@ def test_causal_gate_rejects_incomplete_trade_count(tmp_path: Path) -> None:
 
     assert passed is False
     assert "100-trade completion not reached" in detail
+
+def test_precert_override_accepts_verified_positive_forward_sample(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    state_path, state, _, _ = _valid_bundle(tmp_path)
+    state["ledger"] = state["ledger"][:78]
+    state["completion"] = {
+        "reached": False,
+        "remaining": 22,
+        "required_closed_trades": 100,
+    }
+    state["metrics"]["acceptance_gate_passed"] = False
+    state["metrics"]["closed_trades"] = 78
+    state["metrics"]["wins"] = 60
+    state["metrics"]["losses"] = 18
+    state["metrics"]["net_pnl_sol"] = sum(
+        float(row["pnl_sol"]) for row in state["ledger"]
+    )
+    _write_json(state_path, state)
+    monkeypatch.setenv("V12_PRECERT_MIN_CLOSED_TRADES", "50")
+
+    passed, detail = _precertified_live_override_gate(
+        state_path,
+        repository_root=tmp_path,
+    )
+
+    assert passed is True, detail
+    assert "closed=78/100" in detail
+
+
+def test_precert_override_rejects_too_small_forward_sample(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    state_path, state, _, _ = _valid_bundle(tmp_path)
+    state["ledger"] = state["ledger"][:49]
+    state["completion"] = {
+        "reached": False,
+        "remaining": 51,
+        "required_closed_trades": 100,
+    }
+    state["metrics"]["acceptance_gate_passed"] = False
+    state["metrics"]["closed_trades"] = 49
+    state["metrics"]["wins"] = 49
+    state["metrics"]["losses"] = 0
+    state["metrics"]["net_pnl_sol"] = sum(
+        float(row["pnl_sol"]) for row in state["ledger"]
+    )
+    _write_json(state_path, state)
+    monkeypatch.setenv("V12_PRECERT_MIN_CLOSED_TRADES", "50")
+
+    passed, detail = _precertified_live_override_gate(
+        state_path,
+        repository_root=tmp_path,
+    )
+
+    assert passed is False
+    assert "below override minimum=50" in detail
+
