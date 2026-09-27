@@ -43,6 +43,8 @@ DEFAULT_PATHS = (
     "src/memecoin_bot/config.py",
     "scripts/v12_supervisor.py",
     "tools/e4-builder/race-proxy-v3.mjs",
+    "tools/e4-builder/daemon-v2.mjs",
+    "tools/e4-builder/daemon.mjs",
     "tools/e4-builder/strict-race-proxy-v12.mjs",
     "tools/e4-builder/fast-preload-v4.mjs",
 )
