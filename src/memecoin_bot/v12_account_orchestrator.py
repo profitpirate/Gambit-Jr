@@ -96,8 +96,9 @@ class AccountRuntimeManager:
                 "E4_MAX_POSITION_FRACTION": str(
                     min(0.20, float(row["max_position_fraction"]))
                 ),
-                "E4_MAX_CONCURRENT_POSITIONS": str(
-                    min(2, int(row["max_concurrent_positions"]))
+                "E4_MAX_CONCURRENT_POSITIONS": "2",
+                "V12_ACCOUNT_MAX_CONCURRENT_POSITIONS": str(
+                    max(1, min(2, int(row["max_concurrent_positions"])))
                 ),
                 "V12_SIGNER_SECRET_REF": secret_ref,
                 "E4_SIGNER_COMMAND": (
