@@ -77,7 +77,7 @@ services:
         - CMD
         - python
         - -c
-        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9464/healthz', timeout=2).read()"
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9464/readyz', timeout=2).read()"
       interval: 15s
       timeout: 3s
       retries: 3
