@@ -34,6 +34,28 @@ CREATE TABLE IF NOT EXISTS v12_safety_events(
 """
 
 
+TRANSIENT_EXIT_ONLY_PREFIXES = (
+    "event_feed_stale_",
+    "position_price_feed_stale",
+    "rpc_health_check_failed",
+    "clock_drift_",
+    "disk_space_low",
+    "balance_rpc_failure",
+    "all_transaction_routes_degraded",
+    "transaction_failure_burst",
+    "uncertain_",
+    "runtime_recovery_failure:",
+    "recovery_rpc_unavailable",
+    "position_recovery_rpc_failure",
+    "orphan_buy_recovery_rpc_failure",
+)
+
+
+def transient_exit_only_reason(reason: str) -> bool:
+    value = str(reason or "")
+    return any(value == prefix or value.startswith(prefix) for prefix in TRANSIENT_EXIT_ONLY_PREFIXES)
+
+
 class SafetyMode(StrEnum):
     ACTIVE = "ACTIVE"
     EXIT_ONLY = "EXIT_ONLY"
@@ -97,6 +119,16 @@ class SafetyStore:
         current = self.snapshot()
         # HALTED cannot be automatically relaxed. It requires explicit operator reset.
         if current.mode == SafetyMode.HALTED and mode != SafetyMode.HALTED:
+            return
+        # A transient warning must never erase a harder EXIT_ONLY cause. Without
+        # this precedence, a route/RPC warning could overwrite drawdown or an
+        # exit-execution failure and later auto-recovery could re-enable entries.
+        if (
+            current.mode == SafetyMode.EXIT_ONLY
+            and mode == SafetyMode.EXIT_ONLY
+            and not transient_exit_only_reason(current.reason)
+            and transient_exit_only_reason(reason)
+        ):
             return
         self.conn.execute(
             "UPDATE v12_safety_state SET mode=?,reason=?,updated_ns=? WHERE singleton=1",
