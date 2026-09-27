@@ -93,27 +93,39 @@ class VaultTransitSigner:
         method: str,
         path: str,
         payload: dict | None = None,
+        *,
+        session: aiohttp.ClientSession | None = None,
     ) -> dict:
-        timeout = aiohttp.ClientTimeout(total=self.timeout)
-        async with aiohttp.ClientSession(timeout=timeout) as session, session.request(
-            method,
-            self.address + path,
-            headers=self._headers(),
-            json=payload,
-        ) as response:
-            body = await response.json(content_type=None)
-            if response.status >= 400:
-                raise RuntimeError(
-                    f"Vault HTTP {response.status}: {json.dumps(body)[:500]}"
-                )
-            return body
+        async def perform(active: aiohttp.ClientSession) -> dict:
+            async with active.request(
+                method,
+                self.address + path,
+                headers=self._headers(),
+                json=payload,
+            ) as response:
+                body = await response.json(content_type=None)
+                if response.status >= 400:
+                    raise RuntimeError(
+                        f"Vault HTTP {response.status}: {json.dumps(body)[:500]}"
+                    )
+                return body
 
-    async def public_key(self) -> Pubkey:
+        if session is not None:
+            return await perform(session)
+        timeout = aiohttp.ClientTimeout(total=self.timeout)
+        async with aiohttp.ClientSession(timeout=timeout) as active:
+            return await perform(active)
+
+    async def public_key(
+        self,
+        *,
+        session: aiohttp.ClientSession | None = None,
+    ) -> Pubkey:
         path = (
             f"/v1/{quote(self.reference.mount)}/keys/"
             f"{quote(self.reference.key, safe='')}"
         )
-        payload = await self._request("GET", path)
+        payload = await self._request("GET", path, session=session)
         keys = (payload.get("data") or {}).get("keys") or {}
         latest = str((payload.get("data") or {}).get("latest_version") or "")
         row = keys.get(latest) or next(iter(keys.values()), {})
@@ -131,25 +143,28 @@ class VaultTransitSigner:
         transaction = VersionedTransaction.from_bytes(
             base64.b64decode(transaction_b64)
         )
-        public_key = await self.public_key()
-        if str(public_key) != str(expected_public_key):
-            raise RuntimeError("Vault key does not match expected Solana public key")
-        _validate_transaction_authority(transaction, public_key)
+        timeout = aiohttp.ClientTimeout(total=self.timeout)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            public_key = await self.public_key(session=session)
+            if str(public_key) != str(expected_public_key):
+                raise RuntimeError("Vault key does not match expected Solana public key")
+            _validate_transaction_authority(transaction, public_key)
 
-        message = bytes(transaction.message)
-        path = (
-            f"/v1/{quote(self.reference.mount)}/sign/"
-            f"{quote(self.reference.key, safe='')}"
-        )
-        payload = await self._request(
-            "POST",
-            path,
-            {
-                "input": base64.b64encode(message).decode(),
-                "marshaling_algorithm": "raw",
-                "signature_algorithm": "pure",
-            },
-        )
+            message = bytes(transaction.message)
+            path = (
+                f"/v1/{quote(self.reference.mount)}/sign/"
+                f"{quote(self.reference.key, safe='')}"
+            )
+            payload = await self._request(
+                "POST",
+                path,
+                {
+                    "input": base64.b64encode(message).decode(),
+                    "marshaling_algorithm": "raw",
+                    "signature_algorithm": "pure",
+                },
+                session=session,
+            )
         vault_signature = str((payload.get("data") or {}).get("signature") or "")
         encoded = vault_signature.rsplit(":", 1)[-1]
         raw_signature = base64.b64decode(encoded)
@@ -166,6 +181,19 @@ class VaultTransitSigner:
             signatures[0] = signature
         signed = VersionedTransaction.populate(transaction.message, signatures)
         return base64.b64encode(bytes(signed)).decode(), str(signature)
+
+
+async def probe_from_env() -> dict:
+    reference = parse_vault_ref(os.environ["V12_SIGNER_SECRET_REF"])
+    signer = VaultTransitSigner(
+        reference,
+        address=os.environ["VAULT_ADDR"],
+        token=_vault_token(),
+        namespace=os.getenv("VAULT_NAMESPACE", ""),
+        timeout=float(os.getenv("V12_VAULT_TIMEOUT_SECONDS", "3")),
+    )
+    public_key = await signer.public_key()
+    return {"public_key": str(public_key), "ready": True}
 
 
 async def sign_from_env(request: dict) -> dict:
@@ -188,9 +216,12 @@ async def sign_from_env(request: dict) -> dict:
 
 
 def main() -> int:
-    raw = sys.stdin.buffer.readline()
-    request = json.loads(raw)
-    result = asyncio.run(sign_from_env(request))
+    if "--probe" in sys.argv:
+        result = asyncio.run(probe_from_env())
+    else:
+        raw = sys.stdin.buffer.readline()
+        request = json.loads(raw)
+        result = asyncio.run(sign_from_env(request))
     sys.stdout.write(json.dumps(result, separators=(",", ":")) + "\n")
     sys.stdout.flush()
     return 0
