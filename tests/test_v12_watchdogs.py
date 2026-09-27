@@ -316,6 +316,8 @@ async def test_marketdata_cursor_catches_up_and_recovers_health(tmp_path: Path) 
                 "ts_ns": time.time_ns(),
                 "realtime_sources": 1,
                 "canonical_max_rowid": 100,
+                "pump_provider_seen": True,
+                "pump_provider_ok": True,
                 "providers": [],
             }
         )
@@ -352,4 +354,53 @@ async def test_marketdata_cursor_catches_up_and_recovers_health(tmp_path: Path) 
     assert manager.state.event_healthy is True
     assert manager.state.marketdata_cursor_lag_started_ns == 0
     assert manager.state.marketdata_source_cursor_seen == 100
+
+@pytest.mark.asyncio
+async def test_marketdata_heartbeat_without_connected_pump_feed_blocks_entries(
+    tmp_path: Path,
+) -> None:
+    safety = SafetyStore(tmp_path / "e4.db")
+    breaker = CircuitBreaker(safety)
+    routes = RouteHealthStore(safety.conn)
+    heartbeat = tmp_path / "marketdata.json"
+    heartbeat.write_text(
+        __import__("json").dumps(
+            {
+                "ts_ns": time.time_ns(),
+                "realtime_sources": 1,
+                "canonical_max_rowid": 0,
+                "pump_provider_seen": False,
+                "pump_provider_ok": False,
+                "providers": [],
+            }
+        )
+    )
+    engine = SimpleNamespace(
+        source=SimpleNamespace(last_id=0, table="canonical_events"),
+        positions={},
+        pending_entries=set(),
+        pending_exits=set(),
+        tokens={},
+        sender=SimpleNamespace(routes=[("r1", "https://x")]),
+        rpc=FakeRpc(),
+        signer=SimpleNamespace(wallet="w"),
+        settings=SimpleNamespace(execution_db=tmp_path / "e4.db"),
+        store=FakeStore(safety.conn),
+    )
+    manager = WatchdogManager(
+        engine,
+        breaker,
+        routes,
+        emergency_exit=lambda reason: None,
+        config=WatchdogConfig(
+            heartbeat_path=tmp_path / "hb.json",
+            marketdata_heartbeat_path=heartbeat,
+            kill_switch_path=tmp_path / "kill",
+        ),
+    )
+
+    await manager._check_event_feed(time.time_ns())
+
+    assert manager.state.event_healthy is False
+    assert safety.snapshot().mode == SafetyMode.EXIT_ONLY
 
