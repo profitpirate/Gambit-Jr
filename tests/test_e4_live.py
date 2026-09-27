@@ -252,5 +252,34 @@ class E4SourceTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(event.mint, "mint")
 
 
+    async def test_malformed_canonical_row_does_not_drop_following_trade(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "operational.db"
+            conn = sqlite3.connect(path)
+            conn.execute(
+                "CREATE TABLE canonical_events("
+                "id INTEGER PRIMARY KEY,event_type TEXT,mint TEXT,"
+                "source_timestamp_ns INTEGER,price_sol REAL,fdv_usd REAL)"
+            )
+            conn.execute(
+                "INSERT INTO canonical_events VALUES(1,'NOT_A_REAL_KIND','bad',1,0.001,4878)"
+            )
+            conn.execute(
+                "INSERT INTO canonical_events VALUES(2,'BUY','good',2,0.001,4878)"
+            )
+            conn.commit()
+            conn.close()
+            source = e4_live.SQLiteEventSource(path, 0.001)
+            with patch.dict(
+                os.environ,
+                {"E4_CONSUME_EXISTING_EVENTS": "true"},
+                clear=False,
+            ):
+                event = await asyncio.wait_for(anext(source.events()), timeout=1)
+            self.assertEqual(event.event_id, 2)
+            self.assertEqual(event.mint, "good")
+            self.assertEqual(source.last_id, 2)
+
+
 if __name__ == "__main__":
     unittest.main()
