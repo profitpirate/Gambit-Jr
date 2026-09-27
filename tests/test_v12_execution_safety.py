@@ -139,3 +139,13 @@ def test_failed_route_rehabilitates_after_cooldown_without_funded_probe() -> Non
 
     assert route.score(now) >= 0.25
 
+def test_transient_warning_cannot_overwrite_hard_exit_only_reason(tmp_path: Path) -> None:
+    store = SafetyStore(tmp_path / "e4.db")
+    breaker = CircuitBreaker(store)
+    breaker.exit_only("drawdown_exit_only")
+    breaker.exit_only("rpc_health_check_failed")
+
+    snapshot = store.snapshot()
+    assert snapshot.mode == SafetyMode.EXIT_ONLY
+    assert snapshot.reason == "drawdown_exit_only"
+
