@@ -947,6 +947,23 @@ async def _on_event_production(self: Any, event: Any) -> None:
     operator_graph = getattr(self, "v12_operator_graph", None)
     if watchdog is not None:
         watchdog.touch_event()
+
+    mint = str(getattr(event, "mint", "") or "")
+    account_cap = max(
+        1,
+        min(2, _int_env("V12_ACCOUNT_MAX_CONCURRENT_POSITIONS", 2)),
+    )
+    if (
+        mint
+        and mint not in self.positions
+        and mint not in self.pending_entries
+        and len(self.positions) + len(self.pending_entries) >= account_cap
+    ):
+        # Existing positions must continue receiving events so exits are never
+        # blocked. Only new-mint entry evaluation is suppressed at the mandate cap.
+        if learning is not None:
+            learning.observe(event)
+        return
     if learning is None or operator_graph is None:
         await _PREVIOUS_ON_EVENT(self, event)
         return
