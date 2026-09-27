@@ -50,6 +50,8 @@ def test_user_runtime_environment_isolated_and_bounded(tmp_path: Path) -> None:
     assert env["E4_CREATOR_LEARNING_PATH"].endswith("/7/creator-learning.json")
     assert env["E4_DISCOVERY_QUEUE_PATH"].endswith("/7/discovery-queue.jsonl")
     assert env["V12_MARKETDATA_HEARTBEAT"].endswith("/run/gambit/v12-marketdata-heartbeat.json")
+    assert env["E4_PIPELINE_UDP_PORT"] == "0"
+    assert env["V12_METRICS_PORT"] == "0"
     assert env["V12_ACCOUNT_MAX_BANKROLL_SOL"] == "12.5"
     assert env["E4_MAX_POSITION_FRACTION"] == "0.15"
     assert env["E4_MAX_CONCURRENT_POSITIONS"] == "2"
