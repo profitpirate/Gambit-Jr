@@ -621,7 +621,9 @@ async def _execute_buy_production(
                 },
             )
         else:
-            self.v12_breaker.exit_only("buy_execution_exception")
+            current = self.v12_safety_store.snapshot()
+            if current.reason != "confirmed_buy_token_balance_not_visible":
+                self.v12_breaker.exit_only("buy_execution_exception")
     finally:
         if reserved:
             async with self.allocation_lock:
@@ -804,29 +806,43 @@ async def _runtime_recovery_loop(self: Any) -> None:
         0.1,
         _float_env("V12_UNCERTAIN_RECOVERY_INTERVAL_SECONDS", 0.5),
     )
+    full_interval = max(
+        interval,
+        _float_env("V12_POSITION_RECONCILE_INTERVAL_SECONDS", 2.0),
+    )
+    last_full_reconcile = 0.0
     while not self.stop_event.is_set():
         try:
             uncertain_entries = self.v12_journal.recoverable(("UNCERTAIN",))
-            if uncertain_entries:
+            now = time.monotonic()
+            full_due = now - last_full_reconcile >= full_interval
+            if uncertain_entries or full_due:
                 async with self.v12_recovery_lock:
                     report = await reconcile_engine(
                         self,
                         self.v12_journal,
                         self.v12_breaker,
-                        journal_states=("UNCERTAIN",),
+                        journal_states=("UNCERTAIN",) if uncertain_entries else (),
                     )
-                _audit(
-                    self,
-                    "RUNTIME_RECOVERY",
-                    {
-                        "journal_checked": report.journal_checked,
-                        "journal_confirmed": report.journal_confirmed,
-                        "journal_retried": report.journal_retried,
-                        "journal_uncertain": report.journal_uncertain,
-                        "positions_closed": report.positions_closed,
-                        "positions_reconstructed": report.positions_reconstructed,
-                    },
-                )
+                if full_due:
+                    last_full_reconcile = now
+                if (
+                    report.journal_checked
+                    or report.positions_closed
+                    or report.positions_reconstructed
+                ):
+                    _audit(
+                        self,
+                        "RUNTIME_RECOVERY",
+                        {
+                            "journal_checked": report.journal_checked,
+                            "journal_confirmed": report.journal_confirmed,
+                            "journal_retried": report.journal_retried,
+                            "journal_uncertain": report.journal_uncertain,
+                            "positions_closed": report.positions_closed,
+                            "positions_reconstructed": report.positions_reconstructed,
+                        },
+                    )
             await asyncio.wait_for(self.stop_event.wait(), timeout=interval)
             break
         except TimeoutError:
