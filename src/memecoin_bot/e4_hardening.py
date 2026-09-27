@@ -779,7 +779,8 @@ async def _recover_confirmed_sell(
             position.status = core.PositionStatus.CLOSED
             engine.positions.pop(mint, None)
             engine.store.save_position(position)
-            engine.spawn(engine.sweep())
+            if engine.settings.auto_sweep_enabled:
+                engine.spawn(engine.sweep())
         else:
             position.status = core.PositionStatus.PARTIAL
             engine.store.save_position(position)
@@ -808,7 +809,8 @@ async def _execute_sell_hardened(
             position.status = core.PositionStatus.CLOSED
             self.positions.pop(mint, None)
             self.store.save_position(position)
-            self.spawn(self.sweep())
+            if self.settings.auto_sweep_enabled:
+                self.spawn(self.sweep())
             return
 
         urgent = fraction >= 0.999 or any(
