@@ -48,6 +48,8 @@ TRANSIENT_EXIT_ONLY_PREFIXES = (
     "recovery_rpc_unavailable",
     "position_recovery_rpc_failure",
     "orphan_buy_recovery_rpc_failure",
+    "confirmed_buy_token_balance_not_visible",
+    "confirmed_direct_copy_token_balance_not_visible",
 )
 
 
