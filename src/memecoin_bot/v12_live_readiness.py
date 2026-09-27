@@ -518,6 +518,28 @@ def run_live_readiness(
             "all TLS" if rpc_urls and all(_secure_url(url) for url in rpc_urls) else "non-TLS endpoint present",
         )
     )
+    primary_rpc = str(getattr(settings, "rpc_url", "") or "").strip()
+    primary_host = (urlparse(primary_rpc).hostname or "").lower()
+    known_public_execution_hosts = {
+        "api.mainnet-beta.solana.com",
+        "solana-rpc.publicnode.com",
+    }
+    primary_quality_ok = bool(
+        primary_rpc
+        and primary_host
+        and primary_host not in known_public_execution_hosts
+    )
+    checks.append(
+        ReadinessCheck(
+            "primary_execution_rpc",
+            primary_quality_ok,
+            (
+                f"dedicated endpoint host={primary_host}"
+                if primary_quality_ok
+                else f"public/default endpoint is not allowed for funded execution: {primary_host or 'missing'}"
+            ),
+        )
+    )
 
     route_urls = dict(getattr(settings, "route_urls", {}) or {})
     route_endpoints = [
