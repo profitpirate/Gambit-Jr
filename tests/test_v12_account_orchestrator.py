@@ -44,6 +44,9 @@ def test_user_runtime_environment_isolated_and_bounded(tmp_path: Path) -> None:
     )
     env = manager._environment(values, tmp_path / "accounts" / "7")
     assert env["E4_DATABASE_PATH"].endswith("/7/execution.db")
+    assert env["E4_LIVE_CREATOR_OVERLAY"].endswith("/7/live-creator-overlay.json")
+    assert env["E4_LIVE_OUTCOME_JOURNAL"].endswith("/7/live-outcomes.jsonl")
+    assert env["V12_MARKETDATA_HEARTBEAT"].endswith("/run/gambit/v12-marketdata-heartbeat.json")
     assert env["V12_ACCOUNT_MAX_BANKROLL_SOL"] == "12.5"
     assert env["E4_MAX_POSITION_FRACTION"] == "0.15"
     assert env["V12_SIGNER_SECRET_REF"] == "vault://transit/user-7"
