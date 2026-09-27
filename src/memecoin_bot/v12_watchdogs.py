@@ -14,7 +14,11 @@ from pathlib import Path
 from typing import Any
 
 from .v12_route_health import RouteHealthStore
-from .v12_safety import CircuitBreaker, SafetyMode
+from .v12_safety import (
+    TRANSIENT_EXIT_ONLY_PREFIXES,
+    CircuitBreaker,
+    SafetyMode,
+)
 
 LOGGER = logging.getLogger("gambit.v12.watchdogs")
 
@@ -376,18 +380,7 @@ class WatchdogManager:
             return
         recovered = self.breaker.recover_exit_only(
             "transient_health_recovered",
-            allowed_prefixes=(
-                "event_feed_stale_",
-                "position_price_feed_stale",
-                "rpc_health_check_failed",
-                "clock_drift_",
-                "disk_space_low",
-                "balance_rpc_failure",
-                "all_transaction_routes_degraded",
-                "transaction_failure_burst",
-                "uncertain_",
-                "runtime_recovery_failure:",
-            ),
+            allowed_prefixes=TRANSIENT_EXIT_ONLY_PREFIXES,
         )
         if recovered.mode == SafetyMode.ACTIVE:
             self.breaker.store.event(
