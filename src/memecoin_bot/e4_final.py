@@ -316,7 +316,8 @@ async def _execute_sell(self: core.Engine, position: core.Position, fraction: fl
             position.status = core.PositionStatus.CLOSED
             self.positions.pop(mint, None)
             self.store.save_position(position)
-            self.spawn(self.sweep())
+            if self.settings.auto_sweep_enabled:
+                self.spawn(self.sweep())
             return
 
         urgent = fraction >= 0.999 or any(term in reason.lower() for term in ("failure", "broke", "liquidation"))
@@ -365,7 +366,8 @@ async def _execute_sell(self: core.Engine, position: core.Position, fraction: fl
             position.status = core.PositionStatus.CLOSED
             self.positions.pop(mint, None)
             self.store.save_position(position)
-            self.spawn(self.sweep())
+            if self.settings.auto_sweep_enabled:
+                self.spawn(self.sweep())
         else:
             position.status = core.PositionStatus.PARTIAL
             self.store.save_position(position)
