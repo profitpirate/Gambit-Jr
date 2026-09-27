@@ -7,6 +7,7 @@ import math
 import os
 import shutil
 import sqlite3
+import subprocess
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from urllib.parse import urlparse
@@ -376,14 +377,18 @@ def run_live_readiness(
 
     wallet = str(getattr(settings, "wallet", "") or "")
     vault = str(getattr(settings, "vault", "") or "")
+    auto_sweep = bool(getattr(settings, "auto_sweep_enabled", False))
     checks.append(ReadinessCheck("trading_wallet", bool(wallet), wallet or "missing"))
-    checks.append(
-        ReadinessCheck(
-            "storage_wallet",
-            bool(vault and vault != wallet),
-            "configured and distinct" if vault and vault != wallet else "missing or same as trading wallet",
-        )
-    )
+    storage_ok = bool(vault and vault != wallet) or (not auto_sweep and not vault)
+    if vault and vault == wallet:
+        storage_detail = "storage wallet must differ from trading wallet"
+    elif vault:
+        storage_detail = "configured and distinct"
+    elif auto_sweep:
+        storage_detail = "required because automatic storage sweeping is enabled"
+    else:
+        storage_detail = "optional; automatic storage sweeping is disabled"
+    checks.append(ReadinessCheck("storage_wallet", storage_ok, storage_detail))
 
     signer_command = tuple(getattr(settings, "signer_command", ()) or ())
     keypair_path = getattr(settings, "keypair_path", None)
@@ -394,6 +399,44 @@ def run_live_readiness(
     if signer_command:
         binary = shutil.which(signer_command[0])
         checks.append(ReadinessCheck("signer_binary", bool(binary), binary or "not found"))
+        canonical_vault_signer = "memecoin_bot.v12_vault_signer" in " ".join(
+            signer_command
+        )
+        if binary and canonical_vault_signer and wallet:
+            try:
+                timeout = max(
+                    2.0,
+                    float(os.getenv("V12_VAULT_TIMEOUT_SECONDS", "3")) + 2.0,
+                )
+                probe = subprocess.run(
+                    [*signer_command, "--probe"],
+                    cwd=repository_root,
+                    env=os.environ.copy(),
+                    stdin=subprocess.DEVNULL,
+                    capture_output=True,
+                    text=True,
+                    timeout=timeout,
+                    check=False,
+                )
+                payload = json.loads(probe.stdout or "{}")
+                probe_key = str(payload.get("public_key") or "")
+                probe_ok = (
+                    probe.returncode == 0
+                    and payload.get("ready") is True
+                    and probe_key == wallet
+                )
+                probe_detail = (
+                    "Vault key reachable and matches trading wallet"
+                    if probe_ok
+                    else (
+                        (probe.stderr or probe.stdout or "Vault signer probe failed")
+                        .strip()[:500]
+                    )
+                )
+            except (OSError, ValueError, subprocess.SubprocessError, json.JSONDecodeError) as exc:
+                probe_ok = False
+                probe_detail = str(exc)
+            checks.append(ReadinessCheck("signer_probe", probe_ok, probe_detail))
     if keypair_path:
         try:
             ensure_private_file(Path(keypair_path))
@@ -405,8 +448,52 @@ def run_live_readiness(
         checks.append(ReadinessCheck("local_keypair_policy", permission_ok, permission_detail))
 
     builder = tuple(getattr(settings, "builder_command", ()) or ())
-    builder_ok = bool(builder and shutil.which(builder[0]))
-    checks.append(ReadinessCheck("builder", builder_ok, builder[0] if builder else "missing"))
+    builder_binary = shutil.which(builder[0]) if builder else None
+    builder_ok = bool(builder and builder_binary)
+    checks.append(
+        ReadinessCheck(
+            "builder",
+            builder_ok,
+            str(builder_binary or (builder[0] if builder else "missing")),
+        )
+    )
+    if builder_ok and len(builder) >= 2 and builder[1].endswith((".js", ".mjs")):
+        builder_script = _resolve(repository_root, builder[1])
+        script_ok = builder_script.is_file()
+        checks.append(
+            ReadinessCheck(
+                "builder_script",
+                script_ok,
+                str(builder_script) if script_ok else f"missing {builder_script}",
+            )
+        )
+        if script_ok and "race-proxy" in builder_script.name:
+            try:
+                probe = subprocess.run(
+                    [*builder, "--self-test"],
+                    cwd=repository_root,
+                    env=os.environ.copy(),
+                    stdin=subprocess.DEVNULL,
+                    capture_output=True,
+                    text=True,
+                    timeout=max(
+                        3.0,
+                        float(os.getenv("E4_BUILDER_READINESS_TIMEOUT_SECONDS", "8")),
+                    ),
+                    check=False,
+                )
+                self_test_ok = probe.returncode == 0
+                self_test_detail = (
+                    "local transaction builder self-test passed"
+                    if self_test_ok
+                    else (probe.stderr or probe.stdout or "builder self-test failed").strip()[:500]
+                )
+            except (OSError, ValueError, subprocess.SubprocessError) as exc:
+                self_test_ok = False
+                self_test_detail = str(exc)
+            checks.append(
+                ReadinessCheck("builder_self_test", self_test_ok, self_test_detail)
+            )
 
     rpc_urls = tuple(
         dict.fromkeys(
@@ -433,14 +520,88 @@ def run_live_readiness(
     )
 
     route_urls = dict(getattr(settings, "route_urls", {}) or {})
-    route_count = len(route_urls) + int(bool(getattr(settings, "direct_rpc_route", False)))
-    checks.append(ReadinessCheck("route_redundancy", route_count >= 2, f"{route_count} routes"))
-    insecure_routes = [url for url in route_urls.values() if not _secure_url(str(url))]
+    route_endpoints = [
+        str(url).strip()
+        for url in route_urls.values()
+        if str(url).strip()
+    ]
+    if bool(getattr(settings, "direct_rpc_route", False)):
+        direct_url = str(getattr(settings, "rpc_url", "") or "").strip()
+        if direct_url:
+            route_endpoints.append(direct_url)
+    unique_routes = tuple(dict.fromkeys(route_endpoints))
+    route_count = len(unique_routes)
+    checks.append(
+        ReadinessCheck(
+            "route_redundancy",
+            route_count >= 2,
+            f"{route_count} distinct route endpoints",
+        )
+    )
+    insecure_routes = [url for url in unique_routes if not _secure_url(str(url))]
     checks.append(
         ReadinessCheck(
             "route_transport_security",
             not insecure_routes,
             "all TLS" if not insecure_routes else f"insecure={insecure_routes}",
+        )
+    )
+
+    operational_db = Path(getattr(settings, "operational_db", ""))
+    operational_ok = False
+    operational_detail = "missing"
+    if operational_db:
+        try:
+            resolved_operational = operational_db.resolve()
+            if not resolved_operational.is_file():
+                operational_detail = f"missing {resolved_operational}"
+            else:
+                probe = sqlite3.connect(
+                    f"file:{resolved_operational}?mode=ro",
+                    uri=True,
+                    timeout=2,
+                )
+                quick = probe.execute("PRAGMA quick_check").fetchone()
+                tables = [
+                    str(row[0])
+                    for row in probe.execute(
+                        "SELECT name FROM sqlite_master "
+                        "WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+                    )
+                ]
+                compatible = []
+                for table in tables:
+                    columns = {
+                        str(row[1]).lower()
+                        for row in probe.execute(f'PRAGMA table_info("{table}")')
+                    }
+                    has_mint = bool(
+                        columns.intersection(
+                            {"mint", "canonical_token", "token_address", "address"}
+                        )
+                    )
+                    has_kind = bool(
+                        columns.intersection({"event_type", "kind", "type", "action"})
+                    )
+                    if has_mint and has_kind:
+                        compatible.append(table)
+                probe.close()
+                operational_ok = bool(
+                    quick
+                    and str(quick[0]).lower() == "ok"
+                    and compatible
+                )
+                operational_detail = (
+                    f"quick_check={quick[0] if quick else 'none'} "
+                    f"journals={','.join(compatible[:4]) or 'none'}"
+                )
+        except sqlite3.Error as exc:
+            operational_detail = str(exc)
+    checks.append(
+        ReadinessCheck(
+            "operational_event_database",
+            operational_ok,
+            operational_detail,
         )
     )
 
@@ -456,6 +617,19 @@ def run_live_readiness(
         db_ok = False
         db_detail = str(exc)
     checks.append(ReadinessCheck("execution_database", db_ok, db_detail))
+    try:
+        databases_separate = operational_db.resolve() != execution_db.resolve()
+    except OSError:
+        databases_separate = operational_db != execution_db
+    checks.append(
+        ReadinessCheck(
+            "database_isolation",
+            databases_separate,
+            "separate operational and execution databases"
+            if databases_separate
+            else "operational and execution database paths are identical",
+        )
+    )
 
     notifications = _truthy("V12_NOTIFICATIONS_ENABLED")
     has_discord = bool(
