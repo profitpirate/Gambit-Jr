@@ -84,9 +84,7 @@ async def heartbeat(
             for row in pump_rows
         )
         startup_grace = now - started < stale_seconds
-        pump_provider_ok = pump_provider_connected or (
-            not pump_provider_seen and startup_grace
-        )
+        pump_provider_ok = pump_provider_connected
         if pump_provider_connected:
             last_pump_provider_healthy = now
         elif (
