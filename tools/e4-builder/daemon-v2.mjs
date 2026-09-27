@@ -321,6 +321,11 @@ async function buildPumpLocal(request) {
 async function buildSweep(request) {
   const destination = request.metadata?.destination;
   if (!destination) throw new Error("SWEEP request requires metadata.destination");
+  const configuredVault = String(process.env.E4_VAULT_PUBLIC_KEY || "").trim();
+  if (!configuredVault) throw new Error("SWEEP requires E4_VAULT_PUBLIC_KEY");
+  if (String(destination) !== configuredVault) {
+    throw new Error("SWEEP destination does not match E4_VAULT_PUBLIC_KEY");
+  }
   const lamports = Math.floor(Number(request.amount) * 1_000_000_000);
   if (!Number.isSafeInteger(lamports) || lamports <= 0) throw new Error("invalid sweep amount");
   const instructions = computeBudget(request);
