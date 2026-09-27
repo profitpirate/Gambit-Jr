@@ -2,6 +2,11 @@
 import readline from "node:readline";
 import BN from "bn.js";
 import {PUMP_SDK} from "@pump-fun/pump-sdk";
+import {
+  OnlinePumpAmmSdk,
+  PUMP_AMM_SDK,
+  canonicalPumpPoolPda,
+} from "@pump-fun/pump-swap-sdk";
 import {NATIVE_MINT, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID} from "@solana/spl-token";
 import {
   ComputeBudgetProgram,
@@ -318,6 +323,48 @@ async function buildPumpLocal(request) {
   };
 }
 
+async function buildPumpAmmSell(request) {
+  if (!LOCAL_ENABLED) throw new Error("local Pump AMM builder disabled");
+  if (String(request.side || "").toUpperCase() !== "SELL") {
+    throw new Error("local Pump AMM builder currently supports SELL only");
+  }
+  const user = new PublicKey(request.public_key);
+  const mint = new PublicKey(request.mint);
+  const poolKey = canonicalPumpPoolPda(mint);
+  const tokenAmount = reserveTokens(request.amount, "AMM sell token amount");
+  const slippagePercent = Math.max(
+    0,
+    Math.min(90, Number(request.slippage_bps || 0) / 100),
+  );
+
+  let lastError;
+  for (const connection of connections) {
+    try {
+      const onlineAmm = new OnlinePumpAmmSdk(connection);
+      const swapState = await onlineAmm.swapSolanaState(poolKey, user);
+      const sdkInstructions = await PUMP_AMM_SDK.sellBaseInput(
+        swapState,
+        new BN(tokenAmount.toString()),
+        slippagePercent,
+      );
+      const instructions = computeBudget(request);
+      instructions.push(...sdkInstructions);
+      const tip = appendTip(instructions, request);
+      const bytes = compile(request, instructions, await blockhashFor(request));
+      return {
+        transaction_base64: bytes.toString("base64"),
+        tip_appended: Boolean(tip),
+        tip_account: tip?.toBase58() || null,
+        builder_mode: "official-local-pump-amm-sdk",
+        pool: poolKey.toBase58(),
+      };
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || new Error("all RPCs failed to construct Pump AMM sell");
+}
+
 async function buildSweep(request) {
   const destination = request.metadata?.destination;
   if (!destination) throw new Error("SWEEP request requires metadata.destination");
@@ -387,7 +434,11 @@ async function buildPump(request) {
   const started = process.hrtime.bigint();
   let localError;
   try {
-    const result = await buildPumpLocal(request);
+    const pool = String(request.pool || "pump").toLowerCase();
+    const side = String(request.side || "").toUpperCase();
+    const result = pool === "pump-amm" && side === "SELL"
+      ? await buildPumpAmmSell(request)
+      : await buildPumpLocal(request);
     return {...result, build_ns: Number(process.hrtime.bigint() - started)};
   } catch (error) {
     localError = error;
@@ -404,6 +455,13 @@ async function handle(line) {
 }
 
 async function selfTest() {
+  if (
+    typeof OnlinePumpAmmSdk !== "function"
+    || typeof PUMP_AMM_SDK?.sellBaseInput !== "function"
+    || typeof canonicalPumpPoolPda !== "function"
+  ) {
+    throw new Error("Pump AMM SDK sell path is unavailable");
+  }
   const request = {
     request_id: "local-self-test",
     side: "BUY",
