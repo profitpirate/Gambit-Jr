@@ -41,6 +41,9 @@ INTEGRITY_REQUIRED = [
     "src/memecoin_bot/main.py",
     "src/memecoin_bot/config.py",
     "scripts/v12_supervisor.py",
+    "tools/e4-builder/race-proxy-v3.mjs",
+    "tools/e4-builder/daemon-v2.mjs",
+    "tools/e4-builder/strict-output-guard-v12.mjs",
 ]
 
 
