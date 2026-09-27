@@ -48,6 +48,8 @@ class JournalEntry:
     slot: int | None
     error: str | None
     attempts: int
+    created_ns: int
+    updated_ns: int
 
 
 def canonical_payload(request: Mapping[str, Any]) -> str:
@@ -108,6 +110,8 @@ class ExecutionJournal:
             slot=int(row["slot"]) if row["slot"] is not None else None,
             error=str(row["error"]) if row["error"] else None,
             attempts=int(row["attempts"]),
+            created_ns=int(row["created_ns"]),
+            updated_ns=int(row["updated_ns"]),
         )
 
     def prepare(self, request_id: str, request: Mapping[str, Any]) -> JournalEntry:
@@ -246,6 +250,19 @@ class ExecutionJournal:
             (str(side), mint, mint),
         ).fetchall()
         return [self._entry(row) for row in rows]
+
+    def latest_for(self, side: str, mint: str | None) -> JournalEntry | None:
+        row = self.conn.execute(
+            """
+            SELECT * FROM v12_execution_journal
+            WHERE side=?
+              AND ((? IS NULL AND mint IS NULL) OR mint=?)
+            ORDER BY created_ns DESC
+            LIMIT 1
+            """,
+            (str(side), mint, mint),
+        ).fetchone()
+        return self._entry(row) if row is not None else None
 
     def state_counts(self) -> dict[str, int]:
         return {
