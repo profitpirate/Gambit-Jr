@@ -6,7 +6,7 @@ import pytest
 
 from memecoin_bot.v12_capacity import decide_capacity
 from memecoin_bot.v12_execution_journal import ExecutionJournal
-from memecoin_bot.v12_route_health import RouteHealthStore
+from memecoin_bot.v12_route_health import RouteHealth, RouteHealthStore
 from memecoin_bot.v12_safety import CircuitBreaker, SafetyMode, SafetyStore
 
 
@@ -124,4 +124,18 @@ def test_non_transient_exit_only_does_not_auto_recover(tmp_path: Path) -> None:
 
     assert recovered.mode == SafetyMode.EXIT_ONLY
     assert recovered.reason == "drawdown_exit_only"
+
+def test_failed_route_rehabilitates_after_cooldown_without_funded_probe() -> None:
+    now = 1_000_000_000_000
+    route = RouteHealth(
+        route="recovering",
+        ewma_latency_ms=1000.0,
+        ewma_success=0.0,
+        consecutive_failures=6,
+        observations=6,
+        cooldown_until_ns=now - 1,
+        updated_ns=now - 180_000_000_000,
+    )
+
+    assert route.score(now) >= 0.25
 
