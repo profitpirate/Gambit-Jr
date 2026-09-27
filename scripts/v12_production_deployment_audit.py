@@ -14,9 +14,12 @@ REQUIRED_FILES = [
     "src/memecoin_bot/v12_route_health.py",
     "src/memecoin_bot/v12_backup.py",
     "src/memecoin_bot/v12_watchdogs.py",
+    "src/memecoin_bot/v12_marketdata.py",
     "src/memecoin_bot/e4_production_guard_v12.py",
     "src/memecoin_bot/e4_sub10ms_transport_final_v12.py",
     "scripts/v12_supervisor.py",
+    "deploy/systemd/gambit-v12.service",
+    "deploy/systemd/gambit-v12-marketdata.service",
 ]
 FORBIDDEN_ENV = ["AXIOM_PASSWORD", "AXIOM_SESSION", "AXIOM_COOKIE", "AXIOM_AUTH_TOKEN"]
 INTEGRITY_REQUIRED = [
@@ -32,6 +35,11 @@ INTEGRITY_REQUIRED = [
     "src/memecoin_bot/v12_route_health.py",
     "src/memecoin_bot/v12_backup.py",
     "src/memecoin_bot/v12_watchdogs.py",
+    "src/memecoin_bot/v12_marketdata.py",
+    "src/memecoin_bot/realtime/fabric.py",
+    "src/memecoin_bot/realtime/pumpfun.py",
+    "src/memecoin_bot/main.py",
+    "src/memecoin_bot/config.py",
     "scripts/v12_supervisor.py",
 ]
 
@@ -52,6 +60,8 @@ def audit(root: Path) -> dict:
     docker_exec = _read(root, "Dockerfile.e4-exec")
     docker_prod = _read(root, "Dockerfile.e4-prod")
     supervisor = _read(root, "scripts/v12_supervisor.py")
+    trader_systemd = _read(root, "deploy/systemd/gambit-v12.service")
+    marketdata_systemd = _read(root, "deploy/systemd/gambit-v12-marketdata.service")
     pyproject = _read(root, "pyproject.toml")
     integrity_builder = _read(root, "scripts/v12_integrity_manifest.py")
 
@@ -84,6 +94,16 @@ def audit(root: Path) -> dict:
     for name, payload in (("exec", compose_exec), ("prod", compose_prod)):
         compose_checks[name] = {
             "canonical_entrypoint": "memecoin_bot.e4_exec" in payload,
+            "marketdata_service": "\n  marketdata:" in payload
+            and "memecoin_bot.v12_marketdata" in payload,
+            "marketdata_dependency": "depends_on:" in payload
+            and "condition: service_healthy" in payload,
+            "shared_marketdata_db": payload.count(
+                "DATABASE_PATH: /app/data/memecoin.db"
+            ) >= 2,
+            "marketdata_heartbeat": payload.count(
+                "V12_MARKETDATA_HEARTBEAT: /app/run/v12-marketdata-heartbeat.json"
+            ) >= 2,
             "vault_secret": "VAULT_TOKEN_FILE: /run/secrets/vault-token" in payload
             and "vault_token:" in payload,
             "no_plaintext_keypair": "E4_KEYPAIR_HOST_PATH" not in payload,
@@ -113,6 +133,20 @@ def audit(root: Path) -> dict:
     other_checks = {
         "supervisor_uses_exec": '"memecoin_bot.e4_exec"' in supervisor,
         "console_script_uses_safe_wrapper": 'gambit-e4 = "memecoin_bot.e4_exec.__main__:main"' in pyproject,
+        "systemd_requires_marketdata": "Requires=gambit-v12-marketdata.service"
+        in trader_systemd,
+        "systemd_shared_marketdata_db": (
+            "Environment=DATABASE_PATH=/var/lib/gambit/marketdata.db"
+            in trader_systemd
+            and "Environment=DATABASE_PATH=/var/lib/gambit/marketdata.db"
+            in marketdata_systemd
+        ),
+        "systemd_marketdata_heartbeat": (
+            "Environment=V12_MARKETDATA_HEARTBEAT=/run/gambit/v12-marketdata-heartbeat.json"
+            in trader_systemd
+            and "Environment=V12_MARKETDATA_HEARTBEAT=/run/gambit/v12-marketdata-heartbeat.json"
+            in marketdata_systemd
+        ),
     }
 
     checks = {
