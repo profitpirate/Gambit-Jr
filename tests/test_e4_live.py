@@ -22,6 +22,16 @@ class E4InvariantTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "MAX_CONCURRENT"):
                 e4_live.Settings().validate()
 
+    def test_storage_sweep_is_manual_by_default_and_explicitly_opt_in(self) -> None:
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertFalse(e4_live.Settings.from_env().auto_sweep_enabled)
+        with patch.dict(
+            os.environ,
+            {"V12_AUTO_STORAGE_SWEEP_ENABLED": "true"},
+            clear=True,
+        ):
+            self.assertTrue(e4_live.Settings.from_env().auto_sweep_enabled)
+
     def test_store_commits_only_one_entry_per_mint(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             store = e4_live.Store(Path(directory) / "e4.db")
