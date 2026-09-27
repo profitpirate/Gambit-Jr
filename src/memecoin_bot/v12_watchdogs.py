@@ -364,6 +364,19 @@ class WatchdogManager:
             )
         ):
             return False
+        exiting = any(
+            str(
+                getattr(
+                    getattr(position, "status", None),
+                    "value",
+                    getattr(position, "status", ""),
+                )
+            ).upper()
+            == "EXITING"
+            for position in self.engine.positions.values()
+        )
+        if exiting:
+            return False
         journal = getattr(self.engine, "v12_journal", None)
         return not (
             journal is not None
