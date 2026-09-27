@@ -1,4 +1,42 @@
 services:
+  marketdata:
+    build:
+      context: .
+      dockerfile: Dockerfile.e4-prod
+    restart: unless-stopped
+    init: true
+    read_only: true
+    env_file:
+      - .env.e4
+    environment:
+      DATABASE_PATH: /app/data/memecoin.db
+      V12_MARKETDATA_HEARTBEAT: /app/run/v12-marketdata-heartbeat.json
+      SHADOW_MODE: "true"
+      PUBLIC_ALERTS_ENABLED: "false"
+      OPERATOR_SHADOW_ALERTS_ENABLED: "false"
+    volumes:
+      - ./data:/app/data
+      - ./run:/app/run
+      - ./var:/app/var
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    stop_grace_period: 30s
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import json,time,pathlib; p=pathlib.Path('/app/run/v12-marketdata-heartbeat.json'); d=json.loads(p.read_text()); assert (time.time_ns()-int(d['ts_ns']))/1e9 < 10"
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 20s
+    command: ["python", "-m", "memecoin_bot.v12_marketdata"]
+
   e4:
     build:
       context: .
@@ -10,7 +48,15 @@ services:
       - .env.e4
     environment:
       E4_LIVE: "true"
+      DATABASE_PATH: /app/data/memecoin.db
+      E4_DATABASE_PATH: /app/data/e4.db
+      V12_HEARTBEAT_PATH: /app/run/v12-heartbeat.json
+      V12_KILL_SWITCH_PATH: /app/run/V12_KILL
+      V12_INSTANCE_LOCK: /app/run/v12-live.lock
       VAULT_TOKEN_FILE: /run/secrets/vault-token
+    depends_on:
+      marketdata:
+        condition: service_healthy
     volumes:
       - ./data:/app/data
       - ./backups:/app/backups
