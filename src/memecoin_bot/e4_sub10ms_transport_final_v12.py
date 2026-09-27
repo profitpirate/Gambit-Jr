@@ -348,30 +348,68 @@ class FinalPersistentRouteSender(_BaseSender):
                     )
                     break
 
-            results = await asyncio.gather(*tasks)
-            accepted = [item for item in results if item.accepted]
-            if not accepted:
-                return (
-                    "NONE",
-                    False,
-                    None,
-                    "; ".join(f"{item.name}:{item.error}" for item in results),
-                    results,
-                )
-            winner = min(accepted, key=lambda item: item.completed_ns)
-            if confirmation_task is None:
+            if first_accepted is None:
+                results = await asyncio.gather(*tasks)
+                accepted = [item for item in results if item.accepted]
+                if not accepted:
+                    return (
+                        "NONE",
+                        False,
+                        None,
+                        "; ".join(f"{item.name}:{item.error}" for item in results),
+                        results,
+                    )
+                first_accepted = min(accepted, key=lambda item: item.completed_ns)
                 confirmation_task = asyncio.create_task(
                     self.rpc.confirm(
                         signature,
                         self.settings.confirmation_timeout_seconds,
                     )
                 )
+
+            assert confirmation_task is not None
             confirmed, slot, error = await confirmation_task
-            return winner.name, confirmed, slot, error, results
+            if confirmed:
+                # The chain is authoritative. Do not hold position creation
+                # hostage to a slow duplicate route after the exact signature
+                # has already landed.
+                grace = max(
+                    0.0,
+                    float(os.getenv("E4_ROUTE_RESULT_GRACE_MS", "25")) / 1000.0,
+                )
+                if grace:
+                    pending = [task for task in tasks if not task.done()]
+                    if pending:
+                        await asyncio.wait(pending, timeout=grace)
+                results = [
+                    task.result()
+                    for task in tasks
+                    if task.done() and not task.cancelled()
+                ]
+                if first_accepted not in results:
+                    results.append(first_accepted)
+                winner = min(
+                    (item for item in results if item.accepted),
+                    key=lambda item: item.completed_ns,
+                )
+                return winner.name, True, slot, None, results
+
+            # A confirmation timeout/error is exactly when route diagnostics
+            # matter most; by this point route-level deadlines are shorter than
+            # the chain confirmation deadline, so collect them all.
+            results = await asyncio.gather(*tasks)
+            accepted = [item for item in results if item.accepted]
+            winner = (
+                min(accepted, key=lambda item: item.completed_ns)
+                if accepted
+                else first_accepted
+            )
+            return winner.name, False, slot, error, results
         finally:
             for task in tasks:
                 if not task.done():
                     task.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
 
     async def close(self) -> None:
         if self._final_keepalive_task is not None:
