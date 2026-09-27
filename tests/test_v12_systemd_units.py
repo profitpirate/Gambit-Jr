@@ -14,7 +14,13 @@ def test_trader_unit_requires_marketdata_and_aligns_supervisor_paths() -> None:
     unit = text("gambit-v12.service")
     assert "Requires=gambit-v12-marketdata.service" in unit
     assert "After=network-online.target gambit-v12-marketdata.service" in unit
+    assert "Environment=DATABASE_PATH=/var/lib/gambit/marketdata.db" in unit
+    assert "Environment=E4_DATABASE_PATH=/var/lib/gambit/e4.db" in unit
     assert "Environment=V12_HEARTBEAT_PATH=/run/gambit/v12-heartbeat.json" in unit
+    assert (
+        "Environment=V12_MARKETDATA_HEARTBEAT="
+        "/run/gambit/v12-marketdata-heartbeat.json"
+    ) in unit
     assert "Environment=V12_KILL_SWITCH_PATH=/run/gambit/V12_KILL" in unit
     assert "Environment=V12_INSTANCE_LOCK=/run/gambit/v12-live.lock" in unit
     assert "--heartbeat /run/gambit/v12-heartbeat.json" in unit
