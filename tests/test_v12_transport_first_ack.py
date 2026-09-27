@@ -46,15 +46,18 @@ async def test_confirmation_starts_on_first_accepted_route() -> None:
         return transport.core.RouteResult(name, now, time.time_ns(), True, signature)
 
     sender._send = MethodType(fake_send, sender)
+    started = time.monotonic()
     task = asyncio.create_task(sender.submit("wire", "signature"))
     await asyncio.wait_for(rpc.confirm_started.wait(), 0.03)
     assert not rpc.slow_finished.is_set()
     route, confirmed, slot, error, results = await task
+    elapsed = time.monotonic() - started
     assert confirmed is True
     assert slot == 123
     assert error is None
     assert route == "fast"
-    assert len(results) == 2
+    assert any(item.name == "fast" for item in results)
+    assert elapsed < 0.05
 
 
 def test_signed_payload_serialization_is_cached_by_route_kind() -> None:
