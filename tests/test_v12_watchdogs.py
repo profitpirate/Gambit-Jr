@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from collections import deque
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -116,3 +117,80 @@ async def test_kill_switch_is_persistent_halt(tmp_path: Path) -> None:
     assert safety.snapshot().mode == SafetyMode.HALTED
     assert "operator_kill_switch" in safety.snapshot().reason
     assert exits
+
+def test_transient_exit_only_recovers_after_stable_health(tmp_path: Path) -> None:
+    safety = SafetyStore(tmp_path / "e4.db")
+    breaker = CircuitBreaker(safety)
+    routes = RouteHealthStore(safety.conn)
+    engine = SimpleNamespace(
+        positions={},
+        pending_entries=set(),
+        pending_exits=set(),
+        tokens={},
+        sender=SimpleNamespace(routes=[("r1", "https://x")]),
+        rpc=FakeRpc(),
+        signer=SimpleNamespace(wallet="w"),
+        settings=SimpleNamespace(execution_db=tmp_path / "e4.db"),
+        store=FakeStore(safety.conn),
+        v12_tx_failures=deque(),
+        v12_journal=SimpleNamespace(recoverable=lambda states: []),
+    )
+    manager = WatchdogManager(
+        engine,
+        breaker,
+        routes,
+        emergency_exit=lambda reason: None,
+        config=WatchdogConfig(
+            recovery_healthy_cycles=2,
+            heartbeat_path=tmp_path / "hb.json",
+            kill_switch_path=tmp_path / "kill",
+        ),
+    )
+    breaker.exit_only("rpc_health_check_failed")
+
+    manager._maybe_restore_entries()
+    assert safety.snapshot().mode == SafetyMode.EXIT_ONLY
+    manager._maybe_restore_entries()
+
+    assert safety.snapshot().mode == SafetyMode.ACTIVE
+    assert safety.snapshot().reason == "transient_health_recovered"
+
+
+def test_transaction_failure_window_expires_and_unblocks_entries(tmp_path: Path) -> None:
+    safety = SafetyStore(tmp_path / "e4.db")
+    breaker = CircuitBreaker(safety)
+    routes = RouteHealthStore(safety.conn)
+    failures = deque([time.monotonic() - 61.0 for _ in range(5)])
+    engine = SimpleNamespace(
+        positions={},
+        pending_entries=set(),
+        pending_exits=set(),
+        tokens={},
+        sender=SimpleNamespace(routes=[("r1", "https://x")]),
+        rpc=FakeRpc(),
+        signer=SimpleNamespace(wallet="w"),
+        settings=SimpleNamespace(execution_db=tmp_path / "e4.db"),
+        store=FakeStore(safety.conn),
+        v12_tx_failures=failures,
+        v12_journal=SimpleNamespace(recoverable=lambda states: []),
+    )
+    manager = WatchdogManager(
+        engine,
+        breaker,
+        routes,
+        emergency_exit=lambda reason: None,
+        config=WatchdogConfig(
+            recovery_healthy_cycles=1,
+            heartbeat_path=tmp_path / "hb.json",
+            kill_switch_path=tmp_path / "kill",
+        ),
+    )
+    safety.set_tx_failures(5)
+    breaker.exit_only("transaction_failure_burst")
+
+    manager._refresh_tx_failure_window()
+    manager._maybe_restore_entries()
+
+    assert safety.snapshot().tx_failures_window == 0
+    assert safety.snapshot().mode == SafetyMode.ACTIVE
+
