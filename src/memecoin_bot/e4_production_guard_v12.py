@@ -18,6 +18,7 @@ from typing import Any
 
 from . import e4_hardening_v10 as v10
 from . import e4_role_model_v12 as role_model
+from . import e4_strict_output_deferred_v12 as output_guard
 from .v12_backup import EncryptedBackupManager, decode_aes_key
 from .v12_capacity import decide_capacity
 from .v12_creator_lifecycle import CreatorLifecycleStore
@@ -212,7 +213,10 @@ async def _execute_exactly_once(
     request_id: str,
     request: Mapping[str, Any],
 ) -> tuple[str, bool, int | None, str | None]:
-    enriched = v10._enrich_request(request)
+    # Apply the final output/slippage guard after launch/curve enrichment.
+    # This lives inside the authoritative production executor so later import
+    # order can never silently bypass the guard.
+    enriched = output_guard.guarded_request(v10._enrich_request(request))
     runtime = v10._runtime_for(self)
     entry = self.v12_journal.prepare(request_id, enriched)
 
