@@ -593,8 +593,29 @@ class SQLiteEventSource:
                 await asyncio.sleep(self.poll)
                 continue
             for row in rows:
-                event = Event.from_row(dict(row))
-                self.last_id = max(self.last_id, event.event_id)
+                raw = dict(row)
+                cursor_value = raw.get("_e4_cursor")
+                if cursor_value is None and self.id_column:
+                    cursor_value = raw.get(self.id_column)
+                try:
+                    cursor = int(cursor_value)
+                except (TypeError, ValueError):
+                    cursor = self.last_id
+                try:
+                    event = Event.from_row(raw)
+                except Exception:
+                    # A single corrupt/provider-specific row must never tear
+                    # down the funded consumer. Advance the durable source
+                    # cursor past that poison row and continue with the same
+                    # batch so later valid launches are not skipped on restart.
+                    self.last_id = max(self.last_id, cursor)
+                    LOGGER.exception(
+                        "E4 canonical event row rejected cursor=%s table=%s",
+                        cursor_value,
+                        self.table,
+                    )
+                    continue
+                self.last_id = max(self.last_id, cursor, event.event_id)
                 yield event
 
 
