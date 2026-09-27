@@ -209,6 +209,27 @@ class CircuitBreaker:
             self.store.set_mode(SafetyMode.EXIT_ONLY, "transaction_failure_burst")
         return self.store.snapshot()
 
+    def recover_exit_only(
+        self,
+        reason: str,
+        *,
+        allowed_prefixes: tuple[str, ...],
+    ) -> SafetySnapshot:
+        snap = self.store.snapshot()
+        if snap.mode != SafetyMode.EXIT_ONLY:
+            return snap
+        if not any(
+            snap.reason == prefix or snap.reason.startswith(prefix)
+            for prefix in allowed_prefixes
+        ):
+            return snap
+        if snap.consecutive_losses >= self.config.max_consecutive_losses:
+            return snap
+        if snap.tx_failures_window >= self.config.max_tx_failures_window:
+            return snap
+        self.store.set_mode(SafetyMode.ACTIVE, reason)
+        return self.store.snapshot()
+
     def halt(self, reason: str) -> None:
         self.store.set_mode(SafetyMode.HALTED, reason)
 
