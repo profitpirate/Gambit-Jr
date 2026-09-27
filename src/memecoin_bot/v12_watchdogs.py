@@ -215,10 +215,7 @@ class WatchdogManager:
         self.state.clock_healthy = True
         if block_time:
             drift = abs(time.time() - float(block_time))
-            if drift >= self.config.clock_halt_seconds:
-                self.state.clock_healthy = False
-                self.breaker.exit_only(f"clock_drift_{drift:.1f}s")
-            elif drift >= self.config.clock_warn_seconds:
+            if drift >= self.config.clock_warn_seconds:
                 self.state.clock_healthy = False
                 self.breaker.exit_only(f"clock_drift_{drift:.1f}s")
 
@@ -309,11 +306,10 @@ class WatchdogManager:
         ):
             return False
         journal = getattr(self.engine, "v12_journal", None)
-        if journal is not None and journal.recoverable(
-            ("SIGNED", "SUBMITTED", "UNCERTAIN")
-        ):
-            return False
-        return True
+        return not (
+            journal is not None
+            and journal.recoverable(("SIGNED", "SUBMITTED", "UNCERTAIN"))
+        )
 
     def _maybe_restore_entries(self) -> None:
         snapshot = self.breaker.store.snapshot()
