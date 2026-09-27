@@ -49,6 +49,8 @@ def test_user_runtime_environment_isolated_and_bounded(tmp_path: Path) -> None:
     assert env["V12_MARKETDATA_HEARTBEAT"].endswith("/run/gambit/v12-marketdata-heartbeat.json")
     assert env["V12_ACCOUNT_MAX_BANKROLL_SOL"] == "12.5"
     assert env["E4_MAX_POSITION_FRACTION"] == "0.15"
+    assert env["E4_MAX_CONCURRENT_POSITIONS"] == "2"
+    assert env["V12_ACCOUNT_MAX_CONCURRENT_POSITIONS"] == "2"
     assert env["V12_SIGNER_SECRET_REF"] == "vault://transit/user-7"
 
 
@@ -72,3 +74,27 @@ def test_non_vault_signer_is_rejected(tmp_path: Path) -> None:
     )
     with pytest.raises(RuntimeError, match="Vault Transit"):
         manager._environment(values, tmp_path / "accounts" / "7")
+
+def test_single_position_mandate_does_not_break_e4_invariant(tmp_path: Path) -> None:
+    store = AccessStore(tmp_path / "access.db")
+    manager = AccountRuntimeManager(
+        store,
+        state_root=tmp_path / "accounts",
+        repository_root=tmp_path,
+    )
+    values = row(
+        user_id=8,
+        provider="NATIVE_WALLET",
+        secret_ref="vault://transit/user-8",
+        public_identifier="TradeWallet8",
+        storage_wallet="StorageWallet8",
+        max_position_fraction="0.10",
+        max_concurrent_positions="1",
+        max_active_bankroll_sol="5",
+        discord_user_id="456",
+    )
+    env = manager._environment(values, tmp_path / "accounts" / "8")
+
+    assert env["E4_MAX_CONCURRENT_POSITIONS"] == "2"
+    assert env["V12_ACCOUNT_MAX_CONCURRENT_POSITIONS"] == "1"
+
