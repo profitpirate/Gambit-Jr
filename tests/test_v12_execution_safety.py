@@ -95,3 +95,33 @@ def test_unresolved_lookup_is_scoped_by_side_and_mint(tmp_path: Path) -> None:
     assert [item.signature for item in journal.unresolved_for("SELL", "m1")] == ["sell-sig"]
     assert journal.unresolved_for("SELL", "m2") == []
     assert [item.signature for item in journal.unresolved_for("SWEEP", None)] == ["sweep-sig"]
+
+def test_transient_exit_only_can_recover_without_resetting_counters(tmp_path: Path) -> None:
+    store = SafetyStore(tmp_path / "e4.db")
+    breaker = CircuitBreaker(store)
+    store.record_trade_result(-0.1)
+    breaker.exit_only("rpc_health_check_failed")
+
+    recovered = breaker.recover_exit_only(
+        "transient_health_recovered",
+        allowed_prefixes=("rpc_health_check_failed",),
+    )
+
+    assert recovered.mode == SafetyMode.ACTIVE
+    assert recovered.consecutive_losses == 1
+    assert recovered.reason == "transient_health_recovered"
+
+
+def test_non_transient_exit_only_does_not_auto_recover(tmp_path: Path) -> None:
+    store = SafetyStore(tmp_path / "e4.db")
+    breaker = CircuitBreaker(store)
+    breaker.exit_only("drawdown_exit_only")
+
+    recovered = breaker.recover_exit_only(
+        "transient_health_recovered",
+        allowed_prefixes=("rpc_health_check_failed",),
+    )
+
+    assert recovered.mode == SafetyMode.EXIT_ONLY
+    assert recovered.reason == "drawdown_exit_only"
+
