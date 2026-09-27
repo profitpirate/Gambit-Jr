@@ -14,6 +14,32 @@ from memecoin_bot.main import build
 from memecoin_bot.observability.logging import configure_logging
 
 
+def _marketdata_db_snapshot(store) -> tuple[list[dict], int, int, int]:
+    provider_rows = [
+        dict(row)
+        for row in store.conn.execute(
+            "SELECT * FROM provider_health ORDER BY provider"
+        )
+    ]
+    canonical_count = int(
+        store.conn.execute(
+            "SELECT COUNT(*) FROM canonical_events"
+        ).fetchone()[0]
+    )
+    canonical_max_rowid = int(
+        store.conn.execute(
+            "SELECT COALESCE(MAX(rowid),0) FROM canonical_events"
+        ).fetchone()[0]
+    )
+    pending = int(
+        store.conn.execute(
+            "SELECT COUNT(*) FROM canonical_events "
+            "WHERE processing_status IN ('PENDING','PROCESSING')"
+        ).fetchone()[0]
+    )
+    return provider_rows, canonical_count, canonical_max_rowid, pending
+
+
 async def heartbeat(
     store,
     service,
@@ -26,44 +52,46 @@ async def heartbeat(
     path.parent.mkdir(parents=True, exist_ok=True)
     last_count = -1
     last_progress = time.monotonic()
+    last_pump_provider_healthy = time.monotonic()
     started = time.monotonic()
     while not stop.is_set():
-        provider_rows = [
-            dict(row)
-            for row in store.conn.execute(
-                "SELECT * FROM provider_health ORDER BY provider"
-            )
-        ]
-        canonical_count = 0
-        pending = 0
         try:
-            canonical_count = int(
-                store.conn.execute(
-                    "SELECT COUNT(*) FROM canonical_events"
-                ).fetchone()[0]
-            )
-            pending = int(
-                store.conn.execute(
-                    "SELECT COUNT(*) FROM canonical_events "
-                    "WHERE processing_state!='DONE'"
-                ).fetchone()[0]
-            )
-        except sqlite3.Error:
-            # During migrations the heartbeat still proves process liveness,
-            # but prolonged lack of canonical progress below will fail closed.
-            canonical_count = 0
-            pending = 0
+            (
+                provider_rows,
+                canonical_count,
+                canonical_max_rowid,
+                pending,
+            ) = _marketdata_db_snapshot(store)
+        except sqlite3.Error as exc:
+            raise RuntimeError(
+                f"canonical market-data heartbeat query failed: {exc}"
+            ) from exc
 
+        now = time.monotonic()
         if canonical_count > last_count:
             last_count = canonical_count
-            last_progress = time.monotonic()
+            last_progress = now
+
+        pump_rows = [
+            row
+            for row in provider_rows
+            if "pump" in str(row.get("provider") or "").lower()
+        ]
+        pump_provider_ok = not pump_rows or any(
+            bool(int(row.get("healthy") or 0))
+            or str(row.get("state") or "").upper() == "CONNECTED"
+            for row in pump_rows
+        )
+        if pump_provider_ok:
+            last_pump_provider_healthy = now
         elif (
-            time.monotonic() - started >= stale_seconds
-            and time.monotonic() - last_progress >= stale_seconds
+            now - started >= stale_seconds
+            and now - last_pump_provider_healthy >= stale_seconds
         ):
             raise RuntimeError(
-                f"canonical market-data feed stale for >= {stale_seconds:.1f}s"
+                f"Pump market-data providers unhealthy for >= {stale_seconds:.1f}s"
             )
+
         if pending > max_pending:
             raise RuntimeError(
                 f"canonical processing backlog exceeded limit: {pending}>{max_pending}"
@@ -72,7 +100,11 @@ async def heartbeat(
             "pid": os.getpid(),
             "ts_ns": time.time_ns(),
             "canonical_events": canonical_count,
+            "canonical_max_rowid": canonical_max_rowid,
+            "canonical_quiet_seconds": max(0.0, now - last_progress),
             "pending_canonical_events": pending,
+            "pump_provider_seen": bool(pump_rows),
+            "pump_provider_ok": pump_provider_ok,
             "providers": provider_rows,
             "realtime_sources": len(service.realtime_sources),
         }
