@@ -116,7 +116,7 @@ def audit(root: Path) -> dict:
             "read_only": "read_only: true" in payload,
             "no_new_privileges": "no-new-privileges:true" in payload,
             "cap_drop_all": "cap_drop:" in payload and "- ALL" in payload,
-            "healthcheck": "healthcheck:" in payload and "/healthz" in payload,
+            "healthcheck": "healthcheck:" in payload and "/readyz" in payload,
         }
 
     docker_checks = {}
