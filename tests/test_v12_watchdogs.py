@@ -269,7 +269,7 @@ async def test_marketdata_cursor_lag_blocks_entries_after_grace(tmp_path: Path) 
         )
     )
     engine = SimpleNamespace(
-        source=SimpleNamespace(last_id=95),
+        source=SimpleNamespace(last_id=95, table="canonical_events"),
         positions={},
         pending_entries=set(),
         pending_exits=set(),
@@ -295,7 +295,8 @@ async def test_marketdata_cursor_lag_blocks_entries_after_grace(tmp_path: Path) 
     )
 
     manager.state.marketdata_cursor_lag_started_ns = time.time_ns() - 3_000_000_000
-    manager.state.marketdata_cursor_lag_rowid = 100
+    manager.state.marketdata_source_cursor_seen = 95
+    manager.state.marketdata_source_progress_ns = time.time_ns() - 3_000_000_000
     await manager._check_event_feed(time.time_ns())
 
     assert manager.state.event_healthy is False
@@ -320,7 +321,7 @@ async def test_marketdata_cursor_catches_up_and_recovers_health(tmp_path: Path) 
         )
     )
     engine = SimpleNamespace(
-        source=SimpleNamespace(last_id=100),
+        source=SimpleNamespace(last_id=100, table="canonical_events"),
         positions={},
         pending_entries=set(),
         pending_exits=set(),
@@ -343,10 +344,12 @@ async def test_marketdata_cursor_catches_up_and_recovers_health(tmp_path: Path) 
         ),
     )
     manager.state.marketdata_cursor_lag_started_ns = time.time_ns() - 5_000_000_000
-    manager.state.marketdata_cursor_lag_rowid = 99
+    manager.state.marketdata_source_cursor_seen = 99
+    manager.state.marketdata_source_progress_ns = time.time_ns() - 5_000_000_000
 
     await manager._check_event_feed(time.time_ns())
 
     assert manager.state.event_healthy is True
     assert manager.state.marketdata_cursor_lag_started_ns == 0
+    assert manager.state.marketdata_source_cursor_seen == 100
 
