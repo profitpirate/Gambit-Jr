@@ -2,6 +2,7 @@
 import atexit
 import os
 import sys
+import time
 from pathlib import Path
 
 os.environ.setdefault(
@@ -22,7 +23,11 @@ from memecoin_bot import e4_notifications_v12  # noqa: F401 - durable close/swee
 from memecoin_bot import e4_nextgen_creator_authority_v12  # noqa: F401 - gated canonical post-cert authority
 from memecoin_bot import e4_adaptive_exit_v12  # noqa: F401 - gated post-cert survivor exits
 from memecoin_bot import e4_production_guard_v12  # noqa: F401 - final live safety/recovery authority
-from memecoin_bot.e4_pipeline_runtime_v10 import start_background_supervisor
+from memecoin_bot import e4_runtime_services_v10 as runtime_services
+from memecoin_bot.e4_pipeline_runtime_v10 import (
+    runtime_snapshot,
+    start_background_supervisor,
+)
 from memecoin_bot.e4_role_model_v12 import stop_background_supervisor
 from memecoin_bot.e4_runtime_services_v10 import (
     start_runtime_services,
@@ -63,6 +68,30 @@ def _start_v12_pipelines() -> None:
     # required. Starting only one side leaves a pipeline present but inert.
     start_runtime_services()
     start_background_supervisor()
+    try:
+        deadline = time.monotonic() + max(
+            0.25,
+            float(os.getenv("V12_PIPELINE_STARTUP_TIMEOUT_SECONDS", "2")),
+        )
+        while time.monotonic() < deadline:
+            snapshot = runtime_snapshot()
+            runtime_ok = bool(snapshot.get("running"))
+            threads = tuple(getattr(runtime_services, "_THREADS", ()))
+            services_ok = bool(threads) and all(thread.is_alive() for thread in threads)
+            if runtime_ok and services_ok:
+                break
+            time.sleep(0.05)
+        else:
+            snapshot = runtime_snapshot()
+            raise RuntimeError(
+                "V12 pipeline startup failed "
+                f"running={snapshot.get('running')} "
+                f"runtime={snapshot.get('runtime')}"
+            )
+    except Exception:
+        stop_background_supervisor()
+        stop_runtime_services()
+        raise
     atexit.register(stop_background_supervisor)
     atexit.register(stop_runtime_services)
 
