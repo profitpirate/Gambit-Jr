@@ -32,7 +32,7 @@ class FakeRpc:
 
 
 @pytest.mark.asyncio
-async def test_stale_event_feed_halts_and_emergency_exits(tmp_path: Path) -> None:
+async def test_stale_event_feed_blocks_entries_and_emergency_exits(tmp_path: Path) -> None:
     safety = SafetyStore(tmp_path / "e4.db")
     breaker = CircuitBreaker(safety)
     routes = RouteHealthStore(safety.conn)
@@ -66,7 +66,7 @@ async def test_stale_event_feed_halts_and_emergency_exits(tmp_path: Path) -> Non
     )
     manager.state.last_event_ns = time.time_ns() - 1_000_000_000
     await manager._check_event_feed(time.time_ns())
-    assert safety.snapshot().mode == SafetyMode.HALTED
+    assert safety.snapshot().mode == SafetyMode.EXIT_ONLY
     assert exits == [pytest.approx(exits[0])] if False else exits
     assert exits and "watchdog_event_feed_halt" in exits[0]
 
@@ -192,5 +192,57 @@ def test_transaction_failure_window_expires_and_unblocks_entries(tmp_path: Path)
     manager._maybe_restore_entries()
 
     assert safety.snapshot().tx_failures_window == 0
+    assert safety.snapshot().mode == SafetyMode.ACTIVE
+
+@pytest.mark.asyncio
+async def test_fresh_marketdata_heartbeat_keeps_quiet_feed_active(tmp_path: Path) -> None:
+    safety = SafetyStore(tmp_path / "e4.db")
+    breaker = CircuitBreaker(safety)
+    routes = RouteHealthStore(safety.conn)
+    heartbeat = tmp_path / "marketdata.json"
+    heartbeat.write_text(
+        __import__("json").dumps(
+            {
+                "ts_ns": time.time_ns(),
+                "realtime_sources": 1,
+                "providers": [
+                    {
+                        "provider": "solana_pumpfun_native",
+                        "healthy": 1,
+                        "state": "CONNECTED",
+                    }
+                ],
+            }
+        )
+    )
+    engine = SimpleNamespace(
+        positions={},
+        pending_entries=set(),
+        pending_exits=set(),
+        tokens={},
+        sender=SimpleNamespace(routes=[("r1", "https://x")]),
+        rpc=FakeRpc(),
+        signer=SimpleNamespace(wallet="w"),
+        settings=SimpleNamespace(execution_db=tmp_path / "e4.db"),
+        store=FakeStore(safety.conn),
+    )
+    manager = WatchdogManager(
+        engine,
+        breaker,
+        routes,
+        emergency_exit=lambda reason: None,
+        config=WatchdogConfig(
+            event_warn_seconds=3.0,
+            event_halt_seconds=10.0,
+            heartbeat_path=tmp_path / "hb.json",
+            marketdata_heartbeat_path=heartbeat,
+            kill_switch_path=tmp_path / "kill",
+        ),
+    )
+    manager.state.last_event_ns = time.time_ns() - 60_000_000_000
+
+    await manager._check_event_feed(time.time_ns())
+
+    assert manager.state.event_healthy is True
     assert safety.snapshot().mode == SafetyMode.ACTIVE
 
