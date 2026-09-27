@@ -6,6 +6,14 @@ on:
       - codex/v12-production-reconcile-20260924
     paths:
       - "src/memecoin_bot/v12_*.py"
+      - "src/memecoin_bot/e4_*.py"
+      - "src/memecoin_bot/e4_pipeline/**"
+      - "src/memecoin_bot/realtime/**"
+      - "src/memecoin_bot/providers/**"
+      - "src/memecoin_bot/database/**"
+      - "src/memecoin_bot/service.py"
+      - "src/memecoin_bot/main.py"
+      - "src/memecoin_bot/config.py"
       - "src/memecoin_bot/e4_production_guard_v12.py"
       - "src/memecoin_bot/e4_role_model_v12.py"
       - "src/memecoin_bot/e4_direct_copy_v12.py"
