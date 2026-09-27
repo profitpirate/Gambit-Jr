@@ -16,6 +16,8 @@ def test_trader_unit_requires_marketdata_and_aligns_supervisor_paths() -> None:
     assert "After=network-online.target gambit-v12-marketdata.service" in unit
     assert "Environment=DATABASE_PATH=/var/lib/gambit/marketdata.db" in unit
     assert "Environment=E4_DATABASE_PATH=/var/lib/gambit/e4.db" in unit
+    assert "E4_LIVE_CREATOR_OVERLAY=/var/lib/gambit/e4-runtime/live-creator-overlay.json" in unit
+    assert "E4_LIVE_OUTCOME_JOURNAL=/var/lib/gambit/e4-runtime/live-outcomes.jsonl" in unit
     assert "Environment=V12_HEARTBEAT_PATH=/run/gambit/v12-heartbeat.json" in unit
     assert (
         "Environment=V12_MARKETDATA_HEARTBEAT="
@@ -33,6 +35,10 @@ def test_marketdata_unit_child_and_supervisor_share_heartbeat() -> None:
         "/run/gambit/v12-marketdata-heartbeat.json"
     ) in unit
     assert "--heartbeat /run/gambit/v12-marketdata-heartbeat.json" in unit
+    assert "HISTORICAL_WAREHOUSE_PATH=/var/lib/gambit/historical/warehouse.db" in unit
+    assert "HISTORICAL_ARCHIVE_PATH=/var/lib/gambit/archive/historical" in unit
+    assert "APPROVED_FEATURE_STORE_PATH=/var/lib/gambit/approved/approved_features.db" in unit
+    assert "DUNE_PARQUET_ROOT=/var/lib/gambit/historical/parquet" in unit
     assert "Before=gambit-v12.service gambit-v12-orchestrator.service" in unit
 
 
