@@ -664,6 +664,15 @@ class Signer:
     def __init__(self, settings: Settings):
         self.command = settings.signer_command
         self.wallet = settings.wallet or ""
+        self.process_timeout = max(
+            1.0,
+            float(
+                os.getenv(
+                    "E4_SIGNER_RESPONSE_TIMEOUT_SECONDS",
+                    str(float(os.getenv("V12_VAULT_TIMEOUT_SECONDS", "3")) + 1.0),
+                )
+            ),
+        )
         self.keypair = None
         if settings.keypair_path:
             try:
@@ -683,7 +692,17 @@ class Signer:
             return base64.b64encode(bytes(signed)).decode(), str(signed.signatures[0])
         process = await asyncio.create_subprocess_exec(*self.command, stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
         payload = json.dumps({"transaction_base64": transaction_b64, "expected_public_key": self.wallet}).encode() + b"\n"
-        stdout, stderr = await asyncio.wait_for(process.communicate(payload), timeout=2)
+        try:
+            stdout, stderr = await asyncio.wait_for(
+                process.communicate(payload),
+                timeout=self.process_timeout,
+            )
+        except TimeoutError as exc:
+            process.kill()
+            await process.wait()
+            raise RuntimeError(
+                f"external signer timed out after {self.process_timeout:.2f}s"
+            ) from exc
         if process.returncode:
             raise RuntimeError(stderr.decode(errors="replace")[:1000])
         result = json.loads(stdout)
