@@ -239,20 +239,28 @@ async def _execute_exactly_once(
             _record_tx_result(self, False)
             return signature, False, slot, chain_error or "chain transaction failed"
     else:
-        build_started = time.time_ns()
-        unsigned = await self.builder.build(enriched)
-        build_completed = time.time_ns()
-        runtime.latency.build_done(request_id, build_started, build_completed)
+        try:
+            build_started = time.time_ns()
+            unsigned = await self.builder.build(enriched)
+            build_completed = time.time_ns()
+            runtime.latency.build_done(request_id, build_started, build_completed)
 
-        sign_started = time.time_ns()
-        signed, signature = await self.signer.sign(unsigned)
-        sign_completed = time.time_ns()
-        runtime.latency.sign_done(request_id, sign_started, sign_completed)
-        self.v12_journal.mark_signed(
-            entry.idempotency_key,
-            signed_tx_b64=signed,
-            signature=signature,
-        )
+            sign_started = time.time_ns()
+            signed, signature = await self.signer.sign(unsigned)
+            sign_completed = time.time_ns()
+            runtime.latency.sign_done(request_id, sign_started, sign_completed)
+            self.v12_journal.mark_signed(
+                entry.idempotency_key,
+                signed_tx_b64=signed,
+                signature=signature,
+            )
+        except Exception as exc:
+            self.v12_journal.mark_failed(
+                entry.idempotency_key,
+                f"pre-submit execution failure: {exc}",
+                terminal=True,
+            )
+            raise
         _audit(
             self,
             "TRANSACTION_SIGNED",
@@ -328,6 +336,29 @@ async def _execute_exactly_once(
 core.Engine.execute = _execute_exactly_once
 
 
+def _release_retryable_buy_reservation(
+    engine: Any,
+    mint: str,
+    request_id: str | None,
+    error: BaseException,
+) -> bool:
+    entry = engine.v12_journal.by_request(request_id) if request_id else None
+    safe_to_retry = entry is None or (
+        entry.state == "FAILED_TERMINAL" and not entry.signature
+    )
+    if not safe_to_retry:
+        return False
+    engine.store.conn.execute(
+        """
+        UPDATE e4_seen_mints
+        SET entry_count=0,last_action='BUY_RETRYABLE',last_reason=?
+        WHERE mint=? AND entry_count=0 AND last_action='BUY_PENDING'
+        """,
+        (f"pre-submit failure: {str(error)[:500]}", str(mint)),
+    )
+    return True
+
+
 def _capacity_for(self: Any, state: Any, requested: float):
     curve = v6._CURVE_BY_MINT.get(str(state.mint), {})
     virtual_sol = float(
@@ -383,6 +414,7 @@ async def _execute_buy_production(
         return
 
     mint = str(state.mint)
+    request_id: str | None = None
     if _is_direct_copy_authoritative(mint):
         before = self.positions.get(mint)
         await _PREVIOUS_EXECUTE_BUY(self, state, score, fraction, reason)
@@ -565,9 +597,27 @@ async def _execute_buy_production(
                 "capacity_price_impact_bps": capacity.price_impact_bps,
             },
         )
-    except Exception:
+    except Exception as exc:
         LOGGER.exception("V12 production buy execution error mint=%s", mint)
-        self.v12_breaker.exit_only("buy_execution_exception")
+        retryable = _release_retryable_buy_reservation(
+            self,
+            mint,
+            request_id,
+            exc,
+        )
+        if retryable:
+            _record_tx_result(self, False)
+            _audit(
+                self,
+                "BUY_PRE_SUBMIT_RETRYABLE",
+                {
+                    "mint": mint,
+                    "request_id": request_id,
+                    "error": str(exc)[:500],
+                },
+            )
+        else:
+            self.v12_breaker.exit_only("buy_execution_exception")
     finally:
         if reserved:
             async with self.allocation_lock:
