@@ -85,6 +85,7 @@ class Settings:
     reserve_sol: float = 0.03
     operating_float_sol: float = 0.30
     sweep_min_sol: float = 0.05
+    auto_sweep_enabled: bool = False
     max_entry_fdv_usd: float = 10_000.0
     target_entry_fdv_usd: float = 4_878.0
     minimum_unique_buyers_1s: int = 2
@@ -133,6 +134,7 @@ class Settings:
             reserve_sol=_float("E4_EXECUTION_RESERVE_SOL", 0.03),
             operating_float_sol=_float("E4_OPERATING_FLOAT_SOL", 0.30),
             sweep_min_sol=_float("E4_SWEEP_MIN_SOL", 0.05),
+            auto_sweep_enabled=_bool("V12_AUTO_STORAGE_SWEEP_ENABLED", False),
             max_entry_fdv_usd=_float("E4_MAX_ENTRY_FDV_USD", 10_000),
             target_entry_fdv_usd=_float("E4_TARGET_ENTRY_FDV_USD", 4_878),
             minimum_unique_buyers_1s=_int("E4_MINIMUM_UNIQUE_BUYERS_1S", 2),
@@ -997,7 +999,8 @@ class Engine:
                 position.status = PositionStatus.CLOSED
                 self.positions.pop(mint, None)
                 self.store.save_position(position)
-                self.spawn(self.sweep())
+                if self.settings.auto_sweep_enabled:
+                    self.spawn(self.sweep())
             else:
                 position.status = PositionStatus.PARTIAL
                 self.store.save_position(position)
@@ -1027,7 +1030,7 @@ class Engine:
             "priority_fee_sol": priority, "tip_sol": tip, "pool": "system",
             "metadata": {"destination": self.settings.vault},
         }
-        self.store.order(request_id, None, "SWEEP", amount, None, "automatic excess SOL sweep")
+        self.store.order(request_id, None, "SWEEP", amount, None, "storage wallet sweep")
         try:
             signature, confirmed, _, error = await self.execute(request_id, request)
             if not confirmed:
