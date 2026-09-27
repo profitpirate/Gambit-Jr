@@ -56,7 +56,8 @@ class WatchdogState:
     routes_healthy: bool = True
     healthy_cycles: int = 0
     marketdata_cursor_lag_started_ns: int = 0
-    marketdata_cursor_lag_rowid: int = 0
+    marketdata_source_cursor_seen: int = 0
+    marketdata_source_progress_ns: int = 0
 
 
 class WatchdogManager:
@@ -147,24 +148,50 @@ class WatchdogManager:
             canonical_max_rowid = int(payload.get("canonical_max_rowid") or 0)
             source = getattr(self.engine, "source", None)
             source_cursor = int(getattr(source, "last_id", 0) or 0)
+            source_initialized = bool(
+                source is not None
+                and (
+                    getattr(source, "table", None)
+                    or getattr(source, "_e4_hardened_tail_initialized", False)
+                    or getattr(source, "_e4_tail_initialized", False)
+                )
+            )
             cursor_lag_age = 0.0
-            if canonical_max_rowid > source_cursor:
-                if (
-                    self.state.marketdata_cursor_lag_started_ns <= 0
-                    or self.state.marketdata_cursor_lag_rowid != canonical_max_rowid
-                ):
+            cursor_gap = max(0, canonical_max_rowid - source_cursor)
+            if not source_initialized:
+                self.state.marketdata_cursor_lag_started_ns = 0
+                self.state.marketdata_source_progress_ns = now_ns
+                self.state.marketdata_source_cursor_seen = source_cursor
+            elif source_cursor >= canonical_max_rowid:
+                self.state.marketdata_cursor_lag_started_ns = 0
+                self.state.marketdata_source_progress_ns = now_ns
+                self.state.marketdata_source_cursor_seen = source_cursor
+            else:
+                if source_cursor > self.state.marketdata_source_cursor_seen:
+                    self.state.marketdata_source_cursor_seen = source_cursor
+                    self.state.marketdata_source_progress_ns = now_ns
+                if self.state.marketdata_cursor_lag_started_ns <= 0:
                     self.state.marketdata_cursor_lag_started_ns = now_ns
-                    self.state.marketdata_cursor_lag_rowid = canonical_max_rowid
+                if self.state.marketdata_source_progress_ns <= 0:
+                    self.state.marketdata_source_progress_ns = now_ns
                 cursor_lag_age = max(
                     0.0,
-                    (now_ns - self.state.marketdata_cursor_lag_started_ns) / 1e9,
+                    (now_ns - self.state.marketdata_source_progress_ns) / 1e9,
                 )
-            else:
-                self.state.marketdata_cursor_lag_started_ns = 0
-                self.state.marketdata_cursor_lag_rowid = 0
 
             heartbeat_limit = max(6.0, self.config.event_warn_seconds * 2.0)
-            cursor_ok = cursor_lag_age < max(2.0, self.config.event_warn_seconds)
+            max_gap_rows = max(
+                1,
+                int(os.getenv("V12_EVENT_CURSOR_MAX_LAG_ROWS", "500")),
+            )
+            cursor_ok = (
+                not source_initialized
+                or cursor_gap == 0
+                or (
+                    cursor_lag_age < max(2.0, self.config.event_warn_seconds)
+                    and cursor_gap <= max_gap_rows
+                )
+            )
             healthy = (
                 age < heartbeat_limit
                 and sources > 0
@@ -175,7 +202,8 @@ class WatchdogManager:
                 f"marketdata heartbeat age={age:.1f}s "
                 f"sources={sources} pump_provider_ok={provider_ok} "
                 f"source_cursor={source_cursor} canonical_max_rowid={canonical_max_rowid} "
-                f"cursor_lag_age={cursor_lag_age:.1f}s"
+                f"cursor_gap={cursor_gap} cursor_lag_age={cursor_lag_age:.1f}s "
+                f"source_initialized={source_initialized}"
             )
             return healthy, max(age, cursor_lag_age), detail
         except (OSError, ValueError, TypeError, json.JSONDecodeError) as exc:
