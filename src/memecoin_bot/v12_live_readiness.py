@@ -305,11 +305,11 @@ def _precertified_live_override_gate(
             detail += f"; +{len(failures) - 8} more"
         return False, detail
 
-    return (
-        True,
+    detail = (
         f"explicit operator override eligible closed={closed}/100 "
-        f"net_pnl_sol={net_pnl:.6f} model={frozen_digest[:12]}",
+        f"net_pnl_sol={net_pnl:.6f} model={frozen_digest[:12]}"
     )
+    return True, detail
 
 
 def _secure_url(value: str) -> bool:
