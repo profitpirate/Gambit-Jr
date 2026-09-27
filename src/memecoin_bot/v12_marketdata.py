@@ -77,19 +77,25 @@ async def heartbeat(
             for row in provider_rows
             if "pump" in str(row.get("provider") or "").lower()
         ]
-        pump_provider_ok = not pump_rows or any(
+        pump_provider_seen = bool(pump_rows)
+        pump_provider_connected = pump_provider_seen and any(
             bool(int(row.get("healthy") or 0))
             or str(row.get("state") or "").upper() == "CONNECTED"
             for row in pump_rows
         )
-        if pump_provider_ok:
+        startup_grace = now - started < stale_seconds
+        pump_provider_ok = pump_provider_connected or (
+            not pump_provider_seen and startup_grace
+        )
+        if pump_provider_connected:
             last_pump_provider_healthy = now
         elif (
-            now - started >= stale_seconds
+            not startup_grace
             and now - last_pump_provider_healthy >= stale_seconds
         ):
             raise RuntimeError(
-                f"Pump market-data providers unhealthy for >= {stale_seconds:.1f}s"
+                f"Pump market-data provider never connected or remained unhealthy "
+                f"for >= {stale_seconds:.1f}s"
             )
 
         if pending > max_pending:
@@ -103,7 +109,7 @@ async def heartbeat(
             "canonical_max_rowid": canonical_max_rowid,
             "canonical_quiet_seconds": max(0.0, now - last_progress),
             "pending_canonical_events": pending,
-            "pump_provider_seen": bool(pump_rows),
+            "pump_provider_seen": pump_provider_seen,
             "pump_provider_ok": pump_provider_ok,
             "providers": provider_rows,
             "realtime_sources": len(service.realtime_sources),
