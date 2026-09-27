@@ -143,11 +143,14 @@ class WatchdogManager:
                 if isinstance(row, dict)
                 and "pump" in str(row.get("provider") or "").lower()
             ]
-            provider_ok = not pump_rows or any(
-                bool(int(row.get("healthy") or 0))
-                or str(row.get("state") or "").upper() == "CONNECTED"
-                for row in pump_rows
-            )
+            if "pump_provider_ok" in payload:
+                provider_ok = bool(payload.get("pump_provider_ok"))
+            else:
+                provider_ok = bool(pump_rows) and any(
+                    bool(int(row.get("healthy") or 0))
+                    or str(row.get("state") or "").upper() == "CONNECTED"
+                    for row in pump_rows
+                )
 
             canonical_max_rowid = int(payload.get("canonical_max_rowid") or 0)
             source = getattr(self.engine, "source", None)
