@@ -12,6 +12,8 @@ User=gambit
 Group=gambit
 WorkingDirectory=/opt/gambit/current
 EnvironmentFile=/etc/gambit/v12.env
+Environment=DATABASE_PATH=/var/lib/gambit/marketdata.db
+Environment=E4_DATABASE_PATH=/var/lib/gambit/e4.db
 Environment=V12_HEARTBEAT_PATH=/run/gambit/v12-heartbeat.json
 Environment=V12_KILL_SWITCH_PATH=/run/gambit/V12_KILL
 Environment=V12_INSTANCE_LOCK=/run/gambit/v12-live.lock
