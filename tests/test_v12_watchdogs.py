@@ -404,3 +404,50 @@ async def test_marketdata_heartbeat_without_connected_pump_feed_blocks_entries(
     assert manager.state.event_healthy is False
     assert safety.snapshot().mode == SafetyMode.EXIT_ONLY
 
+
+
+@pytest.mark.asyncio
+async def test_heartbeat_exposes_deployment_fingerprint(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("V12_DEPLOYED_GIT_SHA", "abcdef1234567890")
+    monkeypatch.setenv(
+        "V12_DEPLOYED_GIT_REF",
+        "codex/v12-production-reconcile-20260924",
+    )
+    safety = SafetyStore(tmp_path / "e4.db")
+    breaker = CircuitBreaker(safety)
+    routes = RouteHealthStore(safety.conn)
+    engine = SimpleNamespace(
+        positions={},
+        pending_entries=set(),
+        pending_exits=set(),
+        tokens={},
+        sender=SimpleNamespace(routes=[("r1", "https://x")]),
+        rpc=FakeRpc(),
+        signer=SimpleNamespace(wallet="w"),
+        settings=SimpleNamespace(execution_db=tmp_path / "e4.db"),
+        store=FakeStore(safety.conn),
+        v12_journal=SimpleNamespace(recoverable=lambda states: []),
+    )
+    heartbeat = tmp_path / "hb.json"
+    manager = WatchdogManager(
+        engine,
+        breaker,
+        routes,
+        emergency_exit=lambda reason: None,
+        config=WatchdogConfig(
+            heartbeat_path=heartbeat,
+            kill_switch_path=tmp_path / "kill",
+        ),
+    )
+
+    await manager._write_heartbeat()
+
+    payload = __import__("json").loads(heartbeat.read_text())
+    assert payload["deployment"]["git_sha"] == "abcdef1234567890"
+    assert payload["deployment"]["git_ref"] == (
+        "codex/v12-production-reconcile-20260924"
+    )
+    assert payload["deployment"]["verified"] is True
