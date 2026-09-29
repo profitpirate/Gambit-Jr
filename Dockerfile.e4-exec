@@ -1,8 +1,13 @@
 FROM python:3.12-slim
 
+ARG V12_DEPLOYED_GIT_SHA=UNVERIFIED
+ARG V12_DEPLOYED_GIT_REF=UNVERIFIED
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
+    PIP_NO_CACHE_DIR=1 \
+    V12_DEPLOYED_GIT_SHA=${V12_DEPLOYED_GIT_SHA} \
+    V12_DEPLOYED_GIT_REF=${V12_DEPLOYED_GIT_REF}
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends nodejs npm ca-certificates \
