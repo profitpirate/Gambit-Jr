@@ -10,6 +10,8 @@ from typing import Any
 
 from aiohttp import web
 
+from .v12_deployment import deployment_fingerprint
+
 
 @dataclass(slots=True)
 class MetricsServer:
@@ -71,6 +73,7 @@ class MetricsServer:
         return web.json_response(
             {
                 "ok": safety.mode.value != "HALTED",
+                "deployment": deployment_fingerprint(),
                 "safety": safety.mode.value,
                 "reason": safety.reason,
                 "watchdog": bool(heartbeat),
@@ -108,6 +111,7 @@ class MetricsServer:
         return web.json_response(
             {
                 "ready": ready,
+                "deployment": deployment_fingerprint(),
                 "safety": safety.mode.value,
                 "reason": safety.reason,
                 "watchdog": watchdog is not None,
