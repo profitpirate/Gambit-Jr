@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from .v12_deployment import deployment_fingerprint
 from .v12_route_health import RouteHealthStore
 from .v12_safety import (
     TRANSIENT_EXIT_ONLY_PREFIXES,
@@ -106,6 +107,7 @@ class WatchdogManager:
             else 0
         )
         payload = {
+            "deployment": deployment_fingerprint(),
             "pid": os.getpid(),
             "ts_ns": time.time_ns(),
             "mode": snapshot.mode.value,
