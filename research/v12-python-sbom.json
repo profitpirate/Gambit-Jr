@@ -834,7 +834,7 @@
       "version": "2.7.1"
     },
     {
-      "bom-ref": "duckdb==1.5.5",
+      "bom-ref": "duckdb==1.5.6",
       "description": "DuckDB in-process database",
       "externalReferences": [
         {
@@ -867,12 +867,12 @@
         }
       ],
       "name": "duckdb",
-      "purl": "pkg:pypi/duckdb@1.5.5",
+      "purl": "pkg:pypi/duckdb@1.5.6",
       "type": "library",
-      "version": "1.5.5"
+      "version": "1.5.6"
     },
     {
-      "bom-ref": "filelock==4.0.4",
+      "bom-ref": "filelock==4.0.6",
       "description": "A platform independent file lock.",
       "externalReferences": [
         {
@@ -905,16 +905,31 @@
         }
       ],
       "name": "filelock",
-      "purl": "pkg:pypi/filelock@4.0.4",
+      "purl": "pkg:pypi/filelock@4.0.6",
       "type": "library",
-      "version": "4.0.4"
+      "version": "4.0.6"
     },
     {
-      "bom-ref": "fqdn==1.5.1",
-      "description": "Validates fully-qualified domain names against RFC 1123, so that they are acceptable to modern bowsers",
+      "bom-ref": "fqdn==1.6.0",
+      "description": "Validates fully-qualified domain names against RFC 1123, so that they are acceptable to modern browsers",
       "externalReferences": [
         {
-          "comment": "from packaging metadata: Home-page",
+          "comment": "from packaging metadata Project-URL: Issues",
+          "type": "issue-tracker",
+          "url": "https://github.com/ypcrts/fqdn/issues"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Changelog",
+          "type": "release-notes",
+          "url": "https://github.com/ypcrts/fqdn/blob/develop/CHANGELOG.md"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Repository",
+          "type": "vcs",
+          "url": "https://github.com/ypcrts/fqdn"
+        },
+        {
+          "comment": "from packaging metadata Project-URL: Homepage",
           "type": "website",
           "url": "https://github.com/ypcrts/fqdn"
         }
@@ -923,14 +938,14 @@
         {
           "license": {
             "acknowledgement": "declared",
-            "name": "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)"
+            "id": "MPL-2.0"
           }
         }
       ],
       "name": "fqdn",
-      "purl": "pkg:pypi/fqdn@1.5.1",
+      "purl": "pkg:pypi/fqdn@1.6.0",
       "type": "library",
-      "version": "1.5.1"
+      "version": "1.6.0"
     },
     {
       "bom-ref": "frozenlist==1.8.0",
@@ -1386,7 +1401,7 @@
       "version": "0.1.2"
     },
     {
-      "bom-ref": "msgpack==1.2.2",
+      "bom-ref": "msgpack==1.2.3",
       "description": "MessagePack serializer",
       "externalReferences": [
         {
@@ -1424,9 +1439,9 @@
         }
       ],
       "name": "msgpack",
-      "purl": "pkg:pypi/msgpack@1.2.2",
+      "purl": "pkg:pypi/msgpack@1.2.3",
       "type": "library",
-      "version": "1.2.2"
+      "version": "1.2.3"
     },
     {
       "bom-ref": "multidict==6.9.1",
@@ -1739,7 +1754,7 @@
       "version": "2.10.1"
     },
     {
-      "bom-ref": "platformdirs==4.12.0",
+      "bom-ref": "platformdirs==4.12.1",
       "description": "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`.",
       "externalReferences": [
         {
@@ -1777,9 +1792,9 @@
         }
       ],
       "name": "platformdirs",
-      "purl": "pkg:pypi/platformdirs@4.12.0",
+      "purl": "pkg:pypi/platformdirs@4.12.1",
       "type": "library",
-      "version": "4.12.0"
+      "version": "4.12.1"
     },
     {
       "bom-ref": "pluggy==1.6.0",
@@ -2531,7 +2546,7 @@
       "version": "1.5.0"
     },
     {
-      "bom-ref": "BomRef.3221508042058512.601609197447295",
+      "bom-ref": "BomRef.6535979597778171.684430283027483",
       "description": "Read-only Solana and BNB ultra-early Discord intelligence service",
       "externalReferences": [
         {
@@ -2960,8 +2975,8 @@
   "dependencies": [
     {
       "dependsOn": [
-        "filelock==4.0.4",
-        "msgpack==1.2.2",
+        "filelock==4.0.6",
+        "msgpack==1.2.3",
         "pytest==9.1.1",
         "requests==2.34.2",
         "ruff==0.16.9"
@@ -3091,13 +3106,13 @@
       "dependsOn": [
         "numpy==2.5.3"
       ],
-      "ref": "duckdb==1.5.5"
+      "ref": "duckdb==1.5.6"
     },
     {
-      "ref": "filelock==4.0.4"
+      "ref": "filelock==4.0.6"
     },
     {
-      "ref": "fqdn==1.5.1"
+      "ref": "fqdn==1.6.0"
     },
     {
       "ref": "frozenlist==1.8.0"
@@ -3143,7 +3158,7 @@
     {
       "dependsOn": [
         "attrs==26.1.0",
-        "fqdn==1.5.1",
+        "fqdn==1.6.0",
         "idna==3.20",
         "isoduration==20.11.0",
         "jsonpointer==3.1.1",
@@ -3185,7 +3200,7 @@
       "ref": "mdurl==0.1.2"
     },
     {
-      "ref": "msgpack==1.2.2"
+      "ref": "msgpack==1.2.3"
     },
     {
       "dependsOn": [
@@ -3195,7 +3210,7 @@
     },
     {
       "dependsOn": [
-        "duckdb==1.5.5",
+        "duckdb==1.5.6",
         "packaging==26.3"
       ],
       "ref": "narwhals==2.26.0"
@@ -3236,7 +3251,7 @@
         "packaging==26.3",
         "pip-requirements-parser==32.0.1",
         "pip_api==0.0.35",
-        "platformdirs==4.12.0",
+        "platformdirs==4.12.1",
         "pytest==9.1.1",
         "requests==2.34.2",
         "rich==15.0.0",
@@ -3247,7 +3262,7 @@
       "ref": "pip_audit==2.10.1"
     },
     {
-      "ref": "platformdirs==4.12.0"
+      "ref": "platformdirs==4.12.1"
     },
     {
       "dependsOn": [
@@ -3373,7 +3388,7 @@
         "aiohttp==3.14.3",
         "cryptography==50.0.1",
         "discord.py==2.7.1",
-        "duckdb==1.5.5",
+        "duckdb==1.5.6",
         "pytest-asyncio==1.4.0",
         "pytest==9.1.1",
         "pytz==2026.4",
@@ -3429,7 +3444,7 @@
     }
   ],
   "metadata": {
-    "timestamp": "2026-09-27T18:43:14.107807+00:00",
+    "timestamp": "2026-09-29T09:54:54.970874+00:00",
     "tools": {
       "components": [
         {
@@ -3533,7 +3548,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:09ae4b77-9f30-4bb3-9f05-6b52d1cc4624",
+  "serialNumber": "urn:uuid:e01783a0-745e-453d-839a-bc9f4a0b0149",
   "version": 1,
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
