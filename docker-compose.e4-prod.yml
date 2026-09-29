@@ -2,6 +2,9 @@ services:
   marketdata:
     build:
       context: .
+      args:
+        V12_DEPLOYED_GIT_SHA: ${V12_DEPLOYED_GIT_SHA:-UNVERIFIED}
+        V12_DEPLOYED_GIT_REF: ${V12_DEPLOYED_GIT_REF:-codex/v12-production-reconcile-20260924}
       dockerfile: Dockerfile.e4-prod
     restart: unless-stopped
     init: true
@@ -40,6 +43,9 @@ services:
   e4:
     build:
       context: .
+      args:
+        V12_DEPLOYED_GIT_SHA: ${V12_DEPLOYED_GIT_SHA:-UNVERIFIED}
+        V12_DEPLOYED_GIT_REF: ${V12_DEPLOYED_GIT_REF:-codex/v12-production-reconcile-20260924}
       dockerfile: Dockerfile.e4-prod
     restart: unless-stopped
     init: true
