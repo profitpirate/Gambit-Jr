@@ -1743,6 +1743,22 @@
       "non_copy_closed_positions": 0,
       "reentries": 0,
       "trade_events": 255506
+    },
+    {
+      "batch_id": "37434545911",
+      "closed_positions": 4,
+      "commit": "7c109acacf5fd7217f37544f43b0850e47436e56",
+      "copy_audited": true,
+      "direct_copy_closed_positions": 0,
+      "direct_copy_decisions": 0,
+      "direct_copy_filled_candidates": 0,
+      "generated_at_epoch": 1791280369,
+      "launches": 3000,
+      "max_concurrent_positions": 2,
+      "net_pnl_sol": -0.021553046522780894,
+      "non_copy_closed_positions": 4,
+      "reentries": 0,
+      "trade_events": 181939
     }
   ],
   "copy_audits": {
@@ -32476,6 +32492,138 @@
         "median_source_to_decision_ms": null,
         "median_source_to_fill_ms": null
       }
+    },
+    "37434545911": {
+      "all_v12": {
+        "closed": 4,
+        "losses": 4,
+        "net_pnl_sol": -0.021553046522780575,
+        "profit_factor": 0.0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "comparison": {
+        "both_won": 0,
+        "closed_trade_capture": null,
+        "decision_recall": null,
+        "direct_copy_closed_positions": 0,
+        "direct_copy_decisions": 0,
+        "direct_copy_filled_candidates": 0,
+        "e4_closed_positions": 0,
+        "extra_direct_copy_mints": [],
+        "extra_non_copy_mints": [
+          "7DYAAt4fPZ5wVWSP3BvAcW2c7nvK8eYAuVf2CQvrfZoV",
+          "7HHb1BEV3UKoThGq43aiMafmS33Um4FfnrV6dWYWf7dm",
+          "GpfdbaUdmxD6X9URc4s54vAoLWjKBNYQG9mncJr1WmAV",
+          "J3PR5zqNTrENrnnHD4PhXVUYgc9nuAYJcwG94LD7Q44D"
+        ],
+        "filled_candidate_recall": null,
+        "missed_e4_mints": [],
+        "non_copy_closed_positions": 4,
+        "winner_mint_capture": null
+      },
+      "direct_copy": {
+        "closed": 0,
+        "losses": 0,
+        "net_pnl_sol": 0,
+        "profit_factor": null,
+        "win_rate": null,
+        "wins": 0
+      },
+      "direct_copy_positions": [],
+      "direct_copy_slippage_bps": 9000,
+      "direct_copy_trades": [],
+      "e4": {
+        "closed": 0,
+        "losses": 0,
+        "net_pnl_sol": 0,
+        "profit_factor": null,
+        "win_rate": null,
+        "wins": 0
+      },
+      "fresh_launches": 3000,
+      "latency_ms": 36.0,
+      "missed_direct_copy_fills": [],
+      "non_copy": {
+        "closed": 4,
+        "losses": 4,
+        "net_pnl_sol": -0.021553046522780575,
+        "profit_factor": 0.0,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "non_copy_family_counts": {
+        "v12_proven_creator_quality_launch": 4
+      },
+      "non_copy_positions": [
+        {
+          "entry_cost_sol": 0.021942496317371527,
+          "entry_fdv_usd": 5390.085101809201,
+          "entry_ns": 1791278627679864931,
+          "exit_ns": 1791278646268095361,
+          "failure_exit": true,
+          "first_partial_fraction": null,
+          "gross_pnl_sol": -0.00838750191230604,
+          "hold_ms": 18588.23043,
+          "mint": "J3PR5zqNTrENrnnHD4PhXVUYgc9nuAYJcwG94LD7Q44D",
+          "pnl_sol": -0.00960496595446561,
+          "proceeds_sol": 0.012337530362905916,
+          "sell_count": 1,
+          "size_sol": 0.021639244459964038
+        },
+        {
+          "entry_cost_sol": 0.021530978072793142,
+          "entry_fdv_usd": 5376.0666813889675,
+          "entry_ns": 1791278643597366879,
+          "exit_ns": 1791278647618736226,
+          "failure_exit": true,
+          "first_partial_fraction": null,
+          "gross_pnl_sol": -0.005363100795316142,
+          "hold_ms": 4021.369347,
+          "mint": "7DYAAt4fPZ5wVWSP3BvAcW2c7nvK8eYAuVf2CQvrfZoV",
+          "pnl_sol": -0.006615074007706397,
+          "proceeds_sol": 0.014915904065086746,
+          "sell_count": 1,
+          "size_sol": 0.0212334135205227
+        },
+        {
+          "entry_cost_sol": 0.02163829928000254,
+          "entry_fdv_usd": 5504.330541125742,
+          "entry_ns": 1791278745626312527,
+          "exit_ns": 1791278749612631061,
+          "failure_exit": true,
+          "first_partial_fraction": null,
+          "gross_pnl_sol": -0.0019647282639967158,
+          "hold_ms": 3986.318534,
+          "mint": "7HHb1BEV3UKoThGq43aiMafmS33Um4FfnrV6dWYWf7dm",
+          "pnl_sol": -0.0032914440379762273,
+          "proceeds_sol": 0.018346855242026314,
+          "sell_count": 1,
+          "size_sol": 0.021339251516571678
+        },
+        {
+          "entry_cost_sol": 0.02157657023819048,
+          "entry_fdv_usd": 3515.548347659522,
+          "entry_ns": 1791278773320631173,
+          "exit_ns": 1791278774316201930,
+          "failure_exit": true,
+          "first_partial_fraction": null,
+          "gross_pnl_sol": -0.0006933154016131489,
+          "hold_ms": 995.570757,
+          "mint": "GpfdbaUdmxD6X9URc4s54vAoLWjKBNYQG9mncJr1WmAV",
+          "pnl_sol": -0.0020415625226323404,
+          "proceeds_sol": 0.01953500771555814,
+          "sell_count": 1,
+          "size_sol": 0.021278375588567395
+        }
+      ],
+      "source_run": 37434545911,
+      "timing": {
+        "median_decision_to_fill_ms": null,
+        "median_fill_drift_bps": null,
+        "median_source_to_decision_ms": null,
+        "median_source_to_fill_ms": null
+      }
     }
   },
   "direct_copy_positions": {
@@ -44678,6 +44826,21 @@
       "sell_count": 2,
       "size_sol": 0.014371857634493218
     },
+    "7DYAAt4fPZ5wVWSP3BvAcW2c7nvK8eYAuVf2CQvrfZoV|1791278643597366879": {
+      "entry_cost_sol": 0.021530978072793142,
+      "entry_fdv_usd": 5376.0666813889675,
+      "entry_ns": 1791278643597366879,
+      "exit_ns": 1791278647618736226,
+      "failure_exit": true,
+      "first_partial_fraction": null,
+      "gross_pnl_sol": -0.005363100795316142,
+      "hold_ms": 4021.369347,
+      "mint": "7DYAAt4fPZ5wVWSP3BvAcW2c7nvK8eYAuVf2CQvrfZoV",
+      "pnl_sol": -0.006615074007706397,
+      "proceeds_sol": 0.014915904065086746,
+      "sell_count": 1,
+      "size_sol": 0.0212334135205227
+    },
     "7DYRE7EV8ur5tmH5tRWP74gXf9fZUTcMrdQgWarhhuNx|1790873493307418130": {
       "entry_cost_sol": 0.021700903664573595,
       "entry_fdv_usd": 4082.110651078759,
@@ -44722,6 +44885,21 @@
       "proceeds_sol": 0.019452331190158278,
       "sell_count": 1,
       "size_sol": 0.021556023515742526
+    },
+    "7HHb1BEV3UKoThGq43aiMafmS33Um4FfnrV6dWYWf7dm|1791278745626312527": {
+      "entry_cost_sol": 0.02163829928000254,
+      "entry_fdv_usd": 5504.330541125742,
+      "entry_ns": 1791278745626312527,
+      "exit_ns": 1791278749612631061,
+      "failure_exit": true,
+      "first_partial_fraction": null,
+      "gross_pnl_sol": -0.0019647282639967158,
+      "hold_ms": 3986.318534,
+      "mint": "7HHb1BEV3UKoThGq43aiMafmS33Um4FfnrV6dWYWf7dm",
+      "pnl_sol": -0.0032914440379762273,
+      "proceeds_sol": 0.018346855242026314,
+      "sell_count": 1,
+      "size_sol": 0.021339251516571678
     },
     "7J5QVaLHa2c3Aru9MGLesRFuYRwWJ9e784x9yq2gpump|1788439795841774153": {
       "entry_cost_sol": 0.02160272079854782,
@@ -50573,6 +50751,21 @@
       "sell_count": 2,
       "size_sol": 0.014622332175925932
     },
+    "GpfdbaUdmxD6X9URc4s54vAoLWjKBNYQG9mncJr1WmAV|1791278773320631173": {
+      "entry_cost_sol": 0.02157657023819048,
+      "entry_fdv_usd": 3515.548347659522,
+      "entry_ns": 1791278773320631173,
+      "exit_ns": 1791278774316201930,
+      "failure_exit": true,
+      "first_partial_fraction": null,
+      "gross_pnl_sol": -0.0006933154016131489,
+      "hold_ms": 995.570757,
+      "mint": "GpfdbaUdmxD6X9URc4s54vAoLWjKBNYQG9mncJr1WmAV",
+      "pnl_sol": -0.0020415625226323404,
+      "proceeds_sol": 0.01953500771555814,
+      "sell_count": 1,
+      "size_sol": 0.021278375588567395
+    },
     "Gpipz9Jcv7LcofxbHVGZEpki7DjaVpMBPKp158NLTNEN|1789744719034082060": {
       "entry_cost_sol": 0.03559279102049087,
       "entry_fdv_usd": 4172.015804820189,
@@ -51277,6 +51470,21 @@
       "proceeds_sol": 0.019542364998427667,
       "sell_count": 1,
       "size_sol": 0.02160506643039297
+    },
+    "J3PR5zqNTrENrnnHD4PhXVUYgc9nuAYJcwG94LD7Q44D|1791278627679864931": {
+      "entry_cost_sol": 0.021942496317371527,
+      "entry_fdv_usd": 5390.085101809201,
+      "entry_ns": 1791278627679864931,
+      "exit_ns": 1791278646268095361,
+      "failure_exit": true,
+      "first_partial_fraction": null,
+      "gross_pnl_sol": -0.00838750191230604,
+      "hold_ms": 18588.23043,
+      "mint": "J3PR5zqNTrENrnnHD4PhXVUYgc9nuAYJcwG94LD7Q44D",
+      "pnl_sol": -0.00960496595446561,
+      "proceeds_sol": 0.012337530362905916,
+      "sell_count": 1,
+      "size_sol": 0.021639244459964038
     },
     "J69PpJTkj9Cz4ihkTmfhQ1SmgWpScNMTTYKvTJsmpump|1788513082928052373": {
       "entry_cost_sol": 0.014692285342486613,
@@ -52735,6 +52943,21 @@
       "sell_count": 1,
       "size_sol": 0.022324164603210146
     },
+    "7DYAAt4fPZ5wVWSP3BvAcW2c7nvK8eYAuVf2CQvrfZoV|1791278643597366879": {
+      "entry_cost_sol": 0.021530978072793142,
+      "entry_fdv_usd": 5376.0666813889675,
+      "entry_ns": 1791278643597366879,
+      "exit_ns": 1791278647618736226,
+      "failure_exit": true,
+      "first_partial_fraction": null,
+      "gross_pnl_sol": -0.005363100795316142,
+      "hold_ms": 4021.369347,
+      "mint": "7DYAAt4fPZ5wVWSP3BvAcW2c7nvK8eYAuVf2CQvrfZoV",
+      "pnl_sol": -0.006615074007706397,
+      "proceeds_sol": 0.014915904065086746,
+      "sell_count": 1,
+      "size_sol": 0.0212334135205227
+    },
     "7DYRE7EV8ur5tmH5tRWP74gXf9fZUTcMrdQgWarhhuNx|1790873493307418130": {
       "entry_cost_sol": 0.021700903664573595,
       "entry_fdv_usd": 4082.110651078759,
@@ -52764,6 +52987,21 @@
       "proceeds_sol": 0.019452331190158278,
       "sell_count": 1,
       "size_sol": 0.021556023515742526
+    },
+    "7HHb1BEV3UKoThGq43aiMafmS33Um4FfnrV6dWYWf7dm|1791278745626312527": {
+      "entry_cost_sol": 0.02163829928000254,
+      "entry_fdv_usd": 5504.330541125742,
+      "entry_ns": 1791278745626312527,
+      "exit_ns": 1791278749612631061,
+      "failure_exit": true,
+      "first_partial_fraction": null,
+      "gross_pnl_sol": -0.0019647282639967158,
+      "hold_ms": 3986.318534,
+      "mint": "7HHb1BEV3UKoThGq43aiMafmS33Um4FfnrV6dWYWf7dm",
+      "pnl_sol": -0.0032914440379762273,
+      "proceeds_sol": 0.018346855242026314,
+      "sell_count": 1,
+      "size_sol": 0.021339251516571678
     },
     "7J5QVaLHa2c3Aru9MGLesRFuYRwWJ9e784x9yq2gpump|1788439795841774153": {
       "entry_cost_sol": 0.02160272079854782,
@@ -54175,6 +54413,21 @@
       "sell_count": 1,
       "size_sol": 0.021511417004336855
     },
+    "GpfdbaUdmxD6X9URc4s54vAoLWjKBNYQG9mncJr1WmAV|1791278773320631173": {
+      "entry_cost_sol": 0.02157657023819048,
+      "entry_fdv_usd": 3515.548347659522,
+      "entry_ns": 1791278773320631173,
+      "exit_ns": 1791278774316201930,
+      "failure_exit": true,
+      "first_partial_fraction": null,
+      "gross_pnl_sol": -0.0006933154016131489,
+      "hold_ms": 995.570757,
+      "mint": "GpfdbaUdmxD6X9URc4s54vAoLWjKBNYQG9mncJr1WmAV",
+      "pnl_sol": -0.0020415625226323404,
+      "proceeds_sol": 0.01953500771555814,
+      "sell_count": 1,
+      "size_sol": 0.021278375588567395
+    },
     "GrgXvX3WyQWtqZCYj7TvS4ib3ZLE4pYB7gQS7dhudg9j|1790457084598759604": {
       "entry_cost_sol": 0.02136637149589551,
       "entry_fdv_usd": 5123.20593219891,
@@ -54324,6 +54577,21 @@
       "proceeds_sol": 0.01207900014129532,
       "sell_count": 1,
       "size_sol": 0.020053721060430685
+    },
+    "J3PR5zqNTrENrnnHD4PhXVUYgc9nuAYJcwG94LD7Q44D|1791278627679864931": {
+      "entry_cost_sol": 0.021942496317371527,
+      "entry_fdv_usd": 5390.085101809201,
+      "entry_ns": 1791278627679864931,
+      "exit_ns": 1791278646268095361,
+      "failure_exit": true,
+      "first_partial_fraction": null,
+      "gross_pnl_sol": -0.00838750191230604,
+      "hold_ms": 18588.23043,
+      "mint": "J3PR5zqNTrENrnnHD4PhXVUYgc9nuAYJcwG94LD7Q44D",
+      "pnl_sol": -0.00960496595446561,
+      "proceeds_sol": 0.012337530362905916,
+      "sell_count": 1,
+      "size_sol": 0.021639244459964038
     },
     "fuUSGzpKELoC5a24AsqNo3iuReofZTFevqVjEYN7hd3|1790810634629226246": {
       "entry_cost_sol": 0.022336148122004636,
@@ -65161,10 +65429,10 @@
   },
   "strategy_fingerprint": "93616ed547c2548f9a554fcc4185e5b4a33736d27dedbe3a7449d88db0506801",
   "summary": {
-    "batch_count": 109,
+    "batch_count": 110,
     "classification": "FAILED_FORWARD_EDGE_CERTIFICATION",
-    "copy_audited_batch_count": 109,
-    "copy_audited_launches": 327000,
+    "copy_audited_batch_count": 110,
+    "copy_audited_launches": 330000,
     "direct_copy_both_won": 87,
     "direct_copy_closed_positions": 574,
     "direct_copy_decisions": 592,
@@ -65284,7 +65552,7 @@
     "direct_copy_net_win_rate": 0.16376306620209058,
     "direct_copy_profit_factor": 0.24816111312403968,
     "direct_copy_trade_capture": 0.8503703703703703,
-    "direct_copy_trade_rate_per_launch": 0.0017553516819571865,
+    "direct_copy_trade_rate_per_launch": 0.0017393939393939395,
     "direct_copy_wilson_95_high": 0.19625389006288455,
     "direct_copy_wilson_95_low": 0.13574281230634275,
     "direct_copy_wilson_half_width": 0.0302555388782709,
@@ -65293,39 +65561,39 @@
     "e4_historical_exact_positions": 258,
     "e4_historical_net_profit_factor": 4.92,
     "e4_historical_net_win_rate": 0.6007751937984496,
-    "gambit_closed_positions": 728,
-    "gambit_losers_within_5s": 0.8580750407830342,
-    "gambit_losses": 613,
-    "gambit_median_entry_fdv_usd": 5092.570319851597,
-    "gambit_median_hold_ms": 1595.7495365,
-    "gambit_net_pnl_sol": -1.691865198611891,
-    "gambit_net_win_rate": 0.15796703296703296,
-    "gambit_profit_factor": 0.28819119032785534,
-    "gambit_trade_rate_per_launch": 0.0022262996941896027,
-    "gambit_wilson_95_high": 0.18624661591173516,
-    "gambit_wilson_95_low": 0.13327813361190002,
-    "gambit_wilson_half_width": 0.02648424114991757,
+    "gambit_closed_positions": 732,
+    "gambit_losers_within_5s": 0.8573743922204214,
+    "gambit_losses": 617,
+    "gambit_median_entry_fdv_usd": 5093.181881312539,
+    "gambit_median_hold_ms": 1600.1482455,
+    "gambit_net_pnl_sol": -1.7134182451346718,
+    "gambit_net_win_rate": 0.15710382513661203,
+    "gambit_profit_factor": 0.28560138820813913,
+    "gambit_trade_rate_per_launch": 0.0022181818181818184,
+    "gambit_wilson_95_high": 0.18524755330933915,
+    "gambit_wilson_95_low": 0.1325402745136041,
+    "gambit_wilson_half_width": 0.02635363939786753,
     "gambit_wins": 115,
     "invariants_ok": true,
-    "non_copy_closed_positions": 154,
+    "non_copy_closed_positions": 158,
     "non_copy_family_counts": {
       "v12_elite_creator_quality_launch": 6,
-      "v12_proven_creator_quality_launch": 149
+      "v12_proven_creator_quality_launch": 153
     },
-    "non_copy_losses": 133,
-    "non_copy_net_pnl_sol": -0.43577259289549275,
-    "non_copy_net_win_rate": 0.13636363636363635,
-    "non_copy_profit_factor": 0.3828978367157975,
+    "non_copy_losses": 137,
+    "non_copy_net_pnl_sol": -0.45732563941827337,
+    "non_copy_net_win_rate": 0.13291139240506328,
+    "non_copy_profit_factor": 0.37155735037597865,
     "non_copy_wins": 21,
     "same_window_e4_closed_positions": 676,
     "same_window_e4_net_pnl_sol": -113.29973196899998,
     "same_window_e4_net_win_rate": 0.6375739644970414,
-    "same_window_e4_trade_rate_per_launch": 0.0020672782874617737,
+    "same_window_e4_trade_rate_per_launch": 0.0020484848484848485,
     "same_window_e4_wilson_95_high": 0.6729392277066908,
     "same_window_e4_wilson_95_low": 0.6006539719823221,
     "same_window_e4_wins": 431,
     "sufficient_evidence": true,
-    "unique_launches_observed": 327000
+    "unique_launches_observed": 330000
   },
   "version": "e4-v12-forward-evidence-v2"
 }
