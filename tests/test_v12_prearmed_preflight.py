@@ -127,3 +127,28 @@ def test_provider_exception_never_exposes_credentials():
 def test_alerts_require_explicit_operator_option():
     with pytest.raises(RuntimeError, match='EXPLICIT_TEST_ALERT_OPTION_REQUIRED'):
         asyncio.run(preflight.network_checks(None, None, send_test_alert=False))
+import asyncio
+from types import SimpleNamespace
+import pytest
+
+from memecoin_bot import v12_prearmed_preflight as preflight
+
+@pytest.mark.parametrize('states,expected', [([True,False,True],True),([True,False,False],False),([True,True],True)])
+def test_readiness_requires_two_healthy_feeds_and_reports_extra_failures(monkeypatch,states,expected):
+    urls=tuple('https://provider'+str(i) for i in range(len(states)))
+    monkeypatch.setattr(preflight,'settings',lambda *a:SimpleNamespace(builder_command=(),rpc_url=urls[0],fallback_rpcs=urls[1:]))
+    class Builder:
+        def __init__(self,*a):pass
+        async def close(self):pass
+    monkeypatch.setattr(preflight,'Builder',Builder)
+    async def probe(*a):return {'mainnet_rpc_endpoints':2}
+    async def observe(session,url):return {'passed':states[urls.index(url)],'reason':'provider test'}
+    async def send(*a):pass
+    monkeypatch.setattr(preflight,'network_probe',probe)
+    monkeypatch.setattr(preflight,'observe_endpoint',observe)
+    monkeypatch.setattr(preflight.Notices,'send_discord',send)
+    monkeypatch.setattr(preflight.Notices,'send_pushover',send)
+    result=asyncio.run(preflight.network_checks(None,None,send_test_alert=True))
+    assert result['passed'] is expected
+    assert result['degraded_provider_indices']==[i for i,state in enumerate(states) if not state]
+    assert result['healthy_feed_count']==sum(states)

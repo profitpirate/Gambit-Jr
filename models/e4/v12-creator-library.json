@@ -5,27 +5,91 @@
     "history_certified": false,
     "lifetime_closed_trades": 800,
     "lifetime_ledger_status": "COLLECTING",
-    "mode": "POST_CAUSAL_100_AND_CERTIFIED_LIFETIME_HISTORY_ONLY"
+    "mode": "ORIGINAL_FROZEN_RULES_ONLY_PENDING_REVIEW"
   },
   "counts": {
     "e4_history_creators_analysed": 291,
-    "e4_repeat_winner_promotions": 41,
-    "elite_unique": 14,
+    "e4_repeat_winner_promotions": 0,
+    "elite_unique": 0,
+    "excluded_unique": 1,
     "fresh_creators_analysed": 4216,
     "fresh_launches_analysed": 8955,
-    "fresh_promotion_ready": 4,
-    "promoted_unique": 44,
-    "shortlisted_unique": 28
+    "fresh_promotion_ready": 0,
+    "promoted_unique": 0,
+    "shortlisted_unique": 71
   },
+  "excluded": [
+    {
+      "auto_buy": false,
+      "creator": "8Wz4CQpTsuMtf71mNTJNP7Anm2E8pidZLRUj8taahYWF",
+      "e4": null,
+      "fresh": {
+        "launches_seen": 4,
+        "losses": 1,
+        "net_pnl_sol": 0.12075429796325665,
+        "profit_factor": 7.625328893504478,
+        "runner_2x_count": 1,
+        "runner_3x_count": 0,
+        "scout_fills": 4,
+        "scout_losses": 2,
+        "scout_net_pnl_sol": 0.10474825771746582,
+        "scout_winning_mints": [
+          "5t3YRxQEHCqB47QZQqSt6XkK38bfm7J4QBb37k4UcLoE",
+          "7TZ2SvFGeoSwA77StzXFymkxnNYDomQvFyvJpjs4f6bv"
+        ],
+        "scout_wins": 2,
+        "v12_compatible_fills": 3,
+        "win_rate": 0.6666666666666666,
+        "winning_mints": [
+          "5t3YRxQEHCqB47QZQqSt6XkK38bfm7J4QBb37k4UcLoE",
+          "7TZ2SvFGeoSwA77StzXFymkxnNYDomQvFyvJpjs4f6bv"
+        ],
+        "wins": 2
+      },
+      "live_closed_losses": 5,
+      "live_net_lamports": -98258581,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
+      "quality_score": 0.6488023348657274,
+      "removal_reason": "OWNER_REQUEST_FIVE_ORGANIC_LOSSES",
+      "selection_authority": "RESEARCH_ONLY",
+      "source": "FRESH_APPRENTICESHIP",
+      "status": "EXCLUDED",
+      "tier": "EXCLUDED"
+    }
+  ],
   "history_source": "PROVISIONAL_COMPLETE_ONCHAIN_UNION",
   "policy": {
-    "e4_promote_rule": "verified E4 creator with >=2 historical wins",
-    "fresh_promote_rule": "fresh apprenticeship promotion_ready=true",
+    "e4_promote_rule": "DISABLED_PENDING_VERIFICATION",
+    "extra_promotions_enabled": false,
+    "fresh_promote_rule": "DISABLED_PENDING_VERIFICATION",
     "promoted_is_auto_buy": false,
     "recognition_only": true,
+    "review_basis": "OWNER_ORIGINAL_TESTED_RULES_UNTIL_VERIFIED",
     "shortlist_is_selection_authority": false
   },
-  "promoted": [
+  "promoted": [],
+  "review": {
+    "date": "2026-09-28",
+    "frozen_model_modified": false,
+    "owner_instruction": "Use original tested rules until verified",
+    "previous_library_sha256": "585ecacf26859fc35d3261d3cb14db5017fe16a9d93594a54649d0127901524a",
+    "safety_reset_authorised": false
+  },
+  "runner_2x_gap": {
+    "explanation": "A 2x path is an outcome label, not proof V12 could profit from its causal entry. The apprenticeship only shortlists a creator when the hypothetical scout trade actually fills and closes profitably after timing, output, chase and costs.",
+    "reason_counts_by_creator": {
+      "all_scout_attempts_unfilled_or_rejected": 225,
+      "no_profitable_scout_fill": 309,
+      "profitable_runner_creator_shortlisted": 220
+    },
+    "runner_2x_coin_observations": 948,
+    "runner_creators_already_shortlisted_or_promoted": 220,
+    "runner_creators_not_shortlisted": 309,
+    "unique_runner_2x_creators": 529
+  },
+  "schema_version": "v12-creator-library-v2",
+  "shortlisted": [
     {
       "auto_buy": false,
       "creator": "3s9mU83FbRHfbqtDn8R2cSPCYaFuVb7eA6ZuRxK7KsYw",
@@ -44,11 +108,14 @@
         "wins": 4
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "ELITE",
       "quality_score": 0.9142929708612371,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "ELITE"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -70,11 +137,14 @@
         "wins": 6
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "ELITE",
       "quality_score": 0.8,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "ELITE"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -97,11 +167,14 @@
         "wins": 7
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "ELITE",
       "quality_score": 0.8,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "ELITE"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -123,11 +196,14 @@
         "wins": 6
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "ELITE",
       "quality_score": 0.8,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "ELITE"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -160,11 +236,14 @@
         "wins": 15
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "ELITE",
       "quality_score": 0.765625,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "ELITE"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -195,11 +274,14 @@
         "wins": 13
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "ELITE",
       "quality_score": 0.7607142857142857,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "ELITE"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -224,11 +306,14 @@
         "wins": 7
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "ELITE",
       "quality_score": 0.7312500000000001,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "ELITE"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -251,11 +336,14 @@
         "wins": 5
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "ELITE",
       "quality_score": 0.7083333333333334,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "ELITE"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -278,11 +366,14 @@
         "wins": 5
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "ELITE",
       "quality_score": 0.7083333333333334,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "ELITE"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -301,11 +392,14 @@
         "wins": 3
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "ELITE",
       "quality_score": 0.7000000000000001,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "ELITE"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -324,11 +418,14 @@
         "wins": 3
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "ELITE",
       "quality_score": 0.7000000000000001,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "ELITE"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -347,11 +444,14 @@
         "wins": 3
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "ELITE",
       "quality_score": 0.7000000000000001,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "ELITE"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -370,11 +470,14 @@
         "wins": 3
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "ELITE",
       "quality_score": 0.7000000000000001,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "ELITE"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -396,11 +499,14 @@
         "wins": 4
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "ELITE",
       "quality_score": 0.64,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "ELITE"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -430,11 +536,14 @@
         ],
         "wins": 2
       },
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.8166666666666667,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "FRESH_APPRENTICESHIP",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -489,11 +598,14 @@
         ],
         "wins": 4
       },
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.8143507357067761,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY+FRESH_APPRENTICESHIP",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -511,11 +623,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.7283685181169209,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -533,11 +648,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.6651850061088124,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -562,11 +680,14 @@
         "wins": 6
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.6625000000000001,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -584,11 +705,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.6563255475485155,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -606,11 +730,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.65,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -628,11 +755,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.65,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -650,11 +780,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.65,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -672,11 +805,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.65,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -694,11 +830,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.65,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -716,11 +855,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.65,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -738,11 +880,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.65,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -760,11 +905,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.65,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -782,11 +930,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.65,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -804,11 +955,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.65,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -826,11 +980,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.65,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -848,11 +1005,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.65,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -870,11 +1030,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.65,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -892,11 +1055,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.65,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -914,44 +1080,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.65,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
-    },
-    {
-      "auto_buy": false,
-      "creator": "8Wz4CQpTsuMtf71mNTJNP7Anm2E8pidZLRUj8taahYWF",
-      "e4": null,
-      "fresh": {
-        "launches_seen": 4,
-        "losses": 1,
-        "net_pnl_sol": 0.12075429796325665,
-        "profit_factor": 7.625328893504478,
-        "runner_2x_count": 1,
-        "runner_3x_count": 0,
-        "scout_fills": 4,
-        "scout_losses": 2,
-        "scout_net_pnl_sol": 0.10474825771746582,
-        "scout_winning_mints": [
-          "5t3YRxQEHCqB47QZQqSt6XkK38bfm7J4QBb37k4UcLoE",
-          "7TZ2SvFGeoSwA77StzXFymkxnNYDomQvFyvJpjs4f6bv"
-        ],
-        "scout_wins": 2,
-        "v12_compatible_fills": 3,
-        "win_rate": 0.6666666666666666,
-        "winning_mints": [
-          "5t3YRxQEHCqB47QZQqSt6XkK38bfm7J4QBb37k4UcLoE",
-          "7TZ2SvFGeoSwA77StzXFymkxnNYDomQvFyvJpjs4f6bv"
-        ],
-        "wins": 2
-      },
-      "quality_score": 0.6488023348657274,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
-      "source": "FRESH_APPRENTICESHIP",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -983,11 +1119,14 @@
         "wins": 10
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.6166666666666666,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -1016,11 +1155,14 @@
         ],
         "wins": 2
       },
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.5694092137185508,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "FRESH_APPRENTICESHIP",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -1043,11 +1185,14 @@
         "wins": 4
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.5666666666666667,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -1067,11 +1212,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.523719499408938,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -1093,11 +1241,14 @@
         "wins": 3
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.48,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -1117,11 +1268,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.4666666666666667,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -1141,11 +1295,14 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.4666666666666667,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
     {
       "auto_buy": false,
@@ -1166,27 +1323,15 @@
         "wins": 2
       },
       "fresh": null,
+      "previous_status": "PROMOTED",
+      "previous_tier": "PROMOTED",
       "quality_score": 0.37500000000000006,
-      "selection_authority": "RECOGNISED_CREATOR_ONLY",
+      "review_status": "PENDING_VERIFICATION",
+      "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
-      "status": "PROMOTED",
-      "tier": "PROMOTED"
-    }
-  ],
-  "runner_2x_gap": {
-    "explanation": "A 2x path is an outcome label, not proof V12 could profit from its causal entry. The apprenticeship only shortlists a creator when the hypothetical scout trade actually fills and closes profitably after timing, output, chase and costs.",
-    "reason_counts_by_creator": {
-      "all_scout_attempts_unfilled_or_rejected": 225,
-      "no_profitable_scout_fill": 309,
-      "profitable_runner_creator_shortlisted": 220
+      "status": "SHORTLISTED",
+      "tier": "SHORTLIST"
     },
-    "runner_2x_coin_observations": 948,
-    "runner_creators_already_shortlisted_or_promoted": 220,
-    "runner_creators_not_shortlisted": 309,
-    "unique_runner_2x_creators": 529
-  },
-  "schema_version": "v12-creator-library-v2",
-  "shortlisted": [
     {
       "auto_buy": false,
       "creator": "Aqje5DsN4u2PHmQxGF9PKfpsDGwQRCBhWeLKHCFhSMXk",
@@ -1214,7 +1359,10 @@
         ],
         "wins": 2
       },
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.9198039301291698,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "FRESH_APPRENTICESHIP",
       "status": "SHORTLISTED",
@@ -1235,7 +1383,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.7440582795715984,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1256,7 +1407,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.714838859312908,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1277,7 +1431,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6823647728001148,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1298,7 +1455,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6718787966084279,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1319,7 +1479,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6650168597759188,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1340,7 +1503,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.664299349296172,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1361,7 +1527,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6614033043678357,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1382,7 +1551,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6551845569304002,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1414,7 +1586,10 @@
         ],
         "wins": 1
       },
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6537569383212087,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "FRESH_APPRENTICESHIP",
       "status": "SHORTLISTED",
@@ -1435,7 +1610,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6498872608646475,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1456,7 +1634,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6475424152199689,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1477,7 +1658,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6435976831477639,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1510,7 +1694,10 @@
         ],
         "wins": 2
       },
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6388074911548742,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "FRESH_APPRENTICESHIP",
       "status": "SHORTLISTED",
@@ -1531,7 +1718,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.638459523578393,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1552,7 +1742,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6381958960838962,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1573,7 +1766,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6340094658306689,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1594,7 +1790,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6333777758517999,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1615,7 +1814,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6323320753734752,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1636,7 +1838,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6312866810202353,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1657,7 +1862,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6306841834375905,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1678,7 +1886,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6299612645583177,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1699,7 +1910,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.626888081457653,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1720,7 +1934,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6265521617061933,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1741,7 +1958,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6261614214589823,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1762,7 +1982,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6253946900293302,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1783,7 +2006,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6237431857656087,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",
@@ -1804,7 +2030,10 @@
         "wins": 1
       },
       "fresh": null,
+      "previous_status": "SHORTLISTED",
+      "previous_tier": "SHORTLIST",
       "quality_score": 0.6200259539810219,
+      "review_status": "PENDING_VERIFICATION",
       "selection_authority": "RESEARCH_ONLY",
       "source": "E4_VERIFIED_HISTORY",
       "status": "SHORTLISTED",

@@ -1,23 +1,25 @@
 #!/usr/bin/env python3
 """Operator controls. Installation/probe/shadow never enable trading."""
+
 import argparse
 import base64
 import getpass
 import hashlib
 import json
 import os
-from pathlib import Path
 import re
 import secrets
+import sqlite3
 import subprocess
 import sys
 import time
+from pathlib import Path
 from urllib.parse import urlsplit
 
-STAGE = Path('/opt/gambit-v12-staging')
-CONFIG = STAGE / 'prearmed.env'
-DATA = STAGE / 'prearmed-data'
-SERVICE = 'gambit-prearmed-live'
+STAGE = Path("/opt/gambit-v12-staging")
+CONFIG = STAGE / "prearmed.env"
+DATA = STAGE / "prearmed-data"
+SERVICE = "gambit-prearmed-live"
 
 
 def call(*args, capture=False, check=True):
@@ -28,295 +30,625 @@ def env_read(path):
     result = {}
     if path.exists():
         for line in path.read_text().splitlines():
-            if '=' in line and not line.lstrip().startswith('#'):
-                key, value = line.split('=', 1)
-                if re.fullmatch(r'[A-Z][A-Z0-9_]*', key):
+            if "=" in line and not line.lstrip().startswith("#"):
+                key, value = line.split("=", 1)
+                if re.fullmatch(r"[A-Z][A-Z0-9_]*", key):
                     result[key] = value.strip().strip('"').strip("'")
     return result
 
 
 def env_write(path, values):
     for key, value in values.items():
-        if not re.fullmatch(r'[A-Z][A-Z0-9_]*', key) or any(c in str(value) for c in '\n\r\0'):
-            raise ValueError('Invalid configuration characters')
-    temp = path.with_suffix('.tmp')
-    with temp.open('w') as f:
+        if not re.fullmatch(r"[A-Z][A-Z0-9_]*", key) or any(c in str(value) for c in "\n\r\0"):
+            raise ValueError("Invalid configuration characters")
+    temp = path.with_suffix(".tmp")
+    with temp.open("w") as f:
         os.chmod(temp, 0o600)
-        f.write(''.join(f'{key}={values[key]}\n' for key in sorted(values)))
+        f.write("".join(f"{key}={values[key]}\n" for key in sorted(values)))
         f.flush()
         os.fsync(f.fileno())
     temp.replace(path)
 
 
 def active():
-    value = call('systemctl', 'show', '-p', 'ActiveState', '--value', SERVICE, check=False, capture=True).stdout.strip()
-    return value in {'active', 'activating', 'deactivating', 'reloading'}
+    value = call(
+        "systemctl", "show", "-p", "ActiveState", "--value", SERVICE, check=False, capture=True
+    ).stdout.strip()
+    if value in {"active", "activating", "deactivating", "reloading"}:
+        return True
+    worker = call(
+        "docker", "inspect", "--format", "{{.State.Running}}", SERVICE, check=False, capture=True
+    )
+    return worker.returncode == 0 and worker.stdout.strip() == "true"
 
 
 def installed():
-    doc = json.loads((STAGE / 'prearmed-install.json').read_text())
-    if doc.get('offline_tests_passed') is not True:
-        raise RuntimeError('Install and offline checks must finish first')
+    doc = json.loads((STAGE / "prearmed-install.json").read_text())
+    if doc.get("offline_tests_passed") is not True:
+        raise RuntimeError("Install and offline checks must finish first")
     return doc
 
 
 def configure():
     if active():
-        raise RuntimeError('Stop the live service before changing configuration')
+        raise RuntimeError("Stop the live service before changing configuration")
     doc = installed()
-    old, current = env_read(STAGE / 'v12.env'), env_read(CONFIG)
-    permitted = ('E4_WALLET_PUBLIC_KEY', 'E4_VAULT_PUBLIC_KEY', 'E4_PRIMARY_RPC_URL',
-        'E4_FALLBACK_RPC_URLS', 'DISCORD_TOKEN', 'V12_DISCORD_USER_ID', 'V12_DISCORD_NOTIFICATION_CHANNEL_ID',
-        'PUSHOVER_APP_TOKEN', 'PUSHOVER_USER_KEY', 'V12_AUDIT_HMAC_KEY', 'V12_BACKUP_AES_KEY')
-    values = {k: current.get(k) or old.get(k, '') for k in permitted}
-    if not values.get('DISCORD_TOKEN'):
+    old, current = env_read(STAGE / "v12.env"), env_read(CONFIG)
+    permitted = (
+        "E4_WALLET_PUBLIC_KEY",
+        "E4_VAULT_PUBLIC_KEY",
+        "E4_PRIMARY_RPC_URL",
+        "E4_FALLBACK_RPC_URLS",
+        "DISCORD_TOKEN",
+        "V12_DISCORD_USER_ID",
+        "V12_DISCORD_NOTIFICATION_CHANNEL_ID",
+        "PUSHOVER_APP_TOKEN",
+        "PUSHOVER_USER_KEY",
+        "V12_AUDIT_HMAC_KEY",
+        "V12_BACKUP_AES_KEY",
+        "GAMBIT_POSITION_PERCENT",
+        "GAMBIT_MAXIMUM_POSITIONS",
+    )
+    values = {k: current.get(k) or old.get(k, "") for k in permitted}
+    values["GAMBIT_POSITION_PERCENT"] = values.get("GAMBIT_POSITION_PERCENT") or "10"
+    values["GAMBIT_MAXIMUM_POSITIONS"] = values.get("GAMBIT_MAXIMUM_POSITIONS") or "2"
+    if not values.get("DISCORD_TOKEN"):
         try:
-            values['DISCORD_TOKEN'] = env_read(Path('/opt/gambit-jr/.env')).get('DISCORD_TOKEN', '')
+            values["DISCORD_TOKEN"] = env_read(Path("/opt/gambit-jr/.env")).get("DISCORD_TOKEN", "")
         except OSError:
             pass
-    for name in ('E4_WALLET_PUBLIC_KEY', 'E4_VAULT_PUBLIC_KEY'):
-        if not re.fullmatch(r'[1-9A-HJ-NP-Za-km-z]{32,44}', values[name]):
-            raise RuntimeError('Complete the existing public-wallet setup first')
-    keyfile = STAGE / 'secrets/trading-keypair.json'
+    for name in ("E4_WALLET_PUBLIC_KEY", "E4_VAULT_PUBLIC_KEY"):
+        if not re.fullmatch(r"[1-9A-HJ-NP-Za-km-z]{32,44}", values[name]):
+            raise RuntimeError("Complete the existing public-wallet setup first")
+    keyfile = STAGE / "secrets/trading-keypair.json"
     if not keyfile.is_file() or keyfile.stat().st_mode & 0o077:
-        raise RuntimeError('The existing signer file must exist with private permissions')
-    print('Wallet setup found. No wallet key needs to be entered again.')
-    print('Paste provider URLs and alert credentials only at these private prompts.')
+        raise RuntimeError("The existing signer file must exist with private permissions")
+    print("Wallet setup found. No wallet key needs to be entered again.")
+    print("Paste provider URLs and alert credentials only at these private prompts.")
+
     def prompt(name, label, secret=True):
         if values.get(name):
-            print(label + ': already configured')
+            print(label + ": already configured")
             return
-        value = getpass.getpass(label + ': ') if secret else input(label + ': ')
+        value = getpass.getpass(label + ": ") if secret else input(label + ": ")
         if not value.strip():
-            raise RuntimeError(label + ' is required')
+            raise RuntimeError(label + " is required")
         values[name] = value.strip()
         # Save progress with trading disabled, so interrupted setup can resume.
-        env_write(CONFIG, {**values, 'E4_LIVE': 'false', 'V12_LIVE_TRADING_ENABLED': 'false'})
-    prompt('E4_PRIMARY_RPC_URL', 'Helius Solana MAINNET HTTPS RPC URL')
-    prompt('E4_FALLBACK_RPC_URLS', 'QuickNode Solana MAINNET HTTPS RPC URL')
-    urls = [values['E4_PRIMARY_RPC_URL'], *values['E4_FALLBACK_RPC_URLS'].split(',')]
-    if len(set(urls)) < 2 or any(urlsplit(u).scheme != 'https' or not urlsplit(u).hostname for u in urls):
-        raise RuntimeError('Two distinct HTTPS Solana RPC URLs are required')
-    prompt('DISCORD_TOKEN', 'Discord bot token')
-    if not values.get('V12_DISCORD_USER_ID') and not values.get('V12_DISCORD_NOTIFICATION_CHANNEL_ID'):
-        prompt('V12_DISCORD_NOTIFICATION_CHANNEL_ID', 'Discord alert channel ID', secret=False)
-    prompt('PUSHOVER_APP_TOKEN', 'Pushover application API token')
-    prompt('PUSHOVER_USER_KEY', 'Pushover user key')
-    for key in ('V12_AUDIT_HMAC_KEY', 'V12_BACKUP_AES_KEY'):
+        env_write(CONFIG, {**values, "E4_LIVE": "false", "V12_LIVE_TRADING_ENABLED": "false"})
+
+    prompt("E4_PRIMARY_RPC_URL", "Helius Solana MAINNET HTTPS RPC URL")
+    prompt("E4_FALLBACK_RPC_URLS", "QuickNode Solana MAINNET HTTPS RPC URL")
+    urls = [values["E4_PRIMARY_RPC_URL"], *values["E4_FALLBACK_RPC_URLS"].split(",")]
+    if len(set(urls)) < 2 or any(
+        urlsplit(u).scheme != "https" or not urlsplit(u).hostname for u in urls
+    ):
+        raise RuntimeError("Two distinct HTTPS Solana RPC URLs are required")
+    prompt("DISCORD_TOKEN", "Discord bot token")
+    if not values.get("V12_DISCORD_USER_ID") and not values.get(
+        "V12_DISCORD_NOTIFICATION_CHANNEL_ID"
+    ):
+        prompt("V12_DISCORD_NOTIFICATION_CHANNEL_ID", "Discord alert channel ID", secret=False)
+    prompt("PUSHOVER_APP_TOKEN", "Pushover application API token")
+    prompt("PUSHOVER_USER_KEY", "Pushover user key")
+    for key in ("V12_AUDIT_HMAC_KEY", "V12_BACKUP_AES_KEY"):
         if not values.get(key):
             values[key] = base64.urlsafe_b64encode(secrets.token_bytes(32)).decode()
-    signature = json.loads((Path(doc['release']) / 'release-signature.json').read_text())
-    values.update(E4_LIVE='false', V12_LIVE_TRADING_ENABLED='false', V12_ALLOW_LOCAL_KEYPAIR='true',
-        E4_KEYPAIR_PATH='/secrets/trading-keypair.json', E4_SIGNER_COMMAND='', V12_NOTIFICATIONS_ENABLED='true',
-        V12_FROZEN_MODEL_PATH='/app/evidence/v12-pre-armed-100-trade-frozen-model.json',
-        V12_CAUSAL_CERTIFICATION_STATE_PATH='/app/evidence/v12-pre-armed-100-causal-paper-live.json',
-        V12_INTEGRITY_MANIFEST='/app/release-manifest.json',
-        V12_INTEGRITY_PUBLIC_KEY=signature['public_key'], V12_INTEGRITY_SIGNATURE=signature['signature'],
-        V12_KILL_SWITCH_PATH='/data/STOP', V12_INSTANCE_LOCK='/data/live.lock')
+    signature = json.loads((Path(doc["release"]) / "release-signature.json").read_text())
+    values.update(
+        E4_LIVE="false",
+        V12_LIVE_TRADING_ENABLED="false",
+        V12_ALLOW_LOCAL_KEYPAIR="true",
+        GAMBIT_REQUIRE_EXECUTION_TEST="true",
+        E4_KEYPAIR_PATH="/secrets/trading-keypair.json",
+        E4_SIGNER_COMMAND="",
+        V12_NOTIFICATIONS_ENABLED="true",
+        V12_FROZEN_MODEL_PATH="/app/evidence/v12-pre-armed-100-trade-frozen-model.json",
+        V12_CAUSAL_CERTIFICATION_STATE_PATH="/app/evidence/v12-pre-armed-100-causal-paper-live.json",
+        V12_INTEGRITY_MANIFEST="/app/release-manifest.json",
+        V12_INTEGRITY_PUBLIC_KEY=signature["public_key"],
+        V12_INTEGRITY_SIGNATURE=signature["signature"],
+        V12_KILL_SWITCH_PATH="/data/STOP",
+        V12_INSTANCE_LOCK="/data/live.lock",
+    )
     env_write(CONFIG, values)
-    print('Configuration saved privately. Trading is disabled.')
+    print("Configuration saved privately. Trading is disabled.")
 
 
 def docker_command(mode, *, seconds=0):
     doc = installed()
-    args = ['docker', 'run', '--rm', '--read-only', '--init', '--cap-drop=ALL',
-        '--security-opt=no-new-privileges:true', '--pids-limit=256', '--memory=1536m',
-        '--user', f'{os.getuid()}:{os.getgid()}', '--tmpfs', '/tmp:rw,nosuid,size=256m,mode=1777',
-        '--env-file', str(CONFIG), '-e', 'PYTHONDONTWRITEBYTECODE=1', '-e', 'PYTHONUNBUFFERED=1',
-        '--mount', f'type=bind,source={DATA},target=/data']
-    if mode == 'live':
-        args += ['--name', 'gambit-prearmed-live', '--mount',
-            f'type=bind,source={STAGE}/secrets/trading-keypair.json,target=/secrets/trading-keypair.json,readonly']
+    args = [
+        "docker",
+        "run",
+        "--rm",
+        "--read-only",
+        "--init",
+        "--cap-drop=ALL",
+        "--security-opt=no-new-privileges:true",
+        "--pids-limit=256",
+        "--memory=1536m",
+        "--user",
+        f"{os.getuid()}:{os.getgid()}",
+        "--tmpfs",
+        "/tmp:rw,nosuid,size=256m,mode=1777",
+        "--env-file",
+        str(CONFIG),
+        "-e",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "-e",
+        "PYTHONUNBUFFERED=1",
+        "--mount",
+        f"type=bind,source={DATA},target=/data",
+    ]
+    if mode == "live":
+        args += [
+            "--name",
+            "gambit-prearmed-live",
+            "--mount",
+            f"type=bind,source={STAGE}/secrets/trading-keypair.json,target=/secrets/trading-keypair.json,readonly",
+        ]
     else:
-        args += ['-e', 'E4_LIVE=false', '-e', 'V12_LIVE_TRADING_ENABLED=false']
-    args += [doc['image_id'], mode]
+        args += ["-e", "E4_LIVE=false", "-e", "V12_LIVE_TRADING_ENABLED=false"]
+    args += [doc["image_id"], mode]
     if seconds:
-        args += ['--seconds', str(seconds)]
+        args += ["--seconds", str(seconds)]
     return args
 
 
 def probe():
     if active():
-        raise RuntimeError('Use status while live trading is running')
-    call(*docker_command('probe'))
+        raise RuntimeError("Use status while live trading is running")
+    call(*docker_command("probe"))
 
 
 def shadow(seconds=30):
     if active():
-        raise RuntimeError('Use status while live trading is running')
+        raise RuntimeError("Use status while live trading is running")
     started = time.time_ns()
-    call(*docker_command('shadow', seconds=seconds))
-    state = json.loads((DATA / 'shadow-status.json').read_text())
-    if (not state.get('feed_connected') or not state.get('feed_events') or state.get('safety_mode') != 'ACTIVE'
-            or state.get('updated_ns', 0) < started or time.time_ns() - state.get('updated_ns', 0) > 10_000_000_000):
-        raise RuntimeError('Live-data observation did not pass; inspect shadow status')
-    (DATA / 'shadow-pass.json').write_text(json.dumps({'observed_ns': time.time_ns(), 'image_id': installed()['image_id']}))
-    print('LIVE DATA CHECK PASSED. No transaction was signed or sent.')
+    call(*docker_command("shadow", seconds=seconds))
+    state = json.loads((DATA / "shadow-status.json").read_text())
+    if (
+        not state.get("feed_connected")
+        or not state.get("feed_events")
+        or state.get("safety_mode") != "ACTIVE"
+        or state.get("updated_ns", 0) < started
+        or time.time_ns() - state.get("updated_ns", 0) > 10_000_000_000
+    ):
+        raise RuntimeError("Live-data observation did not pass; inspect shadow status")
+    (DATA / "shadow-pass.json").write_text(
+        json.dumps({"observed_ns": time.time_ns(), "image_id": installed()["image_id"]})
+    )
+    print("LIVE DATA CHECK PASSED. No transaction was signed or sent.")
 
 
 def config_fingerprint():
     values = env_read(CONFIG)
-    for name in ('E4_LIVE', 'V12_LIVE_TRADING_ENABLED', 'V12_LIVE_ARM_TOKEN', 'V12_LIVE_ARM_TOKEN_SHA256'):
+    values.pop(
+        "GAMBIT_RECOVERY_ONLY", None
+    )  # Entry/recovery mode is explicitly chosen by the operator.
+    for name in (
+        "E4_LIVE",
+        "V12_LIVE_TRADING_ENABLED",
+        "V12_LIVE_ARM_TOKEN",
+        "V12_LIVE_ARM_TOKEN_SHA256",
+    ):
         values.pop(name, None)
     return hashlib.sha256(json.dumps(values, sort_keys=True).encode()).hexdigest()
 
 
 def final_report():
-    result = {'status': 'FINAL_CHECKS_NOT_PASSED', 'reports': {}}
-    for kind in ('offline', 'network'):
-        path = DATA / ('final-' + kind + '.json')
+    result = {"status": "FINAL_CHECKS_NOT_PASSED", "reports": {}}
+    for kind in ("offline", "network"):
+        path = DATA / ("final-" + kind + ".json")
         if path.exists():
-            result['reports'][kind] = json.loads(path.read_text())
-    proof = DATA / 'final-check-pass.json'
+            result["reports"][kind] = json.loads(path.read_text())
+    proof = DATA / "final-check-pass.json"
     if proof.exists():
         result = json.loads(proof.read_text())
-        age = time.time_ns() - result.get('observed_ns', 0)
-        if (result.get('image_id') != installed()['image_id'] or result.get('config_sha256') != config_fingerprint()
-                or not 0 <= age <= 3_600_000_000_000):
-            result['status'] = 'FINAL_CHECK_STALE_OR_CONFIGURATION_CHANGED'
-        result.pop('config_sha256', None)
-    result['live_service_active_now'] = active()
+        age = time.time_ns() - result.get("observed_ns", 0)
+        if (
+            result.get("image_id") != installed()["image_id"]
+            or result.get("config_sha256") != config_fingerprint()
+            or not 0 <= age <= 3_600_000_000_000
+        ):
+            result["status"] = "FINAL_CHECK_STALE_OR_CONFIGURATION_CHANGED"
+        result.pop("config_sha256", None)
+    result["live_service_active_now"] = active()
     values = env_read(CONFIG)
-    result['live_flags_enabled_now'] = any(values.get(k, '').lower() == 'true' for k in ('E4_LIVE', 'V12_LIVE_TRADING_ENABLED'))
+    result["live_flags_enabled_now"] = any(
+        values.get(k, "").lower() == "true" for k in ("E4_LIVE", "V12_LIVE_TRADING_ENABLED")
+    )
     print(json.dumps(result, indent=2))
 
 
 def final_check(*, send_test_alert=False):
     if active():
-        raise RuntimeError('Final checks require the live service to be inactive; no service was changed')
+        raise RuntimeError(
+            "Final checks require the live service to be inactive; no service was changed"
+        )
     values = env_read(CONFIG)
-    if any(values.get(k, '').lower() == 'true' for k in ('E4_LIVE', 'V12_LIVE_TRADING_ENABLED')):
-        raise RuntimeError('Final checks require trading flags to remain disabled')
+    if any(values.get(k, "").lower() == "true" for k in ("E4_LIVE", "V12_LIVE_TRADING_ENABLED")):
+        raise RuntimeError("Final checks require trading flags to remain disabled")
     if not send_test_alert:
-        raise RuntimeError('Use final-check --send-test-alert to test delivery to your configured Discord and phone')
-    proof = DATA / 'final-check-pass.json'
+        raise RuntimeError(
+            "Use final-check --send-test-alert to test delivery to your configured Discord and phone"
+        )
+    proof = DATA / "final-check-pass.json"
     proof.unlink(missing_ok=True)
-    clock = call('timedatectl', 'show', '-p', 'NTPSynchronized', '--value', capture=True, check=False)
-    if clock.returncode != 0 or clock.stdout.strip() != 'yes':
-        raise RuntimeError('Server clock synchronization could not be confirmed')
-    running = call('docker', 'inspect', '--format', '{{.State.Running}}', SERVICE, capture=True, check=False)
-    if running.returncode == 0 and running.stdout.strip() == 'true':
-        raise RuntimeError('A live container is running outside the reported service state')
+    clock = call(
+        "timedatectl", "show", "-p", "NTPSynchronized", "--value", capture=True, check=False
+    )
+    if clock.returncode != 0 or clock.stdout.strip() != "yes":
+        raise RuntimeError("Server clock synchronization could not be confirmed")
+    running = call(
+        "docker", "inspect", "--format", "{{.State.Running}}", SERVICE, capture=True, check=False
+    )
+    if running.returncode == 0 and running.stdout.strip() == "true":
+        raise RuntimeError("A live container is running outside the reported service state")
     doc = installed()
-    release = Path(doc['release'])
-    if hashlib.sha256(Path(__file__).read_bytes()).digest() != hashlib.sha256((release / 'deployment/prearmed-control.py').read_bytes()).digest():
-        raise RuntimeError('Installed control script differs from the release')
+    release = Path(doc["release"])
+    if (
+        hashlib.sha256(Path(__file__).read_bytes()).digest()
+        != hashlib.sha256((release / "deployment/prearmed-control.py").read_bytes()).digest()
+    ):
+        raise RuntimeError("Installed control script differs from the release")
     for offline in (True, False):
-        args = docker_command('probe')
-        at = args.index(doc['image_id'])
-        extra = ['--entrypoint', 'python']
+        args = docker_command("probe")
+        at = args.index(doc["image_id"])
+        extra = ["--entrypoint", "python"]
         if offline:
-            extra += ['--network=none', '--mount',
-                f'type=bind,source={STAGE}/secrets/trading-keypair.json,target=/secrets/trading-keypair.json,readonly']
+            extra += [
+                "--network=none",
+                "--mount",
+                f"type=bind,source={STAGE}/secrets/trading-keypair.json,target=/secrets/trading-keypair.json,readonly",
+            ]
         args[at:at] = extra
-        args[-1:] = ['-m', 'memecoin_bot.v12_prearmed_preflight', '--offline' if offline else '--send-test-alert']
+        args[-1:] = [
+            "-m",
+            "memecoin_bot.v12_prearmed_preflight",
+            "--offline" if offline else "--send-test-alert",
+        ]
         call(*args)
     shadow(seconds=120)
-    reports = {name: json.loads((DATA / ('final-' + name + '.json')).read_text()) for name in ('offline', 'network')}
-    if any(report.get('passed') is not True for report in reports.values()):
-        raise RuntimeError('Final readiness report contains failed checks')
-    report = dict(status='FINAL_TECHNICAL_CHECKS_PASS', observed_ns=time.time_ns(), image_id=doc['image_id'],
-        config_sha256=config_fingerprint(), reports=reports,
-        shadow=json.loads((DATA / 'shadow-status.json').read_text()),
-        trading_enabled=False, transactions_signed_or_sent=False, server_clock_synchronized=True,
-        limitations=['No real trade was executed; transaction landing and exit timing are unproven.',
-            'Provider billing limits and remaining credits require dashboard confirmation.',
-            'Unknown submitted transaction outcomes block entries until reconciled; do not blindly resend.'])
+    reports = {
+        name: json.loads((DATA / ("final-" + name + ".json")).read_text())
+        for name in ("offline", "network")
+    }
+    if any(report.get("passed") is not True for report in reports.values()):
+        raise RuntimeError("Final readiness report contains failed checks")
+    report = {
+        "status": "FINAL_TECHNICAL_CHECKS_PASS",
+        "observed_ns": time.time_ns(),
+        "image_id": doc["image_id"],
+        "config_sha256": config_fingerprint(),
+        "reports": reports,
+        "shadow": json.loads((DATA / "shadow-status.json").read_text()),
+        "trading_enabled": False,
+        "transactions_signed_or_sent": False,
+        "server_clock_synchronized": True,
+        "limitations": [
+            "No real trade was executed; transaction landing and exit timing are unproven.",
+            "Provider billing limits and remaining credits require dashboard confirmation.",
+            "Unknown submitted transaction outcomes block entries until reconciled; do not blindly resend.",
+        ],
+    }
     proof.write_text(json.dumps(report, indent=2))
     os.chmod(proof, 0o600)
-    print('FINAL TECHNICAL CHECKS PASSED. Trading remains disabled.')
+    print("FINAL TECHNICAL CHECKS PASSED. Trading remains disabled.")
 
 
 def start_live():
     if active():
-        print('Live service is already active; use status.')
+        print("Live service is already active; use status.")
         return
-    if (DATA / 'STOP').exists():
-        raise RuntimeError('Stop marker is set. Use clear-stop only when you intend to restart.')
-    final_path = DATA / 'final-check-pass.json'
+    if (DATA / "STOP").exists():
+        raise RuntimeError("Stop marker is set. Use clear-stop only when you intend to restart.")
+    final_path = DATA / "final-check-pass.json"
     if not final_path.exists():
-        raise RuntimeError('Run final-check --send-test-alert before live activation')
+        raise RuntimeError("Run final-check --send-test-alert before live activation")
     final = json.loads(final_path.read_text())
-    final_age = time.time_ns() - final.get('observed_ns', 0)
-    if (final.get('status') != 'FINAL_TECHNICAL_CHECKS_PASS' or final.get('image_id') != installed()['image_id']
-            or final.get('config_sha256') != config_fingerprint() or not 0 <= final_age <= 3_600_000_000_000):
-        raise RuntimeError('Final check is missing, stale, or belongs to a different configuration; rerun final-check --send-test-alert')
-    observation = json.loads((DATA / 'shadow-pass.json').read_text())
-    if observation.get('image_id') != installed()['image_id'] or not 0 <= time.time_ns() - observation['observed_ns'] <= 3_600_000_000_000:
-        raise RuntimeError('Run shadow again; its check must be from this release within the last hour')
+    final_age = time.time_ns() - final.get("observed_ns", 0)
+    if (
+        final.get("status") != "FINAL_TECHNICAL_CHECKS_PASS"
+        or final.get("image_id") != installed()["image_id"]
+        or final.get("config_sha256") != config_fingerprint()
+        or not 0 <= final_age <= 3_600_000_000_000
+    ):
+        raise RuntimeError(
+            "Final check is missing, stale, or belongs to a different configuration; rerun final-check --send-test-alert"
+        )
+    observation = json.loads((DATA / "shadow-pass.json").read_text())
+    if (
+        observation.get("image_id") != installed()["image_id"]
+        or not 0 <= time.time_ns() - observation["observed_ns"] <= 3_600_000_000_000
+    ):
+        raise RuntimeError(
+            "Run shadow again; its check must be from this release within the last hour"
+        )
     probe()
+    if env_read(CONFIG).get("GAMBIT_REQUIRE_EXECUTION_TEST") == "true":
+        proof = DATA / "execution-test-pass.json"
+        verified = json.loads(proof.read_text()) if proof.exists() else {}
+        if (
+            verified.get("image_id") != installed()["image_id"]
+            or verified.get("state") != "COMPLETE"
+            or verified.get("wallet") != env_read(CONFIG).get("E4_WALLET_PUBLIC_KEY")
+            or verified.get("residual_tokens_raw") != 0
+            or not verified.get("buy_signature")
+            or not verified.get("sell_signature")
+        ):
+            # A separate, short-lived assessment may reuse the original receipt
+            # only for unchanged execution code/dependencies and stricter creator
+            # selection. The original test file and its image identity stay intact.
+            import importlib.util
+            path = Path(installed()['release']) / 'deployment/execution-proof-reuse.py'
+            spec = importlib.util.spec_from_file_location('execution_proof_reuse', path)
+            reuse = importlib.util.module_from_spec(spec)
+            try:
+                spec.loader.exec_module(reuse)
+                evidence = reuse.validate_reuse(STAGE, installed(), env_read(CONFIG).get('E4_WALLET_PUBLIC_KEY'), env_read(CONFIG))
+            except (OSError, ValueError, KeyError, TypeError):
+                raise RuntimeError(
+                    "This release needs a confirmed buy/sell test or a valid unchanged-execution assessment before trading can start"
+                ) from None
+            print('Prior finalized buy/sell verified for unchanged execution code; no new paid test.', flush=True)
     # This operation happens only when the operator explicitly runs start-live.
-    prior = call('docker', 'inspect', '--format', '{{.State.Running}}', 'gambit-jr-bot-1', capture=True, check=False)
+    prior = call(
+        "docker",
+        "inspect",
+        "--format",
+        "{{.State.Running}}",
+        "gambit-jr-bot-1",
+        capture=True,
+        check=False,
+    )
     if prior.returncode == 0:
         # Prevent Docker from bringing the retired strategy back after a reboot.
-        call('docker', 'update', '--restart=no', 'gambit-jr-bot-1', capture=True)
-        if prior.stdout.strip() == 'true':
-            print('Stopping the old gambit-jr-bot-1 container before starting the frozen strategy.')
-            call('docker', 'stop', '--time', '30', 'gambit-jr-bot-1', capture=True)
+        call("docker", "update", "--restart=no", "gambit-jr-bot-1", capture=True)
+        if prior.stdout.strip() == "true":
+            print("Stopping the old gambit-jr-bot-1 container before starting the frozen strategy.")
+            call("docker", "stop", "--time", "30", "gambit-jr-bot-1", capture=True)
     values = env_read(CONFIG)
     token = secrets.token_urlsafe(32)
-    values.update(E4_LIVE='true', V12_LIVE_TRADING_ENABLED='true', V12_LIVE_ARM_TOKEN=token,
-                  V12_LIVE_ARM_TOKEN_SHA256=hashlib.sha256(token.encode()).hexdigest())
+    values.update(
+        GAMBIT_RECOVERY_ONLY="false",
+        E4_LIVE="true",
+        V12_LIVE_TRADING_ENABLED="true",
+        V12_LIVE_ARM_TOKEN=token,
+        V12_LIVE_ARM_TOKEN_SHA256=hashlib.sha256(token.encode()).hexdigest(),
+    )
     env_write(CONFIG, values)
     try:
-        call('sudo', 'systemctl', 'enable', SERVICE)
-        call('sudo', 'systemctl', 'start', SERVICE)
+        call("sudo", "systemctl", "enable", SERVICE)
+        call("sudo", "systemctl", "start", SERVICE)
     except Exception:
-        values.update(E4_LIVE='false', V12_LIVE_TRADING_ENABLED='false')
+        values.update(E4_LIVE="false", V12_LIVE_TRADING_ENABLED="false")
         env_write(CONFIG, values)
         raise
-    print('Start requested. Use status to verify the live feed and trading state.')
+    print("Start requested. Use status to verify the live feed and trading state.")
 
 
 def status():
-    print('Service:', 'active' if active() else 'inactive')
-    path = DATA / 'live-status.json'
+    print("Service:", "active" if active() else "inactive")
+    path = DATA / "live-status.json"
     if path.exists():
         value = json.loads(path.read_text())
-        value['status_age_seconds'] = round((time.time_ns() - value['updated_ns']) / 1e9, 1)
-        if value['status_age_seconds'] > 10 or not active():
-            value['entries_allowed'] = False
-            value['status_stale_or_service_inactive'] = True
+        value["status_age_seconds"] = round((time.time_ns() - value["updated_ns"]) / 1e9, 1)
+        if value["status_age_seconds"] > 10 or not active():
+            value["entries_allowed"] = False
+            value["status_stale_or_service_inactive"] = True
         print(json.dumps(value, indent=2))
     else:
-        print('No live status yet. Run logs if startup is blocked.')
+        print("No live status yet. Run logs if startup is blocked.")
 
 
-def stop():
-    (DATA / 'STOP').touch(mode=0o600)
+def stop(*, timeout=120):
+    requested_ns = time.time_ns()
+    (DATA / "STOP").touch(mode=0o600)
     values = env_read(CONFIG)
-    values.update(E4_LIVE='false', V12_LIVE_TRADING_ENABLED='false')
+    values.update(E4_LIVE="false", V12_LIVE_TRADING_ENABLED="false")
     env_write(CONFIG, values)
-    call('sudo', 'systemctl', 'disable', '--now', SERVICE)
-    print('Stopped new entries and requested exits before service shutdown. Check status for unresolved positions.')
+    # Keep the execution worker alive until it has acknowledged STOP and is flat.
+    # A stale file must never authorize stopping a process that may hold tokens.
+    deadline = time.monotonic() + timeout
+    while active():
+        try:
+            current = json.loads((DATA / "live-status.json").read_text())
+            fresh = requested_ns <= current.get("updated_ns", 0) <= time.time_ns()
+            if (
+                fresh
+                and time.time_ns() - current["updated_ns"] <= 10_000_000_000
+                and current.get("entries_allowed") is False
+                and current.get("positions") == 0
+                and current.get("unresolved_orders") == 0
+            ):
+                break
+        except (OSError, ValueError, TypeError):
+            pass
+        if time.monotonic() >= deadline:
+            raise RuntimeError(
+                "Entries stopped; exit worker left running because a fresh flat-state acknowledgement is unavailable"
+            )
+        time.sleep(0.25)
+    if not active() and (DATA / "live.sqlite").exists():
+        with sqlite3.connect((DATA / "live.sqlite").as_uri() + "?mode=ro", uri=True) as database:
+            row = database.execute("SELECT data FROM frozen_state WHERE id=1").fetchone()
+            saved = json.loads(row[0]) if row else {}
+            if saved.get("positions") or saved.get("pending"):
+                raise RuntimeError(
+                    "Entries are stopped but an inactive worker has positions or pending orders. Use recover."
+                )
+    call("sudo", "systemctl", "disable", "--now", SERVICE)
+    print("Stopped after a fresh flat-state acknowledgement, or an already inactive service.")
     status()
+
+
+def recover():
+    """Restore only reconciliation and exits; never require a successful entry test to exit."""
+    if active():
+        stop()
+        return
+    installed()
+    values = env_read(CONFIG)
+    token = secrets.token_urlsafe(32)
+    values.update(
+        GAMBIT_RECOVERY_ONLY="true",
+        E4_LIVE="true",
+        V12_LIVE_TRADING_ENABLED="true",
+        V12_LIVE_ARM_TOKEN=token,
+        V12_LIVE_ARM_TOKEN_SHA256=hashlib.sha256(token.encode()).hexdigest(),
+    )
+    env_write(CONFIG, values)
+    (DATA / "STOP").unlink(missing_ok=True)
+    try:
+        call("sudo", "systemctl", "enable", SERVICE)
+        call("sudo", "systemctl", "start", SERVICE)
+    except Exception:
+        values.update(E4_LIVE="false", V12_LIVE_TRADING_ENABLED="false")
+        env_write(CONFIG, values)
+        (DATA / "STOP").touch(mode=0o600)
+        raise
+    print(
+        "Recovery worker requested. It can reconcile and sell existing holdings; new buys remain blocked."
+    )
+
+
+def reset_safety():
+    if active():
+        raise RuntimeError("Stop the worker before acknowledging a safety trip")
+    sys.path.insert(0, str(Path(installed()["release"]) / "src"))
+    from memecoin_bot.v12_safety import SafetyStore
+
+    with sqlite3.connect(DATA / "live.sqlite", isolation_level=None) as database:
+        row = database.execute("SELECT data FROM frozen_state WHERE id=1").fetchone()
+        saved = json.loads(row[0]) if row else {}
+        pending = database.execute(
+            "SELECT COUNT(*) FROM v12_execution_journal WHERE state IN ('SIGNED','SUBMITTED','UNCERTAIN')"
+        ).fetchone()[0]
+        if saved.get("positions") or saved.get("pending") or pending:
+            raise RuntimeError(
+                "Safety cannot be reset while positions or unresolved transactions remain"
+            )
+        SafetyStore(database).operator_reset("discord_owner_acknowledged")
+    print("Safety trip acknowledged. Equity-loss limits remain in force; trading remains stopped.")
+
+
+def wallet_operation(operation_id):
+    if not operation_id or not re.fullmatch(r"[a-f0-9]{32}", operation_id):
+        raise RuntimeError("Invalid operation identifier")
+    if active():
+        raise RuntimeError("Stop organic trading before an owner wallet operation")
+    operations = STAGE / "operator-data"
+    request = operations / (operation_id + ".request.json")
+    if request.is_symlink() or not request.is_file():
+        raise RuntimeError("Confirmed operation request is missing")
+    intent = json.loads(request.read_text())
+    if intent.get("id") != operation_id or intent.get("action") not in ("transfer", "live_test"):
+        raise RuntimeError("Unsupported wallet operation")
+    result = operations / (operation_id + ".result.json")
+    if result.exists():
+        print("This operation already has a result; it was not repeated.")
+        return
+    # A one-use host claim also prevents two local workers racing on the same intent.
+    claim = operations / (operation_id + ".claimed")
+    with claim.open("x") as stream:
+        stream.write(str(time.time_ns()))
+    doc = installed()
+    args = docker_command("live")
+    at = args.index(doc["image_id"])
+    token = secrets.token_urlsafe(32)
+    args[at:at] = [
+        "--entrypoint",
+        "python",
+        "--mount",
+        f"type=bind,source={operations},target=/operations",
+        "-e",
+        "E4_LIVE=true",
+        "-e",
+        "V12_LIVE_TRADING_ENABLED=true",
+        "-e",
+        "V12_LIVE_ARM_TOKEN=" + token,
+        "-e",
+        "V12_LIVE_ARM_TOKEN_SHA256=" + hashlib.sha256(token.encode()).hexdigest(),
+    ]
+    args[-1:] = ["-m", "memecoin_bot.v12_prearmed_wallet", operation_id]
+    (DATA / "STOP").unlink(missing_ok=True)
+    try:
+        call(*args, capture=True)
+        if result.exists() and intent["action"] == "live_test":
+            outcome = json.loads(result.read_text())
+            evidence = outcome.get("evidence", {})
+            if (
+                outcome.get("state") == "COMPLETE"
+                and evidence.get("residual_tokens_raw") == 0
+                and evidence.get("buy_signature")
+                and evidence.get("sell_signature")
+                and evidence.get("net_wallet_cost_lamports", 10_000_001) <= 10_000_000
+            ):
+                (DATA / "execution-test-pass.json").write_text(
+                    json.dumps(
+                        {
+                            **evidence,
+                            "state": "COMPLETE",
+                            "image_id": doc["image_id"],
+                            "verified_ns": time.time_ns(),
+                            "source_sha256": hashlib.sha256(
+                                (Path(doc["release"]) / "release-manifest.json").read_bytes()
+                            ).hexdigest(),
+                        },
+                        indent=2,
+                    )
+                )
+    finally:
+        (DATA / "STOP").touch(mode=0o600)
 
 
 def main():
     os.umask(0o077)
     parser = argparse.ArgumentParser(allow_abbrev=False)
-    parser.add_argument('command', choices=['configure', 'probe', 'shadow', 'final-check', 'final-report', 'start-live', 'status', 'logs', 'stop', 'clear-stop', '_run-live'])
-    parser.add_argument('--send-test-alert', action='store_true')
+    parser.add_argument(
+        "command",
+        choices=[
+            "configure",
+            "probe",
+            "shadow",
+            "final-check",
+            "final-report",
+            "start-live",
+            "status",
+            "logs",
+            "stop",
+            "clear-stop",
+            "_run-live",
+            "wallet-operation",
+            "recover",
+            "reset-safety",
+        ],
+    )
+    parser.add_argument("--operation-id")
+    parser.add_argument("--send-test-alert", action="store_true")
     args = parser.parse_args()
-    if args.command == '_run-live':
-        os.execvp('docker', docker_command('live'))
-    elif args.command == 'logs':
-        call('journalctl', '-u', SERVICE, '-n', '60', '--no-pager')
-    elif args.command == 'clear-stop':
+    if args.command == "wallet-operation":
+        wallet_operation(args.operation_id)
+    elif args.command == "_run-live":
+        os.execvp("docker", docker_command("live"))
+    elif args.command == "logs":
+        call("journalctl", "-u", SERVICE, "-n", "60", "--no-pager")
+    elif args.command == "clear-stop":
         if active():
-            raise RuntimeError('Stop the service first')
-        (DATA / 'STOP').unlink(missing_ok=True)
-        print('Operator stop cleared; trading remains disabled until start-live.')
-    elif args.command == 'final-check':
+            raise RuntimeError("Stop the service first")
+        (DATA / "STOP").unlink(missing_ok=True)
+        print("Operator stop cleared; trading remains disabled until start-live.")
+    elif args.command == "final-check":
         final_check(send_test_alert=args.send_test_alert)
     else:
-        globals()[args.command.replace('-', '_')]()
+        globals()[args.command.replace("-", "_")]()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         main()
     except (RuntimeError, ValueError, FileNotFoundError, subprocess.CalledProcessError) as error:
         # Child errors print only their exit status; never echo credential-bearing environment.
-        print('BLOCKED:', str(error) if isinstance(error, RuntimeError) else type(error).__name__)
+        print("BLOCKED:", str(error) if isinstance(error, RuntimeError) else type(error).__name__)
         raise SystemExit(1) from None

@@ -1,0 +1,20 @@
+[Unit]
+Description=Gambit external VPS availability heartbeat
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=/etc/gambit-outage-heartbeat.json
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/gambit-v12-staging/gambit-outage-heartbeat.py
+TimeoutStartSec=10
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+RestrictAddressFamilies=AF_INET AF_INET6
+ReadOnlyPaths=/etc/gambit-outage-heartbeat.json
+InaccessiblePaths=/opt/gambit-v12-staging/prearmed-data /opt/gambit-v12-staging/prearmed.env
+CapabilityBoundingSet=
+StandardOutput=journal
+StandardError=journal

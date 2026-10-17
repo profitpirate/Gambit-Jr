@@ -91,6 +91,22 @@ class FrozenPrearmedPolicy:
         self._attempts = MappingProxyType(dict(snapshot['creator_prior_e4_attempts']))
         self._maximum_evidence_ns = snapshot['maximum_evidence_ns']
 
+    def creator_known(self, creator: str) -> bool:
+        return isinstance(creator, str) and self._attempts.get(creator, 0) >= 1
+
+    def social_handle_known(self, creator: str, handle: str) -> bool:
+        return str(handle).lower().lstrip('@') in self._handles.get(creator, ())
+
+    def social_rejection_reason(self, creator, handle, status_ns, create_ns):
+        """Shared pre-quote check; entry rechecks the same rule before ordering."""
+        if not self.social_handle_known(creator, handle):
+            return 'NOT_PREARMED_HANDLE'
+        if not positive_time(status_ns) or not positive_time(create_ns):
+            return 'INVALID_TIMESTAMPS'
+        if not 0 <= create_ns - status_ns <= 10_000_000_000:
+            return 'SOCIAL_AGE_OUTSIDE_WINDOW'
+        return None
+
     def entry(self, facts: EntryFacts) -> EntryDecision:
         times = (facts.create_ns, facts.decision_ns, facts.social_status_ns, facts.metadata_observed_ns)
         if not all(positive_time(value) for value in times):
@@ -101,15 +117,14 @@ class FrozenPrearmedPolicy:
             return EntryDecision(False, 'INPUT_NOT_AVAILABLE_AT_DECISION')
         if type(facts.mayhem_mode) is not bool or facts.mayhem_mode:
             return EntryDecision(False, 'MAYHEM_OR_UNKNOWN_MODE')
-        if not isinstance(facts.creator, str) or self._attempts.get(facts.creator, 0) < 1:
+        if not self.creator_known(facts.creator):
             return EntryDecision(False, 'UNKNOWN_CREATOR')
         if not positive_finite(facts.creator_seed_sol) or facts.creator_seed_sol < 2:
             return EntryDecision(False, 'CREATOR_SEED_BELOW_FLOOR')
-        handle = str(facts.social_handle).lower().lstrip('@')
-        if handle not in self._handles.get(facts.creator, ()):
-            return EntryDecision(False, 'NOT_PREARMED_HANDLE')
-        if not 0 <= facts.create_ns - facts.social_status_ns <= 10_000_000_000:
-            return EntryDecision(False, 'SOCIAL_AGE_OUTSIDE_WINDOW')
+        social_reason = self.social_rejection_reason(
+            facts.creator, facts.social_handle, facts.social_status_ns, facts.create_ns)
+        if social_reason:
+            return EntryDecision(False, social_reason)
         if not all(positive_finite(value) for value in (
             facts.expected_token_output, facts.current_token_output, facts.create_price, facts.current_price,
         )):

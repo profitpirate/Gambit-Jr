@@ -42,6 +42,23 @@ def test_stale_shadow_check_cannot_start_live(control, monkeypatch):
         control.start_live()
 
 
+@pytest.mark.parametrize('proof', [{}, {'state':'COMPLETE','image_id':'other-image','wallet':'wallet',
+    'buy_signature':'recorded-buy','sell_signature':'recorded-sell','residual_tokens_raw':0}])
+def test_execution_requirement_cannot_be_skipped_without_a_valid_reuse_assessment(control,monkeypatch,proof):
+    document=control.installed();document['release']=str(Path(__file__).resolve().parents[1])
+    (control.STAGE/'prearmed-install.json').write_text(json.dumps(document))
+    values=control.env_read(control.CONFIG);values.update(GAMBIT_REQUIRE_EXECUTION_TEST='true',E4_WALLET_PUBLIC_KEY='wallet')
+    control.env_write(control.CONFIG,values)
+    final=control.DATA/'final-check-pass.json';d=json.loads(final.read_text());d['config_sha256']=control.config_fingerprint();final.write_text(json.dumps(d))
+    (control.DATA/'execution-test-pass.json').write_text(json.dumps(proof))
+    monkeypatch.setattr(control,'probe',lambda:None)
+    monkeypatch.setattr(control,'call',lambda *a,**k:pytest.fail('Unverified execution must not reach any service start'))
+    with pytest.raises(RuntimeError,match='confirmed buy/sell test or a valid'):
+        control.start_live()
+    assert control.env_read(control.CONFIG)['E4_LIVE']=='false'
+    assert json.loads((control.DATA/'execution-test-pass.json').read_text())==proof
+
+
 def test_service_start_failure_restores_disabled_flags(control, monkeypatch):
     monkeypatch.setattr(control, 'probe', lambda: None)
     calls = []
@@ -62,6 +79,57 @@ def test_environment_values_cannot_inject_enable_flags(control):
     with pytest.raises(ValueError):
         control.env_write(control.CONFIG, {'TOKEN': 'value\nE4_LIVE=true'})
     assert control.env_read(control.CONFIG)['E4_LIVE'] == 'false'
+
+
+def test_stop_never_kills_worker_with_unresolved_orders(control, monkeypatch):
+    monkeypatch.setattr(control, 'active', lambda: True)
+    monkeypatch.setattr(control, 'call', lambda *a, **k: pytest.fail('unresolved worker must remain alive'))
+    (control.DATA/'live-status.json').write_text(json.dumps({'updated_ns':time.time_ns(),
+        'entries_allowed':False,'positions':0,'unresolved_orders':1}))
+    with pytest.raises(RuntimeError,match='exit worker left running'): control.stop(timeout=0)
+    assert (control.DATA/'STOP').exists()
+    assert control.env_read(control.CONFIG)['E4_LIVE']=='false'
+
+
+def test_stale_flat_status_cannot_authorize_shutdown(control, monkeypatch):
+    monkeypatch.setattr(control, 'active', lambda: True)
+    monkeypatch.setattr(control, 'call', lambda *a, **k: pytest.fail('stale acknowledgement must not stop service'))
+    (control.DATA/'live-status.json').write_text(json.dumps({'updated_ns':1,
+        'entries_allowed':False,'positions':0,'unresolved_orders':0}))
+    with pytest.raises(RuntimeError,match='exit worker left running'): control.stop(timeout=0)
+
+
+def test_fresh_flat_acknowledgement_permits_stop(control, monkeypatch):
+    monkeypatch.setattr(control, 'active', lambda: True)
+    def pause(_):
+        (control.DATA/'live-status.json').write_text(json.dumps({'updated_ns':time.time_ns(),
+            'entries_allowed':False,'positions':0,'unresolved_orders':0}))
+    monkeypatch.setattr(control.time,'sleep',pause)
+    calls=[]
+    monkeypatch.setattr(control,'call',lambda *args,**kw:calls.append(args))
+    control.stop(timeout=1)
+    assert ('sudo','systemctl','disable','--now',control.SERVICE) in calls
+
+
+def test_recovery_arms_exit_worker_without_entry_verification(control,monkeypatch):
+    calls=[]
+    monkeypatch.setattr(control,'call',lambda *args,**kw:calls.append(args))
+    (control.DATA/'STOP').touch()
+    control.recover()
+    saved=control.env_read(control.CONFIG)
+    assert saved['GAMBIT_RECOVERY_ONLY']=='true'
+    assert saved['E4_LIVE']=='true' and saved['V12_LIVE_TRADING_ENABLED']=='true'
+    assert ('sudo','systemctl','start',control.SERVICE) in calls
+    assert not (control.DATA/'STOP').exists()
+
+
+def test_inactive_worker_with_positions_is_not_reported_as_safely_stopped(control,monkeypatch):
+    import sqlite3
+    with sqlite3.connect(control.DATA/'live.sqlite') as db:
+        db.execute('CREATE TABLE frozen_state(id INTEGER,data TEXT)')
+        db.execute('INSERT INTO frozen_state VALUES(1,?)',(json.dumps({'positions':{'token':{}},'pending':{}}),))
+    monkeypatch.setattr(control,'call',lambda *args,**kw:pytest.fail('must first require recovery'))
+    with pytest.raises(RuntimeError,match='Use recover'):control.stop()
 
 
 @pytest.mark.parametrize('change', ['missing', 'stale', 'future', 'different_config'])

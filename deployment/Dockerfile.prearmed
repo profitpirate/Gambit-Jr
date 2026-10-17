@@ -5,7 +5,8 @@ COPY . /app
 # The installer stages files with umask 0077. COPY preserves those private
 # modes but creates root-owned image files; the runtime uses the VPS user's UID.
 # Only public release code/dependencies are in /app. Secrets are mounted later.
-RUN cd tools/e4-builder && npm ci --omit=dev --no-audit --no-fund \
+RUN python -m pip install --no-cache-dir --disable-pip-version-check --only-binary=:all: pip==26.2.0 \
+    && cd tools/e4-builder && npm ci --omit=dev --no-audit --no-fund \
     && chmod -R a+rX /app
 ENV PYTHONPATH=/app/src PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 ENTRYPOINT ["python", "-m", "memecoin_bot.v12_prearmed"]
