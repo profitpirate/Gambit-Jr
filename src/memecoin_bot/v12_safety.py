@@ -95,6 +95,8 @@ class SafetyStore:
 
     def set_mode(self, mode: SafetyMode, reason: str) -> None:
         current = self.snapshot()
+        if current.mode == mode and current.reason == str(reason):
+            return
         # HALTED cannot be automatically relaxed. It requires explicit operator reset.
         if current.mode == SafetyMode.HALTED and mode != SafetyMode.HALTED:
             return

@@ -65,11 +65,15 @@ def run_live_readiness(
     *,
     repository_root: Path,
     acquire_lock: bool = True,
+    frozen_model_path: Path | None = None,
+    check_arming: bool = True,
+    inspect_signer_file: bool = True,
 ) -> tuple[list[ReadinessCheck], SingleInstanceLock | None]:
     checks: list[ReadinessCheck] = []
 
     enabled = _truthy("V12_LIVE_TRADING_ENABLED")
-    checks.append(ReadinessCheck("explicit_live_enable", enabled, str(enabled)))
+    if check_arming:
+        checks.append(ReadinessCheck("explicit_live_enable", enabled, str(enabled)))
 
     try:
         validate_live_arm_token(
@@ -78,7 +82,8 @@ def run_live_readiness(
         )
         checks.append(ReadinessCheck("live_arm_token", True, "valid"))
     except (PermissionError, ValueError) as exc:
-        checks.append(ReadinessCheck("live_arm_token", False, str(exc)))
+        if check_arming:
+            checks.append(ReadinessCheck("live_arm_token", False, str(exc)))
 
     causal_path = Path(
         os.getenv(
@@ -87,6 +92,13 @@ def run_live_readiness(
         )
     )
     causal_ok, causal_detail = _causal_gate(causal_path)
+    if frozen_model_path is not None:
+        from .v12_prearmed_evidence import evaluate_research_acceptance, read_evidence
+        try:
+            acceptance = evaluate_research_acceptance(read_evidence(frozen_model_path), read_evidence(causal_path))
+            causal_ok, causal_detail = acceptance.accepted, acceptance.reason
+        except (OSError, ValueError):
+            causal_ok, causal_detail = False, 'FROZEN_EVIDENCE_UNREADABLE'
     checks.append(ReadinessCheck("causal_100_gate", causal_ok, causal_detail))
 
     wallet = str(getattr(settings, "wallet", "") or "")
@@ -109,7 +121,7 @@ def run_live_readiness(
     if signer_command:
         binary = shutil.which(signer_command[0])
         checks.append(ReadinessCheck("signer_binary", bool(binary), binary or "not found"))
-    if keypair_path:
+    if keypair_path and inspect_signer_file:
         try:
             ensure_private_file(Path(keypair_path))
             permission_ok = allow_local

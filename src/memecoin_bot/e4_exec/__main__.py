@@ -1,6 +1,5 @@
 import atexit
 import os
-import sys
 from pathlib import Path
 
 os.environ.setdefault(
@@ -27,7 +26,7 @@ from memecoin_bot.e4_runtime_services_v10 import (  # noqa: E402
     start_runtime_services,
     stop_runtime_services,
 )
-from memecoin_bot.e4_final import main  # noqa: E402
+from memecoin_bot.e4_final import build_parser, main as _run_command  # noqa: E402
 from memecoin_bot.v12_live_readiness import run_live_readiness  # noqa: E402
 
 E4_V12_ROLE_MODEL_POLICY_SHA256 = "2eb324971185c4eacf09ca57c8e06609028381edd03e68c702a0a88e57600ea6"
@@ -41,9 +40,10 @@ _LIVE_INSTANCE_LOCK = None
 
 def _preflight_live_if_requested() -> None:
     global _LIVE_INSTANCE_LOCK
-    if "--live" not in sys.argv:
+    args = build_parser().parse_args()
+    if args.command != "run":
         return
-    if os.getenv("E4_LIVE", "").strip().lower() not in {"1", "true", "yes", "on"}:
+    if not args.live or os.getenv("E4_LIVE", "").strip().lower() not in {"1", "true", "yes", "on"}:
         raise SystemExit("E4 live execution requires both E4_LIVE=true and --live")
     settings = e4_hardening_v12.core.Settings.from_env()
     settings.live = True
@@ -66,7 +66,14 @@ def _start_v12_pipelines() -> None:
     atexit.register(stop_runtime_services)
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Both the installed command and python -m enter through this preflight."""
+    args = build_parser().parse_args()
     _preflight_live_if_requested()
-    _start_v12_pipelines()
+    if args.command == "run":
+        _start_v12_pipelines()
+    _run_command()
+
+
+if __name__ == "__main__":
     main()
