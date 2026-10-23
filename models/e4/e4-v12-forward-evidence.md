@@ -2,9 +2,9 @@
 
 **Classification:** FAILED_FORWARD_EDGE_CERTIFICATION
 **Frozen strategy fingerprint:** `93616ed547c2548f9a554fcc4185e5b4a33736d27dedbe3a7449d88db0506801`
-**Independent batches:** 158
-**Copy-audited batches:** 158
-**Fresh launches:** 474000
+**Independent batches:** 159
+**Copy-audited batches:** 159
+**Fresh launches:** 477000
 
 ## Direct E4-copy cohort
 **Closed:** 574
